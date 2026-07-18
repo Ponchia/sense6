@@ -3,14 +3,26 @@ import { expect, test } from '@playwright/test';
 
 test('the gallery lists exams, is accessible, and routes into one', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: /How well do your senses resolve/i })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Tetracromia/i })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Daltonia/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.locator('.exam-card__link[href="#/tetracromia"]')).toBeVisible();
+  await expect(page.locator('.exam-card__link[href="#/color-blindness"]')).toBeVisible();
+  await expect(page.getByRole('heading', { name: /More senses, same standard/i })).toBeVisible();
+  await expect(page.locator('.roadmap-item')).toHaveCount(3);
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+    )
+    .toBe(true);
 
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
 
-  await page.getByRole('button', { name: /Daltonia/i }).click();
+  await page.getByRole('button', { name: /Toggle light and dark theme/i }).click();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  const darkResults = await new AxeBuilder({ page }).analyze();
+  expect(darkResults.violations).toEqual([]);
+
+  await page.locator('.exam-card__link[href="#/color-blindness"]').click();
   await expect(page).toHaveURL(/#\/color-blindness$/);
   await expect(page.getByRole('heading', { name: /Read the number in the dots/i })).toBeVisible();
 });
@@ -178,6 +190,16 @@ test('mobile layout stays inside the viewport through setup and the first trial'
 test('the colour-blindness screen renders plates and scores a full run', async ({ page }) => {
   await page.goto('/#/color-blindness');
   await expect(page.getByRole('heading', { name: /Read the number in the dots/i })).toBeVisible();
+  await expect(page.getByText('Cone-true axes', { exact: true })).toBeVisible();
+
+  const methodColours = await page.evaluate(() => {
+    const target = document.querySelector('.cb-steps strong');
+    return {
+      text: getComputedStyle(target).color,
+      background: getComputedStyle(document.documentElement).backgroundColor,
+    };
+  });
+  expect(methodColours.text).not.toEqual(methodColours.background);
 
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);

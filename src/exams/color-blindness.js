@@ -45,7 +45,7 @@ export function mount(context) {
 function renderIntro() {
   active = false;
   document.body.classList.remove('lab-mode');
-  document.title = 'Colour Blindness Test — Ishihara-style plates | Daltonia';
+  document.title = 'Colour-vision screen — Ishihara-style plates | Sensoria';
 
   const previous = loadLast();
 
@@ -106,7 +106,7 @@ function renderIntro() {
 
 function renderSetup() {
   document.body.classList.add('lab-mode');
-  document.title = 'Prepare your screen — Daltonia';
+  document.title = 'Prepare your screen — Daltonia | Sensoria';
   window.scrollTo({ top: 0, behavior: 'instant' });
 
   app.innerHTML = `
@@ -185,7 +185,7 @@ function renderPlate() {
   const plate = plates[plateIndex];
   const total = plates.length;
   const progress = Math.round((plateIndex / total) * 100);
-  document.title = `Plate ${plateIndex + 1} of ${total} — Daltonia`;
+  document.title = `Plate ${plateIndex + 1} of ${total} — Daltonia | Sensoria`;
 
   app.innerHTML = `
     <section class="cb-view">
@@ -271,7 +271,7 @@ function submitAnswer(answer) {
 function renderResults() {
   active = false;
   document.body.classList.add('lab-mode');
-  document.title = 'Your colour-vision screen — Daltonia';
+  document.title = 'Your colour-vision screen — Daltonia | Sensoria';
   const result = classifyResults(responses);
   saveLast(result);
 
