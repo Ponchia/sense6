@@ -11,10 +11,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 - Multi-exam suite (Sensoria): a gallery landing and hash router hosting each
   test as a self-contained mount/unmount module.
-- Daltonia — an Ishihara-style colour-blindness screen with generated
-  pseudoisochromatic plates along the cone-true protan/deutan/tritan confusion
-  directions, an on-screen keypad, a control plate, and an honest, non-diagnostic
-  read-out.
+- Daltonia — an experimental adaptive colour-vision check with randomized
+  Landolt-C orientation, luminance-noise dots, three interleaved display-relative
+  staircases, repeated task controls, and threshold uncertainty.
 - Adaptive threshold and noisy-field color discrimination instruments.
 - Touch, pointer, and keyboard-compatible hue ordering.
 - Display setup check and browser-reported gamut indicator.
@@ -27,7 +26,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 
-- Nothing yet.
+- Daltonia now reports display-relative thresholds instead of fixed plate
+  percentages or clinical-looking pass/fail categories. Its interface and
+  research trail explicitly identify the implementation as unvalidated.
 
 ### Fixed
 
