@@ -15,6 +15,10 @@ Live exams:
   randomized C-shaped gap in luminance-noise dots while three display-relative
   colour directions adapt independently. The result contains thresholds and run
   spread, not a clinical classification.
+- **Riflessi** — a device-relative response lab with separate simple-response,
+  two-choice, and three-minute sustained-response instruments. It reports robust
+  timing, choice cost, accuracy, and within-run stability without a composite
+  rating or population percentile.
 
 Adding an exam: create `src/exams/<id>.js` exporting `meta` and `mount(context)`
 (return a cleanup function), then register it in `src/main.js`.
@@ -86,6 +90,32 @@ Research and standards that informed Daltonia:
 - [Evans et al., *Multicenter evaluation of the color vision screener test*](https://doi.org/10.1364/JOSAA.544985)
 - [W3C CSS Color 4 conversion reference](https://www.w3.org/TR/css-color-4/#color-conversion-code)
 
+### Riflessi
+
+Riflessi measures three related but distinct parts of a visual response:
+
+- **Segnale** uses 8 practice responses followed by 20 measured visual signals
+  and 2 no-signal checks. Random waits make early responses visible.
+- **Scelta** uses 8 practice and 32 measured left-or-right choices. The result
+  keeps correct-response time and accuracy together, then reports the difference
+  from Segnale as the run's choice cost.
+- **Tenuta** uses a 3-minute sustained-response sequence with longer, irregular
+  waits. It reports the median response, slowest-fifth gap, first-to-second-half
+  drift, misses, and early responses.
+
+Cue presentation is aligned to `requestAnimationFrame`; response events use the
+browser's monotonic timestamp when it shares the page's time origin. The page
+samples frame cadence, tracks unusually late cue onsets, and discards a current
+trial when the tab loses focus. It does not subtract an assumed display,
+keyboard, touchscreen, operating-system, or browser delay. Results are therefore
+comparable only across repeated runs on the same device and input mode.
+
+Research that informed Riflessi:
+
+- [Deary, Liewald, and Nissan, *A free, easy-to-use, computer-based simple and four-choice reaction time programme*](https://doi.org/10.3758/s13428-010-0024-1)
+- [Basner and Dinges, *Maximizing sensitivity of the psychomotor vigilance test while minimizing test duration*](https://pmc.ncbi.nlm.nih.gov/articles/PMC3197786/)
+- [Bridges et al., *The timing mega-study: comparing a range of experiment generators, both lab-based and online*](https://doi.org/10.7717/peerj.9414)
+
 ## Install
 
 You need Node.js 22 or later.
@@ -103,8 +133,9 @@ npm run dev
 ```
 
 Open the URL printed by Vite. Complete the screen check before you start the
-three instruments. The site stores only the best session index in local
-browser storage. It does not send session data to a server.
+colour tests, or choose one input path before starting Riflessi. The site stores
+only concise last-run summaries in local browser storage. It does not send
+session data to a server.
 
 The interface uses [`@ponchia/ui`](https://github.com/Ponchia/bronto-ui) for its
 tokens, typography, layout primitives, controls, feedback, theme behavior, and
@@ -112,7 +143,7 @@ site shell. Product-specific stimulus geometry remains local to this project.
 
 ## Develop and test
 
-Run the deterministic color-math and session-engine tests:
+Run the deterministic colour-math, timing, and session-engine tests:
 
 ```sh
 npm test
@@ -136,7 +167,7 @@ Run the browser, accessibility, and responsive checks:
 npm run test:e2e
 ```
 
-Run all three gates:
+Run all four gates:
 
 ```sh
 npm run check
@@ -166,6 +197,12 @@ Browser color output depends on the panel, color profile, browser, brightness,
 ambient light, viewing angle, and color-altering operating-system features.
 Tetracromia therefore keeps the stimulus surround neutral, detects the gamut
 reported by the browser, and reports thresholds as display-relative values.
+
+Browser response timing depends on the display refresh path, input hardware,
+operating system, browser, and current device load. Riflessi exposes timing
+health and input mode but cannot calibrate those delays. It does not assess
+fatigue, concussion, driving fitness, neurological health, or any other medical
+or occupational condition.
 
 Do not use this site for medical or occupational decisions. Use a validated
 clinical or physical test administered under controlled conditions when the
