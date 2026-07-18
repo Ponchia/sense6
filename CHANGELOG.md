@@ -14,6 +14,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Display setup check and browser-reported gamut indicator.
 - Local, device-relative result profile with no server upload.
 - Scientific limits and source trail for the test design.
+- GitHub Actions verification for formatting, unit, build, browser, responsive,
+  and accessibility checks.
 
 ### Changed
 

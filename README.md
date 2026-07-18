@@ -64,6 +64,12 @@ Run the deterministic color-math and session-engine tests:
 npm test
 ```
 
+Check the JavaScript and CSS source with Biome:
+
+```sh
+npm run lint
+```
+
 Build the production bundle:
 
 ```sh
