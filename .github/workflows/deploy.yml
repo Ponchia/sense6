@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      publish_only:
+        description: Publish the image without updating the GitOps repository
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -77,6 +83,7 @@ jobs:
           sbom: true
 
       - name: Check out the GitOps repository
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.publish_only }}
         uses: actions/checkout@v6
         with:
           repository: Ponchia/vps-infra
@@ -86,6 +93,7 @@ jobs:
           fetch-depth: 0
 
       - name: Update the desired image in GitOps
+        if: ${{ github.event_name != 'workflow_dispatch' || !inputs.publish_only }}
         run: |
           set -euo pipefail
           cd vps-infra
