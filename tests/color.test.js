@@ -29,4 +29,24 @@ test('ΔEOK is symmetric, zero for the same color, and grows with hue separation
 test('circular hue distance crosses the 360-degree seam correctly', () => {
   assert.equal(circularHueDistance(358, 2), 4);
   assert.equal(circularHueDistance(30, 210), 180);
+  assert.equal(circularHueDistance(0, 200), 160);
+  assert.equal(circularHueDistance(200, 0), 160);
+  assert.equal(circularHueDistance(-20, 20), 40);
+});
+
+test('the staircase floor still renders reference and target as distinct sRGB', () => {
+  // Threshold stimuli are flat fills at l=0.67 c=0.105; if the minimum level
+  // ever quantized both colors to the same 8-bit value the trial would be
+  // unanswerable while still being scored.
+  const floor = 1.2;
+  for (let hue = 0; hue < 360; hue += 1) {
+    for (const direction of [1, -1]) {
+      const target = (hue + direction * floor + 360) % 360;
+      assert.notEqual(
+        toRgbCss(0.67, 0.105, hue),
+        toRgbCss(0.67, 0.105, target),
+        `hue ${hue}, direction ${direction}`,
+      );
+    }
+  }
 });

@@ -11,6 +11,7 @@ const announcer = document.querySelector('#announcer');
 const gamutChip = document.querySelector('#gamut-chip');
 
 let session = null;
+let labActive = false;
 let trialStartedAt = 0;
 let selectedSequenceIndex = null;
 let draggedSequenceIndex = null;
@@ -30,6 +31,7 @@ function detectDisplay() {
 
 function renderHome() {
   session = null;
+  labActive = false;
   selectedSequenceIndex = null;
   document.body.classList.remove('lab-mode');
   document.title = 'Tetracromia — Color perception lab';
@@ -272,6 +274,7 @@ function renderSetup() {
 function startLab() {
   const seed = `${Date.now()}-${crypto.getRandomValues(new Uint32Array(1))[0]}`;
   session = new ColorLabSession(seed);
+  labActive = true;
   selectedSequenceIndex = null;
   document.body.classList.add('lab-mode');
   trialStartedAt = performance.now();
@@ -535,6 +538,7 @@ function submitSequence() {
 }
 
 function renderResults() {
+  labActive = false;
   document.body.classList.add('lab-mode');
   document.title = 'Your color profile — Tetracromia';
   const result = session.results();
@@ -750,7 +754,10 @@ document.addEventListener('click', (event) => {
 
   if (action.dataset.action === 'setup') renderSetup();
   if (action.dataset.action === 'start' && !action.disabled) startLab();
-  if (action.dataset.action === 'home') renderHome();
+  if (action.dataset.action === 'home') {
+    if (labActive && !window.confirm('End this session? Your progress will be lost.')) return;
+    renderHome();
+  }
   if (action.dataset.action === 'move-sequence') moveSequence(Number(action.dataset.direction));
   if (action.dataset.action === 'submit-sequence') submitSequence();
   if (action.dataset.action === 'copy-results') copyResults();

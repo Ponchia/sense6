@@ -70,6 +70,6 @@ export function deltaEok(first, second) {
 }
 
 export function circularHueDistance(first, second) {
-  const distance = Math.abs(((first - second + 180) % 360) - 180);
-  return Math.abs(distance);
+  const distance = Math.abs(first - second) % 360;
+  return distance > 180 ? 360 - distance : distance;
 }

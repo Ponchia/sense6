@@ -10,6 +10,21 @@ test('landing page presents the method and passes an accessibility scan', async 
 
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
+
+  // The inverted method section must re-anchor heading and step-title colors;
+  // base styles pin them to var(--text), which disappears on the dark panel.
+  const methodContrast = await page.evaluate(() => {
+    const section = document.querySelector('.method');
+    const targets = [section.querySelector('h2'), section.querySelector('.method-steps strong')];
+    const sectionBackground = getComputedStyle(section).backgroundColor;
+    return targets.map((element) => ({
+      color: getComputedStyle(element).color,
+      background: sectionBackground,
+    }));
+  });
+  for (const { color, background } of methodContrast) {
+    expect(color).not.toEqual(background);
+  }
 });
 
 test('screen setup gates the adaptive lab and advances into the field instrument', async ({ page }) => {
