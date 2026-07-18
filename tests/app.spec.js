@@ -29,10 +29,34 @@ const QUICK_RIFLESSI = {
   },
 };
 
+const QUICK_UDITO = {
+  udito: {
+    feedbackMs: 2,
+    audio: { toneMs: 8, gapMs: 4, rampMs: 1, referenceMs: 18 },
+    headphones: { practiceTrials: 1, scoredTrials: 2, passCorrect: 2 },
+    range: { targetReversals: 0, minTrials: 2, maxTrials: 2, controlAt: [] },
+    pitch: { targetReversals: 0, minTrials: 2, maxTrials: 2 },
+  },
+};
+
 async function installQuickRiflessi(page) {
   await page.addInitScript((configuration) => {
     window.__SENSORIA_TEST_CONFIG__ = configuration;
   }, QUICK_RIFLESSI);
+}
+
+async function installQuickUdito(page) {
+  await page.addInitScript((configuration) => {
+    window.__SENSORIA_TEST_CONFIG__ = configuration;
+  }, QUICK_UDITO);
+}
+
+async function answerCurrentSoundTrial(page) {
+  const runner = page.locator('[data-au-runner]');
+  const firstResponse = page.locator('[data-au-response="0"]');
+  await expect(firstResponse).toBeEnabled();
+  const correct = await runner.getAttribute('data-correct-interval');
+  await page.locator(`[data-au-response="${correct}"]`).click();
 }
 
 async function respondWithKey(page, key) {
@@ -54,8 +78,9 @@ test('the gallery lists exams, is accessible, and routes into one', async ({ pag
   await expect(page.locator('.exam-card__link[href="#/tetracromia"]')).toBeVisible();
   await expect(page.locator('.exam-card__link[href="#/color-blindness"]')).toBeVisible();
   await expect(page.locator('.exam-card__link[href="#/riflessi"]')).toBeVisible();
+  await expect(page.locator('.exam-card__link[href="#/udito"]')).toBeVisible();
   await expect(page.getByRole('heading', { name: /More senses, same standard/i })).toBeVisible();
-  await expect(page.locator('.roadmap-item')).toHaveCount(2);
+  await expect(page.locator('.roadmap-item')).toHaveCount(1);
   await expect
     .poll(() =>
       page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
@@ -73,6 +98,75 @@ test('the gallery lists exams, is accessible, and routes into one', async ({ pag
   await page.locator('.exam-card__link[href="#/color-blindness"]').click();
   await expect(page).toHaveURL(/#\/color-blindness$/);
   await expect(page.getByRole('heading', { name: /Find the gap in the dots/i })).toBeVisible();
+});
+
+test('Udito completes three safe-listening instruments and keeps results separate', async ({ page }) => {
+  await installQuickUdito(page);
+  await page.goto('/#/udito');
+
+  await expect(page.getByRole('heading', { name: /Listen for the boundary/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /What informed Udito/i })).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.getByRole('button', { name: /Toggle light and dark theme/i }).click();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.getByRole('button', { name: /Toggle light and dark theme/i }).click();
+  await page.getByRole('button', { name: /See the method/i }).click();
+  await expect(page.getByRole('heading', { name: /Three questions. No synthetic score/i })).toBeInViewport();
+
+  await page.getByRole('button', { name: /Prepare the sound lab/i }).click();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  const start = page.getByRole('button', { name: /Begin instrument 01/i });
+  await expect(start).toBeDisabled();
+  await page.getByRole('button', { name: /Play quiet reference/i }).click();
+  await expect(page.getByText(/Reference played/i)).toBeVisible();
+  await page.getByLabel(/The reference is quiet and comfortable/i).check();
+  await expect(start).toBeEnabled();
+  await start.click();
+
+  await expect(page.getByRole('heading', { name: /Which tone is quietest/i })).toBeVisible();
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  await expect(page.locator('[data-au-response="0"]')).toBeEnabled();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await answerCurrentSoundTrial(page);
+  await page.getByRole('button', { name: /Begin headphone check/i }).click();
+  await answerCurrentSoundTrial(page);
+  await answerCurrentSoundTrial(page);
+
+  await page.getByRole('button', { name: /Continue to Portata/i }).click();
+  await page.getByRole('button', { name: /Start Portata/i }).click();
+  await answerCurrentSoundTrial(page);
+  await answerCurrentSoundTrial(page);
+
+  await page.getByRole('button', { name: /Continue to Intonazione/i }).click();
+  await page.getByRole('button', { name: /Start Intonazione/i }).click();
+  for (let trial = 0; trial < 4; trial += 1) await answerCurrentSoundTrial(page);
+
+  await expect(page.getByRole('heading', { name: /Three listening measures/i })).toBeVisible();
+  await expect(page.locator('.au-metric')).toHaveCount(4);
+  await expect(page.getByText(/Device-relative, never dB HL/i)).toBeVisible();
+  await expect(page.getByText(/hearing age/i)).toBeVisible();
+  await expect(page.getByText(/composite hearing score/i)).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test('the mobile Udito setup and listening runner stay inside the viewport', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Mobile-only geometry check');
+  await installQuickUdito(page);
+  await page.goto('/#/udito');
+  await page.getByRole('button', { name: /Prepare the sound lab/i }).click();
+  await page.getByRole('button', { name: /Play quiet reference/i }).click();
+  await expect(page.getByText(/Reference played/i)).toBeVisible();
+  await page.getByLabel(/The reference is quiet and comfortable/i).check();
+  await page.getByRole('button', { name: /Begin instrument 01/i }).click();
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  await expect(page.locator('[data-au-response="0"]')).toBeEnabled();
+
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+    )
+    .toBe(true);
+  await answerCurrentSoundTrial(page);
 });
 
 test('Riflessi completes all three instruments and reports separate device-relative measures', async ({

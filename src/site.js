@@ -5,7 +5,6 @@
  */
 
 const PLANNED = [
-  { name: 'Udito', tagline: 'Hearing range & pitch discrimination', glyph: '♪', duration: '≈ 3 min' },
   { name: 'Acutezza', tagline: 'Visual acuity & astigmatism', glyph: '◎', duration: '≈ 2 min' },
 ];
 
@@ -21,6 +20,10 @@ const TEST_DETAILS = {
   riflessi: {
     category: 'Response timing',
     facts: ['3 instruments', 'Device-relative timing', 'No composite score'],
+  },
+  udito: {
+    category: 'Listening experiment',
+    facts: ['3 instruments', 'Volume safety contract', 'No hearing label'],
   },
 };
 
@@ -46,18 +49,18 @@ export function renderGallery(context) {
         <p class="ui-eyebrow">Sensoria / private perception lab</p>
         <h1>Measure what your <em>senses notice.</em></h1>
         <p class="gallery-hero__lede">
-          Short, careful tests that turn what you see into an honest, screen-relative result.
+          Short, careful tests that turn what you notice into honest, device-relative results.
           No account, no upload, no diagnosis theatre.
         </p>
         <div class="ui-cluster gallery-hero__actions">
-          <a class="ui-button ui-button--lg" href="#/riflessi">
-            Try Riflessi <span aria-hidden="true">·</span> 7 min <span aria-hidden="true">→</span>
+          <a class="ui-button ui-button--lg" href="#/udito">
+            Try Udito <span aria-hidden="true">·</span> 6 min <span aria-hidden="true">→</span>
           </a>
-          <a class="ui-link ui-link--cta" href="#tests">Explore all three tests</a>
+          <a class="ui-link ui-link--cta" href="#tests">Explore all four tests</a>
         </div>
         <dl class="gallery-proof" aria-label="Sensoria at a glance">
           <div><dt>Live now</dt><dd>${String(exams.length).padStart(2, '0')} tests</dd></div>
-          <div><dt>Time for all</dt><dd>≈ 14 min</dd></div>
+          <div><dt>Time for all</dt><dd>≈ 20 min</dd></div>
           <div><dt>Data uploaded</dt><dd>None</dd></div>
         </dl>
       </div>
@@ -65,7 +68,7 @@ export function renderGallery(context) {
       <div class="sense-map" aria-hidden="true">
         <div class="sense-map__head">
           <span>Live signal</span>
-          <span>Display relative</span>
+          <span>Device relative</span>
         </div>
         <div class="sense-map__field">
           <div class="sense-map__axis sense-map__axis--one"></div>
@@ -77,7 +80,7 @@ export function renderGallery(context) {
             <small>Sensoria</small>
           </div>
           <span class="sense-map__label sense-map__label--colour">Colour</span>
-          <span class="sense-map__label sense-map__label--vision">Vision</span>
+          <span class="sense-map__label sense-map__label--vision">Hearing</span>
         </div>
         <div class="sense-map__channels">
           <span><i></i> Threshold</span>
@@ -128,7 +131,7 @@ export function renderGallery(context) {
         <article class="ui-card">
           <span class="principles__number" aria-hidden="true">02</span>
           <h3>Honest about hardware</h3>
-          <p>Your screen, light and attention affect the result. Every test says so before scoring you.</p>
+          <p>Your screen, audio hardware, room and attention affect results. Every test exposes its setup limits.</p>
         </article>
         <article class="ui-card">
           <span class="principles__number" aria-hidden="true">03</span>
@@ -183,6 +186,15 @@ function previewVisual(id) {
     return `
       <div class="mini-reflex" aria-hidden="true">
         <i></i><span></span><b>245<small>ms</small></b>
+      </div>
+    `;
+  }
+
+  if (id === 'udito') {
+    return `
+      <div class="mini-audio" aria-hidden="true">
+        ${Array.from({ length: 24 }, (_, index) => `<i style="--wave:${index}"></i>`).join('')}
+        <span>500</span><span>2k</span><span>18k</span>
       </div>
     `;
   }

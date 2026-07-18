@@ -19,6 +19,10 @@ Live exams:
   two-choice, and three-minute sustained-response instruments. It reports robust
   timing, choice cost, accuracy, and within-run stability without a composite
   rating or population percentile.
+- **Udito** — a device-relative listening lab with a headphone-confidence
+  check, an adaptive upper-audibility boundary, and separate pitch-step
+  estimates near 500 Hz and 2 kHz. It reports no dB HL, hearing age, diagnosis,
+  or composite score.
 
 Adding an exam: create `src/exams/<id>.js` exporting `meta` and `mount(context)`
 (return a cleanup function), then register it in `src/main.js`.
@@ -116,6 +120,48 @@ Research that informed Riflessi:
 - [Basner and Dinges, *Maximizing sensitivity of the psychomotor vigilance test while minimizing test duration*](https://pmc.ncbi.nlm.nih.gov/articles/PMC3197786/)
 - [Bridges et al., *The timing mega-study: comparing a range of experiment generators, both lab-based and online*](https://doi.org/10.7717/peerj.9414)
 
+### Udito
+
+Udito begins with an explicit safe-listening contract. The user starts device
+volume low, plays a digitally capped reference, raises it only until it is quiet
+and comfortable, and then leaves volume unchanged. The browser cannot know
+sound pressure at the eardrum, so the interface never presents its digital
+amplitude as dB SPL or dB HL. Tones are short and use 25 ms onset and offset
+ramps. Users are told never to raise volume to chase an inaudible high tone and
+to stop for discomfort, pain, pressure, or ringing.
+
+The lab keeps three instruments separate:
+
+- **Cuffie** begins with two straightforward practice trials, then uses six
+  three-alternative, 200 Hz trials inspired by Woods et al. One interval is 6
+  dB quieter, one equal-level decoy has opposing stereo phase, and one is an
+  equal-level reference. Five or more quiet targets found is described only as
+  headphone-like presentation—not proof that headphones are present.
+- **Portata** uses a three-alternative, one-tone interval task. A
+  two-correct-up, one-error-down staircase adapts frequency between 2.5 kHz and
+  the lower of 18 kHz or 42% of the audio context's sample rate. Two 1 kHz task
+  controls check continued task performance. The result uses recent reversals
+  and reports their spread or an explicit device-safe ceiling.
+- **Intonazione** interleaves independent two-alternative staircases around 500
+  Hz and 2 kHz. Two correct responses make the pitch step smaller and one error
+  makes it larger. Independent ±3 dB level roving reduces simple loudness cues.
+  Each just-noticeable difference is reported as a percentage at its own anchor
+  frequency.
+
+`AudioContext.currentTime` and scheduled audio parameters place intervals and
+ramps on the Web Audio clock. A hidden tab stops playback and discards the
+current presentation; resuming replays that trial. Udito stores only a concise
+last-run setup summary. It never records from the microphone or uploads audio.
+
+Research and standards that informed Udito:
+
+- [Woods et al., *Headphone screening to facilitate web-based auditory experiments*](https://doi.org/10.3758/s13414-017-1361-2)
+- [Levitt, *Transformed up-down methods in psychoacoustics*](https://doi.org/10.1121/1.1912375)
+- [Grassi et al., *PSYCHOACOUSTICS-WEB: A free web interface for online psychoacoustics*](https://pubmed.ncbi.nlm.nih.gov/38709452/)
+- [Zhao et al., *Robust and efficient online auditory psychophysics*](https://doi.org/10.1177/23312165221118792)
+- [W3C Web Audio API](https://www.w3.org/TR/webaudio-1.0/)
+- [WHO–ITU global standard for safe listening devices and systems](https://www.who.int/publications-detail-redirect/9789241515276)
+
 ## Install
 
 You need Node.js 22 or later.
@@ -133,9 +179,10 @@ npm run dev
 ```
 
 Open the URL printed by Vite. Complete the screen check before you start the
-colour tests, or choose one input path before starting Riflessi. The site stores
-only concise last-run summaries in local browser storage. It does not send
-session data to a server.
+colour tests, choose one input path before starting Riflessi, or complete
+Udito's low-volume reference and volume-lock contract. The site stores only
+concise last-run summaries in local browser storage. It does not send session
+data to a server.
 
 The interface uses [`@ponchia/ui`](https://github.com/Ponchia/bronto-ui) for its
 tokens, typography, layout primitives, controls, feedback, theme behavior, and
@@ -143,7 +190,8 @@ site shell. Product-specific stimulus geometry remains local to this project.
 
 ## Develop and test
 
-Run the deterministic colour-math, timing, and session-engine tests:
+Run the deterministic colour-math, timing, adaptive hearing, and session-engine
+tests:
 
 ```sh
 npm test
@@ -203,6 +251,14 @@ operating system, browser, and current device load. Riflessi exposes timing
 health and input mode but cannot calibrate those delays. It does not assess
 fatigue, concussion, driving fitness, neurological health, or any other medical
 or occupational condition.
+
+Browser audio depends on device volume, digital processing, sample rate,
+headphone frequency response and fit, assistive devices, room noise, and the
+listener. Udito has no acoustic coupler, calibrated transducer, microphone, or
+sound-level measurement. Its upper boundary and pitch steps therefore describe
+only one run under one setup. They cannot establish clinical hearing thresholds,
+hearing loss, hearing age, safe listening ability, or fitness for medical or
+occupational use.
 
 Do not use this site for medical or occupational decisions. Use a validated
 clinical or physical test administered under controlled conditions when the

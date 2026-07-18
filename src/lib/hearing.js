@@ -1,0 +1,286 @@
+export const DEFAULT_HEARING_CONFIG = Object.freeze({
+  feedbackMs: 420,
+  audio: Object.freeze({
+    toneMs: 460,
+    gapMs: 260,
+    rampMs: 25,
+    referenceMs: 1800,
+    masterGain: 0.075,
+  }),
+  headphones: Object.freeze({
+    practiceTrials: 2,
+    scoredTrials: 6,
+    passCorrect: 5,
+  }),
+  range: Object.freeze({
+    startHz: 6000,
+    minHz: 2500,
+    maxHz: 18000,
+    targetReversals: 8,
+    minTrials: 12,
+    maxTrials: 28,
+    controlAt: Object.freeze([8, 17]),
+    initialStepOctaves: 0.28,
+    fineStepOctaves: 0.12,
+  }),
+  pitch: Object.freeze({
+    anchorsHz: Object.freeze([500, 2000]),
+    startPercent: 8,
+    minPercent: 0.2,
+    maxPercent: 20,
+    targetReversals: 6,
+    minTrials: 10,
+    maxTrials: 18,
+    initialFactor: 1.55,
+    fineFactor: 1.22,
+  }),
+});
+
+export function mergeHearingConfig(override = {}) {
+  return {
+    ...DEFAULT_HEARING_CONFIG,
+    ...override,
+    audio: { ...DEFAULT_HEARING_CONFIG.audio, ...override.audio },
+    headphones: { ...DEFAULT_HEARING_CONFIG.headphones, ...override.headphones },
+    range: { ...DEFAULT_HEARING_CONFIG.range, ...override.range },
+    pitch: { ...DEFAULT_HEARING_CONFIG.pitch, ...override.pitch },
+  };
+}
+
+export function createHeadphoneTrials({ count, practice = false, random = Math.random }) {
+  return Array.from({ length: count }, () => {
+    const quietInterval = randomIndex(3, random);
+    const remaining = [0, 1, 2].filter((index) => index !== quietInterval);
+    const antiPhaseInterval = practice ? null : remaining[randomIndex(remaining.length, random)];
+    return {
+      kind: 'headphones',
+      quietInterval,
+      antiPhaseInterval,
+      practice,
+    };
+  });
+}
+
+export function createRangeTrack(maxHz, options = {}) {
+  const config = { ...DEFAULT_HEARING_CONFIG.range, ...options };
+  const ceilingHz = clamp(maxHz, config.minHz, config.maxHz);
+  return {
+    config: { ...config, maxHz: ceilingHz },
+    frequencyHz: clamp(config.startHz, config.minHz, ceilingHz),
+    correctStreak: 0,
+    lastDirection: null,
+    reversals: [],
+    records: [],
+    controls: [],
+    complete: false,
+  };
+}
+
+export function nextRangeTrial(track, random = Math.random) {
+  const presentation = track.records.length + track.controls.length;
+  const control = track.config.controlAt.includes(presentation);
+  return {
+    kind: 'range',
+    control,
+    frequencyHz: control ? 1000 : track.frequencyHz,
+    toneInterval: randomIndex(3, random),
+  };
+}
+
+export function recordRangeResponse(track, trial, selectedInterval) {
+  const correct = selectedInterval === trial.toneInterval;
+  if (trial.control) {
+    track.controls.push({ ...trial, selectedInterval, correct });
+    return track;
+  }
+
+  let direction = null;
+  if (correct) {
+    track.correctStreak += 1;
+    if (track.correctStreak >= 2) {
+      direction = 'up';
+      track.correctStreak = 0;
+    }
+  } else {
+    direction = 'down';
+    track.correctStreak = 0;
+  }
+
+  if (direction) {
+    if (track.lastDirection && direction !== track.lastDirection) {
+      track.reversals.push(track.frequencyHz);
+    }
+    track.lastDirection = direction;
+    const step = track.reversals.length >= 2 ? track.config.fineStepOctaves : track.config.initialStepOctaves;
+    const factor = 2 ** (direction === 'up' ? step : -step);
+    track.frequencyHz = clamp(track.frequencyHz * factor, track.config.minHz, track.config.maxHz);
+  }
+
+  track.records.push({
+    ...trial,
+    selectedInterval,
+    correct,
+    direction,
+    nextFrequencyHz: track.frequencyHz,
+  });
+  track.complete =
+    track.records.length >= track.config.maxTrials ||
+    (track.records.length >= track.config.minTrials &&
+      track.reversals.length >= track.config.targetReversals);
+  return track;
+}
+
+export function summarizeRange(track) {
+  const reversalWindow = track.reversals.slice(-6);
+  const thresholdHz = reversalWindow.length ? roundTo(median(reversalWindow), 100) : null;
+  const atCeiling =
+    track.records.filter(
+      (record) =>
+        record.correct && Math.abs(record.frequencyHz - track.config.maxHz) < track.config.maxHz * 0.001,
+    ).length >= 2;
+  return {
+    thresholdHz: atCeiling ? track.config.maxHz : thresholdHz,
+    spreadHz: reversalWindow.length >= 2 ? roundTo(range(reversalWindow), 100) : null,
+    atCeiling,
+    reversals: track.reversals.length,
+    trials: track.records.length,
+    controlAccuracyPercent: percentCorrect(track.controls),
+  };
+}
+
+export function createPitchTracks(options = {}) {
+  const config = { ...DEFAULT_HEARING_CONFIG.pitch, ...options };
+  return config.anchorsHz.map((anchorHz) => ({
+    anchorHz,
+    config,
+    deltaPercent: config.startPercent,
+    correctStreak: 0,
+    lastDirection: null,
+    reversals: [],
+    records: [],
+    complete: false,
+  }));
+}
+
+export function nextPitchTrial(tracks, random = Math.random) {
+  const open = tracks.filter((track) => !track.complete);
+  if (!open.length) return null;
+  const shortest = Math.min(...open.map((track) => track.records.length));
+  const candidates = open.filter((track) => track.records.length <= shortest + 1);
+  const track = candidates[randomIndex(candidates.length, random)];
+  return {
+    kind: 'pitch',
+    anchorHz: track.anchorHz,
+    deltaPercent: track.deltaPercent,
+    higherInterval: randomIndex(2, random),
+    roveDb: [randomBetween(-3, 3, random), randomBetween(-3, 3, random)],
+  };
+}
+
+export function recordPitchResponse(tracks, trial, selectedInterval) {
+  const track = tracks.find((entry) => entry.anchorHz === trial.anchorHz);
+  if (!track) throw new Error(`Unknown pitch anchor: ${trial.anchorHz}`);
+  const correct = selectedInterval === trial.higherInterval;
+  let direction = null;
+  if (correct) {
+    track.correctStreak += 1;
+    if (track.correctStreak >= 2) {
+      direction = 'down';
+      track.correctStreak = 0;
+    }
+  } else {
+    direction = 'up';
+    track.correctStreak = 0;
+  }
+
+  if (direction) {
+    if (track.lastDirection && direction !== track.lastDirection) {
+      track.reversals.push(track.deltaPercent);
+    }
+    track.lastDirection = direction;
+    const factor = track.reversals.length >= 2 ? track.config.fineFactor : track.config.initialFactor;
+    track.deltaPercent = clamp(
+      direction === 'down' ? track.deltaPercent / factor : track.deltaPercent * factor,
+      track.config.minPercent,
+      track.config.maxPercent,
+    );
+  }
+
+  track.records.push({
+    ...trial,
+    selectedInterval,
+    correct,
+    direction,
+    nextDeltaPercent: track.deltaPercent,
+  });
+  track.complete =
+    track.records.length >= track.config.maxTrials ||
+    (track.records.length >= track.config.minTrials &&
+      track.reversals.length >= track.config.targetReversals);
+  return tracks;
+}
+
+export function summarizePitch(tracks) {
+  return tracks.map((track) => {
+    const reversalWindow = track.reversals.slice(-4);
+    return {
+      anchorHz: track.anchorHz,
+      thresholdPercent: reversalWindow.length ? roundTo(median(reversalWindow), 0.1) : null,
+      spreadPercent: reversalWindow.length >= 2 ? roundTo(range(reversalWindow), 0.1) : null,
+      reversals: track.reversals.length,
+      trials: track.records.length,
+      accuracyPercent: percentCorrect(track.records),
+    };
+  });
+}
+
+export function summarizeHeadphones(records, passCorrect) {
+  const correct = records.filter((record) => record.correct).length;
+  return {
+    correct,
+    trials: records.length,
+    accuracyPercent: records.length ? Math.round((correct / records.length) * 100) : null,
+    headphoneLike: records.length > 0 && correct >= passCorrect,
+  };
+}
+
+export function dbToGain(db) {
+  return 10 ** (db / 20);
+}
+
+export function safeFrequencyCeiling(sampleRate, configuredMax = 18000) {
+  return Math.round(Math.min(configuredMax, sampleRate * 0.42));
+}
+
+export function median(values) {
+  if (!values.length) return null;
+  const sorted = [...values].sort((left, right) => left - right);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+}
+
+function percentCorrect(records) {
+  return records.length
+    ? Math.round((records.filter((record) => record.correct).length / records.length) * 100)
+    : null;
+}
+
+function range(values) {
+  return Math.max(...values) - Math.min(...values);
+}
+
+function roundTo(value, increment) {
+  return Math.round(value / increment) * increment;
+}
+
+function randomIndex(length, random) {
+  return Math.min(length - 1, Math.floor(random() * length));
+}
+
+function randomBetween(minimum, maximum, random) {
+  return minimum + random() * (maximum - minimum);
+}
+
+function clamp(value, minimum, maximum) {
+  return Math.max(minimum, Math.min(maximum, value));
+}
