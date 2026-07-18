@@ -21,8 +21,8 @@ const TEST_DETAILS = {
     facts: ['Adaptive difficulty', '3 instruments', 'Detailed profile'],
   },
   'color-blindness': {
-    category: 'Colour-vision screening',
-    facts: ['10 generated plates', '2 vision axes', 'Plain-language result'],
+    category: 'Colour-vision experiment',
+    facts: ['Adaptive thresholds', '3 display directions', 'Run-relative result'],
   },
 };
 
@@ -53,7 +53,7 @@ export function renderGallery(context) {
         </p>
         <div class="ui-cluster gallery-hero__actions">
           <a class="ui-button ui-button--lg" href="#/color-blindness">
-            Try Daltonia <span aria-hidden="true">·</span> 2 min <span aria-hidden="true">→</span>
+            Try Daltonia <span aria-hidden="true">·</span> 3 min <span aria-hidden="true">→</span>
           </a>
           <a class="ui-link ui-link--cta" href="#tests">Explore both tests</a>
         </div>

@@ -2,81 +2,116 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  ADAPTIVE_CONFIG,
+  AXIS_CONFIGS,
+  AXIS_TYPES,
   CONFUSION_DIRECTIONS,
-  classifyResults,
+  createAdaptiveRun,
+  currentAdaptiveTrial,
   lmsOf,
-  makePlatePair,
-  PLATES,
+  makeTargetPair,
+  ORIENTATIONS,
+  recordAdaptiveAnswer,
   srgbDistance,
+  summarizeAdaptiveRun,
 } from '../src/lib/daltonism.js';
 
-test('confusion directions are unit vectors', () => {
+const fixedRandom = () => 0.25;
+
+test('display-model directions are normalized', () => {
   for (const direction of Object.values(CONFUSION_DIRECTIONS)) {
     assert.ok(Math.abs(Math.hypot(...direction) - 1) < 1e-9);
   }
 });
 
-test('each confusion direction drives only its own cone', () => {
+test('each model direction predominantly drives its corresponding LMS channel', () => {
   const cone = { protan: 0, deutan: 1, tritan: 2 };
   for (const [type, index] of Object.entries(cone)) {
     const lms = lmsOf(CONFUSION_DIRECTIONS[type]);
-    const others = lms.filter((_, i) => i !== index).map(Math.abs);
-    // The driven cone response dominates the other two by a wide margin.
-    assert.ok(Math.abs(lms[index]) > 5 * Math.max(...others), `${type} leaks into other cones`);
+    const others = lms.filter((_, candidate) => candidate !== index).map(Math.abs);
+    assert.ok(Math.abs(lms[index]) > 5 * Math.max(...others), `${type} leaks into other channels`);
   }
 });
 
-test('plate pairs collapse for the target cone but stay visible to typical vision', () => {
-  const coneOf = { protan: 0, deutan: 1, tritan: 2 };
-  for (const plate of PLATES) {
-    if (plate.type === 'mono') continue;
-    const pair = makePlatePair(plate.background, plate.type, plate.strength);
-
-    // Figure stayed in gamut, so the confusion-axis property is exact.
+test('the full adaptive range stays in gamut and produces visible easy targets', () => {
+  for (const [type, config] of Object.entries(AXIS_CONFIGS)) {
+    const pair = makeTargetPair(config.background, type, ADAPTIVE_CONFIG.maximumStrength);
     assert.ok(
-      pair.figureLinear.every((c) => c > 0 && c < 1),
-      `${plate.id} figure clipped out of gamut`,
+      pair.targetLinear.every((channel) => channel > 0 && channel < 1),
+      `${type} clipped`,
     );
-
-    const bgLms = lmsOf(plate.background);
-    const figLms = lmsOf(pair.figureLinear);
-    const driven = coneOf[plate.type];
-    for (let cone = 0; cone < 3; cone += 1) {
-      if (cone === driven) {
-        assert.ok(Math.abs(figLms[cone] - bgLms[cone]) > 0.01, `${plate.id} did not shift its cone`);
-      } else {
-        assert.ok(Math.abs(figLms[cone] - bgLms[cone]) < 1e-6, `${plate.id} leaked into cone ${cone}`);
-      }
-    }
-
-    // Typical vision sees a clear difference.
-    assert.ok(srgbDistance(pair.background, pair.figure) > 40, `${plate.id} too subtle for typical vision`);
+    assert.ok(srgbDistance(pair.field, pair.target) > 40, `${type} easy target is too subtle`);
   }
 });
 
-test('classify flags red-green when those plates are missed', () => {
-  const responses = PLATES.map((plate) => ({
-    plateId: plate.id,
-    answer: plate.axis === 'red-green' ? '' : plate.digit,
-  }));
-  const result = classifyResults(responses);
-  assert.equal(result.category, 'red-green');
-  assert.ok(result.controlOk);
-  assert.ok(result.redGreenScore < 80);
+test('a run interleaves twelve trials per direction with three task controls', () => {
+  const run = createAdaptiveRun(fixedRandom);
+  assert.equal(run.schedule.length, AXIS_TYPES.length * ADAPTIVE_CONFIG.trialsPerAxis + 3);
+  assert.equal(run.schedule.filter(({ type }) => type === 'control').length, 3);
+  for (const type of AXIS_TYPES) {
+    assert.equal(run.schedule.filter((slot) => slot.type === type).length, ADAPTIVE_CONFIG.trialsPerAxis);
+  }
+  assert.ok(run.schedule.every(({ orientation }) => ORIENTATIONS.includes(orientation)));
 });
 
-test('classify reports typical vision for a perfect run', () => {
-  const responses = PLATES.map((plate) => ({ plateId: plate.id, answer: plate.digit }));
-  const result = classifyResults(responses);
-  assert.equal(result.category, 'typical');
-  assert.equal(result.redGreenScore, 100);
-  assert.equal(result.blueYellowScore, 100);
+test('two correct answers lower an axis strength and one error raises it', () => {
+  const run = createAdaptiveRun(fixedRandom);
+  while (currentAdaptiveTrial(run)?.type === 'control') {
+    const trial = currentAdaptiveTrial(run);
+    recordAdaptiveAnswer(run, trial.orientation);
+  }
+
+  const first = currentAdaptiveTrial(run);
+  const type = first.type;
+  const initial = run.axes[type].strength;
+  recordAdaptiveAnswer(run, first.orientation);
+
+  while (currentAdaptiveTrial(run)?.type !== type) {
+    const trial = currentAdaptiveTrial(run);
+    recordAdaptiveAnswer(run, trial.orientation);
+  }
+  recordAdaptiveAnswer(run, currentAdaptiveTrial(run).orientation);
+  assert.ok(run.axes[type].strength < initial);
+
+  while (currentAdaptiveTrial(run)?.type !== type) {
+    const trial = currentAdaptiveTrial(run);
+    recordAdaptiveAnswer(run, trial.orientation);
+  }
+  const strengthBeforeError = run.axes[type].strength;
+  recordAdaptiveAnswer(run, 'not-an-orientation');
+  assert.ok(run.axes[type].strength > strengthBeforeError);
+  assert.equal(run.axes[type].reversals.length, 1);
 });
 
-test('classify is inconclusive when the control plate is missed', () => {
-  const responses = PLATES.map((plate) => ({
-    plateId: plate.id,
-    answer: plate.axis === 'control' ? '0' : plate.digit,
-  }));
-  assert.equal(classifyResults(responses).category, 'inconclusive');
+test('all-correct runs return lower display-relative thresholds than all-error runs', () => {
+  const correctRun = createAdaptiveRun(fixedRandom);
+  while (currentAdaptiveTrial(correctRun)) {
+    recordAdaptiveAnswer(correctRun, currentAdaptiveTrial(correctRun).orientation);
+  }
+
+  const errorRun = createAdaptiveRun(fixedRandom);
+  while (currentAdaptiveTrial(errorRun)) {
+    const trial = currentAdaptiveTrial(errorRun);
+    recordAdaptiveAnswer(errorRun, trial.type === 'control' ? trial.orientation : 'wrong');
+  }
+
+  const correct = summarizeAdaptiveRun(correctRun);
+  const errors = summarizeAdaptiveRun(errorRun);
+  assert.ok(correct.controlOk);
+  assert.ok(errors.controlOk);
+  for (let index = 0; index < AXIS_TYPES.length; index += 1) {
+    assert.ok(correct.axes[index].threshold < errors.axes[index].threshold);
+  }
+});
+
+test('missing two task controls makes a run inconclusive without a diagnostic label', () => {
+  const run = createAdaptiveRun(fixedRandom);
+  while (currentAdaptiveTrial(run)) {
+    const trial = currentAdaptiveTrial(run);
+    recordAdaptiveAnswer(run, trial.type === 'control' ? 'wrong' : trial.orientation);
+  }
+  const result = summarizeAdaptiveRun(run);
+  assert.equal(result.controlOk, false);
+  assert.match(result.title, /inconclusive/i);
+  assert.doesNotMatch(result.title, /deficiency|normal|typical/i);
 });
