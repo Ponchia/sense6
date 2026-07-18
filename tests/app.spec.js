@@ -1,13 +1,61 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
+const QUICK_RIFLESSI = {
+  riflessi: {
+    anticipationMs: 0,
+    feedbackMs: 8,
+    signal: {
+      practiceTrials: 1,
+      scoredTrials: 2,
+      catchTrials: 0,
+      minWaitMs: 12,
+      maxWaitMs: 18,
+      responseTimeoutMs: 500,
+    },
+    choice: {
+      practiceTrials: 2,
+      scoredTrials: 4,
+      minWaitMs: 12,
+      maxWaitMs: 18,
+      responseTimeoutMs: 500,
+    },
+    stability: {
+      durationMs: 550,
+      minWaitMs: 12,
+      maxWaitMs: 18,
+      responseTimeoutMs: 300,
+    },
+  },
+};
+
+async function installQuickRiflessi(page) {
+  await page.addInitScript((configuration) => {
+    window.__SENSORIA_TEST_CONFIG__ = configuration;
+  }, QUICK_RIFLESSI);
+}
+
+async function respondWithKey(page, key) {
+  const chamber = page.locator('[data-rx-chamber]');
+  await expect(chamber).toHaveAttribute('data-rx-state', 'live');
+  await page.keyboard.press(key);
+}
+
+async function respondToChoice(page) {
+  const chamber = page.locator('[data-rx-chamber]');
+  await expect(chamber).toHaveAttribute('data-rx-state', 'live');
+  const side = await page.locator('[data-rx-arrow]').getAttribute('data-side');
+  await page.keyboard.press(side === 'left' ? 'ArrowLeft' : 'ArrowRight');
+}
+
 test('the gallery lists exams, is accessible, and routes into one', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
   await expect(page.locator('.exam-card__link[href="#/tetracromia"]')).toBeVisible();
   await expect(page.locator('.exam-card__link[href="#/color-blindness"]')).toBeVisible();
+  await expect(page.locator('.exam-card__link[href="#/riflessi"]')).toBeVisible();
   await expect(page.getByRole('heading', { name: /More senses, same standard/i })).toBeVisible();
-  await expect(page.locator('.roadmap-item')).toHaveCount(3);
+  await expect(page.locator('.roadmap-item')).toHaveCount(2);
   await expect
     .poll(() =>
       page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
@@ -25,6 +73,74 @@ test('the gallery lists exams, is accessible, and routes into one', async ({ pag
   await page.locator('.exam-card__link[href="#/color-blindness"]').click();
   await expect(page).toHaveURL(/#\/color-blindness$/);
   await expect(page.getByRole('heading', { name: /Find the gap in the dots/i })).toBeVisible();
+});
+
+test('Riflessi completes all three instruments and reports separate device-relative measures', async ({
+  page,
+}) => {
+  await installQuickRiflessi(page);
+  await page.goto('/#/riflessi');
+
+  await expect(page.getByRole('heading', { name: /Notice the signal/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /What informed Riflessi/i })).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.getByRole('link', { name: /See the method/i }).click();
+  await expect(page.getByRole('heading', { name: /Three questions, kept separate/i })).toBeInViewport();
+  await expect(page).toHaveURL(/#\/riflessi$/);
+
+  await page.getByRole('button', { name: /Prepare the lab/i }).click();
+  await page.getByRole('button', { name: /^Keyboard/i }).click();
+  const start = page.getByRole('button', { name: /Begin instrument 01/i });
+  await expect(start).toBeDisabled();
+  await page.getByLabel(/I understand this measures this browser/i).check();
+  await expect(start).toBeEnabled();
+  await start.click();
+
+  await expect(page.getByRole('heading', { name: /One signal. One action/i })).toBeVisible();
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  await respondWithKey(page, 'Space');
+  await page.getByRole('button', { name: /Begin measured block/i }).click();
+  await respondWithKey(page, 'Space');
+  await respondWithKey(page, 'Space');
+
+  await page.getByRole('button', { name: /Continue to Scelta/i }).click();
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  await respondToChoice(page);
+  await respondToChoice(page);
+  await page.getByRole('button', { name: /Begin measured block/i }).click();
+  for (let trial = 0; trial < 4; trial += 1) await respondToChoice(page);
+
+  await page.getByRole('button', { name: /Continue to Tenuta/i }).click();
+  await page.getByRole('button', { name: /Start the 3-minute run/i }).click();
+  await respondWithKey(page, 'Space');
+
+  await expect(page.getByRole('heading', { name: /more than one dimension/i })).toBeVisible();
+  await expect(page.locator('.rx-metric')).toHaveCount(6);
+  await expect(page.getByText(/Compare conditions, not people/i)).toBeVisible();
+  await expect(page.getByText(/population percentile/i)).toBeVisible();
+  await expect(page.getByText(/brain age/i)).toHaveCount(0);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test('the mobile Riflessi setup and response chamber stay inside the viewport', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Mobile-only geometry check');
+  await installQuickRiflessi(page);
+  await page.goto('/#/riflessi');
+  await page.getByRole('button', { name: /Prepare the lab/i }).click();
+  await page.getByRole('button', { name: /^Touch \/ pointer/i }).click();
+  await page.getByLabel(/I understand this measures this browser/i).check();
+  await page.getByRole('button', { name: /Begin instrument 01/i }).click();
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  await expect(page.locator('[data-rx-chamber]')).toHaveAttribute('data-rx-state', 'live');
+
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+    )
+    .toBe(true);
+  await page.getByRole('button', { name: /Respond to signal/i }).click();
 });
 
 test('landing page presents the method and passes an accessibility scan', async ({ page }) => {

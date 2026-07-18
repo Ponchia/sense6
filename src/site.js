@@ -5,12 +5,6 @@
  */
 
 const PLANNED = [
-  {
-    name: 'Riflessi',
-    tagline: 'Reaction time & response consistency',
-    glyph: '⚡',
-    duration: '≈ 1 min',
-  },
   { name: 'Udito', tagline: 'Hearing range & pitch discrimination', glyph: '♪', duration: '≈ 3 min' },
   { name: 'Acutezza', tagline: 'Visual acuity & astigmatism', glyph: '◎', duration: '≈ 2 min' },
 ];
@@ -23,6 +17,10 @@ const TEST_DETAILS = {
   'color-blindness': {
     category: 'Colour-vision experiment',
     facts: ['Adaptive thresholds', '3 display directions', 'Run-relative result'],
+  },
+  riflessi: {
+    category: 'Response timing',
+    facts: ['3 instruments', 'Device-relative timing', 'No composite score'],
   },
 };
 
@@ -52,14 +50,14 @@ export function renderGallery(context) {
           No account, no upload, no diagnosis theatre.
         </p>
         <div class="ui-cluster gallery-hero__actions">
-          <a class="ui-button ui-button--lg" href="#/color-blindness">
-            Try Daltonia <span aria-hidden="true">·</span> 3 min <span aria-hidden="true">→</span>
+          <a class="ui-button ui-button--lg" href="#/riflessi">
+            Try Riflessi <span aria-hidden="true">·</span> 7 min <span aria-hidden="true">→</span>
           </a>
-          <a class="ui-link ui-link--cta" href="#tests">Explore both tests</a>
+          <a class="ui-link ui-link--cta" href="#tests">Explore all three tests</a>
         </div>
         <dl class="gallery-proof" aria-label="Sensoria at a glance">
           <div><dt>Live now</dt><dd>${String(exams.length).padStart(2, '0')} tests</dd></div>
-          <div><dt>Time for both</dt><dd>≈ 6 min</dd></div>
+          <div><dt>Time for all</dt><dd>≈ 14 min</dd></div>
           <div><dt>Data uploaded</dt><dd>None</dd></div>
         </dl>
       </div>
@@ -112,7 +110,7 @@ export function renderGallery(context) {
         <p>In development — visible here as direction, not as something you can start yet.</p>
       </div>
       <div class="roadmap__list">
-        ${PLANNED.map(plannedItem).join('')}
+        ${PLANNED.map((meta, index) => plannedItem(meta, index, exams.length)).join('')}
       </div>
     </section>
 
@@ -181,6 +179,14 @@ function previewVisual(id) {
     `;
   }
 
+  if (id === 'riflessi') {
+    return `
+      <div class="mini-reflex" aria-hidden="true">
+        <i></i><span></span><b>245<small>ms</small></b>
+      </div>
+    `;
+  }
+
   return `
     <div class="mini-plate" aria-hidden="true">
       ${PLATE_EIGHT.flatMap((row) => [...row])
@@ -190,10 +196,10 @@ function previewVisual(id) {
   `;
 }
 
-function plannedItem(meta, index) {
+function plannedItem(meta, index, liveCount) {
   return `
     <article class="roadmap-item">
-      <span class="roadmap-item__index" aria-hidden="true">0${index + 3}</span>
+      <span class="roadmap-item__index" aria-hidden="true">${String(index + liveCount + 1).padStart(2, '0')}</span>
       <span class="roadmap-item__glyph" aria-hidden="true">${meta.glyph}</span>
       <div>
         <h3>${meta.name}</h3>

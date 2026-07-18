@@ -1,4 +1,5 @@
 # Changelog
+<!-- vale Vale.Spelling = NO -->
 
 All notable changes to this project are documented in this file.
 
@@ -14,6 +15,14 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `Daltonia`: an experimental adaptive colour-vision check with randomized
   Landolt-C orientation, luminance-noise dots, three interleaved display-relative
   staircases, repeated task controls, and threshold uncertainty.
+- Riflessi—a three-instrument, device-relative response lab covering simple
+  visual response, balanced two-choice response, and a three-minute sustained
+  response sequence.
+- Riflessi result metrics for typical response, choice cost and accuracy,
+  slow-response tail, within-run drift, early responses, misses, input mode, and
+  page-observed timing health—without a composite score or population norm.
+- Focus and visibility interruption handling that discards the active timing
+  trial and resumes with a fresh randomized wait.
 - Adaptive threshold and noisy-field color discrimination instruments.
 - Touch, pointer, and keyboard-compatible hue ordering.
 - Display setup check and browser-reported gamut indicator.
