@@ -98,6 +98,12 @@ jobs:
           set -euo pipefail
           cd vps-infra
           git pull --rebase origin main
+
+          if [ ! -f deployments/tetracromia/kustomization.yaml ]; then
+            echo "Tetracromia is not bootstrapped in vps-infra; image publication is complete."
+            exit 0
+          fi
+
           python3 scripts/gitops_set_image_tag.py \
             --file deployments/tetracromia/kustomization.yaml \
             --image ghcr.io/ponchia/tetracromia \
