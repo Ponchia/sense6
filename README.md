@@ -97,7 +97,7 @@ commit-specific image in `Ponchia/vps-infra`. Flux deploys the image from
 Kubernetes credentials.
 
 The production site is available at
-[`tetricromia.brontolotto.observer`](https://tetricromia.brontolotto.observer).
+[`tetracromia.brontolotto.observer`](https://tetracromia.brontolotto.observer).
 The source repository and container stay private. Kubernetes receives the
 container through a namespace-scoped GHCR pull secret managed by External
 Secrets Operator and Vaultwarden.
