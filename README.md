@@ -1,9 +1,26 @@
 <!-- vale off -->
-# Tetracromia
+# Sensoria
 <!-- vale on -->
 <!-- vale Vale.Spelling = NO -->
 
-A research-grounded, browser-based color discrimination lab.
+A small collection of honest, browser-based perception tests. Each exam is a
+self-contained module mounted by a hash router behind a shared shell; results
+are computed locally and nothing is uploaded.
+
+Live exams:
+
+- **Tetracromia** — an adaptive colour-discrimination lab (threshold, noisy
+  field, and hue ordering).
+- **Daltonia** — an Ishihara-style colour-blindness screen. Plates are
+  generated (not the copyrighted Ishihara set): the figure is offset from the
+  background along the exact cone-confusion direction for protan/deutan
+  (red–green) or tritan (blue–yellow), so the digit collapses for the targeted
+  deficiency while typical vision reads it. Per-dot luminance jitter removes any
+  brightness cue, and a control plate everyone can read gates the score. It is a
+  screening on an uncalibrated display, never a diagnosis.
+
+Adding an exam: create `src/exams/<id>.js` exporting `meta` and `mount(context)`
+(return a cleanup function), then register it in `src/main.js`.
 
 ## Background
 

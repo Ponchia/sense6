@@ -1,8 +1,22 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
-test('landing page presents the method and passes an accessibility scan', async ({ page }) => {
+test('the gallery lists exams, is accessible, and routes into one', async ({ page }) => {
   await page.goto('/');
+  await expect(page.getByRole('heading', { name: /How well do your senses resolve/i })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Tetracromia/i })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Daltonia/i })).toBeVisible();
+
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
+
+  await page.getByRole('button', { name: /Daltonia/i }).click();
+  await expect(page).toHaveURL(/#\/color-blindness$/);
+  await expect(page.getByRole('heading', { name: /Read the number in the dots/i })).toBeVisible();
+});
+
+test('landing page presents the method and passes an accessibility scan', async ({ page }) => {
+  await page.goto('/#/tetracromia');
 
   await expect(page.getByRole('heading', { name: /How finely do you see color/i })).toBeVisible();
   await expect(page.getByRole('button', { name: /Begin the color lab/i })).toBeVisible();
@@ -28,7 +42,7 @@ test('landing page presents the method and passes an accessibility scan', async 
 });
 
 test('screen setup gates the adaptive lab and advances into the field instrument', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/tetracromia');
   await page.getByRole('button', { name: /Begin the color lab/i }).click();
 
   const start = page.getByRole('button', { name: /Start instrument 01/i });
@@ -49,7 +63,7 @@ test('screen setup gates the adaptive lab and advances into the field instrument
 });
 
 test('a complete session produces an honest, accessible result profile', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/tetracromia');
   await page.getByRole('button', { name: /Begin the color lab/i }).click();
   await page.getByLabel(/I can distinguish the steps/i).check();
   await page.getByRole('button', { name: /Start instrument 01/i }).click();
@@ -86,7 +100,7 @@ test('a complete session produces an honest, accessible result profile', async (
 });
 
 test('pointer drag reorders tiles by insertion and tap-swap is one-shot', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/#/tetracromia');
   await page.getByRole('button', { name: /Begin the color lab/i }).click();
   await page.getByLabel(/I can distinguish the steps/i).check();
   await page.getByRole('button', { name: /Start instrument 01/i }).click();
@@ -137,7 +151,7 @@ test('mobile layout stays inside the viewport through setup and the first trial'
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile-only geometry check');
-  await page.goto('/');
+  await page.goto('/#/tetracromia');
 
   await expect
     .poll(() =>
@@ -154,6 +168,60 @@ test('mobile layout stays inside the viewport through setup and the first trial'
 
   await page.getByLabel(/I can distinguish the steps/i).check();
   await page.getByRole('button', { name: /Start instrument 01/i }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+    )
+    .toBe(true);
+});
+
+test('the colour-blindness screen renders plates and scores a full run', async ({ page }) => {
+  await page.goto('/#/color-blindness');
+  await expect(page.getByRole('heading', { name: /Read the number in the dots/i })).toBeVisible();
+
+  const results = await new AxeBuilder({ page }).analyze();
+  expect(results.violations).toEqual([]);
+
+  await page.getByRole('button', { name: /Start the screen/i }).click();
+  const begin = page.getByRole('button', { name: /Show the first plate/i });
+  await expect(begin).toBeDisabled();
+  await page.getByLabel(/My colour filters are off/i).check();
+  await expect(begin).toBeEnabled();
+  await begin.click();
+
+  // Answer every plate correctly (deterministic order) and reach a scored result.
+  const answers = ['12', '8', '3', '29', '5', '74', '6', '45', '2', '97'];
+  for (const answer of answers) {
+    const canvas = page.locator('[data-plate]');
+    await expect(canvas).toBeVisible();
+    // The plate canvas has non-trivial content (dots were drawn).
+    const painted = await canvas.evaluate((node) => {
+      const ctx = node.getContext('2d');
+      const { data } = ctx.getImageData(0, 0, node.width, node.height);
+      let opaque = 0;
+      for (let i = 3; i < data.length; i += 400) if (data[i] > 0) opaque += 1;
+      return opaque;
+    });
+    expect(painted).toBeGreaterThan(0);
+
+    for (const digit of answer) {
+      await page.getByRole('button', { name: digit, exact: true }).click();
+    }
+    await page.getByRole('button', { name: /submit answer/i }).click();
+  }
+
+  await expect(page.getByRole('heading', { name: /No colour-vision deficiency detected/i })).toBeVisible();
+  await expect(page.getByRole('meter')).toHaveCount(2);
+  await expect(page.locator('.result-note')).toContainText('not a diagnosis');
+});
+
+test('the mobile colour-blindness plate and keypad fit the viewport', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Mobile-only geometry check');
+  await page.goto('/#/color-blindness');
+  await page.getByRole('button', { name: /Start the screen/i }).click();
+  await page.getByLabel(/My colour filters are off/i).check();
+  await page.getByRole('button', { name: /Show the first plate/i }).click();
+  await expect(page.locator('[data-plate]')).toBeVisible();
   await expect
     .poll(() =>
       page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
