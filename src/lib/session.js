@@ -233,6 +233,18 @@ export class ColorLabSession {
     return true;
   }
 
+  /** Remove the tile at fromIndex and re-insert it at toIndex, shifting the rest. */
+  insertSequence(fromIndex, toIndex) {
+    const length = this.currentTrial.order.length;
+    if (fromIndex === toIndex) return false;
+    if (fromIndex < 0 || toIndex < 0 || fromIndex >= length || toIndex >= length) return false;
+    const order = [...this.currentTrial.order];
+    const [moved] = order.splice(fromIndex, 1);
+    order.splice(toIndex, 0, moved);
+    this.currentTrial = { ...this.currentTrial, order };
+    return true;
+  }
+
   submitSequence(elapsedMs = 0) {
     const score = sequenceScore(this.currentTrial.order);
     this.responses.sequence.push({ score, order: [...this.currentTrial.order], elapsedMs });

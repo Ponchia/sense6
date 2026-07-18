@@ -85,6 +85,54 @@ test('a complete session produces an honest, accessible result profile', async (
   expect(results.violations).toEqual([]);
 });
 
+test('pointer drag reorders tiles by insertion and tap-swap is one-shot', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Begin the color lab/i }).click();
+  await page.getByLabel(/I can distinguish the steps/i).check();
+  await page.getByRole('button', { name: /Start instrument 01/i }).click();
+  for (let trial = 0; trial < 14; trial += 1) {
+    await page.getByRole('button', { name: 'Color tile 1', exact: true }).click();
+  }
+  for (let trial = 0; trial < 12; trial += 1) {
+    await page.getByRole('button', { name: 'Dotted field 1', exact: true }).click();
+  }
+  await expect(page.getByRole('heading', { name: /Build the smoothest color path/i })).toBeVisible();
+  // Let the staggered entrance animation settle before measuring geometry.
+  await page.waitForTimeout(700);
+
+  const colors = () =>
+    page.evaluate(() =>
+      [...document.querySelectorAll('.sequence-tile')].map((tile) =>
+        tile.style.getPropertyValue('--tile-color'),
+      ),
+    );
+
+  // Drag the first tile onto the fourth slot: insertion, not swap — the
+  // in-between tiles shift left by one.
+  const before = await colors();
+  const source = page.locator('[data-sequence-index="0"]');
+  const target = page.locator('[data-sequence-index="3"]');
+  const from = await source.boundingBox();
+  const to = await target.boundingBox();
+  await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 8 });
+  await page.mouse.up();
+
+  const afterDrag = await colors();
+  expect(afterDrag[3]).toBe(before[0]);
+  expect(afterDrag.slice(0, 3)).toEqual(before.slice(1, 4));
+
+  // Tap-swap: selecting two tiles swaps them once and clears the selection.
+  await page.locator('[data-sequence-index="1"]').click();
+  await expect(page.locator('[data-sequence-index="1"]')).toHaveAttribute('aria-pressed', 'true');
+  await page.locator('[data-sequence-index="5"]').click();
+  const afterSwap = await colors();
+  expect(afterSwap[1]).toBe(afterDrag[5]);
+  expect(afterSwap[5]).toBe(afterDrag[1]);
+  await expect(page.locator('.sequence-tile.is-selected')).toHaveCount(0);
+});
+
 test('mobile layout stays inside the viewport through setup and the first trial', async ({
   page,
 }, testInfo) => {

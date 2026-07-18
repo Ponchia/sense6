@@ -14,7 +14,8 @@ let session = null;
 let labActive = false;
 let trialStartedAt = 0;
 let selectedSequenceIndex = null;
-let draggedSequenceIndex = null;
+let sequenceDrag = null;
+let suppressNextSequenceClick = false;
 
 const stopTheme = initThemeToggle();
 window.addEventListener('beforeunload', stopTheme);
@@ -348,7 +349,7 @@ function phasePrompt(id) {
 function phaseHelp(id) {
   if (id === 'threshold') return 'Choose once. Trust the first stable difference you see.';
   if (id === 'field') return 'Ignore dot size and brightness. Look for a whole-field hue shift.';
-  return 'The endpoints are fixed. Select two tiles to swap them, or use the arrow controls.';
+  return 'The endpoints are fixed. Drag a tile into place — the row makes room. You can also tap two tiles to swap them.';
 }
 
 function renderThreshold(trial) {
@@ -435,7 +436,6 @@ function renderSequence(trial) {
               return `<button
               class="sequence-tile ${selected ? 'is-selected' : ''}"
               type="button"
-              draggable="true"
               data-sequence-index="${position}"
               aria-label="Movable color tile ${position + 1} of ${trial.order.length}${selected ? ', selected' : ''}"
               aria-pressed="${selected}"
@@ -472,8 +472,8 @@ function sequenceAnchor(color, label) {
 function sequenceStatusText() {
   const run = `Run ${session.trialIndex + 1} of ${session.phase.trials}`;
   return selectedSequenceIndex === null
-    ? `${run} — select a tile to move it.`
-    : `${run} — tile ${selectedSequenceIndex + 1} selected. Tap another tile to swap, or use the arrows.`;
+    ? `${run} — drag a tile into place, or tap two tiles to swap them.`
+    : `${run} — tile ${selectedSequenceIndex + 1} selected. Tap its new place to swap, or use the arrows.`;
 }
 
 /**
@@ -542,14 +542,16 @@ function selectSequence(index) {
   } else if (selectedSequenceIndex === index) {
     selectedSequenceIndex = null;
   } else {
+    // One-shot swap: clear the selection afterwards so the next tap starts
+    // fresh instead of silently arming another swap.
     pulse = [selectedSequenceIndex, index];
     session.swapSequence(selectedSequenceIndex, index);
-    selectedSequenceIndex = index;
-    announce(`Tiles swapped. Tile ${index + 1} selected.`);
+    selectedSequenceIndex = null;
+    announce(`Tiles ${pulse[0] + 1} and ${index + 1} swapped.`);
   }
 
   syncSequenceUi(pulse);
-  document.querySelector(`[data-sequence-index="${selectedSequenceIndex ?? index}"]`)?.focus();
+  document.querySelector(`[data-sequence-index="${index}"]`)?.focus();
 }
 
 function moveSequence(direction) {
@@ -810,6 +812,10 @@ document.addEventListener('click', (event) => {
 
   const sequenceTile = event.target.closest('[data-sequence-index]');
   if (sequenceTile) {
+    if (suppressNextSequenceClick) {
+      suppressNextSequenceClick = false;
+      return;
+    }
     selectSequence(Number(sequenceTile.dataset.sequenceIndex));
     return;
   }
@@ -836,26 +842,120 @@ document.addEventListener('keydown', (event) => {
   moveSequence(event.key === 'ArrowLeft' ? -1 : 1);
 });
 
-document.addEventListener('dragstart', (event) => {
+/*
+ * Pointer-based drag with insertion semantics. HTML5 drag-and-drop never
+ * fires from touch input, so the same pointer path serves mouse, touch, and
+ * pen: press a tile, the row makes room at the insertion point, release to
+ * drop. A small movement threshold keeps plain taps working as taps.
+ */
+const DRAG_THRESHOLD_PX = 8;
+
+function sequenceTiles() {
+  return [...document.querySelectorAll('[data-sequence-index]')];
+}
+
+function dragTargetIndex(drag, pointerX) {
+  const { runLeft, step, count } = drag;
+  const raw = Math.round((pointerX - runLeft - step / 2) / step);
+  return Math.max(0, Math.min(count - 1, raw));
+}
+
+function previewDragShift(drag, targetIndex) {
+  const { index, step } = drag;
+  sequenceTiles().forEach((tile) => {
+    const position = Number(tile.dataset.sequenceIndex);
+    if (position === index) return;
+    let shift = 0;
+    if (index < targetIndex && position > index && position <= targetIndex) shift = -step;
+    if (index > targetIndex && position >= targetIndex && position < index) shift = step;
+    tile.style.transform = shift === 0 ? '' : `translateX(${shift}px)`;
+  });
+}
+
+function endSequenceDrag(commit) {
+  const drag = sequenceDrag;
+  sequenceDrag = null;
+  if (!drag) return;
+
+  const tiles = sequenceTiles();
+  tiles.forEach((tile) => {
+    tile.style.transform = '';
+    tile.classList.remove('is-drag-source');
+  });
+  document.querySelector('#sequence-run')?.classList.remove('is-reordering');
+
+  if (!drag.started) return;
+  suppressNextSequenceClick = true;
+  window.setTimeout(() => {
+    suppressNextSequenceClick = false;
+  }, 120);
+
+  if (commit && session?.phase.id === 'sequence') {
+    const target = dragTargetIndex(drag, drag.lastX);
+    if (session.insertSequence(drag.index, target)) {
+      selectedSequenceIndex = null;
+      syncSequenceUi([target]);
+      announce(`Tile moved to position ${target + 1}.`);
+      document.querySelector(`[data-sequence-index="${target}"]`)?.focus();
+      return;
+    }
+  }
+  syncSequenceUi();
+}
+
+document.addEventListener('pointerdown', (event) => {
   const tile = event.target.closest('[data-sequence-index]');
-  if (!tile) return;
-  draggedSequenceIndex = Number(tile.dataset.sequenceIndex);
-  event.dataTransfer.effectAllowed = 'move';
+  if (!tile || session?.phase.id !== 'sequence' || !event.isPrimary || event.button !== 0) return;
+
+  const run = document.querySelector('#sequence-run');
+  const runBounds = run.getBoundingClientRect();
+  const tileBounds = tile.getBoundingClientRect();
+  const count = session.currentTrial.order.length;
+
+  sequenceDrag = {
+    pointerId: event.pointerId,
+    index: Number(tile.dataset.sequenceIndex),
+    started: false,
+    startX: event.clientX,
+    startY: event.clientY,
+    lastX: event.clientX,
+    runLeft: runBounds.left,
+    step: count > 1 ? (runBounds.width - tileBounds.width) / (count - 1) : tileBounds.width,
+    count,
+    tile,
+  };
 });
 
-document.addEventListener('dragover', (event) => {
-  if (event.target.closest('[data-sequence-index]')) event.preventDefault();
+document.addEventListener('pointermove', (event) => {
+  if (!sequenceDrag || event.pointerId !== sequenceDrag.pointerId) return;
+  const drag = sequenceDrag;
+  drag.lastX = event.clientX;
+
+  if (!drag.started) {
+    if (
+      Math.abs(event.clientX - drag.startX) < DRAG_THRESHOLD_PX &&
+      Math.abs(event.clientY - drag.startY) < DRAG_THRESHOLD_PX
+    ) {
+      return;
+    }
+    drag.started = true;
+    drag.tile.classList.add('is-drag-source');
+    document.querySelector('#sequence-run')?.classList.add('is-reordering');
+    try {
+      drag.tile.setPointerCapture(event.pointerId);
+    } catch {}
+  }
+
+  drag.tile.style.transform = `translateX(${event.clientX - drag.startX}px)`;
+  previewDragShift(drag, dragTargetIndex(drag, event.clientX));
 });
 
-document.addEventListener('drop', (event) => {
-  const tile = event.target.closest('[data-sequence-index]');
-  if (!tile || draggedSequenceIndex === null || !session) return;
-  event.preventDefault();
-  const targetIndex = Number(tile.dataset.sequenceIndex);
-  const pulse = [draggedSequenceIndex, targetIndex];
-  session.swapSequence(draggedSequenceIndex, targetIndex);
-  selectedSequenceIndex = targetIndex;
-  draggedSequenceIndex = null;
-  syncSequenceUi(pulse);
-  announce(`Tile moved to position ${targetIndex + 1}.`);
+document.addEventListener('pointerup', (event) => {
+  if (!sequenceDrag || event.pointerId !== sequenceDrag.pointerId) return;
+  endSequenceDrag(true);
+});
+
+document.addEventListener('pointercancel', (event) => {
+  if (!sequenceDrag || event.pointerId !== sequenceDrag.pointerId) return;
+  endSequenceDrag(false);
 });

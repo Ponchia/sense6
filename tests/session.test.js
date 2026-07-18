@@ -34,6 +34,28 @@ test('sequence scoring rewards the ideal order and penalizes inversions', () => 
   assert.ok(sequenceScore([1, 3, 2, 4]) > 70);
 });
 
+test('insertSequence removes the tile and re-inserts it, shifting the rest', () => {
+  const lab = new ColorLabSession('insert-test');
+  while (lab.phase.id !== 'sequence') lab.answerChoice(lab.currentTrial.answer, 100);
+
+  const before = [...lab.currentTrial.order];
+  assert.ok(lab.insertSequence(1, 4));
+  const after = lab.currentTrial.order;
+  assert.equal(after[4], before[1]);
+  assert.deepEqual(after.slice(1, 4), before.slice(2, 5));
+  assert.deepEqual(
+    [...after].sort((a, b) => a - b),
+    [...before].sort((a, b) => a - b),
+  );
+
+  assert.ok(lab.insertSequence(4, 1));
+  assert.deepEqual(lab.currentTrial.order, before);
+
+  assert.equal(lab.insertSequence(2, 2), false);
+  assert.equal(lab.insertSequence(-1, 3), false);
+  assert.equal(lab.insertSequence(0, 7), false);
+});
+
 test('a complete deterministic session produces bounded results', () => {
   const lab = new ColorLabSession('unit-session');
   let done = false;

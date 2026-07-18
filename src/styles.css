@@ -973,10 +973,26 @@ a:focus-visible {
   animation-delay: calc(var(--pos, 0) * 35ms);
   cursor: grab;
   padding: 0;
+  touch-action: none;
 }
 
 .sequence-tile:active {
   cursor: grabbing;
+}
+
+/* While a pointer drag is in flight the row previews the insertion point:
+   the dragged tile tracks the pointer 1:1, its neighbors slide aside. */
+.sequence-run.is-reordering .sequence-tile {
+  transition: transform 140ms var(--ease-standard);
+}
+
+.sequence-run.is-reordering .sequence-tile.is-drag-source {
+  box-shadow: 0 0.5rem 1.4rem rgb(0 0 0 / 0.35);
+  outline: 2px solid white;
+  outline-offset: 1px;
+  position: relative;
+  transition: none;
+  z-index: 2;
 }
 
 /* Selection and hover must never cover or shift the tile's color area —
@@ -1514,6 +1530,9 @@ a:focus-visible {
   .sequence-tile,
   .sequence-tile.is-swapped {
     animation: none;
+  }
+  .sequence-run.is-reordering .sequence-tile {
+    transition: none;
   }
 }
 
