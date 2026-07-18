@@ -88,6 +88,23 @@ Run all three gates:
 npm run check
 ```
 
+## Deploy
+
+Every push to `main` verifies the app and publishes an immutable
+Linux/AMD64 image to `ghcr.io/ponchia/tetracromia`. The workflow then pins that
+commit-specific image in `Ponchia/vps-infra`. Flux deploys the image from
+`deployments/tetricromia` without giving the app repository direct
+Kubernetes credentials.
+
+The production site is available at
+[`tetricromia.brontolotto.observer`](https://tetricromia.brontolotto.observer).
+The source repository stays private. The container is public because it contains
+only the browser bundle that the public site serves.
+
+The deployment workflow requires the `VPS_INFRA_GITOPS_SSH_KEY` repository
+secret. Its public half is a write-enabled deploy key scoped to
+`Ponchia/vps-infra`.
+
 ## Scientific limits
 
 Browser color output depends on the panel, color profile, browser, brightness,
