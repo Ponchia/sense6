@@ -98,8 +98,9 @@ Kubernetes credentials.
 
 The production site is available at
 [`tetricromia.brontolotto.observer`](https://tetricromia.brontolotto.observer).
-The source repository stays private. The container is public because it contains
-only the browser bundle that the public site serves.
+The source repository and container stay private. Kubernetes receives the
+container through a namespace-scoped GHCR pull secret managed by External
+Secrets Operator and Vaultwarden.
 
 The deployment workflow requires the `VPS_INFRA_GITOPS_SSH_KEY` repository
 secret. Its public half is a write-enabled deploy key scoped to
