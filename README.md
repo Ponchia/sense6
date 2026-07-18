@@ -50,12 +50,16 @@ Research and standards that informed Tetracromia:
 
 ### Daltonia
 
-Daltonia presents a C-shaped target with a gap at the top, right, bottom, or
-left. Target and field consist of randomly sized and positioned dots drawn from
-the same luminance-noise distribution. Twelve presentations for each of three
-display-relative directions are randomly interleaved. Two correct responses
-reduce the chromatic separation, and one error increases it. Three
-high-contrast task controls check that the interaction was understood.
+Daltonia begins with two high-contrast practice targets and immediate feedback.
+The measured run then presents a C-shaped target with a gap at the top, right,
+bottom, or left. Target and field consist of randomly sized and positioned dots
+drawn from the same luminance-noise distribution. It schedules up to twelve
+presentations for each of three display-relative directions. Two correct
+responses reduce the chromatic separation. An incorrect direction or “No gap
+visible” response increases it. An axis ends early after confirmed performance
+at the experiment floor or repeated misses at the experiment maximum, preventing
+unhelpful repetitions at a visibility boundary. Three high-contrast task
+controls check that you understood the interaction.
 
 The three directions are derived from a fixed, D65-referenced transformation
 from linear sRGB into a normalized LMS-like space. This transformation makes the
@@ -64,12 +68,13 @@ spectral output of a display, an observer's cone fundamentals, or anomalous
 trichromacy. CIE cone fundamentals are spectral datasets; applying a fixed
 matrix to consumer display pixels is only an approximation.
 
-The result reports a threshold estimate, run spread, and staircase reversals for
-each direction. Daltonia applies no population norms and does not label a run as
-normal, protan, deutan, or tritan. The implementation has not been validated on
-a diagnosed cohort or compared with an anomaloscope, CAD, Cambridge Colour
-Test, or validated pseudoisochromatic plates. It is therefore an experiment, not
-a screening or diagnostic test.
+The result reports a threshold estimate and, when the staircase settles away
+from a boundary, its run spread and reversals. Boundary runs are reported as
+upper or lower measurement bounds. Daltonia applies no population norms and
+does not label a run as normal, protan, deutan, or tritan. The implementation
+has not been validated on a diagnosed cohort or compared with an anomaloscope,
+CAD, Cambridge Colour Test, or validated pseudoisochromatic plates. It is
+therefore an experiment, not a screening or diagnostic test.
 
 Research and standards that informed Daltonia:
 
