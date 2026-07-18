@@ -37,12 +37,32 @@ const DIRECTION_GLYPHS = {
   left: '←',
 };
 
+const PRACTICE_TARGETS = [
+  {
+    id: 'practice-right',
+    type: 'control',
+    orientation: 'right',
+    strength: 0.32,
+    background: [0.27, 0.32, 0.18],
+  },
+  {
+    id: 'practice-up',
+    type: 'control',
+    orientation: 'up',
+    strength: 0.26,
+    background: [0.27, 0.32, 0.18],
+  },
+];
+
 let app = null;
 let announcer = null;
 let gamutChip = null;
 let goHome = null;
 let run = null;
 let active = false;
+let phase = 'intro';
+let practiceIndex = 0;
+let practiceFeedback = null;
 
 export function mount(context) {
   app = context.app;
@@ -57,12 +77,14 @@ export function mount(context) {
   return () => {
     controller.abort();
     active = false;
+    phase = 'intro';
     document.body.classList.remove('lab-mode');
   };
 }
 
 function renderIntro() {
   active = false;
+  phase = 'intro';
   document.body.classList.remove('lab-mode');
   document.title = 'Experimental colour-vision check — Daltonia | Sensoria';
 
@@ -112,9 +134,9 @@ function renderIntro() {
           <p>The design borrows established psychophysical techniques without claiming their clinical validation.</p>
         </div>
         <ol class="method-steps cb-steps">
-          <li><span>1</span><div><strong>Random C-gap</strong><p>Choose top, right, bottom, or left. Random orientation prevents memorized digits from driving the result.</p></div></li>
+          <li><span>1</span><div><strong>Practice first</strong><p>Two clear targets teach the C-gap interaction with immediate feedback before any threshold is measured.</p></div></li>
           <li><span>2</span><div><strong>Luminance noise</strong><p>Target and field dots share the same brightness variation, reducing a consistent lightness cue.</p></div></li>
-          <li><span>3</span><div><strong>Three staircases</strong><p>Protan-, deutan-, and tritan-aligned display directions become harder after correct responses and easier after errors.</p></div></li>
+          <li><span>3</span><div><strong>Three staircases</strong><p>Directions become harder after correct responses. “No gap visible” counts as a miss and makes that direction easier.</p></div></li>
           <li><span>4</span><div><strong>Run-relative output</strong><p>You receive thresholds and run spread, not a normal/deficient label or a clinical score.</p></div></li>
         </ol>
       </div>
@@ -167,6 +189,8 @@ function researchCard(eyebrow, title, body, href) {
 }
 
 function renderSetup() {
+  active = false;
+  phase = 'setup';
   document.body.classList.add('lab-mode');
   document.title = 'Prepare your display — Daltonia | Sensoria';
   window.scrollTo({ top: 0, behavior: 'instant' });
@@ -191,7 +215,7 @@ function renderSetup() {
           <ol class="setup-list">
             <li><span>1</span><p>Turn off Night Shift, True Tone, blue-light filters, and vivid display modes.</p></li>
             <li><span>2</span><p>Use comfortable medium brightness in even room light, without glare.</p></li>
-            <li><span>3</span><p>View the display straight on at a normal reading distance. Make a best guess when uncertain.</p></li>
+            <li><span>3</span><p>View the display straight on at a normal reading distance. Use “No gap visible” when the target disappears.</p></li>
           </ol>
         </div>
 
@@ -214,7 +238,7 @@ function renderSetup() {
             <span>My colour filters are off and I understand this is an unvalidated browser experiment.</span>
           </label>
           <button class="ui-button ui-button--lg" id="cb-start" type="button" data-action="cb-begin" disabled>
-            Begin adaptive check <span aria-hidden="true">→</span>
+            Start practice <span aria-hidden="true">→</span>
           </button>
           <p class="privacy-note"><span aria-hidden="true">⌁</span> Everything runs locally. No answer leaves the browser.</p>
         </div>
@@ -223,10 +247,112 @@ function renderSetup() {
   `;
 }
 
-function startRun() {
+function startPractice() {
+  active = true;
+  phase = 'practice';
+  practiceIndex = 0;
+  practiceFeedback = null;
+  document.body.classList.add('lab-mode');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  renderPractice();
+  announce('Practice one of two. Find the clear gap in the C.');
+}
+
+function renderPractice() {
+  const trial = PRACTICE_TARGETS[practiceIndex];
+  const correct = practiceFeedback?.correct === true;
+  document.title = `Practice ${practiceIndex + 1} of ${PRACTICE_TARGETS.length} — Daltonia | Sensoria`;
+
+  app.innerHTML = `
+    <section class="cb-view">
+      <div class="lab-topbar ui-container ui-container--wide">
+        <button class="back-link" type="button" data-action="cb-home"><span aria-hidden="true">×</span> End experiment</button>
+        <p class="cb-topbar__label">Learn the C-gap task</p>
+        <span class="trial-count"><b>0${practiceIndex + 1}</b> / 0${PRACTICE_TARGETS.length}</span>
+      </div>
+
+      <div class="cb-stage ui-container cb-stage--practice">
+        <div class="cb-plate-wrap">
+          <div class="cb-plate">
+            <canvas data-target aria-label="Clear dotted practice target with a C-shaped gap"></canvas>
+          </div>
+        </div>
+
+        <div class="cb-answer">
+          <p class="ui-eyebrow">Practice with feedback</p>
+          <h1 class="cb-prompt">Where is the clear gap?</h1>
+          <p class="cb-trial-hint">Learn the shape here. The measured targets will later become faint.</p>
+          <div class="cb-directions" role="group" aria-label="Choose the practice gap direction">
+            ${directionButton('up', correct)}
+            ${directionButton('left', correct)}
+            <span class="cb-directions__center" aria-hidden="true">C</span>
+            ${directionButton('right', correct)}
+            ${directionButton('down', correct)}
+          </div>
+          <button class="ui-button ui-button--ghost cb-unseen" type="button" data-orientation="unseen" ${correct ? 'disabled' : ''}>
+            No gap visible
+          </button>
+          ${practiceFeedback ? practiceFeedbackMarkup(practiceFeedback) : ''}
+          ${
+            correct
+              ? `<button class="ui-button ui-button--lg" type="button" data-action="cb-practice-next">${
+                  practiceIndex === PRACTICE_TARGETS.length - 1
+                    ? 'Begin measured run'
+                    : 'Next practice target'
+                } <span aria-hidden="true">→</span></button>`
+              : ''
+          }
+        </div>
+      </div>
+    </section>
+  `;
+
+  requestAnimationFrame(() => {
+    const canvas = app.querySelector('[data-target]');
+    if (canvas) drawTarget(canvas, trial, trial.id);
+  });
+}
+
+function practiceFeedbackMarkup(feedback) {
+  const tone = feedback.correct ? 'success' : 'warning';
+  return `<div class="ui-alert ui-alert--${tone} cb-practice-feedback" role="status">
+    <div class="ui-alert__body">
+      <strong class="ui-alert__title">${feedback.correct ? 'That is the gap' : 'Try this target again'}</strong>
+      <p>${feedback.message}</p>
+    </div>
+  </div>`;
+}
+
+function submitPracticeAnswer(answer) {
+  if (practiceFeedback?.correct) return;
+  const trial = PRACTICE_TARGETS[practiceIndex];
+  const correct = answer === trial.orientation;
+  practiceFeedback = {
+    correct,
+    message: correct
+      ? `The gap is on the ${DIRECTION_LABELS[trial.orientation]}.`
+      : `This clear practice gap is on the ${DIRECTION_LABELS[trial.orientation]}. Follow the open side of the coloured C.`,
+  };
+  renderPractice();
+  announce(practiceFeedback.message);
+}
+
+function advancePractice() {
+  practiceIndex += 1;
+  practiceFeedback = null;
+  if (practiceIndex >= PRACTICE_TARGETS.length) {
+    beginAdaptiveRun();
+    return;
+  }
+  renderPractice();
+  announce(`Practice ${practiceIndex + 1} of ${PRACTICE_TARGETS.length}. Find the clear gap.`);
+}
+
+function beginAdaptiveRun() {
   const entropy = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}:${performance.now()}`;
   run = createAdaptiveRun(seededRandom(`daltonia:${entropy}`));
   active = true;
+  phase = 'run';
   document.body.classList.add('lab-mode');
   window.scrollTo({ top: 0, behavior: 'instant' });
   renderTrial();
@@ -242,16 +368,16 @@ function renderTrial() {
   }
 
   const total = run.schedule.length;
-  const trialNumber = run.index + 1;
+  const trialNumber = run.responses.length + 1;
   const progress = Math.round((run.index / total) * 100);
-  document.title = `Trial ${trialNumber} of ${total} — Daltonia | Sensoria`;
+  document.title = `Response ${trialNumber}, up to ${total} — Daltonia | Sensoria`;
 
   app.innerHTML = `
     <section class="cb-view">
       <div class="lab-topbar ui-container ui-container--wide">
         <button class="back-link" type="button" data-action="cb-home"><span aria-hidden="true">×</span> End experiment</button>
         <p class="cb-topbar__label">Adaptive colour threshold</p>
-        <span class="trial-count"><b>${String(trialNumber).padStart(2, '0')}</b> / ${String(total).padStart(2, '0')}</span>
+        <span class="trial-count"><b>${String(trialNumber).padStart(2, '0')}</b> / ≤${String(total).padStart(2, '0')}</span>
       </div>
 
       <div class="ui-progress lab-progress" role="progressbar" aria-label="Experiment progress"
@@ -267,9 +393,9 @@ function renderTrial() {
         </div>
 
         <div class="cb-answer">
-          <p class="ui-eyebrow">Four-choice task</p>
+          <p class="ui-eyebrow">Adaptive response</p>
           <h1 class="cb-prompt">Where is the gap?</h1>
-          <p class="cb-trial-hint">Choose the closest answer even when the target is faint.</p>
+          <p class="cb-trial-hint">Some targets should disappear. Say so instead of guessing and that direction will become easier.</p>
           <div class="cb-directions" role="group" aria-label="Choose the gap direction">
             ${directionButton('up')}
             ${directionButton('left')}
@@ -277,7 +403,10 @@ function renderTrial() {
             ${directionButton('right')}
             ${directionButton('down')}
           </div>
-          <p class="cb-key-hint">Keyboard: arrow keys</p>
+          <button class="ui-button ui-button--ghost cb-unseen" type="button" data-orientation="unseen">
+            No gap visible
+          </button>
+          <p class="cb-key-hint">Keyboard: arrow keys · N for no gap</p>
         </div>
       </div>
     </section>
@@ -289,26 +418,32 @@ function renderTrial() {
   });
 }
 
-function directionButton(direction) {
+function directionButton(direction, disabled = false) {
   const label = DIRECTION_LABELS[direction];
-  return `<button class="cb-direction cb-direction--${direction}" type="button" data-orientation="${direction}" aria-label="Gap at ${label}">
+  return `<button class="cb-direction cb-direction--${direction}" type="button" data-orientation="${direction}" aria-label="Gap at ${label}" ${disabled ? 'disabled' : ''}>
     <span aria-hidden="true">${DIRECTION_GLYPHS[direction]}</span><small>${label}</small>
   </button>`;
 }
 
 function submitOrientation(orientation) {
-  if (!active || !run) return;
+  if (!active) return;
+  if (phase === 'practice') {
+    submitPracticeAnswer(orientation);
+    return;
+  }
+  if (phase !== 'run' || !run) return;
   recordAdaptiveAnswer(run, orientation);
   if (run.index >= run.schedule.length) {
     renderResults();
     return;
   }
   renderTrial();
-  announce(`Trial ${run.index + 1}. Choose where the gap points.`);
+  announce(`Response ${run.responses.length + 1}. Choose a direction or no gap visible.`);
 }
 
 function renderResults() {
   active = false;
+  phase = 'results';
   document.body.classList.add('lab-mode');
   window.scrollTo({ top: 0, behavior: 'instant' });
   document.title = 'Your display-relative thresholds — Daltonia | Sensoria';
@@ -357,13 +492,23 @@ function renderResults() {
 }
 
 function thresholdCard(axis) {
+  const prefix = axis.limit === 'floor' ? '≤' : axis.limit === 'ceiling' ? '≥' : '';
+  let note = `${axis.stability === 'settled' ? 'Staircase settled' : 'Limited reversals'} · ${axis.reversals} reversals`;
+  if (axis.limit === 'floor') {
+    note = `Experiment floor confirmed · ${axis.presentations} presentations`;
+  } else if (axis.limit === 'ceiling') {
+    note = `Experiment maximum reached · ${axis.presentations} presentations`;
+  }
+  const spread = axis.limit
+    ? `<p class="cb-threshold-card__spread"><span>${axis.limit === 'floor' ? 'lower' : 'upper'} measurement bound</span></p>`
+    : `<p class="cb-threshold-card__spread">±${axis.spread.toFixed(3)} <span>run spread</span></p>`;
   return `<article class="cb-scorecard cb-threshold-card">
     <div class="cb-scorecard__head">
       <div><h2>${axis.label}</h2><p>${axis.description}</p></div>
-      <strong>${axis.threshold.toFixed(3)}</strong>
+      <strong>${prefix}${axis.threshold.toFixed(3)}</strong>
     </div>
-    <p class="cb-threshold-card__spread">±${axis.spread.toFixed(3)} <span>run spread</span></p>
-    <p class="cb-scorecard__note">${axis.stability === 'settled' ? 'Staircase settled' : 'Limited reversals'} · ${axis.reversals} reversals</p>
+    ${spread}
+    <p class="cb-scorecard__note">${note}</p>
   </article>`;
 }
 
@@ -448,7 +593,11 @@ function announce(message) {
 async function copyResults() {
   const result = summarizeAdaptiveRun(run);
   const thresholds = result.axes
-    .map((axis) => `${axis.label} ${axis.threshold.toFixed(3)} ±${axis.spread.toFixed(3)}`)
+    .map((axis) => {
+      const prefix = axis.limit === 'floor' ? '≤' : axis.limit === 'ceiling' ? '≥' : '';
+      const spread = axis.limit ? '' : ` ±${axis.spread.toFixed(3)}`;
+      return `${axis.label} ${prefix}${axis.threshold.toFixed(3)}${spread}`;
+    })
     .join(', ');
   const summary = `Daltonia experimental browser run — ${thresholds}; task controls ${result.controls.correct}/${result.controls.total}. Display-relative, unvalidated, and not diagnostic.`;
   try {
@@ -515,7 +664,8 @@ function wireEvents(signal) {
         if (active && !window.confirm('End this experiment? Your progress will be lost.')) return;
         renderIntro();
       }
-      if (name === 'cb-begin' && !action.disabled) startRun();
+      if (name === 'cb-begin' && !action.disabled) startPractice();
+      if (name === 'cb-practice-next') advancePractice();
       if (name === 'cb-copy') copyResults();
       if (name === 'gallery') {
         if (active && !window.confirm('Leave the experiment? Your progress will be lost.')) return;
@@ -529,6 +679,11 @@ function wireEvents(signal) {
     'keydown',
     (event) => {
       if (!active) return;
+      if (event.key.toLowerCase() === 'n') {
+        event.preventDefault();
+        submitOrientation('unseen');
+        return;
+      }
       const direction = {
         ArrowUp: 'up',
         ArrowRight: 'right',

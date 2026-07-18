@@ -83,6 +83,54 @@ test('two correct answers lower an axis strength and one error raises it', () =>
   assert.equal(run.axes[type].reversals.length, 1);
 });
 
+test('a no-gap response is a miss and makes that direction easier', () => {
+  const run = createAdaptiveRun(fixedRandom);
+  while (currentAdaptiveTrial(run)?.type === 'control') {
+    const trial = currentAdaptiveTrial(run);
+    recordAdaptiveAnswer(run, trial.orientation);
+  }
+
+  const trial = currentAdaptiveTrial(run);
+  const initial = trial.strength;
+  const response = recordAdaptiveAnswer(run, 'unseen');
+  assert.equal(response.correct, false);
+  assert.equal(response.answer, 'unseen');
+  assert.ok(run.axes[trial.type].strength > initial);
+});
+
+test('confirmed floor performance ends an axis instead of repeating floor trials', () => {
+  const run = createAdaptiveRun(fixedRandom);
+  while (currentAdaptiveTrial(run)) {
+    const trial = currentAdaptiveTrial(run);
+    recordAdaptiveAnswer(run, trial.orientation);
+  }
+
+  const result = summarizeAdaptiveRun(run);
+  for (const axis of result.axes) {
+    const presentations = run.axes[axis.type].presentations;
+    const atFloor = presentations.filter(({ strength }) => strength === ADAPTIVE_CONFIG.minimumStrength);
+    assert.equal(axis.limit, 'floor');
+    assert.equal(atFloor.length, 2);
+    assert.ok(axis.presentations < ADAPTIVE_CONFIG.trialsPerAxis);
+  }
+});
+
+test('two no-gap responses at maximum end an axis at the experiment maximum', () => {
+  const run = createAdaptiveRun(fixedRandom);
+  while (currentAdaptiveTrial(run)) {
+    const trial = currentAdaptiveTrial(run);
+    recordAdaptiveAnswer(run, trial.type === 'control' ? trial.orientation : 'unseen');
+  }
+
+  const result = summarizeAdaptiveRun(run);
+  assert.ok(result.controlOk);
+  for (const axis of result.axes) {
+    assert.equal(axis.limit, 'ceiling');
+    assert.equal(axis.threshold, ADAPTIVE_CONFIG.maximumStrength);
+    assert.ok(axis.presentations < ADAPTIVE_CONFIG.trialsPerAxis);
+  }
+});
+
 test('all-correct runs return lower display-relative thresholds than all-error runs', () => {
   const correctRun = createAdaptiveRun(fixedRandom);
   while (currentAdaptiveTrial(correctRun)) {

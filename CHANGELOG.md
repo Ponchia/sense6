@@ -11,7 +11,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 - Multi-exam suite (Sensoria): a gallery landing and hash router hosting each
   test as a self-contained mount/unmount module.
-- Daltonia — an experimental adaptive colour-vision check with randomized
+- `Daltonia`: an experimental adaptive colour-vision check with randomized
   Landolt-C orientation, luminance-noise dots, three interleaved display-relative
   staircases, repeated task controls, and threshold uncertainty.
 - Adaptive threshold and noisy-field color discrimination instruments.
@@ -26,10 +26,13 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 
-- Daltonia now reports display-relative thresholds instead of fixed plate
+- `Daltonia` now reports display-relative thresholds instead of fixed plate
   percentages or clinical-looking pass/fail categories. Its interface and
-  research trail explicitly identify the implementation as unvalidated.
+  research trail explicitly identify that the implementation isn't validated.
 
 ### Fixed
 
-- Nothing yet.
+- `Daltonia` no longer forces a directional guess when no gap is visible or
+  repeats up to six near-imperceptible trials at its minimum stimulus strength.
+  It now includes feedback-based practice, an explicit no-gap response, and
+  early axis termination at confirmed experiment boundaries.

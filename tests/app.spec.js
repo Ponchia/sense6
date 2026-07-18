@@ -208,26 +208,46 @@ test('the Daltonia experiment renders adaptive targets and reports non-clinical 
   expect(results.violations).toEqual([]);
 
   await page.getByRole('button', { name: /Start the experiment/i }).click();
-  const begin = page.getByRole('button', { name: /Begin adaptive check/i });
+  const begin = page.getByRole('button', { name: /Start practice/i });
   await expect(begin).toBeDisabled();
   await page.getByLabel(/My colour filters are off and I understand/i).check();
   await expect(begin).toBeEnabled();
   await begin.click();
 
-  // Forced choices advance all 39 randomized presentations. Unit tests cover
-  // correctness-aware staircase behavior independently of this rendering path.
-  for (let trial = 0; trial < 39; trial += 1) {
+  // Practice gives corrective feedback rather than silently accepting a guess.
+  await expect(page.getByRole('heading', { name: /Where is the clear gap/i })).toBeVisible();
+  const practiceScan = await new AxeBuilder({ page }).analyze();
+  expect(practiceScan.violations).toEqual([]);
+  await page.getByRole('button', { name: /Gap at top/i }).click();
+  await expect(page.getByText(/Try this target again/i)).toBeVisible();
+  await page.getByRole('button', { name: /Gap at right/i }).click();
+  await expect(page.getByText(/That is the gap/i)).toBeVisible();
+  await page.keyboard.press('n');
+  await expect(page.getByText(/That is the gap/i)).toBeVisible();
+  await page.getByRole('button', { name: /Next practice target/i }).click();
+  await page.getByRole('button', { name: /Gap at top/i }).click();
+  await page.getByRole('button', { name: /Begin measured run/i }).click();
+
+  await expect(page.getByRole('button', { name: /No gap visible/i })).toBeVisible();
+
+  // No-gap responses advance the adaptive run. Axes may now end before the
+  // 39-presentation maximum when a display boundary is confirmed.
+  for (let response = 0; response < 39; response += 1) {
+    if (await page.locator('.results-view').count()) break;
     const canvas = page.locator('[data-target]');
     await expect(canvas).toBeVisible();
-    const painted = await canvas.evaluate((node) => {
-      const ctx = node.getContext('2d');
-      const { data } = ctx.getImageData(0, 0, node.width, node.height);
-      let opaque = 0;
-      for (let i = 3; i < data.length; i += 400) if (data[i] > 0) opaque += 1;
-      return opaque;
-    });
-    expect(painted).toBeGreaterThan(0);
-    await page.getByRole('button', { name: /Gap at top/i }).click();
+    await expect
+      .poll(() =>
+        canvas.evaluate((node) => {
+          const ctx = node.getContext('2d');
+          const { data } = ctx.getImageData(0, 0, node.width, node.height);
+          let opaque = 0;
+          for (let i = 3; i < data.length; i += 400) if (data[i] > 0) opaque += 1;
+          return opaque;
+        }),
+      )
+      .toBeGreaterThan(0);
+    await page.getByRole('button', { name: /No gap visible/i }).click();
   }
 
   await expect(
@@ -246,9 +266,10 @@ test('the mobile Daltonia target and direction controls fit the viewport', async
   await page.goto('/#/color-blindness');
   await page.getByRole('button', { name: /Start the experiment/i }).click();
   await page.getByLabel(/My colour filters are off and I understand/i).check();
-  await page.getByRole('button', { name: /Begin adaptive check/i }).click();
+  await page.getByRole('button', { name: /Start practice/i }).click();
   await expect(page.locator('[data-target]')).toBeVisible();
   await expect(page.getByRole('button', { name: /Gap at top/i })).toBeVisible();
+  await expect(page.getByRole('button', { name: /No gap visible/i })).toBeVisible();
   await expect
     .poll(() =>
       page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),

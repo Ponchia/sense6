@@ -163,6 +163,9 @@ function createAxisState() {
     lastDirection: null,
     reversals: [],
     presentations: [],
+    boundaryMisses: 0,
+    finished: false,
+    limit: null,
   };
 }
 
@@ -218,6 +221,19 @@ export function currentAdaptiveTrial(run) {
 function updateStaircase(state, correct) {
   state.presentations.push({ strength: state.strength, correct });
 
+  if (correct) {
+    state.boundaryMisses = 0;
+  } else if (state.strength >= ADAPTIVE_CONFIG.maximumStrength) {
+    state.boundaryMisses += 1;
+    if (state.boundaryMisses >= 2) {
+      state.finished = true;
+      state.limit = 'ceiling';
+      return;
+    }
+  } else {
+    state.boundaryMisses = 0;
+  }
+
   let direction = null;
   if (correct) {
     state.correctStreak += 1;
@@ -232,6 +248,12 @@ function updateStaircase(state, correct) {
 
   if (!direction) return;
 
+  if (direction === 'down' && state.strength <= ADAPTIVE_CONFIG.minimumStrength) {
+    state.finished = true;
+    state.limit = 'floor';
+    return;
+  }
+
   if (state.lastDirection && state.lastDirection !== direction) {
     state.reversals.push(state.strength);
     state.step = Math.max(ADAPTIVE_CONFIG.minimumStep, state.step * 0.65);
@@ -244,6 +266,14 @@ function updateStaircase(state, correct) {
     ADAPTIVE_CONFIG.minimumStrength,
     ADAPTIVE_CONFIG.maximumStrength,
   );
+}
+
+function skipFinishedAxisSlots(run) {
+  while (run.index < run.schedule.length) {
+    const nextType = run.schedule[run.index].type;
+    if (nextType === 'control' || !run.axes[nextType].finished) return;
+    run.index += 1;
+  }
 }
 
 /** Record a forced-choice answer and advance the run by one presentation. */
@@ -269,10 +299,26 @@ export function recordAdaptiveAnswer(run, answer) {
   };
   run.responses.push(response);
   run.index += 1;
+  skipFinishedAxisSlots(run);
   return response;
 }
 
 function summarizeAxis(type, state) {
+  if (state.limit) {
+    const threshold =
+      state.limit === 'floor' ? ADAPTIVE_CONFIG.minimumStrength : ADAPTIVE_CONFIG.maximumStrength;
+    return {
+      type,
+      ...AXIS_CONFIGS[type],
+      threshold,
+      spread: rounded(state.step),
+      reversals: state.reversals.length,
+      stability: state.limit,
+      limit: state.limit,
+      presentations: state.presentations.length,
+    };
+  }
+
   const reversalWindow = state.reversals.slice(-4);
   const recentWindow = state.presentations.slice(-3).map((entry) => entry.strength);
   const window = reversalWindow.length >= 2 ? reversalWindow : recentWindow;
@@ -287,6 +333,7 @@ function summarizeAxis(type, state) {
     spread: rounded(spread),
     reversals: state.reversals.length,
     stability: state.reversals.length >= 3 ? 'settled' : 'limited',
+    limit: null,
     presentations: state.presentations.length,
   };
 }
