@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Tetracromia is a research-grounded color discrimination lab for the browser."
+    />
+    <meta name="theme-color" content="#f4f4f2" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23111111'/%3E%3Ccircle cx='20' cy='20' r='8' fill='%23ff4250'/%3E%3Ccircle cx='44' cy='20' r='8' fill='%23ffd34e'/%3E%3Ccircle cx='20' cy='44' r='8' fill='%233bd6a2'/%3E%3Ccircle cx='44' cy='44' r='8' fill='%235c75ff'/%3E%3C/svg%3E" />
+    <title>Tetracromia — Color perception lab</title>
+    <script>
+      try {
+        var theme = localStorage.getItem('bronto-theme');
+        if (theme) document.documentElement.dataset.theme = theme;
+      } catch (error) {}
+    </script>
+  </head>
+  <body>
+    <a class="ui-skiplink" href="#main">Skip to the lab</a>
+
+    <header class="site-chrome">
+      <div class="ui-container ui-container--wide">
+        <div class="ui-siteheader">
+          <a class="ui-siteheader__brand brand" href="#top" aria-label="Tetracromia home">
+            Tetracromia
+          </a>
+          <nav class="ui-sitenav" aria-label="Primary navigation">
+            <a href="#lab">Lab</a>
+            <a href="#method">Method</a>
+            <a href="#science">Science</a>
+          </nav>
+          <div class="ui-siteheader__actions">
+            <span class="device-chip" id="gamut-chip" aria-live="polite">Checking display…</span>
+            <button
+              class="ui-button ui-button--ghost ui-button--sm theme-button"
+              type="button"
+              data-bronto-theme-toggle
+              aria-label="Toggle light and dark theme"
+            >
+              <span aria-hidden="true">◐</span>
+              <span class="theme-button__label">Theme</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <div id="app"></div>
+    </main>
+
+    <footer class="ui-container ui-container--wide ui-sitefooter">
+      <p>Tetracromia <span aria-hidden="true">·</span> A screen-level perception experiment.</p>
+      <div class="ui-sitefooter__links">
+        <a href="#science">Scientific limits</a>
+        <a href="https://github.com/Ponchia/tetracromia" rel="noreferrer">Source</a>
+      </div>
+    </footer>
+
+    <div class="sr-only" id="announcer" aria-live="polite" aria-atomic="true"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
+
