@@ -91,17 +91,17 @@ jobs:
           cd vps-infra
           git pull --rebase origin main
           python3 scripts/gitops_set_image_tag.py \
-            --file deployments/tetricromia/kustomization.yaml \
+            --file deployments/tetracromia/kustomization.yaml \
             --image ghcr.io/ponchia/tetracromia \
             --tag "${GITHUB_SHA}"
 
-          if git diff --quiet -- deployments/tetricromia/kustomization.yaml; then
+          if git diff --quiet -- deployments/tetracromia/kustomization.yaml; then
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add deployments/tetricromia/kustomization.yaml
+          git add deployments/tetracromia/kustomization.yaml
           git commit -m "chore(gitops): deploy tetracromia ${GITHUB_SHA}"
 
           pushed=false
