@@ -16,6 +16,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Scientific limits and source trail for the test design.
 - GitHub Actions verification for formatting, unit, build, browser, responsive,
   and accessibility checks.
+- A rootless, security-hardened `nginx` production container.
+- An immutable GitHub Container Registry and Flux deployment workflow.
 
 ### Changed
 
