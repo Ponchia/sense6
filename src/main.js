@@ -439,7 +439,7 @@ function renderSequence(trial) {
               data-sequence-index="${position}"
               aria-label="Movable color tile ${position + 1} of ${trial.order.length}${selected ? ', selected' : ''}"
               aria-pressed="${selected}"
-              style="--tile-color:${toRgbCss(color.l, color.c, color.h)}"
+              style="--tile-color:${toRgbCss(color.l, color.c, color.h)};--pos:${position}"
             ><span>${String(position + 1).padStart(2, '0')}</span></button>`;
             })
             .join('')}
@@ -448,7 +448,7 @@ function renderSequence(trial) {
       </div>
 
       <div class="sequence-controls">
-        <p id="sequence-status">${selectedSequenceIndex === null ? 'Select a tile to move it.' : `Tile ${selectedSequenceIndex + 1} selected.`}</p>
+        <p id="sequence-status">${sequenceStatusText()}</p>
         <div class="ui-cluster">
           <button class="ui-button ui-button--ghost" type="button" data-action="move-sequence" data-direction="-1" ${selectedSequenceIndex === null ? 'disabled' : ''}>
             <span aria-hidden="true">←</span> Move left
@@ -467,6 +467,46 @@ function sequenceAnchor(color, label) {
   return `<div class="sequence-anchor" style="--tile-color:${toRgbCss(color.l, color.c, color.h)}">
     <span>${label}</span>
   </div>`;
+}
+
+function sequenceStatusText() {
+  const run = `Run ${session.trialIndex + 1} of ${session.phase.trials}`;
+  return selectedSequenceIndex === null
+    ? `${run} — select a tile to move it.`
+    : `${run} — tile ${selectedSequenceIndex + 1} selected. Tap another tile to swap, or use the arrows.`;
+}
+
+/**
+ * Update the sequence board in place. Rebuilding the DOM on every interaction
+ * made the whole stage flash and dropped hover/focus state, which read as the
+ * exercise "resetting".
+ */
+function syncSequenceUi(pulsePositions = []) {
+  const trial = session.currentTrial;
+
+  document.querySelectorAll('[data-sequence-index]').forEach((tile) => {
+    const position = Number(tile.dataset.sequenceIndex);
+    const color = trial.colors[trial.order[position]];
+    const selected = selectedSequenceIndex === position;
+    tile.style.setProperty('--tile-color', toRgbCss(color.l, color.c, color.h));
+    tile.classList.toggle('is-selected', selected);
+    tile.setAttribute('aria-pressed', String(selected));
+    tile.setAttribute(
+      'aria-label',
+      `Movable color tile ${position + 1} of ${trial.order.length}${selected ? ', selected' : ''}`,
+    );
+    tile.classList.remove('is-swapped');
+    if (pulsePositions.includes(position)) {
+      void tile.offsetWidth;
+      tile.classList.add('is-swapped');
+    }
+  });
+
+  const status = document.querySelector('#sequence-status');
+  if (status) status.textContent = sequenceStatusText();
+  document.querySelectorAll('[data-action="move-sequence"]').forEach((button) => {
+    button.disabled = selectedSequenceIndex === null;
+  });
 }
 
 function answerChoice(choice) {
@@ -494,18 +534,21 @@ function answerChoice(choice) {
 
 function selectSequence(index) {
   if (session?.phase.id !== 'sequence') return;
+  let pulse = [];
 
   if (selectedSequenceIndex === null) {
     selectedSequenceIndex = index;
+    announce(`Tile ${index + 1} selected.`);
   } else if (selectedSequenceIndex === index) {
     selectedSequenceIndex = null;
   } else {
+    pulse = [selectedSequenceIndex, index];
     session.swapSequence(selectedSequenceIndex, index);
     selectedSequenceIndex = index;
     announce(`Tiles swapped. Tile ${index + 1} selected.`);
   }
 
-  renderLab();
+  syncSequenceUi(pulse);
   document.querySelector(`[data-sequence-index="${selectedSequenceIndex ?? index}"]`)?.focus();
 }
 
@@ -516,8 +559,9 @@ function moveSequence(direction) {
     announce('That tile is already at the edge.');
     return;
   }
+  const pulse = [selectedSequenceIndex, selectedSequenceIndex + direction];
   selectedSequenceIndex += direction;
-  renderLab();
+  syncSequenceUi(pulse);
   document.querySelector(`[data-sequence-index="${selectedSequenceIndex}"]`)?.focus();
   announce(`Tile moved to position ${selectedSequenceIndex + 1}.`);
 }
@@ -571,25 +615,29 @@ function renderResults() {
             <span class="ui-badge ui-badge--accent">Display-relative</span>
           </div>
           ${renderRadar(result.hueProfile)}
-          <div class="profile-key" aria-hidden="true">
-            ${['Warm', 'Yellow', 'Green', 'Cyan', 'Blue', 'Magenta'].map((label, index) => `<span style="--key:${toRgbCss(0.68, 0.12, index * 60 + 20)}">${label}</span>`).join('')}
-          </div>
+          <p class="profile-explain">
+            Each spoke is one hue region, drawn in its real color. The dot shows the share of
+            discrimination trials you answered correctly there — the test keeps overall difficulty
+            near your limit, so shorter spokes mark your relatively weaker directions.
+          </p>
         </article>
 
         <div class="result-details">
-          ${resultMetric('01', 'Threshold', result.thresholdScore, `Boundary ≈ ${result.thresholdDelta.toFixed(2)} ΔEOK`, `${result.thresholdAccuracy}% choices correct`)}
-          ${resultMetric('02', 'Field', result.fieldScore, `Boundary ≈ ${result.fieldDelta.toFixed(2)} ΔEOK`, `${result.fieldAccuracy}% choices correct`)}
-          ${resultMetric('03', 'Sequence', result.sequenceScore, 'Adjacent hue ordering', 'Lower inversion count is better')}
+          ${resultMetric('01', 'Threshold', result.thresholdScore, `Finest step ≈ ${result.thresholdDegrees.toFixed(1)}° of hue (ΔEOK ${result.thresholdDelta.toFixed(2)})`, `${result.thresholdAccuracy}% correct · smaller angle = finer vision`)}
+          ${resultMetric('02', 'Field', result.fieldScore, `Finest shift ≈ ${result.fieldDegrees.toFixed(1)}° of hue through noise (ΔEOK ${result.fieldDelta.toFixed(2)})`, `${result.fieldAccuracy}% correct · smaller angle = finer vision`)}
+          ${resultMetric('03', 'Sequence', result.sequenceScore, 'Hue ordering between fixed anchors', '100 = perfect order · each out-of-place pair costs points')}
         </div>
       </div>
 
       <div class="result-note ui-alert ui-alert--info">
         <div class="ui-alert__body">
-          <strong class="ui-alert__title">What this score means</strong>
+          <strong class="ui-alert__title">How to read this</strong>
           <p>
-            It summarizes this run on this browser and screen. It is useful for comparing your own
-            sessions under similar conditions. It is not a population percentile, diagnosis, or
-            evidence for tetrachromacy.
+            Threshold and Field report the smallest hue difference you kept answering correctly,
+            found adaptively (the app floor is 1.2°, near what an sRGB screen can render).
+            The session index weighs them 35% + 35%, plus 30% for Sequence. Scores describe this
+            run on this browser and screen — useful for comparing your own sessions under similar
+            conditions, not a population percentile, diagnosis, or evidence for tetrachromacy.
           </p>
         </div>
       </div>
@@ -626,41 +674,58 @@ function resultMetric(number, title, score, detail, note) {
   </article>`;
 }
 
-function renderRadar(values) {
-  const center = 150;
-  const radius = 104;
-  const points = values
-    .map((value, index) => {
-      const angle = -Math.PI / 2 + (index * Math.PI * 2) / values.length;
-      const distance = 28 + (radius - 28) * (value / 100);
+function renderRadar(profile) {
+  const center = 160;
+  const radius = 100;
+  const inner = 24;
+  const count = profile.length;
+  const angleAt = (index) => -Math.PI / 2 + (index * Math.PI * 2) / count;
+
+  const points = profile
+    .map(({ score }, index) => {
+      const angle = angleAt(index);
+      const distance = inner + (radius - inner) * ((score ?? 0) / 100);
       return `${center + Math.cos(angle) * distance},${center + Math.sin(angle) * distance}`;
     })
     .join(' ');
-  const axes = values
-    .map((_, index) => {
-      const angle = -Math.PI / 2 + (index * Math.PI * 2) / values.length;
-      return `<line x1="${center}" y1="${center}" x2="${center + Math.cos(angle) * radius}" y2="${center + Math.sin(angle) * radius}" />`;
+
+  const axes = profile
+    .map((family, index) => {
+      const angle = angleAt(index);
+      const x = center + Math.cos(angle) * radius;
+      const y = center + Math.sin(angle) * radius;
+      const labelX = center + Math.cos(angle) * (radius + 24);
+      const labelY = center + Math.sin(angle) * (radius + 24);
+      const anchor = Math.cos(angle) > 0.35 ? 'start' : Math.cos(angle) < -0.35 ? 'end' : 'middle';
+      return `
+        <line class="profile-radar__axis" x1="${center}" y1="${center}" x2="${x}" y2="${y}" />
+        <circle class="profile-radar__swatch" cx="${labelX}" cy="${labelY - 8}" r="6"
+          fill="${toRgbCss(0.7, 0.12, family.hue)}" />
+        <text class="profile-radar__label" x="${labelX}" y="${labelY + 8}" text-anchor="${anchor}">
+          ${family.label} ${family.score ?? '–'}
+        </text>`;
     })
     .join('');
 
-  return `<svg class="profile-radar" viewBox="0 0 300 300" role="img" aria-label="Six-direction hue discrimination profile">
-    <defs>
-      <linearGradient id="profile-fill" x1="0" x2="1" y1="0" y2="1">
-        <stop offset="0" stop-color="${toRgbCss(0.7, 0.14, 20)}" />
-        <stop offset="0.5" stop-color="${toRgbCss(0.7, 0.14, 160)}" />
-        <stop offset="1" stop-color="${toRgbCss(0.7, 0.14, 285)}" />
-      </linearGradient>
-    </defs>
+  const summary = profile
+    .map(({ label, score }) => `${label} ${score === null ? 'no data' : `${score} percent`}`)
+    .join(', ');
+
+  return `<svg class="profile-radar" viewBox="0 0 320 320" role="img"
+    aria-label="Hue discrimination profile, share of correct answers per hue region: ${summary}">
     <g class="profile-radar__grid">
-      <circle cx="150" cy="150" r="28" /><circle cx="150" cy="150" r="54" />
-      <circle cx="150" cy="150" r="79" /><circle cx="150" cy="150" r="104" />${axes}
+      <circle cx="${center}" cy="${center}" r="${inner}" />
+      <circle cx="${center}" cy="${center}" r="${Math.round(inner + (radius - inner) * 0.5)}" />
+      <circle cx="${center}" cy="${center}" r="${radius}" />
     </g>
+    ${axes}
     <polygon class="profile-radar__area" points="${points}" />
     ${points
       .split(' ')
-      .map((point) => {
+      .map((point, index) => {
         const [x, y] = point.split(',');
-        return `<circle class="profile-radar__point" cx="${x}" cy="${y}" r="4" />`;
+        return `<circle class="profile-radar__point" cx="${x}" cy="${y}" r="4.5"
+          fill="${toRgbCss(0.7, 0.12, profile[index].hue)}" />`;
       })
       .join('')}
   </svg>`;
@@ -787,9 +852,10 @@ document.addEventListener('drop', (event) => {
   if (!tile || draggedSequenceIndex === null || !session) return;
   event.preventDefault();
   const targetIndex = Number(tile.dataset.sequenceIndex);
+  const pulse = [draggedSequenceIndex, targetIndex];
   session.swapSequence(draggedSequenceIndex, targetIndex);
   selectedSequenceIndex = targetIndex;
   draggedSequenceIndex = null;
-  renderLab();
+  syncSequenceUi(pulse);
   announce(`Tile moved to position ${targetIndex + 1}.`);
 });

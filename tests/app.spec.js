@@ -61,10 +61,16 @@ test('a complete session produces an honest, accessible result profile', async (
     await page.getByRole('button', { name: 'Dotted field 1', exact: true }).click();
   }
 
+  // Sequence interactions must update the board in place — a full re-render
+  // reads as the exercise resetting.
+  await page.evaluate(() => {
+    document.querySelector('#sequence-run').dataset.probe = 'kept';
+  });
   const firstMovableTile = page.getByRole('button', { name: /Movable color tile 1 of 7/ });
   await firstMovableTile.click();
   await expect(firstMovableTile).toHaveAttribute('aria-pressed', 'true');
   await firstMovableTile.press('ArrowRight');
+  expect(await page.evaluate(() => document.querySelector('#sequence-run').dataset.probe)).toBe('kept');
 
   for (let run = 0; run < 3; run += 1) {
     await page.getByRole('button', { name: /Lock this order/i }).click();
@@ -73,6 +79,7 @@ test('a complete session produces an honest, accessible result profile', async (
   await expect(page.getByRole('heading', { name: /Your visible boundary, on this display/i })).toBeVisible();
   await expect(page.locator('.result-note')).toContainText('not a population percentile');
   await expect(page.getByRole('meter')).toHaveCount(3);
+  await expect(page.locator('.profile-radar__point')).toHaveCount(7);
 
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);

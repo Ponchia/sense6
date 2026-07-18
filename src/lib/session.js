@@ -1,4 +1,4 @@
-import { deltaEok } from './color.js';
+import { circularHueDistance, deltaEok } from './color.js';
 import { randomInt, seededRandom, shuffle } from './random.js';
 
 export const PHASES = [
@@ -25,7 +25,15 @@ export const PHASES = [
   },
 ];
 
-const HUE_FAMILIES = [18, 62, 118, 170, 222, 276, 326];
+export const HUE_FAMILIES = [
+  { hue: 18, label: 'Rose' },
+  { hue: 62, label: 'Amber' },
+  { hue: 118, label: 'Lime' },
+  { hue: 170, label: 'Green' },
+  { hue: 222, label: 'Cyan' },
+  { hue: 276, label: 'Blue' },
+  { hue: 326, label: 'Magenta' },
+];
 
 export function createStaircase({ initial = 18, minimum = 1.2, maximum = 26 } = {}) {
   return {
@@ -91,8 +99,8 @@ export function sequenceScore(order) {
   return maximum === 0 ? 100 : Math.round((1 - inversions / maximum) * 100);
 }
 
-function createDiscriminationTrial(random, staircase, kind) {
-  const baseHue = HUE_FAMILIES[randomInt(random, HUE_FAMILIES.length)] + (random() - 0.5) * 14;
+function createDiscriminationTrial(random, staircase, kind, baseFamilyHue) {
+  const baseHue = baseFamilyHue + (random() - 0.5) * 14;
   const direction = random() > 0.5 ? 1 : -1;
   const reference = {
     l: kind === 'field' ? 0.7 : 0.67,
@@ -147,7 +155,26 @@ export class ColorLabSession {
       field: createStaircase({ initial: 24 }),
     };
     this.responses = { threshold: [], field: [], sequence: [] };
+    this.hueDecks = { threshold: [], field: [] };
     this.currentTrial = this.createTrial();
+  }
+
+  /**
+   * Draw hue families from a shuffled deck that refills when empty, so every
+   * family is sampled evenly across a phase and the hue profile has data in
+   * every direction.
+   */
+  nextBaseHue(kind) {
+    const deck = this.hueDecks[kind];
+    if (deck.length === 0) {
+      deck.push(
+        ...shuffle(
+          HUE_FAMILIES.map(({ hue }) => hue),
+          this.random,
+        ),
+      );
+    }
+    return deck.pop();
   }
 
   get phase() {
@@ -168,7 +195,12 @@ export class ColorLabSession {
 
   createTrial() {
     if (this.phase.id === 'sequence') return createSequenceTrial(this.random, this.trialIndex);
-    return createDiscriminationTrial(this.random, this.staircases[this.phase.id], this.phase.id);
+    return createDiscriminationTrial(
+      this.random,
+      this.staircases[this.phase.id],
+      this.phase.id,
+      this.nextBaseHue(this.phase.id),
+    );
   }
 
   answerChoice(choice, elapsedMs = 0) {
@@ -240,6 +272,8 @@ export class ColorLabSession {
       thresholdScore,
       fieldScore,
       sequenceScore: sequence,
+      thresholdDegrees: thresholdLevel,
+      fieldDegrees: fieldLevel,
       thresholdDelta,
       fieldDelta,
       thresholdAccuracy,
@@ -268,12 +302,29 @@ function discriminationScore(delta) {
   return Math.round(Math.max(0, Math.min(100, 112 - delta * 22)));
 }
 
+function nearestFamilyIndex(hue) {
+  let nearest = 0;
+  let nearestDistance = Number.POSITIVE_INFINITY;
+  HUE_FAMILIES.forEach((family, index) => {
+    const distance = circularHueDistance(hue, family.hue);
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearest = index;
+    }
+  });
+  return nearest;
+}
+
+/**
+ * Share of correct choices per hue family. The staircase keeps overall
+ * difficulty near the observer's boundary, so differences between families
+ * show relative strengths rather than absolute ability.
+ */
 function hueProfile(responses) {
-  return Array.from({ length: 6 }, (_, bin) => {
-    const inBin = responses.filter(({ hue }) => Math.floor(((hue + 30) % 360) / 60) === bin);
-    if (inBin.length === 0) return 50;
-    const correct = inBin.filter((response) => response.correct).length / inBin.length;
-    const averageDelta = inBin.reduce((sum, response) => sum + response.delta, 0) / inBin.length;
-    return Math.round(Math.max(18, Math.min(100, correct * 72 + (8 - averageDelta) * 3.5)));
+  return HUE_FAMILIES.map((family, index) => {
+    const inFamily = responses.filter(({ hue }) => nearestFamilyIndex(hue) === index);
+    if (inFamily.length === 0) return { ...family, score: null, trials: 0 };
+    const correct = inFamily.filter((response) => response.correct).length;
+    return { ...family, score: Math.round((correct / inFamily.length) * 100), trials: inFamily.length };
   });
 }

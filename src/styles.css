@@ -969,25 +969,55 @@ a:focus-visible {
 }
 
 .sequence-tile {
+  animation: tile-in 260ms var(--ease-standard) both;
+  animation-delay: calc(var(--pos, 0) * 35ms);
   cursor: grab;
   padding: 0;
-  transition:
-    transform 120ms ease,
-    outline-color 120ms ease;
 }
 
 .sequence-tile:active {
   cursor: grabbing;
 }
 
-.sequence-tile:hover {
-  transform: translateY(-0.25rem);
+/* Selection and hover must never cover or shift the tile's color area —
+   judging the hue is the whole task. Marker lives outside the tile. */
+@media (hover: hover) {
+  .sequence-tile:hover:not(.is-selected) {
+    outline: 2px solid rgb(255 255 255 / 0.45);
+    outline-offset: 1px;
+  }
 }
 
 .sequence-tile.is-selected {
-  outline: 4px solid white;
-  outline-offset: -8px;
-  transform: translateY(-0.4rem);
+  outline: 2px solid white;
+  outline-offset: 1px;
+}
+
+.sequence-tile.is-selected::after {
+  border: 0.4rem solid transparent;
+  border-block-end: 0.45rem solid white;
+  content: "";
+  inset-block-start: calc(100% + 0.45rem);
+  inset-inline-start: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+}
+
+.sequence-tile.is-swapped {
+  animation: tile-swap 240ms var(--ease-standard);
+}
+
+@keyframes tile-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+}
+
+@keyframes tile-swap {
+  40% {
+    transform: scale(0.93);
+  }
 }
 
 .sequence-tile span {
@@ -1146,40 +1176,40 @@ a:focus-visible {
   stroke-width: 1;
 }
 
+.profile-radar__axis {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
 .profile-radar__area {
-  fill: url("#profile-fill");
-  fill-opacity: 0.3;
+  fill: color-mix(in srgb, var(--text) 10%, transparent);
   stroke: var(--text);
   stroke-width: 2;
 }
 
 .profile-radar__point {
-  fill: var(--panel-strong);
-  stroke: var(--text);
+  stroke: var(--panel-strong);
   stroke-width: 2;
 }
 
-.profile-key {
-  display: grid;
-  gap: 0.4rem;
-  grid-template-columns: repeat(3, 1fr);
+.profile-radar__swatch {
+  stroke: color-mix(in srgb, var(--text) 25%, transparent);
+  stroke-width: 1;
 }
 
-.profile-key span {
-  align-items: center;
-  color: var(--text-dim);
-  display: flex;
+.profile-radar__label {
+  fill: var(--text-dim);
   font-family: var(--mono);
-  font-size: var(--text-2xs);
-  gap: 0.45rem;
+  font-size: 10.5px;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
 }
 
-.profile-key span::before {
-  background: var(--key);
-  block-size: 0.5rem;
-  content: "";
-  inline-size: 0.5rem;
+.profile-explain {
+  color: var(--text-dim);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+  margin: 0;
 }
 
 .result-details {
@@ -1432,7 +1462,7 @@ a:focus-visible {
   }
 
   .sequence-run {
-    gap: 2px;
+    gap: 4px;
   }
 
   .sequence-anchor > span,
@@ -1480,7 +1510,9 @@ a:focus-visible {
     scroll-behavior: auto;
   }
   .color-orbit::before,
-  .spectrum span {
+  .spectrum span,
+  .sequence-tile,
+  .sequence-tile.is-swapped {
     animation: none;
   }
 }

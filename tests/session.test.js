@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   ColorLabSession,
   createStaircase,
+  HUE_FAMILIES,
   sequenceScore,
   staircaseThreshold,
   updateStaircase,
@@ -51,8 +52,38 @@ test('a complete deterministic session produces bounded results', () => {
   assert.equal(result.thresholdAccuracy, 100);
   assert.equal(result.fieldAccuracy, 100);
   assert.ok(result.overall >= 0 && result.overall <= 100);
-  assert.equal(result.hueProfile.length, 6);
-  assert.ok(result.hueProfile.every((value) => value >= 0 && value <= 100));
+  assert.equal(result.hueProfile.length, HUE_FAMILIES.length);
+  assert.ok(
+    result.hueProfile.every(
+      ({ label, score, trials }) => typeof label === 'string' && trials > 0 && score >= 0 && score <= 100,
+    ),
+  );
+});
+
+test('hue families are sampled evenly across each discrimination phase', () => {
+  const lab = new ColorLabSession('balanced-sampling');
+  const seen = { threshold: new Map(), field: new Map() };
+
+  while (lab.phase.id !== 'sequence') {
+    const nearest = HUE_FAMILIES.reduce(
+      (best, family, index) => {
+        const raw = Math.abs(lab.currentTrial.reference.h - family.hue) % 360;
+        const distance = raw > 180 ? 360 - raw : raw;
+        return distance < best.distance ? { index, distance } : best;
+      },
+      { index: 0, distance: Number.POSITIVE_INFINITY },
+    ).index;
+    const counts = seen[lab.phase.id];
+    counts.set(nearest, (counts.get(nearest) ?? 0) + 1);
+    lab.answerChoice(0, 100);
+  }
+
+  // 14 threshold trials over 7 families = exactly two per family; 12 field
+  // trials = one full cycle plus five, so every family appears 1-2 times.
+  assert.ok([...seen.threshold.values()].every((count) => count === 2));
+  assert.equal(seen.threshold.size, HUE_FAMILIES.length);
+  assert.equal(seen.field.size, HUE_FAMILIES.length);
+  assert.ok([...seen.field.values()].every((count) => count >= 1 && count <= 2));
 });
 
 test('sessions with the same seed generate the same trial sequence', () => {
