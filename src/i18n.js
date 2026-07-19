@@ -168,9 +168,9 @@ function isLetterOrNumber(character) {
 function renderLocaleSelector() {
   const selector = document.querySelector('[data-locale-select]');
   if (!selector) return;
-  selector.innerHTML = LOCALES.map(
-    (entry) => `<option value="${entry.code}">${entry.short} · ${entry.label}</option>`,
-  ).join('');
+  selector.innerHTML = LOCALES.map((entry) => `<option value="${entry.code}">${entry.label}</option>`).join(
+    '',
+  );
   selector.value = locale;
   selector.addEventListener('change', () => setLocale(selector.value));
 }
