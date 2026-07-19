@@ -262,3 +262,24 @@ test('long German labels remain inside the mobile viewport', async ({ page }, te
     )
     .toBe(true);
 });
+
+test('the shared shell reflows at 200% text size without hidden controls', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Mobile-only text reflow check');
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('/de/');
+  await page.addStyleTag({ content: 'html { font-size: 200% !important; }' });
+
+  await expectNoHorizontalOverflow(page, '200% text gallery');
+  await expectInVisualViewport(page.locator('.brand'), '200% text brand', {
+    clearOfChrome: false,
+    hitTest: true,
+  });
+  await expectInVisualViewport(page.locator('[data-locale-select]'), '200% text language selector', {
+    clearOfChrome: false,
+    hitTest: true,
+  });
+  await expectInVisualViewport(page.locator('[data-bronto-theme-toggle]'), '200% text theme control', {
+    clearOfChrome: false,
+    hitTest: true,
+  });
+});

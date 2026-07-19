@@ -59,6 +59,11 @@ a:focus-visible {
   white-space: nowrap;
 }
 
+.ui-skiplink {
+  max-inline-size: calc(100vw - 2rem);
+  overflow-wrap: anywhere;
+}
+
 .site-chrome {
   backdrop-filter: blur(18px);
   background: color-mix(in srgb, var(--bg) 91%, transparent);
@@ -1457,6 +1462,7 @@ a:focus-visible {
   }
 
   .site-chrome .ui-siteheader__actions {
+    max-inline-size: 100%;
     min-inline-size: 0;
   }
 
@@ -1470,8 +1476,14 @@ a:focus-visible {
     display: none;
   }
 
+  .locale-picker {
+    flex: 1 1 5.75rem;
+    min-inline-size: 0;
+  }
+
   .locale-picker select {
-    min-inline-size: clamp(5.75rem, 31vw, 7rem);
+    inline-size: 100%;
+    min-inline-size: 0;
     padding-inline: 0.45rem 1.2rem;
   }
 
@@ -1708,6 +1720,22 @@ a:focus-visible {
   font-size: clamp(1.1rem, 2vw, 1.45rem);
   line-height: 1.5;
   max-inline-size: 40rem;
+}
+
+.gallery-heading > *,
+.exam-card__body,
+.exam-card__facts,
+.exam-card__facts li {
+  min-inline-size: 0;
+}
+
+.gallery-heading h2,
+.gallery-heading .ui-eyebrow,
+.exam-card .ui-eyebrow,
+.exam-card__facts li {
+  hyphens: auto;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .sense-mark {
