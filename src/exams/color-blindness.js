@@ -66,6 +66,7 @@ export function mount(context) {
     announcer: context.announcer,
     gamutChip: context.gamutChip,
     goHome: context.navigateHome,
+    lifecycle,
     locale: context.locale,
     run: null,
     active: false,
@@ -91,6 +92,7 @@ export function mount(context) {
 function renderIntro() {
   state.dprGuardCleanup();
   state.active = false;
+  state.lifecycle.setActive(false);
   state.phase = 'intro';
   document.body.classList.remove('lab-mode');
   document.title = t('Experimental colour-vision check — Daltonia | Sense6');
@@ -198,6 +200,7 @@ function researchCard(eyebrow, title, body, href) {
 function renderSetup() {
   state.dprGuardCleanup();
   state.active = false;
+  state.lifecycle.setActive(false);
   state.phase = 'setup';
   document.body.classList.add('lab-mode');
   document.title = t('Prepare your display — Daltonia | Sense6');
@@ -257,6 +260,7 @@ function renderSetup() {
 }
 
 function startPractice() {
+  state.lifecycle.setActive(true, t('Leave the experiment? Your progress will be lost.'));
   state.active = true;
   state.phase = 'practice';
   state.practiceIndex = 0;
@@ -466,6 +470,7 @@ function submitOrientation(orientation) {
 
 function renderResults() {
   state.active = false;
+  state.lifecycle.setActive(false);
   trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.daltonia);
   state.phase = 'results';
   document.body.classList.add('lab-mode');
@@ -751,6 +756,7 @@ function validateMeasurementEnvironment() {
 function invalidateMeasurement(reason) {
   if (!state.active || state.phase !== 'run') return;
   state.active = false;
+  state.lifecycle.setActive(false);
   state.phase = 'invalidated';
   state.run = null;
   state.dprGuardCleanup();

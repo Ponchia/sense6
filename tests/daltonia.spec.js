@@ -202,6 +202,8 @@ test('the primary mobile landing action appears before the decorative preview', 
   test.skip(testInfo.project.name !== 'mobile', 'Mobile-only landing priority check');
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto('/en/color-blindness/');
+  await expect(page.locator('[data-action="cb-setup"]')).toBeVisible();
+  await expect(page.locator('.cb-hero__plate')).toBeVisible();
   const priority = await page.evaluate(() => {
     const action = document.querySelector('[data-action="cb-setup"]').getBoundingClientRect();
     const preview = document.querySelector('.cb-hero__plate').getBoundingClientRect();
@@ -239,12 +241,22 @@ test('shortcuts ignore the locale select and focus returns after a keyboard answ
 });
 
 for (const [change, mutate] of [
-  ['theme', (page) => page.locator('[data-bronto-theme-toggle]').click()],
+  [
+    'theme',
+    (page) =>
+      page.evaluate(() => {
+        document.documentElement.dataset.theme =
+          document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+        document.documentElement.dispatchEvent(new Event('bronto:themechange'));
+      }),
+  ],
   ['geometry', (page) => page.setViewportSize({ width: 844, height: 390 })],
 ]) {
   test(`a ${change} change invalidates the measured run without saving it`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await startMeasuredRun(page);
+    await expect(page.locator('[data-bronto-theme-toggle]')).toBeDisabled();
+    await expect(page.locator('[data-locale-select]')).toBeDisabled();
     await mutate(page);
     await expect(page.locator('[data-invalidated-by]')).toBeVisible();
     await expect(page.getByText(/stopped before a result/i)).toBeVisible();
