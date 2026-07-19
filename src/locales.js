@@ -127,34 +127,6 @@ message(
   'Sin cuenta, sin envíos y sin teatro diagnóstico.',
   'Sem conta, sem envios e sem teatro de diagnóstico.',
 );
-message('Try Udito', 'Prova Udito', 'Udito starten', 'Essayer Udito', 'Probar Udito', 'Experimentar Udito');
-message(
-  'Explore all four tests',
-  'Esplora tutti e quattro i test',
-  'Alle vier Tests ansehen',
-  'Explorer les quatre tests',
-  'Explorar las cuatro pruebas',
-  'Explorar os quatro testes',
-);
-message(
-  'Live now',
-  'Disponibili ora',
-  'Jetzt verfügbar',
-  'Disponibles',
-  'Disponibles ahora',
-  'Disponíveis agora',
-);
-message('tests', 'test', 'Tests', 'tests', 'pruebas', 'testes');
-message('Time for all', 'Tempo totale', 'Gesamtdauer', 'Durée totale', 'Tiempo total', 'Tempo total');
-message(
-  'Data uploaded',
-  'Dati caricati',
-  'Hochgeladene Daten',
-  'Données envoyées',
-  'Datos enviados',
-  'Dados enviados',
-);
-message('None', 'Nessuno', 'Keine', 'Aucune', 'Ninguno', 'Nenhum');
 message('Live signal', 'Segnale attivo', 'Live-Signal', 'Signal actif', 'Señal activa', 'Sinal ativo');
 message(
   'Device relative',
@@ -232,70 +204,6 @@ message(
   'Netteté calibrée et clarté méridienne',
   'Nitidez calibrada y claridad meridional',
   'Nitidez calibrada e clareza meridional',
-);
-message(
-  'Useful because the limits are visible',
-  'Utile perché i limiti sono visibili',
-  'Nützlich, weil die Grenzen sichtbar sind',
-  'Utile parce que les limites sont visibles',
-  'Útil porque los límites son visibles',
-  'Útil porque os limites são visíveis',
-);
-message(
-  'Careful by construction.',
-  'Accurato per progettazione.',
-  'Von Grund auf sorgfältig.',
-  'Rigoureux par conception.',
-  'Riguroso por diseño.',
-  'Rigoroso desde a conceção.',
-);
-message(
-  'Private in practice',
-  'Privato nella pratica',
-  'Praktisch privat',
-  'Privé en pratique',
-  'Privado en la práctica',
-  'Privado na prática',
-);
-message(
-  'Your session stays in this browser. There is no account and nothing is uploaded.',
-  'La sessione rimane in questo browser. Non serve un account e nulla viene caricato.',
-  'Ihre Sitzung bleibt in diesem Browser. Es gibt kein Konto und nichts wird hochgeladen.',
-  'Votre session reste dans ce navigateur. Aucun compte et aucun envoi.',
-  'Tu sesión permanece en este navegador. No hay cuenta y no se envía nada.',
-  'A sua sessão fica neste navegador. Não há conta e nada é enviado.',
-);
-message(
-  'Honest about hardware',
-  'Onesto sull’hardware',
-  'Ehrlich zur Hardware',
-  'Transparent sur le matériel',
-  'Honesto sobre el hardware',
-  'Honesto sobre o equipamento',
-);
-message(
-  'Your screen, audio hardware, room and attention affect results. Every test exposes its setup limits.',
-  'Schermo, hardware audio, ambiente e attenzione influenzano i risultati. Ogni test mostra i limiti della configurazione.',
-  'Bildschirm, Audiogeräte, Raum und Aufmerksamkeit beeinflussen die Ergebnisse. Jeder Test zeigt seine Einrichtungsgrenzen.',
-  'Écran, matériel audio, environnement et attention influencent les résultats. Chaque test expose les limites de l’installation.',
-  'Pantalla, equipo de audio, entorno y atención afectan los resultados. Cada prueba muestra los límites de la configuración.',
-  'Ecrã, equipamento áudio, ambiente e atenção afetam os resultados. Cada teste mostra os limites da configuração.',
-);
-message(
-  'Insight, not a label',
-  'Informazione, non un’etichetta',
-  'Erkenntnis statt Etikett',
-  'Un éclairage, pas une étiquette',
-  'Información, no una etiqueta',
-  'Informação, não um rótulo',
-);
-message(
-  'Results describe this run and this setup. They never pretend to replace calibrated clinical work.',
-  'I risultati descrivono questa sessione e questa configurazione. Non sostituiscono mai una valutazione clinica calibrata.',
-  'Die Ergebnisse beschreiben diesen Durchlauf und diese Einrichtung. Sie ersetzen niemals kalibrierte klinische Verfahren.',
-  'Les résultats décrivent cette session et cette installation. Ils ne remplacent jamais un examen clinique étalonné.',
-  'Los resultados describen esta sesión y esta configuración. Nunca sustituyen una evaluación clínica calibrada.',
-  'Os resultados descrevem esta sessão e esta configuração. Nunca substituem uma avaliação clínica calibrada.',
 );
 message('Open test', 'Apri il test', 'Test öffnen', 'Ouvrir le test', 'Abrir la prueba', 'Abrir o teste');
 message(

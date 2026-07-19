@@ -57,17 +57,6 @@ export function renderGallery(context) {
           Short, careful tests that turn what you notice into honest, device-relative results.
           No account, no upload, no diagnosis theatre.
         </p>
-        <div class="ui-cluster gallery-hero__actions">
-          <a class="ui-button ui-button--lg" href="${localeHref('udito')}">
-            Try Udito <span aria-hidden="true">·</span> 6 min <span aria-hidden="true">→</span>
-          </a>
-          <a class="ui-link ui-link--cta" href="#tests">Explore all four tests</a>
-        </div>
-        <dl class="gallery-proof" aria-label="Sense6 at a glance">
-          <div><dt>Live now</dt><dd>${String(exams.length).padStart(2, '0')} tests</dd></div>
-          <div><dt>Time for all</dt><dd>≈ 20 min</dd></div>
-          <div><dt>Data uploaded</dt><dd>None</dd></div>
-        </dl>
       </div>
 
       <div class="sense-map" aria-hidden="true">
@@ -122,29 +111,6 @@ export function renderGallery(context) {
       </div>
     </section>
 
-    <section class="principles ui-container ui-container--wide" aria-labelledby="principles-title">
-      <div class="principles__intro">
-        <p class="ui-eyebrow">Useful because the limits are visible</p>
-        <h2 id="principles-title">Careful by construction.</h2>
-      </div>
-      <div class="ui-grid principles__grid">
-        <article class="ui-card">
-          <span class="principles__number" aria-hidden="true">01</span>
-          <h3>Private in practice</h3>
-          <p>Your session stays in this browser. There is no account and nothing is uploaded.</p>
-        </article>
-        <article class="ui-card">
-          <span class="principles__number" aria-hidden="true">02</span>
-          <h3>Honest about hardware</h3>
-          <p>Your screen, audio hardware, room and attention affect results. Every test exposes its setup limits.</p>
-        </article>
-        <article class="ui-card">
-          <span class="principles__number" aria-hidden="true">03</span>
-          <h3>Insight, not a label</h3>
-          <p>Results describe this run and this setup. They never pretend to replace calibrated clinical work.</p>
-        </article>
-      </div>
-    </section>
   `;
 
   return () => {};

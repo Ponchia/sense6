@@ -83,6 +83,8 @@ test('the gallery lists exams, is accessible, and routes into one', async ({ pag
   await expect(page.locator('.roadmap-item')).toHaveCount(1);
   await expect(page.locator('.roadmap-item')).toContainText('Calibrated sharpness & meridional clarity');
   await expect(page.locator('.roadmap-item')).toContainText('≈ 7–9 min');
+  await expect(page.locator('.gallery-hero__actions, .gallery-proof, .principles')).toHaveCount(0);
+  await expect(page.getByRole('link', { name: /Try Udito|Explore all four tests/i })).toHaveCount(0);
   await expect
     .poll(() =>
       page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
@@ -113,6 +115,14 @@ test('language routes translate, persist, and remain accessible', async ({ page 
 
   await page.goto('/#/it/');
   await expect(page.locator('html')).toHaveAttribute('lang', 'it');
+  await expect(page.locator('[data-locale-select] option')).toHaveText([
+    'English',
+    'Italiano',
+    'Deutsch',
+    'Français',
+    'Español',
+    'Português',
+  ]);
   await expect(page.getByRole('heading', { name: expectations.it })).toBeVisible();
   await expect(page.locator('.exam-card__link[href="#/it/udito"]')).toBeVisible();
 
@@ -136,12 +146,27 @@ test('language and theme controls do not overlap at narrow header widths', async
   for (const width of [320, 375, 640, 641, 700]) {
     await page.setViewportSize({ width, height: 800 });
     await page.goto('/#/en/');
+    await page.locator('[data-locale-select]').selectOption('pt');
+    await expect(page).toHaveURL(/#\/pt\/$/);
 
     const geometry = await page.evaluate(() => {
-      const locale = document.querySelector('[data-locale-select]').getBoundingClientRect();
+      const localeElement = document.querySelector('[data-locale-select]');
+      const locale = localeElement.getBoundingClientRect();
+      const localeStyle = getComputedStyle(localeElement);
       const theme = document.querySelector('[data-bronto-theme-toggle]').getBoundingClientRect();
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      context.font = `${localeStyle.fontWeight} ${localeStyle.fontSize} ${localeStyle.fontFamily}`;
+      const label = localeElement.selectedOptions[0].textContent;
+      const letterSpacing = Number.parseFloat(localeStyle.letterSpacing) || 0;
+      const labelWidth = context.measureText(label).width + Math.max(0, label.length - 1) * letterSpacing;
+      const labelSpace =
+        locale.width -
+        Number.parseFloat(localeStyle.paddingInlineStart) -
+        Number.parseFloat(localeStyle.paddingInlineEnd);
       return {
         localeRight: locale.right,
+        labelFits: labelWidth <= labelSpace,
         themeLeft: theme.left,
         viewportWidth: document.documentElement.clientWidth,
         contentWidth: document.documentElement.scrollWidth,
@@ -151,6 +176,7 @@ test('language and theme controls do not overlap at narrow header widths', async
     expect(geometry.localeRight, `language selector overlaps theme button at ${width}px`).toBeLessThanOrEqual(
       geometry.themeLeft,
     );
+    expect(geometry.labelFits, `language label is clipped at ${width}px`).toBe(true);
     expect(geometry.contentWidth, `header overflows horizontally at ${width}px`).toBeLessThanOrEqual(
       geometry.viewportWidth,
     );
