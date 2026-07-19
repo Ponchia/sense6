@@ -4,14 +4,7 @@
  * competes with tests people can take now.
  */
 
-const PLANNED = [
-  {
-    name: 'Acutezza',
-    tagline: 'Calibrated sharpness & meridional clarity',
-    glyph: '◎',
-    duration: '≈ 7–9 min',
-  },
-];
+const PLANNED = [];
 
 const TEST_DETAILS = {
   tetracromia: {
@@ -29,6 +22,10 @@ const TEST_DETAILS = {
   udito: {
     category: 'Listening experiment',
     facts: ['3 instruments', 'Volume safety contract', 'No hearing label'],
+  },
+  acutezza: {
+    category: 'Calibrated sharpness experiment',
+    facts: ['Physical screen calibration', '3 per-eye instruments', 'No clinical label'],
   },
 };
 
@@ -88,16 +85,14 @@ export function renderGallery(context) {
       </div>
     </section>
 
-    <section class="roadmap ui-container ui-container--wide" aria-labelledby="roadmap-title">
-      <div class="roadmap__intro">
-        <p class="ui-eyebrow">Next in the lab</p>
-        <h2 id="roadmap-title">More senses, same standard.</h2>
-        <p>In development — visible here as direction, not as something you can start yet.</p>
-      </div>
-      <div class="roadmap__list">
-        ${PLANNED.map((meta, index) => plannedItem(meta, index, exams.length)).join('')}
-      </div>
-    </section>
+    ${
+      PLANNED.length
+        ? `<section class="roadmap ui-container ui-container--wide" aria-labelledby="roadmap-title">
+            <div class="roadmap__intro"><p class="ui-eyebrow">Next in the lab</p><h2 id="roadmap-title">More senses, same standard.</h2><p>In development — visible here as direction, not as something you can start yet.</p></div>
+            <div class="roadmap__list">${PLANNED.map((meta, index) => plannedItem(meta, index, exams.length)).join('')}</div>
+          </section>`
+        : ''
+    }
 
   `;
 
@@ -156,6 +151,10 @@ function previewVisual(id) {
         <span>500</span><span>2k</span><span>18k</span>
       </div>
     `;
+  }
+
+  if (id === 'acutezza') {
+    return `<div class="mini-acuity" aria-hidden="true"><i></i><span></span><b>13.5°</b></div>`;
   }
 
   return `

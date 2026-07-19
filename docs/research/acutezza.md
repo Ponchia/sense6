@@ -3,7 +3,8 @@
 <!-- vale on -->
 <!-- vale Vale.Spelling = NO -->
 
-Status: proposed, 2026-07-19
+Status: implemented as a nonclinical experiment; external validation pending,
+2026-07-19
 
 Acutezza should be a calibrated browser sharpness experiment, not an online eye
 exam. It should describe what a person resolved on one screen, at one estimated
@@ -263,10 +264,11 @@ Add these components when implementation begins:
 - browser tests for zoom invalidation, visibility changes, keyboard/touch paths,
   small-screen refusal, both eye blocks, accessibility, and all six locales.
 
-Register the exam only after it meets the acceptance gates. Until then, keep it
-in the roadmap.
+The browser implementation now covers this shape. Registration as a public,
+nonclinical experiment does not satisfy or replace the external validation gates
+below.
 
-## Acceptance gates before release
+## Validation status and gates before any clinical claim
 
 1. Verify Landolt geometry and visual-angle conversion against independent
    calculations at several pixel densities and distances.
@@ -284,8 +286,15 @@ in the roadmap.
 7. Have an optometrist or ophthalmologist review the setup, safety copy, result
    language, and medical-device boundary before public release.
 
-If these gates are not met, ship no acuity-shaped number. Keep the module as an
-internal prototype or report only within-run task behavior.
+The software implementation covers gates 1 and 2 with deterministic unit and
+simulation tests, and covers browser geometry invalidation, both eye blocks,
+keyboard and touch interaction, responsive layout, six locales, and automated
+accessibility checks. Gates 3–7 require physical-device, comparative, test-retest,
+or professional review and remain open.
+
+Until those gates are met, every angular value remains explicitly a task
+threshold from one calibrated browser run. It must not be presented as clinical
+visual acuity, a Snellen equivalent, screening, diagnosis, or reassurance.
 
 ## Evidence and sources
 

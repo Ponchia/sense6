@@ -369,6 +369,1524 @@ message(
 );
 message('3 instruments', '3 strumenti', '3 Instrumente', '3 instruments', '3 instrumentos', '3 instrumentos');
 
+// Acutezza.
+message(
+  'Three per-eye instruments measure angular detail, low-contrast cost, and repeatable orientation preference without making a clinical claim.',
+  'Tre strumenti per ciascun occhio misurano il dettaglio angolare, il costo del basso contrasto e la preferenza di orientamento ripetibile senza formulare affermazioni cliniche.',
+  'Drei Instrumente pro Auge messen Winkeldetails, den Aufwand bei niedrigem Kontrast und wiederholbare Orientierungspräferenzen, ohne klinische Aussagen zu treffen.',
+  'Trois instruments par œil mesurent le détail angulaire, le coût du faible contraste et une préférence d’orientation répétable, sans revendication clinique.',
+  'Tres instrumentos por ojo miden el detalle angular, el coste del bajo contraste y la preferencia de orientación repetible sin hacer afirmaciones clínicas.',
+  'Três instrumentos por olho medem o detalhe angular, o custo do baixo contraste e a preferência de orientação repetível sem alegações clínicas.',
+);
+message(
+  'Calibrated sharpness experiment',
+  'Esperimento di nitidezza calibrata',
+  'Kalibriertes Sehschärfeexperiment',
+  'Expérience de netteté calibrée',
+  'Experimento de nitidez calibrada',
+  'Experiência de nitidez calibrada',
+);
+message(
+  'Physical screen calibration',
+  'Calibrazione fisica dello schermo',
+  'Physische Bildschirmkalibrierung',
+  'Étalonnage physique de l’écran',
+  'Calibración física de la pantalla',
+  'Calibração física do ecrã',
+);
+message(
+  '3 per-eye instruments',
+  '3 strumenti per occhio',
+  '3 Instrumente pro Auge',
+  '3 instruments par œil',
+  '3 instrumentos por ojo',
+  '3 instrumentos por olho',
+);
+message(
+  'No clinical label',
+  'Nessuna etichetta clinica',
+  'Keine klinische Bewertung',
+  'Aucune étiquette clinique',
+  'Sin etiqueta clínica',
+  'Sem rótulo clínico',
+);
+message(
+  'Vision lab / three instruments / about 8 minutes',
+  'Laboratorio visivo / tre strumenti / circa 8 minuti',
+  'Sehlabor / drei Instrumente / etwa 8 Minuten',
+  'Laboratoire visuel / trois instruments / environ 8 minutes',
+  'Laboratorio visual / tres instrumentos / unos 8 minutos',
+  'Laboratório visual / três instrumentos / cerca de 8 minutos',
+);
+message(
+  'Calibrate the screen.',
+  'Calibra lo schermo.',
+  'Kalibrieren Sie den Bildschirm.',
+  'Étalonnez l’écran.',
+  'Calibra la pantalla.',
+  'Calibre o ecrã.',
+);
+message(
+  'Resolve the opening.',
+  'Risolvi l’apertura.',
+  'Erkennen Sie die Öffnung.',
+  'Distinguez l’ouverture.',
+  'Distingue la abertura.',
+  'Distinga a abertura.',
+);
+message(
+  'Acutezza measures the angular detail resolved by each eye, the cost of lower contrast, and whether a directional clarity preference repeats. It is a perception experiment, not an eye examination.',
+  'Acutezza misura il dettaglio angolare risolto da ciascun occhio, il costo del contrasto ridotto e se una preferenza direzionale di chiarezza si ripete. È un esperimento di percezione, non un esame della vista.',
+  'Acutezza misst die von jedem Auge aufgelösten Winkeldetails, den Aufwand bei geringerem Kontrast und ob sich eine richtungsabhängige Klarheitspräferenz wiederholt. Es ist ein Wahrnehmungsexperiment, keine Augenuntersuchung.',
+  'Acutezza mesure le détail angulaire résolu par chaque œil, le coût d’un contraste réduit et la répétition éventuelle d’une préférence directionnelle de clarté. C’est une expérience de perception, pas un examen de la vue.',
+  'Acutezza mide el detalle angular resuelto por cada ojo, el coste de un contraste menor y si se repite una preferencia direccional de claridad. Es un experimento de percepción, no un examen ocular.',
+  'O Acutezza mede o detalhe angular resolvido por cada olho, o custo de um contraste menor e se uma preferência direcional de clareza se repete. É uma experiência de perceção, não um exame ocular.',
+);
+message(
+  'Prepare the vision lab',
+  'Prepara il laboratorio visivo',
+  'Sehlabor vorbereiten',
+  'Préparer le laboratoire visuel',
+  'Preparar el laboratorio visual',
+  'Preparar o laboratório visual',
+);
+message(
+  'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
+  'Nessuna etichetta 20/20, diagnosi, rilevazione dell’astigmatismo o prescrizione.',
+  'Keine 20/20-Bewertung, Diagnose, Astigmatismuserkennung oder Verordnung.',
+  'Aucune étiquette 20/20, aucun diagnostic, dépistage de l’astigmatisme ou prescription.',
+  'Sin etiqueta 20/20, diagnóstico, detección de astigmatismo ni prescripción.',
+  'Sem rótulo 20/20, diagnóstico, deteção de astigmatismo ou prescrição.',
+);
+message(
+  'Gap angle',
+  'Angolo dell’apertura',
+  'Öffnungswinkel',
+  'Angle de l’ouverture',
+  'Ángulo de la abertura',
+  'Ângulo da abertura',
+);
+message('calibrated', 'calibrato', 'kalibriert', 'étalonné', 'calibrado', 'calibrado');
+message(
+  'Three observations. No composite score.',
+  'Tre osservazioni. Nessun punteggio composito.',
+  'Drei Beobachtungen. Kein Gesamtwert.',
+  'Trois observations. Aucun score composite.',
+  'Tres observaciones. Sin puntuación compuesta.',
+  'Três observações. Sem pontuação composta.',
+);
+message(
+  'High-contrast detail, low-contrast cost, and directional preference remain separate.',
+  'Dettaglio ad alto contrasto, costo del basso contrasto e preferenza direzionale restano separati.',
+  'Hochkontrastdetail, Niedrigkontrastaufwand und Richtungspräferenz bleiben getrennt.',
+  'Le détail à fort contraste, le coût du faible contraste et la préférence directionnelle restent séparés.',
+  'El detalle de alto contraste, el coste del bajo contraste y la preferencia direccional permanecen separados.',
+  'O detalhe de alto contraste, o custo do baixo contraste e a preferência direcional permanecem separados.',
+);
+message(
+  'High-contrast sharpness',
+  'Nitidezza ad alto contrasto',
+  'Hochkontrast-Sehschärfe',
+  'Netteté à fort contraste',
+  'Nitidez de alto contraste',
+  'Nitidez de alto contraste',
+);
+message(
+  'Find the opening.',
+  'Trova l’apertura.',
+  'Finden Sie die Öffnung.',
+  'Trouvez l’ouverture.',
+  'Encuentra la abertura.',
+  'Encontre a abertura.',
+);
+message(
+  'Low-contrast cost',
+  'Costo del basso contrasto',
+  'Niedrigkontrastaufwand',
+  'Coût du faible contraste',
+  'Coste del bajo contraste',
+  'Custo do baixo contraste',
+);
+message(
+  'Find the quieter opening.',
+  'Trova l’apertura più tenue.',
+  'Finden Sie die blassere Öffnung.',
+  'Trouvez l’ouverture plus discrète.',
+  'Encuentra la abertura más tenue.',
+  'Encontre a abertura mais ténue.',
+);
+message(
+  'Orientation consistency',
+  'Coerenza dell’orientamento',
+  'Orientierungskonsistenz',
+  'Régularité d’orientation',
+  'Consistencia de orientación',
+  'Consistência de orientação',
+);
+message(
+  'Which line field looks clearer?',
+  'Quale campo di linee appare più nitido?',
+  'Welches Linienfeld wirkt klarer?',
+  'Quel champ de lignes paraît plus net ?',
+  '¿Qué campo de líneas se ve más claro?',
+  'Qual campo de linhas parece mais nítido?',
+);
+message(
+  'Comfort and context come first.',
+  'Comfort e contesto vengono prima.',
+  'Komfort und Kontext stehen an erster Stelle.',
+  'Le confort et le contexte passent avant tout.',
+  'La comodidad y el contexto son lo primero.',
+  'O conforto e o contexto vêm primeiro.',
+);
+message(
+  'Use your usual correction for this distance. Cover one eye without pressing it, keep your head upright, and stop for discomfort.',
+  'Usa la correzione abituale per questa distanza. Copri un occhio senza premerlo, tieni la testa dritta e fermati in caso di fastidio.',
+  'Verwenden Sie Ihre übliche Korrektur für diese Entfernung. Decken Sie ein Auge ohne Druck ab, halten Sie den Kopf aufrecht und hören Sie bei Beschwerden auf.',
+  'Utilisez votre correction habituelle pour cette distance. Couvrez un œil sans appuyer, gardez la tête droite et arrêtez en cas d’inconfort.',
+  'Usa tu corrección habitual para esta distancia. Cubre un ojo sin presionarlo, mantén la cabeza recta y detente si sientes molestias.',
+  'Use a correção habitual para esta distância. Cubra um olho sem pressionar, mantenha a cabeça direita e pare em caso de desconforto.',
+);
+message(
+  'Sudden vision loss, severe eye pain, new flashes or floaters, or a curtain-like shadow needs prompt professional assessment.',
+  'Una perdita improvvisa della vista, un forte dolore oculare, nuovi lampi o corpi mobili oppure un’ombra simile a una tenda richiedono una valutazione professionale tempestiva.',
+  'Plötzlicher Sehverlust, starke Augenschmerzen, neue Lichtblitze oder Floater oder ein vorhangartiger Schatten erfordern eine rasche professionelle Abklärung.',
+  'Une perte soudaine de vision, une forte douleur oculaire, de nouveaux éclairs ou corps flottants, ou une ombre en rideau nécessitent une évaluation professionnelle rapide.',
+  'La pérdida repentina de visión, dolor ocular intenso, nuevos destellos o moscas volantes, o una sombra como una cortina requieren evaluación profesional inmediata.',
+  'A perda súbita de visão, dor ocular intensa, novos flashes ou moscas volantes, ou uma sombra semelhante a uma cortina exigem avaliação profissional rápida.',
+);
+message(
+  'Do not delay care to take this test.',
+  'Non ritardare le cure per svolgere questo test.',
+  'Verzögern Sie keine Behandlung für diesen Test.',
+  'Ne retardez pas les soins pour effectuer ce test.',
+  'No retrases la atención por hacer esta prueba.',
+  'Não adie cuidados para fazer este teste.',
+);
+message(
+  'What informed Acutezza.',
+  'Cosa ha guidato Acutezza.',
+  'Was Acutezza zugrunde liegt.',
+  'Ce qui a guidé Acutezza.',
+  'Qué ha guiado Acutezza.',
+  'O que orientou o Acutezza.',
+);
+message(
+  'Published methods shape the task. They do not make this implementation clinically validated.',
+  'Metodi pubblicati guidano il compito. Non rendono questa implementazione clinicamente validata.',
+  'Veröffentlichte Methoden prägen die Aufgabe. Sie machen diese Implementierung nicht klinisch validiert.',
+  'Des méthodes publiées structurent la tâche. Elles ne rendent pas cette implémentation cliniquement validée.',
+  'Métodos publicados dan forma a la tarea. No hacen que esta implementación esté validada clínicamente.',
+  'Métodos publicados moldam a tarefa. Não tornam esta implementação clinicamente validada.',
+);
+message(
+  'Prepare your vision setup — Acutezza | Sense6',
+  'Prepara la configurazione visiva — Acutezza | Sense6',
+  'Seheinrichtung vorbereiten — Acutezza | Sense6',
+  'Préparez votre installation visuelle — Acutezza | Sense6',
+  'Prepara tu configuración visual — Acutezza | Sense6',
+  'Prepare a configuração visual — Acutezza | Sense6',
+);
+message(
+  'Setup / adult near-vision experiment',
+  'Configurazione / esperimento visivo da vicino per adulti',
+  'Einrichtung / Nahsehexperiment für Erwachsene',
+  'Installation / expérience de vision de près pour adultes',
+  'Configuración / experimento de visión cercana para adultos',
+  'Configuração / experiência de visão próxima para adultos',
+);
+message(
+  'Stable screen.',
+  'Schermo stabile.',
+  'Stabiler Bildschirm.',
+  'Écran stable.',
+  'Pantalla estable.',
+  'Ecrã estável.',
+);
+message(
+  'Steady distance.',
+  'Distanza costante.',
+  'Konstanter Abstand.',
+  'Distance constante.',
+  'Distancia constante.',
+  'Distância constante.',
+);
+message('One eye.', 'Un occhio.', 'Ein Auge.', 'Un œil.', 'Un ojo.', 'Um olho.');
+message(
+  'Correction during this run',
+  'Correzione durante questa sessione',
+  'Korrektur während dieses Durchlaufs',
+  'Correction pendant cette session',
+  'Corrección durante esta sesión',
+  'Correção durante esta sessão',
+);
+message(
+  'No correction',
+  'Nessuna correzione',
+  'Keine Korrektur',
+  'Aucune correction',
+  'Sin corrección',
+  'Sem correção',
+);
+message('Glasses', 'Occhiali', 'Brille', 'Lunettes', 'Gafas', 'Óculos');
+message(
+  'Contact lenses',
+  'Lenti a contatto',
+  'Kontaktlinsen',
+  'Lentilles de contact',
+  'Lentes de contacto',
+  'Lentes de contacto',
+);
+message('First eye', 'Primo occhio', 'Erstes Auge', 'Premier œil', 'Primer ojo', 'Primeiro olho');
+message(
+  'Right eye first',
+  'Prima l’occhio destro',
+  'Rechtes Auge zuerst',
+  'Œil droit d’abord',
+  'Primero el ojo derecho',
+  'Olho direito primeiro',
+);
+message(
+  'Left eye first',
+  'Prima l’occhio sinistro',
+  'Linkes Auge zuerst',
+  'Œil gauche d’abord',
+  'Primero el ojo izquierdo',
+  'Olho esquerdo primeiro',
+);
+message(
+  'Calibrate the screen',
+  'Calibra lo schermo',
+  'Bildschirm kalibrieren',
+  'Étalonner l’écran',
+  'Calibrar la pantalla',
+  'Calibrar o ecrã',
+);
+message(
+  'Setup contract',
+  'Accordo di configurazione',
+  'Einrichtungsvereinbarung',
+  'Contrat d’installation',
+  'Acuerdo de configuración',
+  'Acordo de configuração',
+);
+message(
+  'Match a physical card',
+  'Abbina una carta fisica',
+  'Physische Karte abgleichen',
+  'Faire correspondre une carte physique',
+  'Ajustar una tarjeta física',
+  'Ajustar um cartão físico',
+);
+message(
+  'Estimate viewing distance',
+  'Stima la distanza di visione',
+  'Betrachtungsabstand schätzen',
+  'Estimer la distance de vision',
+  'Estimar la distancia de visualización',
+  'Estimar a distância de visualização',
+);
+message(
+  'Lock display geometry',
+  'Blocca la geometria dello schermo',
+  'Bildschirmgeometrie sperren',
+  'Verrouiller la géométrie de l’écran',
+  'Bloquear la geometría de la pantalla',
+  'Bloquear a geometria do ecrã',
+);
+message(
+  'Match a real card.',
+  'Abbina una carta reale.',
+  'Gleichen Sie eine echte Karte ab.',
+  'Faites correspondre une vraie carte.',
+  'Ajusta una tarjeta real.',
+  'Ajuste um cartão real.',
+);
+message(
+  'Card width',
+  'Larghezza della carta',
+  'Kartenbreite',
+  'Largeur de la carte',
+  'Ancho de la tarjeta',
+  'Largura do cartão',
+);
+message('Smaller', 'Più piccolo', 'Kleiner', 'Plus petit', 'Más pequeño', 'Menor');
+message('Larger', 'Più grande', 'Größer', 'Plus grand', 'Más grande', 'Maior');
+message('No card?', 'Nessuna carta?', 'Keine Karte?', 'Pas de carte ?', '¿Sin tarjeta?', 'Sem cartão?');
+message(
+  'The edges match',
+  'I bordi coincidono',
+  'Die Kanten stimmen überein',
+  'Les bords correspondent',
+  'Los bordes coinciden',
+  'As margens coincidem',
+);
+message(
+  'The card cannot fit',
+  'La carta non entra',
+  'Die Karte passt nicht',
+  'La carte ne tient pas',
+  'La tarjeta no cabe',
+  'O cartão não cabe',
+);
+message(
+  'Display too narrow',
+  'Schermo troppo stretto',
+  'Bildschirm zu schmal',
+  'Écran trop étroit',
+  'Pantalla demasiado estrecha',
+  'Ecrã demasiado estreito',
+);
+message(
+  'Try card calibration again',
+  'Riprova la calibrazione con la carta',
+  'Kartenkalibrierung erneut versuchen',
+  'Réessayer l’étalonnage par carte',
+  'Reintentar la calibración con tarjeta',
+  'Repetir a calibração com cartão',
+);
+message(
+  'Find the natural blind spot.',
+  'Trova il punto cieco naturale.',
+  'Finden Sie den natürlichen blinden Fleck.',
+  'Trouvez la tache aveugle naturelle.',
+  'Encuentra el punto ciego natural.',
+  'Encontre o ponto cego natural.',
+);
+message(
+  'Check the same distance.',
+  'Controlla la stessa distanza.',
+  'Prüfen Sie denselben Abstand.',
+  'Vérifiez la même distance.',
+  'Comprueba la misma distancia.',
+  'Verifique a mesma distância.',
+);
+message(
+  'Between-eye distance check',
+  'Controllo della distanza tra gli occhi',
+  'Abstandsprüfung zwischen den Augen',
+  'Vérification de distance entre les yeux',
+  'Comprobación de distancia entre ojos',
+  'Verificação de distância entre olhos',
+);
+message(
+  'Fixation square',
+  'Quadrato di fissazione',
+  'Fixationsquadrat',
+  'Carré de fixation',
+  'Cuadrado de fijación',
+  'Quadrado de fixação',
+);
+message(
+  'sweeps remaining',
+  'passaggi rimanenti',
+  'Durchläufe verbleiben',
+  'passages restants',
+  'barridos restantes',
+  'passagens restantes',
+);
+message(
+  'Start sweep',
+  'Avvia il passaggio',
+  'Durchlauf starten',
+  'Démarrer le passage',
+  'Iniciar barrido',
+  'Iniciar passagem',
+);
+message(
+  'Dot disappeared',
+  'Il punto è scomparso',
+  'Punkt verschwunden',
+  'Le point a disparu',
+  'El punto desapareció',
+  'O ponto desapareceu',
+);
+message(
+  'Use a ruler-measured distance',
+  'Usa una distanza misurata con un righello',
+  'Mit Lineal gemessenen Abstand verwenden',
+  'Utiliser une distance mesurée à la règle',
+  'Usar una distancia medida con regla',
+  'Usar uma distância medida com régua',
+);
+message(
+  'Viewing-distance estimate',
+  'Stima della distanza di visione',
+  'Schätzung des Betrachtungsabstands',
+  'Estimation de la distance de vision',
+  'Estimación de la distancia de visualización',
+  'Estimativa da distância de visualização',
+);
+message(
+  'The sweeps did not agree.',
+  'I passaggi non concordano.',
+  'Die Durchläufe stimmen nicht überein.',
+  'Les passages ne concordent pas.',
+  'Los barridos no coinciden.',
+  'As passagens não coincidem.',
+);
+message(
+  'Use this distance',
+  'Usa questa distanza',
+  'Diesen Abstand verwenden',
+  'Utiliser cette distance',
+  'Usar esta distancia',
+  'Usar esta distância',
+);
+message(
+  'Repeat the sweeps',
+  'Ripeti i passaggi',
+  'Durchläufe wiederholen',
+  'Répéter les passages',
+  'Repetir los barridos',
+  'Repetir as passagens',
+);
+message(
+  'Enter measured distance',
+  'Inserisci la distanza misurata',
+  'Gemessenen Abstand eingeben',
+  'Saisir la distance mesurée',
+  'Introducir distancia medida',
+  'Introduzir distância medida',
+);
+message(
+  'Ruler-measured fallback',
+  'Alternativa misurata con righello',
+  'Mit Lineal gemessene Alternative',
+  'Solution mesurée à la règle',
+  'Alternativa medida con regla',
+  'Alternativa medida com régua',
+);
+message(
+  'Measure eye to screen.',
+  'Misura dall’occhio allo schermo.',
+  'Messen Sie vom Auge zum Bildschirm.',
+  'Mesurez de l’œil à l’écran.',
+  'Mide del ojo a la pantalla.',
+  'Meça do olho ao ecrã.',
+);
+message(
+  'Distance in centimetres',
+  'Distanza in centimetri',
+  'Abstand in Zentimetern',
+  'Distance en centimètres',
+  'Distancia en centímetros',
+  'Distância em centímetros',
+);
+message(
+  'Use measured distance',
+  'Usa la distanza misurata',
+  'Gemessenen Abstand verwenden',
+  'Utiliser la distance mesurée',
+  'Usar distancia medida',
+  'Usar a distância medida',
+);
+message(
+  'Return to blind-spot sweeps',
+  'Torna ai passaggi del punto cieco',
+  'Zu den Blinder-Fleck-Durchläufen zurückkehren',
+  'Revenir aux passages de la tache aveugle',
+  'Volver a los barridos del punto ciego',
+  'Voltar às passagens do ponto cego',
+);
+message(
+  'Can you see the inset square?',
+  'Riesci a vedere il quadrato interno?',
+  'Können Sie das innere Quadrat sehen?',
+  'Voyez-vous le carré intérieur ?',
+  '¿Puedes ver el cuadrado interior?',
+  'Consegue ver o quadrado interior?',
+);
+message(
+  'Yes, clearly',
+  'Sì, chiaramente',
+  'Ja, deutlich',
+  'Oui, clairement',
+  'Sí, claramente',
+  'Sim, claramente',
+);
+message(
+  'Not clearly',
+  'Non chiaramente',
+  'Nicht deutlich',
+  'Pas clairement',
+  'No claramente',
+  'Não claramente',
+);
+message(
+  'Low-contrast square inside a larger gray field',
+  'Quadrato a basso contrasto in un campo grigio più grande',
+  'Niedrigkontrastquadrat in einem größeren grauen Feld',
+  'Carré à faible contraste dans un champ gris plus grand',
+  'Cuadrado de bajo contraste dentro de un campo gris mayor',
+  'Quadrado de baixo contraste num campo cinzento maior',
+);
+message(
+  'Calibration locked',
+  'Calibrazione bloccata',
+  'Kalibrierung gesperrt',
+  'Étalonnage verrouillé',
+  'Calibración bloqueada',
+  'Calibração bloqueada',
+);
+message(
+  'The screen now has physical scale.',
+  'Lo schermo ora ha una scala fisica.',
+  'Der Bildschirm hat jetzt einen physischen Maßstab.',
+  'L’écran possède maintenant une échelle physique.',
+  'La pantalla ya tiene escala física.',
+  'O ecrã tem agora uma escala física.',
+);
+message(
+  'Viewing distance',
+  'Distanza di visione',
+  'Betrachtungsabstand',
+  'Distance de vision',
+  'Distancia de visualización',
+  'Distância de visualização',
+);
+message(
+  'Low contrast',
+  'Basso contrasto',
+  'Niedriger Kontrast',
+  'Faible contraste',
+  'Bajo contraste',
+  'Baixo contraste',
+);
+message(
+  'Measurable gap range',
+  'Intervallo misurabile dell’apertura',
+  'Messbarer Öffnungsbereich',
+  'Plage d’ouverture mesurable',
+  'Rango medible de la abertura',
+  'Intervalo mensurável da abertura',
+);
+message('Unavailable', 'Non disponibile', 'Nicht verfügbar', 'Indisponible', 'No disponible', 'Indisponível');
+message(
+  'Measured setup',
+  'Configurazione misurata',
+  'Gemessene Einrichtung',
+  'Installation mesurée',
+  'Configuración medida',
+  'Configuração medida',
+);
+message(
+  'Assumed distance',
+  'Distanza presunta',
+  'Angenommener Abstand',
+  'Distance supposée',
+  'Distancia estimada',
+  'Distância presumida',
+);
+message('Right eye', 'Occhio destro', 'Rechtes Auge', 'Œil droit', 'Ojo derecho', 'Olho direito');
+message('Left eye', 'Occhio sinistro', 'Linkes Auge', 'Œil gauche', 'Ojo izquierdo', 'Olho esquerdo');
+message(
+  'Look at the ring and locate its opening.',
+  'Guarda l’anello e individua l’apertura.',
+  'Sehen Sie auf den Ring und finden Sie seine Öffnung.',
+  'Regardez l’anneau et repérez son ouverture.',
+  'Mira el anillo y localiza su abertura.',
+  'Olhe para o anel e localize a abertura.',
+);
+message(
+  'Landolt ring target',
+  'Bersaglio ad anello di Landolt',
+  'Landolt-Ring-Ziel',
+  'Cible en anneau de Landolt',
+  'Objetivo de anillo de Landolt',
+  'Alvo em anel de Landolt',
+);
+message(
+  'Direction of the opening',
+  'Direzione dell’apertura',
+  'Richtung der Öffnung',
+  'Direction de l’ouverture',
+  'Dirección de la abertura',
+  'Direção da abertura',
+);
+message(
+  'High contrast',
+  'Alto contrasto',
+  'Hoher Kontrast',
+  'Fort contraste',
+  'Alto contraste',
+  'Alto contraste',
+);
+message(
+  'Keep distance fixed',
+  'Mantieni fissa la distanza',
+  'Abstand konstant halten',
+  'Gardez la distance fixe',
+  'Mantén la distancia fija',
+  'Mantenha a distância fixa',
+);
+message(
+  'Forced choice',
+  'Scelta forzata',
+  'Erzwungene Wahl',
+  'Choix forcé',
+  'Elección forzada',
+  'Escolha forçada',
+);
+message(
+  'Yes — that is the opening.',
+  'Sì, quella è l’apertura.',
+  'Ja — das ist die Öffnung.',
+  'Oui — c’est l’ouverture.',
+  'Sí, esa es la abertura.',
+  'Sim — essa é a abertura.',
+);
+message(
+  'Try the same target again. Follow the opening, not the ring.',
+  'Riprova lo stesso bersaglio. Segui l’apertura, non l’anello.',
+  'Versuchen Sie dasselbe Ziel erneut. Folgen Sie der Öffnung, nicht dem Ring.',
+  'Réessayez la même cible. Suivez l’ouverture, pas l’anneau.',
+  'Prueba el mismo objetivo de nuevo. Sigue la abertura, no el anillo.',
+  'Tente o mesmo alvo novamente. Siga a abertura, não o anel.',
+);
+message(
+  'Begin Nitidezza',
+  'Inizia Nitidezza',
+  'Nitidezza starten',
+  'Commencer Nitidezza',
+  'Empezar Nitidezza',
+  'Iniciar Nitidezza',
+);
+message(
+  'Continue to Contrasto',
+  'Continua con Contrasto',
+  'Weiter zu Contrasto',
+  'Continuer vers Contrasto',
+  'Continuar a Contrasto',
+  'Continuar para Contrasto',
+);
+message(
+  'Continue to Meridiani',
+  'Continua con Meridiani',
+  'Weiter zu Meridiani',
+  'Continuer vers Meridiani',
+  'Continuar a Meridiani',
+  'Continuar para Meridiani',
+);
+message(
+  'Without moving closer, which line field looks clearer?',
+  'Senza avvicinarti, quale campo di linee appare più nitido?',
+  'Welches Linienfeld wirkt klarer, ohne dass Sie näher rücken?',
+  'Sans vous rapprocher, quel champ de lignes paraît plus net ?',
+  'Sin acercarte, ¿qué campo de líneas se ve más claro?',
+  'Sem se aproximar, qual campo de linhas parece mais nítido?',
+);
+message(
+  'Left line field',
+  'Campo di linee sinistro',
+  'Linkes Linienfeld',
+  'Champ de lignes gauche',
+  'Campo de líneas izquierdo',
+  'Campo de linhas esquerdo',
+);
+message(
+  'Right line field',
+  'Campo di linee destro',
+  'Rechtes Linienfeld',
+  'Champ de lignes droit',
+  'Campo de líneas derecho',
+  'Campo de linhas direito',
+);
+message(
+  'Left clearer',
+  'Sinistra più nitida',
+  'Links klarer',
+  'Gauche plus net',
+  'Izquierda más clara',
+  'Esquerda mais nítida',
+);
+message(
+  'No difference',
+  'Nessuna differenza',
+  'Kein Unterschied',
+  'Aucune différence',
+  'Sin diferencia',
+  'Sem diferença',
+);
+message(
+  'Right clearer',
+  'Destra più nitida',
+  'Rechts klarer',
+  'Droite plus nette',
+  'Derecha más clara',
+  'Direita mais nítida',
+);
+message(
+  'No astigmatism claim',
+  'Nessuna affermazione sull’astigmatismo',
+  'Keine Astigmatismusaussage',
+  'Aucune affirmation d’astigmatisme',
+  'Sin afirmación de astigmatismo',
+  'Sem alegação de astigmatismo',
+);
+message(
+  'First eye complete',
+  'Primo occhio completato',
+  'Erstes Auge abgeschlossen',
+  'Premier œil terminé',
+  'Primer ojo completado',
+  'Primeiro olho concluído',
+);
+message(
+  'Finish with one eye',
+  'Termina con un occhio',
+  'Mit einem Auge abschließen',
+  'Terminer avec un œil',
+  'Terminar con un ojo',
+  'Terminar com um olho',
+);
+message(
+  'Separate observations.',
+  'Osservazioni separate.',
+  'Getrennte Beobachtungen.',
+  'Observations séparées.',
+  'Observaciones separadas.',
+  'Observações separadas.',
+);
+message(
+  'No vision label.',
+  'Nessuna etichetta visiva.',
+  'Keine Sehbewertung.',
+  'Aucune étiquette visuelle.',
+  'Sin etiqueta visual.',
+  'Sem rótulo visual.',
+);
+message(
+  'High-contrast angular gap',
+  'Apertura angolare ad alto contrasto',
+  'Hochkontrast-Öffnungswinkel',
+  'Ouverture angulaire à fort contraste',
+  'Abertura angular de alto contraste',
+  'Abertura angular de alto contraste',
+);
+message(
+  'Low-contrast angular gap',
+  'Apertura angolare a basso contrasto',
+  'Niedrigkontrast-Öffnungswinkel',
+  'Ouverture angulaire à faible contraste',
+  'Abertura angular de bajo contraste',
+  'Abertura angular de baixo contraste',
+);
+message(
+  'Meridional consistency',
+  'Coerenza meridionale',
+  'Meridionale Konsistenz',
+  'Régularité méridienne',
+  'Consistencia meridional',
+  'Consistência meridional',
+);
+message(
+  'No stable preference',
+  'Nessuna preferenza stabile',
+  'Keine stabile Präferenz',
+  'Aucune préférence stable',
+  'Sin preferencia estable',
+  'Sem preferência estável',
+);
+message(
+  'Calibrated experiment, not an eye examination.',
+  'Esperimento calibrato, non un esame della vista.',
+  'Kalibriertes Experiment, keine Augenuntersuchung.',
+  'Expérience étalonnée, pas un examen de la vue.',
+  'Experimento calibrado, no un examen ocular.',
+  'Experiência calibrada, não um exame ocular.',
+);
+message(
+  'Sudden changes need care, not another run.',
+  'I cambiamenti improvvisi richiedono cure, non un’altra sessione.',
+  'Plötzliche Veränderungen brauchen Versorgung, keinen weiteren Durchlauf.',
+  'Les changements soudains nécessitent des soins, pas une nouvelle session.',
+  'Los cambios repentinos requieren atención, no otra sesión.',
+  'Alterações súbitas exigem cuidados, não outra sessão.',
+);
+message(
+  'This is not vision screening, diagnosis, or a prescription.',
+  'Non è uno screening visivo, una diagnosi o una prescrizione.',
+  'Dies ist weder Sehscreening noch Diagnose oder Verordnung.',
+  'Il ne s’agit ni d’un dépistage visuel, ni d’un diagnostic ou d’une prescription.',
+  'No es un cribado visual, diagnóstico ni prescripción.',
+  'Não é um rastreio visual, diagnóstico ou prescrição.',
+);
+message(
+  'Acutezza — calibrated sharpness profile',
+  'Acutezza — profilo di nitidezza calibrata',
+  'Acutezza — kalibriertes Sehschärfeprofil',
+  'Acutezza — profil de netteté étalonnée',
+  'Acutezza — perfil de nitidez calibrada',
+  'Acutezza — perfil de nitidez calibrada',
+);
+message('preference', 'preferenza', 'Präferenz', 'préférence', 'preferencia', 'preferência');
+message(
+  'no stable preference',
+  'nessuna preferenza stabile',
+  'keine stabile Präferenz',
+  'aucune préférence stable',
+  'sin preferencia estable',
+  'sem preferência estável',
+);
+message(
+  'Calibrated sharpness experiment — Acutezza | Sense6',
+  'Esperimento di nitidezza calibrata — Acutezza | Sense6',
+  'Kalibriertes Sehschärfeexperiment — Acutezza | Sense6',
+  'Expérience de netteté étalonnée — Acutezza | Sense6',
+  'Experimento de nitidez calibrada — Acutezza | Sense6',
+  'Experiência de nitidez calibrada — Acutezza | Sense6',
+);
+message(
+  'Calibrate screen size — Acutezza | Sense6',
+  'Calibra le dimensioni dello schermo — Acutezza | Sense6',
+  'Bildschirmgröße kalibrieren — Acutezza | Sense6',
+  'Étalonner la taille de l’écran — Acutezza | Sense6',
+  'Calibrar el tamaño de la pantalla — Acutezza | Sense6',
+  'Calibrar o tamanho do ecrã — Acutezza | Sense6',
+);
+message(
+  'Estimate viewing distance — Acutezza | Sense6',
+  'Stima la distanza di visione — Acutezza | Sense6',
+  'Betrachtungsabstand schätzen — Acutezza | Sense6',
+  'Estimer la distance de vision — Acutezza | Sense6',
+  'Estimar la distancia de visualización — Acutezza | Sense6',
+  'Estimar a distância de visualização — Acutezza | Sense6',
+);
+message(
+  'Your calibrated sharpness profile — Acutezza | Sense6',
+  'Il tuo profilo di nitidezza calibrata — Acutezza | Sense6',
+  'Ihr kalibriertes Sehschärfeprofil — Acutezza | Sense6',
+  'Votre profil de netteté étalonnée — Acutezza | Sense6',
+  'Tu perfil de nitidez calibrada — Acutezza | Sense6',
+  'O seu perfil de nitidez calibrada — Acutezza | Sense6',
+);
+message(
+  'Gap at top',
+  'Apertura in alto',
+  'Öffnung oben',
+  'Ouverture en haut',
+  'Abertura arriba',
+  'Abertura em cima',
+);
+message(
+  'Gap at upper right',
+  'Apertura in alto a destra',
+  'Öffnung oben rechts',
+  'Ouverture en haut à droite',
+  'Abertura arriba a la derecha',
+  'Abertura em cima à direita',
+);
+message(
+  'Gap at right',
+  'Apertura a destra',
+  'Öffnung rechts',
+  'Ouverture à droite',
+  'Abertura a la derecha',
+  'Abertura à direita',
+);
+message(
+  'Gap at lower right',
+  'Apertura in basso a destra',
+  'Öffnung unten rechts',
+  'Ouverture en bas à droite',
+  'Abertura abajo a la derecha',
+  'Abertura em baixo à direita',
+);
+message(
+  'Gap at bottom',
+  'Apertura in basso',
+  'Öffnung unten',
+  'Ouverture en bas',
+  'Abertura abajo',
+  'Abertura em baixo',
+);
+message(
+  'Gap at lower left',
+  'Apertura in basso a sinistra',
+  'Öffnung unten links',
+  'Ouverture en bas à gauche',
+  'Abertura abajo a la izquierda',
+  'Abertura em baixo à esquerda',
+);
+message(
+  'Gap at left',
+  'Apertura a sinistra',
+  'Öffnung links',
+  'Ouverture à gauche',
+  'Abertura a la izquierda',
+  'Abertura à esquerda',
+);
+message(
+  'Gap at upper left',
+  'Apertura in alto a sinistra',
+  'Öffnung oben links',
+  'Ouverture en haut à gauche',
+  'Abertura arriba a la izquierda',
+  'Abertura em cima à esquerda',
+);
+message(
+  'A Landolt ring changes size while you identify its opening. The estimate belongs to this calibrated distance and display.',
+  'Un anello di Landolt cambia dimensione mentre ne identifichi l’apertura. La stima vale per questa distanza calibrata e questo schermo.',
+  'Ein Landolt-Ring ändert seine Größe, während Sie seine Öffnung bestimmen. Die Schätzung gilt für diesen kalibrierten Abstand und diesen Bildschirm.',
+  'Un anneau de Landolt change de taille pendant que vous repérez son ouverture. L’estimation vaut pour cette distance étalonnée et cet écran.',
+  'Un anillo de Landolt cambia de tamaño mientras identificas su abertura. La estimación corresponde a esta distancia calibrada y esta pantalla.',
+  'Um anel de Landolt muda de tamanho enquanto identifica a abertura. A estimativa pertence a esta distância calibrada e a este ecrã.',
+);
+message(
+  'The same task repeats with a pale target. Sense6 compares conditions within this run, not across devices.',
+  'Lo stesso compito si ripete con un bersaglio tenue. Sense6 confronta le condizioni in questa sessione, non tra dispositivi.',
+  'Dieselbe Aufgabe wird mit einem blassen Ziel wiederholt. Sense6 vergleicht Bedingungen innerhalb dieses Durchlaufs, nicht zwischen Geräten.',
+  'La même tâche se répète avec une cible pâle. Sense6 compare les conditions de cette session, pas les appareils entre eux.',
+  'La misma tarea se repite con un objetivo tenue. Sense6 compara condiciones dentro de esta sesión, no entre dispositivos.',
+  'A mesma tarefa repete-se com um alvo ténue. O Sense6 compara condições nesta sessão, não entre dispositivos.',
+);
+message(
+  'Line fields repeat at two scales and changing pixel phases. A preference appears only when it replicates.',
+  'I campi di linee si ripetono a due scale e con fasi dei pixel variabili. Una preferenza appare solo se si replica.',
+  'Linienfelder werden in zwei Größen und mit wechselnden Pixelphasen wiederholt. Eine Präferenz erscheint nur, wenn sie sich wiederholt.',
+  'Les champs de lignes se répètent à deux échelles et avec des phases de pixels variables. Une préférence n’apparaît que si elle se reproduit.',
+  'Los campos de líneas se repiten a dos escalas y con fases de píxel cambiantes. Una preferencia solo aparece si se replica.',
+  'Os campos de linhas repetem-se em duas escalas e com fases de píxel variáveis. Só surge uma preferência quando se replica.',
+);
+message(
+  'Before testing',
+  'Prima del test',
+  'Vor dem Test',
+  'Avant le test',
+  'Antes de la prueba',
+  'Antes do teste',
+);
+message(
+  'Acutezza setup rules',
+  'Regole di configurazione di Acutezza',
+  'Acutezza-Einrichtungsregeln',
+  'Règles d’installation d’Acutezza',
+  'Reglas de configuración de Acutezza',
+  'Regras de configuração do Acutezza',
+);
+message(
+  'Adaptive burden',
+  'Carico adattivo',
+  'Adaptive Belastung',
+  'Charge adaptative',
+  'Carga adaptativa',
+  'Carga adaptativa',
+);
+message(
+  'Standard optotype',
+  'Ottotipo standard',
+  'Standardoptotyp',
+  'Optotype standard',
+  'Optotipo estándar',
+  'Optótipo padrão',
+);
+message(
+  'Urgent symptoms',
+  'Sintomi urgenti',
+  'Dringende Symptome',
+  'Symptômes urgents',
+  'Síntomas urgentes',
+  'Sintomas urgentes',
+);
+message('Camera', 'Fotocamera', 'Kamera', 'Caméra', 'Cámara', 'Câmara');
+message('Result', 'Risultato', 'Ergebnis', 'Résultat', 'Resultado', 'Resultado');
+message('None', 'Nessuno', 'Keine', 'Aucun', 'Ninguno', 'Nenhum');
+message(
+  'Run relative',
+  'Relativo alla sessione',
+  'Durchlaufbezogen',
+  'Lié à la session',
+  'Relativo a la sesión',
+  'Relativo à sessão',
+);
+message(
+  'Calibration 01 / physical screen scale',
+  'Calibrazione 01 / scala fisica dello schermo',
+  'Kalibrierung 01 / physischer Bildschirmmaßstab',
+  'Étalonnage 01 / échelle physique de l’écran',
+  'Calibración 01 / escala física de la pantalla',
+  'Calibração 01 / escala física do ecrã',
+);
+message(
+  'Calibration 02 / estimated viewing distance',
+  'Calibrazione 02 / distanza di visione stimata',
+  'Kalibrierung 02 / geschätzter Betrachtungsabstand',
+  'Étalonnage 02 / distance de vision estimée',
+  'Calibración 02 / distancia de visualización estimada',
+  'Calibração 02 / distância de visualização estimada',
+);
+message(
+  'Calibration 03 / contrast availability',
+  'Calibrazione 03 / disponibilità del contrasto',
+  'Kalibrierung 03 / Kontrastverfügbarkeit',
+  'Étalonnage 03 / disponibilité du contraste',
+  'Calibración 03 / disponibilidad del contraste',
+  'Calibração 03 / disponibilidade do contraste',
+);
+message(
+  'Between-eye setup check',
+  'Controllo della configurazione tra gli occhi',
+  'Einrichtungsprüfung zwischen den Augen',
+  'Vérification de l’installation entre les yeux',
+  'Comprobación de configuración entre ojos',
+  'Verificação da configuração entre olhos',
+);
+message(
+  'Changing pixel phase',
+  'Fase dei pixel variabile',
+  'Wechselnde Pixelphase',
+  'Phase de pixels variable',
+  'Fase de píxel cambiante',
+  'Fase de píxel variável',
+);
+message(
+  'Two repeated scales',
+  'Due scale ripetute',
+  'Zwei wiederholte Größen',
+  'Deux échelles répétées',
+  'Dos escalas repetidas',
+  'Duas escalas repetidas',
+);
+message(
+  'Comparison recorded.',
+  'Confronto registrato.',
+  'Vergleich erfasst.',
+  'Comparaison enregistrée.',
+  'Comparación registrada.',
+  'Comparação registada.',
+);
+message(
+  'A physical card and blind-spot sweeps establish screen scale and estimated viewing distance.',
+  'Una carta fisica e i passaggi del punto cieco stabiliscono la scala dello schermo e la distanza di visione stimata.',
+  'Eine physische Karte und Blinder-Fleck-Durchläufe bestimmen Bildschirmmaßstab und geschätzten Betrachtungsabstand.',
+  'Une carte physique et des passages sur la tache aveugle établissent l’échelle de l’écran et la distance de vision estimée.',
+  'Una tarjeta física y barridos del punto ciego establecen la escala de la pantalla y la distancia de visualización estimada.',
+  'Um cartão físico e passagens pelo ponto cego estabelecem a escala do ecrã e a distância de visualização estimada.',
+);
+message(
+  'The Landolt ring provides language-independent, eight-direction geometry.',
+  'L’anello di Landolt offre una geometria a otto direzioni indipendente dalla lingua.',
+  'Der Landolt-Ring bietet eine sprachunabhängige Geometrie mit acht Richtungen.',
+  'L’anneau de Landolt offre une géométrie à huit directions indépendante de la langue.',
+  'El anillo de Landolt ofrece una geometría de ocho direcciones independiente del idioma.',
+  'O anel de Landolt oferece uma geometria de oito direções independente do idioma.',
+);
+message(
+  'Eighteen eight-choice trials balance precision and effort in FrACT research.',
+  'Diciotto prove a otto scelte bilanciano precisione e impegno nella ricerca FrACT.',
+  'Achtzehn Versuche mit acht Wahlmöglichkeiten gleichen in der FrACT-Forschung Präzision und Aufwand aus.',
+  'Dix-huit essais à huit choix équilibrent précision et effort dans la recherche FrACT.',
+  'Dieciocho ensayos de ocho opciones equilibran precisión y esfuerzo en la investigación FrACT.',
+  'Dezoito ensaios com oito opções equilibram precisão e esforço na investigação FrACT.',
+);
+message(
+  'Safety copy reflects guidance for sudden floaters, flashes, or curtain-like shadows.',
+  'Il testo di sicurezza riflette le indicazioni su corpi mobili, lampi o ombre a tenda improvvisi.',
+  'Der Sicherheitstext folgt Hinweisen zu plötzlich auftretenden Floatern, Lichtblitzen oder vorhangartigen Schatten.',
+  'Le texte de sécurité reprend les recommandations concernant les corps flottants, éclairs ou ombres en rideau soudains.',
+  'El texto de seguridad refleja la orientación sobre moscas volantes, destellos o sombras como una cortina repentinos.',
+  'O texto de segurança reflete orientações sobre moscas volantes, flashes ou sombras semelhantes a uma cortina repentinos.',
+);
+message(
+  'Use a laptop, tablet, or monitor without glare. Reset browser zoom, keep brightness comfortable, and leave the display still after calibration.',
+  'Usa un portatile, tablet o monitor senza riflessi. Ripristina lo zoom del browser, mantieni una luminosità confortevole e non muovere lo schermo dopo la calibrazione.',
+  'Verwenden Sie einen Laptop, ein Tablet oder einen Monitor ohne Blendung. Setzen Sie den Browserzoom zurück, wählen Sie eine angenehme Helligkeit und lassen Sie den Bildschirm nach der Kalibrierung unverändert.',
+  'Utilisez un ordinateur portable, une tablette ou un moniteur sans reflets. Réinitialisez le zoom du navigateur, gardez une luminosité confortable et ne déplacez plus l’écran après l’étalonnage.',
+  'Usa un portátil, tableta o monitor sin reflejos. Restablece el zoom del navegador, mantén un brillo cómodo y no muevas la pantalla tras la calibración.',
+  'Use um portátil, tablet ou monitor sem reflexos. Reponha o zoom do navegador, mantenha um brilho confortável e não mova o ecrã após a calibração.',
+);
+message(
+  'I am 18 or older; I will use my usual correction for this distance; I can cover either eye without pressing it; I understand this is not an eye examination.',
+  'Ho almeno 18 anni; userò la mia correzione abituale per questa distanza; posso coprire entrambi gli occhi senza premerli; comprendo che questo non è un esame della vista.',
+  'Ich bin mindestens 18 Jahre alt; ich verwende meine übliche Korrektur für diesen Abstand; ich kann jedes Auge ohne Druck abdecken; mir ist klar, dass dies keine Augenuntersuchung ist.',
+  'J’ai au moins 18 ans ; j’utiliserai ma correction habituelle pour cette distance ; je peux couvrir chaque œil sans appuyer ; je comprends qu’il ne s’agit pas d’un examen de la vue.',
+  'Tengo 18 años o más; usaré mi corrección habitual para esta distancia; puedo cubrir cualquiera de los ojos sin presionarlo; entiendo que esto no es un examen ocular.',
+  'Tenho 18 anos ou mais; usarei a correção habitual para esta distância; consigo cobrir qualquer olho sem o pressionar; compreendo que isto não é um exame ocular.',
+);
+message(
+  'Place the blank side of a standard bank or identity card against the screen. Adjust the rectangle until its outer edges match. Sense6 reads no card details and uses no camera.',
+  'Appoggia allo schermo il lato vuoto di una carta bancaria o d’identità standard. Regola il rettangolo finché i bordi esterni coincidono. Sense6 non legge alcun dato della carta e non usa la fotocamera.',
+  'Halten Sie die leere Seite einer üblichen Bank- oder Ausweiskarte an den Bildschirm. Passen Sie das Rechteck an, bis die Außenkanten übereinstimmen. Sense6 liest keine Kartendaten und verwendet keine Kamera.',
+  'Placez le côté vierge d’une carte bancaire ou d’identité standard contre l’écran. Ajustez le rectangle jusqu’à ce que les bords extérieurs coïncident. Sense6 ne lit aucune donnée de la carte et n’utilise pas la caméra.',
+  'Coloca el lado en blanco de una tarjeta bancaria o de identidad estándar contra la pantalla. Ajusta el rectángulo hasta que coincidan los bordes exteriores. Sense6 no lee datos de la tarjeta ni usa la cámara.',
+  'Coloque o lado em branco de um cartão bancário ou de identificação padrão contra o ecrã. Ajuste o retângulo até as margens exteriores coincidirem. O Sense6 não lê dados do cartão nem usa a câmara.',
+);
+message(
+  'Use a ruler and set the rectangle to exactly 85.6 mm wide. If the card cannot fit, rotate to landscape or use a larger screen.',
+  'Usa un righello e imposta il rettangolo a esattamente 85,6 mm di larghezza. Se la carta non entra, ruota in orizzontale o usa uno schermo più grande.',
+  'Verwenden Sie ein Lineal und stellen Sie das Rechteck auf genau 85,6 mm Breite ein. Wenn die Karte nicht passt, drehen Sie ins Querformat oder verwenden Sie einen größeren Bildschirm.',
+  'Utilisez une règle et réglez le rectangle sur exactement 85,6 mm de large. Si la carte ne tient pas, passez en mode paysage ou utilisez un écran plus grand.',
+  'Usa una regla y ajusta el rectángulo a exactamente 85,6 mm de ancho. Si la tarjeta no cabe, gira a horizontal o usa una pantalla mayor.',
+  'Use uma régua e defina o retângulo com exatamente 85,6 mm de largura. Se o cartão não couber, rode para horizontal ou use um ecrã maior.',
+);
+message(
+  'This screen cannot show the calibration card at physical size.',
+  'Questo schermo non può mostrare la carta di calibrazione nelle dimensioni fisiche corrette.',
+  'Dieser Bildschirm kann die Kalibrierkarte nicht in physischer Größe anzeigen.',
+  'Cet écran ne peut pas afficher la carte d’étalonnage à sa taille physique.',
+  'Esta pantalla no puede mostrar la tarjeta de calibración a tamaño físico.',
+  'Este ecrã não consegue mostrar o cartão de calibração no tamanho físico.',
+);
+message(
+  'Rotate to landscape or continue on a larger tablet, laptop, or monitor. Acutezza will not guess physical screen size.',
+  'Ruota in orizzontale o continua su un tablet, portatile o monitor più grande. Acutezza non indovinerà le dimensioni fisiche dello schermo.',
+  'Drehen Sie ins Querformat oder verwenden Sie ein größeres Tablet, einen Laptop oder Monitor. Acutezza schätzt die physische Bildschirmgröße nicht.',
+  'Passez en mode paysage ou continuez sur une tablette, un ordinateur portable ou un moniteur plus grand. Acutezza ne devinera pas la taille physique de l’écran.',
+  'Gira a horizontal o continúa en una tableta, portátil o monitor mayor. Acutezza no adivinará el tamaño físico de la pantalla.',
+  'Rode para horizontal ou continue num tablet, portátil ou monitor maior. O Acutezza não irá adivinhar o tamanho físico do ecrã.',
+);
+message(
+  'Keep this viewport, browser zoom, orientation, and viewing distance unchanged.',
+  'Mantieni invariati finestra, zoom del browser, orientamento e distanza di visione.',
+  'Lassen Sie Ansichtsbereich, Browserzoom, Ausrichtung und Betrachtungsabstand unverändert.',
+  'Gardez la fenêtre, le zoom du navigateur, l’orientation et la distance de vision inchangés.',
+  'Mantén sin cambios la ventana, el zoom del navegador, la orientación y la distancia de visualización.',
+  'Mantenha inalterados a janela, o zoom do navegador, a orientação e a distância de visualização.',
+);
+message(
+  'Screen scale is measured, but distance came from manual entry. Results retain this caution.',
+  'La scala dello schermo è misurata, ma la distanza è stata inserita manualmente. I risultati mantengono questa cautela.',
+  'Der Bildschirmmaßstab ist gemessen, der Abstand wurde jedoch manuell eingegeben. Die Ergebnisse behalten diesen Hinweis.',
+  'L’échelle de l’écran est mesurée, mais la distance a été saisie manuellement. Les résultats conservent cet avertissement.',
+  'La escala de la pantalla está medida, pero la distancia se introdujo manualmente. Los resultados conservan esta precaución.',
+  'A escala do ecrã foi medida, mas a distância foi introduzida manualmente. Os resultados mantêm este aviso.',
+);
+message(
+  'Prepare {eye}',
+  'Prepara {eye}',
+  '{eye} vorbereiten',
+  'Préparer {eye}',
+  'Preparar {eye}',
+  'Preparar {eye}',
+);
+message(
+  'Eye {current} of 2 / {eye}',
+  'Occhio {current} di 2 / {eye}',
+  'Auge {current} von 2 / {eye}',
+  'Œil {current} sur 2 / {eye}',
+  'Ojo {current} de 2 / {eye}',
+  'Olho {current} de 2 / {eye}',
+);
+message(
+  'Cover the {eye}.',
+  'Copri {eye}.',
+  '{eye} abdecken.',
+  'Couvrez {eye}.',
+  'Cubre {eye}.',
+  'Cubra {eye}.',
+);
+message(
+  'Keep the {eye} open.',
+  'Tieni aperto {eye}.',
+  '{eye} offen halten.',
+  'Gardez {eye} ouvert.',
+  'Mantén {eye} abierto.',
+  'Mantenha {eye} aberto.',
+);
+message(
+  'Use an opaque card or your palm without pressing the covered eye. Keep your head upright and remain at about {distance} cm.',
+  'Usa una carta opaca o il palmo senza premere l’occhio coperto. Tieni la testa dritta e resta a circa {distance} cm.',
+  'Verwenden Sie eine undurchsichtige Karte oder Ihre Handfläche, ohne auf das abgedeckte Auge zu drücken. Halten Sie den Kopf aufrecht und bleiben Sie etwa {distance} cm entfernt.',
+  'Utilisez une carte opaque ou votre paume sans appuyer sur l’œil couvert. Gardez la tête droite et restez à environ {distance} cm.',
+  'Usa una tarjeta opaca o la palma sin presionar el ojo cubierto. Mantén la cabeza recta y quédate a unos {distance} cm.',
+  'Use um cartão opaco ou a palma sem pressionar o olho coberto. Mantenha a cabeça direita e fique a cerca de {distance} cm.',
+);
+message(
+  'Four easy practice targets come first.',
+  'Prima vengono quattro bersagli facili di pratica.',
+  'Zuerst folgen vier einfache Übungsziele.',
+  'Quatre cibles faciles d’entraînement viennent d’abord.',
+  'Primero aparecen cuatro objetivos fáciles de práctica.',
+  'Primeiro surgem quatro alvos fáceis de prática.',
+);
+message(
+  'Use the direction pad or matching number keys.',
+  'Usa il selettore direzionale o i tasti numerici corrispondenti.',
+  'Verwenden Sie das Richtungsfeld oder die passenden Zifferntasten.',
+  'Utilisez le pavé directionnel ou les touches numériques correspondantes.',
+  'Usa el mando de direcciones o las teclas numéricas correspondientes.',
+  'Use o painel direcional ou as teclas numéricas correspondentes.',
+);
+message(
+  'Guess when uncertain; do not move closer.',
+  'Se non sei sicuro, prova a indovinare; non avvicinarti.',
+  'Raten Sie bei Unsicherheit; gehen Sie nicht näher heran.',
+  'Devinez en cas d’incertitude ; ne vous rapprochez pas.',
+  'Adivina si dudas; no te acerques.',
+  'Adivinhe se tiver dúvidas; não se aproxime.',
+);
+message(
+  'Keep brightness comfortable. This checks whether the display preserves the nominal {contrast}% condition; it does not calibrate luminance.',
+  'Mantieni una luminosità confortevole. Questo verifica se lo schermo conserva la condizione nominale del {contrast}%; non calibra la luminanza.',
+  'Wählen Sie eine angenehme Helligkeit. Dies prüft, ob der Bildschirm die nominelle {contrast}%-Bedingung erhält; die Leuchtdichte wird nicht kalibriert.',
+  'Gardez une luminosité confortable. Ceci vérifie si l’écran préserve la condition nominale de {contrast} % ; cela n’étalonne pas la luminance.',
+  'Mantén un brillo cómodo. Esto comprueba si la pantalla conserva la condición nominal del {contrast}%; no calibra la luminancia.',
+  'Mantenha um brilho confortável. Isto verifica se o ecrã preserva a condição nominal de {contrast}%; não calibra a luminância.',
+);
+message(
+  'If unavailable, Acutezza skips Contrasto instead of producing a misleading value.',
+  'Se non disponibile, Acutezza salta Contrasto invece di produrre un valore fuorviante.',
+  'Wenn nicht verfügbar, überspringt Acutezza Contrasto, anstatt einen irreführenden Wert zu erzeugen.',
+  'Si elle n’est pas disponible, Acutezza ignore Contrasto plutôt que de produire une valeur trompeuse.',
+  'Si no está disponible, Acutezza omite Contrasto en lugar de producir un valor engañoso.',
+  'Se não estiver disponível, o Acutezza ignora Contrasto em vez de produzir um valor enganador.',
+);
+message(
+  'Return to {distance} cm.',
+  'Torna a {distance} cm.',
+  'Kehren Sie zu {distance} cm zurück.',
+  'Revenez à {distance} cm.',
+  'Vuelve a {distance} cm.',
+  'Volte a {distance} cm.',
+);
+message(
+  'Re-measure from eye to screen, confirm the viewport is unchanged, then continue.',
+  'Misura di nuovo dall’occhio allo schermo, conferma che la finestra non sia cambiata, poi continua.',
+  'Messen Sie erneut vom Auge zum Bildschirm, bestätigen Sie den unveränderten Ansichtsbereich und fahren Sie fort.',
+  'Mesurez à nouveau de l’œil à l’écran, confirmez que la fenêtre n’a pas changé, puis continuez.',
+  'Vuelve a medir del ojo a la pantalla, confirma que la ventana no ha cambiado y continúa.',
+  'Meça novamente do olho ao ecrã, confirme que a janela não mudou e continue.',
+);
+message(
+  'Setup unchanged — continue',
+  'Configurazione invariata — continua',
+  'Einrichtung unverändert — weiter',
+  'Installation inchangée — continuer',
+  'Configuración sin cambios — continuar',
+  'Configuração inalterada — continuar',
+);
+message(
+  'Sit in the position you will keep and measure from the bridge of your nose to the screen. This run remains labelled “assumed distance.”',
+  'Siediti nella posizione che manterrai e misura dal ponte del naso allo schermo. Questa sessione resta etichettata come “distanza presunta”.',
+  'Setzen Sie sich in die Position, die Sie beibehalten, und messen Sie vom Nasenrücken bis zum Bildschirm. Dieser Durchlauf bleibt als „angenommener Abstand“ gekennzeichnet.',
+  'Asseyez-vous dans la position que vous garderez et mesurez de l’arête du nez à l’écran. Cette session reste étiquetée « distance supposée ».',
+  'Siéntate en la posición que mantendrás y mide desde el puente de la nariz hasta la pantalla. Esta sesión conserva la etiqueta «distancia estimada».',
+  'Sente-se na posição que irá manter e meça da ponte do nariz ao ecrã. Esta sessão mantém o rótulo “distância presumida”.',
+);
+message('assumed', 'presunta', 'angenommen', 'supposée', 'estimada', 'presumida');
+message('measured', 'misurata', 'gemessen', 'mesurée', 'medida', 'medida');
+message('nominal', 'nominale', 'nominell', 'nominal', 'nominal', 'nominal');
+message(
+  'nominal contrast',
+  'contrasto nominale',
+  'Nennkontrast',
+  'contraste nominal',
+  'contraste nominal',
+  'contraste nominal',
+);
+message(
+  'Cover your right eye. Keep your left eye fixed on the square at the right. Start a sweep, then press Space or the button when the violet dot disappears. Do not follow the dot.',
+  'Copri l’occhio destro. Tieni l’occhio sinistro fisso sul quadrato a destra. Avvia un passaggio, poi premi Spazio o il pulsante quando il punto viola scompare. Non seguire il punto.',
+  'Decken Sie das rechte Auge ab. Fixieren Sie mit dem linken Auge das Quadrat rechts. Starten Sie einen Durchlauf und drücken Sie die Leertaste oder die Schaltfläche, sobald der violette Punkt verschwindet. Folgen Sie dem Punkt nicht.',
+  'Couvrez l’œil droit. Fixez avec l’œil gauche le carré à droite. Lancez un passage, puis appuyez sur Espace ou sur le bouton lorsque le point violet disparaît. Ne suivez pas le point.',
+  'Cubre el ojo derecho. Mantén el ojo izquierdo fijo en el cuadrado de la derecha. Inicia un barrido y pulsa Espacio o el botón cuando desaparezca el punto violeta. No sigas el punto.',
+  'Cubra o olho direito. Mantenha o olho esquerdo fixo no quadrado à direita. Inicie uma passagem e prima Espaço ou o botão quando o ponto violeta desaparecer. Não siga o ponto.',
+);
+message(
+  'Keep the right eye covered and look only at the square.',
+  'Tieni coperto l’occhio destro e guarda solo il quadrato.',
+  'Lassen Sie das rechte Auge abgedeckt und schauen Sie nur auf das Quadrat.',
+  'Gardez l’œil droit couvert et regardez uniquement le carré.',
+  'Mantén cubierto el ojo derecho y mira solo el cuadrado.',
+  'Mantenha o olho direito coberto e olhe apenas para o quadrado.',
+);
+message(
+  'Acutezza / this display / this distance',
+  'Acutezza / questo schermo / questa distanza',
+  'Acutezza / dieser Bildschirm / dieser Abstand',
+  'Acutezza / cet écran / cette distance',
+  'Acutezza / esta pantalla / esta distancia',
+  'Acutezza / este ecrã / esta distância',
+);
+message(
+  'The calibration and task controls support interpretation of this run at the stated distance.',
+  'La calibrazione e i controlli del compito consentono di interpretare questa sessione alla distanza indicata.',
+  'Kalibrierung und Aufgabenkontrollen ermöglichen die Interpretation dieses Durchlaufs beim angegebenen Abstand.',
+  'L’étalonnage et les contrôles de tâche permettent d’interpréter cette session à la distance indiquée.',
+  'La calibración y los controles de tarea permiten interpretar esta sesión a la distancia indicada.',
+  'A calibração e os controlos da tarefa permitem interpretar esta sessão à distância indicada.',
+);
+message(
+  'A calibration or task-control check was limited. Repeat before comparing runs.',
+  'Un controllo di calibrazione o del compito era limitato. Ripeti prima di confrontare le sessioni.',
+  'Eine Kalibrierungs- oder Aufgabenkontrolle war eingeschränkt. Wiederholen Sie den Test vor dem Vergleich von Durchläufen.',
+  'Un contrôle d’étalonnage ou de tâche était limité. Répétez avant de comparer les sessions.',
+  'Una comprobación de calibración o tarea fue limitada. Repite antes de comparar sesiones.',
+  'Uma verificação de calibração ou da tarefa foi limitada. Repita antes de comparar sessões.',
+);
+message(
+  'What travelled with the target.',
+  'Ciò che ha accompagnato il bersaglio.',
+  'Was das Ziel begleitete.',
+  'Ce qui accompagnait la cible.',
+  'Lo que acompañó al objetivo.',
+  'O que acompanhou o alvo.',
+);
+message('Correction', 'Correzione', 'Korrektur', 'Correction', 'Corrección', 'Correção');
+message('Distance', 'Distanza', 'Abstand', 'Distance', 'Distancia', 'Distância');
+message(
+  'Card scale',
+  'Scala della carta',
+  'Kartenmaßstab',
+  'Échelle de la carte',
+  'Escala de la tarjeta',
+  'Escala do cartão',
+);
+message(
+  'Acutezza describes one self-administered run on this display at this estimated distance. It is not vision screening, diagnosis, or a prescription.',
+  'Acutezza descrive una sessione autosomministrata su questo schermo a questa distanza stimata. Non è uno screening visivo, una diagnosi o una prescrizione.',
+  'Acutezza beschreibt einen selbst durchgeführten Durchlauf auf diesem Bildschirm bei diesem geschätzten Abstand. Es ist weder Sehscreening noch Diagnose oder Verordnung.',
+  'Acutezza décrit une session auto-administrée sur cet écran à cette distance estimée. Il ne s’agit ni d’un dépistage visuel, ni d’un diagnostic ou d’une prescription.',
+  'Acutezza describe una sesión autoadministrada en esta pantalla a esta distancia estimada. No es un cribado visual, diagnóstico ni prescripción.',
+  'O Acutezza descreve uma sessão autoadministrada neste ecrã a esta distância estimada. Não é um rastreio visual, diagnóstico ou prescrição.',
+);
+message(
+  'Do not infer normal vision, 20/20, refractive error, cylinder power, or an astigmatism axis.',
+  'Non dedurre visione normale, 20/20, errore refrattivo, potere cilindrico o asse dell’astigmatismo.',
+  'Leiten Sie daraus weder normales Sehen, 20/20, Refraktionsfehler, Zylinderstärke noch eine Astigmatismusachse ab.',
+  'N’en déduisez pas une vision normale, 20/20, une erreur réfractive, une puissance cylindrique ou un axe d’astigmatisme.',
+  'No deduzcas visión normal, 20/20, error refractivo, potencia cilíndrica ni un eje de astigmatismo.',
+  'Não deduza visão normal, 20/20, erro refrativo, potência cilíndrica ou um eixo de astigmatismo.',
+);
+message(
+  'Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.',
+  'Richiedi tempestivamente una valutazione professionale per perdita improvvisa della vista, forte dolore oculare, nuovi lampi o corpi mobili oppure una tenda o ombra nel campo visivo.',
+  'Suchen Sie bei plötzlichem Sehverlust, starken Augenschmerzen, neuen Lichtblitzen oder Floatern oder einem Vorhang oder Schatten im Gesichtsfeld umgehend professionelle Hilfe.',
+  'Consultez rapidement un professionnel en cas de perte soudaine de vision, forte douleur oculaire, nouveaux éclairs ou corps flottants, ou rideau ou ombre dans le champ visuel.',
+  'Busca evaluación profesional inmediata ante pérdida repentina de visión, dolor ocular intenso, nuevos destellos o moscas volantes, o una cortina o sombra en el campo visual.',
+  'Procure rapidamente avaliação profissional em caso de perda súbita de visão, dor ocular intensa, novos flashes ou moscas volantes, ou uma cortina ou sombra no campo visual.',
+);
+message(
+  'Three measures for this eye.',
+  'Tre misure per questo occhio.',
+  'Drei Messwerte für dieses Auge.',
+  'Trois mesures pour cet œil.',
+  'Tres medidas para este ojo.',
+  'Três medidas para este olho.',
+);
+message(
+  '{lower}–{upper} uncertainty interval',
+  'intervallo di incertezza {lower}–{upper}',
+  'Unsicherheitsintervall {lower}–{upper}',
+  'intervalle d’incertitude {lower}–{upper}',
+  'intervalo de incertidumbre {lower}–{upper}',
+  'intervalo de incerteza {lower}–{upper}',
+);
+message(
+  '{cost}% gap size versus high contrast',
+  'dimensione dell’apertura {cost}% rispetto all’alto contrasto',
+  'Öffnungsgröße {cost}% gegenüber hohem Kontrast',
+  'taille d’ouverture {cost}% par rapport au fort contraste',
+  'tamaño de abertura {cost}% frente al alto contraste',
+  'tamanho da abertura {cost}% face ao alto contraste',
+);
+message(
+  '{consistency}% leading-choice consistency',
+  'coerenza della scelta prevalente: {consistency}%',
+  'Konsistenz der häufigsten Wahl: {consistency}%',
+  'régularité du choix dominant : {consistency} %',
+  'consistencia de la elección principal: {consistency}%',
+  'consistência da escolha dominante: {consistency}%',
+);
+message('not measured', 'non misurato', 'nicht gemessen', 'non mesuré', 'no medido', 'não medido');
+message(
+  'The estimate touches the display range; treat it as a bound.',
+  'La stima tocca l’intervallo dello schermo; trattala come un limite.',
+  'Die Schätzung berührt den Darstellungsbereich; behandeln Sie sie als Grenze.',
+  'L’estimation atteint la plage de l’écran ; traitez-la comme une limite.',
+  'La estimación toca el rango de la pantalla; trátala como un límite.',
+  'A estimativa toca o intervalo do ecrã; trate-a como um limite.',
+);
+message(
+  'A calibrated angular threshold from forced-choice trials.',
+  'Una soglia angolare calibrata da prove a scelta forzata.',
+  'Eine kalibrierte Winkelschwelle aus Versuchen mit erzwungener Wahl.',
+  'Un seuil angulaire étalonné issu d’essais à choix forcé.',
+  'Un umbral angular calibrado a partir de ensayos de elección forzada.',
+  'Um limiar angular calibrado a partir de ensaios de escolha forçada.',
+);
+message(
+  'A within-run difference, not clinical contrast sensitivity.',
+  'Una differenza interna alla sessione, non sensibilità clinica al contrasto.',
+  'Ein Unterschied innerhalb des Durchlaufs, keine klinische Kontrastempfindlichkeit.',
+  'Une différence au sein de la session, pas une sensibilité clinique au contraste.',
+  'Una diferencia dentro de la sesión, no sensibilidad clínica al contraste.',
+  'Uma diferença dentro da sessão, não sensibilidade clínica ao contraste.',
+);
+message(
+  'The display could not preserve a dependable low-contrast condition.',
+  'Lo schermo non ha potuto conservare una condizione affidabile a basso contrasto.',
+  'Der Bildschirm konnte keine verlässliche Niedrigkontrastbedingung darstellen.',
+  'L’écran n’a pas pu préserver une condition fiable à faible contraste.',
+  'La pantalla no pudo conservar una condición fiable de bajo contraste.',
+  'O ecrã não conseguiu preservar uma condição fiável de baixo contraste.',
+);
+message(
+  'The preference repeated at both scales. It does not identify astigmatism.',
+  'La preferenza si è ripetuta a entrambe le scale. Non identifica l’astigmatismo.',
+  'Die Präferenz wiederholte sich bei beiden Größen. Sie weist keinen Astigmatismus nach.',
+  'La préférence s’est répétée aux deux échelles. Elle n’identifie pas un astigmatisme.',
+  'La preferencia se repitió en ambas escalas. No identifica astigmatismo.',
+  'A preferência repetiu-se em ambas as escalas. Não identifica astigmatismo.',
+);
+message(
+  'No preference met the replication rule across scale and pixel phase.',
+  'Nessuna preferenza ha soddisfatto la regola di replica tra scala e fase dei pixel.',
+  'Keine Präferenz erfüllte die Replikationsregel über Größe und Pixelphase hinweg.',
+  'Aucune préférence n’a satisfait la règle de répétition entre échelle et phase de pixels.',
+  'Ninguna preferencia cumplió la regla de repetición entre escala y fase de píxel.',
+  'Nenhuma preferência cumpriu a regra de repetição entre escala e fase de píxel.',
+);
+message(
+  'Instrument 01 complete',
+  'Strumento 01 completato',
+  'Instrument 01 abgeschlossen',
+  'Instrument 01 terminé',
+  'Instrumento 01 completado',
+  'Instrumento 01 concluído',
+);
+message(
+  'Threshold tasks complete',
+  'Compiti di soglia completati',
+  'Schwellenaufgaben abgeschlossen',
+  'Tâches de seuil terminées',
+  'Tareas de umbral completadas',
+  'Tarefas de limiar concluídas',
+);
+message(
+  'A calibrated estimate was recorded with {trials} measured targets.',
+  'È stata registrata una stima calibrata con {trials} bersagli misurati.',
+  'Eine kalibrierte Schätzung wurde mit {trials} gemessenen Zielen erfasst.',
+  'Une estimation étalonnée a été enregistrée avec {trials} cibles mesurées.',
+  'Se registró una estimación calibrada con {trials} objetivos medidos.',
+  'Foi registada uma estimativa calibrada com {trials} alvos medidos.',
+);
+message(
+  'Rest your eye for a moment. Keep the same correction, distance, screen, and covered eye.',
+  'Riposa un momento l’occhio. Mantieni la stessa correzione, distanza, schermo e occhio coperto.',
+  'Ruhen Sie das Auge kurz aus. Behalten Sie Korrektur, Abstand, Bildschirm und abgedecktes Auge bei.',
+  'Reposez un instant votre œil. Gardez la même correction, distance, écran et le même œil couvert.',
+  'Descansa el ojo un momento. Mantén la misma corrección, distancia, pantalla y ojo cubierto.',
+  'Descanse o olho por um momento. Mantenha a mesma correção, distância, ecrã e olho coberto.',
+);
+message(
+  'High- and low-contrast estimates remain separate in the result.',
+  'Le stime ad alto e basso contrasto restano separate nel risultato.',
+  'Hoch- und Niedrigkontrastschätzungen bleiben im Ergebnis getrennt.',
+  'Les estimations à fort et faible contraste restent séparées dans le résultat.',
+  'Las estimaciones de alto y bajo contraste permanecen separadas en el resultado.',
+  'As estimativas de alto e baixo contraste permanecem separadas no resultado.',
+);
+message(
+  'Contrasto is unavailable on this setup, so no low-contrast value will be inferred.',
+  'Contrasto non è disponibile con questa configurazione, quindi non verrà dedotto alcun valore a basso contrasto.',
+  'Contrasto ist mit dieser Einrichtung nicht verfügbar; daher wird kein Niedrigkontrastwert abgeleitet.',
+  'Contrasto n’est pas disponible avec cette installation ; aucune valeur à faible contraste ne sera donc déduite.',
+  'Contrasto no está disponible con esta configuración, por lo que no se inferirá ningún valor de bajo contraste.',
+  'O Contrasto não está disponível nesta configuração, por isso não será inferido qualquer valor de baixo contraste.',
+);
+
 // Udito.
 message(
   'Listening lab / three instruments / about 6 minutes',
@@ -4058,12 +5576,12 @@ message(
 );
 
 message(
-  'Private browser tests for colour, response timing, and hearing. Careful results, visible limits, nothing uploaded.',
-  'Test privati nel browser per colore, tempi di risposta e udito. Risultati accurati, limiti visibili, nessun caricamento.',
-  'Private Browsertests für Farbe, Reaktionszeit und Hören. Sorgfältige Ergebnisse, sichtbare Grenzen, keine Uploads.',
-  'Tests privés dans le navigateur pour la couleur, le temps de réponse et l’audition. Résultats rigoureux, limites visibles, aucun envoi.',
-  'Pruebas privadas en el navegador de color, tiempo de respuesta y audición. Resultados cuidadosos, límites visibles, sin envíos.',
-  'Testes privados no navegador para cor, tempo de resposta e audição. Resultados rigorosos, limites visíveis, sem envios.',
+  'Private browser tests for colour, response timing, hearing, and calibrated visual detail. Answers and results stay in your browser.',
+  'Test privati nel browser per colore, tempi di risposta, udito e dettaglio visivo calibrato. Risposte e risultati restano nel browser.',
+  'Private Browsertests für Farbe, Reaktionszeit, Hören und kalibrierte visuelle Details. Antworten und Ergebnisse bleiben in Ihrem Browser.',
+  'Tests privés dans le navigateur pour la couleur, le temps de réponse, l’audition et le détail visuel étalonné. Réponses et résultats restent dans votre navigateur.',
+  'Pruebas privadas en el navegador de color, tiempo de respuesta, audición y detalle visual calibrado. Las respuestas y los resultados permanecen en tu navegador.',
+  'Testes privados no navegador para cor, tempo de resposta, audição e detalhe visual calibrado. As respostas e os resultados permanecem no seu navegador.',
 );
 
 message(

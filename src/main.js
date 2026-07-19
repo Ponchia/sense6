@@ -2,6 +2,7 @@ import '@ponchia/ui';
 import { initThemeToggle } from '@ponchia/ui/behaviors';
 import './styles.css';
 
+import * as acutezza from './exams/acutezza.js';
 import * as colorBlindness from './exams/color-blindness.js';
 import * as riflessi from './exams/riflessi.js';
 import * as tetracromia from './exams/tetracromia.js';
@@ -15,7 +16,7 @@ const app = document.querySelector('#app');
 const announcer = document.querySelector('#announcer');
 const gamutChip = document.querySelector('#gamut-chip');
 
-const exams = [tetracromia, colorBlindness, riflessi, udito];
+const exams = [tetracromia, colorBlindness, riflessi, udito, acutezza];
 const registry = new Map(exams.map((exam) => [exam.meta.id, exam]));
 
 const initialLocale = window.location.hash.match(/^#\/([a-z]{2})(?:\/|$)/)?.[1];
