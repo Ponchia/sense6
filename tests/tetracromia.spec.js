@@ -386,7 +386,6 @@ test('rapid real touch activation records one response per rendered trial', asyn
     const bounds = await locator.boundingBox();
     const point = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
     await page.touchscreen.tap(point.x, point.y);
-    await page.waitForTimeout(60);
     await page.touchscreen.tap(point.x, point.y);
     await page.waitForTimeout(240);
   };

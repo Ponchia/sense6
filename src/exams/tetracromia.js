@@ -15,6 +15,7 @@ const RESULT_STORE = createResultStore({
 });
 const MOUNT_OWNER = Symbol('tetracromia');
 const RESPONSE_GATE_MS = 180;
+const RAPID_TOUCH_COMMIT_MS = 600;
 
 let state = null;
 
@@ -33,6 +34,7 @@ export function mount(context) {
     selectedSequenceIndex: null,
     sequenceDrag: null,
     suppressNextSequenceClick: false,
+    lastTouchCommitAt: Number.NEGATIVE_INFINITY,
     responseReady: false,
     responseGateToken: 0,
     responseGateFrame: 0,
@@ -1004,6 +1006,14 @@ function updateSetupEligibility() {
     ?.setAttribute('aria-hidden', String(!blocked));
 }
 
+function isRepeatedTouchCommit(event) {
+  if (event.pointerType !== 'touch') return false;
+  const elapsed = event.timeStamp - state.lastTouchCommitAt;
+  if (elapsed >= 0 && elapsed < RAPID_TOUCH_COMMIT_MS) return true;
+  state.lastTouchCommitAt = event.timeStamp;
+  return false;
+}
+
 function wireEvents(signal) {
   document.addEventListener(
     'change',
@@ -1020,6 +1030,7 @@ function wireEvents(signal) {
     (event) => {
       const choice = event.target.closest('[data-choice]');
       if (choice) {
+        if (isRepeatedTouchCommit(event)) return;
         answerChoice(Number(choice.dataset.choice), { restoreFocus: event.detail === 0 });
         return;
       }
@@ -1048,7 +1059,7 @@ function wireEvents(signal) {
         state.goHome();
       }
       if (action.dataset.action === 'move-sequence') moveSequence(Number(action.dataset.direction));
-      if (action.dataset.action === 'submit-sequence') submitSequence();
+      if (action.dataset.action === 'submit-sequence' && !isRepeatedTouchCommit(event)) submitSequence();
       if (action.dataset.action === 'copy-results') copyResults();
     },
     { signal },
