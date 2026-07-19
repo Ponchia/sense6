@@ -32,6 +32,10 @@ The planned Acutezza exam has a source-backed
 the roadmap until its calibration, threshold engine, result language, and
 validation gates are complete.
 
+The [product and engineering roadmap](docs/roadmap.md) records the next work:
+private repeated-run history, shared experiment lifecycle primitives, bundle
+scaling, and Acutezza's release gates.
+
 ## Background
 
 ### Tetracromia
@@ -249,8 +253,9 @@ npm run check
 ## Deploy
 
 Every push to `main` runs the complete lint, unit, build, browser, responsive,
-and accessibility gate. After that gate passes, GitHub Actions builds `dist/`
-and uploads the verified static bundle directly to Cloudflare Pages.
+and accessibility gate. GitHub Actions stores the resulting `dist/` directory
+as a short-lived artifact and uploads those exact verified files to Cloudflare
+Pages after the gate passes.
 
 The production site is available at
 [`sense6.net`](https://sense6.net). Cloudflare Pages terminates TLS and serves

@@ -10,7 +10,7 @@ exam. It should describe what a person resolved on one screen, at one estimated
 distance, with one stated correction. It must not diagnose astigmatism, produce
 a prescription, or classify vision as normal or abnormal.
 
-This brief defines the evidence boundary and a protocol that fits Sensoria's
+This brief defines the evidence boundary and a protocol that fits Sense6's
 existing product contract. It does not claim that the resulting implementation
 has clinical validity. That would require a separate validation study.
 
@@ -226,7 +226,7 @@ accessible:
 
 Do not use webcam distance estimation in the first implementation. It adds camera
 permission, privacy concerns, device-specific face geometry, and another
-unvalidated estimator. Do not add a second-device remote until Sensoria has a
+unvalidated estimator. Do not add a second-device remote until Sense6 has a
 privacy-preserving connection design and a real need for clinical distance.
 
 ## Regulatory and product boundary
@@ -242,7 +242,7 @@ aged 22–40, uses two devices at 10 feet, reports only two categories, and posi
 the result as support for an eye-care provider. That comparison shows how much
 validation and restriction sit behind even a narrow medical claim.
 
-Sensoria should remain a general perception experiment. Avoid these words in
+Sense6 should remain a general perception experiment. Avoid these words in
 results and marketing: screening, normal vision, abnormal vision, 20/20, 6/6,
 clinical logMAR, refractive error, myopia, hyperopia, astigmatism detected,
 amblyopia, cylinder, prescription, pass, and fail.
@@ -278,7 +278,7 @@ in the roadmap.
    displays. Document mean bias and Bland–Altman limits rather than correlation
    alone.
 5. Run test-retest sessions and confirm that 18 trials per condition provide an
-   acceptable precision/burden tradeoff for Sensoria.
+   acceptable precision/burden tradeoff for Sense6.
 6. Treat Meridiani as qualitative until a preregistered comparison with clinical
    subjective refraction shows useful agreement.
 7. Have an optometrist or ophthalmologist review the setup, safety copy, result

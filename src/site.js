@@ -5,7 +5,12 @@
  */
 
 const PLANNED = [
-  { name: 'Acutezza', tagline: 'Visual acuity & astigmatism', glyph: '◎', duration: '≈ 2 min' },
+  {
+    name: 'Acutezza',
+    tagline: 'Calibrated sharpness & meridional clarity',
+    glyph: '◎',
+    duration: '≈ 7–9 min',
+  },
 ];
 
 const TEST_DETAILS = {

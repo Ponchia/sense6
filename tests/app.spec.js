@@ -81,6 +81,8 @@ test('the gallery lists exams, is accessible, and routes into one', async ({ pag
   await expect(page.locator('.exam-card__link[href="#/en/udito"]')).toBeVisible();
   await expect(page.getByRole('heading', { name: /More senses, same standard/i })).toBeVisible();
   await expect(page.locator('.roadmap-item')).toHaveCount(1);
+  await expect(page.locator('.roadmap-item')).toContainText('Calibrated sharpness & meridional clarity');
+  await expect(page.locator('.roadmap-item')).toContainText('≈ 7–9 min');
   await expect
     .poll(() =>
       page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),

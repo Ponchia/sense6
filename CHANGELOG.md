@@ -10,6 +10,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- Acutezza's research and implementation brief, together with a product and
+  engineering roadmap for repeated-run history and suite scaling.
 - Cloudflare Pages deployment with the existing full verification gate,
   production security headers, immutable asset caching, and canonical-domain
   redirects.
@@ -47,11 +49,14 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Scientific limits and source trail for the test design.
 - GitHub Actions verification for formatting, unit, build, browser, responsive,
   and accessibility checks.
-- A rootless, security-hardened `nginx` production container.
-- An immutable GitHub Container Registry and Flux deployment workflow.
 
 ### Changed
 
+- The npm package now uses the `sense6` project name, and the public footer no
+  longer links to a private source repository.
+- Acutezza's roadmap promise now describes calibrated sharpness and meridional
+  clarity as a 7–9 minute protocol instead of a two-minute acuity and
+  astigmatism test.
 - The public suite name is now Sense6, and its canonical URL is
   `https://sense6.net`.
 - Production hosting now serves the static bundle from Cloudflare Pages instead
