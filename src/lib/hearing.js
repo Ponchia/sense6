@@ -37,13 +37,14 @@ export const DEFAULT_HEARING_CONFIG = Object.freeze({
 });
 
 export function mergeHearingConfig(override = {}) {
+  const safeOverride = override ?? {};
   return {
     ...DEFAULT_HEARING_CONFIG,
-    ...override,
-    audio: { ...DEFAULT_HEARING_CONFIG.audio, ...override.audio },
-    headphones: { ...DEFAULT_HEARING_CONFIG.headphones, ...override.headphones },
-    range: { ...DEFAULT_HEARING_CONFIG.range, ...override.range },
-    pitch: { ...DEFAULT_HEARING_CONFIG.pitch, ...override.pitch },
+    ...safeOverride,
+    audio: { ...DEFAULT_HEARING_CONFIG.audio, ...safeOverride.audio },
+    headphones: { ...DEFAULT_HEARING_CONFIG.headphones, ...safeOverride.headphones },
+    range: { ...DEFAULT_HEARING_CONFIG.range, ...safeOverride.range },
+    pitch: { ...DEFAULT_HEARING_CONFIG.pitch, ...safeOverride.pitch },
   };
 }
 

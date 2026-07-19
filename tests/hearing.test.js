@@ -5,6 +5,7 @@ import {
   createPitchTracks,
   createRangeTrack,
   dbToGain,
+  mergeHearingConfig,
   nextPitchTrial,
   nextRangeTrial,
   recordPitchResponse,
@@ -121,4 +122,10 @@ test('audio helpers convert digital level and cap frequencies below Nyquist', ()
   assert.ok(Math.abs(dbToGain(-6) - 0.5012) < 0.001);
   assert.equal(safeFrequencyCeiling(44100), 18000);
   assert.equal(safeFrequencyCeiling(32000), 13440);
+});
+
+test('production configuration accepts an explicit null development override', () => {
+  const config = mergeHearingConfig(null);
+  assert.equal(config.audio.toneMs, 460);
+  assert.equal(config.headphones.scoredTrials, 6);
 });
