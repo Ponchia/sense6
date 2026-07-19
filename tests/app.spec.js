@@ -130,6 +130,31 @@ test('language routes translate, persist, and remain accessible', async ({ page 
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
+test('language and theme controls do not overlap at narrow header widths', async ({ page }) => {
+  for (const width of [320, 375, 640, 641, 700]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/#/en/');
+
+    const geometry = await page.evaluate(() => {
+      const locale = document.querySelector('[data-locale-select]').getBoundingClientRect();
+      const theme = document.querySelector('[data-bronto-theme-toggle]').getBoundingClientRect();
+      return {
+        localeRight: locale.right,
+        themeLeft: theme.left,
+        viewportWidth: document.documentElement.clientWidth,
+        contentWidth: document.documentElement.scrollWidth,
+      };
+    });
+
+    expect(geometry.localeRight, `language selector overlaps theme button at ${width}px`).toBeLessThanOrEqual(
+      geometry.themeLeft,
+    );
+    expect(geometry.contentWidth, `header overflows horizontally at ${width}px`).toBeLessThanOrEqual(
+      geometry.viewportWidth,
+    );
+  }
+});
+
 test('every live exam has a localized European-language entry point', async ({ page }) => {
   const headings = {
     it: {
