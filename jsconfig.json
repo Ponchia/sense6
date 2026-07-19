@@ -10,5 +10,11 @@
     "strict": true,
     "target": "ES2023"
   },
-  "include": ["src/lib/lifecycle.js", "src/lib/storage.js"]
+  "include": [
+    "src/crawler-policy.js",
+    "src/journal-copy.js",
+    "src/lib/journal.js",
+    "src/lib/lifecycle.js",
+    "src/lib/storage.js"
+  ]
 }

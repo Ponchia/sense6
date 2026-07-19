@@ -55,7 +55,12 @@ startRouter(async ({ route, locale }) => {
   document.body.classList.remove('lab-mode');
   window.scrollTo({ top: 0, behavior: 'instant' });
 
-  if (route === 'privacy') {
+  if (route === 'journal') {
+    const [{ renderJournal }] = await Promise.all([import('./journal.js'), import('./styles/journal.css')]);
+    if (token !== renderToken) return;
+    app.innerHTML = '';
+    cleanup = renderJournal({ ...context(), exams: EXAMS });
+  } else if (route === 'privacy') {
     const [{ renderPrivacy }] = await Promise.all([import('./privacy.js'), import('./styles/privacy.css')]);
     if (token !== renderToken) return;
     app.innerHTML = '';

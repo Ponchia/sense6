@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import test from 'node:test';
+import { CRAWLER_POLICY } from '../src/crawler-policy.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { LOCALES } from '../src/locales.js';
 
@@ -11,6 +12,7 @@ const expectedPaths = [
   ...LOCALES.flatMap(({ code }) => [
     `/${code}/`,
     ...EXAMS.map(({ route }) => `/${code}/${route}/`),
+    `/${code}/journal/`,
     `/${code}/privacy/`,
   ]),
 ];
@@ -59,12 +61,27 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   assert.deepEqual(sitemapPaths, expectedPaths);
 
   const robots = await readFile(new URL('robots.txt', DIST), 'utf8');
+  assert.ok(
+    Date.now() <= Date.parse(`${CRAWLER_POLICY.reviewBy}T23:59:59Z`),
+    'crawler policy review is overdue',
+  );
+  assert.match(
+    robots,
+    new RegExp(`Policy reviewed ${CRAWLER_POLICY.reviewedAt}; review by ${CRAWLER_POLICY.reviewBy}`),
+  );
   assert.match(robots, /Sitemap: https:\/\/sense6\.net\/sitemap\.xml/);
   assert.match(robots, /User-agent: OAI-SearchBot\nAllow: \//);
   assert.match(robots, /User-agent: GPTBot\nDisallow: \//);
   assert.match(robots, /User-agent: ClaudeBot\nDisallow: \//);
+  for (const { agent, allow } of CRAWLER_POLICY.rules) {
+    assert.match(
+      robots,
+      new RegExp(`User-agent: ${escapeRegex(agent)}\\n${allow ? 'Allow' : 'Disallow'}: /`),
+    );
+  }
 
   const llms = await readFile(new URL('llms.txt', DIST), 'utf8');
+  assert.match(llms, /\[Private measurement journal\]\(https:\/\/sense6\.net\/en\/journal\/\)/);
   for (const { name, route } of EXAMS) {
     assert.match(llms, new RegExp(`\\[${escapeRegex(name)}\\]\\(https://sense6\\.net/en/${route}/\\)`));
   }
@@ -76,6 +93,10 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   const privacy = await readFile(new URL('en/privacy/index.html', DIST), 'utf8');
   assert.match(privacy, /href="mailto:privacy@sense6\.net"/);
   assert.match(privacy, /href="https:\/\/www\.cloudflare\.com\/privacypolicy\/"/);
+
+  const journal = await readFile(new URL('en/journal/index.html', DIST), 'utf8');
+  assert.match(journal, /Your private measurement journal/);
+  assert.match(journal, /Entries, setup passports, comparisons, imports, and exports stay on this device/);
 });
 
 test('the entry bundle stays route-split and within its documented budget', async () => {
@@ -99,9 +120,9 @@ test('the entry bundle stays route-split and within its documented budget', asyn
   const entryCssBytes = await sumSizes([entryCss]);
   assert.ok(entryCssBytes <= 130_000, `entry CSS is ${entryCssBytes} bytes; budget is 130000`);
   const routeCss = files.filter((file) =>
-    /^(acutezza|color-blindness|riflessi|udito|privacy)-.+\.css$/.test(file),
+    /^(acutezza|color-blindness|riflessi|udito|journal|privacy)-.+\.css$/.test(file),
   );
-  assert.equal(routeCss.length, 5);
+  assert.equal(routeCss.length, 6);
   assert.ok(
     entryCssBytes +
       Math.max(

@@ -1,6 +1,7 @@
 import { toast } from '@ponchia/ui/behaviors';
 import { formatNumber, t } from '../i18n.js';
 import { toRgbCss } from '../lib/color.js';
+import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
 import { createExamLifecycle } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
 import { ColorLabSession, PHASES } from '../lib/session.js';
@@ -23,6 +24,7 @@ export function mount(context) {
     announcer: context.announcer,
     gamutChip: context.gamutChip,
     goHome: context.navigateHome,
+    locale: context.locale,
     session: null,
     labActive: false,
     trialStartedAt: 0,
@@ -627,6 +629,7 @@ function renderResults() {
   const result = state.session.results();
   const previous = loadBestResult();
   if (!previous || result.overall > previous.overall) saveBestResult(result);
+  saveJournalResult(result);
   const profile = profileLabel(result.overall);
 
   state.app.innerHTML = `
@@ -803,6 +806,22 @@ function loadBestResult() {
 
 function saveBestResult(result) {
   RESULT_STORE.save({ overall: result.overall, savedAt: new Date().toISOString() });
+}
+
+function saveJournalResult(result) {
+  const entry = createJournalEntry({
+    examId: 'tetracromia',
+    locale: state.locale,
+    quality: 'usable',
+    setup: captureDisplayPassport(),
+    measurements: [
+      { id: 'overall', value: result.overall, unit: '/100' },
+      { id: 'threshold-degrees', value: result.thresholdDegrees, unit: '° hue' },
+      { id: 'field-degrees', value: result.fieldDegrees, unit: '° hue' },
+      { id: 'sequence-score', value: result.sequenceScore, unit: '/100' },
+    ],
+  });
+  if (entry) appendJournalEntry(entry);
 }
 
 async function copyResults() {

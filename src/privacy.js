@@ -20,8 +20,8 @@ export const PRIVACY_COPY = Object.freeze({
       {
         title: 'What stays in your browser',
         paragraphs: [
-          'Test answers, measurements, and results are processed in your browser and are not uploaded to Sense6. Your selected language, theme, and the latest or best result offered by each test may be saved in local browser storage so the site can remember them.',
-          'You can remove this information at any time by clearing the site data for sense6.net in your browser. Copy-to-clipboard features run only when you choose them.',
+          'Test answers, measurements, and results are processed in your browser and are not uploaded to Sense6. Your selected language, theme, concise latest or best results, and private multi-run journal may be saved in local browser storage.',
+          'You can delete one journal entry, clear the complete journal, or remove all information by clearing the site data for sense6.net in your browser. Copy, import, and export features run only when you choose them. An exported journal file contains the measurements and setup details shown to you.',
         ],
       },
       {
@@ -74,8 +74,8 @@ export const PRIVACY_COPY = Object.freeze({
       {
         title: 'Cosa rimane nel tuo browser',
         paragraphs: [
-          'Le risposte, le misurazioni e i risultati dei test vengono elaborati nel browser e non sono caricati su Sense6. La lingua e il tema scelti, nonché l’ultimo o il miglior risultato previsto da ciascun test, possono essere salvati nella memoria locale del browser affinché il sito possa ricordarli.',
-          'Puoi eliminare queste informazioni in qualsiasi momento cancellando nel browser i dati del sito sense6.net. Le funzioni di copia negli appunti si attivano soltanto quando le scegli.',
+          'Le risposte, le misurazioni e i risultati dei test vengono elaborati nel browser e non sono caricati su Sense6. La lingua e il tema scelti, i risultati sintetici più recenti o migliori e il diario privato con più sessioni possono essere salvati nella memoria locale del browser.',
+          'Puoi eliminare una voce, cancellare l’intero diario o rimuovere tutte le informazioni cancellando nel browser i dati del sito sense6.net. Le funzioni di copia, importazione ed esportazione si attivano soltanto quando le scegli. Un diario esportato contiene le misurazioni e i dettagli di configurazione mostrati.',
         ],
       },
       {
@@ -128,8 +128,8 @@ export const PRIVACY_COPY = Object.freeze({
       {
         title: 'Was in Ihrem Browser bleibt',
         paragraphs: [
-          'Testantworten, Messwerte und Ergebnisse werden in Ihrem Browser verarbeitet und nicht an Sense6 übermittelt. Die gewählte Sprache, das Design sowie das letzte oder beste von einem Test angebotene Ergebnis können im lokalen Browserspeicher gesichert werden, damit die Website sie wiedererkennt.',
-          'Sie können diese Informationen jederzeit löschen, indem Sie die Websitedaten für sense6.net in Ihrem Browser entfernen. Funktionen zum Kopieren in die Zwischenablage werden nur auf Ihre Auswahl hin ausgeführt.',
+          'Testantworten, Messwerte und Ergebnisse werden in Ihrem Browser verarbeitet und nicht an Sense6 übermittelt. Die gewählte Sprache, das Design, knappe letzte oder beste Ergebnisse und das private Journal mit mehreren Durchläufen können im lokalen Browserspeicher gesichert werden.',
+          'Sie können einen Journaleintrag oder das gesamte Journal löschen. Alle Informationen entfernen Sie über die Websitedaten für sense6.net im Browser. Kopier-, Import- und Exportfunktionen laufen nur auf Ihre Auswahl hin. Eine exportierte Journaldatei enthält die angezeigten Messwerte und Einrichtungsdetails.',
         ],
       },
       {
@@ -182,8 +182,8 @@ export const PRIVACY_COPY = Object.freeze({
       {
         title: 'Ce qui reste dans votre navigateur',
         paragraphs: [
-          'Les réponses, mesures et résultats des tests sont traités dans votre navigateur et ne sont pas envoyés à Sense6. La langue et le thème choisis, ainsi que le dernier ou le meilleur résultat proposé par chaque test, peuvent être enregistrés dans le stockage local du navigateur afin que le site puisse les mémoriser.',
-          'Vous pouvez supprimer ces informations à tout moment en effaçant les données du site sense6.net dans votre navigateur. Les fonctions de copie dans le presse-papiers ne s’exécutent que lorsque vous les choisissez.',
+          'Les réponses, mesures et résultats sont traités dans votre navigateur et ne sont pas envoyés à Sense6. La langue, le thème, les derniers ou meilleurs résultats synthétiques et le journal privé de plusieurs sessions peuvent être enregistrés localement.',
+          'Vous pouvez supprimer une entrée, effacer le journal complet ou retirer toutes les informations en effaçant les données du site sense6.net. Les fonctions de copie, d’import et d’export ne s’exécutent que lorsque vous les choisissez. Un journal exporté contient les mesures et les détails de configuration affichés.',
         ],
       },
       {
@@ -235,8 +235,8 @@ export const PRIVACY_COPY = Object.freeze({
       {
         title: 'Lo que permanece en tu navegador',
         paragraphs: [
-          'Las respuestas, mediciones y resultados de las pruebas se procesan en tu navegador y no se envían a Sense6. El idioma y el tema seleccionados, así como el último o el mejor resultado ofrecido por cada prueba, pueden guardarse en el almacenamiento local del navegador para que el sitio pueda recordarlos.',
-          'Puedes eliminar esta información en cualquier momento borrando los datos del sitio sense6.net en tu navegador. Las funciones para copiar al portapapeles solo se ejecutan cuando tú las eliges.',
+          'Las respuestas, mediciones y resultados se procesan en tu navegador y no se envían a Sense6. El idioma, el tema, los resultados resumidos más recientes o mejores y el diario privado de varias sesiones pueden guardarse localmente.',
+          'Puedes eliminar una entrada, borrar todo el diario o retirar toda la información borrando los datos del sitio sense6.net. Las funciones de copia, importación y exportación solo se ejecutan cuando las eliges. Un diario exportado contiene las mediciones y los detalles de configuración mostrados.',
         ],
       },
       {
@@ -288,8 +288,8 @@ export const PRIVACY_COPY = Object.freeze({
       {
         title: 'O que permanece no seu navegador',
         paragraphs: [
-          'As respostas, medições e resultados dos testes são processados no seu navegador e não são enviados para a Sense6. O idioma e o tema escolhidos, assim como o último ou o melhor resultado disponibilizado por cada teste, podem ser guardados no armazenamento local do navegador para que o site os possa recordar.',
-          'Pode remover estas informações a qualquer momento apagando os dados do site sense6.net no seu navegador. As funções de cópia para a área de transferência só são executadas quando as escolhe.',
+          'As respostas, medições e resultados são processados no seu navegador e não são enviados para a Sense6. O idioma, o tema, os resultados resumidos mais recentes ou melhores e o diário privado de várias sessões podem ser guardados localmente.',
+          'Pode eliminar uma entrada, apagar todo o diário ou remover todas as informações apagando os dados do site sense6.net. As funções de cópia, importação e exportação só são executadas quando as escolhe. Um diário exportado contém as medições e os detalhes de configuração apresentados.',
         ],
       },
       {

@@ -1,6 +1,11 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { installQuickRiflessi, respondToChoice, respondWithKey } from './helpers/browser.js';
+import {
+  expectJournalEntry,
+  installQuickRiflessi,
+  respondToChoice,
+  respondWithKey,
+} from './helpers/browser.js';
 
 test('Riflessi completes all three instruments and reports separate device-relative measures', async ({
   page,
@@ -46,6 +51,7 @@ test('Riflessi completes all three instruments and reports separate device-relat
   await expect(page.getByText(/Compare conditions, not people/i)).toBeVisible();
   await expect(page.getByText(/population percentile/i)).toBeVisible();
   await expect(page.getByText(/brain age/i)).toHaveCount(0);
+  await expectJournalEntry(page, 'riflessi');
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 

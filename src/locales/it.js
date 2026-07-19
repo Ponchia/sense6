@@ -754,6 +754,7 @@ const rows = [
   ['Timing clock', 'Orologio di misura'],
   ['Monotonic', 'Monotono'],
   ['Privacy', 'Privacy'],
+  ['Journal', 'Diario'],
   ['Answers stay local', 'Le risposte restano locali'],
   ['Back', 'Indietro'],
   ['Leave lab', 'Esci dal laboratorio'],

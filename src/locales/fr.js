@@ -760,6 +760,7 @@ const rows = [
   ['Timing clock', 'Horloge de mesure'],
   ['Monotonic', 'Monotone'],
   ['Privacy', 'Confidentialité'],
+  ['Journal', 'Journal'],
   ['Answers stay local', 'Les réponses restent locales'],
   ['Back', 'Retour'],
   ['Leave lab', 'Quitter le laboratoire'],

@@ -1,0 +1,240 @@
+.journal-view {
+  padding-block: clamp(2rem, 6vw, 6rem);
+}
+
+.journal-hero {
+  align-items: end;
+  display: grid;
+  gap: clamp(2rem, 6vw, 6rem);
+  grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
+  margin-block: clamp(2rem, 6vw, 5rem);
+}
+
+.journal-hero h1 {
+  font-family: var(--display);
+  font-size: clamp(3rem, 7vw, 7rem);
+  letter-spacing: -0.06em;
+  line-height: 0.88;
+  margin-block: 1rem 1.5rem;
+  max-inline-size: 12ch;
+  text-wrap: balance;
+}
+
+.journal-hero > div > p:last-child {
+  color: var(--text-soft);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  max-inline-size: 48rem;
+}
+
+.journal-hero .ui-alert {
+  margin: 0;
+  max-inline-size: none;
+}
+
+.journal-toolbar {
+  align-items: end;
+  border-block: 1px solid var(--line);
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding-block: 1.25rem;
+}
+
+.journal-toolbar > label {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.journal-toolbar > label > span,
+.journal-count {
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+.journal-toolbar select {
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  color: var(--text);
+  min-block-size: 2.5rem;
+  padding-inline: 0.75rem;
+}
+
+.journal-import {
+  cursor: pointer;
+  position: relative;
+}
+
+.journal-import input {
+  block-size: 1px;
+  clip: rect(0 0 0 0);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+}
+
+.journal-import:focus-within {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.journal-count {
+  margin-block: 1rem 2rem;
+}
+
+.journal-list {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.journal-entry {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.journal-entry > header {
+  align-items: start;
+  border-block-end: 1px solid var(--line);
+  display: flex;
+  gap: 2rem;
+  justify-content: space-between;
+  padding-block-end: 1.25rem;
+}
+
+.journal-entry h2 {
+  font-family: var(--display);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  letter-spacing: -0.04em;
+  margin: 0.4rem 0;
+}
+
+.journal-entry header p:last-child {
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  margin: 0;
+}
+
+.journal-entry__grid {
+  display: grid;
+  gap: clamp(2rem, 5vw, 5rem);
+  grid-template-columns: minmax(0, 1.2fr) minmax(16rem, 0.8fr);
+  padding-block: 2rem;
+}
+
+.journal-entry__grid h3 {
+  font-family: var(--display);
+  font-size: 1.35rem;
+  margin: 0 0 1rem;
+}
+
+.journal-measurements,
+.journal-setup {
+  margin: 0;
+}
+
+.journal-measurements > div,
+.journal-setup > div {
+  border-block-start: 1px solid var(--line);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(8rem, 1fr) minmax(10rem, 1fr);
+  padding-block: 0.85rem;
+}
+
+.journal-measurements dt,
+.journal-setup dt {
+  color: var(--text-dim);
+}
+
+.journal-measurements dd,
+.journal-setup dd {
+  margin: 0;
+}
+
+.journal-measurements strong,
+.journal-measurements small {
+  display: block;
+}
+
+.journal-measurements small {
+  color: var(--text-dim);
+  font-size: var(--text-xs);
+  margin-block-start: 0.25rem;
+}
+
+.journal-comparison {
+  border-inline-start: 3px solid var(--line-strong);
+  padding: 1rem 1.25rem;
+}
+
+.journal-comparison--comparable {
+  border-color: var(--success);
+}
+
+.journal-comparison--caution {
+  border-color: var(--warning);
+}
+
+.journal-comparison--not-comparable {
+  border-color: var(--danger);
+}
+
+.journal-comparison strong {
+  display: block;
+  margin-block-start: 0.35rem;
+}
+
+.journal-comparison ul {
+  color: var(--text-dim);
+  margin-block-end: 0;
+}
+
+.journal-empty {
+  border: 1px dashed var(--line-strong);
+  padding: clamp(2rem, 7vw, 6rem);
+  text-align: center;
+}
+
+.journal-empty h2 {
+  font-family: var(--display);
+  font-size: clamp(2rem, 5vw, 4rem);
+  margin-block: 1rem;
+}
+
+:where(.journal-empty p:last-child) {
+  color: var(--text-dim);
+}
+
+@media (max-width: 800px) {
+  .journal-hero,
+  .journal-entry__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .journal-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .journal-toolbar .ui-cluster {
+    display: grid;
+  }
+}
+
+@media (max-width: 520px) {
+  .journal-entry > header,
+  .journal-measurements > div,
+  .journal-setup > div {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .journal-entry > header {
+    flex-direction: column;
+  }
+}

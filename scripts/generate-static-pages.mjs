@@ -1,7 +1,9 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { CRAWLER_POLICY, renderRobots } from '../src/crawler-policy.js';
 import { EXAMS } from '../src/exams/registry.js';
+import { journalCopy } from '../src/journal-copy.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
 import { privacyCopy, privacyHtml } from '../src/privacy.js';
 
@@ -55,6 +57,19 @@ for (const { code: locale } of LOCALES) {
       structuredData: examData(definition, locale, path, translate),
     });
   }
+
+  const journal = journalCopy(locale);
+  const journalPath = `/${locale}/journal/`;
+  canonicalPaths.push(journalPath);
+  await writePage(`${locale}/journal/index.html`, {
+    locale,
+    path: journalPath,
+    title: `${journal.title} | Sense6`,
+    description: journal.intro,
+    main: journalMarkup(journal, locale),
+    alternates: pageAlternates('journal'),
+    structuredData: webpageData(`${journal.title} | Sense6`, journal.intro, locale, journalPath),
+  });
 
   const copy = privacyCopy(locale);
   const privacyPath = `/${locale}/privacy/`;
@@ -113,12 +128,14 @@ function localizeShell(html, locale) {
     .replace('>Theme<', `>${escapeHtml(tr('Theme'))}<`)
     .replace('Measure carefully. Keep it private.', escapeHtml(tr('Measure carefully. Keep it private.')))
     .replace('Anonymous daily counts · no cookies', escapeHtml(tr('Anonymous daily counts · no cookies')))
+    .replace('>Journal<', `>${escapeHtml(tr('Journal'))}<`)
     .replace(
       '>Privacy<',
       `>${escapeHtml(privacyCopy(locale).title.replace(/ (at|chez|bei|en|na) Sense6$/, ''))}<`,
     )
     .replace('>All tests<', `>${escapeHtml(tr('All tests'))}<`)
     .replaceAll('href="/en/"', `href="/${locale}/"`)
+    .replace('href="/en/journal/"', `href="/${locale}/journal/"`)
     .replace('href="/en/privacy/"', `href="/${locale}/privacy/"`)
     .replace(
       `<select data-locale-select aria-label="${escapeAttribute(tr('Language'))}"></select>`,
@@ -202,6 +219,16 @@ function privacyMarkup(copy, locale) {
   </article>`;
 }
 
+function journalMarkup(copy, locale) {
+  return `<article class="static-entry ui-container">
+    <a data-sense6-route="" href="/${locale}/">← ${escapeHtml(copy.back)}</a>
+    <header><p class="ui-eyebrow">${escapeHtml(copy.eyebrow)}</p><h1>${escapeHtml(copy.title)}</h1><p>${escapeHtml(copy.intro)}</p></header>
+    <aside><p><strong>${escapeHtml(copy.privacy)}</strong></p><p>${escapeHtml(copy.empty)}</p></aside>
+    <section><h2>${escapeHtml(copy.setup)}</h2><p>${escapeHtml(copy.reasonSetup)} ${escapeHtml(copy.reasonMinor)}</p></section>
+    <section><h2>${escapeHtml(copy.measurements)}</h2><p>${escapeHtml(copy.comparable)} · ${escapeHtml(copy.caution)} · ${escapeHtml(copy.notComparable)}. ${escapeHtml(copy.noUncertainty)}; ${escapeHtml(copy.bounded)}.</p></section>
+  </article>`;
+}
+
 function galleryAlternates() {
   return `${LOCALES.map(
     ({ code }) => `<link rel="alternate" hreflang="${code}" href="${ORIGIN}/${code}/">`,
@@ -270,11 +297,8 @@ async function writeDiscoveryFiles() {
     .map((path) => `  <url><loc>${ORIGIN}${path}</loc></url>`)
     .join('\n')}\n</urlset>\n`;
   await writeFile(join(DIST, 'sitemap.xml'), sitemap);
-  await writeFile(
-    join(DIST, 'robots.txt'),
-    `User-agent: *\nAllow: /\n\nUser-agent: GPTBot\nDisallow: /\n\nUser-agent: ClaudeBot\nDisallow: /\n\nUser-agent: OAI-SearchBot\nAllow: /\n\nUser-agent: ChatGPT-User\nAllow: /\n\nUser-agent: Claude-SearchBot\nAllow: /\n\nUser-agent: Claude-User\nAllow: /\n\nSitemap: ${ORIGIN}/sitemap.xml\n`,
-  );
-  const llms = `# Sense6\n\nSense6 is a privacy-first collection of device-relative browser perception experiments. It does not provide medical screening or diagnosis. Answers and results stay in the browser; the service stores only anonymous daily activity totals.\n\n## Main pages\n\n- [English test gallery](${ORIGIN}/en/)\n- [Privacy notice](${ORIGIN}/en/privacy/)\n\n## Experiments\n\n${EXAMS.map(
+  await writeFile(join(DIST, 'robots.txt'), renderRobots(ORIGIN));
+  const llms = `# Sense6\n\nSense6 is a privacy-first collection of device-relative browser perception experiments. It does not provide medical screening or diagnosis. Answers and results stay in the browser; the service stores only anonymous daily activity totals.\n\n## Main pages\n\n- [English test gallery](${ORIGIN}/en/)\n- [Private measurement journal](${ORIGIN}/en/journal/)\n- [Privacy notice](${ORIGIN}/en/privacy/)\n\n## Crawler policy\n\n${CRAWLER_POLICY.intent} The policy was reviewed on ${CRAWLER_POLICY.reviewedAt} and must be reviewed again by ${CRAWLER_POLICY.reviewBy}. robots.txt is advisory; llms.txt is a discovery aid, not an access-control mechanism.\n\n## Experiments\n\n${EXAMS.map(
     (definition) =>
       `- [${definition.name}](${ORIGIN}/en/${definition.route}/): ${definition.blurb} ${definition.limit}`,
   ).join(

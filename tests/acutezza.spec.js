@@ -4,6 +4,7 @@ import {
   captureMetrics,
   completeAcutezzaCalibration,
   completeAcutezzaEye,
+  expectJournalEntry,
   installQuickAcutezza,
 } from './helpers/browser.js';
 
@@ -40,6 +41,7 @@ test('Acutezza calibrates the display and reports three separate non-clinical ob
   await expect(page.getByText(/not an eye examination/i)).toBeVisible();
   await expect(page.getByText(/Do not infer normal vision, 20\/20/i)).toBeVisible();
   await expect(page.getByText(/astigmatism axis/i)).toBeVisible();
+  await expectJournalEntry(page, 'acutezza');
   await expect
     .poll(() => metrics)
     .toEqual([

@@ -141,3 +141,14 @@ export async function captureMetrics(page) {
   });
   return metrics;
 }
+
+export async function expectJournalEntry(page, examId) {
+  await expect
+    .poll(() =>
+      page.evaluate((id) => {
+        const journal = JSON.parse(localStorage.getItem('sense6:journal') ?? 'null');
+        return journal?.entries?.find((entry) => entry.examId === id) ?? null;
+      }, examId),
+    )
+    .not.toBeNull();
+}

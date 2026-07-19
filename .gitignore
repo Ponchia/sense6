@@ -3,5 +3,6 @@ dist/
 test-results/
 playwright-report/
 .wrangler/
+validation/acutezza/*.local.json
 .DS_Store
 *.log
