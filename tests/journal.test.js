@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { journalSetupLabel } from '../src/journal-copy.js';
 import {
   appendJournalEntry,
   captureDisplayPassport,
@@ -247,6 +248,23 @@ test('Daltonia comparisons preserve its measured display environment', () => {
     status: 'caution',
     reasons: ['changed:orientation'],
   });
+});
+
+test('the journal labels enriched setup evidence in every supported language', () => {
+  const connections = {
+    en: 'Connection',
+    it: 'Connessione',
+    de: 'Verbindung',
+    fr: 'Connexion',
+    es: 'Conexión',
+    pt: 'Ligação',
+  };
+  for (const [locale, label] of Object.entries(connections)) {
+    assert.equal(journalSetupLabel('connection', locale), label);
+    assert.notEqual(journalSetupLabel('contrastPercent', locale), 'Contrast Percent');
+    assert.notEqual(journalSetupLabel('measurementDpr', locale), 'Measurement Dpr');
+  }
+  assert.equal(journalSetupLabel('contrastPercent', 'de'), 'Nennkontrast');
 });
 
 test('measurement changes combine intervals and retain bound warnings', () => {
