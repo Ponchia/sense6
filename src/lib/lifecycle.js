@@ -64,9 +64,13 @@ export function createExamLifecycle(owner, { bodyClasses = [] } = {}) {
    */
   function present(root = document, { focus = 'h1', scroll = true } = {}) {
     if (scroll) window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    if (!focus) return;
+    if (!scroll && !focus) return;
     requestAnimationFrame(() => {
       if (disposed) return;
+      // Re-anchor after the replacement content has completed layout. Scroll
+      // anchoring can otherwise restore part of the previous screen's offset.
+      if (scroll) window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+      if (!focus) return;
       const target = /** @type {HTMLElement | null} */ (root.querySelector(focus));
       if (!target) return;
       if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');

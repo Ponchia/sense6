@@ -111,7 +111,7 @@ const QUICK_ACUTEZZA = {
     practiceTrials: 1,
     calibration: {
       repetitions: 3,
-      sweepMs: 400,
+      sweepMs: 5000,
       minDistanceMm: 1,
       maxDistanceMm: 5000,
       maxSpreadPercent: 100,

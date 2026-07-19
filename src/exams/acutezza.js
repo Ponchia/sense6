@@ -252,7 +252,6 @@ function startSweep() {
   state.sweepGeometry = { fixCenter, startOffset: fieldRect.width * 0.08, endOffset: fieldRect.width * 0.88 };
   state.sweepStartedAt = performance.now();
   state.app.querySelector('[data-action="ac-start-sweep"]').disabled = true;
-  state.app.querySelector('[data-action="ac-record-sweep"]').disabled = false;
   state.app.querySelector('[data-ac-sweep-status]').textContent = t(
     'The dot is moving. Keep looking at the square.',
   );
@@ -271,6 +270,8 @@ function startSweep() {
       );
       return;
     }
+    // Do not expose a response until a position can actually be recorded.
+    state.app.querySelector('[data-action="ac-record-sweep"]').disabled = false;
     state.sweepFrame = requestAnimationFrame(animate);
   };
   state.sweepFrame = requestAnimationFrame(animate);

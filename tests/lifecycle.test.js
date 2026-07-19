@@ -100,6 +100,7 @@ test('present resets scroll and moves focus to the new screen heading', () => {
     lifecycle.present(root);
     assert.deepEqual(calls, [
       ['scroll', { top: 0, left: 0, behavior: 'instant' }],
+      ['scroll', { top: 0, left: 0, behavior: 'instant' }],
       ['attribute', 'tabindex', '-1'],
       ['focus', { preventScroll: true }],
     ]);

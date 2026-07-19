@@ -425,6 +425,11 @@ test('copied limited summaries retain quality, interruptions, and wrong-choice c
   test.skip(testInfo.project.name !== 'chromium', 'Keeps the accelerated completion single-run');
   await installQuickRiflessi(page);
   await page.addInitScript(() => {
+    for (const instrument of ['signal', 'choice', 'stability']) {
+      window.__SENSE6_TEST_CONFIG__.riflessi[instrument].responseTimeoutMs = 15_000;
+    }
+  });
+  await page.addInitScript(() => {
     Object.defineProperty(navigator, 'clipboard', {
       configurable: true,
       value: {

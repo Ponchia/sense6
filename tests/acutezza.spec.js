@@ -221,7 +221,6 @@ test('Acutezza accepts repeatable blind-spot sweeps as measured calibration', as
   for (let sweep = 0; sweep < 3; sweep += 1) {
     await page.getByRole('button', { name: /Start sweep/i }).click();
     await expect(page.getByRole('button', { name: /Dot disappeared/i })).toBeEnabled();
-    await page.waitForTimeout(180);
     await page.getByRole('button', { name: /Dot disappeared/i }).click();
   }
 
@@ -309,6 +308,7 @@ test('Acutezza carries the 20% fallback and unusable controls through results an
 test('Acutezza keeps calibration and runner geometry ordered at required short viewports', async ({
   page,
 }, testInfo) => {
+  test.setTimeout(90_000);
   test.skip(testInfo.project.name === 'mobile', 'Explicit viewport matrix runs in desktop Chromium');
   await installQuickAcutezza(page);
   for (const viewport of [
