@@ -27,6 +27,11 @@ Live exams:
 Adding an exam: create `src/exams/<id>.js` exporting `meta` and `mount(context)`
 (return a cleanup function), then register it in `src/main.js`.
 
+The planned Acutezza exam has a source-backed
+[research and implementation brief](docs/research/acutezza.md). It remains in
+the roadmap until its calibration, threshold engine, result language, and
+validation gates are complete.
+
 ## Background
 
 ### Tetracromia
