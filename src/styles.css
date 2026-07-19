@@ -3210,6 +3210,138 @@ a:focus-visible {
 }
 
 /* ============================================================
+   Privacy notice
+   ============================================================ */
+
+.privacy-view {
+  max-inline-size: 76rem;
+  padding-block: clamp(2rem, 5vw, 4rem) clamp(5rem, 9vw, 8rem);
+}
+
+.privacy-view__back {
+  margin-block-end: clamp(2rem, 5vw, 4rem);
+  text-decoration: none;
+}
+
+.privacy-hero {
+  align-items: end;
+  display: grid;
+  gap: clamp(2rem, 6vw, 6rem);
+  grid-template-columns: minmax(0, 1.15fr) minmax(18rem, 0.65fr);
+  padding-block-end: clamp(3rem, 7vw, 6rem);
+}
+
+.privacy-hero h1 {
+  font-family: var(--display);
+  font-size: clamp(3.5rem, 8vw, 7rem);
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  line-height: 0.86;
+  margin: 1rem 0 1.5rem;
+  text-wrap: balance;
+}
+
+.privacy-hero__lede {
+  color: var(--text-soft);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  line-height: 1.55;
+  margin: 0;
+  max-inline-size: 44rem;
+}
+
+.privacy-hero__updated {
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  margin: 1.5rem 0 0;
+  text-transform: uppercase;
+}
+
+.privacy-summary {
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 2.5rem 1fr;
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.privacy-summary > span,
+.privacy-section__number {
+  color: var(--accent-text);
+  font-family: var(--display);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.privacy-summary h2 {
+  font-family: var(--display);
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.privacy-summary p {
+  color: var(--text-dim);
+  line-height: 1.55;
+  margin: 0.65rem 0 0;
+}
+
+.privacy-sections {
+  border-block-start: 1px solid var(--line-strong);
+}
+
+.privacy-section {
+  border-block-end: 1px solid var(--line);
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  grid-template-columns: 3rem minmax(0, 1fr);
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+}
+
+.privacy-section > div {
+  max-inline-size: 53rem;
+}
+
+.privacy-section h2 {
+  font-family: var(--display);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  letter-spacing: -0.035em;
+  line-height: 1;
+  margin: 0 0 1.25rem;
+}
+
+.privacy-section p {
+  color: var(--text-soft);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.privacy-section p + p {
+  margin-block-start: 1rem;
+}
+
+.privacy-section a {
+  color: var(--accent-text);
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+@media (max-width: 700px) {
+  .privacy-hero {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .privacy-section {
+    gap: 1rem;
+    grid-template-columns: 2rem minmax(0, 1fr);
+  }
+}
+
+/* ============================================================
    Daltonia — colour-blindness screen
    ============================================================ */
 
