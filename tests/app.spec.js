@@ -72,6 +72,15 @@ async function respondToChoice(page) {
   await page.keyboard.press(side === 'left' ? 'ArrowLeft' : 'ArrowRight');
 }
 
+async function captureMetrics(page) {
+  const metrics = [];
+  await page.route('**/api/metric', async (route) => {
+    metrics.push(route.request().postDataJSON());
+    await route.fulfill({ status: 204 });
+  });
+  return metrics;
+}
+
 test('the gallery lists exams, is accessible, and routes into one', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
@@ -266,6 +275,7 @@ test('long German labels remain inside the mobile viewport', async ({ page }, te
 
 test('Udito completes three safe-listening instruments and keeps results separate', async ({ page }) => {
   await installQuickUdito(page);
+  const metrics = await captureMetrics(page);
   await page.goto('/#/udito');
   await expect(page).toHaveURL(/#\/en\/udito$/);
 
@@ -311,6 +321,13 @@ test('Udito completes three safe-listening instruments and keeps results separat
   await expect(page.getByText(/Device-relative, never dB HL/i)).toBeVisible();
   await expect(page.getByText(/hearing age/i)).toBeVisible();
   await expect(page.getByText(/composite hearing score/i)).toBeVisible();
+  await expect
+    .poll(() => metrics)
+    .toEqual([
+      { event: 'site_loaded', test: 'site' },
+      { event: 'test_started', test: 'udito' },
+      { event: 'test_completed', test: 'udito' },
+    ]);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 

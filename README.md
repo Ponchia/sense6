@@ -5,7 +5,9 @@
 
 A small collection of honest, browser-based perception tests. Each exam is a
 self-contained module mounted by a hash router behind a shared shell; results
-are computed locally and nothing is uploaded.
+and answers remain local. The service stores only anonymous daily totals for
+page loads, measured-test starts, measured-test completions, and future report
+downloads.
 
 Live exams:
 
@@ -191,7 +193,27 @@ Open the URL printed by Vite. Complete the screen check before you start the
 colour tests, choose one input path before starting Riflessi, or complete
 Udito's low-volume reference and volume-lock contract. The site stores only
 concise last-run summaries in local browser storage. It does not send session
-data to a server.
+answers, measurements, or results to a server. It sends one allowlisted event
+name and test name when a page loads or a measured run starts or completes.
+
+## Privacy-preserving metrics
+
+Sense6 doesn't use analytics cookies, browser storage, identifiers,
+fingerprints, IP addresses, user-agent strings, referrers, answers, scores, or
+exact event timestamps for product metrics. A Cloudflare Pages Function accepts
+only an allowlisted event and test name. The server chooses the coordinated
+universal time day and atomically increments one row in D1. The resulting table
+contains only `day`, `test`, `metric`, and `count`.
+
+`site_loaded` measures document loads, not unique people. Reloads and bots can
+increase the count. `test_started` begins at the first measured block after any
+practice. Sense6 records `test_completed` only when the result view appears.
+Sense6 reserves `report_downloaded` for a future report action.
+
+The write endpoint has no read, update, or delete operation. It requires a
+same-origin JSON request, rejects unknown fields and event combinations, limits
+the body to 128 bytes, and fails closed when D1 is unavailable. The app ignores
+metric failures, so analytics availability can't block a test.
 
 The interface uses [`@ponchia/ui`](https://github.com/Ponchia/bronto-ui) for its
 tokens, typography, layout primitives, controls, feedback, theme behavior, and
@@ -269,6 +291,18 @@ hostnames, so keep domain-level redirects in the corresponding Cloudflare zone.
 The deployment workflow requires the `CLOUDFLARE_API_TOKEN` and
 `CLOUDFLARE_ACCOUNT_ID` repository secrets. Scope the token to Cloudflare Pages
 edits for the account that owns `sense6.net`.
+
+The Pages project also requires a D1 binding named `ANALYTICS_DB`. Apply
+`migrations/0001_daily_metrics.sql` to that database before enabling the
+binding. Keep metric reads private in the Cloudflare dashboard or Wrangler;
+don't add a public read endpoint.
+
+Add the zone's single rate-limiting rule for production before enabling the
+counter. Match `POST` requests whose path equals `/api/metric`, allow 10 requests
+per 10 seconds per source IP, and block excess requests for 10 seconds. This is
+the free-plan minimum window and leaves ample room for a page load, test start,
+completion, and report download. Cloudflare uses the request IP transiently for
+this edge control; Sense6 doesn't copy or store it.
 
 ## Scientific limits
 

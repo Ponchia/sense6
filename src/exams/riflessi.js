@@ -8,6 +8,7 @@ import {
   randomWait,
   summarizeRiflessi,
 } from '../lib/reflexes.js';
+import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 
 export const meta = {
   id: 'riflessi',
@@ -222,7 +223,7 @@ function renderSetup() {
           <dl>
             <div><dt>Display correction</dt><dd>None</dd></div>
             <div><dt>Timing clock</dt><dd>Monotonic</dd></div>
-            <div><dt>Privacy</dt><dd>Local only</dd></div>
+            <div><dt>Privacy</dt><dd>Answers stay local</dd></div>
           </dl>
         </aside>
       </div>
@@ -330,6 +331,9 @@ function beginStage() {
 
 function beginScoredBlock() {
   session.block = 'scored';
+  if (session.instrument === 'signal') {
+    trackMetric(METRIC_EVENTS.testStarted, METRIC_TESTS.riflessi);
+  }
   session.index = 0;
   session.queue = makeSchedule(session.instrument, false);
   renderRunner();
@@ -566,6 +570,7 @@ function finishCurrentInstrument() {
 
 function renderResults() {
   stopClocks();
+  trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.riflessi);
   document.body.classList.add('lab-mode');
   document.body.classList.remove('rx-running');
   document.title = 'Your response profile — Riflessi | Sense6';

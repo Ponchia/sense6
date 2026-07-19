@@ -7,6 +7,7 @@ import * as riflessi from './exams/riflessi.js';
 import * as tetracromia from './exams/tetracromia.js';
 import * as udito from './exams/udito.js';
 import { getLocale, initializeI18n, localeHref, setLocale, t, translateTree } from './i18n.js';
+import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from './metrics.js';
 import { currentRoute, navigate, startRouter } from './router.js';
 import { renderGallery } from './site.js';
 
@@ -24,6 +25,7 @@ initializeI18n({
 });
 initThemeToggle();
 detectDisplay();
+trackMetric(METRIC_EVENTS.siteLoaded, METRIC_TESTS.site);
 
 let cleanup = null;
 

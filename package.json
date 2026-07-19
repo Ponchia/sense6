@@ -9,7 +9,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0 --port 4173",
-    "lint": "biome check src tests playwright.config.js",
+    "lint": "biome check src functions tests playwright.config.js",
     "test": "node --test tests/*.test.js",
     "test:e2e": "playwright test",
     "check": "npm run lint && npm run test && npm run build && npm run test:e2e"

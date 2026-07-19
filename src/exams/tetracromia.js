@@ -3,6 +3,7 @@ import { formatNumber, t } from '../i18n.js';
 import { toRgbCss } from '../lib/color.js';
 import { seededRandom } from '../lib/random.js';
 import { ColorLabSession, PHASES } from '../lib/session.js';
+import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 
 export const meta = {
   id: 'tetracromia',
@@ -112,7 +113,7 @@ function renderHome() {
           <p class="ui-eyebrow">The lab</p>
           <h2>Three views of discrimination.</h2>
         </div>
-        <p>No names, no account, no upload. Your session stays in this browser.</p>
+        <p>No names, no account, no result upload. Your session stays in this browser.</p>
       </div>
 
       <div class="test-index">
@@ -303,6 +304,7 @@ function startLab() {
   const seed = `${Date.now()}-${crypto.getRandomValues(new Uint32Array(1))[0]}`;
   session = new ColorLabSession(seed);
   labActive = true;
+  trackMetric(METRIC_EVENTS.testStarted, METRIC_TESTS.tetracromia);
   selectedSequenceIndex = null;
   document.body.classList.add('lab-mode');
   trialStartedAt = performance.now();
@@ -612,6 +614,7 @@ function submitSequence() {
 
 function renderResults() {
   labActive = false;
+  trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.tetracromia);
   document.body.classList.add('lab-mode');
   document.title = 'Your colour profile — Tetracromia | Sense6';
   const result = session.results();

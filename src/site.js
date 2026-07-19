@@ -55,7 +55,7 @@ export function renderGallery(context) {
         <h1>Measure what your <em>senses notice.</em></h1>
         <p class="gallery-hero__lede">
           Short, careful tests that turn what you notice into honest, device-relative results.
-          No account, no upload, no diagnosis theatre.
+          No account, no answers or results uploaded, no diagnosis theatre.
         </p>
       </div>
 

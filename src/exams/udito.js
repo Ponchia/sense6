@@ -16,6 +16,7 @@ import {
 } from '../lib/hearing.js';
 import { HearingAudio } from '../lib/hearing-audio.js';
 import { seededRandom } from '../lib/random.js';
+import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 
 export const meta = {
   id: 'udito',
@@ -318,6 +319,7 @@ function beginStage() {
 
 function beginMeasuredHeadphones() {
   session.block = 'scored';
+  trackMetric(METRIC_EVENTS.testStarted, METRIC_TESTS.udito);
   session.queue = createHeadphoneTrials({
     count: config.headphones.scoredTrials,
     random: session.random,
@@ -490,6 +492,7 @@ function updateRunnerMeta() {
 
 function renderResults() {
   stopPlayback();
+  trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.udito);
   document.body.classList.add('lab-mode');
   document.body.classList.remove('au-running');
   document.title = 'Your listening profile — Udito | Sense6';
