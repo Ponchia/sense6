@@ -1,4 +1,4 @@
-import { LOCALE_CODES } from './locales.js';
+import { resolveLocale } from './locales.js';
 
 export function currentLocation(location = window.location) {
   const legacy = parseParts(location.hash.replace(/^#\/?/, ''));
@@ -44,6 +44,8 @@ export function startRouter(onRoute) {
 
 function parseParts(raw) {
   const parts = raw.split('/').filter(Boolean);
-  const locale = LOCALE_CODES.has(parts[0]) ? parts.shift() : null;
-  return { locale, route: parts[0] || '' };
+  const requestedLocale = parts[0] ?? '';
+  const locale = resolveLocale(requestedLocale);
+  if (locale) parts.shift();
+  return { locale, route: parts[0] || '', canonical: !locale || requestedLocale === locale };
 }

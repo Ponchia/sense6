@@ -55,7 +55,7 @@ and the operational
 [external-validation protocol](research/acutezza-validation-protocol.md).
 The nonclinical browser implementation now covers calibrated rendering,
 threshold recovery simulations, geometry invalidation, accessibility, responsive
-behavior, the six supported locales, a machine-readable observation contract,
+behavior, the twelve supported locales, a machine-readable observation contract,
 an evidence validator, and a prespecified collection and analysis protocol. The
 remaining work requires real participants and professional coordination:
 physical-device observations, paired FrACT comparison, test-retest evidence,

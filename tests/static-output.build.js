@@ -23,7 +23,8 @@ test('every canonical route has substantive, localized raw HTML', async () => {
   for (const path of expectedPaths) {
     const html = await readFile(new URL(path === '/' ? 'index.html' : `.${path}index.html`, DIST), 'utf8');
     const locale = path.split('/').filter(Boolean)[0] ?? 'en';
-    assert.match(html, new RegExp(`<html lang="${locale}"`), path);
+    const metadata = LOCALES.find(({ code }) => code === locale) ?? LOCALES[0];
+    assert.match(html, new RegExp(`<html lang="${metadata.languageTag}" dir="${metadata.direction}"`), path);
     assert.match(html, /<h1[ >]/, path);
     assert.match(html, /<meta name="description" content="[^"].+">/, path);
     assert.match(
@@ -31,9 +32,13 @@ test('every canonical route has substantive, localized raw HTML', async () => {
       new RegExp(`<link rel="canonical" href="https://sense6\\.net${escapeRegex(path)}">`),
       path,
     );
-    assert.equal((html.match(/rel="alternate" hreflang=/g) ?? []).length, 7, path);
+    assert.equal((html.match(/rel="alternate" hreflang=/g) ?? []).length, LOCALES.length + 1, path);
     assert.match(html, /<script type="application\/ld\+json">.+<\/script>/, path);
-    assert.match(html, /<a[^>]+href="\/(?:en|it|de|fr|es|pt)\//, path);
+    assert.match(
+      html,
+      new RegExp(`<a[^>]+href="/(?:${LOCALES.map(({ code }) => escapeRegex(code)).join('|')})/`),
+      path,
+    );
     const main = html.match(/<main[^>]*>([\s\S]*?)<\/main>/)?.[1] ?? '';
     assert.ok(stripTags(main).length >= 180, `${path} needs substantive raw main content`);
     assertBalanced(main, 'section', path);
@@ -48,12 +53,17 @@ test('every canonical route has substantive, localized raw HTML', async () => {
     }
     const title = html.match(/<title>([^<]+)<\/title>/)?.[1];
     assert.ok(title, `${path} needs a title`);
-    if (path !== '/') assert.ok(!titles.has(title), `duplicate localized title: ${title}`);
-    titles.add(title);
+    const localizedTitle = `${locale}:${title}`;
+    if (path !== '/') assert.ok(!titles.has(localizedTitle), `duplicate title within ${locale}: ${title}`);
+    titles.add(localizedTitle);
   }
 });
 
 test('sitemap, robots, llms index, and 404 match the registry', async () => {
+  const redirects = await readFile(new URL('_redirects', DIST), 'utf8');
+  assert.match(redirects, /^\/pt-BR\/\* \/pt-br\/:splat 301$/m);
+  assert.match(redirects, /^\/zh-CN\/\* \/zh-hans\/:splat 301$/m);
+
   const sitemap = await readFile(new URL('sitemap.xml', DIST), 'utf8');
   const sitemapPaths = [...sitemap.matchAll(/<loc>https:\/\/sense6\.net([^<]*)<\/loc>/g)].map(
     (match) => match[1],

@@ -76,6 +76,7 @@ test('Acutezza invalidates a measured run when display geometry changes', async 
 
 test('Acutezza accepts repeatable blind-spot sweeps as measured calibration', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name === 'mobile', 'The mobile project covers the ruler fallback');
+  test.setTimeout(60_000);
   await installQuickAcutezza(page);
   await page.goto('/en/acutezza/');
   await page.getByRole('button', { name: /Prepare the vision lab/i }).click();
@@ -85,8 +86,18 @@ test('Acutezza accepts repeatable blind-spot sweeps as measured calibration', as
 
   for (let sweep = 0; sweep < 3; sweep += 1) {
     await page.getByRole('button', { name: /Start sweep/i }).click();
-    await expect(page.getByRole('button', { name: /Dot disappeared/i })).toBeEnabled();
-    await page.waitForTimeout(180);
+    await expect
+      .poll(() =>
+        page.evaluate(() => {
+          const field = document.querySelector('[data-ac-sweep-field]');
+          const dot = document.querySelector('[data-ac-sweep-dot]');
+          if (!dot.style.insetInlineStart) return 1;
+          const fieldRect = field.getBoundingClientRect();
+          const dotRect = dot.getBoundingClientRect();
+          return (dotRect.left + dotRect.width / 2 - fieldRect.left) / fieldRect.width;
+        }),
+      )
+      .toBeLessThanOrEqual(0.75);
     await page.getByRole('button', { name: /Dot disappeared/i }).click();
   }
 

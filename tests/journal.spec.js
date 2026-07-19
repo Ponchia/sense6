@@ -1,5 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { journalCopy } from '../src/journal-copy.js';
+import { localeMetadata } from '../src/locales.js';
 
 const storedJournal = JSON.stringify({
   format: 'sense6-journal',
@@ -43,6 +45,23 @@ test('journal data recorded in another locale remains readable through localized
   await expect(page.getByRole('heading', { name: 'Tetracromia' })).toHaveCount(2);
   await expect(page.getByText('Indice della sessione', { exact: true })).toHaveCount(2);
   await expect(page.getByText('Schermo', { exact: true })).toHaveCount(2);
+});
+
+test('the added locales render portable journal entries without fallback or overflow', async ({ page }) => {
+  for (const locale of ['pt-br', 'ar', 'ja', 'ko', 'hi', 'zh-hans']) {
+    const metadata = localeMetadata(locale);
+    await page.goto(`/${locale}/journal/`);
+    await expect(page.locator('html')).toHaveAttribute('lang', metadata.languageTag);
+    await expect(page.locator('html')).toHaveAttribute('dir', metadata.direction);
+    await expect(page.getByRole('heading', { name: journalCopy(locale).title })).toBeVisible();
+    await expect(page.locator('[data-journal-entry]')).toHaveCount(2);
+    await expect
+      .poll(() =>
+        page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+      )
+      .toBe(true);
+  }
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
 function run(id, recordedAt, value) {

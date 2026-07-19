@@ -766,7 +766,7 @@ const rows = [
   ],
   ['How finely do you', 'How finely do you'],
   ['see', 'see'],
-  ['color?', 'color?'],
+  ['colour?', 'colour?'],
   ['Begin the color lab', 'Begin the color lab'],
   ['Set the room before the score.', 'Set the room before the score.'],
   ['Which tile is different?', 'Which tile is different?'],
@@ -1424,6 +1424,7 @@ rows.push(
   ['Sound {number}', 'Sound {number}'],
   ['Adaptive · {count}', 'Adaptive · {count}'],
   ['Interleaved · {count}', 'Interleaved · {count}'],
+  ['≈ {minutes} min', '≈ {minutes} min'],
 );
 
 export const MESSAGE_COUNT = rows.length;

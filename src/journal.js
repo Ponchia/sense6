@@ -10,6 +10,7 @@ import {
   measurementChanges,
   removeJournalEntry,
 } from './lib/journal.js';
+import { localeMetadata } from './locales.js';
 
 export function renderJournal(context) {
   const { app, exams, locale, localeHref, t } = context;
@@ -102,9 +103,10 @@ function entryMarkup(entry, entries, exams, copy, locale, t) {
   );
   const comparison = previous ? compareJournalEntries(entry, previous) : null;
   const changes = previous ? measurementChanges(entry, previous) : [];
-  const date = new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(
-    new Date(entry.recordedAt),
-  );
+  const date = new Intl.DateTimeFormat(localeMetadata(locale).languageTag, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(entry.recordedAt));
   return `<section class="journal-entry" data-journal-entry="${escapeAttribute(entry.id)}">
     <header>
       <div><p class="ui-eyebrow">${escapeHtml(definition?.category ?? entry.examId)}</p><h2>${escapeHtml(definition?.name ?? entry.examId)}</h2><p>${escapeHtml(date)} · ${escapeHtml(t(qualitySource(entry.quality)))}</p></div>

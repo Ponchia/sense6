@@ -2280,3 +2280,83 @@ a:focus-visible {
     grid-column: 3;
   }
 }
+
+@media (max-width: 420px) {
+  .gallery-hero h1 {
+    font-size: clamp(2.5rem, 12.5vw, 3.25rem);
+    max-inline-size: 100%;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Arabic and the added Asian scripts need native shaping and metrics rather
+   than the Latin-only dot display face or expanded all-caps labels. */
+html:is(:lang(ar), :lang(hi), :lang(ja), :lang(ko), :lang(zh-Hans)) {
+  --display: var(--sans);
+  --mono: var(--sans);
+  --tracking-wide: 0;
+  --tracking-wider: 0;
+}
+
+html:is(:lang(ar), :lang(hi), :lang(ja), :lang(ko), :lang(zh-Hans))
+  :is(h1, h2, h3, h4, .ui-eyebrow, .ui-tag, .back-link, .device-chip, .locale-picker select) {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+html:is(:lang(ar), :lang(hi), :lang(ja), :lang(ko), :lang(zh-Hans)) :is(h1, h2, h3, h4) {
+  line-height: 1.2;
+}
+
+html:is(:lang(ar), :lang(hi)) :is(button, .ui-button, .ui-link, .back-link, .locale-picker select) {
+  line-height: 1.3;
+}
+
+html[dir="rtl"] :is(.back-link, .exam-card__cta) > span[aria-hidden="true"] {
+  display: inline-block;
+  transform: scaleX(-1);
+}
+
+/* Keep experimental left/right placement and numbered response order physical.
+   Reading direction must not invert a stimulus, a response side, or keyboard mapping. */
+html[dir="rtl"]
+:is(
+  .threshold-grid,
+  .field-grid,
+  .sequence-track,
+  .sequence-controls .ui-cluster,
+  .cb-directions,
+  .ac-sweep,
+  .ac-direction-pad,
+  .ac-meridian__fields,
+  .ac-meridian__choices,
+  .rx-choice-zones,
+  .au-intervals,
+  .au-responses
+) {
+  direction: ltr;
+}
+
+html[dir="rtl"]
+  :is(
+    .sequence-controls .ui-cluster,
+    .cb-directions,
+    .ac-direction-pad,
+    .ac-meridian__choices,
+    .rx-choice-zones,
+    .au-responses
+  )
+  button {
+  direction: rtl;
+}
+
+html[dir="rtl"] :is(input[type="number"], output, code, kbd, samp) {
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+@media (hover: hover) {
+  html[dir="rtl"] .exam-card:hover .exam-card__cta > span[aria-hidden="true"] {
+    transform: translateX(-0.25rem) scaleX(-1);
+  }
+}

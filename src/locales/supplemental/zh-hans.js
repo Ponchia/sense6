@@ -3,16 +3,13 @@ export const privacy = Object.freeze({
   eyebrow: '隐私 / 通俗说明',
   updated: '最后更新：2026年7月19日',
   back: '所有测试',
-  intro:
-    '测试只在你的设备上进行。Sense6 仅保留匿名的每日活动总数，不使用 Cookie、广告跟踪器或用户画像。',
+  intro: '测试只在你的设备上进行。Sense6 仅保留匿名的每日活动总数，不使用 Cookie、广告跟踪器或用户画像。',
   summaryTitle: '简要说明',
   summary: '我们看不到你的回答或结果，也不会尝试在多次访问之间识别你。',
   sections: [
     {
       title: '谁负责运营',
-      paragraphs: [
-        'Sense6 是一个在瑞士运营的独立项目。如有隐私问题或相关请求，请发送至 {email}。',
-      ],
+      paragraphs: ['Sense6 是一个在瑞士运营的独立项目。如有隐私问题或相关请求，请发送至 {email}。'],
     },
     {
       title: '哪些信息留在浏览器中',
@@ -55,10 +52,8 @@ export const privacy = Object.freeze({
 export const journal = Object.freeze({
   title: '你的私密测量日志',
   eyebrow: '本地日志 / 仅限此浏览器',
-  intro:
-    '无需账户即可回顾多次测量。记录、设置档案、比较、导入和导出都保留在此设备上。',
-  privacy:
-    'Sense6 绝不会上传此日志。导出的文件包含你的测量值和设置详情，请将它保存在你选择的安全位置。',
+  intro: '无需账户即可回顾多次测量。记录、设置档案、比较、导入和导出都保留在此设备上。',
+  privacy: 'Sense6 绝不会上传此日志。导出的文件包含你的测量值和设置详情，请将它保存在你选择的安全位置。',
   emptyTitle: '尚无已记录的测量',
   empty: '完成任意一项 Sense6 实验后，其结构化结果会显示在这里。',
   filter: '显示测量项目',

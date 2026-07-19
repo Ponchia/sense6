@@ -485,7 +485,10 @@ const rows = [
   ['What informed Udito.', 'Fundamentos do Udito.'],
   ['Read the primary source', 'Ler a fonte primária'],
   ['Safe listening', 'Audição segura'],
-  ['Audio setup / volume locks after this screen', 'Configuração de áudio / o volume será fixado depois desta tela'],
+  [
+    'Audio setup / volume locks after this screen',
+    'Configuração de áudio / o volume será fixado depois desta tela',
+  ],
   ['Quiet room.', 'Ambiente silencioso.'],
   ['Low volume.', 'Volume baixo.'],
   ['Headphones.', 'Fones de ouvido.'],
@@ -778,7 +781,7 @@ const rows = [
   ],
   ['How finely do you', 'Com que precisão'],
   ['see', 'vê'],
-  ['color?', 'as cores?'],
+  ['colour?', 'as cores?'],
   ['Begin the color lab', 'Iniciar o laboratório de cor'],
   ['Set the room before the score.', 'Prepare o ambiente antes da medição.'],
   ['Which tile is different?', 'Qual bloco é diferente?'],
@@ -1448,6 +1451,7 @@ rows.push(
   ['Sound {number}', 'Som {number}'],
   ['Adaptive · {count}', 'Adaptativo · {count}'],
   ['Interleaved · {count}', 'Intercalado · {count}'],
+  ['≈ {minutes} min', '≈ {minutes} min'],
 );
 
 export const MESSAGE_COUNT = rows.length;

@@ -4,10 +4,10 @@
 <!-- vale Vale.Spelling = NO -->
 
 A small collection of honest, browser-based perception tests. Every gallery,
-exam, and privacy route has a substantive localized HTML entry page for people,
-search engines, and text-retrieval tools. JavaScript then mounts the selected
-experiment as a progressively enhanced module; results and answers remain
-local. The service stores only anonymous daily totals for page loads,
+exam, journal, and privacy route has a substantive localized HTML entry page
+for people, search engines, and text-retrieval tools. JavaScript then mounts the
+selected experiment as a progressively enhanced module; results and answers
+remain local. The service stores only anonymous daily totals for page loads,
 measured-test starts, measured-test completions, and future report downloads.
 
 Live exams:
@@ -247,32 +247,39 @@ site shell. Product-specific stimulus geometry remains local to this project.
 
 ## Localization
 
-Sense6 supports English, Italian, German, French, Spanish, and Portuguese.
+Sense6 supports English, Italian, German, French, Spanish, European Portuguese,
+Brazilian Portuguese, Arabic, Japanese, Korean, Hindi, and Simplified Chinese.
 Locale-aware paths make every exam directly addressable, for example
-`/it/udito/`. Historic hash links such as `#/it/udito` and `#/udito` remain
-valid and are replaced with the corresponding canonical path in the browser.
+`/it/udito/`, `/pt-br/acutezza/`, or `/zh-hans/riflessi/`. Historic hash links
+such as `#/it/udito` and `#/udito` remain valid and are replaced with the
+corresponding canonical path in the browser. Regional language-tag paths such
+as `/pt-BR/` and `/zh-CN/` redirect to their canonical locale routes.
 
 On a first visit, Sense6 selects the first supported language reported by the
 browser and otherwise falls back to English. A choice made in the header is
 stored under `sense6:locale` in local storage. Changing the language keeps the
 current exam open. The runtime also updates the document language, page title,
 metadata, internal links, accessibility labels, number formatting, and copied
-result summaries.
+result summaries. Arabic sets right-to-left document flow. Spatial experiment
+controls retain physical left/right placement and numbered keyboard order in
+every writing direction.
 
-English source phrases and their five translations live in
+English source phrases and their eleven translations live in
 `src/locales/<language>.js`. Only the active language catalog is loaded. Add
 each new user-facing phrase with the same placeholders in every language and
-translate dynamic text explicitly where it is rendered. `tests/i18n.test.js`
-rejects missing values, duplicate English source phrases, and placeholder
-drift. Browser tests cover locale routing, legacy links, detection,
-persistence, accessibility, and mobile overflow.
+translate dynamic text explicitly where it is rendered. Route-specific privacy
+and journal copy for the added locales lives in `src/locales/supplemental/`.
+`tests/i18n.test.js` rejects missing values, duplicate English source phrases,
+placeholder drift, and accidental English fallback. Browser tests cover locale
+routing, regional detection, right-to-left behavior, persistence,
+accessibility, and mobile overflow.
 
 ## Static discovery and crawler policy
 
-`npm run build` creates 49 localized static entry pages: the root, all six
-galleries, all 30 exam routes, all six journal routes, and all six privacy
-routes. Each route contains useful content without JavaScript, a unique title
-and description, a canonical URL, reciprocal `hreflang` links, truthful
+`npm run build` creates 97 localized static entry pages: the root, all twelve
+galleries, all 60 exam routes, all twelve journal routes, and all twelve
+privacy routes. Each route contains useful content without JavaScript, a unique
+title and description, a canonical URL, reciprocal `hreflang` links, truthful
 structured data, research links, and real internal links. The build also
 creates an exact sitemap, `robots.txt`, an optional `llms.txt` discovery
 summary, and a script-free `404.html` so unknown paths don't become indexable

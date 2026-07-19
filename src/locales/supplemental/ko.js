@@ -6,7 +6,8 @@ export const privacy = Object.freeze({
   intro:
     '테스트는 사용자의 기기에만 남습니다. Sense6는 익명 일일 활동 집계만 보관하며 쿠키, 광고 추적기 또는 사용자 프로필을 사용하지 않습니다.',
   summaryTitle: '간단히 말하면',
-  summary: 'Sense6는 사용자의 답변이나 결과를 볼 수 없으며, 방문할 때마다 같은 사용자인지 알아내려 하지 않습니다.',
+  summary:
+    'Sense6는 사용자의 답변이나 결과를 볼 수 없으며, 방문할 때마다 같은 사용자인지 알아내려 하지 않습니다.',
   sections: [
     {
       title: '책임 주체',
