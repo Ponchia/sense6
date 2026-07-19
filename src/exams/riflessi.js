@@ -1,6 +1,7 @@
 import { toast } from '@ponchia/ui/behaviors';
 import '../styles/riflessi.css';
 import { t } from '../i18n.js';
+import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
 import { createExamLifecycle } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
 import {
@@ -51,6 +52,7 @@ export function mount(context) {
     app: context.app,
     announcer: context.announcer,
     goHome: context.navigateHome,
+    locale: context.locale,
     session: null,
     config: runtimeConfig(),
     selectedMode: window.matchMedia?.('(pointer: coarse)').matches ? 'pointer' : 'keyboard',
@@ -586,6 +588,7 @@ function renderResults() {
     recordedAt: Date.now(),
   };
   saveLast(stored);
+  saveJournalResult(result, timing);
   state.session.result = result;
 
   state.app.innerHTML = `
@@ -922,6 +925,36 @@ function saveLast(result) {
   if (!RESULT_STORE.save(result)) {
     announce('The result is ready, but this browser did not allow local storage.');
   }
+}
+
+function saveJournalResult(result, timing) {
+  const entry = createJournalEntry({
+    examId: 'riflessi',
+    locale: state.locale,
+    quality: result.usable ? 'usable' : 'limited',
+    setup: {
+      ...captureDisplayPassport(),
+      inputMode: state.session.inputMode,
+      frameCadence: state.session.diagnostics.frameMedianMs ?? null,
+      timingHealth: timing.label,
+      interruptions: state.session.diagnostics.interruptions,
+    },
+    measurements: [
+      {
+        id: 'signal-median',
+        value: result.signal.medianMs,
+        unit: 'ms',
+        ...(result.signal.spreadMs === null ? {} : { uncertainty: result.signal.spreadMs }),
+      },
+      { id: 'choice-median', value: result.choice.medianMs, unit: 'ms' },
+      { id: 'choice-cost', value: result.choice.costMs, unit: 'ms' },
+      { id: 'stability-median', value: result.stability.medianMs, unit: 'ms' },
+      { id: 'slowest-gap', value: result.stability.slowestGapMs, unit: 'ms' },
+      { id: 'drift', value: result.stability.driftMs, unit: 'ms' },
+    ],
+    notes: result.usable ? [] : ['partial-run'],
+  });
+  if (entry) appendJournalEntry(entry);
 }
 
 function loadLast() {

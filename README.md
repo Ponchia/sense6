@@ -43,10 +43,10 @@ brief](docs/research/acutezza.md) records the method, product boundary, complete
 software checks, and the external validation still required before making any
 clinical claim.
 
-The [product and engineering roadmap](docs/roadmap.md) records the next work:
-private repeated-run history and Acutezza's external validation. The shared
-lifecycle, versioned persistence, route-level loading, and bundle budgets are
-now established foundations.
+The [product and engineering roadmap](docs/roadmap.md) records the completed
+private repeated-run journal and Acutezza's remaining external evidence gates.
+The shared lifecycle, versioned persistence, route-level loading, and bundle
+budgets are established foundations.
 
 ## Background
 
@@ -201,10 +201,26 @@ npm run dev
 
 Open the URL printed by Vite. Complete the screen check before you start the
 colour tests, choose one input path before starting Riflessi, or complete
-Udito's low-volume reference and volume-lock contract. The site stores only
-concise last-run summaries in local browser storage. It does not send session
-answers, measurements, or results to a server. It sends one allowlisted event
-name and test name when a page loads or a measured run starts or completes.
+Udito's low-volume reference and volume-lock contract. Each completed run adds
+a structured entry to the private journal in local browser storage. Sense6 does
+not send session answers, measurements, journal entries, or results to a
+server. It sends one allowlisted event name and test name when a page loads or a
+measured run starts or completes.
+
+## Private measurement journal
+
+Open `/{locale}/journal/`, for example `/en/journal/`, to review up to 100 saved
+runs. Each entry contains structured measurements, uncertainty or measurement
+bounds when an instrument provides them, and a setup passport with the
+conditions needed for comparison. Comparisons are instrument-specific and use
+three labels: comparable, comparable with caution, or not comparable. Sense6
+does not convert the five instruments into a suite-wide score.
+
+You can delete one entry, delete the complete journal, export a documented JSON
+file, or merge that file back into a browser. Imports are size-limited,
+validated, schema-versioned, and idempotent by entry ID. The journal remains on
+the device unless you deliberately save or move an exported file. The compact
+legacy latest-or-best result keys remain readable for compatibility.
 
 ## Privacy-preserving metrics
 
@@ -253,19 +269,23 @@ persistence, accessibility, and mobile overflow.
 
 ## Static discovery and crawler policy
 
-`npm run build` creates localized static entry pages for the root, all six
-galleries, all 30 exam routes, and all six privacy routes. Each route contains
-useful content without JavaScript, a unique title and description, a canonical
-URL, reciprocal `hreflang` links, truthful structured data, research links, and
-real internal links. The build also creates an exact sitemap, `robots.txt`, an
-optional `llms.txt` discovery summary, and a script-free `404.html` so unknown
-paths don't become indexable soft-404 responses.
+`npm run build` creates 49 localized static entry pages: the root, all six
+galleries, all 30 exam routes, all six journal routes, and all six privacy
+routes. Each route contains useful content without JavaScript, a unique title
+and description, a canonical URL, reciprocal `hreflang` links, truthful
+structured data, research links, and real internal links. The build also
+creates an exact sitemap, `robots.txt`, an optional `llms.txt` discovery
+summary, and a script-free `404.html` so unknown paths don't become indexable
+soft-404 responses.
 
 The default policy allows conventional search and user-directed retrieval
 crawlers. It disallows `GPTBot` and `ClaudeBot`, which are associated with model
 training rather than a user's immediate request. Review that deliberate product
 choice whenever the crawler policy changes; `llms.txt` is a convenience, not an
-access-control mechanism. Preview deployments send `X-Robots-Tag: noindex`.
+access-control mechanism. `src/crawler-policy.js` records the provider purpose,
+official guidance, review date, and next review deadline. Static verification
+fails after that deadline until the policy is reviewed. Preview deployments
+send `X-Robots-Tag: noindex`.
 
 Static pages are generated from `src/exams/registry.js`, the locale catalogs,
 and the privacy copy. Don't hand-edit files under `dist/`.
@@ -295,6 +315,14 @@ Run unit tests with enforced coverage for shared storage and lifecycle code:
 
 ```sh
 npm run test:coverage
+```
+
+Validate the empty Acutezza evidence contract, or pass a local observation file
+to its validator as described in the
+[external-validation protocol](docs/research/acutezza-validation-protocol.md):
+
+```sh
+npm run validate:acutezza
 ```
 
 Build the production bundle:

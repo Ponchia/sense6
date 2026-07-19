@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { expectJournalEntry } from './helpers/browser.js';
 
 test('landing page presents the method and passes an accessibility scan', async ({ page }) => {
   await page.goto('/en/tetracromia/');
@@ -80,6 +81,7 @@ test('a complete session produces an honest, accessible result profile', async (
   await expect(page.locator('.result-note')).toContainText('not a population percentile');
   await expect(page.getByRole('meter')).toHaveCount(3);
   await expect(page.locator('.profile-radar__point')).toHaveCount(7);
+  await expectJournalEntry(page, 'tetracromia');
 
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);

@@ -21,6 +21,7 @@ import {
   summarizeBlindSpot,
   summarizeMeridians,
 } from '../lib/acuity.js';
+import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
 import { createExamLifecycle } from '../lib/lifecycle.js';
 import { drawLandoltRing, drawMeridianField } from '../lib/optotypes.js';
 import { seededRandom } from '../lib/random.js';
@@ -62,6 +63,7 @@ export function mount(context) {
     app: context.app,
     announcer: context.announcer,
     goHome: context.navigateHome,
+    locale: context.locale,
     config: runtimeConfig(),
     session: null,
     activeTrial: null,
@@ -645,6 +647,7 @@ function renderResults() {
     usable && !bounded ? 'Setup checks coherent' : usable ? 'Interpret with caution' : 'Run unusable';
   state.session.result = { setupQuality, usable };
   saveLast({ setupQuality, eyes: state.session.eyeResults.length, recordedAt: Date.now() });
+  saveJournalResult({ setupQuality, usable, bounded });
   document.title = t('Your calibrated sharpness profile — Acutezza | Sense6');
   state.app.innerHTML = `<section class="ac-results ui-container ui-container--wide"><button class="back-link" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button><header class="ac-results__hero"><div><p class="ui-eyebrow">Acutezza / this display / this distance</p><h1>Separate observations.<br><em>No vision label.</em></h1><p>${usable ? 'The calibration and task controls support interpretation of this run at the stated distance.' : 'A calibration or task-control check was limited. Repeat before comparing runs.'}</p></div><div class="ac-results__stamp ${usable && !bounded ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>${String(state.session.eyeResults.length).padStart(2, '0')} / 02</strong></div></header><div class="ac-eye-results">${state.session.eyeResults.map(eyeResultMarkup).join('')}</div><div class="ac-context-grid"><article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the target.</h2><dl><div><dt>Correction</dt><dd>${correctionLabel(state.session.correction)}</dd></div><div><dt>Distance</dt><dd>${Math.round(state.session.calibration.distanceMm / 10)} cm · ${t(state.session.calibration.state)}</dd></div><div><dt>Card scale</dt><dd>${Math.round(state.session.calibration.cardWidthCssPx)} CSS px</dd></div><div><dt>Task controls</dt><dd>${controlCorrect} / ${controlCount || '—'}</dd></div></dl></article><article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Calibrated experiment, not an eye examination.</h2><p>Acutezza describes one self-administered run on this display at this estimated distance. It is not vision screening, diagnosis, or a prescription.</p><p>Do not infer normal vision, 20/20, refractive error, cylinder power, or an astigmatism axis.</p></article></div><aside class="ac-results__safety"><strong>Sudden changes need care, not another run.</strong><p>Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.</p></aside><div class="ui-cluster ac-results__actions"><button class="ui-button" type="button" data-action="ac-restart">Run again</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-copy">Copy result summary</button></div></section>`;
 }
@@ -928,6 +931,49 @@ function saveLast(result) {
     if (state.announcer)
       state.announcer.textContent = t('The result is ready, but local storage was unavailable.');
   }
+}
+
+function saveJournalResult({ usable, bounded }) {
+  const measurements = state.session.eyeResults.flatMap((eye) => {
+    const prefix = eye.eye;
+    return [
+      acuityMeasurement(`${prefix}-high`, eye.high),
+      ...(eye.low ? [acuityMeasurement(`${prefix}-low`, eye.low)] : []),
+      { id: `${prefix}-contrast-cost`, value: eye.contrastCostPercent, unit: '%' },
+      {
+        id: `${prefix}-meridian`,
+        value: eye.meridian.consistencyPercent,
+        unit: '%',
+      },
+    ];
+  });
+  const entry = createJournalEntry({
+    examId: 'acutezza',
+    locale: state.locale,
+    quality: usable && !bounded ? 'usable' : usable ? 'caution' : 'limited',
+    setup: {
+      ...captureDisplayPassport(),
+      correction: state.session.correction,
+      distanceMm: state.session.calibration.distanceMm,
+      calibrationState: state.session.calibration.state,
+      cardWidthCssPx: Math.round(state.session.calibration.cardWidthCssPx),
+      interruptions: state.session.interruptions,
+    },
+    measurements,
+    notes: bounded ? ['display-range-bound'] : usable ? [] : ['setup-check-limited'],
+  });
+  if (entry) appendJournalEntry(entry);
+}
+
+function acuityMeasurement(id, result) {
+  return {
+    id,
+    value: result.thresholdArcmin,
+    unit: 'arcmin',
+    lower: result.lowerArcmin,
+    upper: result.upperArcmin,
+    ...(result.atFloor ? { bound: 'upper' } : result.atCeiling ? { bound: 'lower' } : {}),
+  };
 }
 
 function loadLast() {

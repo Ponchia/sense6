@@ -739,6 +739,7 @@ const rows = [
   ['Timing clock', 'Timing clock'],
   ['Monotonic', 'Monotonic'],
   ['Privacy', 'Privacy'],
+  ['Journal', 'Journal'],
   ['Answers stay local', 'Answers stay local'],
   ['Back', 'Back'],
   ['Leave lab', 'Leave lab'],

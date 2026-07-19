@@ -16,6 +16,7 @@ import {
   summarizeRange,
 } from '../lib/hearing.js';
 import { HearingAudio } from '../lib/hearing-audio.js';
+import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
 import { createExamLifecycle } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
@@ -57,6 +58,7 @@ export function mount(context) {
     app: context.app,
     announcer: context.announcer,
     goHome: context.navigateHome,
+    locale: context.locale,
     config,
     audio: new HearingAudio(config.audio),
     session: null,
@@ -505,6 +507,7 @@ function renderResults() {
   const result = { headphones, range, pitch, usable, setupQuality };
   state.session.result = result;
   saveLast({ setupQuality, sampleRate: state.session.sampleRate, recordedAt: Date.now() });
+  saveJournalResult(result);
 
   state.app.innerHTML = `
     <section class="au-results ui-container ui-container--wide">
@@ -702,6 +705,47 @@ function saveLast(result) {
     if (state.announcer)
       state.announcer.textContent = t('The result is ready, but local storage was unavailable.');
   }
+}
+
+function saveJournalResult(result) {
+  const rangeMeasurement = {
+    id: 'range-hz',
+    value: result.range.thresholdHz,
+    unit: 'Hz',
+    ...(result.range.atCeiling
+      ? { bound: 'lower' }
+      : result.range.spreadHz === null
+        ? {}
+        : { uncertainty: result.range.spreadHz / 2 }),
+  };
+  const entry = createJournalEntry({
+    examId: 'udito',
+    locale: state.locale,
+    quality: result.usable ? 'usable' : 'caution',
+    setup: {
+      ...captureDisplayPassport(),
+      device: state.session.device,
+      sampleRate: state.session.sampleRate,
+      interruptions: state.session.interruptions,
+      volumeLockedWithinRun: true,
+    },
+    measurements: [
+      {
+        id: 'headphone-confidence',
+        value: result.headphones.correct,
+        unit: `/ ${result.headphones.trials}`,
+      },
+      rangeMeasurement,
+      ...result.pitch.map((pitch) => ({
+        id: `pitch-${pitch.anchorHz}`,
+        value: pitch.thresholdPercent,
+        unit: '%',
+        ...(pitch.spreadPercent === null ? {} : { uncertainty: pitch.spreadPercent / 2 }),
+      })),
+    ],
+    notes: result.usable ? ['volume-not-verifiable-between-runs'] : ['setup-check-limited'],
+  });
+  if (entry) appendJournalEntry(entry);
 }
 
 function loadLast() {

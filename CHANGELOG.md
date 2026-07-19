@@ -10,6 +10,14 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- A local-only, versioned multi-run journal with setup passports,
+  instrument-specific comparability, uncertainty and bound-aware changes,
+  validated import/export, individual and complete deletion, six localized
+  routes, and recording from all five experiments.
+- An Acutezza external-validation protocol, machine-readable observation
+  schema, and evidence validator for the physical-device, FrACT, test-retest,
+  and professional-review gates that cannot be satisfied by software tests.
+- A centralized, dated crawler policy with an automated review deadline.
 - Privacy-preserving product metrics that store only daily aggregate page-load,
   measured-start, measured-completion, and future report-download counts in D1,
   with no visitor or event records.

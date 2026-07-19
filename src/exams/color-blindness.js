@@ -11,6 +11,7 @@ import {
   rgbCss,
   summarizeAdaptiveRun,
 } from '../lib/daltonism.js';
+import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
 import { createExamLifecycle } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
@@ -63,6 +64,7 @@ export function mount(context) {
     announcer: context.announcer,
     gamutChip: context.gamutChip,
     goHome: context.navigateHome,
+    locale: context.locale,
     run: null,
     active: false,
     phase: 'intro',
@@ -450,6 +452,7 @@ function renderResults() {
   document.title = t('Your display-relative thresholds — Daltonia | Sense6');
   const result = summarizeAdaptiveRun(state.run);
   saveLast(result);
+  saveJournalResult(result);
 
   state.app.innerHTML = `
     <section class="results-view ui-container ui-container--wide">
@@ -630,6 +633,23 @@ function saveLast(result) {
     controlOk: result.controlOk,
     savedAt: new Date().toISOString(),
   });
+}
+
+function saveJournalResult(result) {
+  const entry = createJournalEntry({
+    examId: 'color-blindness',
+    locale: state.locale,
+    quality: result.controlOk ? 'usable' : 'limited',
+    setup: captureDisplayPassport(),
+    measurements: result.axes.map((axis) => ({
+      id: axis.type,
+      value: axis.threshold,
+      unit: 'relative',
+      ...(axis.limit ? { bound: axis.limit === 'floor' ? 'upper' : 'lower' } : { uncertainty: axis.spread }),
+    })),
+    notes: result.controlOk ? [] : ['task-controls-limited'],
+  });
+  if (entry) appendJournalEntry(entry);
 }
 
 function wireEvents(signal) {

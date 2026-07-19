@@ -6,6 +6,11 @@
 Status: implemented as a nonclinical experiment; external validation pending,
 2026-07-19
 
+The operational [external-validation protocol](acutezza-validation-protocol.md)
+defines the physical-device matrix, paired FrACT procedure, evidence file,
+analysis, and professional-review gate. No participant or clinical-review
+evidence has been collected in this repository.
+
 Acutezza should be a calibrated browser sharpness experiment, not an online eye
 exam. It should describe what a person resolved on one screen, at one estimated
 distance, with one stated correction. It must not diagnose astigmatism, produce

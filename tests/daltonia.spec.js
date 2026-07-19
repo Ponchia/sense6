@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { expectJournalEntry } from './helpers/browser.js';
 
 test('the Daltonia experiment renders adaptive targets and reports non-clinical thresholds', async ({
   page,
@@ -70,6 +71,7 @@ test('the Daltonia experiment renders adaptive targets and reports non-clinical 
   await expect(page.locator('.cb-threshold-card')).toHaveCount(3);
   await expect(page.locator('.result-note')).toContainText('cannot confirm or rule out');
   await expect(page.getByText(/No colour-vision deficiency detected/i)).toHaveCount(0);
+  await expectJournalEntry(page, 'color-blindness');
 
   const resultScan = await new AxeBuilder({ page }).analyze();
   expect(resultScan.violations).toEqual([]);

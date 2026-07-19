@@ -1,6 +1,11 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { answerCurrentSoundTrial, captureMetrics, installQuickUdito } from './helpers/browser.js';
+import {
+  answerCurrentSoundTrial,
+  captureMetrics,
+  expectJournalEntry,
+  installQuickUdito,
+} from './helpers/browser.js';
 
 test('Udito completes three safe-listening instruments and keeps results separate', async ({ page }) => {
   await installQuickUdito(page);
@@ -50,6 +55,7 @@ test('Udito completes three safe-listening instruments and keeps results separat
   await expect(page.getByText(/Device-relative, never dB HL/i)).toBeVisible();
   await expect(page.getByText(/hearing age/i)).toBeVisible();
   await expect(page.getByText(/composite hearing score/i)).toBeVisible();
+  await expectJournalEntry(page, 'udito');
   await expect
     .poll(() => metrics)
     .toEqual([
