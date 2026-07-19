@@ -25,6 +25,7 @@ export function mount(context) {
     announcer: context.announcer,
     gamutChip: context.gamutChip,
     goHome: context.navigateHome,
+    lifecycle,
     locale: context.locale,
     session: null,
     labActive: false,
@@ -68,6 +69,7 @@ function renderHome() {
   cancelTrialEffects();
   state.session = null;
   state.labActive = false;
+  state.lifecycle.setActive(false);
   state.selectedSequenceIndex = null;
   document.body.classList.remove('lab-mode');
   document.title = t('Tetracromia — colour discrimination | Sense6');
@@ -256,6 +258,9 @@ function testDescription(id) {
 
 function renderSetup() {
   cancelTrialEffects();
+  state.session = null;
+  state.labActive = false;
+  state.lifecycle.setActive(false);
   document.body.classList.add('lab-mode');
   document.title = t('Prepare your screen — Tetracromia | Sense6');
   window.scrollTo({ top: 0, behavior: 'instant' });
@@ -309,12 +314,19 @@ function renderSetup() {
       </div>
     </section>
   `;
+  updateSetupEligibility();
 }
 
 function startLab() {
+  if (forcedColorsActive()) {
+    updateSetupEligibility();
+    announce('Turn off forced-colors or high-contrast mode before this color task.');
+    return;
+  }
   const seed = `${Date.now()}-${crypto.getRandomValues(new Uint32Array(1))[0]}`;
   state.session = new ColorLabSession(seed);
   state.labActive = true;
+  state.lifecycle.setActive(true, t('Leave the lab? Your progress will be lost.'));
   trackMetric(METRIC_EVENTS.testStarted, METRIC_TESTS.tetracromia);
   state.selectedSequenceIndex = null;
   document.body.classList.add('lab-mode');
@@ -731,6 +743,7 @@ function submitSequence() {
 function renderResults() {
   cancelTrialEffects();
   state.labActive = false;
+  state.lifecycle.setActive(false);
   trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.tetracromia);
   document.body.classList.add('lab-mode');
   document.title = t('Your colour profile — Tetracromia | Sense6');
@@ -962,12 +975,27 @@ function announce(message) {
   });
 }
 
+function forcedColorsActive() {
+  return window.matchMedia?.('(forced-colors: active)').matches === true;
+}
+
+function updateSetupEligibility() {
+  const ready = state.app.querySelector('#screen-ready');
+  const start = state.app.querySelector('#start-lab');
+  if (!ready || !start) return;
+  const blocked = forcedColorsActive();
+  start.disabled = !ready.checked || blocked;
+  state.app
+    .querySelector('.tetracromia-forced-colors-warning')
+    ?.setAttribute('aria-hidden', String(!blocked));
+}
+
 function wireEvents(signal) {
   document.addEventListener(
     'change',
     (event) => {
       if (event.target.matches('#screen-ready')) {
-        document.querySelector('#start-lab').disabled = !event.target.checked;
+        updateSetupEligibility();
       }
     },
     { signal },
@@ -1029,6 +1057,18 @@ function wireEvents(signal) {
   document.addEventListener('pointerup', onSequencePointerUp, { signal });
   document.addEventListener('pointercancel', onSequencePointerCancel, { signal });
   window.addEventListener('resize', scheduleFieldRedraw, { signal });
+  window.matchMedia?.('(forced-colors: active)').addEventListener(
+    'change',
+    () => {
+      if (state.labActive && forcedColorsActive()) {
+        renderSetup();
+        announce('Color override detected. This run stopped and was not saved.');
+        return;
+      }
+      updateSetupEligibility();
+    },
+    { signal },
+  );
 }
 
 /*

@@ -43,6 +43,11 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+#app :where(h1, h2, h3, p, li, a, strong, button) {
+  hyphens: auto;
+  overflow-wrap: anywhere;
+}
+
 button:focus-visible,
 a:focus-visible {
   outline: 2px solid var(--focus-ring);
@@ -180,6 +185,26 @@ a:focus-visible {
 
 .hero__copy {
   max-inline-size: 50rem;
+  min-inline-size: 0;
+}
+
+.hero__copy .ui-eyebrow,
+.hero__lede,
+.hero__limit,
+.section-heading .ui-eyebrow,
+.section-heading h2,
+.closing-cta .ui-eyebrow,
+.closing-cta h2,
+.source-list a {
+  hyphens: auto;
+  overflow-wrap: anywhere;
+}
+
+.section-heading > *,
+.closing-cta > *,
+.source-list,
+.source-list li {
+  min-inline-size: 0;
 }
 
 .hero h1,
@@ -611,11 +636,16 @@ a:focus-visible {
 
 .science__sources {
   align-self: end;
+  grid-template-columns: minmax(0, 1fr);
+  min-inline-size: 0;
+  overflow: hidden;
   padding: 1.5rem;
 }
 
 .source-list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  inline-size: 100%;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -632,6 +662,7 @@ a:focus-visible {
   font-size: var(--text-sm);
   gap: 1rem;
   justify-content: space-between;
+  min-inline-size: 0;
   padding-block: 1rem;
   text-decoration: none;
 }
@@ -639,6 +670,13 @@ a:focus-visible {
 .source-list a::after {
   color: var(--accent-text);
   content: "↗";
+}
+
+.science__sources .ui-eyebrow,
+.closing-cta .ui-button {
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .closing-cta {
@@ -681,6 +719,25 @@ a:focus-visible {
   gap: clamp(3rem, 8vw, 9rem);
   grid-template-columns: 0.9fr 1.1fr;
   margin-block-start: clamp(3rem, 8vh, 7rem);
+}
+
+.setup-grid > *,
+.setup-copy,
+.setup-panel {
+  min-inline-size: 0;
+}
+
+.setup-panel {
+  grid-template-columns: minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.setup-panel .ui-card__head {
+  flex-wrap: wrap;
+}
+
+.setup-panel .ui-card__head > * {
+  min-inline-size: 0;
 }
 
 .setup-copy h1 {
@@ -1466,7 +1523,7 @@ a:focus-visible {
   }
 
   .setup-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .hero {
@@ -1583,7 +1640,7 @@ a:focus-visible {
   }
 
   .hero__instrument {
-    inline-size: min(86vw, 25rem);
+    inline-size: min(100%, 86vw, 25rem);
   }
 
   .section {

@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { expectJournalEntry } from './helpers/browser.js';
+import { expectInVisualViewport, expectJournalEntry, expectNoHorizontalOverflow } from './helpers/browser.js';
 
 async function startLab(page, locale = 'en') {
   await page.goto(`/${locale}/tetracromia/`);
@@ -138,6 +138,7 @@ test('screen setup exposes its warning when forced colors are active', async ({ 
   await page.getByRole('button', { name: /Begin the color lab/i }).click();
 
   await expect(page.getByText('Color override detected', { exact: true })).toBeVisible();
+  await page.getByLabel(/I can distinguish the steps/i).check();
   await expect(page.getByRole('button', { name: /Start instrument 01/i })).toBeDisabled();
 });
 
@@ -508,6 +509,26 @@ test('German landing and results stay contained across narrow widths', async ({ 
       radarContained: true,
     });
   }
+});
+
+test('Tetracromia remains operable at 320px with 200% text sizing', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Uses explicit text-only zoom geometry');
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('/de/tetracromia/');
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '32px';
+  });
+  await expectNoHorizontalOverflow(page, '200% text Tetracromia landing');
+
+  await page.locator('[data-action="setup"]').first().click();
+  await expectNoHorizontalOverflow(page, '200% text Tetracromia setup');
+  await page.locator('#screen-ready').check();
+  await page.locator('[data-action="start"]').click();
+  await expect(page.locator('[data-choice="0"]')).toBeEnabled();
+  await expectNoHorizontalOverflow(page, '200% text Tetracromia trial');
+  const firstChoice = page.locator('[data-choice="0"]');
+  await firstChoice.scrollIntoViewIfNeeded();
+  await expectInVisualViewport(firstChoice, '200% text Threshold choice', { hitTest: true });
 });
 
 test('mobile layout stays inside the viewport through setup and the first trial', async ({
