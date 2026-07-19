@@ -1,9 +1,9 @@
 {
-  "name": "tetracromia",
+  "name": "sense6",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "A research-grounded, browser-based color discrimination lab.",
+  "description": "A private, research-grounded browser perception lab.",
   "license": "MIT",
   "scripts": {
     "dev": "vite --host 0.0.0.0",

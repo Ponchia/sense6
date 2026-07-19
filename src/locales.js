@@ -226,12 +226,12 @@ message(
   'Em desenvolvimento — apresentado como direção, mas ainda não disponível.',
 );
 message(
-  'Visual acuity & astigmatism',
-  'Acuità visiva e astigmatismo',
-  'Sehschärfe und Astigmatismus',
-  'Acuité visuelle et astigmatisme',
-  'Agudeza visual y astigmatismo',
-  'Acuidade visual e astigmatismo',
+  'Calibrated sharpness & meridional clarity',
+  'Nitidezza calibrata e chiarezza meridionale',
+  'Kalibrierte Sehschärfe und meridionale Klarheit',
+  'Netteté calibrée et clarté méridienne',
+  'Nitidez calibrada y claridad meridional',
+  'Nitidez calibrada e clareza meridional',
 );
 message(
   'Useful because the limits are visible',

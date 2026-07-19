@@ -35,6 +35,14 @@ jobs:
       - name: Verify the production bundle
         run: npm run check
 
+      - name: Store the verified bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: sense6-dist
+          path: dist/
+          if-no-files-found: error
+          retention-days: 1
+
   publish:
     needs: verify
     runs-on: ubuntu-latest
@@ -47,17 +55,11 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v6
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
+      - name: Restore the verified bundle
+        uses: actions/download-artifact@v4
         with:
-          node-version: 24
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build the static site
-        run: npm run build
+          name: sense6-dist
+          path: dist/
 
       - name: Publish the verified bundle
         uses: cloudflare/wrangler-action@v3
