@@ -188,6 +188,26 @@ The interface uses [`@ponchia/ui`](https://github.com/Ponchia/bronto-ui) for its
 tokens, typography, layout primitives, controls, feedback, theme behavior, and
 site shell. Product-specific stimulus geometry remains local to this project.
 
+## Localization
+
+Sensoria supports English, Italian, German, French, Spanish, and Portuguese.
+Locale-aware hash routes make every exam directly addressable, for example
+`#/it/udito`. Existing routes such as `#/udito` remain valid and are normalized
+to the active locale.
+
+On a first visit, Sensoria selects the first supported language reported by the
+browser and otherwise falls back to English. A choice made in the header is
+stored under `sensoria:locale` in local storage. Changing the language keeps the
+current exam open. The runtime also updates the document language, page title,
+metadata, internal links, accessibility labels, number formatting, and copied
+result summaries.
+
+English source phrases and their five translations live in `src/locales.js`.
+Add each new user-facing phrase there with the same placeholders in every
+language. `tests/i18n.test.js` rejects missing values, duplicate English source
+phrases, and placeholder drift. Browser tests cover locale routing, detection,
+persistence, accessibility, and mobile overflow.
+
 ## Develop and test
 
 Run the deterministic colour-math, timing, adaptive hearing, and session-engine

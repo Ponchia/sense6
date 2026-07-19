@@ -75,10 +75,10 @@ async function respondToChoice(page) {
 test('the gallery lists exams, is accessible, and routes into one', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
-  await expect(page.locator('.exam-card__link[href="#/tetracromia"]')).toBeVisible();
-  await expect(page.locator('.exam-card__link[href="#/color-blindness"]')).toBeVisible();
-  await expect(page.locator('.exam-card__link[href="#/riflessi"]')).toBeVisible();
-  await expect(page.locator('.exam-card__link[href="#/udito"]')).toBeVisible();
+  await expect(page.locator('.exam-card__link[href="#/en/tetracromia"]')).toBeVisible();
+  await expect(page.locator('.exam-card__link[href="#/en/color-blindness"]')).toBeVisible();
+  await expect(page.locator('.exam-card__link[href="#/en/riflessi"]')).toBeVisible();
+  await expect(page.locator('.exam-card__link[href="#/en/udito"]')).toBeVisible();
   await expect(page.getByRole('heading', { name: /More senses, same standard/i })).toBeVisible();
   await expect(page.locator('.roadmap-item')).toHaveCount(1);
   await expect
@@ -95,14 +95,117 @@ test('the gallery lists exams, is accessible, and routes into one', async ({ pag
   const darkResults = await new AxeBuilder({ page }).analyze();
   expect(darkResults.violations).toEqual([]);
 
-  await page.locator('.exam-card__link[href="#/color-blindness"]').click();
-  await expect(page).toHaveURL(/#\/color-blindness$/);
+  await page.locator('.exam-card__link[href="#/en/color-blindness"]').click();
+  await expect(page).toHaveURL(/#\/en\/color-blindness$/);
   await expect(page.getByRole('heading', { name: /Find the gap in the dots/i })).toBeVisible();
+});
+
+test('language routes translate, persist, and remain accessible', async ({ page }) => {
+  const expectations = {
+    it: 'Inizia da ciò che vuoi scoprire.',
+    de: 'Beginnen Sie mit dem, was Sie erfahren möchten.',
+    fr: 'Commencez par ce que vous souhaitez découvrir.',
+    es: 'Empieza por lo que quieres descubrir.',
+    pt: 'Comece pelo que deseja descobrir.',
+  };
+
+  await page.goto('/#/it/');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'it');
+  await expect(page.getByRole('heading', { name: expectations.it })).toBeVisible();
+  await expect(page.locator('.exam-card__link[href="#/it/udito"]')).toBeVisible();
+
+  for (const [locale, heading] of Object.entries(expectations)) {
+    await page.locator('[data-locale-select]').selectOption(locale);
+    await expect(page).toHaveURL(new RegExp(`#/${locale}/$`));
+    await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    await expect(page.getByRole('heading', { name: heading })).toBeVisible();
+  }
+
+  await page.locator('[data-locale-select]').selectOption('de');
+  await page.reload();
+  await expect(page.locator('[data-locale-select]')).toHaveValue('de');
+  await page.locator('.exam-card__link[href="#/de/udito"]').click();
+  await expect(page.getByRole('heading', { name: /Hören Sie auf die Grenze/i })).toBeVisible();
+  await expect(page).toHaveTitle(/Gerätebezogenes Hörlabor/);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test('every live exam has a localized European-language entry point', async ({ page }) => {
+  const headings = {
+    it: {
+      tetracromia: 'Quanto finemente',
+      'color-blindness': 'Trova l’apertura',
+      riflessi: 'Nota il segnale',
+      udito: 'Ascolta il limite',
+    },
+    de: {
+      tetracromia: 'Wie fein',
+      'color-blindness': 'Finden Sie die Lücke',
+      riflessi: 'Signal erkennen',
+      udito: 'Hören Sie auf die Grenze',
+    },
+    fr: {
+      tetracromia: 'Avec quelle finesse',
+      'color-blindness': 'Repérez l’ouverture',
+      riflessi: 'Repérez le signal',
+      udito: 'Écoutez la limite',
+    },
+    es: {
+      tetracromia: '¿Con qué precisión',
+      'color-blindness': 'Encuentra la abertura',
+      riflessi: 'Detecta la señal',
+      udito: 'Escucha el límite',
+    },
+    pt: {
+      tetracromia: 'Com que precisão',
+      'color-blindness': 'Encontre a abertura',
+      riflessi: 'Detete o sinal',
+      udito: 'Escute o limite',
+    },
+  };
+
+  for (const [locale, routes] of Object.entries(headings)) {
+    for (const [route, heading] of Object.entries(routes)) {
+      await page.goto(`/#/${locale}/${route}`);
+      await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      await expect(page.locator('main h1')).toContainText(heading, { ignoreCase: true });
+      await expect(page.locator('[data-locale-select]')).toHaveValue(locale);
+    }
+  }
+
+  await page.goto('/#/en/udito');
+  await page.locator('[data-locale-select]').selectOption('es');
+  await expect(page).toHaveURL(/#\/es\/udito$/);
+  await expect(page.locator('main h1')).toContainText('Escucha el límite', { ignoreCase: true });
+});
+
+test('the first visit follows a supported browser language', async ({ browser }) => {
+  const context = await browser.newContext({ locale: 'fr-FR', baseURL: 'http://127.0.0.1:4173' });
+  const page = await context.newPage();
+  await page.goto('/');
+  await expect(page).toHaveURL(/#\/fr\/$/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
+  await expect(
+    page.getByRole('heading', { name: /Commencez par ce que vous souhaitez découvrir/i }),
+  ).toBeVisible();
+  await context.close();
+});
+
+test('long German labels remain inside the mobile viewport', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Mobile-only localization geometry check');
+  await page.goto('/#/de/udito');
+  await page.getByRole('button', { name: /Hörlabor vorbereiten/i }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+    )
+    .toBe(true);
 });
 
 test('Udito completes three safe-listening instruments and keeps results separate', async ({ page }) => {
   await installQuickUdito(page);
   await page.goto('/#/udito');
+  await expect(page).toHaveURL(/#\/en\/udito$/);
 
   await expect(page.getByRole('heading', { name: /Listen for the boundary/i })).toBeVisible();
   await expect(page.getByRole('heading', { name: /What informed Udito/i })).toBeVisible();
@@ -180,7 +283,7 @@ test('Riflessi completes all three instruments and reports separate device-relat
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole('link', { name: /See the method/i }).click();
   await expect(page.getByRole('heading', { name: /Three questions, kept separate/i })).toBeInViewport();
-  await expect(page).toHaveURL(/#\/riflessi$/);
+  await expect(page).toHaveURL(/#\/en\/riflessi$/);
 
   await page.getByRole('button', { name: /Prepare the lab/i }).click();
   await page.getByRole('button', { name: /^Keyboard/i }).click();

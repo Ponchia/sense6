@@ -1,5 +1,5 @@
 import { toast } from '@ponchia/ui/behaviors';
-
+import { formatNumber, t } from '../i18n.js';
 import { toRgbCss } from '../lib/color.js';
 import { seededRandom } from '../lib/random.js';
 import { ColorLabSession, PHASES } from '../lib/session.js';
@@ -652,8 +652,8 @@ function renderResults() {
         </article>
 
         <div class="result-details">
-          ${resultMetric('01', 'Threshold', result.thresholdScore, `Finest step ≈ ${result.thresholdDegrees.toFixed(1)}° of hue (ΔEOK ${result.thresholdDelta.toFixed(2)})`, `${result.thresholdAccuracy}% correct · smaller angle = finer vision`)}
-          ${resultMetric('02', 'Field', result.fieldScore, `Finest shift ≈ ${result.fieldDegrees.toFixed(1)}° of hue through noise (ΔEOK ${result.fieldDelta.toFixed(2)})`, `${result.fieldAccuracy}% correct · smaller angle = finer vision`)}
+          ${resultMetric('01', 'Threshold', result.thresholdScore, `Finest step ≈ ${formatNumber(result.thresholdDegrees, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}° of hue (ΔEOK ${formatNumber(result.thresholdDelta, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`, `${result.thresholdAccuracy}% correct · smaller angle = finer vision`)}
+          ${resultMetric('02', 'Field', result.fieldScore, `Finest shift ≈ ${formatNumber(result.fieldDegrees, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}° of hue through noise (ΔEOK ${formatNumber(result.fieldDelta, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`, `${result.fieldAccuracy}% correct · smaller angle = finer vision`)}
           ${resultMetric('03', 'Sequence', result.sequenceScore, 'Hue ordering between fixed anchors', '100 = perfect order · each out-of-place pair costs points')}
         </div>
       </div>
@@ -807,7 +807,15 @@ function saveBestResult(result) {
 async function copyResults() {
   if (!session) return;
   const result = session.results();
-  const summary = `Tetracromia — ${result.overall}/100 screen-level color discrimination. Threshold ${result.thresholdScore}, Field ${result.fieldScore}, Sequence ${result.sequenceScore}. Device-relative, not diagnostic.`;
+  const summary = t(
+    'Tetracromia — {overall}/100 screen-level color discrimination. Threshold {threshold}, Field {field}, Sequence {sequence}. Device-relative, not diagnostic.',
+    {
+      overall: result.overall,
+      threshold: result.thresholdScore,
+      field: result.fieldScore,
+      sequence: result.sequenceScore,
+    },
+  );
 
   try {
     await navigator.clipboard.writeText(summary);
@@ -860,11 +868,11 @@ function wireEvents(signal) {
       if (action.dataset.action === 'setup') renderSetup();
       if (action.dataset.action === 'start' && !action.disabled) startLab();
       if (action.dataset.action === 'home') {
-        if (labActive && !window.confirm('End this session? Your progress will be lost.')) return;
+        if (labActive && !window.confirm(t('End this session? Your progress will be lost.'))) return;
         renderHome();
       }
       if (action.dataset.action === 'gallery') {
-        if (labActive && !window.confirm('Leave the lab? Your progress will be lost.')) return;
+        if (labActive && !window.confirm(t('Leave the lab? Your progress will be lost.'))) return;
         goHome();
       }
       if (action.dataset.action === 'move-sequence') moveSequence(Number(action.dataset.direction));

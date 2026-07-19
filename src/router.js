@@ -1,16 +1,24 @@
 /*
- * Minimal hash router. Routes look like `#/`, `#/tetracromia`,
- * `#/color-blindness`. Hash routing keeps the app a single static file that
- * nginx serves for every path, with no server-side rewrites to maintain.
+ * Minimal locale-aware hash router. Routes look like `#/it/udito`; legacy
+ * links such as `#/udito` remain valid and are normalized by the app shell.
+ * Hash routing keeps the app static, with no server rewrites to maintain.
  */
 
-export function currentRoute() {
+import { LOCALE_CODES } from './locales.js';
+
+export function currentLocation() {
   const raw = window.location.hash.replace(/^#\/?/, '');
-  return raw.split('/')[0] || '';
+  const parts = raw.split('/').filter(Boolean);
+  const locale = LOCALE_CODES.has(parts[0]) ? parts.shift() : null;
+  return { locale, route: parts[0] || '' };
 }
 
-export function navigate(name) {
-  const target = `#/${name}`;
+export function currentRoute() {
+  return currentLocation().route;
+}
+
+export function navigate(name, locale = 'en') {
+  const target = `#/${locale}/${name}`;
   if (window.location.hash === target) {
     window.dispatchEvent(new HashChangeEvent('hashchange'));
   } else {
@@ -19,7 +27,7 @@ export function navigate(name) {
 }
 
 export function startRouter(onRoute) {
-  const handle = () => onRoute(currentRoute());
+  const handle = () => onRoute(currentLocation());
   window.addEventListener('hashchange', handle);
   handle();
   return () => window.removeEventListener('hashchange', handle);

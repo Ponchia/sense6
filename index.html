@@ -10,7 +10,7 @@
     <meta property="og:title" content="Sensoria — measure what your senses notice" />
     <meta
       property="og:description"
-      content="Private browser tests for colour discrimination and colour vision. Careful results, visible limits, nothing uploaded."
+      content="Private browser tests for colour, response timing, and hearing. Careful results, visible limits, nothing uploaded."
     />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://tetracromia.brontolotto.observer/" />
@@ -32,10 +32,14 @@
       <div class="ui-container ui-container--wide">
         <div class="ui-siteheader">
           <a class="ui-siteheader__brand brand" href="#/" aria-label="Sensoria — all tests">
-            Sensoria
+            Sensoria <span class="brand__lab">/ <span>Perception lab</span></span>
           </a>
           <div class="ui-siteheader__actions">
             <span class="device-chip" id="gamut-chip" aria-live="polite">Checking display…</span>
+            <label class="locale-picker">
+              <span class="sr-only">Language</span>
+              <select data-locale-select aria-label="Language"></select>
+            </label>
             <button
               class="ui-button ui-button--ghost ui-button--sm theme-button"
               type="button"

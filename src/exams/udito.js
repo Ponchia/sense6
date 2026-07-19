@@ -1,4 +1,5 @@
 import { toast } from '@ponchia/ui/behaviors';
+import { formatNumber, t } from '../i18n.js';
 import {
   createHeadphoneTrials,
   createPitchTracks,
@@ -235,7 +236,7 @@ async function playReference() {
     await audio.playReference();
     referencePlayed = true;
     button.textContent = 'Play reference again';
-    status.textContent = `Reference played · ${audio.sampleRate.toLocaleString()} Hz audio context · now leave volume unchanged.`;
+    status.textContent = `Reference played · ${formatNumber(audio.sampleRate)} Hz audio context · now leave volume unchanged.`;
     updateSetupGate();
   } catch {
     status.textContent = 'Audio could not start. Check browser audio permissions and try again.';
@@ -469,7 +470,7 @@ function finishInstrument(completed) {
     completed === 'headphones'
       ? `${summary.correct} of ${summary.trials} quiet targets located. This is evidence about presentation, not proof of hardware.`
       : `${summary.trials} adaptive presentations recorded${summary.controlAccuracyPercent === null ? '' : `; control accuracy ${summary.controlAccuracyPercent}%`} without changing volume.`;
-  app.innerHTML = `<section class="au-transition ui-container"><span class="au-transition__mark" aria-hidden="true">${INSTRUMENTS[completed].number}</span><p class="ui-eyebrow">Instrument complete</p><h1>${INSTRUMENTS[completed].name} recorded.</h1><p>${line}</p><button class="ui-button ui-button--lg" type="button" data-action="au-next-stage" data-next="${next}">Continue to ${INSTRUMENTS[next].name} <span aria-hidden="true">→</span></button></section>`;
+  app.innerHTML = `<section class="au-transition ui-container"><span class="au-transition__mark" aria-hidden="true">${INSTRUMENTS[completed].number}</span><p class="ui-eyebrow">Instrument complete</p><h1>Measurement recorded: ${INSTRUMENTS[completed].name}.</h1><p>${line}</p><button class="ui-button ui-button--lg" type="button" data-action="au-next-stage" data-next="${next}">Continue to ${INSTRUMENTS[next].name} <span aria-hidden="true">→</span></button></section>`;
 }
 
 function updateRunnerMeta() {
@@ -509,12 +510,12 @@ function renderResults() {
       <header class="au-results__hero"><div><p class="ui-eyebrow">Udito / this setup / this run</p><h1>Three listening measures.<br><em>No hearing label.</em></h1><p>${usable ? 'The setup checks and adaptive tracks produced a coherent run-level profile.' : 'At least one setup check or adaptive track did not settle. The observations remain visible, but comparison should wait for a steadier repeat.'}</p></div><div class="au-results__stamp ${usable ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>03 / 03</strong></div></header>
       <div class="au-result-grid">
         ${resultCard('01', 'Headphone confidence', headphones.headphoneLike ? 'Headphone-like' : 'Uncertain', `${headphones.correct} / ${headphones.trials}`, 'A phase-based presentation check, not hardware detection.')}
-        ${resultCard('02', 'Upper run boundary', formatHertz(range), range.spreadHz ? `spread ${range.spreadHz.toLocaleString()} Hz` : 'boundary estimate', range.atCeiling ? 'Reached the device-safe test ceiling; your personal boundary may be higher.' : 'Relative to this device, fixed volume, room, and audio sample rate.')}
+        ${resultCard('02', 'Upper run boundary', formatHertz(range), range.spreadHz ? `spread ${formatNumber(range.spreadHz)} Hz` : 'boundary estimate', range.atCeiling ? 'Reached the device-safe test ceiling; your personal boundary may be higher.' : 'Relative to this device, fixed volume, room, and audio sample rate.')}
         ${resultCard('03a', 'Pitch step near 500 Hz', formatPitch(pitch, 500), pitchDetail(pitch, 500), 'Reversal-based just-noticeable difference for this run.')}
         ${resultCard('03b', 'Pitch step near 2 kHz', formatPitch(pitch, 2000), pitchDetail(pitch, 2000), 'Reported separately; no composite hearing score is calculated.')}
       </div>
       <div class="au-context-grid">
-        <article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the sound.</h2><dl><div><dt>Listening setup</dt><dd>${deviceLabel(session.device)}</dd></div><div><dt>Audio context</dt><dd>${session.sampleRate.toLocaleString()} Hz</dd></div><div><dt>Portata controls</dt><dd>${range.controlAccuracyPercent === null ? 'Not sampled' : `${range.controlAccuracyPercent}%`}</dd></div><div><dt>Interruptions</dt><dd>${session.interruptions}</dd></div></dl></article>
+        <article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the sound.</h2><dl><div><dt>Listening setup</dt><dd>${deviceLabel(session.device)}</dd></div><div><dt>Audio context</dt><dd>${formatNumber(session.sampleRate)} Hz</dd></div><div><dt>Portata controls</dt><dd>${range.controlAccuracyPercent === null ? 'Not sampled' : `${range.controlAccuracyPercent}%`}</dd></div><div><dt>Interruptions</dt><dd>${session.interruptions}</dd></div></dl></article>
         <article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Device-relative, never dB HL.</h2><p>A browser knows digital amplitude, not sound pressure at your eardrum. Headphone response, fit, output, age, room noise, device processing, and the volume setting all shape these numbers.</p><p>Do not infer hearing age, “normal” hearing, safety for work, or a medical diagnosis. If hearing concerns affect daily life, use calibrated clinical audiometry.</p></article>
       </div>
       <aside class="au-results__safety"><strong>Keep the same volume only for comparison.</strong><p>Compare your own runs only with the same device, headphones, fit, room, and volume. Stop testing if any sound is uncomfortable.</p></aside>
@@ -528,7 +529,7 @@ function resultCard(index, label, value, detail, copy) {
 
 function formatHertz(result) {
   if (result.thresholdHz === null) return 'Not settled';
-  return `${result.atCeiling ? '≥ ' : ''}${result.thresholdHz.toLocaleString()} Hz`;
+  return `${result.atCeiling ? '≥ ' : ''}${formatNumber(result.thresholdHz)} Hz`;
 }
 
 function formatPitch(results, anchorHz) {
@@ -577,13 +578,20 @@ function copyResults() {
   if (!session?.result) return;
   const { headphones, range, pitch } = session.result;
   const text = [
-    'Udito — device-relative listening profile',
-    `Setup: ${deviceLabel(session.device)}; ${session.sampleRate} Hz audio context`,
-    `Headphone confidence: ${headphones.correct}/${headphones.trials} (${headphones.headphoneLike ? 'headphone-like' : 'uncertain'})`,
-    `Upper run boundary: ${formatHertz(range)}`,
-    `Pitch step near 500 Hz: ${formatPitch(pitch, 500)}`,
-    `Pitch step near 2 kHz: ${formatPitch(pitch, 2000)}`,
-    'This is not dB HL, a hearing-age score, screening, or diagnosis.',
+    t('Udito — device-relative listening profile'),
+    t('Setup: {device}; {sampleRate} Hz audio context', {
+      device: t(deviceLabel(session.device)),
+      sampleRate: formatNumber(session.sampleRate),
+    }),
+    t('Headphone confidence: {correct}/{trials} ({confidence})', {
+      correct: headphones.correct,
+      trials: headphones.trials,
+      confidence: t(headphones.headphoneLike ? 'headphone-like' : 'uncertain'),
+    }),
+    t('Upper run boundary: {boundary}', { boundary: formatHertz(range) }),
+    t('Pitch step near 500 Hz: {step}', { step: formatPitch(pitch, 500) }),
+    t('Pitch step near 2 kHz: {step}', { step: formatPitch(pitch, 2000) }),
+    t('This is not dB HL, a hearing-age score, screening, or diagnosis.'),
   ].join('\n');
   navigator.clipboard
     ?.writeText(text)

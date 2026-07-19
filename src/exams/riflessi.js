@@ -1,4 +1,5 @@
 import { toast } from '@ponchia/ui/behaviors';
+import { t } from '../i18n.js';
 import { seededRandom } from '../lib/random.js';
 import {
   createChoiceSchedule,
@@ -554,7 +555,7 @@ function finishCurrentInstrument() {
     <section class="rx-transition ui-container">
       <span class="rx-transition__mark" aria-hidden="true">${INSTRUMENTS[completed].number}</span>
       <p class="ui-eyebrow">Instrument complete</p>
-      <h1>${INSTRUMENTS[completed].name} recorded.</h1>
+      <h1>Measurement recorded: ${INSTRUMENTS[completed].name}.</h1>
       <p>${valid} clean response${valid === 1 ? '' : 's'} captured across ${total} measured event${total === 1 ? '' : 's'}. Interpretation waits until all three instruments are complete.</p>
       <button class="ui-button ui-button--lg" type="button" data-action="rx-next-stage" data-next="${next}">
         Continue to ${INSTRUMENTS[next].name} <span aria-hidden="true">→</span>
@@ -760,13 +761,25 @@ function copyResults() {
   if (!session?.result) return;
   const result = session.result;
   const text = [
-    'Riflessi — device-relative response profile',
-    `Input: ${session.inputMode === 'pointer' ? 'touch / pointer' : 'keyboard'}`,
-    `Signal median: ${metric(result.signal.medianMs)} ms`,
-    `Choice median: ${metric(result.choice.medianMs)} ms; accuracy: ${metric(result.choice.accuracyPercent)}%; cost: ${signedMetric(result.choice.costMs)} ms`,
-    `Sustained median: ${metric(result.stability.medianMs)} ms; slow tail: ${signedMetric(result.stability.slowestGapMs)} ms; drift: ${signedMetric(result.stability.driftMs)} ms`,
-    `Events: ${result.events.falseStarts} false starts, ${result.events.anticipations} anticipations, ${result.events.misses} misses`,
-    'Compare only on the same device and input. Not a clinical or population score.',
+    t('Riflessi — device-relative response profile'),
+    t('Input: {input}', { input: t(session.inputMode === 'pointer' ? 'touch / pointer' : 'keyboard') }),
+    t('Signal median: {value} ms', { value: metric(result.signal.medianMs) }),
+    t('Choice median: {median} ms; accuracy: {accuracy}%; cost: {cost} ms', {
+      median: metric(result.choice.medianMs),
+      accuracy: metric(result.choice.accuracyPercent),
+      cost: signedMetric(result.choice.costMs),
+    }),
+    t('Sustained median: {median} ms; slow tail: {tail} ms; drift: {drift} ms', {
+      median: metric(result.stability.medianMs),
+      tail: signedMetric(result.stability.slowestGapMs),
+      drift: signedMetric(result.stability.driftMs),
+    }),
+    t('Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses', {
+      falseStarts: result.events.falseStarts,
+      anticipations: result.events.anticipations,
+      misses: result.events.misses,
+    }),
+    t('Compare only on the same device and input. Not a clinical or population score.'),
   ].join('\n');
   navigator.clipboard
     ?.writeText(text)
