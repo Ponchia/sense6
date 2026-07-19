@@ -29,7 +29,10 @@ export function renderGallery(context) {
         <h1>Measure what your <em>senses notice.</em></h1>
         <p class="gallery-hero__lede">
           Short, careful tests that turn what you notice into honest, device-relative results.
-          No account, no answers or results uploaded, no diagnosis theatre.
+          No account, no answers or results uploaded.
+        </p>
+        <p class="gallery-hero__boundary">
+          Experimental perception tests for curiosity and fun—not medical tests or diagnoses.
         </p>
         <a class="ui-link gallery-hero__about" data-sense6-route="about" href="${localeHref('about')}">
           How Sense6 works <span aria-hidden="true">→</span>

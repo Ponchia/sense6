@@ -238,7 +238,7 @@ function renderSetup() {
               <option value="integrated">Built-in / assistive route</option>
             </select>
           </label>
-          <label class="au-consent"><input type="checkbox" data-au-consent ${supported ? '' : 'disabled'}><span>The reference is quiet and comfortable; the room is quiet; I will not change volume or raise it to chase a tone; I understand this is not clinical audiometry.</span></label>
+          <label class="au-consent"><input type="checkbox" data-au-consent ${supported ? '' : 'disabled'}><span><strong class="experiment-boundary">I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.</strong>The reference is quiet and comfortable; the room is quiet; I will not change volume or raise it to chase a tone; I understand this is not clinical audiometry.</span></label>
           <button class="ui-button ui-button--lg" type="button" data-action="au-start" disabled>Begin instrument 01 <span aria-hidden="true">→</span></button>
         </div>
         <aside class="au-setup__rules" aria-label="Safe listening rules">

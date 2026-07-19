@@ -142,6 +142,9 @@ export async function installQuickAcutezza(page) {
 
 export async function completeAcutezzaCalibration(page) {
   await page.getByRole('button', { name: /Prepare the vision lab/i }).click();
+  await expect(page.locator('.experiment-boundary')).toHaveText(
+    /recreational experiment for curiosity and fun—not a medical test or diagnosis/i,
+  );
   await page.getByLabel(/I am 18 or older/i).check();
   await page.getByRole('button', { name: /Calibrate the screen/i }).click();
   await page.getByRole('button', { name: /The edges match/i }).click();

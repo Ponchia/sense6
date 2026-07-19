@@ -111,6 +111,12 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   assert.match(journal, /Your private measurement journal/);
   assert.match(journal, /Entries, setup passports, comparisons, imports, and exports stay on this device/);
 
+  const gallery = await readFile(new URL('en/index.html', DIST), 'utf8');
+  assert.match(
+    gallery,
+    /Experimental perception tests for curiosity and fun—not medical tests or diagnoses\./,
+  );
+
   const about = await readFile(new URL('en/about/index.html', DIST), 'utf8');
   const aboutJson = JSON.parse(
     about.match(/<script type="application\/ld\+json">(.+)<\/script>/)?.[1] ?? '{}',

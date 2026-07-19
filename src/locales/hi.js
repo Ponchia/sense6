@@ -26,6 +26,15 @@ const rows = [
     'No account, no answers or results uploaded, no diagnosis theatre.',
     'न खाता, न उत्तर या परिणाम अपलोड होते हैं, और न निदान का दिखावा।',
   ],
+  ['No account, no answers or results uploaded.', 'न खाता, न उत्तर या परिणाम अपलोड होते हैं।'],
+  [
+    'Experimental perception tests for curiosity and fun—not medical tests or diagnoses.',
+    'जिज्ञासा और मनोरंजन के लिए अनुभूति प्रयोग—ये चिकित्सीय परीक्षण या निदान नहीं हैं।',
+  ],
+  [
+    'I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.',
+    'मैं समझता/समझती हूँ कि यह जिज्ञासा और मनोरंजन के लिए एक मनोरंजक प्रयोग है—चिकित्सीय परीक्षण या निदान नहीं।',
+  ],
   ['device relative', 'डिवाइस के सापेक्ष'],
   ['Colour', 'रंग'],
   ['Hearing', 'श्रवण'],

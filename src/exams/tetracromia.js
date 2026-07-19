@@ -307,7 +307,7 @@ function renderSetup() {
           <p class="calibration-hint">Look for distinct edges above and a smooth ramp here—without a bright hotspot.</p>
           <label class="ui-check ready-check">
             <input type="checkbox" id="screen-ready" />
-            <span>I can distinguish the steps and my color-shifting filters are off.</span>
+            <span><strong class="experiment-boundary">I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.</strong>I can distinguish the steps and my color-shifting filters are off.</span>
           </label>
           <button class="ui-button ui-button--lg" id="start-lab" type="button" data-action="start" disabled>
             Start instrument 01 <span aria-hidden="true">→</span>

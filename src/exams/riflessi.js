@@ -207,7 +207,7 @@ function renderSetup() {
           </fieldset>
           <label class="rx-consent">
             <input type="checkbox" data-rx-consent>
-            <span>I understand this measures this browser, device, input, and moment—not a clinical trait.</span>
+            <span><strong class="experiment-boundary">I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.</strong>I understand this measures this browser, device, input, and moment—not a clinical trait.</span>
           </label>
           <button class="ui-button ui-button--lg" type="button" data-action="rx-start" disabled>
             Begin instrument 01 <span aria-hidden="true">→</span>

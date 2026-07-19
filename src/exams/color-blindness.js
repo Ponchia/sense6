@@ -246,7 +246,7 @@ function renderSetup() {
           <p class="calibration-hint">These six swatches are a gross display check, not colour calibration.</p>
           <label class="ui-check ready-check">
             <input type="checkbox" id="cb-ready" />
-            <span>My colour filters are off and I understand this is an unvalidated browser experiment.</span>
+            <span><strong class="experiment-boundary">I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.</strong>My colour filters are off and I understand this is an unvalidated browser experiment.</span>
           </label>
           <button class="ui-button ui-button--lg" id="cb-start" type="button" data-action="cb-begin" disabled>
             Start practice <span aria-hidden="true">→</span>

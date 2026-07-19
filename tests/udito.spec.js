@@ -24,6 +24,9 @@ test('Udito completes three safe-listening instruments and keeps results separat
 
   await page.getByRole('button', { name: /Prepare the sound lab/i }).click();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await expect(page.locator('.experiment-boundary')).toHaveText(
+    /recreational experiment for curiosity and fun—not a medical test or diagnosis/i,
+  );
   const start = page.getByRole('button', { name: /Begin instrument 01/i });
   await expect(start).toBeDisabled();
   await page.getByRole('button', { name: /Play maximum-level reference/i }).click();

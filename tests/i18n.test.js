@@ -105,10 +105,16 @@ test('privacy and journal routes have dedicated copy in every supported language
 });
 
 test('critical navigation and safety copy exists in every language', async () => {
+  const boundaryKeys = [
+    'No account, no answers or results uploaded.',
+    'Experimental perception tests for curiosity and fun—not medical tests or diagnoses.',
+    'I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.',
+  ];
   const keys = [
     'All tests',
     'About',
     'How Sense6 works',
+    ...boundaryKeys,
     'Language',
     'Never raise volume to chase a missing high tone. Stop immediately for discomfort, pain, pressure, or ringing.',
     'An RGB screen cannot test tetrachromacy.',
@@ -120,6 +126,10 @@ test('critical navigation and safety copy exists in every language', async () =>
   for (const { code } of LOCALES) {
     const messages = await loadMessages(code);
     for (const key of keys) assert.ok(messages.get(key));
+    if (code === DEFAULT_LOCALE) continue;
+    for (const key of boundaryKeys) {
+      assert.notEqual(messages.get(key), key, `${code} experimental boundary fell back to English`);
+    }
   }
 });
 

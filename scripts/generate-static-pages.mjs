@@ -188,6 +188,7 @@ function rootMarkup() {
     <p class="ui-eyebrow">Sense6</p>
     <h1>Measure what your senses notice.</h1>
     <p>Choose your language to read about private, device-relative perception experiments and open a test.</p>
+    <p><strong>Experimental perception tests for curiosity and fun—not medical tests or diagnoses.</strong></p>
     <nav class="static-language-list" aria-label="Language">${LOCALES.map(
       ({ code, languageTag, direction, label }) =>
         `<a href="/${code}/" hreflang="${languageTag}" lang="${languageTag}" dir="${direction}">${label}</a>`,
@@ -200,7 +201,8 @@ function galleryMarkup(locale, tr) {
     <p class="ui-eyebrow">Sense6</p>
     <h1>${escapeHtml(tr('Sense6 — measure what your senses notice'))}</h1>
     <p>${escapeHtml(tr('Short, careful tests that turn what you notice into honest, device-relative results.'))}</p>
-    <p>${escapeHtml(tr('No account, no answers or results uploaded, no diagnosis theatre.'))}</p>
+    <p>${escapeHtml(tr('No account, no answers or results uploaded.'))}</p>
+    <p><strong>${escapeHtml(tr('Experimental perception tests for curiosity and fun—not medical tests or diagnoses.'))}</strong></p>
     <p><a data-sense6-route="about" href="/${locale}/about/">${escapeHtml(tr('How Sense6 works'))}</a></p>
     <h2>${escapeHtml(tr('Start with what you want to learn.'))}</h2>
     <div class="static-page-grid">${EXAMS.map(
