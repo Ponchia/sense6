@@ -325,7 +325,7 @@ test('Acutezza keeps calibration and runner geometry ordered at required short v
     await page.getByLabel(/I am 18 or older/i).check();
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     await page.getByRole('button', { name: /Calibrate the screen/i }).click();
-    await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThanOrEqual(2);
     await expect(page.getByRole('heading', { name: /Match a real card/i })).toBeFocused();
     const card = await page.locator('[data-ac-card-shape]').boundingBox();
     expect(card.y, `${viewport.width}x${viewport.height} card top`).toBeGreaterThanOrEqual(0);

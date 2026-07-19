@@ -333,15 +333,14 @@ test('Field redraws deterministic seeded pixels whenever its bounds change', asy
 
   const canvasState = () =>
     page.locator('canvas[data-field="0"]').evaluate((canvas) => {
-      const bounds = canvas.getBoundingClientRect();
       const pixels = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data;
       let hash = 2166136261;
       for (const value of pixels) hash = Math.imul(hash ^ value, 16777619);
       return {
         width: canvas.width,
         height: canvas.height,
-        expectedWidth: Math.round(bounds.width * Math.min(devicePixelRatio || 1, 2)),
-        expectedHeight: Math.round(bounds.height * Math.min(devicePixelRatio || 1, 2)),
+        expectedWidth: Math.round(canvas.clientWidth * Math.min(devicePixelRatio || 1, 2)),
+        expectedHeight: Math.round(canvas.clientHeight * Math.min(devicePixelRatio || 1, 2)),
         hash: hash >>> 0,
       };
     });

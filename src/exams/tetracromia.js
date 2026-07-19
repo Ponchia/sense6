@@ -463,26 +463,30 @@ function renderField() {
 function drawFields(trial) {
   document.querySelectorAll('canvas[data-field]').forEach((canvas) => {
     const index = Number(canvas.dataset.field);
-    const bounds = canvas.getBoundingClientRect();
+    // Layout dimensions stay stable while the choice's hover transform animates.
+    // getBoundingClientRect() includes that transform and could leave the backing
+    // store undersized after the pointer happened to rest over a field.
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.max(1, Math.round(bounds.width * ratio));
-    canvas.height = Math.max(1, Math.round(bounds.height * ratio));
+    canvas.width = Math.max(1, Math.round(width * ratio));
+    canvas.height = Math.max(1, Math.round(height * ratio));
     const context = canvas.getContext('2d');
     context.scale(ratio, ratio);
     context.fillStyle = '#747472';
-    context.fillRect(0, 0, bounds.width, bounds.height);
+    context.fillRect(0, 0, width, height);
 
     const random = seededRandom(`${trial.nonce}:${index}`);
     const base = index === trial.answer ? trial.target : trial.reference;
-    const count = Math.round((bounds.width * bounds.height) / 145);
+    const count = Math.round((width * height) / 145);
 
     for (let dot = 0; dot < count; dot += 1) {
       const lightness = base.l + (random() - 0.5) * 0.105;
       const chroma = Math.max(0.035, base.c + (random() - 0.5) * 0.036);
       const hue = base.h + (random() - 0.5) * 4.5;
       const radius = 2.2 + random() * 4.8;
-      const x = radius + random() * (bounds.width - radius * 2);
-      const y = radius + random() * (bounds.height - radius * 2);
+      const x = radius + random() * (width - radius * 2);
+      const y = radius + random() * (height - radius * 2);
       context.beginPath();
       context.arc(x, y, radius, 0, Math.PI * 2);
       context.fillStyle = toRgbCss(lightness, chroma, hue);
