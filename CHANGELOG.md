@@ -13,8 +13,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Acutezza's research and implementation brief, together with a product and
   engineering roadmap for repeated-run history and suite scaling.
 - Cloudflare Pages deployment with the existing full verification gate,
-  production security headers, immutable asset caching, and canonical-domain
-  redirects.
+  production security headers, and immutable asset caching.
 - English, Italian, German, French, Spanish, and Portuguese interfaces across
   the gallery, all four exams, safety/setup flows, live tasks, result screens,
   accessibility labels, metadata, and copied summaries.
@@ -61,6 +60,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   `https://sense6.net`.
 - Production hosting now serves the static bundle from Cloudflare Pages instead
   of the personal Kubernetes cluster.
+- Cloudflare Single Redirect rules send `www.sense6.net` and the former
+  `tetracromia.brontolotto.observer` hostname to the canonical domain.
 - `Daltonia` now reports display-relative thresholds instead of fixed plate
   percentages or clinical-looking pass/fail categories. Its interface and
   research trail explicitly identify that the implementation isn't validated.

@@ -262,7 +262,9 @@ The production site is available at
 the files from its edge; the site has no application server or origin in the
 personal Kubernetes cluster. The old
 [`tetracromia.brontolotto.observer`](https://tetracromia.brontolotto.observer)
-hostname redirects to the canonical domain.
+hostname and `www.sense6.net` redirect to the canonical domain through
+Cloudflare Single Redirect rules. Pages `_redirects` files cannot match source
+hostnames, so keep domain-level redirects in the corresponding Cloudflare zone.
 
 The deployment workflow requires the `CLOUDFLARE_API_TOKEN` and
 `CLOUDFLARE_ACCOUNT_ID` repository secrets. Scope the token to Cloudflare Pages
