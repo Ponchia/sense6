@@ -113,6 +113,7 @@ a:focus-visible {
 
 .locale-picker {
   display: inline-flex;
+  position: relative;
 }
 
 .locale-picker select {
@@ -131,12 +132,14 @@ a:focus-visible {
 }
 
 .locale-picker::after {
-  align-self: center;
   color: var(--text-dim);
   content: "▾";
   font-size: 0.65rem;
-  margin-inline-start: -1.25rem;
+  inset-inline-end: 0.65rem;
+  inset-block-start: 50%;
   pointer-events: none;
+  position: absolute;
+  transform: translateY(-50%);
 }
 
 .locale-picker select:focus-visible {
@@ -1439,6 +1442,10 @@ a:focus-visible {
   .brand::after,
   .device-chip,
   .theme-button__label {
+    display: none;
+  }
+
+  .brand__lab {
     display: none;
   }
 
