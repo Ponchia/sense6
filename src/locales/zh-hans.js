@@ -1,0 +1,3218 @@
+// Simplified Chinese locale catalog. English source keys are the stable message identifiers.
+const rows = [
+  [
+    "Skip to content",
+    "跳到正文"
+  ],
+  [
+    "Sense6 — all tests",
+    "Sense6 — 所有测试"
+  ],
+  [
+    "Checking display…",
+    "正在检查显示效果…"
+  ],
+  [
+    "P3 reported",
+    "报告为 P3"
+  ],
+  [
+    "sRGB reported",
+    "报告为 sRGB"
+  ],
+  [
+    "Color gamut unknown",
+    "色域未知"
+  ],
+  [
+    "Toggle light and dark theme",
+    "切换浅色和深色主题"
+  ],
+  [
+    "Theme",
+    "主题"
+  ],
+  [
+    "Language",
+    "语言"
+  ],
+  [
+    "Measure carefully. Keep it private.",
+    "认真测量。结果只属于你。"
+  ],
+  [
+    "All tests",
+    "所有测试"
+  ],
+  [
+    "Anonymous daily counts · no cookies",
+    "仅统计匿名每日总数 · 不使用 Cookie"
+  ],
+  [
+    "Source",
+    "来源"
+  ],
+  [
+    "Sense6 — measure what your senses notice",
+    "Sense6 — 测量你的感官所察觉的细节"
+  ],
+  [
+    "Measure what your",
+    "测量你的感官"
+  ],
+  [
+    "senses notice.",
+    "所察觉的细节。"
+  ],
+  [
+    "Short, careful tests that turn what you notice into honest, device-relative results.",
+    "用简短、严谨的测试，把你的感受转化为诚实的设备相对结果。"
+  ],
+  [
+    "No account, no answers or results uploaded, no diagnosis theatre.",
+    "无需账户，不上传回答或结果，也不伪装成诊断。"
+  ],
+  [
+    "device relative",
+    "设备相对"
+  ],
+  [
+    "Colour",
+    "颜色"
+  ],
+  [
+    "Hearing",
+    "听觉"
+  ],
+  [
+    "Threshold",
+    "阈值"
+  ],
+  [
+    "Pattern",
+    "图案"
+  ],
+  [
+    "Profile",
+    "结果概况"
+  ],
+  [
+    "Ready now / choose a test",
+    "现在可以开始 / 选择测试"
+  ],
+  [
+    "Start with what you want to learn.",
+    "从你想了解的内容开始。"
+  ],
+  [
+    "Each test explains its limits before you begin and gives you a result you can actually interpret afterwards.",
+    "每项测试都会在开始前说明局限，并在结束后给出真正可以理解的结果。"
+  ],
+  [
+    "Next in the lab",
+    "实验室的下一步"
+  ],
+  [
+    "More senses, same standard.",
+    "感官更多，标准不变。"
+  ],
+  [
+    "In development — visible here as direction, not as something you can start yet.",
+    "开发中 — 此处展示未来方向，目前还不能开始。"
+  ],
+  [
+    "Calibrated sharpness & meridional clarity",
+    "校准后的视敏度与子午线方向清晰度"
+  ],
+  [
+    "Open test",
+    "打开测试"
+  ],
+  [
+    "What this test includes",
+    "本次测试内容"
+  ],
+  [
+    "How finely do you see colour?",
+    "你能分辨多细微的颜色差异？"
+  ],
+  [
+    "An adaptive colour-discrimination lab: three instruments measure the smallest hue steps you can resolve on this screen.",
+    "自适应色彩辨别实验室：三项测量会找出你在此屏幕上能分辨的最小色相差。"
+  ],
+  [
+    "Colour discrimination",
+    "色彩辨别"
+  ],
+  [
+    "Adaptive difficulty",
+    "自适应难度"
+  ],
+  [
+    "Detailed profile",
+    "详细结果概况"
+  ],
+  [
+    "Adaptive browser colour-vision experiment",
+    "通过浏览器进行的自适应色觉实验"
+  ],
+  [
+    "Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.",
+    "三个相对于显示器的颜色方向各自自适应变化，同时请找出隐藏在亮度噪点中的缺口。"
+  ],
+  [
+    "Colour-vision experiment",
+    "色觉实验"
+  ],
+  [
+    "Adaptive thresholds",
+    "自适应阈值"
+  ],
+  [
+    "3 display directions",
+    "显示器上的三个方向"
+  ],
+  [
+    "Run-relative result",
+    "本次测量内的相对结果"
+  ],
+  [
+    "Response speed, choice cost & consistency",
+    "反应速度、选择成本与一致性"
+  ],
+  [
+    "Three short instruments separate a simple visual response from decision cost and within-run stability.",
+    "三项简短测量分别观察简单视觉反应、做出选择所增加的时间，以及本次测量中的稳定性。"
+  ],
+  [
+    "Response timing",
+    "反应计时"
+  ],
+  [
+    "Device-relative timing",
+    "设备相对计时"
+  ],
+  [
+    "No composite score",
+    "没有综合评分"
+  ],
+  [
+    "Headphone confidence, audibility & pitch",
+    "耳机呈现可信度、可听性与音高"
+  ],
+  [
+    "Three listening instruments map this setup without pretending an uncalibrated browser is an audiometer.",
+    "三项听觉测量会描述当前设置，同时不会把未经校准的浏览器冒充为听力计。"
+  ],
+  [
+    "Listening experiment",
+    "听觉实验"
+  ],
+  [
+    "Volume safety contract",
+    "安全音量确认"
+  ],
+  [
+    "No hearing label",
+    "不作听力判定"
+  ],
+  [
+    "3 instruments",
+    "三项测量"
+  ],
+  [
+    "Three per-eye instruments measure angular detail, low-contrast cost, and repeatable orientation preference without making a clinical claim.",
+    "每只眼睛分别进行三项测量，观察角分辨细节、低对比度带来的影响，以及方向清晰度偏好能否重复出现，但不作临床结论。"
+  ],
+  [
+    "Calibrated sharpness experiment",
+    "校准后的视敏度实验"
+  ],
+  [
+    "Physical screen calibration",
+    "屏幕物理尺寸校准"
+  ],
+  [
+    "3 per-eye instruments",
+    "每只眼睛三项测量"
+  ],
+  [
+    "No clinical label",
+    "不作临床判定"
+  ],
+  [
+    "Vision lab / three instruments / about 8 minutes",
+    "视觉实验室 / 三项测量 / 约8分钟"
+  ],
+  [
+    "Calibrate the screen.",
+    "校准屏幕。"
+  ],
+  [
+    "Resolve the opening.",
+    "辨认缺口。"
+  ],
+  [
+    "Acutezza measures the angular detail resolved by each eye, the cost of lower contrast, and whether a directional clarity preference repeats. It is a perception experiment, not an eye examination.",
+    "Acutezza 会测量每只眼睛能分辨的角度细节、低对比度带来的影响，以及某个方向看起来更清晰的偏好能否重复出现。这是一项感知实验，不是眼科检查。"
+  ],
+  [
+    "Prepare the vision lab",
+    "准备视觉实验室"
+  ],
+  [
+    "No 20/20 label, diagnosis, astigmatism detection, or prescription.",
+    "不提供 20/20 判定、诊断、散光检测或处方。"
+  ],
+  [
+    "Gap angle",
+    "缺口角度"
+  ],
+  [
+    "calibrated",
+    "已校准"
+  ],
+  [
+    "Three observations. No composite score.",
+    "三项观察结果。不计算综合分数。"
+  ],
+  [
+    "High-contrast detail, low-contrast cost, and directional preference remain separate.",
+    "高对比度细节、低对比度影响和方向偏好分别呈现。"
+  ],
+  [
+    "High-contrast sharpness",
+    "高对比度视敏度"
+  ],
+  [
+    "Find the opening.",
+    "找到缺口。"
+  ],
+  [
+    "Low-contrast cost",
+    "低对比度影响"
+  ],
+  [
+    "Find the quieter opening.",
+    "找到较淡圆环的缺口。"
+  ],
+  [
+    "Orientation consistency",
+    "方向偏好一致性"
+  ],
+  [
+    "Which line field looks clearer?",
+    "哪一组条纹看起来更清晰？"
+  ],
+  [
+    "Comfort and context come first.",
+    "舒适和安全始终优先。"
+  ],
+  [
+    "Use your usual correction for this distance. Cover one eye without pressing it, keep your head upright, and stop for discomfort.",
+    "请使用你在此距离通常佩戴的眼镜或隐形眼镜。遮住一只眼睛，但不要按压眼球；头部保持端正，如有不适请停止。"
+  ],
+  [
+    "Sudden vision loss, severe eye pain, new flashes or floaters, or a curtain-like shadow needs prompt professional assessment.",
+    "如果突然视力下降、眼睛剧痛、新出现闪光或飞蚊，或视野中出现帘幕状阴影，请尽快接受专业评估。"
+  ],
+  [
+    "Do not delay care to take this test.",
+    "不要为了参加此测试而延误就医。"
+  ],
+  [
+    "What informed Acutezza.",
+    "Acutezza 的设计依据。"
+  ],
+  [
+    "Published methods shape the task. They do not make this implementation clinically validated.",
+    "公开发表的方法为任务设计提供依据，但并不意味着此实现已经通过临床验证。"
+  ],
+  [
+    "Prepare your vision setup — Acutezza | Sense6",
+    "准备视觉测试环境 — Acutezza | Sense6"
+  ],
+  [
+    "Setup / adult near-vision experiment",
+    "准备 / 成人近视力实验"
+  ],
+  [
+    "Stable screen.",
+    "固定屏幕。"
+  ],
+  [
+    "Steady distance.",
+    "保持距离。"
+  ],
+  [
+    "One eye.",
+    "一只眼睛。"
+  ],
+  [
+    "Correction during this run",
+    "本次测量使用的视力矫正"
+  ],
+  [
+    "No correction",
+    "未矫正"
+  ],
+  [
+    "Glasses",
+    "眼镜"
+  ],
+  [
+    "Contact lenses",
+    "隐形眼镜"
+  ],
+  [
+    "First eye",
+    "先测哪只眼睛"
+  ],
+  [
+    "Right eye first",
+    "先测右眼"
+  ],
+  [
+    "Left eye first",
+    "先测左眼"
+  ],
+  [
+    "Calibrate the screen",
+    "屏幕校准"
+  ],
+  [
+    "Setup contract",
+    "测试条件确认"
+  ],
+  [
+    "Match a physical card",
+    "与实体卡片匹配"
+  ],
+  [
+    "Estimate viewing distance",
+    "估算观看距离"
+  ],
+  [
+    "Lock display geometry",
+    "锁定显示尺寸"
+  ],
+  [
+    "Match a real card.",
+    "与实体卡片匹配。"
+  ],
+  [
+    "Card width",
+    "卡片宽度"
+  ],
+  [
+    "Smaller",
+    "缩小"
+  ],
+  [
+    "Larger",
+    "放大"
+  ],
+  [
+    "No card?",
+    "没有卡片？"
+  ],
+  [
+    "The edges match",
+    "边缘已对齐"
+  ],
+  [
+    "The card cannot fit",
+    "卡片无法放入"
+  ],
+  [
+    "Display too narrow",
+    "屏幕太窄"
+  ],
+  [
+    "Try card calibration again",
+    "重新用卡片校准"
+  ],
+  [
+    "Find the natural blind spot.",
+    "找到生理盲点。"
+  ],
+  [
+    "Check the same distance.",
+    "确认距离保持不变。"
+  ],
+  [
+    "Between-eye distance check",
+    "双眼之间的距离复核"
+  ],
+  [
+    "Fixation square",
+    "注视方块"
+  ],
+  [
+    "sweeps remaining",
+    "次扫描待完成"
+  ],
+  [
+    "Start sweep",
+    "开始扫描"
+  ],
+  [
+    "Dot disappeared",
+    "圆点消失了"
+  ],
+  [
+    "Use a ruler-measured distance",
+    "使用直尺实测距离"
+  ],
+  [
+    "Viewing-distance estimate",
+    "观看距离估值"
+  ],
+  [
+    "The sweeps did not agree.",
+    "多次扫描结果不一致。"
+  ],
+  [
+    "Use this distance",
+    "使用此距离"
+  ],
+  [
+    "Repeat the sweeps",
+    "重新扫描"
+  ],
+  [
+    "Enter measured distance",
+    "输入实测距离"
+  ],
+  [
+    "Ruler-measured fallback",
+    "改用直尺测量"
+  ],
+  [
+    "Measure eye to screen.",
+    "测量眼睛到屏幕的距离。"
+  ],
+  [
+    "Distance in centimetres",
+    "距离（厘米）"
+  ],
+  [
+    "Use measured distance",
+    "使用实测距离"
+  ],
+  [
+    "Return to blind-spot sweeps",
+    "返回盲点扫描"
+  ],
+  [
+    "Can you see the inset square?",
+    "能看到内嵌方块吗？"
+  ],
+  [
+    "Yes, clearly",
+    "能，清晰可见"
+  ],
+  [
+    "Not clearly",
+    "看不清"
+  ],
+  [
+    "Low-contrast square inside a larger gray field",
+    "较大灰色区域内的低对比度方块"
+  ],
+  [
+    "Calibration locked",
+    "校准已锁定"
+  ],
+  [
+    "The screen now has physical scale.",
+    "屏幕现已具有物理尺度。"
+  ],
+  [
+    "Viewing distance",
+    "观看距离"
+  ],
+  [
+    "Low contrast",
+    "低对比度"
+  ],
+  [
+    "Measurable gap range",
+    "可测量缺口范围"
+  ],
+  [
+    "Unavailable",
+    "不可用"
+  ],
+  [
+    "Measured setup",
+    "实测设置"
+  ],
+  [
+    "Assumed distance",
+    "估算距离"
+  ],
+  [
+    "Right eye",
+    "右眼"
+  ],
+  [
+    "Left eye",
+    "左眼"
+  ],
+  [
+    "Look at the ring and locate its opening.",
+    "观察圆环并指出缺口方向。"
+  ],
+  [
+    "Landolt ring target",
+    "Landolt C 视标"
+  ],
+  [
+    "Direction of the opening",
+    "缺口方向"
+  ],
+  [
+    "High contrast",
+    "高对比度"
+  ],
+  [
+    "Keep distance fixed",
+    "保持距离不变"
+  ],
+  [
+    "Forced choice",
+    "强迫选择"
+  ],
+  [
+    "Yes — that is the opening.",
+    "正确 — 那里就是缺口。"
+  ],
+  [
+    "Try the same target again. Follow the opening, not the ring.",
+    "请再试一次相同视标。关注缺口，不要关注圆环本身。"
+  ],
+  [
+    "Begin Nitidezza",
+    "开始 Nitidezza"
+  ],
+  [
+    "Continue to Contrasto",
+    "继续到 Contrasto"
+  ],
+  [
+    "Continue to Meridiani",
+    "继续到 Meridiani"
+  ],
+  [
+    "Without moving closer, which line field looks clearer?",
+    "不要靠近屏幕。哪一组条纹看起来更清晰？"
+  ],
+  [
+    "Left line field",
+    "左侧条纹"
+  ],
+  [
+    "Right line field",
+    "右侧条纹"
+  ],
+  [
+    "Left clearer",
+    "左侧更清晰"
+  ],
+  [
+    "No difference",
+    "无差异"
+  ],
+  [
+    "Right clearer",
+    "右侧更清晰"
+  ],
+  [
+    "No astigmatism claim",
+    "不作散光判断"
+  ],
+  [
+    "First eye complete",
+    "第一只眼睛测量完成"
+  ],
+  [
+    "Finish with one eye",
+    "继续测量另一只眼睛"
+  ],
+  [
+    "Separate observations.",
+    "各项观察分别呈现。"
+  ],
+  [
+    "No vision label.",
+    "不作视力判定。"
+  ],
+  [
+    "High-contrast angular gap",
+    "高对比度缺口角度"
+  ],
+  [
+    "Low-contrast angular gap",
+    "低对比度缺口角度"
+  ],
+  [
+    "Meridional consistency",
+    "子午线方向一致性"
+  ],
+  [
+    "No stable preference",
+    "无稳定偏好"
+  ],
+  [
+    "Calibrated experiment, not an eye examination.",
+    "这是校准后的实验，不是眼科检查。"
+  ],
+  [
+    "Sudden changes need care, not another run.",
+    "突然的变化需要就医，而不是再次测试。"
+  ],
+  [
+    "This is not vision screening, diagnosis, or a prescription.",
+    "这不是视力筛查、诊断或处方。"
+  ],
+  [
+    "Acutezza — calibrated sharpness profile",
+    "Acutezza — 校准后的视敏度概况"
+  ],
+  [
+    "preference",
+    "偏好"
+  ],
+  [
+    "no stable preference",
+    "无稳定偏好"
+  ],
+  [
+    "Calibrated sharpness experiment — Acutezza | Sense6",
+    "校准后的视敏度实验 — Acutezza | Sense6"
+  ],
+  [
+    "Calibrate screen size — Acutezza | Sense6",
+    "校准屏幕尺寸 — Acutezza | Sense6"
+  ],
+  [
+    "Estimate viewing distance — Acutezza | Sense6",
+    "估算观看距离 — Acutezza | Sense6"
+  ],
+  [
+    "Your calibrated sharpness profile — Acutezza | Sense6",
+    "你的校准视敏度概况 — Acutezza | Sense6"
+  ],
+  [
+    "Gap at top",
+    "缺口在上方"
+  ],
+  [
+    "Gap at upper right",
+    "缺口在右上方"
+  ],
+  [
+    "Gap at right",
+    "缺口在右侧"
+  ],
+  [
+    "Gap at lower right",
+    "缺口在右下方"
+  ],
+  [
+    "Gap at bottom",
+    "缺口在下方"
+  ],
+  [
+    "Gap at lower left",
+    "缺口在左下方"
+  ],
+  [
+    "Gap at left",
+    "缺口在左侧"
+  ],
+  [
+    "Gap at upper left",
+    "缺口在左上方"
+  ],
+  [
+    "A Landolt ring changes size while you identify its opening. The estimate belongs to this calibrated distance and display.",
+    "Landolt C 视标会改变大小，你需要指出缺口方向。估值只适用于当前校准距离和显示器。"
+  ],
+  [
+    "The same task repeats with a pale target. Sense6 compares conditions within this run, not across devices.",
+    "相同任务会使用较淡的视标重复进行。Sense6 比较的是本次测量中的不同条件，而不是不同设备。"
+  ],
+  [
+    "Line fields repeat at two scales and changing pixel phases. A preference appears only when it replicates.",
+    "条纹会以两种尺寸和变化的像素相位重复呈现。只有偏好重复出现时才会显示结果。"
+  ],
+  [
+    "Before testing",
+    "测试前"
+  ],
+  [
+    "Acutezza setup rules",
+    "Acutezza 测试条件"
+  ],
+  [
+    "Adaptive burden",
+    "自适应试验量"
+  ],
+  [
+    "Standard optotype",
+    "标准视标"
+  ],
+  [
+    "Urgent symptoms",
+    "紧急症状"
+  ],
+  [
+    "Camera",
+    "相机"
+  ],
+  [
+    "Result",
+    "结果"
+  ],
+  [
+    "None",
+    "无"
+  ],
+  [
+    "Run relative",
+    "测量内相对"
+  ],
+  [
+    "Calibration 01 / physical screen scale",
+    "校准 01 / 屏幕物理尺度"
+  ],
+  [
+    "Calibration 02 / estimated viewing distance",
+    "校准 02 / 估算观看距离"
+  ],
+  [
+    "Calibration 03 / contrast availability",
+    "校准 03 / 低对比度可用性"
+  ],
+  [
+    "Between-eye setup check",
+    "双眼之间的设置复核"
+  ],
+  [
+    "Changing pixel phase",
+    "像素相位变化"
+  ],
+  [
+    "Two repeated scales",
+    "以两种尺寸重复"
+  ],
+  [
+    "Comparison recorded.",
+    "比较结果已记录。"
+  ],
+  [
+    "A physical card and blind-spot sweeps establish screen scale and estimated viewing distance.",
+    "实体卡片和盲点扫描用于确定屏幕尺度及估算观看距离。"
+  ],
+  [
+    "The Landolt ring provides language-independent, eight-direction geometry.",
+    "Landolt C 视标提供与语言无关的八方向几何图形。"
+  ],
+  [
+    "Eighteen eight-choice trials balance precision and effort in FrACT research.",
+    "FrACT 研究使用18次八选一试验，在精度与负担之间取得平衡。"
+  ],
+  [
+    "Safety copy reflects guidance for sudden floaters, flashes, or curtain-like shadows.",
+    "安全提示参考了针对突然出现飞蚊、闪光或帘幕状阴影的医疗建议。"
+  ],
+  [
+    "Use a laptop, tablet, or monitor without glare. Reset browser zoom, keep brightness comfortable, and leave the display still after calibration.",
+    "请使用无眩光的笔记本电脑、平板电脑或显示器。重置浏览器缩放，调到舒适亮度，校准后不要移动显示器。"
+  ],
+  [
+    "I am 18 or older; I will use my usual correction for this distance; I can cover either eye without pressing it; I understand this is not an eye examination.",
+    "我已年满18岁；会使用在此距离通常佩戴的眼镜或隐形眼镜；可以遮住任一只眼睛而不按压眼球；并理解这不是眼科检查。"
+  ],
+  [
+    "Place the blank side of a standard bank or identity card against the screen. Adjust the rectangle until its outer edges match. Sense6 reads no card details and uses no camera.",
+    "将标准银行卡或身份证件未印字的一面贴近屏幕。调整矩形，直至外缘吻合。Sense6 不读取卡片信息，也不使用摄像头。"
+  ],
+  [
+    "Use a ruler and set the rectangle to exactly 85.6 mm wide. If the card cannot fit, rotate to landscape or use a larger screen.",
+    "使用直尺，将矩形宽度精确调至85.6 mm。如果卡片放不下，请旋转为横屏或使用更大的屏幕。"
+  ],
+  [
+    "This screen cannot show the calibration card at physical size.",
+    "此屏幕无法按实际尺寸显示校准卡。"
+  ],
+  [
+    "Rotate to landscape or continue on a larger tablet, laptop, or monitor. Acutezza will not guess physical screen size.",
+    "请旋转为横屏，或改用更大的平板电脑、笔记本电脑或显示器。Acutezza 不会猜测屏幕的物理尺寸。"
+  ],
+  [
+    "Keep this viewport, browser zoom, orientation, and viewing distance unchanged.",
+    "请勿改变当前视口、浏览器缩放、屏幕方向和观看距离。"
+  ],
+  [
+    "Screen scale is measured, but distance came from manual entry. Results retain this caution.",
+    "屏幕尺度已经实测，但距离来自手动输入。结果会保留这一注意事项。"
+  ],
+  [
+    "Prepare {eye}",
+    "准备{eye}"
+  ],
+  [
+    "Eye {current} of 2 / {eye}",
+    "第{current}只眼睛，共2只 / {eye}"
+  ],
+  [
+    "Cover the {eye}.",
+    "遮住{eye}。"
+  ],
+  [
+    "Keep the {eye} open.",
+    "保持{eye}睁开。"
+  ],
+  [
+    "Use an opaque card or your palm without pressing the covered eye. Keep your head upright and remain at about {distance} cm.",
+    "用不透明卡片或手掌遮眼，但不要按压被遮住的眼睛。头部保持端正，与屏幕保持约{distance} cm。"
+  ],
+  [
+    "Four easy practice targets come first.",
+    "首先用四个清晰视标练习。"
+  ],
+  [
+    "Use the direction pad or matching number keys.",
+    "使用方向键盘或对应的数字键。"
+  ],
+  [
+    "Guess when uncertain; do not move closer.",
+    "不确定时也请选择一个答案；不要靠近屏幕。"
+  ],
+  [
+    "Keep brightness comfortable. This checks whether the display preserves the nominal {contrast}% condition; it does not calibrate luminance.",
+    "请保持舒适亮度。此步骤检查显示器能否保留标称{contrast}%条件，并不会校准亮度。"
+  ],
+  [
+    "If unavailable, Acutezza skips Contrasto instead of producing a misleading value.",
+    "如果该条件不可用，Acutezza 会跳过 Contrasto，而不是给出误导性数值。"
+  ],
+  [
+    "Return to {distance} cm.",
+    "回到{distance} cm的位置。"
+  ],
+  [
+    "Re-measure from eye to screen, confirm the viewport is unchanged, then continue.",
+    "重新测量眼睛到屏幕的距离，确认视口没有变化，然后继续。"
+  ],
+  [
+    "Setup unchanged — continue",
+    "设置未变 — 继续"
+  ],
+  [
+    "Sit in the position you will keep and measure from the bridge of your nose to the screen. This run remains labelled “assumed distance.”",
+    "以测试期间会保持的姿势坐好，测量鼻梁到屏幕的距离。本次测量仍会标记为“估算距离”。"
+  ],
+  [
+    "assumed",
+    "估算"
+  ],
+  [
+    "measured",
+    "实测"
+  ],
+  [
+    "nominal",
+    "标称"
+  ],
+  [
+    "nominal contrast",
+    "标称对比度"
+  ],
+  [
+    "Cover your right eye. Keep your left eye fixed on the square at the right. Start a sweep, then press Space or the button when the violet dot disappears. Do not follow the dot.",
+    "遮住右眼，左眼只注视右侧方块。开始扫描；紫色圆点消失时，按空格键或按钮。不要用眼睛追随圆点。"
+  ],
+  [
+    "Keep the right eye covered and look only at the square.",
+    "继续遮住右眼，只看方块。"
+  ],
+  [
+    "Acutezza / this display / this distance",
+    "Acutezza / 此显示器 / 此距离"
+  ],
+  [
+    "The calibration and task controls support interpretation of this run at the stated distance.",
+    "校准和任务控制检查有助于解释在标示距离下的本次测量。"
+  ],
+  [
+    "A calibration or task-control check was limited. Repeat before comparing runs.",
+    "校准或任务控制检查存在局限。比较不同测量前请重新测试。"
+  ],
+  [
+    "What travelled with the target.",
+    "与视标一同记录的条件。"
+  ],
+  [
+    "Correction",
+    "视力矫正"
+  ],
+  [
+    "Distance",
+    "距离"
+  ],
+  [
+    "Card scale",
+    "卡片尺度"
+  ],
+  [
+    "Acutezza describes one self-administered run on this display at this estimated distance. It is not vision screening, diagnosis, or a prescription.",
+    "Acutezza 描述的是在此显示器、此估算距离下自行完成的一次测量。它不是视力筛查、诊断或处方。"
+  ],
+  [
+    "Do not infer normal vision, 20/20, refractive error, cylinder power, or an astigmatism axis.",
+    "请勿据此推断视力正常、20/20视力、屈光不正、柱镜度数或散光轴位。"
+  ],
+  [
+    "Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.",
+    "如突然视力下降、眼睛剧痛、新出现闪光或飞蚊，或视野中出现帘幕或阴影，请立即寻求专业评估。"
+  ],
+  [
+    "Three measures for this eye.",
+    "这只眼睛的三项测量。"
+  ],
+  [
+    "{lower}–{upper} uncertainty interval",
+    "{lower}–{upper} 不确定区间"
+  ],
+  [
+    "{cost}% gap size versus high contrast",
+    "缺口尺寸比高对比度条件大{cost}%"
+  ],
+  [
+    "{consistency}% leading-choice consistency",
+    "首选方向一致性 {consistency}%"
+  ],
+  [
+    "not measured",
+    "未测量"
+  ],
+  [
+    "The estimate touches the display range; treat it as a bound.",
+    "估值触及显示器可测范围；请把它视为边界值。"
+  ],
+  [
+    "A calibrated angular threshold from forced-choice trials.",
+    "由强迫选择试验得到的校准角度阈值。"
+  ],
+  [
+    "A within-run difference, not clinical contrast sensitivity.",
+    "这是本次测量内部的差异，不是临床对比敏感度。"
+  ],
+  [
+    "The display could not preserve a dependable low-contrast condition.",
+    "显示器无法稳定保留可信的低对比度条件。"
+  ],
+  [
+    "The preference repeated at both scales. It does not identify astigmatism.",
+    "同一偏好在两种尺寸下重复出现，但这不能识别散光。"
+  ],
+  [
+    "No preference met the replication rule across scale and pixel phase.",
+    "没有任何偏好在不同尺寸和像素相位下满足重复标准。"
+  ],
+  [
+    "Instrument 01 complete",
+    "测量 01 完成"
+  ],
+  [
+    "Threshold tasks complete",
+    "阈值任务完成"
+  ],
+  [
+    "A calibrated estimate was recorded with {trials} measured targets.",
+    "已通过{trials}个测量视标记录校准估值。"
+  ],
+  [
+    "Rest your eye for a moment. Keep the same correction, distance, screen, and covered eye.",
+    "让眼睛休息片刻。请保持相同的视力矫正、距离、屏幕和被遮住的眼睛。"
+  ],
+  [
+    "High- and low-contrast estimates remain separate in the result.",
+    "高对比度与低对比度估值会在结果中分别呈现。"
+  ],
+  [
+    "Contrasto is unavailable on this setup, so no low-contrast value will be inferred.",
+    "此设置无法使用 Contrasto，因此不会推断低对比度数值。"
+  ],
+  [
+    "Listening lab / three instruments / about 6 minutes",
+    "听觉实验室 / 三项测量 / 约6分钟"
+  ],
+  [
+    "Listen for the boundary.",
+    "寻找听觉边界。"
+  ],
+  [
+    "Keep the limits audible.",
+    "始终保持安全、可听。"
+  ],
+  [
+    "Udito checks headphone-like presentation, maps an upper audibility boundary, and estimates pitch discrimination at two frequencies. Every result belongs to this device, volume, room, and run.",
+    "Udito 会检查声音是否以类似耳机的方式呈现，测量本次可听上限，并估算两个频率下的音高辨别能力。所有结果只适用于此设备、音量、房间和本次测量。"
+  ],
+  [
+    "Prepare the sound lab",
+    "准备听觉实验室"
+  ],
+  [
+    "See the method",
+    "查看方法"
+  ],
+  [
+    "No dB HL, hearing age, diagnosis, or population score.",
+    "不提供 dB HL、听力年龄、诊断或人群分数。"
+  ],
+  [
+    "Output",
+    "输出"
+  ],
+  [
+    "Method and limits",
+    "方法与局限"
+  ],
+  [
+    "Three questions. No synthetic score.",
+    "三个问题。不合成总分。"
+  ],
+  [
+    "The instruments stay separate because confidence in the setup is not the same thing as audibility or pitch discrimination.",
+    "测试设置的可信度不同于可听性或音高辨别，因此三项结果分别呈现。"
+  ],
+  [
+    "Headphone confidence",
+    "耳机呈现可信度"
+  ],
+  [
+    "Upper audibility boundary",
+    "可听上限"
+  ],
+  [
+    "Pitch discrimination",
+    "音高辨别"
+  ],
+  [
+    "Which tone is quietest?",
+    "哪个声音最轻？"
+  ],
+  [
+    "Which interval contains the tone?",
+    "哪个时段包含声音？"
+  ],
+  [
+    "Which tone was higher?",
+    "哪个声音更高？"
+  ],
+  [
+    "Before listening",
+    "聆听前"
+  ],
+  [
+    "Comfort sets the ceiling.",
+    "以舒适为上限。"
+  ],
+  [
+    "Start with device volume low. Raise it only until the reference is quiet and comfortable, never beyond about 60%. Then lock it for the whole run.",
+    "开始时将设备音量调低。只调高到参考音轻柔、舒适为止，切勿超过约60%。然后在整次测量中保持音量不变。"
+  ],
+  [
+    "Never raise volume to chase a missing high tone. Stop immediately for discomfort, pain, pressure, or ringing.",
+    "切勿为了追寻听不到的高音而调高音量。如有不适、疼痛、压迫感或耳鸣，请立即停止。"
+  ],
+  [
+    "Research trail",
+    "研究依据"
+  ],
+  [
+    "What informed Udito.",
+    "Udito 的设计依据。"
+  ],
+  [
+    "Read the primary source",
+    "阅读原始资料"
+  ],
+  [
+    "Safe listening",
+    "安全聆听"
+  ],
+  [
+    "Audio setup / volume locks after this screen",
+    "音频设置 / 离开此页面后锁定音量"
+  ],
+  [
+    "Quiet room.",
+    "安静的房间。"
+  ],
+  [
+    "Low volume.",
+    "较低的音量。"
+  ],
+  [
+    "Headphones.",
+    "耳机。"
+  ],
+  [
+    "Play quiet reference",
+    "播放轻柔参考音"
+  ],
+  [
+    "Start device volume low before playing.",
+    "播放前先调低设备音量。"
+  ],
+  [
+    "Listening setup",
+    "聆听设置"
+  ],
+  [
+    "Over-ear / on-ear headphones",
+    "包耳式／贴耳式耳机"
+  ],
+  [
+    "Earbuds / in-ear headphones",
+    "耳塞／入耳式耳机"
+  ],
+  [
+    "Other / unsure",
+    "其他 / 不确定"
+  ],
+  [
+    "Begin instrument 01",
+    "开始测量 01"
+  ],
+  [
+    "Volume contract",
+    "音量确认"
+  ],
+  [
+    "Start low",
+    "从低音量开始"
+  ],
+  [
+    "Find quiet comfort",
+    "调到轻柔、舒适"
+  ],
+  [
+    "Lock volume",
+    "锁定音量"
+  ],
+  [
+    "Stop for discomfort",
+    "不适时停止"
+  ],
+  [
+    "Microphone",
+    "麦克风"
+  ],
+  [
+    "Not used",
+    "未使用"
+  ],
+  [
+    "Calibration",
+    "校准"
+  ],
+  [
+    "User-set only",
+    "仅由用户设置"
+  ],
+  [
+    "Start practice",
+    "开始练习"
+  ],
+  [
+    "Listen…",
+    "请听…"
+  ],
+  [
+    "Stop safely",
+    "安全停止"
+  ],
+  [
+    "Volume locked",
+    "音量已锁定"
+  ],
+  [
+    "Short ramped tones",
+    "短促的渐入渐出音"
+  ],
+  [
+    "Response recorded.",
+    "回答已记录。"
+  ],
+  [
+    "Run again",
+    "再测一次"
+  ],
+  [
+    "Not settled",
+    "未收敛"
+  ],
+  [
+    "Device-relative, never dB HL.",
+    "仅为设备相对值，绝不是 dB HL。"
+  ],
+  [
+    "Take off hearing protection only if you normally would. If you use hearing aids or another listening device, leave your usual setup unchanged and record it below.",
+    "只有在你平时会摘下听力防护用品时才将其摘下。如果使用助听器或其他辅助聆听设备，请保持平时的设置不变，并在下方记录。"
+  ],
+  [
+    "Web Audio is unavailable.",
+    "Web Audio 不可用。"
+  ],
+  [
+    "Udito cannot present controlled intervals in this browser. Try a current browser with audio enabled.",
+    "Udito 无法在此浏览器中呈现受控时段。请改用已启用音频的现代浏览器。"
+  ],
+  [
+    "Usual hearing aid / assistive setup",
+    "平时使用的助听器／辅助聆听设置"
+  ],
+  [
+    "The reference is quiet and comfortable; the room is quiet; I will not change volume or raise it to chase a tone; I understand this is not clinical audiometry.",
+    "参考音轻柔、舒适，房间安静；我不会改变音量，也不会为了追寻声音而调高音量；我理解这不是临床听力测定。"
+  ],
+  [
+    "Safe listening rules",
+    "安全聆听规则"
+  ],
+  [
+    "A device control, not a measured sound-pressure level. The browser cannot know dB SPL.",
+    "这是设备控制值，不是实测声压级。浏览器无法得知 dB SPL。"
+  ],
+  [
+    "Upload",
+    "上传"
+  ],
+  [
+    "Playing quiet reference…",
+    "正在播放轻柔参考音…"
+  ],
+  [
+    "Keep this quiet and comfortable.",
+    "请保持轻柔、舒适。"
+  ],
+  [
+    "Play reference again",
+    "再次播放参考音"
+  ],
+  [
+    "audio context",
+    "音频上下文"
+  ],
+  [
+    "now leave volume unchanged.",
+    "现在起不要改变音量。"
+  ],
+  [
+    "Audio could not start. Check browser audio permissions and try again.",
+    "无法启动音频。请检查浏览器的音频权限，然后重试。"
+  ],
+  [
+    "The reference sound could not start.",
+    "无法启动参考音。"
+  ],
+  [
+    "Play the quiet reference and confirm the volume contract first.",
+    "请先播放轻柔参考音，并确认音量要求。"
+  ],
+  [
+    "Never raise volume to chase a missing high tone.",
+    "切勿为了追寻听不到的高音而调高音量。"
+  ],
+  [
+    "Stop immediately for discomfort, pain, pressure, or ringing.",
+    "如有不适、疼痛、压迫感或耳鸣，请立即停止。"
+  ],
+  [
+    "Instrument",
+    "测量项目"
+  ],
+  [
+    "of 03",
+    "/ 03"
+  ],
+  [
+    "Choose the quietest tone. Two practice trials come first; the measured check is six trials.",
+    "请选择最轻的声音。先进行两次练习，再进行六次测量试验。"
+  ],
+  [
+    "Choose the interval containing the tone. Silence is a valid experience—guess without changing volume.",
+    "请选择包含声音的时段。完全听不到也是有效感受；不要改变音量，任选一个答案。"
+  ],
+  [
+    "Choose which tone was higher. Loudness changes slightly on purpose, so follow pitch rather than loudness.",
+    "请选择哪个声音更高。响度会有意地略微变化，因此请比较音高，不要比较响度。"
+  ],
+  [
+    "Start Cuffie",
+    "开始 Cuffie"
+  ],
+  [
+    "Start Portata",
+    "开始 Portata"
+  ],
+  [
+    "Start Intonazione",
+    "开始 Intonazione"
+  ],
+  [
+    "Practice",
+    "练习"
+  ],
+  [
+    "Adaptive run",
+    "自适应测量"
+  ],
+  [
+    "Preparing…",
+    "正在准备…"
+  ],
+  [
+    "Preparing the sounds…",
+    "正在准备声音…"
+  ],
+  [
+    "Sound interval choices",
+    "选择声音时段"
+  ],
+  [
+    "First tone",
+    "第一个声音"
+  ],
+  [
+    "Second tone",
+    "第二个声音"
+  ],
+  [
+    "Interval",
+    "时段"
+  ],
+  [
+    "Keys",
+    "按键"
+  ],
+  [
+    "Sound",
+    "声音"
+  ],
+  [
+    "of",
+    "/"
+  ],
+  [
+    "Which tone was quietest?",
+    "哪个声音最轻？"
+  ],
+  [
+    "Which interval contained the tone?",
+    "哪个时段包含声音？"
+  ],
+  [
+    "Yes—that was the quieter tone.",
+    "正确 — 那个声音更轻。"
+  ],
+  [
+    "Listen for the tone with lower level.",
+    "请辨别声级更低的声音。"
+  ],
+  [
+    "Control tone found.",
+    "已找到控制音。"
+  ],
+  [
+    "Control tone missed; setup confidence will be limited.",
+    "未找到控制音；测试设置的可信度将受到限制。"
+  ],
+  [
+    "Cuffie / practice complete",
+    "Cuffie / 练习完成"
+  ],
+  [
+    "Now six measured trials.",
+    "接下来进行六次测量试验。"
+  ],
+  [
+    "The phase-based decoy appears only in the measured block. Keep the volume unchanged.",
+    "基于相位的干扰音只会在测量阶段出现。请保持音量不变。"
+  ],
+  [
+    "Begin headphone check",
+    "开始耳机呈现检查"
+  ],
+  [
+    "recorded.",
+    "已记录。"
+  ],
+  [
+    "Continue to",
+    "继续到"
+  ],
+  [
+    "quiet targets located. This is evidence about presentation, not proof of hardware.",
+    "个轻柔目标音已定位。这是关于声音呈现的证据，不是硬件证明。"
+  ],
+  [
+    "adaptive presentations recorded",
+    "次自适应呈现已记录"
+  ],
+  [
+    "without changing volume.",
+    "且音量保持不变。"
+  ],
+  [
+    "Adaptive",
+    "自适应"
+  ],
+  [
+    "Interleaved",
+    "交错呈现"
+  ],
+  [
+    "Your listening profile — Udito | Sense6",
+    "你的聆听概况 — Udito | Sense6"
+  ],
+  [
+    "Udito / this setup / this run",
+    "Udito / 此设置 / 本次测量"
+  ],
+  [
+    "Three listening measures.",
+    "三项听觉测量。"
+  ],
+  [
+    "No hearing label.",
+    "不作听力判定。"
+  ],
+  [
+    "The setup checks and adaptive tracks produced a coherent run-level profile.",
+    "设置检查与自适应轨迹产生了一致的本次测量概况。"
+  ],
+  [
+    "At least one setup check or adaptive track did not settle. The observations remain visible, but comparison should wait for a steadier repeat.",
+    "至少一项设置检查或自适应轨迹没有收敛。观察结果仍会显示，但请在更稳定的条件下重测后再作比较。"
+  ],
+  [
+    "Setup checks coherent",
+    "设置检查一致"
+  ],
+  [
+    "Interpret with caution",
+    "谨慎解读"
+  ],
+  [
+    "Headphone-like",
+    "类似耳机呈现"
+  ],
+  [
+    "Uncertain",
+    "不确定"
+  ],
+  [
+    "A phase-based presentation check, not hardware detection.",
+    "这是基于相位的呈现检查，不是硬件检测。"
+  ],
+  [
+    "Upper run boundary",
+    "本次可听上限"
+  ],
+  [
+    "boundary estimate",
+    "边界估值"
+  ],
+  [
+    "adaptive estimate",
+    "自适应估值"
+  ],
+  [
+    "Over-ear / on-ear",
+    "包耳式／贴耳式"
+  ],
+  [
+    "Reached the device-safe test ceiling; your personal boundary may be higher.",
+    "已达到设备安全测试上限；你的个人边界可能更高。"
+  ],
+  [
+    "Relative to this device, fixed volume, room, and audio sample rate.",
+    "结果相对于此设备、固定音量、房间和音频采样率。"
+  ],
+  [
+    "Pitch step near 500 Hz",
+    "500 Hz附近的音高差"
+  ],
+  [
+    "Pitch step near 2 kHz",
+    "2 kHz附近的音高差"
+  ],
+  [
+    "Reversal-based just-noticeable difference for this run.",
+    "本次测量中由反转点估算的最小可觉差。"
+  ],
+  [
+    "Reported separately; no composite hearing score is calculated.",
+    "各项分别呈现；不计算综合听力分数。"
+  ],
+  [
+    "Run context",
+    "测量环境"
+  ],
+  [
+    "What travelled with the sound.",
+    "与声音一同记录的条件。"
+  ],
+  [
+    "Audio context",
+    "音频上下文"
+  ],
+  [
+    "Portata controls",
+    "Portata 控制检查"
+  ],
+  [
+    "Not sampled",
+    "未采样"
+  ],
+  [
+    "Interruptions",
+    "中断"
+  ],
+  [
+    "Interpretation boundary",
+    "解读边界"
+  ],
+  [
+    "A browser knows digital amplitude, not sound pressure at your eardrum. Headphone response, fit, output, age, room noise, device processing, and the volume setting all shape these numbers.",
+    "浏览器只能知道数字振幅，无法知道你耳膜处的声压。耳机响应、佩戴贴合度、输出、年龄、室内噪声、设备处理和音量设置都会影响这些数字。"
+  ],
+  [
+    "Do not infer hearing age, “normal” hearing, safety for work, or a medical diagnosis. If hearing concerns affect daily life, use calibrated clinical audiometry.",
+    "请勿据此推断听力年龄、“正常”听力、工作安全性或医学诊断。如果听力问题影响日常生活，请接受经过校准的临床听力测定。"
+  ],
+  [
+    "Keep the same volume only for comparison.",
+    "只有作比较时才保持相同音量。"
+  ],
+  [
+    "Compare your own runs only with the same device, headphones, fit, room, and volume. Stop testing if any sound is uncomfortable.",
+    "只比较使用相同设备、耳机、佩戴方式、房间和音量完成的个人测量。如有任何声音令人不适，请停止测试。"
+  ],
+  [
+    "Screen check / 01 of 01",
+    "屏幕检查 / 01 / 01"
+  ],
+  [
+    "Prepare the environment before the score.",
+    "测量前先准备好环境。"
+  ],
+  [
+    "Display settings and ambient light can move a color threshold. This one-minute check makes your run more repeatable.",
+    "显示设置和环境光会改变颜色阈值。用一分钟完成此检查，可提高测量的可重复性。"
+  ],
+  [
+    "Use one screen. Disable Night Shift, True Tone, blue-light filters, and vivid modes.",
+    "只使用一个屏幕。关闭 Night Shift、True Tone、蓝光过滤和鲜艳模式。"
+  ],
+  [
+    "Avoid direct glare. Let your eyes settle on the neutral page for about 30 seconds.",
+    "避免屏幕直射眩光。注视中性色页面约30秒，让眼睛适应。"
+  ],
+  [
+    "Set comfortable brightness. You should distinguish every neighboring step below.",
+    "设置舒适亮度。你应能区分下方每两个相邻的色阶。"
+  ],
+  [
+    "Black → white",
+    "黑 → 白"
+  ],
+  [
+    "11-step check",
+    "11级检查"
+  ],
+  [
+    "Look for distinct edges above and a smooth ramp here—without a bright hotspot.",
+    "检查上方是否有清晰边界，并确认此处过渡平滑、没有异常亮斑。"
+  ],
+  [
+    "I can distinguish the steps and my color-shifting filters are off.",
+    "我能区分各个色阶，并已关闭会改变颜色的滤镜。"
+  ],
+  [
+    "Start instrument 01",
+    "开始测量 01"
+  ],
+  [
+    "Viewing setup / 01 of 01",
+    "观看设置 / 01 / 01"
+  ],
+  [
+    "Colour filters off, please.",
+    "请关闭会改变颜色的滤镜。"
+  ],
+  [
+    "The thresholds only describe this browser, display, lighting, and viewing position. Colour-shifting features can move them substantially.",
+    "这些阈值只描述当前浏览器、显示器、照明和观看位置。改变颜色的功能会让阈值大幅变化。"
+  ],
+  [
+    "Turn off Night Shift, True Tone, blue-light filters, and vivid display modes.",
+    "关闭 Night Shift、True Tone、蓝光过滤和鲜艳显示模式。"
+  ],
+  [
+    "Use comfortable medium brightness in even room light, without glare.",
+    "在均匀、无眩光的室内光线下，将屏幕调至舒适的中等亮度。"
+  ],
+  [
+    "View the display straight on at a normal reading distance. Use “No gap visible” when the target disappears.",
+    "以正常阅读距离正视屏幕。视标消失时请选择“看不到缺口”。"
+  ],
+  [
+    "Display check",
+    "显示器检查"
+  ],
+  [
+    "Ready to begin",
+    "可以开始"
+  ],
+  [
+    "These six swatches are a gross display check, not colour calibration.",
+    "这六个色块只用于粗略检查显示效果，并非色彩校准。"
+  ],
+  [
+    "My colour filters are off and I understand this is an unvalidated browser experiment.",
+    "我已关闭颜色滤镜，并理解这是一项未经验证的浏览器实验。"
+  ],
+  [
+    "Input setup / before timing starts",
+    "输入设置 / 计时开始前"
+  ],
+  [
+    "Use the same device and input mode when comparing runs. Keep this tab visible and silence interruptions.",
+    "比较测量时请使用相同设备和输入方式。保持此标签页可见，并关闭通知等干扰。"
+  ],
+  [
+    "Space, then ← / →",
+    "先按空格，再按 ← / →"
+  ],
+  [
+    "Tap the chamber or side",
+    "点击测试区域或对应一侧"
+  ],
+  [
+    "I understand this measures this browser, device, input, and moment—not a clinical trait.",
+    "我理解这测量的是此刻的浏览器、设备和输入方式，不是临床特征。"
+  ],
+  [
+    "Timing readiness",
+    "计时准备状态"
+  ],
+  [
+    "Frame cadence check",
+    "帧间隔检查"
+  ],
+  [
+    "Measuring…",
+    "正在测量…"
+  ],
+  [
+    "Sampling animation frames without changing your measured responses.",
+    "正在采样动画帧，且不会更改你的实测反应。"
+  ],
+  [
+    "Display correction",
+    "显示校正"
+  ],
+  [
+    "Timing clock",
+    "计时器"
+  ],
+  [
+    "Monotonic",
+    "单调递增"
+  ],
+  [
+    "Privacy",
+    "隐私"
+  ],
+  [
+    "Journal",
+    "日志"
+  ],
+  [
+    "Answers stay local",
+    "回答仅保留在本机"
+  ],
+  [
+    "Back",
+    "返回"
+  ],
+  [
+    "Leave lab",
+    "离开实验室"
+  ],
+  [
+    "End session",
+    "结束会话"
+  ],
+  [
+    "End experiment",
+    "结束实验"
+  ],
+  [
+    "How it works",
+    "工作原理"
+  ],
+  [
+    "Practice first",
+    "先练习"
+  ],
+  [
+    "Practice with feedback",
+    "带反馈练习"
+  ],
+  [
+    "Begin measured run",
+    "开始测量"
+  ],
+  [
+    "Next practice target",
+    "下一个练习视标"
+  ],
+  [
+    "Copy summary",
+    "复制摘要"
+  ],
+  [
+    "Return to method",
+    "返回方法说明"
+  ],
+  [
+    "Everything runs locally. No answer leaves the browser.",
+    "所有处理都在本机完成。回答不会离开浏览器。"
+  ],
+  [
+    "Results are calculated locally and are not uploaded.",
+    "结果在本机计算，不会上传。"
+  ],
+  [
+    "Color perception / 03 instruments / about 4 minutes",
+    "色彩感知 / 三项测量 / 约4分钟"
+  ],
+  [
+    "How finely do you",
+    "颜色差异"
+  ],
+  [
+    "see",
+    "你能分辨得"
+  ],
+  [
+    "color?",
+    "多细微？"
+  ],
+  [
+    "Begin the color lab",
+    "开始色彩实验室"
+  ],
+  [
+    "Set the room before the score.",
+    "测量前先调整房间环境。"
+  ],
+  [
+    "Which tile is different?",
+    "哪个色块不同？"
+  ],
+  [
+    "Which field shifts in color?",
+    "哪个区域的颜色发生了变化？"
+  ],
+  [
+    "Build the smoothest color path.",
+    "排出最平滑的颜色路径。"
+  ],
+  [
+    "Lock this order",
+    "确认此顺序"
+  ],
+  [
+    "Your visible boundary, on this display.",
+    "你在此显示器上的可见边界。"
+  ],
+  [
+    "This is not a medical test and cannot confirm tetrachromacy.",
+    "这不是医学检查，无法确认四色型色觉。"
+  ],
+  [
+    "Lab progress",
+    "实验室进度"
+  ],
+  [
+    "Current instrument progress",
+    "当前测量进度"
+  ],
+  [
+    "Choose once. Trust the first stable difference you see.",
+    "只选一次。相信你最先看到的稳定差异。"
+  ],
+  [
+    "Ignore dot size and brightness. Look for a whole-field hue shift.",
+    "忽略圆点大小和亮度，寻找整个区域的色相变化。"
+  ],
+  [
+    "The endpoints are fixed. Drag a tile into place — the row makes room. You can also tap two tiles to swap them.",
+    "两端固定。将色块拖到目标位置，行内会自动腾出空间。也可以依次点击两个色块进行交换。"
+  ],
+  [
+    "No answer is stored online",
+    "回答不会在线保存"
+  ],
+  [
+    "Sixteen color tiles",
+    "16个色块"
+  ],
+  [
+    "Color tile",
+    "色块"
+  ],
+  [
+    "Four dotted color fields",
+    "四个点状颜色区域"
+  ],
+  [
+    "Dotted field",
+    "点状区域"
+  ],
+  [
+    "Hue ordering track",
+    "色相排序轨道"
+  ],
+  [
+    "Start anchor",
+    "起始锚点"
+  ],
+  [
+    "End anchor",
+    "结束锚点"
+  ],
+  [
+    "Movable color tile",
+    "可移动色块"
+  ],
+  [
+    "selected",
+    "已选中"
+  ],
+  [
+    "Move left",
+    "向左移动"
+  ],
+  [
+    "Move right",
+    "向右移动"
+  ],
+  [
+    "Run",
+    "测量"
+  ],
+  [
+    "drag a tile into place, or tap two tiles to swap them.",
+    "将色块拖到目标位置，或依次点击两个色块进行交换。"
+  ],
+  [
+    "tile",
+    "色块"
+  ],
+  [
+    "Tap its new place to swap, or use the arrows.",
+    "点击新位置进行交换，或使用箭头。"
+  ],
+  [
+    "Your colour profile — Tetracromia | Sense6",
+    "你的色彩概况 — Tetracromia | Sense6"
+  ],
+  [
+    "Session complete",
+    "会话完成"
+  ],
+  [
+    "Session index",
+    "会话指数"
+  ],
+  [
+    "Hue profile",
+    "色相概况"
+  ],
+  [
+    "Display-relative",
+    "显示器相对"
+  ],
+  [
+    "Each spoke is one hue region, drawn in its real color. The dot shows the share of discrimination trials you answered correctly there — the test keeps overall difficulty near your limit, so shorter spokes mark your relatively weaker directions.",
+    "每根辐条代表一个色相区域，并以其实际颜色绘制。圆点表示你在该区域的辨别试验中答对的比例。测试会让整体难度保持在你的极限附近，因此辐条越短，表示你在本次测量中相对较弱的方向。"
+  ],
+  [
+    "Sequence",
+    "序列"
+  ],
+  [
+    "Finest step",
+    "最小色阶"
+  ],
+  [
+    "Finest shift",
+    "最小变化"
+  ],
+  [
+    "Rose",
+    "玫瑰色"
+  ],
+  [
+    "Amber",
+    "琥珀色"
+  ],
+  [
+    "Lime",
+    "青柠色"
+  ],
+  [
+    "Green",
+    "绿色"
+  ],
+  [
+    "Cyan",
+    "青色"
+  ],
+  [
+    "Blue",
+    "蓝色"
+  ],
+  [
+    "Magenta",
+    "品红色"
+  ],
+  [
+    "of hue",
+    "色相"
+  ],
+  [
+    "through noise",
+    "穿过噪声"
+  ],
+  [
+    "correct · smaller angle = finer vision",
+    "正确 · 角度越小，辨别越精细"
+  ],
+  [
+    "Hue ordering between fixed anchors",
+    "在固定锚点之间排列色相"
+  ],
+  [
+    "perfect order · each out-of-place pair costs points",
+    "顺序完全正确 · 每一对错位都会扣分"
+  ],
+  [
+    "How to read this",
+    "如何解读"
+  ],
+  [
+    "Threshold and Field report the smallest hue difference you kept answering correctly, found adaptively (the app floor is 1.2°, near what an sRGB screen can render). The session index weighs them 35% + 35%, plus 30% for Sequence. Scores describe this run on this browser and screen — useful for comparing your own sessions under similar conditions, not a population percentile, diagnosis, or evidence for tetrachromacy.",
+    "Threshold 和 Field 会报告你持续答对的最小色相差，并通过自适应方式找出（应用下限为1.2°，接近 sRGB 屏幕可以呈现的范围）。会话指数按 Threshold 35% + Field 35% + Sequence 30%计算。分数只描述此次在当前浏览器和屏幕上的表现，可用于在相似条件下比较你自己的不同会话，但不是人群百分位、诊断或四色型色觉的证据。"
+  ],
+  [
+    "Very fine screen-level discrimination",
+    "屏幕上非常精细的辨别能力"
+  ],
+  [
+    "Fine screen-level discrimination",
+    "屏幕上精细的辨别能力"
+  ],
+  [
+    "Moderate screen-level discrimination",
+    "屏幕上中等的辨别能力"
+  ],
+  [
+    "Broad screen-level discrimination",
+    "屏幕上较宽泛的辨别能力"
+  ],
+  [
+    "You resolved small display differences consistently across the three instruments.",
+    "你在三项测量中都能稳定分辨屏幕上的细小差异。"
+  ],
+  [
+    "You resolved subtle display differences with a stable overall profile.",
+    "你的整体概况稳定，并能分辨屏幕上的细微差异。"
+  ],
+  [
+    "You found clear differences; the finest steps were less consistent in this run.",
+    "你能找到明显差异；此次测量中，对最细微色阶的反应不够稳定。"
+  ],
+  [
+    "The smallest display steps were difficult in this run. Screen setup and fatigue can matter.",
+    "此次测量中，最小的显示差异较难分辨。屏幕设置和疲劳都可能产生影响。"
+  ],
+  [
+    "Colour vision / adaptive experiment / about 3 minutes",
+    "色觉 / 自适应实验 / 约3分钟"
+  ],
+  [
+    "Find the gap",
+    "寻找缺口"
+  ],
+  [
+    "in the dots",
+    "从圆点中"
+  ],
+  [
+    "Start the experiment",
+    "开始实验"
+  ],
+  [
+    "Where is the clear gap?",
+    "清晰缺口在哪里？"
+  ],
+  [
+    "Where is the gap?",
+    "缺口在哪里？"
+  ],
+  [
+    "No gap visible",
+    "看不到缺口"
+  ],
+  [
+    "What this result cannot tell you",
+    "此结果无法告诉你的内容"
+  ],
+  [
+    "Task controls",
+    "任务控制试验"
+  ],
+  [
+    "Learn the C-gap task",
+    "学习 C 形缺口任务"
+  ],
+  [
+    "Clear dotted practice target with a C-shaped gap",
+    "带有清晰 C 形缺口的点状练习视标"
+  ],
+  [
+    "Learn the shape here. The measured targets will later become faint.",
+    "请先在这里熟悉形状。之后的测量视标会逐渐变淡。"
+  ],
+  [
+    "Choose the practice gap direction",
+    "选择练习缺口方向"
+  ],
+  [
+    "That is the gap",
+    "那里就是缺口"
+  ],
+  [
+    "Try this target again",
+    "再试一次此视标"
+  ],
+  [
+    "The gap is on the",
+    "缺口方向："
+  ],
+  [
+    "This clear practice gap is on the",
+    "此清晰练习缺口位于："
+  ],
+  [
+    "Follow the open side of the coloured C.",
+    "请指出彩色 C 形的开口方向。"
+  ],
+  [
+    "right",
+    "右"
+  ],
+  [
+    "left",
+    "左"
+  ],
+  [
+    "top",
+    "上"
+  ],
+  [
+    "bottom",
+    "下"
+  ],
+  [
+    "Adaptive colour threshold",
+    "自适应色觉阈值"
+  ],
+  [
+    "Experiment progress",
+    "实验进度"
+  ],
+  [
+    "Dotted colour target with a C-shaped gap",
+    "带有 C 形缺口的点状彩色视标"
+  ],
+  [
+    "Adaptive response",
+    "自适应回答"
+  ],
+  [
+    "Some targets should disappear. Say so instead of guessing and that direction will become easier.",
+    "有些视标应当会消失。请如实选择“看不到”，不要猜测；该方向的下一个视标会变得更容易。"
+  ],
+  [
+    "Choose the gap direction",
+    "选择缺口方向"
+  ],
+  [
+    "Gap at",
+    "缺口："
+  ],
+  [
+    "Keyboard: arrow keys · N for no gap",
+    "键盘：方向键 · 看不到缺口请按 N"
+  ],
+  [
+    "Experimental run complete",
+    "实验测量完成"
+  ],
+  [
+    "Display-relative thresholds from this run",
+    "本次测量的显示器相对阈值"
+  ],
+  [
+    "Run inconclusive — repeat the controls",
+    "结果无法确定 — 请重做控制试验"
+  ],
+  [
+    "Lower values mean you followed a smaller colour shift in that direction on this display. The three directions are not clinical scores and should not be compared as diagnoses.",
+    "数值越低，表示你在此显示器上能辨别该方向上越小的颜色变化。三个方向都不是临床分数，不应像诊断结果一样相互比较。"
+  ],
+  [
+    "Too many high-contrast task controls were missed to interpret the adaptive thresholds. Check the instructions and viewing setup, then try again.",
+    "高对比度控制试验漏答过多，无法解读自适应阈值。请检查说明和观看设置，然后重试。"
+  ],
+  [
+    "L direction",
+    "L 方向"
+  ],
+  [
+    "M direction",
+    "M 方向"
+  ],
+  [
+    "S direction",
+    "S 方向"
+  ],
+  [
+    "Protan-aligned display direction",
+    "沿 Protan 混淆线的显示方向"
+  ],
+  [
+    "Deutan-aligned display direction",
+    "沿 Deutan 混淆线的显示方向"
+  ],
+  [
+    "Tritan-aligned display direction",
+    "沿 Tritan 混淆线的显示方向"
+  ],
+  [
+    "Staircase settled",
+    "阶梯法已收敛"
+  ],
+  [
+    "Limited reversals",
+    "反转次数有限"
+  ],
+  [
+    "reversals",
+    "次反转"
+  ],
+  [
+    "Experiment floor confirmed",
+    "实验下限已确认"
+  ],
+  [
+    "Experiment maximum reached",
+    "已达到实验上限"
+  ],
+  [
+    "presentations",
+    "次呈现"
+  ],
+  [
+    "lower measurement bound",
+    "测量下限"
+  ],
+  [
+    "upper measurement bound",
+    "测量上限"
+  ],
+  [
+    "run spread",
+    "本次测量离散度"
+  ],
+  [
+    "High-contrast gap trials",
+    "高对比度缺口控制试验"
+  ],
+  [
+    "Enough controls were read to report this run.",
+    "控制试验正确数足以报告本次结果。"
+  ],
+  [
+    "Too many controls were missed; repeat before interpreting thresholds.",
+    "控制试验漏答过多；请在解读阈值前重新测试。"
+  ],
+  [
+    "Daltonia has no clinical norms and has not been validated against an anomaloscope, CAD, Cambridge Colour Test, or a diagnosed cohort. These values cannot confirm or rule out a colour-vision deficiency. Compare repeat runs only on the same display and setup.",
+    "Daltonia 没有临床常模，也未与色觉镜、CAD、Cambridge Colour Test 或已诊断人群进行验证。这些数值既不能确认也不能排除色觉缺陷。只比较在相同显示器和设置下重复完成的测量。"
+  ],
+  [
+    "Copy run summary",
+    "复制测量摘要"
+  ],
+  [
+    "A careful, adaptive lab for the differences your display can reproduce—and your eyes can resolve.",
+    "用严谨的自适应实验，测量显示器能够重现、你的眼睛能够分辨的差异。"
+  ],
+  [
+    "display relative",
+    "显示器相对"
+  ],
+  [
+    "Hue",
+    "色相"
+  ],
+  [
+    "Field",
+    "色场"
+  ],
+  [
+    "Order",
+    "顺序"
+  ],
+  [
+    "The lab",
+    "实验室"
+  ],
+  [
+    "Three views of discrimination.",
+    "从三个角度观察辨别能力。"
+  ],
+  [
+    "No names, no account, no upload. Your session stays in this browser.",
+    "无需姓名、账户或上传。会话只保留在此浏览器中。"
+  ],
+  [
+    "No names, no account, no result upload. Your session stays in this browser.",
+    "无需姓名、账户或上传结果。会话只保留在此浏览器中。"
+  ],
+  [
+    "trials",
+    "次试验"
+  ],
+  [
+    "runs",
+    "次测量"
+  ],
+  [
+    "Pick the one tile whose hue is different. The offset adapts after every answer.",
+    "选出唯一色相不同的色块。每次回答后，色相差都会自适应调整。"
+  ],
+  [
+    "Find the shifted quadrant through controlled lightness and dot-size noise.",
+    "在受控的明度和圆点大小噪声中，找出颜色发生变化的象限。"
+  ],
+  [
+    "Arrange three short hue arcs between fixed endpoints, with no color names as clues.",
+    "不要用颜色名称作线索，在固定端点之间排列三段短色相序列。"
+  ],
+  [
+    "Method, not magic",
+    "依靠方法，不靠魔法"
+  ],
+  [
+    "The difference gets smaller as you succeed.",
+    "答对后，差异会变小。"
+  ],
+  [
+    "Threshold and Field use a two-correct-down, one-error-up staircase. It spends more trials near your current boundary instead of asking the same easy question repeatedly.",
+    "Threshold 和 Field 使用答对两次降低一步、答错一次升高一步的阶梯法。它不会反复问同样简单的问题，而会把更多试验安排在你当前的辨别边界附近。"
+  ],
+  [
+    "Neutral surround",
+    "中性背景"
+  ],
+  [
+    "Stimuli sit on the same middle-gray chamber in either theme.",
+    "无论使用哪种主题，刺激都呈现在同一个中灰色区域中。"
+  ],
+  [
+    "Perceptual spacing",
+    "知觉间距"
+  ],
+  [
+    "Colors are generated in OKLCH and mapped safely into sRGB.",
+    "颜色以 OKLCH 生成，并安全映射到 sRGB 色域。"
+  ],
+  [
+    "Adaptive estimate",
+    "自适应估值"
+  ],
+  [
+    "Reversals around the boundary produce a session-relative threshold.",
+    "边界附近的反转点会产生相对于本次会话的阈值。"
+  ],
+  [
+    "Honest result",
+    "诚实的结果"
+  ],
+  [
+    "Your profile describes this screen, light, fatigue level, and run.",
+    "你的结果概况描述的是此屏幕、照明、疲劳程度和本次测量。"
+  ],
+  [
+    "The fourth-cone question",
+    "关于第四种视锥细胞的问题"
+  ],
+  [
+    "An RGB screen cannot test tetrachromacy.",
+    "RGB 屏幕无法检测四色型色觉。"
+  ],
+  [
+    "Consumer displays mix three primaries. Confirming functional tetrachromacy requires spectral stimuli that can separate a fourth response, specialized hardware, genetics, and controlled conditions. Tetracromia measures ordinary on-screen color discrimination instead—and says exactly that.",
+    "消费级显示器混合三种原色。确认功能性四色型色觉需要能分离第四种反应的光谱刺激、专用硬件、遗传信息和受控条件。Tetracromia 测量的是普通屏幕上的色彩辨别能力，并明确说明这一点。"
+  ],
+  [
+    "Ready when your screen is",
+    "屏幕准备好后"
+  ],
+  [
+    "Find your visible boundary.",
+    "寻找你的可见边界。"
+  ],
+  [
+    "Start the lab",
+    "开始实验室"
+  ],
+  [
+    "A C-shaped target becomes harder to separate from its field. Three independent staircases estimate the smallest colour shift you follow in each display-relative direction during this run.",
+    "C 形视标会越来越难与背景分开。三条独立阶梯法会估算本次测量中，你在每个显示器相对方向上能分辨的最小颜色变化。"
+  ],
+  [
+    "Experimental and unvalidated. This is not a screening result or diagnosis.",
+    "这是未经验证的实验，不是筛查结果或诊断。"
+  ],
+  [
+    "Last run on this browser:",
+    "此浏览器上的上次测量："
+  ],
+  [
+    "display-relative thresholds recorded",
+    "已记录显示器相对阈值"
+  ],
+  [
+    "An adaptive task, not a plate score.",
+    "这是自适应任务，不是色觉图版分数。"
+  ],
+  [
+    "The design borrows established psychophysical techniques without claiming their clinical validation.",
+    "设计借鉴了成熟的心理物理学技术，但不声称经过临床验证。"
+  ],
+  [
+    "Two clear targets teach the C-gap interaction with immediate feedback before any threshold is measured.",
+    "测量阈值前，先用两个清晰视标和即时反馈学习如何回答 C 形缺口任务。"
+  ],
+  [
+    "Luminance noise",
+    "亮度噪声"
+  ],
+  [
+    "Target and field dots share the same brightness variation, reducing a consistent lightness cue.",
+    "视标与背景圆点使用相同的亮度变化，减少稳定的明度线索。"
+  ],
+  [
+    "Three staircases",
+    "三条阶梯法"
+  ],
+  [
+    "Directions become harder after correct responses. “No gap visible” counts as a miss and makes that direction easier.",
+    "答对后，该方向会变难。“看不到缺口”按错误回答计算，并让该方向变得更容易。"
+  ],
+  [
+    "Run-relative output",
+    "测量内相对输出"
+  ],
+  [
+    "You receive thresholds and run spread, not a normal/deficient label or a clinical score.",
+    "你会得到阈值和本次测量离散度，而不是正常／缺陷判定或临床分数。"
+  ],
+  [
+    "What informed Daltonia.",
+    "Daltonia 的设计依据。"
+  ],
+  [
+    "These sources inform the stimulus model and task design. They do not validate this implementation.",
+    "这些资料为刺激模型和任务设计提供依据，但不能验证此实现。"
+  ],
+  [
+    "Adaptive colour thresholds",
+    "自适应色觉阈值"
+  ],
+  [
+    "Random Landolt-C orientation, spatial and luminance noise, and interleaved confusion-line staircases.",
+    "随机 Landolt C 方向、空间与亮度噪声，以及交错呈现的混淆线阶梯法。"
+  ],
+  [
+    "Cone-contrast testing",
+    "视锥对比度测试"
+  ],
+  [
+    "Randomized cone-specific optotypes and validation against anomaloscope and plate results.",
+    "随机呈现针对不同视锥的视标，并与色觉镜和图版结果进行验证。"
+  ],
+  [
+    "Modern screener validation",
+    "现代筛查工具验证"
+  ],
+  [
+    "A multicentre comparison on calibrated displays demonstrates the evidence required for screening claims.",
+    "在校准显示器上进行的多中心比较，展示了提出筛查结论所需的证据。"
+  ],
+  [
+    "Response lab / three instruments / about 7 minutes",
+    "反应实验室 / 三项测量 / 约7分钟"
+  ],
+  [
+    "Notice the signal.",
+    "察觉信号。"
+  ],
+  [
+    "Measure the response.",
+    "测量反应。"
+  ],
+  [
+    "Prepare the lab",
+    "准备实验室"
+  ],
+  [
+    "Browser and device latency remain in every measurement.",
+    "每项测量都包含浏览器和设备延迟。"
+  ],
+  [
+    "Three questions, kept separate.",
+    "三个问题，分别测量。"
+  ],
+  [
+    "Simple visual response",
+    "简单视觉反应"
+  ],
+  [
+    "Two-choice response",
+    "二选一反应"
+  ],
+  [
+    "Sustained response",
+    "持续反应"
+  ],
+  [
+    "One signal. One action.",
+    "一个信号。一个动作。"
+  ],
+  [
+    "See a side. Choose it.",
+    "看到一侧，就选择该侧。"
+  ],
+  [
+    "Keep the response steady.",
+    "保持反应稳定。"
+  ],
+  [
+    "Choose one response path.",
+    "选择一种反应方式。"
+  ],
+  [
+    "How will you respond?",
+    "你将如何反应？"
+  ],
+  [
+    "Keyboard",
+    "键盘"
+  ],
+  [
+    "Touch / pointer",
+    "触摸／指针"
+  ],
+  [
+    "Begin measured block",
+    "开始测量阶段"
+  ],
+  [
+    "Start the 3-minute run",
+    "开始3分钟测量"
+  ],
+  [
+    "Wait for the signal",
+    "等待信号"
+  ],
+  [
+    "Respond now",
+    "立即反应"
+  ],
+  [
+    "Choose the matching side",
+    "选择匹配的一侧"
+  ],
+  [
+    "Practice complete",
+    "练习完成"
+  ],
+  [
+    "Now the measured block.",
+    "现在进入测量阶段。"
+  ],
+  [
+    "Instrument complete",
+    "测量完成"
+  ],
+  [
+    "Your response has",
+    "你的反应"
+  ],
+  [
+    "more than one dimension.",
+    "不止一个维度。"
+  ],
+  [
+    "Compare conditions, not people.",
+    "比较条件，不比较人。"
+  ],
+  [
+    "Timing context",
+    "计时环境"
+  ],
+  [
+    "Response events",
+    "反应事件"
+  ],
+  [
+    "Riflessi separates simple response speed, the extra cost of choosing, and how responses change across a sustained run. It reports this device and this session—nothing broader.",
+    "Riflessi 分别测量简单反应速度、做出选择所增加的时间，以及持续测量中的反应变化。它只报告此设备和本次会话，不作更广泛的推断。"
+  ],
+  [
+    "No percentile, “brain age,” or reflex rating. Each instrument answers a narrower question.",
+    "不提供百分位、“大脑年龄”或反射能力评级。每项测量只回答一个更具体的问题。"
+  ],
+  [
+    "Wait while the chamber is quiet, then respond as soon as the central mark appears. Random waits make anticipation visible.",
+    "测试区域静止时请等待，中央标记出现后立即反应。随机等待时间可以识别预判反应。"
+  ],
+  [
+    "A left or right arrow appears. Respond on the matching side. The difference from Segnale estimates the cost of choosing.",
+    "左或右箭头出现后，请在匹配的一侧作答。与 Segnale 的差值用于估算选择成本。"
+  ],
+  [
+    "For three minutes, respond to the same simple signal across longer, irregular waits. The pattern within this run matters more than one fastest press.",
+    "在3分钟内，每次经过较长且不规则的等待后，对同一个简单信号作出反应。本次测量内的模式比最快的一次按键更重要。"
+  ],
+  [
+    "What informed Riflessi.",
+    "Riflessi 的设计依据。"
+  ],
+  [
+    "Established task structures inform the design. They do not validate an uncontrolled browser as a clinical instrument.",
+    "成熟的任务结构为设计提供依据，但不能把不受控的浏览器验证为临床仪器。"
+  ],
+  [
+    "Simple and choice response",
+    "简单反应与选择反应"
+  ],
+  [
+    "A transparent reaction-time task with practice, randomized intervals, and separate simple and choice measures.",
+    "一项过程透明的反应时间任务，包含练习、随机间隔，以及分别测量的简单反应和选择反应。"
+  ],
+  [
+    "Brief vigilance task",
+    "短时警觉任务"
+  ],
+  [
+    "The three-minute PVT-B informs the sustained-response duration and emphasis on lapses and false starts.",
+    "三分钟 PVT-B 为持续反应时长，以及对漏答和抢先反应的关注提供依据。"
+  ],
+  [
+    "Browser timing reality",
+    "浏览器计时的现实"
+  ],
+  [
+    "Browser experiments can be precise enough for many effects, while input hardware and presentation still add latency.",
+    "浏览器实验足以精确测量许多效应，但输入硬件和呈现过程仍会增加延迟。"
+  ],
+  [
+    "Three low tones play in sequence. Choose the quietest. A phase-based decoy helps check whether the sound is arriving like headphones, without claiming to identify your hardware.",
+    "三个低音依次播放。请选择最轻的一个。基于相位的干扰音可帮助判断声音是否以类似耳机的方式呈现，但不会声称识别你的硬件。"
+  ],
+  [
+    "One of three intervals contains a tone. Its frequency adapts to find the upper boundary available in this run, on this device, at the locked volume.",
+    "三个时段中有一个包含声音。频率会自适应变化，以找出本次测量中，在此设备和锁定音量下可用的上限。"
+  ],
+  [
+    "Two tones play in sequence. Separate adaptive tracks estimate the smallest pitch step resolved around 500 Hz and 2 kHz.",
+    "两个声音依次播放。两条独立的自适应轨迹会估算在500 Hz和2 kHz附近能够辨别的最小音高差。"
+  ],
+  [
+    "Established task structures inform the experiment. Consumer audio hardware remains uncalibrated.",
+    "成熟的任务结构为实验提供依据，但消费级音频硬件仍未经校准。"
+  ],
+  [
+    "A six-trial, three-alternative phase-cancellation task informs Cuffie and its cautious setup language.",
+    "一项六试验、三选一的相位抵消任务，为 Cuffie 及其谨慎的设置说明提供依据。"
+  ],
+  [
+    "Transformed up-down staircases inform the reversal-based Portata and Intonazione estimates.",
+    "变形上下阶梯法为基于反转点的 Portata 和 Intonazione 估值提供依据。"
+  ],
+  [
+    "Browser psychoacoustics",
+    "浏览器心理声学"
+  ],
+  [
+    "Web and mobile adaptive frequency-discrimination work supports the browser task structure—not clinical interpretation.",
+    "网页和移动设备上的自适应频率辨别研究支持浏览器任务结构，但不支持临床解读。"
+  ],
+  [
+    "Safe-listening guidance informs the low reference, volume lock, short tones, and stop warnings.",
+    "安全聆听指南为轻柔参考音、音量锁定、短音和停止警告提供依据。"
+  ],
+  [
+    "Copy result summary",
+    "复制结果摘要"
+  ],
+  [
+    "practice",
+    "练习"
+  ],
+  [
+    "practice complete",
+    "练习完成"
+  ],
+  [
+    "Measurement recorded:",
+    "已记录测量："
+  ],
+  [
+    "Keyboard timing",
+    "键盘计时"
+  ],
+  [
+    "Touch / pointer timing",
+    "触摸／指针计时"
+  ],
+  [
+    "Median of",
+    "中位数（"
+  ],
+  [
+    "clean responses",
+    "次有效反应）"
+  ],
+  [
+    "measured events",
+    "次测量事件"
+  ],
+  [
+    "Under",
+    "过早阈值："
+  ],
+  [
+    "Keep the same hand position. Early responses, misses, and no-signal responses will be recorded.",
+    "保持手的位置不变。过早反应、漏答和无信号时的反应都会被记录。"
+  ],
+  [
+    "Keep the same hand position. Early responses, misses, and wrong sides will be recorded.",
+    "保持手的位置不变。过早反应、漏答和选错一侧都会被记录。"
+  ],
+  [
+    "Please acknowledge the device-relative limit before starting.",
+    "开始前，请确认你理解设备相对这一局限。"
+  ],
+  [
+    "8 practice responses, then 20 measured signals and 2 no-signal checks.",
+    "先练习反应8次，然后测量20次信号和2次无信号检查。"
+  ],
+  [
+    "8 practice choices, then 32 balanced measured choices.",
+    "先练习选择8次，然后测量32次左右平衡的选择。"
+  ],
+  [
+    "A 3-minute PVT-B-inspired sequence. No fatigue or attention diagnosis is inferred.",
+    "一段受 PVT-B 启发的3分钟序列。不推断疲劳或注意力诊断。"
+  ],
+  [
+    "Rest one hand near the arrow keys. Use the matching key.",
+    "将一只手放在方向键附近，按下匹配的键。"
+  ],
+  [
+    "Rest one thumb or finger on Space. Do not hold it down.",
+    "将一根拇指或手指轻放在空格键上。不要按住。"
+  ],
+  [
+    "Keep two thumbs or fingers ready. Tap the matching side.",
+    "准备好两根拇指或手指，点击匹配的一侧。"
+  ],
+  [
+    "Keep one finger ready. Tap anywhere inside the chamber.",
+    "准备好一根手指，点击测试区域内的任意位置。"
+  ],
+  [
+    "Measured run",
+    "测量过程"
+  ],
+  [
+    "Instrument progress",
+    "测量进度"
+  ],
+  [
+    "Respond left",
+    "向左反应"
+  ],
+  [
+    "Respond right",
+    "向右反应"
+  ],
+  [
+    "left key",
+    "左键"
+  ],
+  [
+    "right key",
+    "右键"
+  ],
+  [
+    "tap left",
+    "点击左侧"
+  ],
+  [
+    "tap right",
+    "点击右侧"
+  ],
+  [
+    "Respond to signal",
+    "对信号作出反应"
+  ],
+  [
+    "press space",
+    "按空格键"
+  ],
+  [
+    "tap chamber",
+    "点击测试区域"
+  ],
+  [
+    "Respond only after the signal",
+    "只在信号出现后反应"
+  ],
+  [
+    "timing",
+    "计时"
+  ],
+  [
+    "Good wait",
+    "等待正确"
+  ],
+  [
+    "Other side",
+    "另一侧"
+  ],
+  [
+    "No response",
+    "无反应"
+  ],
+  [
+    "Too early",
+    "太早"
+  ],
+  [
+    "Keep the same hand position. Early responses, misses, and",
+    "保持手的位置不变。过早反应、漏答以及"
+  ],
+  [
+    "wrong sides",
+    "选错一侧"
+  ],
+  [
+    "no-signal responses",
+    "无信号时的反应"
+  ],
+  [
+    "will be recorded.",
+    "都会被记录。"
+  ],
+  [
+    "clean response",
+    "次有效反应，来自"
+  ],
+  [
+    "captured across",
+    "共"
+  ],
+  [
+    "measured event",
+    "次测量事件。"
+  ],
+  [
+    "Interpretation waits until all three instruments are complete.",
+    "三项测量全部完成后才会显示解读。"
+  ],
+  [
+    "Your response profile — Riflessi | Sense6",
+    "你的反应概况 — Riflessi | Sense6"
+  ],
+  [
+    "Riflessi / this run / this device",
+    "Riflessi / 本次测量 / 此设备"
+  ],
+  [
+    "The three instruments captured enough clean responses for a run-level profile.",
+    "三项测量获得了足够的有效反应，可以形成此次测量的结果概况。"
+  ],
+  [
+    "Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.",
+    "多次反应被中断或无效。请将这些数字视为部分测量结果，并在更稳定的条件下重测。"
+  ],
+  [
+    "Run usable",
+    "测量可用"
+  ],
+  [
+    "Limited run",
+    "测量受限"
+  ],
+  [
+    "Typical signal response",
+    "典型信号反应"
+  ],
+  [
+    "clean simple responses. Typical is more robust than your single fastest response.",
+    "次有效的简单反应。典型值比单次最快反应更稳健。"
+  ],
+  [
+    "Choice response",
+    "选择反应"
+  ],
+  [
+    "correct across",
+    "正确（共"
+  ],
+  [
+    "valid choices.",
+    "次有效选择）"
+  ],
+  [
+    "Choice cost",
+    "选择成本"
+  ],
+  [
+    "Difference between the choice and simple-response medians in this run.",
+    "本次测量中，选择反应与简单反应中位数之差。"
+  ],
+  [
+    "clean responses across the sustained block.",
+    "次持续阶段有效反应。"
+  ],
+  [
+    "Slow-response tail",
+    "慢反应尾部"
+  ],
+  [
+    "How much slower the slowest fifth was than the sustained median.",
+    "最慢的五分之一比持续反应中位数慢多少。"
+  ],
+  [
+    "Within-run drift",
+    "测量内漂移"
+  ],
+  [
+    "Not enough clean responses to estimate a first-to-second-half change.",
+    "有效反应不足，无法估算前半段到后半段的变化。"
+  ],
+  [
+    "The first and second halves were similar after rounding to 5 ms.",
+    "四舍五入到5 ms后，前半段与后半段相近。"
+  ],
+  [
+    "The second half was slower than the first half in this run.",
+    "本次测量后半段比前半段更慢。"
+  ],
+  [
+    "The second half was faster than the first half in this run.",
+    "本次测量后半段比前半段更快。"
+  ],
+  [
+    "What accompanied the medians.",
+    "与中位数一同记录的内容。"
+  ],
+  [
+    "False starts",
+    "抢先反应"
+  ],
+  [
+    "Missed signals",
+    "漏掉的信号"
+  ],
+  [
+    "Wrong choices",
+    "错误选择"
+  ],
+  [
+    "Input",
+    "输入"
+  ],
+  [
+    "Frame cadence",
+    "帧间隔"
+  ],
+  [
+    "Unknown",
+    "未知"
+  ],
+  [
+    "Interrupted trials",
+    "中断的试验"
+  ],
+  [
+    "How to use this result",
+    "如何使用此结果"
+  ],
+  [
+    "Browser, display, keyboard, touchscreen, operating system, posture, and attention all remain in the numbers. Compare repeated runs only on the same device and input. Riflessi does not assess concussion, driving fitness, fatigue, neurological health, or a population percentile.",
+    "浏览器、显示器、键盘、触摸屏、操作系统、姿势和注意状态都会影响这些数字。只比较使用相同设备和输入方式完成的重复测量。Riflessi 不评估脑震荡、驾驶适宜性、疲劳、神经系统健康或人群百分位。"
+  ],
+  [
+    "Timing interruptions observed",
+    "检测到计时中断"
+  ],
+  [
+    "At least one focus interruption or unusually late presentation occurred. Raw response times were not “corrected”; repeat if conditions were unstable.",
+    "至少发生过一次页面失去焦点或异常延迟呈现。原始反应时间没有经过“校正”；如果条件不稳定，请重新测试。"
+  ],
+  [
+    "Timing appeared steady",
+    "计时看起来稳定"
+  ],
+  [
+    "No major interruption was observed by the page. This does not remove unknown display or input-device latency.",
+    "页面未检测到重大中断，但这并不能消除未知的显示器或输入设备延迟。"
+  ],
+  [
+    "End this session? Your progress will be lost.",
+    "结束此会话？你的进度将丢失。"
+  ],
+  [
+    "Leave the lab? Your progress will be lost.",
+    "离开实验室？你的进度将丢失。"
+  ],
+  [
+    "End this experiment? Your progress will be lost.",
+    "结束此实验？你的进度将丢失。"
+  ],
+  [
+    "Leave the experiment? Your progress will be lost.",
+    "离开实验？你的进度将丢失。"
+  ],
+  [
+    "Prepare your screen — Tetracromia | Sense6",
+    "准备屏幕 — Tetracromia | Sense6"
+  ],
+  [
+    "Prepare your display — Daltonia | Sense6",
+    "准备显示器 — Daltonia | Sense6"
+  ],
+  [
+    "Your display-relative thresholds — Daltonia | Sense6",
+    "你的显示器相对阈值 — Daltonia | Sense6"
+  ],
+  [
+    "Prepare your response setup — Riflessi | Sense6",
+    "准备反应设置 — Riflessi | Sense6"
+  ],
+  [
+    "Prepare your audio setup — Udito | Sense6",
+    "准备音频设置 — Udito | Sense6"
+  ],
+  [
+    "Reference played",
+    "参考音已播放"
+  ],
+  [
+    "Result summary copied.",
+    "结果摘要已复制。"
+  ],
+  [
+    "Copy was unavailable in this browser.",
+    "此浏览器无法复制。"
+  ],
+  [
+    "Result summary copied",
+    "结果摘要已复制"
+  ],
+  [
+    "Run summary copied",
+    "测量摘要已复制"
+  ],
+  [
+    "Could not access the clipboard",
+    "无法访问剪贴板"
+  ],
+  [
+    "Tetracromia — {overall}/100 screen-level color discrimination. Threshold {threshold}, Field {field}, Sequence {sequence}. Device-relative, not diagnostic.",
+    "Tetracromia — 屏幕级色彩辨别 {overall}/100。Threshold {threshold}，Field {field}，Sequence {sequence}。设备相对值，不用于诊断。"
+  ],
+  [
+    "Daltonia experimental browser run — {thresholds}; task controls {correct}/{total}. Display-relative, unvalidated, and not diagnostic.",
+    "Daltonia 浏览器实验 — {thresholds}; 任务控制 {correct}/{total}。显示器相对、未经验证且不用于诊断。"
+  ],
+  [
+    "Riflessi — device-relative response profile",
+    "Riflessi — 设备相对反应概况"
+  ],
+  [
+    "Input: {input}",
+    "输入：{input}"
+  ],
+  [
+    "Signal median: {value} ms",
+    "信号反应中位数：{value} ms"
+  ],
+  [
+    "Choice median: {median} ms; accuracy: {accuracy}%; cost: {cost} ms",
+    "选择反应中位数：{median} ms; 准确率：{accuracy}%; 成本：{cost} ms"
+  ],
+  [
+    "Sustained median: {median} ms; slow tail: {tail} ms; drift: {drift} ms",
+    "持续反应中位数：{median} ms; 慢反应尾部：{tail} ms; 漂移：{drift} ms"
+  ],
+  [
+    "Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses",
+    "事件：抢先反应 {falseStarts}次，预判反应 {anticipations}次，漏答 {misses}次"
+  ],
+  [
+    "Compare only on the same device and input. Not a clinical or population score.",
+    "只比较使用相同设备和输入方式完成的结果。这不是临床分数或人群分数。"
+  ],
+  [
+    "touch / pointer",
+    "触摸／指针"
+  ],
+  [
+    "keyboard",
+    "键盘"
+  ],
+  [
+    "Udito — device-relative listening profile",
+    "Udito — 设备相对聆听概况"
+  ],
+  [
+    "Setup: {device}; {sampleRate} Hz audio context",
+    "设置：{device}; {sampleRate} Hz 音频上下文"
+  ],
+  [
+    "Headphone confidence: {correct}/{trials} ({confidence})",
+    "耳机呈现可信度：{correct}/{trials}（{confidence}）"
+  ],
+  [
+    "Upper run boundary: {boundary}",
+    "本次可听上限：{boundary}"
+  ],
+  [
+    "Pitch step near 500 Hz: {step}",
+    "500 Hz附近的音高差：{step}"
+  ],
+  [
+    "Pitch step near 2 kHz: {step}",
+    "2 kHz附近的音高差：{step}"
+  ],
+  [
+    "headphone-like",
+    "类似耳机呈现"
+  ],
+  [
+    "uncertain",
+    "不确定"
+  ],
+  [
+    "This is not dB HL, a hearing-age score, screening, or diagnosis.",
+    "这不是 dB HL、听力年龄分数、筛查或诊断。"
+  ],
+  [
+    "Private browser tests for colour, response timing, hearing, and calibrated visual detail. Answers and results stay in your browser.",
+    "用于测量色彩、反应计时、听觉和校准视觉细节的隐私优先浏览器测试。回答和结果只保留在你的浏览器中。"
+  ],
+  [
+    "Tetracromia — colour discrimination | Sense6",
+    "Tetracromia — 色彩辨别 | Sense6"
+  ],
+  [
+    "Experimental colour-vision check — Daltonia | Sense6",
+    "实验性色觉检查 — Daltonia | Sense6"
+  ],
+  [
+    "Response speed and consistency — Riflessi | Sense6",
+    "反应速度与一致性 — Riflessi | Sense6"
+  ],
+  [
+    "Device-relative hearing lab — Udito | Sense6",
+    "设备相对听觉实验室 — Udito | Sense6"
+  ],
+  [
+    "Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.",
+    "Sense6 提供简短、严谨的浏览器感知测试，并诚实呈现屏幕相对结果。无需账户，也不上传回答或结果。"
+  ],
+  [
+    "Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.",
+    "用于测量色彩、反应计时和听觉的隐私优先浏览器测试。回答和结果只保留在你的浏览器中。"
+  ],
+  [
+    "Movable color tile {position} of {total}{selected}",
+    "可移动色块 {position}/{total}{selected}"
+  ],
+  [
+    ", selected",
+    "，已选中"
+  ],
+  [
+    "{count} long frame intervals observed in the sample.",
+    "样本中观察到{count}个较长帧间隔。"
+  ],
+  [
+    "{count} sweeps remaining",
+    "还剩{count}次扫描"
+  ],
+  [
+    "Reference played · {sampleRate} Hz audio context · now leave volume unchanged.",
+    "参考音已播放 · {sampleRate} Hz 音频上下文 · 现在起不要改变音量。"
+  ],
+  [
+    "Sound {number}",
+    "声音 {number}"
+  ],
+  [
+    "Adaptive · {count}",
+    "自适应 · {count}"
+  ],
+  [
+    "Interleaved · {count}",
+    "交错呈现 · {count}"
+  ]
+];
+
+export const MESSAGE_COUNT = rows.length;
+export default new Map(rows);
