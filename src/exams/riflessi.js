@@ -92,7 +92,7 @@ function renderIntro() {
       <div class="rx-hero">
         <div class="rx-hero__copy">
           <p class="ui-eyebrow">Response lab / three instruments / about 7 minutes</p>
-          <h1>Notice the signal.<br><em>Measure the response.</em></h1>
+          <h1 tabindex="-1" data-rx-screen-title>Notice the signal.<br><em>Measure the response.</em></h1>
           <p class="rx-lede">
             Riflessi separates simple response speed, the extra cost of choosing, and how
             responses change across a sustained run. It reports this device and this session—nothing broader.
@@ -168,6 +168,7 @@ function renderIntro() {
       </section>
     </section>
   `;
+  resetScreen();
 }
 
 function researchCard(eyebrow, title, body, href) {
@@ -190,7 +191,7 @@ function renderSetup() {
       <div class="rx-setup__grid">
         <div class="rx-setup__copy">
           <p class="ui-eyebrow">Input setup / before timing starts</p>
-          <h1>Choose one response path.</h1>
+          <h1 tabindex="-1" data-rx-screen-title>Choose one response path.</h1>
           <p class="rx-lede">Use the same device and input mode when comparing runs. Keep this tab visible and silence interruptions.</p>
           <fieldset class="rx-mode-picker">
             <legend>How will you respond?</legend>
@@ -224,6 +225,7 @@ function renderSetup() {
     </section>
   `;
 
+  resetScreen();
   measureFrameCadence();
 }
 
@@ -281,7 +283,7 @@ function renderInstrumentBrief(instrument) {
       <div class="rx-brief__index" aria-hidden="true">${info.number}</div>
       <div class="rx-brief__copy">
         <p class="ui-eyebrow">Instrument ${info.number} of 03 / ${info.eyebrow}</p>
-        <h1>${info.title}</h1>
+        <h1 tabindex="-1" data-rx-screen-title>${info.title}</h1>
         <p class="rx-lede">${info.body}</p>
         <p class="rx-brief__note"><span aria-hidden="true">◇</span>${info.note}</p>
         <div class="rx-instructions">${inputInstructions(instrument)}</div>
@@ -291,6 +293,7 @@ function renderInstrumentBrief(instrument) {
       </div>
     </section>
   `;
+  resetScreen();
 }
 
 function inputInstructions(instrument) {
@@ -361,10 +364,12 @@ function renderRunner() {
 
   state.app.innerHTML = `
     <section class="rx-runner" data-rx-instrument="${state.session.instrument}">
+      <h1 class="sr-only" tabindex="-1" data-rx-screen-title>${info.name} response runner</h1>
       <header class="rx-runner__header">
         <div><p class="ui-eyebrow">${info.number} / ${info.name}</p><strong data-rx-block>${stability ? 'Measured run' : state.session.block}</strong></div>
-        <div class="rx-progress" aria-label="Instrument progress"><i data-rx-progress></i></div>
+        <div class="rx-progress" role="progressbar" aria-label="Instrument progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="0% complete" data-rx-progressbar><i data-rx-progress></i></div>
         <span class="rx-runner__count" data-rx-count>${stability ? formatClock(state.config.stability.durationMs) : `0 / ${state.session.queue.length}`}</span>
+        <button class="rx-runner__stop" type="button" data-action="rx-stop">Stop safely</button>
       </header>
       <div class="rx-chamber" data-rx-chamber data-rx-state="waiting">
         <div class="rx-chamber__status" aria-live="polite" data-rx-status>Wait for the signal</div>
@@ -389,6 +394,7 @@ function renderRunner() {
     </section>
   `;
   updateRunnerProgress();
+  resetScreen();
 }
 
 function prepareQueuedTrial() {
@@ -427,9 +433,9 @@ function prepareTrial(trial, responseTimeoutMs) {
   const feedback = state.app.querySelector('[data-rx-feedback]');
   if (feedback) feedback.textContent = '';
   const arrow = state.app.querySelector('[data-rx-arrow]');
-  if (arrow && trial.side) {
-    arrow.textContent = trial.side === 'left' ? '←' : '→';
-    arrow.dataset.side = trial.side;
+  if (arrow) {
+    arrow.textContent = '';
+    delete arrow.dataset.side;
   }
   updateRunnerProgress();
   state.expectedOnsetAt = performance.now() + trial.waitMs;
@@ -450,6 +456,11 @@ function revealSignal(timestamp, responseTimeoutMs) {
   const tolerance = Math.max(12, (state.session.diagnostics.frameMedianMs || 16.7) * 1.5);
   if (timestamp - state.expectedOnsetAt > tolerance) state.session.diagnostics.lateOnsets += 1;
   const chamber = state.app.querySelector('[data-rx-chamber]');
+  const arrow = state.app.querySelector('[data-rx-arrow]');
+  if (arrow && state.activeTrial?.side) {
+    arrow.textContent = state.activeTrial.side === 'left' ? '←' : '→';
+    arrow.dataset.side = state.activeTrial.side;
+  }
   chamber?.setAttribute('data-rx-state', 'live');
   const status = state.app.querySelector('[data-rx-status]');
   if (status)
@@ -536,11 +547,12 @@ function renderPracticeComplete() {
     <section class="rx-transition ui-container">
       <span class="rx-transition__mark" aria-hidden="true">✓</span>
       <p class="ui-eyebrow">${info.name} / practice complete</p>
-      <h1>Now the measured block.</h1>
+      <h1 tabindex="-1" data-rx-screen-title>Now the measured block.</h1>
       <p>Keep the same hand position. Early responses, misses, and ${state.session.instrument === 'choice' ? 'wrong sides' : 'no-signal responses'} will be recorded.</p>
       <button class="ui-button ui-button--lg" type="button" data-action="rx-begin-scored">Begin measured block <span aria-hidden="true">→</span></button>
     </section>
   `;
+  resetScreen();
 }
 
 function finishCurrentInstrument() {
@@ -559,13 +571,14 @@ function finishCurrentInstrument() {
     <section class="rx-transition ui-container">
       <span class="rx-transition__mark" aria-hidden="true">${INSTRUMENTS[completed].number}</span>
       <p class="ui-eyebrow">Instrument complete</p>
-      <h1>Measurement recorded: ${INSTRUMENTS[completed].name}.</h1>
+      <h1 tabindex="-1" data-rx-screen-title>Measurement recorded: ${INSTRUMENTS[completed].name}.</h1>
       <p>${valid} clean response${valid === 1 ? '' : 's'} captured across ${total} measured event${total === 1 ? '' : 's'}. Interpretation waits until all three instruments are complete.</p>
       <button class="ui-button ui-button--lg" type="button" data-action="rx-next-stage" data-next="${next}">
         Continue to ${INSTRUMENTS[next].name} <span aria-hidden="true">→</span>
       </button>
     </section>
   `;
+  resetScreen();
 }
 
 function renderResults() {
@@ -597,7 +610,7 @@ function renderResults() {
       <header class="rx-results__hero">
         <div>
           <p class="ui-eyebrow">Riflessi / this run / this device</p>
-          <h1>Your response has <em>more than one dimension.</em></h1>
+          <h1 tabindex="-1" data-rx-screen-title>Your response has <em>more than one dimension.</em></h1>
           <p>${result.usable ? 'The three instruments captured enough clean responses for a run-level profile.' : 'Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.'}</p>
         </div>
         <div class="rx-results__stamp ${result.usable ? '' : 'is-limited'}"><span>${result.usable ? 'Run usable' : 'Limited run'}</span><strong>03 / 03</strong></div>
@@ -644,6 +657,7 @@ function renderResults() {
       </div>
     </section>
   `;
+  resetScreen();
 }
 
 function metricCard(index, label, value, unit, copy) {
@@ -672,15 +686,25 @@ function driftCopy(value) {
 function updateRunnerProgress() {
   if (!state.session) return;
   const progress = state.app.querySelector('[data-rx-progress]');
+  const progressbar = state.app.querySelector('[data-rx-progressbar]');
   const count = state.app.querySelector('[data-rx-count]');
-  if (!progress || !count) return;
+  if (!progress || !progressbar || !count) return;
   if (state.session.instrument === 'stability') {
     const remaining = Math.max(0, state.session.stabilityEndsAt - performance.now());
     const complete = 1 - remaining / state.config.stability.durationMs;
-    progress.style.inlineSize = `${Math.min(100, Math.max(0, complete * 100))}%`;
+    const percent = Math.min(100, Math.max(0, complete * 100));
+    progress.style.inlineSize = `${percent}%`;
+    progressbar.setAttribute('aria-valuenow', String(Math.round(percent)));
+    progressbar.setAttribute('aria-valuetext', `${formatClock(remaining)} remaining`);
     count.textContent = formatClock(remaining);
   } else {
-    progress.style.inlineSize = `${(state.session.index / state.session.queue.length) * 100}%`;
+    const percent = (state.session.index / state.session.queue.length) * 100;
+    progress.style.inlineSize = `${percent}%`;
+    progressbar.setAttribute('aria-valuenow', String(Math.round(percent)));
+    progressbar.setAttribute(
+      'aria-valuetext',
+      `${state.session.index} of ${state.session.queue.length} trials complete`,
+    );
     count.textContent = `${Math.min(state.session.index + 1, state.session.queue.length)} / ${state.session.queue.length}`;
   }
 }
@@ -705,9 +729,10 @@ function pauseRun() {
   state.app.innerHTML = `
     <section class="rx-transition ui-container" data-rx-paused>
       <span class="rx-transition__mark" aria-hidden="true">Ⅱ</span><p class="ui-eyebrow">Timing paused</p>
-      <h1>This trial was interrupted.</h1><p>The current trial has been discarded. Return when this tab can stay visible and focused.</p>
+      <h1 tabindex="-1" data-rx-screen-title>This trial was interrupted.</h1><p>The current trial has been discarded. Return when this tab can stay visible and focused.</p>
       <button class="ui-button ui-button--lg" type="button" data-action="rx-resume">Resume with a fresh trial <span aria-hidden="true">→</span></button>
     </section>`;
+  resetScreen();
 }
 
 function resumeRun() {
@@ -772,9 +797,15 @@ function timingHealth(diagnostics) {
 function copyResults() {
   if (!state.session?.result) return;
   const result = state.session.result;
+  const timing = timingHealth(state.session.diagnostics);
   const text = [
     t('Riflessi — device-relative response profile'),
     t('Input: {input}', { input: t(state.session.inputMode === 'pointer' ? 'touch / pointer' : 'keyboard') }),
+    t('Run quality: {quality}', { quality: t(result.usable ? 'Usable run' : 'Limited run') }),
+    t('Timing: {timing}; interruptions: {interruptions}', {
+      timing: t(timing.label),
+      interruptions: state.session.diagnostics.interruptions,
+    }),
     t('Signal median: {value} ms', { value: metric(result.signal.medianMs) }),
     t('Choice median: {median} ms; accuracy: {accuracy}%; cost: {cost} ms', {
       median: metric(result.choice.medianMs),
@@ -786,11 +817,15 @@ function copyResults() {
       tail: signedMetric(result.stability.slowestGapMs),
       drift: signedMetric(result.stability.driftMs),
     }),
-    t('Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses', {
-      falseStarts: result.events.falseStarts,
-      anticipations: result.events.anticipations,
-      misses: result.events.misses,
-    }),
+    t(
+      'Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses, {wrongChoices} wrong choices',
+      {
+        falseStarts: result.events.falseStarts,
+        anticipations: result.events.anticipations,
+        misses: result.events.misses,
+        wrongChoices: result.events.wrongChoices,
+      },
+    ),
     t('Compare only on the same device and input. Not a clinical or population score.'),
   ].join('\n');
   navigator.clipboard
@@ -836,6 +871,9 @@ function wireEvents(signal) {
           break;
         case 'rx-resume':
           resumeRun();
+          break;
+        case 'rx-stop':
+          if (confirmActiveExit('End this run? Your progress will be lost.')) renderIntro();
           break;
         case 'rx-restart':
           renderSetup();
@@ -886,6 +924,45 @@ function wireEvents(signal) {
 
   document.addEventListener('visibilitychange', () => document.hidden && pauseRun(), { signal });
   window.addEventListener('blur', pauseRun, { signal });
+
+  document.addEventListener('click', guardShellNavigation, { capture: true, signal });
+  document.addEventListener('change', guardLocaleNavigation, { capture: true, signal });
+  window.addEventListener('beforeunload', guardPageUnload, { signal });
+}
+
+function guardShellNavigation(event) {
+  if (!event.target.closest?.('a[data-sense6-route]') || !hasActiveSession()) return;
+  if (confirmActiveExit('Leave the run? Your progress will be lost.')) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+}
+
+function guardLocaleNavigation(event) {
+  if (!event.target.matches?.('[data-locale-select]') || !hasActiveSession()) return;
+  if (confirmActiveExit('Leave the run? Your progress will be lost.')) return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  event.target.value = state.locale;
+}
+
+function guardPageUnload(event) {
+  if (!hasActiveSession()) return;
+  event.preventDefault();
+  event.returnValue = '';
+}
+
+function hasActiveSession() {
+  return Boolean(state?.session && !state.session.result);
+}
+
+function confirmActiveExit(message) {
+  return !hasActiveSession() || window.confirm(t(message));
+}
+
+function resetScreen() {
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  const title = state.app.querySelector('[data-rx-screen-title]');
+  title?.focus({ preventScroll: true });
 }
 
 function eventTimestamp(event) {
