@@ -65,6 +65,8 @@ export function mount(context) {
     app: context.app,
     announcer: context.announcer,
     goHome: context.navigateHome,
+    goJournal: () => context.navigate('journal'),
+    lifecycle,
     locale: context.locale,
     config,
     audio: new HearingAudio(config.audio),
@@ -100,6 +102,7 @@ export function mount(context) {
 }
 
 function renderIntro() {
+  state.lifecycle.setActive(false);
   stopPlayback();
   state.session = null;
   state.referencePlayed = false;
@@ -194,6 +197,7 @@ function researchCard(eyebrow, title, body, href) {
 }
 
 function renderSetup() {
+  state.lifecycle.setActive(false);
   stopPlayback();
   state.referencePlayed = false;
   document.body.classList.add('lab-mode');
@@ -297,7 +301,7 @@ function updateSetupGate() {
 function startSession() {
   const consent = state.app.querySelector('[data-au-consent]');
   if (!state.referencePlayed || !consent?.checked) {
-    toast('Play the maximum-level reference and confirm the volume contract first.');
+    toast(t('Play the maximum-level reference and confirm the volume contract first.'));
     return;
   }
   const random = seededRandom(`${Date.now()}-${Math.random()}`);
@@ -322,6 +326,7 @@ function startSession() {
 }
 
 function renderBrief(instrument) {
+  state.lifecycle.setActive(true, t('Leave this listening run? Your progress will be lost.'));
   stopPlayback();
   state.session.instrument = instrument;
   const info = INSTRUMENTS[instrument];
@@ -576,6 +581,7 @@ function updateRunnerMeta() {
 }
 
 function renderResults() {
+  state.lifecycle.setActive(false);
   stopPlayback();
   state.trialPhase = TRIAL_PHASES.idle;
   trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.udito);
@@ -622,7 +628,7 @@ function renderResults() {
         <article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Device-relative, never dB HL.</h2><p>A browser knows digital amplitude, not sound pressure at your eardrum. Headphone response, fit, output, age, room noise, device processing, and the volume setting all shape these numbers.</p><p>Do not infer hearing age, “normal” hearing, safety for work, or a medical diagnosis. If hearing concerns affect daily life, use calibrated clinical audiometry.</p></article>
       </div>
       <aside class="au-results__safety"><strong>Keep the same volume only for comparison.</strong><p>Compare your own runs only with the same device, headphones, fit, room, and volume. Stop testing if any sound is uncomfortable.</p></aside>
-      <div class="ui-cluster au-results__actions"><button class="ui-button" type="button" data-action="au-restart">Run again</button><button class="ui-button ui-button--ghost" type="button" data-action="au-copy">Copy result summary</button></div>
+      <div class="ui-cluster au-results__actions"><button class="ui-button" type="button" data-action="au-restart">Run again</button><button class="ui-button ui-button--ghost" type="button" data-action="au-copy">Copy result summary</button>${journalSaved ? '<button class="ui-button ui-button--ghost" type="button" data-action="au-journal">Open private journal</button>' : ''}</div>
     </section>`;
   focusStage(
     'h1',
@@ -763,7 +769,7 @@ function stopSafely() {
   stopPlayback();
   state.trialPhase = TRIAL_PHASES.idle;
   renderIntro();
-  toast('Listening stopped. No unfinished result was saved.');
+  toast(t('Listening stopped. No unfinished result was saved.'));
 }
 
 function handleAudioStateChange(contextState) {
@@ -848,12 +854,12 @@ function copyResults() {
   ].join('\n');
   const copy = navigator.clipboard?.writeText(text);
   if (!copy) {
-    toast('Copy was unavailable in this browser.');
+    toast(t('Copy was unavailable in this browser.'));
     return;
   }
   copy
-    .then(() => toast('Result summary copied.'))
-    .catch(() => toast('Copy was unavailable in this browser.'));
+    .then(() => toast(t('Result summary copied.')))
+    .catch(() => toast(t('Copy was unavailable in this browser.')));
 }
 
 function setResponseDisabled(disabled) {
@@ -918,6 +924,9 @@ function wireEvents(signal) {
         case 'au-copy':
           copyResults();
           break;
+        case 'au-journal':
+          state.goJournal();
+          break;
       }
     },
     { signal },
@@ -962,12 +971,9 @@ function wireEvents(signal) {
 }
 
 function focusStage(selector, announcement) {
-  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  state.lifecycle.present(state.app, { focus: selector });
   const target = state.app.querySelector(selector);
-  if (target) {
-    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
-    target.focus({ preventScroll: true });
-  }
+  if (target && !target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
   if (state.announcer && announcement) state.announcer.textContent = t(announcement);
 }
 

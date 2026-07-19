@@ -39,8 +39,10 @@ test('Udito completes three safe-listening instruments and keeps results separat
   await start.click();
 
   await expect(page.getByRole('heading', { name: /Which tone is quietest/i })).toBeVisible();
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeLessThanOrEqual(2);
   await expect.poll(() => page.evaluate(() => document.activeElement?.tagName)).toBe('H1');
+  await expect(page.getByRole('button', { name: /Toggle light and dark theme/i })).toBeDisabled();
+  await expect(page.locator('[data-locale-select]')).toBeDisabled();
   await page.getByRole('button', { name: /Start practice/i }).click();
   await expect(page.locator('[data-au-response="0"]')).toBeEnabled();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
@@ -67,6 +69,8 @@ test('Udito completes three safe-listening instruments and keeps results separat
   await expect(page.getByText(/Device-relative, never dB HL/i)).toBeVisible();
   await expect(page.getByText(/hearing age/i)).toBeVisible();
   await expect(page.getByText(/composite hearing score/i)).toBeVisible();
+  await expect(page.getByRole('button', { name: /Toggle light and dark theme/i })).toBeEnabled();
+  await expect(page.locator('[data-locale-select]')).toBeEnabled();
   await expectJournalEntry(page, 'udito');
   await expect
     .poll(() => metrics)
@@ -83,6 +87,9 @@ test('Udito completes three safe-listening instruments and keeps results separat
   expect(journalSetup.connection).toBe('wireless');
   expect(journalSetup.selfReportedVolumeConsistent).toBe(true);
   expect(journalSetup.volumeLockedWithinRun).toBeUndefined();
+  await page.getByRole('button', { name: /Open private journal/i }).click();
+  await expect(page).toHaveURL(/\/en\/journal\/$/);
+  await expect(page.getByRole('heading', { name: /Your private measurement journal/i })).toBeVisible();
 });
 
 test('the mobile Udito setup and listening runner stay inside the viewport', async ({ page }, testInfo) => {

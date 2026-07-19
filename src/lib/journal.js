@@ -321,7 +321,7 @@ function hardSetupDifferences(newer, older) {
 /** @param {string} examId */
 function hardFields(examId) {
   if (examId === 'riflessi') return ['display', 'inputMode'];
-  if (examId === 'udito') return ['device', 'sampleRate'];
+  if (examId === 'udito') return ['device', 'connection', 'sampleRate'];
   if (examId === 'acutezza') return ['display', 'correction'];
   return ['display', 'gamut'];
 }

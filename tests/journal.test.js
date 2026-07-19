@@ -186,7 +186,12 @@ test('instrument rules include distance tolerance, run quality, and unverifiable
     reasons: ['changed:distanceMm'],
   });
 
-  const audioSetup = { device: 'headphones', sampleRate: 48_000, interruptions: 0 };
+  const audioSetup = {
+    device: 'headphones',
+    connection: 'wired',
+    sampleRate: 48_000,
+    interruptions: 0,
+  };
   const audio = entry({ id: 'audio-one', examId: 'udito', setup: audioSetup });
   const audioLimited = entry({
     id: 'audio-two',
@@ -197,6 +202,15 @@ test('instrument rules include distance tolerance, run quality, and unverifiable
   assert.deepEqual(compareJournalEntries(audioLimited, audio), {
     status: 'caution',
     reasons: ['volume-not-verifiable', 'limited-run'],
+  });
+  const changedConnection = entry({
+    ...audio,
+    id: 'audio-wireless',
+    setup: { ...audioSetup, connection: 'bluetooth' },
+  });
+  assert.deepEqual(compareJournalEntries(changedConnection, audio), {
+    status: 'not-comparable',
+    reasons: ['changed:connection'],
   });
 });
 
