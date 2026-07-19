@@ -71,12 +71,8 @@ a:focus-visible {
   text-decoration: none;
 }
 
-.brand__lab {
-  color: var(--text-dim);
-  font-family: var(--mono);
-  font-size: var(--text-2xs);
-  font-weight: 500;
-  letter-spacing: var(--tracking-wide);
+.brand__six {
+  color: var(--accent-text);
 }
 
 .exam-back {
@@ -2616,141 +2612,129 @@ a:focus-visible {
   max-inline-size: 40rem;
 }
 
-.sense-map {
-  background: var(--panel);
-  border: 1px solid var(--line);
+.sense-mark {
+  background:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px), var(--panel);
+  background-size: 12.5% 12.5%;
+  border: 1px solid var(--line-strong);
   inline-size: min(100%, 34rem);
   justify-self: end;
-  padding: clamp(1rem, 2vw, 1.5rem);
+  padding: clamp(1.25rem, 3vw, 2.25rem);
 }
 
-.sense-map__head,
-.sense-map__channels {
-  color: var(--text-dim);
-  display: flex;
-  font-family: var(--mono);
-  font-size: var(--text-2xs);
-  justify-content: space-between;
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-}
-
-.sense-map__field {
+.sense-mark__field {
   aspect-ratio: 1;
-  margin-block: 1rem;
   overflow: hidden;
   position: relative;
 }
 
-.sense-map__axis {
-  border: 1px solid var(--line);
-  inset: 13%;
-  position: absolute;
-}
-
-.sense-map__axis--one {
-  transform: rotate(45deg);
-}
-
-.sense-map__axis--two {
-  border-color: var(--line-strong);
-  inset: 25%;
-  transform: rotate(45deg);
-}
-
-.sense-map__orbit {
-  border-radius: 50%;
-  inset: 14%;
-  position: absolute;
-}
-
-.sense-map__orbit::before {
-  animation: orbit 34s linear infinite;
-  background: conic-gradient(#e64048, #e8892c, #d8c735, #48b863, #34bdb4, #448bdd, #7659d8, #c64e9a, #e64048);
-  border-radius: 50%;
+.sense-mark__field::before,
+.sense-mark__field::after {
+  background: var(--line-strong);
   content: "";
-  inset: 0;
-  mask: radial-gradient(circle closest-side, transparent calc(100% - 9px), #000 calc(100% - 8px));
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.sense-mark__field::before {
+  block-size: 1px;
+  inline-size: 100%;
+}
+
+.sense-mark__field::after {
+  block-size: 100%;
+  inline-size: 1px;
+}
+
+.sense-mark__ring {
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
   position: absolute;
 }
 
-.sense-map__orbit--inner {
-  inset: 28%;
+.sense-mark__ring--outer {
+  inset: 10%;
 }
 
-.sense-map__orbit--inner::before {
-  animation-direction: reverse;
-  animation-duration: 24s;
-  opacity: 0.45;
+.sense-mark__ring--inner {
+  border-style: dashed;
+  inset: 27%;
+  opacity: 0.72;
 }
 
-.sense-map__core {
+.sense-mark__signal {
+  --signal-color: var(--accent);
+
+  background: linear-gradient(90deg, transparent 0 18%, var(--signal-color) 58% 100%);
+  block-size: 2px;
+  inline-size: 39%;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  position: absolute;
+  transform: rotate(calc(var(--signal) * 60deg - 90deg));
+  transform-origin: 0 50%;
+}
+
+.sense-mark__signal::after {
+  background: var(--signal-color);
+  block-size: clamp(0.55rem, 1.4vw, 0.8rem);
+  border: 2px solid var(--panel);
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--signal-color);
+  content: "";
+  inline-size: clamp(0.55rem, 1.4vw, 0.8rem);
+  inset-block-start: 50%;
+  inset-inline-end: 0;
+  position: absolute;
+  transform: translate(50%, -50%);
+}
+
+.sense-mark__signal:nth-of-type(2) {
+  --signal-color: #dc7a27;
+}
+
+.sense-mark__signal:nth-of-type(3) {
+  --signal-color: #77a82d;
+}
+
+.sense-mark__signal:nth-of-type(4) {
+  --signal-color: #28a994;
+}
+
+.sense-mark__signal:nth-of-type(5) {
+  --signal-color: #397ed1;
+}
+
+.sense-mark__signal:nth-of-type(6) {
+  --signal-color: #8c5bc2;
+}
+
+.sense-mark__core {
   align-items: center;
   background: var(--panel-strong);
   border: 1px solid var(--line-strong);
   display: flex;
-  flex-direction: column;
-  inset: 37%;
+  inset: 32%;
   justify-content: center;
   position: absolute;
+  transform: rotate(45deg);
   z-index: 1;
 }
 
-.sense-map__core strong {
-  color: var(--accent-text);
+.sense-mark__core strong {
+  color: var(--text);
   font-family: var(--display);
-  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-size: clamp(1.15rem, 3vw, 2rem);
+  letter-spacing: -0.045em;
   line-height: 1;
+  transform: rotate(-45deg);
 }
 
-.sense-map__core small,
-.sense-map__label {
-  color: var(--text-dim);
-  font-family: var(--mono);
-  font-size: 0.58rem;
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
-}
-
-.sense-map__label {
-  background: var(--panel);
-  padding: 0.15rem 0.35rem;
-  position: absolute;
-}
-
-.sense-map__label--colour {
-  inset-block-start: 15%;
-  inset-inline-start: 43%;
-}
-
-.sense-map__label--vision {
-  inset-block-end: 19%;
-  inset-inline-end: 8%;
-}
-
-.sense-map__channels {
-  gap: 0.6rem;
-}
-
-.sense-map__channels span {
-  align-items: center;
-  display: inline-flex;
-  gap: 0.35rem;
-}
-
-.sense-map__channels i {
-  background: var(--line-strong);
-  block-size: 0.38rem;
-  border-radius: 50%;
-  inline-size: 0.38rem;
-}
-
-.sense-map__channels span:first-child i {
-  background: var(--accent);
-}
-
-.sense-map__channels span:nth-child(2) i {
-  background: var(--success);
+.sense-mark__core strong span {
+  color: var(--accent-text);
 }
 
 .tests-section {
@@ -3164,7 +3148,7 @@ a:focus-visible {
     min-block-size: 0;
   }
 
-  .sense-map {
+  .sense-mark {
     inline-size: min(82vw, 31rem);
     justify-self: start;
   }
@@ -3194,12 +3178,8 @@ a:focus-visible {
     font-size: clamp(3.25rem, 16vw, 5.2rem);
   }
 
-  .sense-map {
+  .sense-mark {
     inline-size: 100%;
-  }
-
-  .sense-map__channels {
-    flex-wrap: wrap;
   }
 
   .gallery-heading,

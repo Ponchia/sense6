@@ -51,7 +51,7 @@ export function renderGallery(context) {
   app.innerHTML = `
     <section class="gallery-hero ui-container ui-container--wide">
       <div class="gallery-hero__copy">
-        <p class="ui-eyebrow">Sense6 / private perception lab</p>
+        <p class="ui-eyebrow">Sense6</p>
         <h1>Measure what your <em>senses notice.</em></h1>
         <p class="gallery-hero__lede">
           Short, careful tests that turn what you notice into honest, device-relative results.
@@ -59,27 +59,15 @@ export function renderGallery(context) {
         </p>
       </div>
 
-      <div class="sense-map" aria-hidden="true">
-        <div class="sense-map__head">
-          <span>Live signal</span>
-          <span>Device relative</span>
-        </div>
-        <div class="sense-map__field">
-          <div class="sense-map__axis sense-map__axis--one"></div>
-          <div class="sense-map__axis sense-map__axis--two"></div>
-          <div class="sense-map__orbit sense-map__orbit--outer"></div>
-          <div class="sense-map__orbit sense-map__orbit--inner"></div>
-          <div class="sense-map__core">
-            <strong>S</strong>
-            <small>Sense6</small>
-          </div>
-          <span class="sense-map__label sense-map__label--colour">Colour</span>
-          <span class="sense-map__label sense-map__label--vision">Hearing</span>
-        </div>
-        <div class="sense-map__channels">
-          <span><i></i> Threshold</span>
-          <span><i></i> Pattern</span>
-          <span><i></i> Profile</span>
+      <div class="sense-mark" aria-hidden="true">
+        <div class="sense-mark__field">
+          <span class="sense-mark__ring sense-mark__ring--outer"></span>
+          <span class="sense-mark__ring sense-mark__ring--inner"></span>
+          ${Array.from(
+            { length: 6 },
+            (_, index) => `<i class="sense-mark__signal" style="--signal:${index}"></i>`,
+          ).join('')}
+          <div class="sense-mark__core"><strong>Sense<span>6</span></strong></div>
         </div>
       </div>
     </section>
