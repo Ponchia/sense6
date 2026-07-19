@@ -25,18 +25,22 @@ Live exams:
   check, an adaptive upper-audibility boundary, and separate pitch-step
   estimates near 500 Hz and 2 kHz. It reports no dB HL, hearing age, diagnosis,
   or composite score.
+- **Acutezza** — a calibrated near-vision perception experiment with separate
+  high-contrast Landolt-ring detail, low-contrast cost, and repeated meridional
+  clarity observations for each eye. It reports angular task thresholds and
+  uncertainty, never 20/20, a diagnosis, astigmatism, or a prescription.
 
 Adding an exam: create `src/exams/<id>.js` exporting `meta` and `mount(context)`
 (return a cleanup function), then register it in `src/main.js`.
 
-The planned Acutezza exam has a source-backed
-[research and implementation brief](docs/research/acutezza.md). It remains in
-the roadmap until its calibration, threshold engine, result language, and
-validation gates are complete.
+Acutezza's source-backed [research and implementation
+brief](docs/research/acutezza.md) records the method, product boundary, completed
+software checks, and the external validation still required before making any
+clinical claim.
 
 The [product and engineering roadmap](docs/roadmap.md) records the next work:
 private repeated-run history, shared experiment lifecycle primitives, bundle
-scaling, and Acutezza's release gates.
+scaling, and Acutezza's external validation work.
 
 ## Background
 
@@ -241,8 +245,8 @@ persistence, accessibility, and mobile overflow.
 
 ## Develop and test
 
-Run the deterministic colour-math, timing, adaptive hearing, and session-engine
-tests:
+Run the deterministic colour, timing, adaptive hearing, calibrated acuity, and
+session-engine tests:
 
 ```sh
 npm test

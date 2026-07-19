@@ -46,14 +46,19 @@ documented production bundle budget and fail CI when it regresses materially.
 The refactor is complete when all existing unit, browser, responsive, and
 accessibility tests pass without changing experiment behavior or result copy.
 
-## 3. Build Acutezza only after validation
+## 3. Validate Acutezza beyond software verification
 
 Acutezza is a calibrated browser sharpness experiment, not an online eye exam.
 Its public promise is **Calibrated sharpness and meridional clarity**, with an
 expected complete-run duration of about 7–9 minutes.
 
 Follow the [Acutezza research and implementation brief](research/acutezza.md).
-Keep the experiment in the roadmap until its calibration, threshold recovery,
-test-retest, clinical-review, accessibility, and device-coverage gates pass.
+The nonclinical browser implementation now covers calibrated rendering,
+threshold recovery simulations, geometry invalidation, accessibility, responsive
+behavior, and the six supported locales. The remaining work is physical-device
+coverage, comparison with FrACT, test-retest evidence, and optometrist or
+ophthalmologist review.
 
-Do not publish an acuity-shaped number when those gates have not been met.
+Until those gates pass, keep every value labelled as a run-specific angular task
+threshold and make no clinical acuity, screening, diagnosis, or prescription
+claim.

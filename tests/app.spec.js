@@ -39,6 +39,23 @@ const QUICK_UDITO = {
   },
 };
 
+const QUICK_ACUTEZZA = {
+  acutezza: {
+    feedbackMs: 2,
+    practiceTrials: 1,
+    calibration: {
+      repetitions: 3,
+      sweepMs: 400,
+      minDistanceMm: 1,
+      maxDistanceMm: 5000,
+      maxSpreadPercent: 100,
+    },
+    high: { trials: 2, controlAt: [] },
+    low: { trials: 2, controlAt: [], contrast: 0.1 },
+    meridian: { angles: [0, 60, 120], scales: [1, 1.5] },
+  },
+};
+
 async function installQuickRiflessi(page) {
   await page.addInitScript((configuration) => {
     window.__SENSE6_TEST_CONFIG__ = configuration;
@@ -49,6 +66,51 @@ async function installQuickUdito(page) {
   await page.addInitScript((configuration) => {
     window.__SENSE6_TEST_CONFIG__ = configuration;
   }, QUICK_UDITO);
+}
+
+async function installQuickAcutezza(page) {
+  await page.addInitScript((configuration) => {
+    window.__SENSORIA_TEST_CONFIG__ = configuration;
+  }, QUICK_ACUTEZZA);
+}
+
+async function completeAcutezzaCalibration(page) {
+  await page.getByRole('button', { name: /Prepare the vision lab/i }).click();
+  await page.getByLabel(/I am 18 or older/i).check();
+  await page.getByRole('button', { name: /Calibrate the screen/i }).click();
+  await page.getByRole('button', { name: /The edges match/i }).click();
+  await page.getByRole('button', { name: /Use a ruler-measured distance/i }).click();
+  await page.getByLabel(/Distance in centimetres/i).fill('50');
+  await page.getByRole('button', { name: /Use measured distance/i }).click();
+  await page.getByRole('button', { name: /Yes, clearly/i }).click();
+}
+
+async function answerAcutezzaTarget(page, correct = true) {
+  const canvas = page.locator('[data-ac-optotype]');
+  await expect(canvas).toBeVisible();
+  const orientation = await canvas.getAttribute('data-orientation');
+  const response = correct ? orientation : orientation === 'up' ? 'down' : 'up';
+  await page.locator(`[data-ac-direction="${response}"]`).click();
+}
+
+async function completeAcutezzaEye(page, { missPractice = false } = {}) {
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  if (missPractice) {
+    await answerAcutezzaTarget(page, false);
+    await expect(page.getByText(/Try the same target again/i)).toBeVisible();
+  }
+  await answerAcutezzaTarget(page);
+  await page.getByRole('button', { name: /Begin Nitidezza/i }).click();
+  await answerAcutezzaTarget(page);
+  await answerAcutezzaTarget(page);
+  await page.getByRole('button', { name: /Continue to Contrasto/i }).click();
+  await answerAcutezzaTarget(page);
+  await answerAcutezzaTarget(page);
+  await page.getByRole('button', { name: /Continue to Meridiani/i }).click();
+  for (let comparison = 0; comparison < 6; comparison += 1) {
+    await expect(page.locator('[data-ac-meridian="left"]')).toBeVisible();
+    await page.getByRole('button', { name: /No difference/i }).click();
+  }
 }
 
 async function answerCurrentSoundTrial(page) {
@@ -101,10 +163,8 @@ test('the gallery lists exams, is accessible, and routes into one', async ({ pag
   await expect(page.locator('.exam-card__link[href="#/en/color-blindness"]')).toBeVisible();
   await expect(page.locator('.exam-card__link[href="#/en/riflessi"]')).toBeVisible();
   await expect(page.locator('.exam-card__link[href="#/en/udito"]')).toBeVisible();
-  await expect(page.getByRole('heading', { name: /More senses, same standard/i })).toBeVisible();
-  await expect(page.locator('.roadmap-item')).toHaveCount(1);
-  await expect(page.locator('.roadmap-item')).toContainText('Calibrated sharpness & meridional clarity');
-  await expect(page.locator('.roadmap-item')).toContainText('≈ 7–9 min');
+  await expect(page.locator('.exam-card__link[href="#/en/acutezza"]')).toBeVisible();
+  await expect(page.locator('.roadmap-item')).toHaveCount(0);
   await expect(page.locator('.gallery-hero__actions, .gallery-proof, .principles')).toHaveCount(0);
   await expect(page.getByRole('link', { name: /Try Udito|Explore all four tests/i })).toHaveCount(0);
   await expect
@@ -239,30 +299,35 @@ test('every live exam has a localized European-language entry point', async ({ p
       'color-blindness': 'Trova l’apertura',
       riflessi: 'Nota il segnale',
       udito: 'Ascolta il limite',
+      acutezza: 'Calibra lo schermo',
     },
     de: {
       tetracromia: 'Wie fein',
       'color-blindness': 'Finden Sie die Lücke',
       riflessi: 'Signal erkennen',
       udito: 'Hören Sie auf die Grenze',
+      acutezza: 'Kalibrieren Sie den Bildschirm',
     },
     fr: {
       tetracromia: 'Avec quelle finesse',
       'color-blindness': 'Repérez l’ouverture',
       riflessi: 'Repérez le signal',
       udito: 'Écoutez la limite',
+      acutezza: 'Étalonnez l’écran',
     },
     es: {
       tetracromia: '¿Con qué precisión',
       'color-blindness': 'Encuentra la abertura',
       riflessi: 'Detecta la señal',
       udito: 'Escucha el límite',
+      acutezza: 'Calibra la pantalla',
     },
     pt: {
       tetracromia: 'Com que precisão',
       'color-blindness': 'Encontre a abertura',
       riflessi: 'Detete o sinal',
       udito: 'Escute o limite',
+      acutezza: 'Calibre o ecrã',
     },
   };
 
@@ -306,6 +371,152 @@ test('long German labels remain inside the mobile viewport', async ({ page }, te
       page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
     )
     .toBe(true);
+
+  await page.goto('/#/de/acutezza');
+  await page.getByRole('button', { name: /Sehlabor vorbereiten/i }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+    )
+    .toBe(true);
+});
+
+test('Acutezza calibrates the display and reports three separate non-clinical observations', async ({
+  page,
+}) => {
+  await installQuickAcutezza(page);
+  const metrics = await captureMetrics(page);
+  await page.goto('/#/acutezza');
+  await expect(page).toHaveURL(/#\/en\/acutezza$/);
+  await expect(page.getByRole('heading', { name: /Calibrate the screen/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /What informed Acutezza/i })).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.getByRole('button', { name: /Toggle light and dark theme/i }).click();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.getByRole('button', { name: /Toggle light and dark theme/i }).click();
+
+  await completeAcutezzaCalibration(page);
+  await expect(page.getByRole('heading', { name: /physical scale/i })).toBeVisible();
+  await expect(page.getByText(/Assumed distance/i)).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+
+  await page.getByRole('button', { name: /Prepare Right eye/i }).click();
+  await completeAcutezzaEye(page, { missPractice: true });
+
+  await expect(page.getByRole('heading', { name: /Rest before switching/i })).toBeVisible();
+  await page.getByRole('button', { name: /Check distance, then test Left eye/i }).click();
+  await expect(page.getByRole('heading', { name: /Return to 50 cm/i })).toBeVisible();
+  await page.getByRole('button', { name: /Setup unchanged/i }).click();
+  await completeAcutezzaEye(page);
+  await expect(page.getByRole('heading', { name: /Separate observations/i })).toBeVisible();
+  await expect(page.locator('.ac-metric')).toHaveCount(6);
+  await expect(page.locator('.ac-results__stamp')).toContainText('02 / 02');
+  await expect(page.getByText(/not an eye examination/i)).toBeVisible();
+  await expect(page.getByText(/Do not infer normal vision, 20\/20/i)).toBeVisible();
+  await expect(page.getByText(/astigmatism axis/i)).toBeVisible();
+  await expect
+    .poll(() => metrics)
+    .toEqual([
+      { event: 'site_loaded', test: 'site' },
+      { event: 'test_started', test: 'acutezza' },
+      { event: 'test_completed', test: 'acutezza' },
+    ]);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test('Acutezza invalidates a measured run when display geometry changes', async ({ page }) => {
+  await installQuickAcutezza(page);
+  await page.goto('/#/acutezza');
+  await completeAcutezzaCalibration(page);
+  await page.getByRole('button', { name: /Prepare Right eye/i }).click();
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  await expect(page.locator('[data-ac-optotype]')).toBeVisible();
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, value: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
+  await expect(page.getByRole('heading', { name: /current target was discarded/i })).toBeVisible();
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, value: false });
+  });
+  await page.getByRole('button', { name: /Resume this instrument/i }).click();
+  await expect(page.locator('[data-ac-optotype]')).toBeVisible();
+  await page.setViewportSize({ width: 900, height: 700 });
+  await expect(page.getByRole('heading', { name: /measured geometry changed/i })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Recalibrate/i })).toBeVisible();
+});
+
+test('Acutezza accepts repeatable blind-spot sweeps as measured calibration', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'The mobile project covers the ruler fallback');
+  await installQuickAcutezza(page);
+  await page.goto('/#/acutezza');
+  await page.getByRole('button', { name: /Prepare the vision lab/i }).click();
+  await page.getByLabel(/I am 18 or older/i).check();
+  await page.getByRole('button', { name: /Calibrate the screen/i }).click();
+  await page.getByRole('button', { name: /The edges match/i }).click();
+
+  for (let sweep = 0; sweep < 3; sweep += 1) {
+    await page.getByRole('button', { name: /Start sweep/i }).click();
+    await expect(page.getByRole('button', { name: /Dot disappeared/i })).toBeEnabled();
+    await page.waitForTimeout(180);
+    await page.getByRole('button', { name: /Dot disappeared/i }).click();
+  }
+
+  await expect(page.getByRole('heading', { name: /cm from the screen/i })).toBeVisible();
+  await page.getByRole('button', { name: /Use this distance/i }).click();
+  await page.getByRole('button', { name: /Yes, clearly/i }).click();
+  await expect(page.getByText('Measured setup', { exact: true })).toBeVisible();
+  await expect(page.getByText(/blind-spot sweeps agreed/i)).toBeVisible();
+});
+
+test('Acutezza retries stronger contrast before marking Contrasto unavailable', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'Desktop covers the contrast fallback state');
+  await installQuickAcutezza(page);
+  await page.goto('/#/acutezza');
+  await page.getByRole('button', { name: /Prepare the vision lab/i }).click();
+  await page.getByLabel(/I am 18 or older/i).check();
+  await page.getByRole('button', { name: /Calibrate the screen/i }).click();
+  await page.getByRole('button', { name: /The edges match/i }).click();
+  await page.getByRole('button', { name: /Use a ruler-measured distance/i }).click();
+  await page.getByLabel(/Distance in centimetres/i).fill('50');
+  await page.getByRole('button', { name: /Use measured distance/i }).click();
+
+  await expect(page.getByText(/nominal 10% condition/i)).toBeVisible();
+  await page.getByRole('button', { name: /Not clearly/i }).click();
+  await expect(page.getByText(/nominal 20% condition/i)).toBeVisible();
+  await page.getByRole('button', { name: /Not clearly/i }).click();
+  await expect(page.getByText('Unavailable', { exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Prepare Right eye/i })).toBeVisible();
+});
+
+test('the mobile Acutezza setup and target controls remain inside the viewport', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Mobile-only geometry check');
+  await installQuickAcutezza(page);
+  await page.goto('/#/acutezza');
+  await page.getByRole('button', { name: /Prepare the vision lab/i }).click();
+  await page.getByLabel(/I am 18 or older/i).check();
+  await page.getByRole('button', { name: /Calibrate the screen/i }).click();
+  await page.getByRole('button', { name: /The card cannot fit/i }).click();
+  await expect(page.getByRole('heading', { name: /screen cannot show the calibration card/i })).toBeVisible();
+  await page.getByRole('button', { name: /Try card calibration again/i }).click();
+  await page.getByRole('button', { name: /The edges match/i }).click();
+  await page.getByRole('button', { name: /Use a ruler-measured distance/i }).click();
+  await page.getByLabel(/Distance in centimetres/i).fill('50');
+  await page.getByRole('button', { name: /Use measured distance/i }).click();
+  await page.getByRole('button', { name: /Yes, clearly/i }).click();
+  await page.getByRole('button', { name: /Prepare Right eye/i }).click();
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  await expect(page.locator('[data-ac-optotype]')).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+    )
+    .toBe(true);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
 test('Udito completes three safe-listening instruments and keeps results separate', async ({ page }) => {

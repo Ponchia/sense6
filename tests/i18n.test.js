@@ -34,6 +34,8 @@ test('critical navigation and safety copy exists in every language', () => {
     'An RGB screen cannot test tetrachromacy.',
     'No gap visible',
     'Compare conditions, not people.',
+    'This is not vision screening, diagnosis, or a prescription.',
+    'Sudden vision loss, severe eye pain, new flashes or floaters, or a curtain-like shadow needs prompt professional assessment.',
   ];
   for (const { code } of LOCALES) {
     for (const key of keys) assert.ok(MESSAGES[code].get(key));
