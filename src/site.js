@@ -6,29 +6,6 @@
 
 const PLANNED = [];
 
-const TEST_DETAILS = {
-  tetracromia: {
-    category: 'Colour discrimination',
-    facts: ['Adaptive difficulty', '3 instruments', 'Detailed profile'],
-  },
-  'color-blindness': {
-    category: 'Colour-vision experiment',
-    facts: ['Adaptive thresholds', '3 display directions', 'Run-relative result'],
-  },
-  riflessi: {
-    category: 'Response timing',
-    facts: ['3 instruments', 'Device-relative timing', 'No composite score'],
-  },
-  udito: {
-    category: 'Listening experiment',
-    facts: ['3 instruments', 'Volume safety contract', 'No hearing label'],
-  },
-  acutezza: {
-    category: 'Calibrated sharpness experiment',
-    facts: ['Physical screen calibration', '3 per-eye instruments', 'No clinical label'],
-  },
-};
-
 const PLATE_EIGHT = [
   '001111100',
   '011000110',
@@ -42,8 +19,8 @@ const PLATE_EIGHT = [
 ];
 
 export function renderGallery(context) {
-  const { app, exams, localeHref } = context;
-  document.title = 'Sense6 — measure what your senses notice';
+  const { app, exams, localeHref, t } = context;
+  document.title = t('Sense6 — measure what your senses notice');
 
   app.innerHTML = `
     <section class="gallery-hero ui-container ui-container--wide">
@@ -100,24 +77,23 @@ export function renderGallery(context) {
 }
 
 function liveCard(meta, localeHref) {
-  const details = TEST_DETAILS[meta.id];
   return `
     <article class="exam-card ui-card ui-card--interactive" style="--card-accent:${meta.accent}">
-      <a class="exam-card__link" href="${localeHref(meta.id)}">
+      <a class="exam-card__link" data-sense6-route="${meta.route}" href="${localeHref(meta.route)}">
         <div class="exam-card__visual exam-card__visual--${meta.id}">
           ${previewVisual(meta.id)}
           <span class="exam-card__glyph" aria-hidden="true">${meta.glyph}</span>
         </div>
         <div class="exam-card__body">
           <div class="ui-cluster ui-cluster--between exam-card__meta">
-            <span class="ui-eyebrow">${details.category}</span>
+            <span class="ui-eyebrow">${meta.category}</span>
             <span class="ui-tag">${meta.duration}</span>
           </div>
           <h3>${meta.name}</h3>
           <p class="exam-card__tagline">${meta.tagline}</p>
           <p class="exam-card__blurb">${meta.blurb}</p>
           <ul class="exam-card__facts" aria-label="What this test includes">
-            ${details.facts.map((fact) => `<li>${fact}</li>`).join('')}
+            ${meta.facts.map((fact) => `<li>${fact}</li>`).join('')}
           </ul>
           <span class="exam-card__cta">Open test <span aria-hidden="true">→</span></span>
         </div>

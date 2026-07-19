@@ -5,14 +5,20 @@
   "type": "module",
   "description": "A private, research-grounded browser perception lab.",
   "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "vite build && node scripts/generate-static-pages.mjs",
     "preview": "vite preview --host 0.0.0.0 --port 4173",
-    "lint": "biome check src functions tests playwright.config.js",
+    "lint": "biome check src functions scripts tests playwright.config.js",
     "test": "node --test tests/*.test.js",
+    "test:coverage": "node --test --experimental-test-coverage --test-coverage-lines=95 --test-coverage-branches=80 --test-coverage-functions=90 --test-coverage-include='src/lib/*.js' tests/*.test.js",
+    "test:static": "node --test tests/static-output.build.js",
     "test:e2e": "playwright test",
-    "check": "npm run lint && npm run test && npm run build && npm run test:e2e"
+    "typecheck": "tsc -p jsconfig.json",
+    "check": "npm run lint && npm run typecheck && npm run test:coverage && npm run build && npm run test:static && npm run test:e2e"
   },
   "dependencies": {
     "@ponchia/ui": "^0.6.12"
@@ -21,6 +27,7 @@
     "@axe-core/playwright": "^4.10.2",
     "@biomejs/biome": "^2.5.0",
     "@playwright/test": "^1.55.0",
+    "typescript": "^7.0.2",
     "vite": "^8.0.0"
   }
 }

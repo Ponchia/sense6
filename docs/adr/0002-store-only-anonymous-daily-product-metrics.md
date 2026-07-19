@@ -12,8 +12,9 @@ profiles, attribution, session replay, answer telemetry, or unique-user counts.
 
 Cloudflare Web Analytics doesn't provide the required custom test lifecycle
 events. A conventional analytics product would add identifiers and event-level
-records that Sense6 doesn't need. Hash-based routing also makes route-level page
-counts less useful.
+records that Sense6 doesn't need. The former hash-based router also made
+route-level page counts less useful; canonical localized paths now identify
+each gallery, exam, and privacy page.
 
 The site must keep answers, measurements, and results in the browser. Metrics
 mustn't create a way to reconstruct a visit or connect two actions to the same

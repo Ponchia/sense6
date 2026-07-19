@@ -1,4 +1,5 @@
 import { toast } from '@ponchia/ui/behaviors';
+import '../styles/udito.css';
 import { formatNumber, t } from '../i18n.js';
 import {
   createHeadphoneTrials,
@@ -15,21 +16,14 @@ import {
   summarizeRange,
 } from '../lib/hearing.js';
 import { HearingAudio } from '../lib/hearing-audio.js';
+import { createExamLifecycle } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
+import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 
-export const meta = {
-  id: 'udito',
-  name: 'Udito',
-  tagline: 'Headphone confidence, audibility & pitch',
-  blurb:
-    'Three listening instruments map this setup without pretending an uncalibrated browser is an audiometer.',
-  accent: '#4cc9f0',
-  duration: '≈ 6 min',
-  glyph: 'U',
-};
-
 const STORAGE_KEY = 'sense6:udito:last';
+const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isRecord });
+const MOUNT_OWNER = Symbol('udito');
 const INSTRUMENTS = {
   headphones: {
     number: '01',
@@ -54,46 +48,46 @@ const INSTRUMENTS = {
   },
 };
 
-let app = null;
-let announcer = null;
-let goHome = null;
-let config = null;
-let audio = null;
-let session = null;
-let activeTrial = null;
-let responseOpen = false;
-let feedbackTimer = 0;
-let referencePlayed = false;
+let state = null;
 
 export function mount(context) {
-  app = context.app;
-  announcer = context.announcer;
-  goHome = context.navigateHome;
-  config = runtimeConfig();
-  audio = new HearingAudio(config.audio);
-  const controller = new AbortController();
-  wireEvents(controller.signal);
+  const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClasses: ['lab-mode', 'au-running'] });
+  const config = runtimeConfig();
+  const mountState = {
+    app: context.app,
+    announcer: context.announcer,
+    goHome: context.navigateHome,
+    config,
+    audio: new HearingAudio(config.audio),
+    session: null,
+    activeTrial: null,
+    responseOpen: false,
+    feedbackTimer: 0,
+    referencePlayed: false,
+  };
+  state = mountState;
+  wireEvents(lifecycle.signal);
   renderIntro();
 
-  return () => {
-    controller.abort();
-    clearTimeout(feedbackTimer);
-    audio?.close();
-    audio = null;
-    session = null;
-    document.body.classList.remove('lab-mode', 'au-running');
-  };
+  lifecycle.onCleanup(() => {
+    clearTimeout(mountState.feedbackTimer);
+    mountState.audio?.close();
+    mountState.audio = null;
+    mountState.session = null;
+    if (state === mountState) state = null;
+  });
+  return lifecycle.dispose;
 }
 
 function renderIntro() {
   stopPlayback();
-  session = null;
-  referencePlayed = false;
+  state.session = null;
+  state.referencePlayed = false;
   document.body.classList.remove('lab-mode', 'au-running');
-  document.title = 'Device-relative hearing lab — Udito | Sense6';
+  document.title = t('Device-relative hearing lab — Udito | Sense6');
   const previous = loadLast();
 
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="au-intro ui-container ui-container--wide">
       <button class="back-link exam-back" type="button" data-action="au-home"><span aria-hidden="true">←</span> All tests</button>
       <div class="au-hero">
@@ -180,13 +174,13 @@ function researchCard(eyebrow, title, body, href) {
 
 function renderSetup() {
   stopPlayback();
-  referencePlayed = false;
+  state.referencePlayed = false;
   document.body.classList.add('lab-mode');
   document.body.classList.remove('au-running');
-  document.title = 'Prepare your audio setup — Udito | Sense6';
+  document.title = t('Prepare your audio setup — Udito | Sense6');
   window.scrollTo({ top: 0, behavior: 'instant' });
-  const supported = audio.supported;
-  app.innerHTML = `
+  const supported = state.audio.supported;
+  state.app.innerHTML = `
     <section class="au-setup ui-container ui-container--wide">
       <button class="back-link" type="button" data-action="au-intro"><span aria-hidden="true">←</span> Back</button>
       <div class="au-setup__grid">
@@ -227,20 +221,22 @@ function renderSetup() {
 }
 
 async function playReference() {
-  const button = app.querySelector('[data-action="au-reference"]');
-  const status = app.querySelector('[data-au-reference-status]');
+  const button = state.app.querySelector('[data-action="au-reference"]');
+  const status = state.app.querySelector('[data-au-reference-status]');
   if (!button || !status) return;
   button.disabled = true;
-  button.textContent = 'Playing quiet reference…';
-  status.textContent = 'Keep this quiet and comfortable.';
+  button.textContent = t('Playing quiet reference…');
+  status.textContent = t('Keep this quiet and comfortable.');
   try {
-    await audio.playReference();
-    referencePlayed = true;
-    button.textContent = 'Play reference again';
-    status.textContent = `Reference played · ${formatNumber(audio.sampleRate)} Hz audio context · now leave volume unchanged.`;
+    await state.audio.playReference();
+    state.referencePlayed = true;
+    button.textContent = t('Play reference again');
+    status.textContent = t('Reference played · {sampleRate} Hz audio context · now leave volume unchanged.', {
+      sampleRate: formatNumber(state.audio.sampleRate),
+    });
     updateSetupGate();
   } catch {
-    status.textContent = 'Audio could not start. Check browser audio permissions and try again.';
+    status.textContent = t('Audio could not start. Check browser audio permissions and try again.');
     toast('The reference sound could not start.');
   } finally {
     button.disabled = false;
@@ -248,30 +244,30 @@ async function playReference() {
 }
 
 function updateSetupGate() {
-  const consent = app.querySelector('[data-au-consent]');
-  const start = app.querySelector('[data-action="au-start"]');
-  if (start) start.disabled = !(referencePlayed && consent?.checked);
+  const consent = state.app.querySelector('[data-au-consent]');
+  const start = state.app.querySelector('[data-action="au-start"]');
+  if (start) start.disabled = !(state.referencePlayed && consent?.checked);
 }
 
 function startSession() {
-  const consent = app.querySelector('[data-au-consent]');
-  if (!referencePlayed || !consent?.checked) {
+  const consent = state.app.querySelector('[data-au-consent]');
+  if (!state.referencePlayed || !consent?.checked) {
     toast('Play the quiet reference and confirm the volume contract first.');
     return;
   }
   const random = seededRandom(`${Date.now()}-${Math.random()}`);
-  const maxHz = safeFrequencyCeiling(audio.sampleRate, config.range.maxHz);
-  session = {
+  const maxHz = safeFrequencyCeiling(state.audio.sampleRate, state.config.range.maxHz);
+  state.session = {
     instrument: 'headphones',
     block: null,
     queue: [],
     index: 0,
     random,
-    device: app.querySelector('[data-au-device]')?.value ?? 'other',
-    sampleRate: audio.sampleRate,
+    device: state.app.querySelector('[data-au-device]')?.value ?? 'other',
+    sampleRate: state.audio.sampleRate,
     headphoneRecords: [],
-    rangeTrack: createRangeTrack(maxHz, config.range),
-    pitchTracks: createPitchTracks(config.pitch),
+    rangeTrack: createRangeTrack(maxHz, state.config.range),
+    pitchTracks: createPitchTracks(state.config.pitch),
     interruptions: 0,
   };
   renderBrief('headphones');
@@ -279,12 +275,12 @@ function startSession() {
 
 function renderBrief(instrument) {
   stopPlayback();
-  session.instrument = instrument;
+  state.session.instrument = instrument;
   const info = INSTRUMENTS[instrument];
   document.body.classList.add('lab-mode');
   document.body.classList.remove('au-running');
-  document.title = `${info.name} — Udito | Sense6`;
-  app.innerHTML = `
+  document.title = `${t(info.name)} — Udito | Sense6`;
+  state.app.innerHTML = `
     <section class="au-brief ui-container ui-container--wide">
       <div class="au-brief__index" aria-hidden="true">${info.number}</div>
       <div class="au-brief__copy">
@@ -304,27 +300,27 @@ function briefRules(instrument) {
 }
 
 function beginStage() {
-  if (session.instrument === 'headphones') {
-    session.block = 'practice';
-    session.queue = createHeadphoneTrials({
-      count: config.headphones.practiceTrials,
+  if (state.session.instrument === 'headphones') {
+    state.session.block = 'practice';
+    state.session.queue = createHeadphoneTrials({
+      count: state.config.headphones.practiceTrials,
       practice: true,
-      random: session.random,
+      random: state.session.random,
     });
-    session.index = 0;
+    state.session.index = 0;
   }
   renderRunner();
   prepareNextTrial();
 }
 
 function beginMeasuredHeadphones() {
-  session.block = 'scored';
+  state.session.block = 'scored';
   trackMetric(METRIC_EVENTS.testStarted, METRIC_TESTS.udito);
-  session.queue = createHeadphoneTrials({
-    count: config.headphones.scoredTrials,
-    random: session.random,
+  state.session.queue = createHeadphoneTrials({
+    count: state.config.headphones.scoredTrials,
+    random: state.session.random,
   });
-  session.index = 0;
+  state.session.index = 0;
   renderRunner();
   prepareNextTrial();
 }
@@ -332,15 +328,15 @@ function beginMeasuredHeadphones() {
 function renderRunner() {
   stopPlayback();
   document.body.classList.add('lab-mode', 'au-running');
-  const info = INSTRUMENTS[session.instrument];
-  const choices = session.instrument === 'pitch' ? 2 : 3;
-  app.innerHTML = `
-    <section class="au-runner" data-au-runner data-au-instrument="${session.instrument}">
-      <header class="au-runner__header"><div><p class="ui-eyebrow">${info.number} / ${info.name}</p><strong>${session.block === 'practice' ? 'Practice' : 'Adaptive run'}</strong></div><span data-au-count>Preparing…</span><button type="button" data-action="au-stop">Stop safely</button></header>
+  const info = INSTRUMENTS[state.session.instrument];
+  const choices = state.session.instrument === 'pitch' ? 2 : 3;
+  state.app.innerHTML = `
+    <section class="au-runner" data-au-runner data-au-instrument="${state.session.instrument}">
+      <header class="au-runner__header"><div><p class="ui-eyebrow">${info.number} / ${info.name}</p><strong>${state.session.block === 'practice' ? 'Practice' : 'Adaptive run'}</strong></div><span data-au-count>Preparing…</span><button type="button" data-action="au-stop">Stop safely</button></header>
       <div class="au-listening">
         <p class="au-listening__status" data-au-status aria-live="polite">Preparing the sounds…</p>
         <div class="au-intervals" data-au-intervals aria-hidden="true">${Array.from({ length: choices }, (_, index) => `<div><span>${index + 1}</span><i></i></div>`).join('')}</div>
-        <div class="au-responses" aria-label="Sound interval choices">${Array.from({ length: choices }, (_, index) => `<button type="button" data-au-response="${index}" disabled><span>${index + 1}</span>${session.instrument === 'pitch' ? (index ? 'Second tone' : 'First tone') : `Interval ${index + 1}`}</button>`).join('')}</div>
+        <div class="au-responses" aria-label="Sound interval choices">${Array.from({ length: choices }, (_, index) => `<button type="button" data-au-response="${index}" disabled><span>${index + 1}</span>${state.session.instrument === 'pitch' ? (index ? 'Second tone' : 'First tone') : `Interval ${index + 1}`}</button>`).join('')}</div>
         <div class="au-feedback" data-au-feedback aria-live="polite"></div>
       </div>
       <footer class="au-runner__footer"><span>Volume locked</span><span>Keys ${choices === 2 ? '1 · 2' : '1 · 2 · 3'}</span><span>Short ramped tones</span></footer>
@@ -348,22 +344,22 @@ function renderRunner() {
 }
 
 function prepareNextTrial() {
-  if (!session) return;
-  if (session.instrument === 'headphones') {
-    if (session.index >= session.queue.length) {
+  if (!state.session) return;
+  if (state.session.instrument === 'headphones') {
+    if (state.session.index >= state.session.queue.length) {
       finishHeadphoneBlock();
       return;
     }
-    activeTrial = session.queue[session.index];
-  } else if (session.instrument === 'range') {
-    if (session.rangeTrack.complete) {
+    state.activeTrial = state.session.queue[state.session.index];
+  } else if (state.session.instrument === 'range') {
+    if (state.session.rangeTrack.complete) {
       finishInstrument('range');
       return;
     }
-    activeTrial = nextRangeTrial(session.rangeTrack, session.random);
+    state.activeTrial = nextRangeTrial(state.session.rangeTrack, state.session.random);
   } else {
-    activeTrial = nextPitchTrial(session.pitchTracks, session.random);
-    if (!activeTrial) {
+    state.activeTrial = nextPitchTrial(state.session.pitchTracks, state.session.random);
+    if (!state.activeTrial) {
       renderResults();
       return;
     }
@@ -373,42 +369,44 @@ function prepareNextTrial() {
 }
 
 async function playTrial() {
-  responseOpen = false;
+  state.responseOpen = false;
   setResponseDisabled(true);
-  const runner = app.querySelector('[data-au-runner]');
-  if (runner) runner.dataset.correctInterval = String(correctInterval(activeTrial));
-  const status = app.querySelector('[data-au-status]');
-  const feedback = app.querySelector('[data-au-feedback]');
-  if (status) status.textContent = 'Listen…';
+  const runner = state.app.querySelector('[data-au-runner]');
+  if (runner) runner.dataset.correctInterval = String(correctInterval(state.activeTrial));
+  const status = state.app.querySelector('[data-au-status]');
+  const feedback = state.app.querySelector('[data-au-feedback]');
+  if (status) status.textContent = t('Listen…');
   if (feedback) feedback.textContent = '';
   let completed = false;
   try {
     const onInterval = (index) => showInterval(index);
-    if (session.instrument === 'headphones')
-      completed = await audio.playHeadphoneTrial(activeTrial, onInterval);
-    if (session.instrument === 'range') completed = await audio.playRangeTrial(activeTrial, onInterval);
-    if (session.instrument === 'pitch') completed = await audio.playPitchTrial(activeTrial, onInterval);
+    if (state.session.instrument === 'headphones')
+      completed = await state.audio.playHeadphoneTrial(state.activeTrial, onInterval);
+    if (state.session.instrument === 'range')
+      completed = await state.audio.playRangeTrial(state.activeTrial, onInterval);
+    if (state.session.instrument === 'pitch')
+      completed = await state.audio.playPitchTrial(state.activeTrial, onInterval);
   } catch {
     pauseRun('Audio playback was interrupted.');
     return;
   }
-  if (!completed || !session || !document.body.classList.contains('au-running')) return;
+  if (!completed || !state.session || !document.body.classList.contains('au-running')) return;
   clearIntervalHighlights();
-  responseOpen = true;
+  state.responseOpen = true;
   setResponseDisabled(false);
-  if (status) status.textContent = questionFor(session.instrument);
-  app.querySelector('[data-au-response]')?.focus({ preventScroll: true });
+  if (status) status.textContent = t(questionFor(state.session.instrument));
+  state.app.querySelector('[data-au-response]')?.focus({ preventScroll: true });
 }
 
 function showInterval(index) {
   clearIntervalHighlights();
-  app.querySelectorAll('[data-au-intervals] > div')[index]?.classList.add('is-live');
-  const status = app.querySelector('[data-au-status]');
-  if (status) status.textContent = `Sound ${index + 1}`;
+  state.app.querySelectorAll('[data-au-intervals] > div')[index]?.classList.add('is-live');
+  const status = state.app.querySelector('[data-au-status]');
+  if (status) status.textContent = t('Sound {number}', { number: index + 1 });
 }
 
 function clearIntervalHighlights() {
-  for (const interval of app.querySelectorAll('[data-au-intervals] > div'))
+  for (const interval of state.app.querySelectorAll('[data-au-intervals] > div'))
     interval.classList.remove('is-live');
 }
 
@@ -425,27 +423,28 @@ function correctInterval(trial) {
 }
 
 function chooseInterval(selectedInterval) {
-  if (!responseOpen || !activeTrial || !session) return;
-  responseOpen = false;
+  if (!state.responseOpen || !state.activeTrial || !state.session) return;
+  state.responseOpen = false;
   setResponseDisabled(true);
-  const correct = selectedInterval === correctInterval(activeTrial);
-  if (session.instrument === 'headphones') {
-    if (session.block === 'scored') session.headphoneRecords.push({ ...activeTrial, correct });
-    session.index += 1;
-  } else if (session.instrument === 'range') {
-    recordRangeResponse(session.rangeTrack, activeTrial, selectedInterval);
+  const correct = selectedInterval === correctInterval(state.activeTrial);
+  if (state.session.instrument === 'headphones') {
+    if (state.session.block === 'scored')
+      state.session.headphoneRecords.push({ ...state.activeTrial, correct });
+    state.session.index += 1;
+  } else if (state.session.instrument === 'range') {
+    recordRangeResponse(state.session.rangeTrack, state.activeTrial, selectedInterval);
   } else {
-    recordPitchResponse(session.pitchTracks, activeTrial, selectedInterval);
+    recordPitchResponse(state.session.pitchTracks, state.activeTrial, selectedInterval);
   }
-  const feedback = app.querySelector('[data-au-feedback]');
-  if (feedback) feedback.textContent = feedbackText(correct);
-  feedbackTimer = window.setTimeout(prepareNextTrial, config.feedbackMs);
+  const feedback = state.app.querySelector('[data-au-feedback]');
+  if (feedback) feedback.textContent = t(feedbackText(correct));
+  state.feedbackTimer = window.setTimeout(prepareNextTrial, state.config.feedbackMs);
 }
 
 function feedbackText(correct) {
-  if (session.instrument === 'headphones' && session.block === 'practice')
+  if (state.session.instrument === 'headphones' && state.session.block === 'practice')
     return correct ? 'Yes—that was the quieter tone.' : 'Listen for the tone with lower level.';
-  if (session.instrument === 'range' && activeTrial.control)
+  if (state.session.instrument === 'range' && state.activeTrial.control)
     return correct ? 'Control tone found.' : 'Control tone missed; setup confidence will be limited.';
   return 'Response recorded.';
 }
@@ -453,8 +452,8 @@ function feedbackText(correct) {
 function finishHeadphoneBlock() {
   stopPlayback();
   document.body.classList.remove('au-running');
-  if (session.block === 'practice') {
-    app.innerHTML = `<section class="au-transition ui-container"><span class="au-transition__mark" aria-hidden="true">✓</span><p class="ui-eyebrow">Cuffie / practice complete</p><h1>Now six measured trials.</h1><p>The phase-based decoy appears only in the measured block. Keep the volume unchanged.</p><button class="ui-button ui-button--lg" type="button" data-action="au-begin-measured">Begin headphone check <span aria-hidden="true">→</span></button></section>`;
+  if (state.session.block === 'practice') {
+    state.app.innerHTML = `<section class="au-transition ui-container"><span class="au-transition__mark" aria-hidden="true">✓</span><p class="ui-eyebrow">Cuffie / practice complete</p><h1>Now six measured trials.</h1><p>The phase-based decoy appears only in the measured block. Keep the volume unchanged.</p><button class="ui-button ui-button--lg" type="button" data-action="au-begin-measured">Begin headphone check <span aria-hidden="true">→</span></button></section>`;
     return;
   }
   finishInstrument('headphones');
@@ -466,27 +465,27 @@ function finishInstrument(completed) {
   const next = completed === 'headphones' ? 'range' : 'pitch';
   const summary =
     completed === 'headphones'
-      ? summarizeHeadphones(session.headphoneRecords, config.headphones.passCorrect)
-      : summarizeRange(session.rangeTrack);
+      ? summarizeHeadphones(state.session.headphoneRecords, state.config.headphones.passCorrect)
+      : summarizeRange(state.session.rangeTrack);
   const line =
     completed === 'headphones'
       ? `${summary.correct} of ${summary.trials} quiet targets located. This is evidence about presentation, not proof of hardware.`
       : `${summary.trials} adaptive presentations recorded${summary.controlAccuracyPercent === null ? '' : `; control accuracy ${summary.controlAccuracyPercent}%`} without changing volume.`;
-  app.innerHTML = `<section class="au-transition ui-container"><span class="au-transition__mark" aria-hidden="true">${INSTRUMENTS[completed].number}</span><p class="ui-eyebrow">Instrument complete</p><h1>Measurement recorded: ${INSTRUMENTS[completed].name}.</h1><p>${line}</p><button class="ui-button ui-button--lg" type="button" data-action="au-next-stage" data-next="${next}">Continue to ${INSTRUMENTS[next].name} <span aria-hidden="true">→</span></button></section>`;
+  state.app.innerHTML = `<section class="au-transition ui-container"><span class="au-transition__mark" aria-hidden="true">${INSTRUMENTS[completed].number}</span><p class="ui-eyebrow">Instrument complete</p><h1>Measurement recorded: ${INSTRUMENTS[completed].name}.</h1><p>${line}</p><button class="ui-button ui-button--lg" type="button" data-action="au-next-stage" data-next="${next}">Continue to ${INSTRUMENTS[next].name} <span aria-hidden="true">→</span></button></section>`;
 }
 
 function updateRunnerMeta() {
-  const count = app.querySelector('[data-au-count]');
+  const count = state.app.querySelector('[data-au-count]');
   if (!count) return;
-  if (session.instrument === 'headphones')
-    count.textContent = `${session.index + 1} / ${session.queue.length}`;
-  if (session.instrument === 'range') {
-    const complete = session.rangeTrack.records.length;
-    count.textContent = `Adaptive · ${complete + 1}`;
+  if (state.session.instrument === 'headphones')
+    count.textContent = `${state.session.index + 1} / ${state.session.queue.length}`;
+  if (state.session.instrument === 'range') {
+    const complete = state.session.rangeTrack.records.length;
+    count.textContent = t('Adaptive · {count}', { count: complete + 1 });
   }
-  if (session.instrument === 'pitch') {
-    const complete = session.pitchTracks.reduce((sum, track) => sum + track.records.length, 0);
-    count.textContent = `Interleaved · ${complete + 1}`;
+  if (state.session.instrument === 'pitch') {
+    const complete = state.session.pitchTracks.reduce((sum, track) => sum + track.records.length, 0);
+    count.textContent = t('Interleaved · {count}', { count: complete + 1 });
   }
 }
 
@@ -495,19 +494,19 @@ function renderResults() {
   trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.udito);
   document.body.classList.add('lab-mode');
   document.body.classList.remove('au-running');
-  document.title = 'Your listening profile — Udito | Sense6';
-  const headphones = summarizeHeadphones(session.headphoneRecords, config.headphones.passCorrect);
-  const range = summarizeRange(session.rangeTrack);
-  const pitch = summarizePitch(session.pitchTracks);
+  document.title = t('Your listening profile — Udito | Sense6');
+  const headphones = summarizeHeadphones(state.session.headphoneRecords, state.config.headphones.passCorrect);
+  const range = summarizeRange(state.session.rangeTrack);
+  const pitch = summarizePitch(state.session.pitchTracks);
   const controlsOkay = range.controlAccuracyPercent === null || range.controlAccuracyPercent >= 50;
   const settled = pitch.every((item) => item.thresholdPercent !== null) && range.thresholdHz !== null;
   const usable = headphones.headphoneLike && controlsOkay && settled;
   const setupQuality = usable ? 'Setup checks coherent' : 'Interpret with caution';
   const result = { headphones, range, pitch, usable, setupQuality };
-  session.result = result;
-  saveLast({ setupQuality, sampleRate: session.sampleRate, recordedAt: Date.now() });
+  state.session.result = result;
+  saveLast({ setupQuality, sampleRate: state.session.sampleRate, recordedAt: Date.now() });
 
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="au-results ui-container ui-container--wide">
       <button class="back-link" type="button" data-action="au-home"><span aria-hidden="true">←</span> All tests</button>
       <header class="au-results__hero"><div><p class="ui-eyebrow">Udito / this setup / this run</p><h1>Three listening measures.<br><em>No hearing label.</em></h1><p>${usable ? 'The setup checks and adaptive tracks produced a coherent run-level profile.' : 'At least one setup check or adaptive track did not settle. The observations remain visible, but comparison should wait for a steadier repeat.'}</p></div><div class="au-results__stamp ${usable ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>03 / 03</strong></div></header>
@@ -518,7 +517,7 @@ function renderResults() {
         ${resultCard('03b', 'Pitch step near 2 kHz', formatPitch(pitch, 2000), pitchDetail(pitch, 2000), 'Reported separately; no composite hearing score is calculated.')}
       </div>
       <div class="au-context-grid">
-        <article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the sound.</h2><dl><div><dt>Listening setup</dt><dd>${deviceLabel(session.device)}</dd></div><div><dt>Audio context</dt><dd>${formatNumber(session.sampleRate)} Hz</dd></div><div><dt>Portata controls</dt><dd>${range.controlAccuracyPercent === null ? 'Not sampled' : `${range.controlAccuracyPercent}%`}</dd></div><div><dt>Interruptions</dt><dd>${session.interruptions}</dd></div></dl></article>
+        <article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the sound.</h2><dl><div><dt>Listening setup</dt><dd>${deviceLabel(state.session.device)}</dd></div><div><dt>Audio context</dt><dd>${formatNumber(state.session.sampleRate)} Hz</dd></div><div><dt>Portata controls</dt><dd>${range.controlAccuracyPercent === null ? 'Not sampled' : `${range.controlAccuracyPercent}%`}</dd></div><div><dt>Interruptions</dt><dd>${state.session.interruptions}</dd></div></dl></article>
         <article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Device-relative, never dB HL.</h2><p>A browser knows digital amplitude, not sound pressure at your eardrum. Headphone response, fit, output, age, room noise, device processing, and the volume setting all shape these numbers.</p><p>Do not infer hearing age, “normal” hearing, safety for work, or a medical diagnosis. If hearing concerns affect daily life, use calibrated clinical audiometry.</p></article>
       </div>
       <aside class="au-results__safety"><strong>Keep the same volume only for comparison.</strong><p>Compare your own runs only with the same device, headphones, fit, room, and volume. Stop testing if any sound is uncomfortable.</p></aside>
@@ -557,12 +556,12 @@ function deviceLabel(device) {
 }
 
 function pauseRun(message = 'This playback was interrupted.') {
-  if (!session || !document.body.classList.contains('au-running')) return;
+  if (!state.session || !document.body.classList.contains('au-running')) return;
   stopPlayback();
-  audio?.suspend();
-  session.interruptions += 1;
+  state.audio?.suspend();
+  state.session.interruptions += 1;
   document.body.classList.remove('au-running');
-  app.innerHTML = `<section class="au-transition ui-container" data-au-paused><span class="au-transition__mark" aria-hidden="true">Ⅱ</span><p class="ui-eyebrow">Listening paused</p><h1>${message}</h1><p>The current trial was discarded. Return when the tab can stay visible; the same trial will replay from the beginning.</p><button class="ui-button ui-button--lg" type="button" data-action="au-resume">Replay this trial <span aria-hidden="true">→</span></button></section>`;
+  state.app.innerHTML = `<section class="au-transition ui-container" data-au-paused><span class="au-transition__mark" aria-hidden="true">Ⅱ</span><p class="ui-eyebrow">Listening paused</p><h1>${message}</h1><p>The current trial was discarded. Return when the tab can stay visible; the same trial will replay from the beginning.</p><button class="ui-button ui-button--lg" type="button" data-action="au-resume">Replay this trial <span aria-hidden="true">→</span></button></section>`;
 }
 
 function resumeRun() {
@@ -578,13 +577,13 @@ function stopSafely() {
 }
 
 function copyResults() {
-  if (!session?.result) return;
-  const { headphones, range, pitch } = session.result;
+  if (!state.session?.result) return;
+  const { headphones, range, pitch } = state.session.result;
   const text = [
     t('Udito — device-relative listening profile'),
     t('Setup: {device}; {sampleRate} Hz audio context', {
-      device: t(deviceLabel(session.device)),
-      sampleRate: formatNumber(session.sampleRate),
+      device: t(deviceLabel(state.session.device)),
+      sampleRate: formatNumber(state.session.sampleRate),
     }),
     t('Headphone confidence: {correct}/{trials} ({confidence})', {
       correct: headphones.correct,
@@ -603,14 +602,14 @@ function copyResults() {
 }
 
 function setResponseDisabled(disabled) {
-  for (const button of app.querySelectorAll('[data-au-response]')) button.disabled = disabled;
+  for (const button of state.app.querySelectorAll('[data-au-response]')) button.disabled = disabled;
 }
 
 function stopPlayback() {
-  clearTimeout(feedbackTimer);
-  feedbackTimer = 0;
-  responseOpen = false;
-  audio?.stop();
+  clearTimeout(state.feedbackTimer);
+  state.feedbackTimer = 0;
+  state.responseOpen = false;
+  state.audio?.stop();
 }
 
 function wireEvents(signal) {
@@ -624,7 +623,7 @@ function wireEvents(signal) {
       if (action.matches('a')) event.preventDefault();
       switch (action.dataset.action) {
         case 'au-home':
-          goHome();
+          state.goHome();
           break;
         case 'au-intro':
           renderIntro();
@@ -633,7 +632,7 @@ function wireEvents(signal) {
           renderSetup();
           break;
         case 'au-method':
-          app.querySelector('#au-method')?.scrollIntoView({ behavior: 'smooth' });
+          state.app.querySelector('#au-method')?.scrollIntoView({ behavior: 'smooth' });
           break;
         case 'au-reference':
           playReference();
@@ -648,8 +647,8 @@ function wireEvents(signal) {
           beginMeasuredHeadphones();
           break;
         case 'au-next-stage':
-          session.instrument = action.dataset.next;
-          session.block = 'adaptive';
+          state.session.instrument = action.dataset.next;
+          state.session.block = 'adaptive';
           renderBrief(action.dataset.next);
           break;
         case 'au-resume':
@@ -678,9 +677,9 @@ function wireEvents(signal) {
   document.addEventListener(
     'keydown',
     (event) => {
-      if (event.repeat || !responseOpen || !['1', '2', '3'].includes(event.key)) return;
+      if (event.repeat || !state.responseOpen || !['1', '2', '3'].includes(event.key)) return;
       const selected = Number(event.key) - 1;
-      if (app.querySelector(`[data-au-response="${selected}"]`)) {
+      if (state.app.querySelector(`[data-au-response="${selected}"]`)) {
         event.preventDefault();
         chooseInterval(selected);
       }
@@ -699,17 +698,12 @@ function runtimeConfig() {
 }
 
 function saveLast(result) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
-  } catch {
-    if (announcer) announcer.textContent = 'The result is ready, but local storage was unavailable.';
+  if (!RESULT_STORE.save(result)) {
+    if (state.announcer)
+      state.announcer.textContent = t('The result is ready, but local storage was unavailable.');
   }
 }
 
 function loadLast() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY));
-  } catch {
-    return null;
-  }
+  return RESULT_STORE.load();
 }

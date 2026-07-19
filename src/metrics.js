@@ -1,3 +1,5 @@
+import { EXAMS } from './exams/registry.js';
+
 export const METRIC_EVENTS = Object.freeze({
   siteLoaded: 'site_loaded',
   testStarted: 'test_started',
@@ -7,11 +9,7 @@ export const METRIC_EVENTS = Object.freeze({
 
 export const METRIC_TESTS = Object.freeze({
   site: 'site',
-  tetracromia: 'tetracromia',
-  daltonia: 'daltonia',
-  riflessi: 'riflessi',
-  udito: 'udito',
-  acutezza: 'acutezza',
+  ...Object.fromEntries(EXAMS.map(({ metricTest }) => [metricTest, metricTest])),
 });
 
 const ALLOWED_PAIRS = new Set([

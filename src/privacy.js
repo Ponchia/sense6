@@ -1,6 +1,6 @@
 const PRIVACY_EMAIL = 'privacy@sense6.net';
 
-const COPY = Object.freeze({
+export const PRIVACY_COPY = Object.freeze({
   en: {
     title: 'Privacy at Sense6',
     eyebrow: 'Privacy / plain language',
@@ -334,12 +334,12 @@ const LINKS = Object.freeze({
 
 export function renderPrivacy(context) {
   const { app, locale, localeHref } = context;
-  const copy = COPY[locale] ?? COPY.en;
+  const copy = privacyCopy(locale);
   document.title = `${copy.title} | Sense6`;
 
   app.innerHTML = `
     <article class="privacy-view ui-container">
-      <a class="back-link privacy-view__back" href="${localeHref('')}">
+      <a class="back-link privacy-view__back" data-sense6-route="" href="${localeHref('')}">
         <span aria-hidden="true">←</span> ${copy.back}
       </a>
 
@@ -367,7 +367,7 @@ export function renderPrivacy(context) {
                 <span class="privacy-section__number" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span>
                 <div>
                   <h2 id="privacy-section-${index}">${section.title}</h2>
-                  ${section.paragraphs.map((paragraph) => `<p>${withLinks(paragraph)}</p>`).join('')}
+                  ${section.paragraphs.map((paragraph) => `<p>${privacyHtml(paragraph)}</p>`).join('')}
                 </div>
               </section>
             `,
@@ -380,6 +380,10 @@ export function renderPrivacy(context) {
   return () => {};
 }
 
-function withLinks(text) {
+export function privacyCopy(locale) {
+  return PRIVACY_COPY[locale] ?? PRIVACY_COPY.en;
+}
+
+export function privacyHtml(text) {
   return Object.entries(LINKS).reduce((output, [name, link]) => output.replaceAll(`{${name}}`, link), text);
 }

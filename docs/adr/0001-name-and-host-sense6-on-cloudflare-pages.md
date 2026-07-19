@@ -26,8 +26,8 @@ security headers.
 - Use `https://sense6.net` as the canonical production origin.
 - Deploy the static site to the Cloudflare Pages project `sense6` by direct
   upload from GitHub Actions.
-- Run `npm run check` before deployment, store its generated `dist/` directory
-  as a short-lived workflow artifact, and deploy those exact verified files.
+- Build and run `npm run check` in one deployment job, then upload that exact
+  verified `dist/` directory without rebuilding it or retaining an artifact.
 - Keep security and cache policy in `public/_headers` so Vite copies it into the
   deployed bundle.
 - Redirect `www.sense6.net` and the former hostname to the canonical origin.
@@ -37,9 +37,7 @@ security headers.
 ## Consequences
 
 - The public site no longer depends on the personal Kubernetes cluster.
-- Rollback redeploys a previous verified Pages deployment. The old Kubernetes
-  workload remains available until the cutover is verified and its retirement
-  change is merged.
+- Rollback selects a previous verified Pages deployment.
 - Browser storage is origin-bound. Existing summaries under the former origin
   are not deleted, but they are not visible from `sense6.net`. Returning to the
   former origin before its retirement restores access to them.
