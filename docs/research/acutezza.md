@@ -3,22 +3,17 @@
 <!-- vale on -->
 <!-- vale Vale.Spelling = NO -->
 
-Status: implemented as a nonclinical experiment; external validation pending,
-2026-07-19
+Status: implemented as a permanently experimental, nonclinical browser task;
+no certification or formal validation planned, 2026-07-19
 
-The operational [external-validation protocol](acutezza-validation-protocol.md)
-defines the physical-device matrix, paired FrACT procedure, evidence file,
-analysis, and professional-review gate. No participant or clinical-review
-evidence has been collected in this repository.
-
-Acutezza should be a calibrated browser sharpness experiment, not an online eye
-exam. It should describe what a person resolved on one screen, at one estimated
+Acutezza is a calibrated browser sharpness experiment, not an online eye exam.
+It describes what a person resolved on one screen, at one estimated
 distance, with one stated correction. It must not diagnose astigmatism, produce
 a prescription, or classify vision as normal or abnormal.
 
-This brief defines the evidence boundary and a protocol that fits Sense6's
-existing product contract. It does not claim that the resulting implementation
-has clinical validity. That would require a separate validation study.
+This brief records the design rationale, software contract, and evidence
+boundary. Published methods inform the task, but do not validate Sense6's
+implementation. Scientific or clinical validation is not planned.
 
 ## Recommendation
 
@@ -41,9 +36,9 @@ and meridional response consistency. Do not show Snellen fractions, clinical
 logMAR labels, cylinder power, a prescription axis, pass or fail, population
 percentiles, or reassurance that vision is normal.
 
-Limit the initial release to adults aged 18 or older. Pediatric acuity and
-crowding need a separate protocol, age-appropriate instructions, and their own
-validation.
+Limit the experiment to adults aged 18 or older. Pediatric acuity and crowding
+need different instructions and controls and are outside this recreational
+project's scope.
 
 ## Why calibration is the load-bearing constraint
 
@@ -53,7 +48,7 @@ relationship between logical and backing pixels; it does not establish screen
 millimetres. Rendering a familiar eye-chart symbol without both measurements
 would create a precise-looking but meaningless result.
 
-The proposed calibration follows the validated virtual-chinrest method:
+The calibration follows a published virtual-chinrest method:
 
 - Ask the user to resize an on-screen rectangle to an ISO ID-1 bank or identity
   card, whose width is 85.60 mm. Tell them to use the blank side. The app reads
@@ -186,9 +181,9 @@ differently in 8 of 10 repeated comparisons.” It must not say “astigmatism a
 also reflect display rasterization, correction, accommodation, tear film,
 attention, or neural adaptation.
 
-This instrument is exploratory. Keep the roadmap wording and result copy away
-from an astigmatism-screening claim until a prospective comparison against
-subjective refraction establishes what the signal means.
+This instrument is exploratory. Keep the wording and result copy away from an
+astigmatism-screening claim. Sense6 does not plan a prospective clinical
+comparison or certification effort.
 
 ## Result contract
 
@@ -230,10 +225,10 @@ accessible:
 - pause and invalidate the current trial when the tab loses visibility; and
 - allow the person to stop between eye blocks without losing the completed eye.
 
-Do not use webcam distance estimation in the first implementation. It adds camera
-permission, privacy concerns, device-specific face geometry, and another
-unvalidated estimator. Do not add a second-device remote until Sense6 has a
-privacy-preserving connection design and a real need for clinical distance.
+Do not use webcam distance estimation. It adds camera permission, privacy
+concerns, device-specific face geometry, and another unvalidated estimator. Do
+not add a second-device remote until Sense6 has a privacy-preserving connection
+design and a clear recreational use for the added complexity.
 
 ## Regulatory and product boundary
 
@@ -244,9 +239,9 @@ Commission software guidance should be reviewed before making medical claims.
 
 The FDA previously warned Opternative for marketing an uncleared online
 refraction examination. A later cleared web acuity product is limited to adults
-aged 22–40, uses two devices at 10 feet, reports only two categories, and positions
-the result as support for an eye-care provider. That comparison shows how much
-validation and restriction sit behind even a narrow medical claim.
+aged 22–40, uses two devices at 10 feet, reports only two categories, and
+positions the result as support for an eye-care provider. That comparison shows
+how much evidence and restriction sit behind even a narrow medical claim.
 
 Sense6 should remain a general perception experiment. Avoid these words in
 results and marketing: screening, normal vision, abnormal vision, 20/20, 6/6,
@@ -255,9 +250,9 @@ amblyopia, cylinder, prescription, pass, and fail.
 
 This section records a product guardrail, not legal advice.
 
-## Implementation shape
+## Implementation shape and verification
 
-Add these components when implementation begins:
+The implementation uses these components:
 
 - `src/exams/acutezza.js`: intro, setup, calibration, eye blocks, result, cleanup,
   and copied summary;
@@ -269,37 +264,22 @@ Add these components when implementation begins:
 - browser tests for zoom invalidation, visibility changes, keyboard/touch paths,
   small-screen refusal, both eye blocks, accessibility, and all twelve locales.
 
-The browser implementation now covers this shape. Registration as a public,
-nonclinical experiment does not satisfy or replace the external validation gates
-below.
+The browser implementation covers this shape.
 
-## Validation status and gates before any clinical claim
+## Software-verification boundary
 
-1. Verify Landolt geometry and visual-angle conversion against independent
-   calculations at several pixel densities and distances.
-2. Recover known simulated thresholds without material bias across the supported
-   range and expose a calibrated uncertainty interval.
-3. Verify card calibration repeatability and blind-spot distance repeatability on
-   phones, tablets, standard-density monitors, and high-density monitors.
-4. Compare Nitidezza against FrACT at the same measured distance on multiple
-   displays. Document mean bias and Bland–Altman limits rather than correlation
-   alone.
-5. Run test-retest sessions and confirm that 18 trials per condition provide an
-   acceptable precision/burden tradeoff for Sense6.
-6. Treat Meridiani as qualitative until a preregistered comparison with clinical
-   subjective refraction shows useful agreement.
-7. Have an optometrist or ophthalmologist review the setup, safety copy, result
-   language, and medical-device boundary before public release.
+Deterministic unit and simulation tests verify Landolt geometry, visual-angle
+conversion, estimator behavior, and known simulated thresholds. Browser tests
+cover geometry invalidation, both eye blocks, keyboard and touch interaction,
+responsive layout, twelve locales, and automated accessibility checks.
 
-The software implementation covers gates 1 and 2 with deterministic unit and
-simulation tests, and covers browser geometry invalidation, both eye blocks,
-keyboard and touch interaction, responsive layout, twelve locales, and automated
-accessibility checks. Gates 3–7 require physical-device, comparative, test-retest,
-or professional review and remain open.
-
-Until those gates are met, every angular value remains explicitly a task
-threshold from one calibrated browser run. It must not be presented as clinical
-visual acuity, a Snellen equivalent, screening, diagnosis, or reassurance.
+Those checks establish implementation behavior only. They provide no
+physical-device repeatability evidence, comparison with a clinical instrument,
+participant study, professional review, certification, or scientific validity.
+Sense6 does not plan to collect those forms of evidence. Every angular value
+therefore remains a task threshold from one calibrated browser run and must not
+be presented as clinical visual acuity, a Snellen equivalent, screening,
+diagnosis, or reassurance.
 
 ## Evidence and sources
 

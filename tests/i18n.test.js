@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { aboutCopy, aboutMarkup } from '../src/about.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { journalCopy, journalSetupLabel } from '../src/journal-copy.js';
 import { DEFAULT_LOCALE, LOCALES, loadMessages, localeMetadata, resolveLocale } from '../src/locales.js';
@@ -106,6 +107,8 @@ test('privacy and journal routes have dedicated copy in every supported language
 test('critical navigation and safety copy exists in every language', async () => {
   const keys = [
     'All tests',
+    'About',
+    'How Sense6 works',
     'Language',
     'Never raise volume to chase a missing high tone. Stop immediately for discomfort, pain, pressure, or ringing.',
     'An RGB screen cannot test tetrachromacy.',
@@ -117,6 +120,19 @@ test('critical navigation and safety copy exists in every language', async () =>
   for (const { code } of LOCALES) {
     const messages = await loadMessages(code);
     for (const key of keys) assert.ok(messages.get(key));
+  }
+});
+
+test('the About page has complete, dedicated copy for every locale', () => {
+  const examIds = EXAMS.map(({ id }) => id).sort();
+  const english = aboutCopy('en');
+  for (const { code } of LOCALES) {
+    const page = aboutCopy(code);
+    assert.equal(page.profileLabel, 'Zeno');
+    assert.deepEqual(Object.keys(page.experiments).sort(), examIds);
+    assert.match(page.summary, /Sense6/);
+    assert.doesNotMatch(aboutMarkup(code), /\{(?:profile|privacy)\}/);
+    if (code !== 'en') assert.notEqual(page.title, english.title);
   }
 });
 

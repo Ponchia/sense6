@@ -11,6 +11,8 @@ const rows = [
   ['Language', 'Language'],
   ['Measure carefully. Keep it private.', 'Measure carefully. Keep it private.'],
   ['All tests', 'All tests'],
+  ['About', 'About'],
+  ['How Sense6 works', 'How Sense6 works'],
   ['Anonymous daily counts · no cookies', 'Anonymous daily counts · no cookies'],
   ['Source', 'Source'],
   ['Sense6 — measure what your senses notice', 'Sense6 — measure what your senses notice'],

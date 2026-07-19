@@ -3,12 +3,17 @@
 <!-- vale on -->
 <!-- vale Vale.Spelling = NO -->
 
-A small collection of honest, browser-based perception tests. Every gallery,
-exam, journal, and privacy route has a substantive localized HTML entry page
-for people, search engines, and text-retrieval tools. JavaScript then mounts the
-selected experiment as a progressively enhanced module; results and answers
-remain local. The service stores only anonymous daily totals for page loads,
-measured-test starts, measured-test completions, and future report downloads.
+A small collection of experimental browser-based perception tests, made for
+curiosity and fun. Every gallery, exam, About, journal, and privacy route has a
+substantive localized HTML entry page for people, search engines, and
+text-retrieval tools. JavaScript then mounts the selected experiment as a
+progressively enhanced module; results and answers remain local. The service
+stores only anonymous daily activity totals. Sense6 is not validated,
+certified, diagnostic, or intended to become a medical product.
+
+The localized [About page](https://sense6.net/en/about/) explains how the tasks
+work, who maintains them, their privacy boundary, and what each result can and
+cannot describe.
 
 Live exams:
 
@@ -40,11 +45,11 @@ gallery facts, metadata, metrics, static pages, and runtime module loading.
 
 Acutezza's source-backed [research and implementation
 brief](docs/research/acutezza.md) records the method, product boundary, completed
-software checks, and the external validation still required before making any
-clinical claim.
+software checks, and the permanent distinction between implementation
+verification and scientific validity.
 
 The [product and engineering roadmap](docs/roadmap.md) records the completed
-private repeated-run journal and Acutezza's remaining external evidence gates.
+private repeated-run journal and the permanent experimental product boundary.
 The shared lifecycle, versioned persistence, route-level loading, and bundle
 budgets are established foundations.
 
@@ -276,11 +281,12 @@ accessibility, and mobile overflow.
 
 ## Static discovery and crawler policy
 
-`npm run build` creates 97 localized static entry pages: the root, all twelve
-galleries, all 60 exam routes, all twelve journal routes, and all twelve
-privacy routes. Each route contains useful content without JavaScript, a unique
-title and description, a canonical URL, reciprocal `hreflang` links, truthful
-structured data, research links, and real internal links. The build also
+`npm run build` creates 109 localized static entry pages: the root, all twelve
+galleries, all 60 exam routes, all twelve About routes, all twelve journal
+routes, and all twelve privacy routes. Each route contains useful content
+without JavaScript, a unique title and description, a canonical URL, reciprocal
+`hreflang` links, truthful structured data, research links, and real internal
+links. The build also
 creates an exact sitemap, `robots.txt`, an optional `llms.txt` discovery
 summary, and a script-free `404.html` so unknown paths don't become indexable
 soft-404 responses.
@@ -295,7 +301,8 @@ fails after that deadline until the policy is reviewed. Preview deployments
 send `X-Robots-Tag: noindex`.
 
 Static pages are generated from `src/exams/registry.js`, the locale catalogs,
-and the privacy copy. Don't hand-edit files under `dist/`.
+the structured About copy, and the privacy copy. Don't hand-edit files under
+`dist/`.
 
 ## Develop and test
 
@@ -322,14 +329,6 @@ Run unit tests with enforced coverage for shared storage and lifecycle code:
 
 ```sh
 npm run test:coverage
-```
-
-Validate the empty Acutezza evidence contract, or pass a local observation file
-to its validator as described in the
-[external-validation protocol](docs/research/acutezza-validation-protocol.md):
-
-```sh
-npm run validate:acutezza
 ```
 
 Build the production bundle:
@@ -422,7 +421,7 @@ result matters.
 
 ## Maintainer
 
-[Ponchia](https://github.com/Ponchia)
+[Zeno](https://personal.brontolotto.observer)
 
 ## License
 

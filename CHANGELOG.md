@@ -10,13 +10,13 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- A twelve-language About and methodology page with visible authorship, permanent
+  experimental boundaries, per-experiment interpretation limits, privacy and
+  quality explanations, research links, static HTML, and structured data.
 - A local-only, versioned multi-run journal with setup passports,
   instrument-specific comparability, uncertainty and bound-aware changes,
   validated import/export, individual and complete deletion, twelve localized
   routes, and recording from all five experiments.
-- An Acutezza external-validation protocol, machine-readable observation
-  schema, and evidence validator for the physical-device, FrACT, test-retest,
-  and professional-review gates that cannot be satisfied by software tests.
 - A centralized, dated crawler policy with an automated review deadline.
 - Privacy-preserving product metrics that store only daily aggregate page-load,
   measured-start, measured-completion, and future report-download counts in D1,
@@ -29,8 +29,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   Arabic, Japanese, Korean, Hindi, and Simplified Chinese interfaces across the
   gallery, all five exams, safety/setup flows, live tasks, result screens,
   accessibility labels, metadata, privacy notice, journal, and copied summaries.
-- Localized static entry pages for every gallery, exam, and privacy route, with
-  substantive no-JavaScript content, canonical and `hreflang` metadata,
+- Localized static entry pages for every gallery, exam, About, journal, and
+  privacy route, with substantive no-JavaScript content, canonical and
+  `hreflang` metadata,
   structured data, an exact sitemap, crawler policy, `llms.txt`, and a real 404.
 - Locale-aware canonical paths, historic hash-link compatibility, first-visit
   browser-language detection, persistent language selection, English fallback,
@@ -76,6 +77,10 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 
+- Sense6 now explicitly positions every task as a recreational experiment for
+  curiosity and fun. Formal validation, certification, regulatory approval, and
+  professional review are not planned; software tests prove implementation
+  behavior only.
 - The npm package now uses the `sense6` project name, and the public footer no
   longer links to a private source repository.
 - Acutezza's roadmap promise now describes calibrated sharpness and meridional
@@ -92,6 +97,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - `Daltonia` now reports display-relative thresholds instead of fixed plate
   percentages or clinical-looking pass/fail categories. Its interface and
   research trail explicitly identify that the implementation isn't validated.
+
+### Removed
+
+- The unused Acutezza external-validation protocol, observation schema, and
+  evidence validator, which contradicted the permanent experimental product
+  boundary.
 
 ### Fixed
 
