@@ -1,4 +1,4 @@
-import { dbToGain } from './hearing.js';
+import { dbToGain, HEARING_DIGITAL_LEVELS } from './hearing.js';
 
 export class HearingAudio {
   constructor(config) {
@@ -6,9 +6,16 @@ export class HearingAudio {
     this.context = null;
     this.master = null;
     this.nodes = new Set();
-    this.timers = new Set();
     this.pendingWaits = new Set();
     this.playToken = 0;
+    this.onStateChange = null;
+    this.onOutputChange = null;
+    this.handleContextStateChange = () => {
+      const contextState = this.context?.state ?? 'closed';
+      if (contextState !== 'running') this.stop();
+      this.onStateChange?.(contextState);
+    };
+    this.handleSinkChange = () => this.onOutputChange?.();
   }
 
   get supported() {
@@ -19,16 +26,27 @@ export class HearingAudio {
     return this.context?.sampleRate ?? null;
   }
 
+  get state() {
+    return this.context?.state ?? 'closed';
+  }
+
   async init() {
     if (!this.supported) throw new Error('Web Audio is unavailable');
+    if (this.context?.state === 'closed') {
+      this.context = null;
+      this.master = null;
+    }
     if (!this.context) {
       const AudioContextClass = globalThis.AudioContext || globalThis.webkitAudioContext;
       this.context = new AudioContextClass({ latencyHint: 'interactive' });
+      this.context.addEventListener?.('statechange', this.handleContextStateChange);
+      this.context.addEventListener?.('sinkchange', this.handleSinkChange);
       this.master = this.context.createGain();
       this.master.gain.value = this.config.masterGain;
       this.master.connect(this.context.destination);
     }
-    if (this.context.state === 'suspended') await this.context.resume();
+    if (this.context.state !== 'running') await this.context.resume();
+    if (this.context.state !== 'running') throw new Error('Audio context is not running');
     return this.context;
   }
 
@@ -38,36 +56,20 @@ export class HearingAudio {
     const token = this.playToken;
     const startAt = this.context.currentTime + 0.05;
     const durationSeconds = this.config.referenceMs / 1000;
-    const source = this.context.createBufferSource();
-    const samples = Math.ceil(this.context.sampleRate * durationSeconds);
-    const buffer = this.context.createBuffer(2, samples, this.context.sampleRate);
-    for (let channel = 0; channel < buffer.numberOfChannels; channel += 1) {
-      const data = buffer.getChannelData(channel);
-      let memory = 0;
-      for (let index = 0; index < samples; index += 1) {
-        const white = Math.random() * 2 - 1;
-        memory = memory * 0.92 + white * 0.08;
-        data[index] = memory * 1.8;
-      }
-    }
-    source.buffer = buffer;
-    const filter = this.context.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.value = 1000;
-    filter.Q.value = 0.55;
-    const envelope = this.context.createGain();
-    scheduleEnvelope(envelope.gain, startAt, durationSeconds, Math.min(0.08, durationSeconds / 3), 0.68);
-    source.connect(filter).connect(envelope).connect(this.master);
-    this.track(source, filter, envelope);
-    source.start(startAt);
-    source.stop(startAt + durationSeconds + 0.02);
-    return this.waitFor(durationSeconds + 0.08, token);
+    this.scheduleTone({
+      frequencyHz: 1000,
+      gain: HEARING_DIGITAL_LEVELS.reference,
+      startAt,
+      toneSeconds: durationSeconds,
+      rampSeconds: Math.min(0.08, durationSeconds / 3),
+    });
+    return this.waitForAudioTime(startAt + durationSeconds + 0.03, token);
   }
 
   async playHeadphoneTrial(trial, onInterval) {
     const intervals = [0, 1, 2].map((index) => ({
       frequencyHz: 200,
-      gain: index === trial.quietInterval ? dbToGain(-6) : 1,
+      gain: HEARING_DIGITAL_LEVELS.headphones * (index === trial.quietInterval ? dbToGain(-6) : 1),
       antiPhase: index === trial.antiPhaseInterval,
     }));
     return this.playIntervals(intervals, onInterval);
@@ -75,7 +77,9 @@ export class HearingAudio {
 
   async playRangeTrial(trial, onInterval) {
     const intervals = [0, 1, 2].map((index) =>
-      index === trial.toneInterval ? { frequencyHz: trial.frequencyHz, gain: 0.82 } : null,
+      index === trial.toneInterval
+        ? { frequencyHz: trial.frequencyHz, gain: HEARING_DIGITAL_LEVELS.range }
+        : null,
     );
     return this.playIntervals(intervals, onInterval);
   }
@@ -84,7 +88,7 @@ export class HearingAudio {
     const upperHz = trial.anchorHz * (1 + trial.deltaPercent / 100);
     const intervals = [0, 1].map((index) => ({
       frequencyHz: index === trial.higherInterval ? upperHz : trial.anchorHz,
-      gain: 0.78 * dbToGain(trial.roveDb[index]),
+      gain: HEARING_DIGITAL_LEVELS.pitchBase * dbToGain(trial.roveDb[index]),
     }));
     return this.playIntervals(intervals, onInterval);
   }
@@ -103,13 +107,10 @@ export class HearingAudio {
       if (interval) {
         this.scheduleTone({ ...interval, startAt: intervalStart, toneSeconds, rampSeconds });
       }
-      this.scheduleTimer(
-        () => onInterval?.(index),
-        Math.max(0, (intervalStart - this.context.currentTime) * 1000),
-      );
+      this.scheduleAudioMarker(intervalStart, token, () => onInterval?.(index));
     });
-    const totalSeconds = intervals.length * toneSeconds + (intervals.length - 1) * gapSeconds + 0.1;
-    return this.waitFor(totalSeconds, token);
+    const endAt = startAt + intervals.length * toneSeconds + (intervals.length - 1) * gapSeconds + 0.03;
+    return this.waitForAudioTime(endAt, token);
   }
 
   scheduleTone({ frequencyHz, gain, antiPhase = false, startAt, toneSeconds, rampSeconds }) {
@@ -139,8 +140,6 @@ export class HearingAudio {
 
   stop() {
     this.playToken += 1;
-    for (const timer of this.timers) clearTimeout(timer);
-    this.timers.clear();
     for (const pending of this.pendingWaits) pending.resolve(false);
     this.pendingWaits.clear();
     for (const node of this.nodes) {
@@ -160,7 +159,11 @@ export class HearingAudio {
 
   async close() {
     this.stop();
-    if (this.context && this.context.state !== 'closed') await this.context.close();
+    if (this.context) {
+      this.context.removeEventListener?.('statechange', this.handleContextStateChange);
+      this.context.removeEventListener?.('sinkchange', this.handleSinkChange);
+      if (this.context.state !== 'closed') await this.context.close();
+    }
     this.context = null;
     this.master = null;
   }
@@ -169,24 +172,43 @@ export class HearingAudio {
     for (const node of nodes) this.nodes.add(node);
   }
 
-  scheduleTimer(callback, delayMs) {
-    const timer = setTimeout(() => {
-      this.timers.delete(timer);
-      callback();
-    }, delayMs);
-    this.timers.add(timer);
+  scheduleAudioMarker(at, token, callback) {
+    const marker = this.context.createBufferSource();
+    marker.buffer = this.context.createBuffer(1, 1, this.context.sampleRate);
+    marker.connect(this.master);
+    marker.onended = () => {
+      this.nodes.delete(marker);
+      marker.disconnect?.();
+      if (token === this.playToken && this.context?.state === 'running') callback();
+    };
+    this.track(marker);
+    marker.start(at);
   }
 
-  waitFor(seconds, token) {
+  waitForAudioTime(endAt, token) {
     return new Promise((resolve) => {
-      const pending = { resolve };
-      const timer = setTimeout(() => {
-        this.timers.delete(timer);
+      let settled = false;
+      const marker = this.context.createBufferSource();
+      marker.buffer = this.context.createBuffer(1, 1, this.context.sampleRate);
+      marker.connect(this.master);
+      const settle = (completed) => {
+        if (settled) return;
+        settled = true;
         this.pendingWaits.delete(pending);
-        resolve(token === this.playToken);
-      }, seconds * 1000);
+        this.nodes.delete(marker);
+        marker.disconnect?.();
+        resolve(completed);
+      };
+      const pending = { resolve: () => settle(false) };
       this.pendingWaits.add(pending);
-      this.timers.add(timer);
+      this.track(marker);
+      marker.onended = () =>
+        settle(
+          token === this.playToken &&
+            this.context?.state === 'running' &&
+            this.context.currentTime >= endAt - 0.005,
+        );
+      marker.start(endAt);
     });
   }
 }

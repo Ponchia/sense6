@@ -5,6 +5,7 @@ import {
   createPitchTracks,
   createRangeTrack,
   dbToGain,
+  HEARING_DIGITAL_LEVELS,
   mergeHearingConfig,
   nextPitchTrial,
   nextRangeTrial,
@@ -57,6 +58,7 @@ test('range staircase moves up after two correct responses and down after one mi
   assert.equal(track.reversals.length, 1);
   assert.ok(track.frequencyHz < third.frequencyHz);
   assert.equal(track.complete, true);
+  assert.equal(track.completionReason, 'converged');
 });
 
 test('range controls do not alter the adaptive frequency', () => {
@@ -77,12 +79,18 @@ test('range summary keeps ceiling boundaries explicit', () => {
     { correct: true, frequencyHz: 8000 },
   ];
   track.reversals = [6500, 7300, 6900, 7500];
+  track.complete = true;
+  track.completionReason = 'technical-ceiling';
   assert.deepEqual(summarizeRange(track), {
     thresholdHz: 8000,
     spreadHz: 1000,
     atCeiling: true,
+    settled: true,
+    completionReason: 'technical-ceiling',
     reversals: 4,
     trials: 2,
+    controlTrials: 0,
+    expectedControls: 0,
     controlAccuracyPercent: null,
   });
 });
@@ -110,18 +118,74 @@ test('pitch summary reports percentages per anchor without a composite', () => {
   const tracks = createPitchTracks();
   tracks[0].reversals = [4, 3, 2, 3];
   tracks[0].records = [{ correct: true }, { correct: false }];
+  tracks[0].complete = true;
+  tracks[0].completionReason = 'converged';
   const summary = summarizePitch(tracks);
   assert.equal(summary[0].thresholdPercent, 3);
   assert.equal(summary[0].spreadPercent, 2);
   assert.equal(summary[0].accuracyPercent, 50);
+  assert.equal(summary[0].settled, true);
+  assert.equal(summary[0].completionReason, 'converged');
   assert.equal(summary[1].thresholdPercent, null);
+  assert.equal(summary[1].settled, false);
   assert.equal('score' in summary, false);
+});
+
+test('max-trial tracks with one reversal remain explicitly non-settled', () => {
+  const range = createRangeTrack(16000, {
+    controlAt: [],
+    minTrials: 3,
+    maxTrials: 3,
+    targetReversals: 8,
+  });
+  const firstRange = nextRangeTrial(range, () => 0);
+  recordRangeResponse(range, firstRange, firstRange.toneInterval);
+  const secondRange = nextRangeTrial(range, () => 0);
+  recordRangeResponse(range, secondRange, secondRange.toneInterval);
+  const thirdRange = nextRangeTrial(range, () => 0);
+  recordRangeResponse(range, thirdRange, 1);
+  assert.equal(range.reversals.length, 1);
+  assert.equal(range.completionReason, 'max-trials');
+  assert.equal(summarizeRange(range).settled, false);
+  assert.equal(summarizeRange(range).thresholdHz, null);
+
+  const pitch = createPitchTracks({ minTrials: 3, maxTrials: 3, targetReversals: 6 });
+  const pitchTrial = () => ({
+    kind: 'pitch',
+    anchorHz: 500,
+    deltaPercent: pitch[0].deltaPercent,
+    higherInterval: 0,
+    roveDb: [0, 0],
+  });
+  const firstPitch = pitchTrial();
+  recordPitchResponse(pitch, firstPitch, 0);
+  const secondPitch = pitchTrial();
+  recordPitchResponse(pitch, secondPitch, 0);
+  const thirdPitch = pitchTrial();
+  recordPitchResponse(pitch, thirdPitch, 1);
+  const firstSummary = summarizePitch(pitch).find((item) => item.anchorHz === 500);
+  assert.equal(firstSummary.reversals, 1);
+  assert.equal(firstSummary.completionReason, 'max-trials');
+  assert.equal(firstSummary.settled, false);
+  assert.equal(firstSummary.thresholdPercent, null);
 });
 
 test('audio helpers convert digital level and cap frequencies below Nyquist', () => {
   assert.ok(Math.abs(dbToGain(-6) - 0.5012) < 0.001);
   assert.equal(safeFrequencyCeiling(44100), 18000);
   assert.equal(safeFrequencyCeiling(32000), 13440);
+});
+
+test('the setup reference bounds every later representative digital stimulus', () => {
+  const laterGains = [
+    HEARING_DIGITAL_LEVELS.headphones,
+    HEARING_DIGITAL_LEVELS.range,
+    HEARING_DIGITAL_LEVELS.pitchBase * dbToGain(HEARING_DIGITAL_LEVELS.pitchRoveMaxDb),
+  ];
+  for (const gain of laterGains) {
+    const differenceDb = 20 * Math.log10(gain / HEARING_DIGITAL_LEVELS.reference);
+    assert.ok(differenceDb <= 0, `later gain exceeded reference by ${differenceDb.toFixed(2)} dB`);
+  }
 });
 
 test('production configuration accepts an explicit null development override', () => {
