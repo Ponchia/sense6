@@ -14,11 +14,11 @@ import {
   measurableGapBounds,
   mergeAcuityConfig,
   nextAcuityTrial,
-  percentContrastCost,
   pixelsPerMillimetre,
   recordAcuityResponse,
   summarizeAcuity,
   summarizeBlindSpot,
+  summarizeContrastCost,
   summarizeMeridians,
 } from '../lib/acuity.js';
 import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
@@ -58,7 +58,9 @@ const INSTRUMENTS = {
 let state = null;
 
 export function mount(context) {
-  const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClasses: ['lab-mode', 'ac-running'] });
+  const lifecycle = createExamLifecycle(MOUNT_OWNER, {
+    bodyClasses: ['ac-active', 'lab-mode', 'ac-running'],
+  });
   const mountState = {
     app: context.app,
     announcer: context.announcer,
@@ -73,12 +75,21 @@ export function mount(context) {
     sweepStartedAt: 0,
     sweepGeometry: null,
     geometryTimer: 0,
+    pendingAdvance: false,
+    trialSequence: 0,
+    themeToggle: null,
+    themeToggleWasDisabled: false,
   };
   state = mountState;
+  document.body.classList.add('ac-active');
   wireEvents(lifecycle.signal);
+  const themeObserver = new MutationObserver(themeChanged);
+  themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   renderIntro();
   lifecycle.onCleanup(() => {
     clearRuntime();
+    releaseThemeFreeze();
+    themeObserver.disconnect();
     mountState.session = null;
     if (state === mountState) state = null;
   });
@@ -87,11 +98,12 @@ export function mount(context) {
 
 function renderIntro() {
   clearRuntime();
+  releaseThemeFreeze();
   state.session = null;
   document.body.classList.remove('lab-mode', 'ac-running');
   document.title = t('Calibrated sharpness experiment — Acutezza | Sense6');
   const previous = loadLast();
-  state.app.innerHTML = `
+  renderScreen(`
     <section class="ac-intro ui-container ui-container--wide">
       <button class="back-link exam-back" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button>
       <div class="ac-hero">
@@ -119,7 +131,7 @@ function renderIntro() {
         <div class="section-heading"><div><p class="ui-eyebrow">Research trail</p><h2 id="ac-research-title">What informed Acutezza.</h2></div><p>Published methods shape the task. They do not make this implementation clinically validated.</p></div>
         <div class="ui-grid ac-research__grid">${researchCard('Calibration', 'Li et al., 2020', 'A physical card and blind-spot sweeps establish screen scale and estimated viewing distance.', 'https://www.nature.com/articles/s41598-019-57204-1')}${researchCard('Standard optotype', 'ISO 8596:2017', 'The Landolt ring provides language-independent, eight-direction geometry.', 'https://www.iso.org/standard/69042.html')}${researchCard('Adaptive burden', 'Bach, 2024', 'Eighteen eight-choice trials balance precision and effort in FrACT research.', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC11868300/')}${researchCard('Urgent symptoms', 'National Eye Institute', 'Safety copy reflects guidance for sudden floaters, flashes, or curtain-like shadows.', 'https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/floaters')}</div>
       </section>
-    </section>`;
+    </section>`);
 }
 
 function researchCard(eyebrow, title, body, href) {
@@ -130,8 +142,7 @@ function renderPreparation() {
   clearRuntime();
   document.body.classList.add('lab-mode');
   document.title = t('Prepare your vision setup — Acutezza | Sense6');
-  window.scrollTo({ top: 0, behavior: 'instant' });
-  state.app.innerHTML = `
+  renderScreen(`
     <section class="ac-setup ui-container ui-container--wide"><button class="back-link" type="button" data-action="ac-intro"><span aria-hidden="true">←</span> Back</button>
       <div class="ac-setup__grid"><div class="ac-setup__copy"><p class="ui-eyebrow">Setup / adult near-vision experiment</p><h1>Stable screen.<br>Steady distance.<br>One eye.</h1><p class="ac-lede">Use a laptop, tablet, or monitor without glare. Reset browser zoom, keep brightness comfortable, and leave the display still after calibration.</p>
         <label class="ac-field">Correction during this run<select data-ac-correction><option value="none">No correction</option><option value="glasses">Glasses</option><option value="contacts">Contact lenses</option></select></label>
@@ -139,7 +150,7 @@ function renderPreparation() {
         <label class="ac-consent"><input type="checkbox" data-ac-consent><span>I am 18 or older; I will use my usual correction for this distance; I can cover either eye without pressing it; I understand this is not an eye examination.</span></label>
         <button class="ui-button ui-button--lg" type="button" data-action="ac-card" disabled>Calibrate the screen <span aria-hidden="true">→</span></button></div>
         <aside class="ac-setup__rules" aria-label="Acutezza setup rules"><p class="ui-eyebrow">Setup contract</p><strong>01 / 03</strong><ol><li>Match a physical card</li><li>Estimate viewing distance</li><li>Lock display geometry</li></ol><dl><div><dt>Camera</dt><dd>Not used</dd></div><div><dt>Upload</dt><dd>None</dd></div><div><dt>Result</dt><dd>Run relative</dd></div></dl></aside>
-      </div></section>`;
+      </div></section>`);
 }
 
 function beginCalibration() {
@@ -163,11 +174,11 @@ function renderCardCalibration() {
   const maximum = Math.max(180, Math.min(620, window.innerWidth - 40));
   const initial = Math.min(340, maximum);
   document.title = t('Calibrate screen size — Acutezza | Sense6');
-  state.app.innerHTML = `
+  renderScreen(`
     <section class="ac-calibration ui-container"><div class="ac-calibration__head"><p class="ui-eyebrow">Calibration 01 / physical screen scale</p><h1>Match a real card.</h1><p>Place the blank side of a standard bank or identity card against the screen. Adjust the rectangle until its outer edges match. Sense6 reads no card details and uses no camera.</p></div>
       <div class="ac-card-stage"><div class="ac-card" data-ac-card-shape style="inline-size:${initial}px" aria-hidden="true"><i></i><span>${CARD_WIDTH_MM.toFixed(1)} × ${CARD_HEIGHT_MM.toFixed(2)} mm</span></div><label>Card width<input type="range" data-ac-card-size min="160" max="${maximum}" value="${initial}" step="1"></label><div class="ac-card-controls"><button class="ui-button ui-button--ghost" type="button" data-action="ac-card-smaller">Smaller</button><output data-ac-card-output>${initial} px</output><button class="ui-button ui-button--ghost" type="button" data-action="ac-card-larger">Larger</button></div></div>
       <div class="ui-notice"><strong>No card?</strong><p>Use a ruler and set the rectangle to exactly 85.6 mm wide. If the card cannot fit, rotate to landscape or use a larger screen.</p></div>
-      <div class="ui-cluster ac-calibration__actions"><button class="ui-button ui-button--lg" type="button" data-action="ac-confirm-card">The edges match <span aria-hidden="true">→</span></button><button class="ui-link" type="button" data-action="ac-card-no-fit">The card cannot fit</button></div></section>`;
+      <div class="ui-cluster ac-calibration__actions"><button class="ui-button ui-button--lg" type="button" data-action="ac-confirm-card">The edges match <span aria-hidden="true">→</span></button><button class="ui-link" type="button" data-action="ac-card-no-fit">The card cannot fit</button></div></section>`);
 }
 
 function adjustCard(delta) {
@@ -195,7 +206,9 @@ function confirmCard() {
 }
 
 function renderCardNoFit() {
-  state.app.innerHTML = `<section class="ac-blocked ui-container"><span aria-hidden="true">↔</span><p class="ui-eyebrow">Display too narrow</p><h1>This screen cannot show the calibration card at physical size.</h1><p>Rotate to landscape or continue on a larger tablet, laptop, or monitor. Acutezza will not guess physical screen size.</p><button class="ui-button" type="button" data-action="ac-card-retry">Try card calibration again</button></section>`;
+  renderScreen(
+    `<section class="ac-blocked ui-container"><span aria-hidden="true">↔</span><p class="ui-eyebrow">Display too narrow</p><h1>This screen cannot show the calibration card at physical size.</h1><p>Rotate to landscape or continue on a larger tablet, laptop, or monitor. Acutezza will not guess physical screen size.</p><button class="ui-button" type="button" data-action="ac-card-retry">Try card calibration again</button></section>`,
+  );
 }
 
 function renderBlindSpotCalibration({ recheck = false } = {}) {
@@ -206,11 +219,11 @@ function renderBlindSpotCalibration({ recheck = false } = {}) {
     expected: recheck ? 1 : state.config.calibration.repetitions,
   };
   document.title = t('Estimate viewing distance — Acutezza | Sense6');
-  state.app.innerHTML = `
+  renderScreen(`
     <section class="ac-calibration ac-distance ui-container ui-container--wide"><div class="ac-calibration__head"><p class="ui-eyebrow">${recheck ? 'Between-eye distance check' : 'Calibration 02 / estimated viewing distance'}</p><h1>${recheck ? 'Check the same distance.' : 'Find the natural blind spot.'}</h1><p>Cover your right eye. Keep your left eye fixed on the square at the right. Start a sweep, then press Space or the button when the violet dot disappears. Do not follow the dot.</p></div>
-      <div class="ac-sweep" data-ac-sweep-field><div class="ac-sweep__dot" data-ac-sweep-dot aria-hidden="true"></div><div class="ac-sweep__fixation" data-ac-fixation aria-label="Fixation square"></div></div>
+      <div class="ac-sweep" data-ac-sweep-field><div class="ac-sweep__dot" data-ac-sweep-dot aria-hidden="true"></div><div class="ac-sweep__fixation" data-ac-fixation role="img" aria-label="Fixation square"></div></div>
       <div class="ac-sweep__status" aria-live="polite"><strong data-ac-sweep-count>${state.session.sweep.expected} sweeps remaining</strong><span data-ac-sweep-status>Keep the right eye covered and look only at the square.</span></div>
-      <div class="ui-cluster ac-calibration__actions"><button class="ui-button ui-button--lg" type="button" data-action="ac-start-sweep">Start sweep</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-record-sweep" disabled>Dot disappeared <span aria-hidden="true">· Space</span></button><button class="ui-link" type="button" data-action="ac-manual-distance">Use a ruler-measured distance</button></div></section>`;
+      <div class="ui-cluster ac-calibration__actions"><button class="ui-button ui-button--lg" type="button" data-action="ac-start-sweep">Start sweep</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-record-sweep" disabled>Dot disappeared <span aria-hidden="true">· Space</span></button><button class="ui-link" type="button" data-action="ac-manual-distance">Use a ruler-measured distance</button></div></section>`);
   requestAnimationFrame(checkSweepSpace);
 }
 
@@ -292,7 +305,9 @@ function renderDistanceReview() {
   const result = summarizeBlindSpot(state.session.sweep.readings, state.config.calibration);
   state.session.pendingDistance = result;
   state.session.calibration.readings = result.readings;
-  state.app.innerHTML = `<section class="ac-distance-result ui-container"><span class="ac-distance-result__mark ${result.coherent ? '' : 'is-limited'}" aria-hidden="true">${result.coherent ? '✓' : '!'}</span><p class="ui-eyebrow">Viewing-distance estimate</p><h1>${result.coherent ? `${Math.round(result.distanceMm / 10)} cm from the screen.` : 'The sweeps did not agree.'}</h1><p>${result.coherent ? `The three estimates varied by ${formatNumber(result.spreadPercent)}%. Keep your chair and screen in this position.` : 'Repeat without following the dot, or enter a distance measured from eye to screen.'}</p><div class="ui-cluster ac-calibration__actions">${result.coherent ? '<button class="ui-button ui-button--lg" type="button" data-action="ac-accept-distance">Use this distance <span aria-hidden="true">→</span></button>' : ''}<button class="ui-button ui-button--ghost" type="button" data-action="ac-repeat-distance">Repeat the sweeps</button><button class="ui-link" type="button" data-action="ac-manual-distance">Enter measured distance</button></div></section>`;
+  renderScreen(
+    `<section class="ac-distance-result ui-container"><span class="ac-distance-result__mark ${result.coherent ? '' : 'is-limited'}" aria-hidden="true">${result.coherent ? '✓' : '!'}</span><p class="ui-eyebrow">Viewing-distance estimate</p><h1>${result.coherent ? `${Math.round(result.distanceMm / 10)} cm from the screen.` : 'The sweeps did not agree.'}</h1><p>${result.coherent ? `The three estimates varied by ${formatNumber(result.spreadPercent)}%. Keep your chair and screen in this position.` : 'Repeat without following the dot, or enter a distance measured from eye to screen.'}</p><div class="ui-cluster ac-calibration__actions">${result.coherent ? '<button class="ui-button ui-button--lg" type="button" data-action="ac-accept-distance">Use this distance <span aria-hidden="true">→</span></button>' : ''}<button class="ui-button ui-button--ghost" type="button" data-action="ac-repeat-distance">Repeat the sweeps</button><button class="ui-link" type="button" data-action="ac-manual-distance">Enter measured distance</button></div></section>`,
+  );
 }
 
 function acceptDistance() {
@@ -307,7 +322,9 @@ function acceptDistance() {
 
 function renderManualDistance() {
   clearSweep();
-  state.app.innerHTML = `<section class="ac-distance-result ui-container"><span class="ac-distance-result__mark" aria-hidden="true">cm</span><p class="ui-eyebrow">Ruler-measured fallback</p><h1>Measure eye to screen.</h1><p>Sit in the position you will keep and measure from the bridge of your nose to the screen. This run remains labelled “assumed distance.”</p><label class="ac-field">Distance in centimetres<input type="number" data-ac-manual-distance min="30" max="100" step="1" value="50" inputmode="decimal"></label><div class="ui-cluster ac-calibration__actions"><button class="ui-button ui-button--lg" type="button" data-action="ac-confirm-manual-distance">Use measured distance</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-repeat-distance">Return to blind-spot sweeps</button></div></section>`;
+  renderScreen(
+    `<section class="ac-distance-result ui-container"><span class="ac-distance-result__mark" aria-hidden="true">cm</span><p class="ui-eyebrow">Ruler-measured fallback</p><h1>Measure eye to screen.</h1><p>Sit in the position you will keep and measure from the bridge of your nose to the screen. This run remains labelled “assumed distance.”</p><label class="ac-field">Distance in centimetres<input type="number" data-ac-manual-distance min="30" max="100" step="1" value="50" inputmode="decimal"></label><div class="ui-cluster ac-calibration__actions"><button class="ui-button ui-button--lg" type="button" data-action="ac-confirm-manual-distance">Use measured distance</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-repeat-distance">Return to blind-spot sweeps</button></div></section>`,
+  );
 }
 
 function confirmManualDistance() {
@@ -325,7 +342,9 @@ function renderContrastCheck({ stronger = false } = {}) {
   const contrast = stronger ? 0.2 : state.config.low.contrast;
   const colors = contrastGrays(contrast);
   state.session.pendingContrast = contrast;
-  state.app.innerHTML = `<section class="ac-contrast ui-container"><p class="ui-eyebrow">Calibration 03 / contrast availability</p><h1>Can you see the inset square?</h1><p>${t('Keep brightness comfortable. This checks whether the display preserves the nominal {contrast}% condition; it does not calibrate luminance.', { contrast: Math.round(contrast * 100) })}</p><div class="ac-contrast__sample" style="--contrast-bg:${colors.background};--contrast-target:${colors.target}" role="img" aria-label="Low-contrast square inside a larger gray field"><i></i></div><div class="ui-cluster ac-calibration__actions"><button class="ui-button ui-button--lg" type="button" data-action="ac-contrast-visible">Yes, clearly</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-contrast-hidden">Not clearly</button></div><p class="ac-contrast__note">If unavailable, Acutezza skips Contrasto instead of producing a misleading value.</p></section>`;
+  renderScreen(
+    `<section class="ac-contrast ui-container"><p class="ui-eyebrow">Calibration 03 / contrast availability</p><h1>Can you see the inset square?</h1><p>${t('Keep brightness comfortable. This checks whether the display preserves the nominal {contrast}% condition; it does not calibrate luminance.', { contrast: Math.round(contrast * 100) })}</p><div class="ac-contrast__sample" style="--contrast-bg:${colors.background};--contrast-target:${colors.target}" role="img" aria-label="Low-contrast square inside a larger gray field"><i></i></div><div class="ui-cluster ac-calibration__actions"><button class="ui-button ui-button--lg" type="button" data-action="ac-contrast-visible">Yes, clearly</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-contrast-hidden">Not clearly</button></div><p class="ac-contrast__note">If unavailable, Acutezza skips Contrasto instead of producing a misleading value.</p></section>`,
+  );
 }
 
 function acceptContrast() {
@@ -342,7 +361,7 @@ function rejectContrast() {
 }
 
 function lockCalibration() {
-  const maxDiameterCssPx = Math.max(180, Math.min(320, window.innerWidth - 48, window.innerHeight - 280));
+  const maxDiameterCssPx = maximumAcuityCanvasBox();
   const bounds = measurableGapBounds({
     distanceMm: state.session.calibration.distanceMm,
     cssPixelsPerMm: state.session.calibration.cssPixelsPerMm,
@@ -356,23 +375,32 @@ function lockCalibration() {
       'This display and distance cannot present a useful range of Landolt-ring sizes.',
     );
   Object.assign(state.session.calibration, { bounds, geometry: captureGeometry(), valid: true });
+  state.session.theme = currentTheme();
+  freezeTheme();
   renderCalibrationSummary();
 }
 
 function renderCalibrationSummary() {
+  if (!ensureGeometry()) return;
   const calibration = state.session.calibration;
-  state.app.innerHTML = `<section class="ac-calibration-summary ui-container ui-container--wide"><div class="ac-calibration-summary__hero"><p class="ui-eyebrow">Calibration locked</p><h1>The screen now has physical scale.</h1><p>Keep this viewport, browser zoom, orientation, and viewing distance unchanged.</p></div><dl class="ac-calibration-summary__grid"><div><dt>Card width</dt><dd>${Math.round(calibration.cardWidthCssPx)} CSS px</dd></div><div><dt>Viewing distance</dt><dd>${Math.round(calibration.distanceMm / 10)} cm · ${t(calibration.state)}</dd></div><div><dt>Low contrast</dt><dd>${state.session.contrast ? `${Math.round(state.session.contrast * 100)}% ${t('nominal')}` : 'Unavailable'}</dd></div><div><dt>Measurable gap range</dt><dd>${formatArcmin(calibration.bounds.minGapArcmin)}–${formatArcmin(calibration.bounds.maxGapArcmin)}</dd></div></dl><div class="ui-notice ${calibration.state === 'assumed' ? 'ui-notice--warning' : ''}"><strong>${calibration.state === 'measured' ? 'Measured setup' : 'Assumed distance'}</strong><p>${calibration.state === 'measured' ? 'Card scale and repeated blind-spot sweeps agreed.' : 'Screen scale is measured, but distance came from manual entry. Results retain this caution.'}</p></div><button class="ui-button ui-button--lg" type="button" data-action="ac-first-eye">${t('Prepare {eye}', { eye: t(eyeLabel(state.session.eyes[0])) })} <span aria-hidden="true">→</span></button></section>`;
+  renderScreen(
+    `<section class="ac-calibration-summary ui-container ui-container--wide"><div class="ac-calibration-summary__hero"><p class="ui-eyebrow">Calibration locked</p><h1>The screen now has physical scale.</h1><p>Keep this viewport, browser zoom, orientation, viewing distance, and ${state.session.theme} surround unchanged.</p></div><dl class="ac-calibration-summary__grid"><div><dt>Card width</dt><dd>${Math.round(calibration.cardWidthCssPx)} CSS px</dd></div><div><dt>Viewing distance</dt><dd>${Math.round(calibration.distanceMm / 10)} cm · ${t(calibration.state)}</dd></div><div><dt>Low contrast</dt><dd>${state.session.contrast ? `${Math.round(state.session.contrast * 100)}% ${t('nominal')}` : 'Unavailable'}</dd></div><div><dt>Measurable gap range</dt><dd>${formatArcmin(calibration.bounds.minGapArcmin)}–${formatArcmin(calibration.bounds.maxGapArcmin)}</dd></div></dl><div class="ui-notice ${calibration.state === 'assumed' ? 'ui-notice--warning' : ''}"><strong>${calibration.state === 'measured' ? 'Measured setup' : 'Assumed distance'}</strong><p>${calibration.state === 'measured' ? 'Card scale and repeated blind-spot sweeps agreed.' : 'Screen scale is measured, but distance came from manual entry. Results retain this caution.'}</p></div><button class="ui-button ui-button--lg" type="button" data-action="ac-first-eye">${t('Prepare {eye}', { eye: t(eyeLabel(state.session.eyes[0])) })} <span aria-hidden="true">→</span></button></section>`,
+  );
 }
 
 function renderEyeBrief() {
+  if (!ensureGeometry()) return;
   clearRuntime();
   const eye = state.session.eyes[state.session.eyeIndex];
   const other = eye === 'right' ? 'left' : 'right';
   document.title = `${eyeLabel(eye)} — Acutezza | Sense6`;
-  state.app.innerHTML = `<section class="ac-eye-brief ui-container ui-container--wide"><div class="ac-eye-brief__mark" aria-hidden="true">${eye === 'right' ? 'R' : 'L'}</div><div><p class="ui-eyebrow">${t('Eye {current} of 2 / {eye}', { current: state.session.eyeIndex + 1, eye: t(eyeLabel(eye)) })}</p><h1>${t('Cover the {eye}.', { eye: t(eyeLabel(other)) })}<br>${t('Keep the {eye} open.', { eye: t(eyeLabel(eye)) })}</h1><p class="ac-lede">${t('Use an opaque card or your palm without pressing the covered eye. Keep your head upright and remain at about {distance} cm.', { distance: Math.round(state.session.calibration.distanceMm / 10) })}</p><ul><li>Four easy practice targets come first.</li><li>Use the direction pad or matching number keys.</li><li>Guess when uncertain; do not move closer.</li></ul><button class="ui-button ui-button--lg" type="button" data-action="ac-begin-eye">Start practice <span aria-hidden="true">→</span></button></div></section>`;
+  renderScreen(
+    `<section class="ac-eye-brief ui-container ui-container--wide"><div class="ac-eye-brief__mark" aria-hidden="true">${eye === 'right' ? 'R' : 'L'}</div><div><p class="ui-eyebrow">${t('Eye {current} of 2 / {eye}', { current: state.session.eyeIndex + 1, eye: t(eyeLabel(eye)) })}</p><h1>${t('Cover the {eye}.', { eye: t(eyeLabel(other)) })}<br>${t('Keep the {eye} open.', { eye: t(eyeLabel(eye)) })}</h1><p class="ac-lede">${t('Use an opaque card or your palm without pressing the covered eye. Keep your head upright and remain at about {distance} cm.', { distance: Math.round(state.session.calibration.distanceMm / 10) })}</p><ul><li>Four easy practice targets come first.</li><li>Use the direction pad or matching number keys.</li><li>Guess when uncertain; do not move closer.</li></ul><button class="ui-button ui-button--lg" type="button" data-action="ac-begin-eye">Start practice <span aria-hidden="true">→</span></button></div></section>`,
+  );
 }
 
 function beginEye() {
+  if (!ensureGeometry()) return;
   const bounds = state.session.calibration.bounds;
   state.session.currentEye = {
     eye: state.session.eyes[state.session.eyeIndex],
@@ -399,34 +427,36 @@ function beginEye() {
     meridianRecords: [],
     meridianIndex: 0,
   };
-  renderAcuityRunner();
-  prepareAcuityTrial();
+  if (renderAcuityRunner()) prepareAcuityTrial();
 }
 
 function renderAcuityRunner() {
+  if (!ensureGeometry()) return false;
   document.body.classList.add('lab-mode', 'ac-running');
   const stage = state.session.currentEye.stage;
   const info = stage === 'low' ? INSTRUMENTS.low : INSTRUMENTS.high;
-  state.app.innerHTML = `<section class="ac-runner" data-ac-runner data-ac-stage="${stage}"><header class="ac-runner__header"><div><p class="ui-eyebrow">${stage === 'practice' ? 'Practice' : `${info.number} / ${info.name}`}</p><strong>${eyeLabel(state.session.currentEye.eye)}</strong></div><span data-ac-count>Preparing…</span><button type="button" data-action="ac-stop">Stop safely</button></header><div class="ac-stimulus"><p data-ac-status aria-live="polite">Look at the ring and locate its opening.</p><canvas data-ac-optotype aria-label="Landolt ring target"></canvas><div class="ac-direction-pad" aria-label="Direction of the opening">${ACUITY_DIRECTIONS.map((direction) => `<button type="button" data-ac-direction="${direction.id}" aria-label="Gap ${directionLabel(direction.id)}"><span aria-hidden="true">${direction.symbol}</span><small>${direction.key}</small></button>`).join('')}</div><div class="ac-feedback" data-ac-feedback aria-live="polite"></div></div><footer class="ac-runner__footer"><span>${stage === 'low' ? `${Math.round(state.session.contrast * 100)}% ${t('nominal contrast')}` : 'High contrast'}</span><span>Keep distance fixed</span><span>Forced choice</span></footer></section>`;
+  state.app.innerHTML = `<section class="ac-runner" data-ac-runner data-ac-stage="${stage}"><header class="ac-runner__header"><div><p class="ui-eyebrow">${stage === 'practice' ? 'Practice' : `${info.number} / ${info.name}`}</p><h1 tabindex="-1" data-ac-runner-heading>${eyeLabel(state.session.currentEye.eye)} ${stage === 'practice' ? 'practice' : info.name}</h1></div><span data-ac-count>Preparing…</span><button type="button" data-action="ac-stop">Stop safely</button></header><div class="ac-stimulus"><p data-ac-status aria-live="polite">Look at the ring and locate its opening.</p><canvas data-ac-optotype aria-label="Landolt ring target"></canvas><div class="ac-direction-pad" aria-label="Direction of the opening">${ACUITY_DIRECTIONS.map((direction) => `<button type="button" data-ac-direction="${direction.id}" aria-label="Gap ${directionLabel(direction.id)}"><span aria-hidden="true">${direction.symbol}</span><small>${direction.key}</small></button>`).join('')}</div><div class="ac-feedback" data-ac-feedback aria-live="polite"></div></div><footer class="ac-runner__footer"><span>${stage === 'low' ? `${Math.round(state.session.contrast * 100)}% ${t('nominal contrast')}` : 'High contrast'}</span><span>Keep distance fixed</span><span>Forced choice</span></footer></section>`;
+  resetScrollAndFocus('[data-ac-runner-heading]');
+  return true;
 }
 
 function prepareAcuityTrial() {
-  if (!state.session?.currentEye) return;
+  if (!state.session?.currentEye || !ensureGeometry()) return;
   const eye = state.session.currentEye;
   if (eye.stage === 'practice') {
     if (eye.practiceIndex >= state.config.practiceTrials) return renderStageTransition('practice');
-    state.activeTrial = {
+    state.activeTrial = withTrialIdentity({
       gapArcmin: Math.min(12, state.session.calibration.bounds.maxGapArcmin),
       orientation: eye.practiceOrientations[eye.practiceIndex],
       control: false,
       practice: true,
-    };
+    });
   } else {
     const track = eye[eye.stage];
     if (track.complete) return renderStageTransition(eye.stage);
-    state.activeTrial = nextAcuityTrial(track);
+    state.activeTrial = withTrialIdentity(nextAcuityTrial(track));
   }
-  drawCurrentAcuity();
+  if (!drawCurrentAcuity()) return;
   updateAcuityProgress();
   state.responseOpen = true;
   for (const button of state.app.querySelectorAll('[data-ac-direction]')) button.disabled = false;
@@ -434,13 +464,17 @@ function prepareAcuityTrial() {
 
 function drawCurrentAcuity() {
   const canvas = state.app.querySelector('[data-ac-optotype]');
-  if (!canvas || !state.activeTrial) return;
-  const boxCssPx = Math.max(190, Math.min(340, window.innerWidth - 36, window.innerHeight - 330));
+  if (!canvas || !state.activeTrial) return false;
+  const boxCssPx = availableAcuityCanvasBox();
   const diameterCssPx = landoltDiameterCssPixels(
     state.activeTrial.gapArcmin,
     state.session.calibration.distanceMm,
     state.session.calibration.cssPixelsPerMm,
   );
+  if (!(diameterCssPx > 0) || diameterCssPx > boxCssPx)
+    return renderCalibrationInvalid(
+      'This viewport cannot contain the calibrated Landolt ring without clipping.',
+    );
   const direction = ACUITY_DIRECTIONS.find((entry) => entry.id === state.activeTrial.orientation);
   const colors =
     state.session.currentEye.stage === 'low'
@@ -454,10 +488,12 @@ function drawCurrentAcuity() {
     boxCssPx,
   });
   Object.assign(canvas.dataset, {
+    trialId: state.activeTrial.id,
     gap: String(state.activeTrial.gapArcmin),
     orientation: state.activeTrial.orientation,
     diameter: String(diameterCssPx),
   });
+  return true;
 }
 
 function chooseDirection(direction) {
@@ -465,6 +501,7 @@ function chooseDirection(direction) {
   state.responseOpen = false;
   for (const button of state.app.querySelectorAll('[data-ac-direction]')) button.disabled = true;
   const eye = state.session.currentEye;
+  const trial = state.activeTrial;
   const correct = direction === state.activeTrial.orientation;
   const feedback = state.app.querySelector('[data-ac-feedback]');
   if (eye.stage === 'practice') {
@@ -476,7 +513,7 @@ function chooseDirection(direction) {
       );
     if (correct) eye.practiceIndex += 1;
   } else {
-    recordAcuityResponse(eye[eye.stage], state.activeTrial, direction);
+    recordAcuityResponse(eye[eye.stage], trial, direction);
     if (feedback)
       feedback.textContent = t(
         state.activeTrial.control && !correct
@@ -484,7 +521,9 @@ function chooseDirection(direction) {
           : 'Response recorded.',
       );
   }
-  state.feedbackTimer = window.setTimeout(prepareAcuityTrial, state.config.feedbackMs);
+  trial.responseCommitted = true;
+  state.pendingAdvance = true;
+  state.feedbackTimer = window.setTimeout(advanceCommittedTrial, state.config.feedbackMs);
 }
 
 function updateAcuityProgress() {
@@ -498,6 +537,7 @@ function updateAcuityProgress() {
 }
 
 function renderStageTransition(completed) {
+  if (!ensureGeometry()) return;
   clearRuntime();
   document.body.classList.remove('ac-running');
   const eye = state.session.currentEye;
@@ -531,10 +571,13 @@ function renderStageTransition(completed) {
 }
 
 function renderTransition(eyebrow, title, button, action) {
-  state.app.innerHTML = `<section class="ac-transition ui-container"><span class="ac-transition__mark" aria-hidden="true">✓</span><p class="ui-eyebrow">${eyebrow}</p><h1>${title}</h1><p>Rest your eye for a moment. Keep the same correction, distance, screen, and covered eye.</p><button class="ui-button ui-button--lg" type="button" data-action="${action}">${button} <span aria-hidden="true">→</span></button></section>`;
+  renderScreen(
+    `<section class="ac-transition ui-container"><span class="ac-transition__mark" aria-hidden="true">✓</span><p class="ui-eyebrow">${eyebrow}</p><h1>${title}</h1><p>Rest your eye for a moment. Keep the same correction, distance, screen, and covered eye.</p><button class="ui-button ui-button--lg" type="button" data-action="${action}">${button} <span aria-hidden="true">→</span></button></section>`,
+  );
 }
 
 function continueAcuity() {
+  if (!ensureGeometry()) return;
   if (
     state.session.currentEye.stage === 'high' &&
     state.session.currentEye.high.records.length === 0 &&
@@ -543,18 +586,19 @@ function continueAcuity() {
     state.session.metricStarted = true;
     trackMetric(METRIC_EVENTS.testStarted, METRIC_TESTS.acutezza);
   }
-  renderAcuityRunner();
-  prepareAcuityTrial();
+  if (renderAcuityRunner()) prepareAcuityTrial();
 }
 
 function renderMeridianRunner() {
+  if (!ensureGeometry()) return;
   document.body.classList.add('lab-mode', 'ac-running');
   const eye = state.session.currentEye;
   if (eye.meridianIndex >= eye.meridianSchedule.length) return finishEye();
-  state.activeTrial = eye.meridianSchedule[eye.meridianIndex];
+  state.activeTrial = withTrialIdentity(eye.meridianSchedule[eye.meridianIndex]);
   state.responseOpen = true;
-  state.app.innerHTML = `<section class="ac-runner ac-meridian-runner" data-ac-meridian-runner><header class="ac-runner__header"><div><p class="ui-eyebrow">03 / Meridiani</p><strong>${eyeLabel(eye.eye)}</strong></div><span>${eye.meridianIndex + 1} / ${eye.meridianSchedule.length}</span><button type="button" data-action="ac-stop">Stop safely</button></header><div class="ac-meridian"><p>Without moving closer, which line field looks clearer?</p><div class="ac-meridian__fields"><canvas data-ac-meridian="left" aria-label="Left line field"></canvas><canvas data-ac-meridian="right" aria-label="Right line field"></canvas></div><div class="ac-meridian__choices"><button type="button" data-ac-meridian-choice="left"><span aria-hidden="true">←</span> Left clearer <small>1</small></button><button type="button" data-ac-meridian-choice="equal">No difference <small>2</small></button><button type="button" data-ac-meridian-choice="right">Right clearer <span aria-hidden="true">→</span><small>3</small></button></div><div class="ac-feedback" data-ac-feedback aria-live="polite"></div></div><footer class="ac-runner__footer"><span>Two repeated scales</span><span>Changing pixel phase</span><span>No astigmatism claim</span></footer></section>`;
+  state.app.innerHTML = `<section class="ac-runner ac-meridian-runner" data-ac-meridian-runner data-ac-trial-id="${state.activeTrial.id}"><header class="ac-runner__header"><div><p class="ui-eyebrow">03 / Meridiani</p><h1 tabindex="-1" data-ac-runner-heading>${eyeLabel(eye.eye)} Meridiani</h1></div><span>${eye.meridianIndex + 1} / ${eye.meridianSchedule.length}</span><button type="button" data-action="ac-stop">Stop safely</button></header><div class="ac-meridian"><p>Without moving closer, which line field looks clearer?</p><div class="ac-meridian__fields"><canvas data-ac-meridian="left" aria-label="Left line field"></canvas><canvas data-ac-meridian="right" aria-label="Right line field"></canvas></div><div class="ac-meridian__choices"><button type="button" data-ac-meridian-choice="left"><span aria-hidden="true">←</span> Left clearer <small>1</small></button><button type="button" data-ac-meridian-choice="equal">No difference <small>2</small></button><button type="button" data-ac-meridian-choice="right">Right clearer <span aria-hidden="true">→</span><small>3</small></button></div><div class="ac-feedback" data-ac-feedback aria-live="polite"></div></div><footer class="ac-runner__footer"><span>Two repeated scales</span><span>Changing pixel phase</span><span>No astigmatism claim</span></footer></section>`;
   drawCurrentMeridians();
+  resetScrollAndFocus('[data-ac-runner-heading]');
 }
 
 function drawCurrentMeridians() {
@@ -575,25 +619,31 @@ function drawCurrentMeridians() {
 function chooseMeridian(choice) {
   if (!state.responseOpen || !state.activeTrial || !state.session?.currentEye) return;
   state.responseOpen = false;
-  state.session.currentEye.meridianRecords.push({ ...state.activeTrial, choice });
+  const trial = state.activeTrial;
+  state.session.currentEye.meridianRecords.push({ ...trial, choice });
   state.session.currentEye.meridianIndex += 1;
   for (const button of state.app.querySelectorAll('[data-ac-meridian-choice]')) button.disabled = true;
   state.app.querySelector('[data-ac-feedback]').textContent = t('Comparison recorded.');
-  state.feedbackTimer = window.setTimeout(renderMeridianRunner, state.config.feedbackMs);
+  trial.responseCommitted = true;
+  state.pendingAdvance = true;
+  state.feedbackTimer = window.setTimeout(advanceCommittedTrial, state.config.feedbackMs);
 }
 
 function finishEye() {
+  if (!ensureGeometry()) return;
   clearRuntime();
   document.body.classList.remove('ac-running');
   const eye = state.session.currentEye;
   const high = summarizeAcuity(eye.high);
   const low = eye.low ? summarizeAcuity(eye.low) : null;
+  const contrastCost = summarizeContrastCost(high, low);
   const meridian = summarizeMeridians(eye.meridianRecords, state.config.meridian);
   state.session.eyeResults.push({
     eye: eye.eye,
     high,
     low,
-    contrastCostPercent: low ? percentContrastCost(high.thresholdArcmin, low.thresholdArcmin) : null,
+    contrastCostPercent: contrastCost.value,
+    contrastCostBounded: contrastCost.bounded,
     meridian,
   });
   state.session.currentEye = null;
@@ -602,19 +652,26 @@ function finishEye() {
 }
 
 function renderBetweenEyes() {
+  if (!ensureGeometry()) return;
   const result = state.session.eyeResults[0];
   const nextEye = state.session.eyes[1];
-  state.app.innerHTML = `<section class="ac-between ui-container ui-container--wide"><div><p class="ui-eyebrow">First eye complete</p><h1>${eyeLabel(result.eye)} recorded.<br>Rest before switching.</h1><p>Uncover both eyes and blink normally. The completed eye is retained in this session.</p></div><aside><p class="ui-eyebrow">Provisional observations</p><strong>${formatArcmin(result.high.thresholdArcmin)}</strong><span>high-contrast angular gap</span><p>${result.meridian.stable ? `Stable ${result.meridian.preferredAngle}° preference appeared.` : 'No stable meridional preference appeared.'}</p></aside><div class="ui-cluster"><button class="ui-button ui-button--lg" type="button" data-action="ac-next-eye">Check distance, then test ${eyeLabel(nextEye)} <span aria-hidden="true">→</span></button><button class="ui-button ui-button--ghost" type="button" data-action="ac-finish-one-eye">Finish with one eye</button></div></section>`;
+  renderScreen(
+    `<section class="ac-between ui-container ui-container--wide"><div><p class="ui-eyebrow">First eye complete</p><h1>${eyeLabel(result.eye)} recorded.<br>Rest before switching.</h1><p>Uncover both eyes and blink normally. The completed eye is retained in this session.</p></div><aside><p class="ui-eyebrow">Provisional observations</p><strong>${formatBoundedAcuity(result.high)}</strong><span>high-contrast angular gap</span><p>${result.meridian.stable ? `Stable ${result.meridian.preferredAngle}° preference appeared.` : 'No stable meridional preference appeared.'}</p></aside><div class="ui-cluster"><button class="ui-button ui-button--lg" type="button" data-action="ac-next-eye">Check distance, then test ${eyeLabel(nextEye)} <span aria-hidden="true">→</span></button><button class="ui-button ui-button--ghost" type="button" data-action="ac-finish-one-eye">Finish with one eye</button></div></section>`,
+  );
 }
 
 function startNextEye() {
+  if (!ensureGeometry()) return;
   state.session.eyeIndex = 1;
   if (state.session.calibration.state === 'measured') renderBlindSpotCalibration({ recheck: true });
   else renderAssumedDistanceRecheck();
 }
 
 function renderAssumedDistanceRecheck() {
-  state.app.innerHTML = `<section class="ac-distance-result ui-container"><span class="ac-distance-result__mark" aria-hidden="true">Ⅱ</span><p class="ui-eyebrow">Between-eye setup check</p><h1>${t('Return to {distance} cm.', { distance: Math.round(state.session.calibration.distanceMm / 10) })}</h1><p>Re-measure from eye to screen, confirm the viewport is unchanged, then continue.</p><button class="ui-button ui-button--lg" type="button" data-action="ac-confirm-next-eye">Setup unchanged — continue</button></section>`;
+  if (!ensureGeometry()) return;
+  renderScreen(
+    `<section class="ac-distance-result ui-container"><span class="ac-distance-result__mark" aria-hidden="true">Ⅱ</span><p class="ui-eyebrow">Between-eye setup check</p><h1>${t('Return to {distance} cm.', { distance: Math.round(state.session.calibration.distanceMm / 10) })}</h1><p>Re-measure from eye to screen, confirm the viewport is unchanged, then continue.</p><button class="ui-button ui-button--lg" type="button" data-action="ac-confirm-next-eye">Setup unchanged — continue</button></section>`,
+  );
 }
 
 function finishDistanceRecheck(distanceMm) {
@@ -624,7 +681,9 @@ function finishDistanceRecheck(distanceMm) {
     return renderCalibrationInvalid(
       'The between-eye distance check differed by more than 20%. Recalibrate before continuing.',
     );
-  state.app.innerHTML = `<section class="ac-distance-result ui-container"><span class="ac-distance-result__mark" aria-hidden="true">✓</span><p class="ui-eyebrow">Distance coherent</p><h1>The setup remains close to the original distance.</h1><p>The quick check differed by ${formatNumber(difference * 100, { maximumFractionDigits: 1 })}%.</p><button class="ui-button ui-button--lg" type="button" data-action="ac-confirm-next-eye">Prepare ${eyeLabel(state.session.eyes[1])} <span aria-hidden="true">→</span></button></section>`;
+  renderScreen(
+    `<section class="ac-distance-result ui-container"><span class="ac-distance-result__mark" aria-hidden="true">✓</span><p class="ui-eyebrow">Distance coherent</p><h1>The setup remains close to the original distance.</h1><p>The quick check differed by ${formatNumber(difference * 100, { maximumFractionDigits: 1 })}%.</p><button class="ui-button ui-button--lg" type="button" data-action="ac-confirm-next-eye">Prepare ${eyeLabel(state.session.eyes[1])} <span aria-hidden="true">→</span></button></section>`,
+  );
 }
 
 function confirmNextEye() {
@@ -634,6 +693,7 @@ function confirmNextEye() {
 }
 
 function renderResults() {
+  if (!ensureGeometry()) return;
   clearRuntime();
   trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.acutezza);
   document.body.classList.add('lab-mode');
@@ -645,25 +705,25 @@ function renderResults() {
     state.session.calibration.valid && (controlCount === 0 || controlCorrect >= controlCount - 1);
   const setupQuality =
     usable && !bounded ? 'Setup checks coherent' : usable ? 'Interpret with caution' : 'Run unusable';
-  state.session.result = { setupQuality, usable };
+  state.session.result = { setupQuality, usable, bounded, controlCorrect, controlCount };
   saveLast({ setupQuality, eyes: state.session.eyeResults.length, recordedAt: Date.now() });
-  saveJournalResult({ setupQuality, usable, bounded });
+  saveJournalResult({ setupQuality, usable, bounded, controlCorrect, controlCount });
+  releaseThemeFreeze();
   document.title = t('Your calibrated sharpness profile — Acutezza | Sense6');
-  state.app.innerHTML = `<section class="ac-results ui-container ui-container--wide"><button class="back-link" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button><header class="ac-results__hero"><div><p class="ui-eyebrow">Acutezza / this display / this distance</p><h1>Separate observations.<br><em>No vision label.</em></h1><p>${usable ? 'The calibration and task controls support interpretation of this run at the stated distance.' : 'A calibration or task-control check was limited. Repeat before comparing runs.'}</p></div><div class="ac-results__stamp ${usable && !bounded ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>${String(state.session.eyeResults.length).padStart(2, '0')} / 02</strong></div></header><div class="ac-eye-results">${state.session.eyeResults.map(eyeResultMarkup).join('')}</div><div class="ac-context-grid"><article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the target.</h2><dl><div><dt>Correction</dt><dd>${correctionLabel(state.session.correction)}</dd></div><div><dt>Distance</dt><dd>${Math.round(state.session.calibration.distanceMm / 10)} cm · ${t(state.session.calibration.state)}</dd></div><div><dt>Card scale</dt><dd>${Math.round(state.session.calibration.cardWidthCssPx)} CSS px</dd></div><div><dt>Task controls</dt><dd>${controlCorrect} / ${controlCount || '—'}</dd></div></dl></article><article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Calibrated experiment, not an eye examination.</h2><p>Acutezza describes one self-administered run on this display at this estimated distance. It is not vision screening, diagnosis, or a prescription.</p><p>Do not infer normal vision, 20/20, refractive error, cylinder power, or an astigmatism axis.</p></article></div><aside class="ac-results__safety"><strong>Sudden changes need care, not another run.</strong><p>Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.</p></aside><div class="ui-cluster ac-results__actions"><button class="ui-button" type="button" data-action="ac-restart">Run again</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-copy">Copy result summary</button></div></section>`;
+  renderScreen(
+    `<section class="ac-results ui-container ui-container--wide"><button class="back-link" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button><header class="ac-results__hero"><div><p class="ui-eyebrow">Acutezza / this display / this distance</p><h1>Separate observations.<br><em>No vision label.</em></h1><p>${usable ? 'The calibration and task controls support interpretation of this run at the stated distance.' : 'A calibration or task-control check was limited. Repeat before comparing runs.'}</p></div><div class="ac-results__stamp ${usable && !bounded ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>${String(state.session.eyeResults.length).padStart(2, '0')} / 02</strong></div></header><div class="ac-eye-results">${state.session.eyeResults.map(eyeResultMarkup).join('')}</div><div class="ac-context-grid"><article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the target.</h2><dl><div><dt>Correction</dt><dd>${correctionLabel(state.session.correction)}</dd></div><div><dt>Distance</dt><dd>${Math.round(state.session.calibration.distanceMm / 10)} cm · ${t(state.session.calibration.state)}</dd></div><div><dt>Card scale</dt><dd>${Math.round(state.session.calibration.cardWidthCssPx)} CSS px</dd></div><div><dt>Low contrast</dt><dd>${contrastLabel()}</dd></div><div><dt>Surround theme</dt><dd>${state.session.theme}</dd></div><div><dt>Task controls</dt><dd>${controlCorrect} / ${controlCount}</dd></div><div><dt>Interruptions</dt><dd>${state.session.interruptions}</dd></div></dl></article><article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Calibrated experiment, not an eye examination.</h2><p>Acutezza describes one self-administered run on this display at this estimated distance. It is not vision screening, diagnosis, or a prescription.</p><p>Do not infer normal vision, 20/20, refractive error, cylinder power, or an astigmatism axis.</p></article></div><aside class="ac-results__safety"><strong>Sudden changes need care, not another run.</strong><p>Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.</p></aside><div class="ui-cluster ac-results__actions"><button class="ui-button" type="button" data-action="ac-restart">Run again</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-copy">Copy result summary</button></div></section>`,
+  );
 }
 
 function eyeResultMarkup(result) {
-  const lowValue = result.low ? formatArcmin(result.low.thresholdArcmin) : 'Unavailable';
+  const lowValue = result.low ? formatBoundedAcuity(result.low) : 'Unavailable';
   const cost = result.contrastCostPercent;
   const meridianValue = result.meridian.stable
     ? `${result.meridian.preferredAngle}° preference`
     : 'No stable preference';
-  const uncertainty = t('{lower}–{upper} uncertainty interval', {
-    lower: formatArcmin(result.high.lowerArcmin),
-    upper: formatArcmin(result.high.upperArcmin),
-  });
-  const costDetail =
-    cost === null
+  const costDetail = result.contrastCostBounded
+    ? 'Contrast cost is indeterminate because an estimate meets the display range.'
+    : cost === null
       ? 'not measured'
       : t('{cost}% gap size versus high contrast', {
           cost: `${cost >= 0 ? '+' : ''}${formatNumber(cost)}`,
@@ -671,7 +731,7 @@ function eyeResultMarkup(result) {
   const consistency = t('{consistency}% leading-choice consistency', {
     consistency: formatNumber(result.meridian.consistencyPercent),
   });
-  return `<section class="ac-eye-result" aria-label="${eyeLabel(result.eye)}"><header><p class="ui-eyebrow">${eyeLabel(result.eye)}</p><h2>Three measures for this eye.</h2></header><div class="ac-metric-grid">${resultCard('01', 'High-contrast angular gap', formatArcmin(result.high.thresholdArcmin), uncertainty, result.high.atFloor || result.high.atCeiling ? 'The estimate touches the display range; treat it as a bound.' : 'A calibrated angular threshold from forced-choice trials.')}${resultCard('02', 'Low-contrast angular gap', lowValue, costDetail, result.low ? 'A within-run difference, not clinical contrast sensitivity.' : 'The display could not preserve a dependable low-contrast condition.')}${resultCard('03', 'Meridional consistency', meridianValue, consistency, result.meridian.stable ? 'The preference repeated at both scales. It does not identify astigmatism.' : 'No preference met the replication rule across scale and pixel phase.')}</div></section>`;
+  return `<section class="ac-eye-result" aria-label="${eyeLabel(result.eye)}"><header><p class="ui-eyebrow">${eyeLabel(result.eye)}</p><h2>Three measures for this eye.</h2></header><div class="ac-metric-grid">${resultCard('01', 'High-contrast angular gap', formatBoundedAcuity(result.high), acuityInterval(result.high), acuityInterpretation(result.high, 'A calibrated angular threshold from forced-choice trials.'))}${resultCard('02', 'Low-contrast angular gap', lowValue, result.low ? acuityInterval(result.low) : 'not measured', result.low ? `${costDetail} A within-run difference, not clinical contrast sensitivity.` : 'The display could not preserve a dependable low-contrast condition.')}${resultCard('03', 'Meridional consistency', meridianValue, consistency, result.meridian.stable ? 'The preference repeated at both scales. It does not identify astigmatism.' : 'No preference met the replication rule across scale and pixel phase.')}</div></section>`;
 }
 
 function resultCard(index, label, value, detail, copy) {
@@ -680,6 +740,7 @@ function resultCard(index, label, value, detail, copy) {
 
 function copyResults() {
   if (!state.session?.result) return;
+  const resultState = state.session.result;
   const lines = [
     t('Acutezza — calibrated sharpness profile'),
     t('Setup: {distance} cm ({distanceState}); correction: {correction}', {
@@ -687,18 +748,30 @@ function copyResults() {
       distanceState: t(state.session.calibration.state),
       correction: t(correctionLabel(state.session.correction)),
     }),
+    `Calibration: card ${Math.round(state.session.calibration.cardWidthCssPx)} CSS px; contrast ${contrastLabel()}; surround ${state.session.theme}`,
+    `Quality: ${resultState.setupQuality}; controls ${resultState.controlCorrect} / ${resultState.controlCount}; interruptions ${state.session.interruptions}`,
   ];
   for (const result of state.session.eyeResults)
     lines.push(
-      t('{eye}: high-contrast gap {gap}; low-contrast gap {low}; meridians {meridians}', {
-        eye: t(eyeLabel(result.eye)),
-        gap: formatArcmin(result.high.thresholdArcmin),
-        low: result.low ? formatArcmin(result.low.thresholdArcmin) : t('Unavailable'),
-        meridians: result.meridian.stable
-          ? `${result.meridian.preferredAngle}° ${t('preference')}`
-          : t('no stable preference'),
-      }),
+      t(
+        '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
+        {
+          eye: t(eyeLabel(result.eye)),
+          gap: clipboardAcuity(result.high),
+          low: result.low ? clipboardAcuity(result.low) : t('Unavailable'),
+          cost: result.contrastCostBounded
+            ? t('indeterminate (display-range bound)')
+            : result.contrastCostPercent === null
+              ? t('not measured')
+              : `${result.contrastCostPercent >= 0 ? '+' : ''}${formatNumber(result.contrastCostPercent)}%`,
+          meridians: result.meridian.stable
+            ? `${result.meridian.preferredAngle}° ${t('preference')}`
+            : t('no stable preference'),
+        },
+      ),
     );
+  if (!resultState.usable || resultState.bounded)
+    lines.push(t('Interpret with caution; repeat before comparing runs.'));
   lines.push(t('This is not vision screening, diagnosis, or a prescription.'));
   navigator.clipboard
     ?.writeText(lines.join('\n'))
@@ -713,35 +786,80 @@ function pauseRun() {
   state.responseOpen = false;
   state.session.interruptions += 1;
   document.body.classList.remove('ac-running');
-  state.app.innerHTML = `<section class="ac-transition ui-container" data-ac-paused><span class="ac-transition__mark" aria-hidden="true">Ⅱ</span><p class="ui-eyebrow">Vision task paused</p><h1>The current target was discarded.</h1><p>Return when the tab can stay visible. Keep the same distance and covered eye.</p><button class="ui-button ui-button--lg" type="button" data-action="ac-resume">Resume this instrument <span aria-hidden="true">→</span></button></section>`;
+  const committed = state.pendingAdvance || state.activeTrial?.responseCommitted;
+  renderScreen(
+    `<section class="ac-transition ui-container" data-ac-paused><span class="ac-transition__mark" aria-hidden="true">Ⅱ</span><p class="ui-eyebrow">Vision task paused</p><h1>${committed ? 'Your response was recorded.' : 'The unanswered target will be presented again.'}</h1><p>Return when the tab can stay visible. Keep the same distance and covered eye. ${committed ? 'Resume advances to the next target exactly once.' : 'No response was counted.'}</p><button class="ui-button ui-button--lg" type="button" data-action="ac-resume">Resume this instrument <span aria-hidden="true">→</span></button></section>`,
+  );
 }
 
 function resumeRun() {
-  if (state.session.currentEye.stage === 'meridian') renderMeridianRunner();
-  else {
-    renderAcuityRunner();
-    drawCurrentAcuity();
-    updateAcuityProgress();
-    state.responseOpen = true;
-  }
+  if (!ensureGeometry()) return;
+  const stage = state.session.currentEye.stage;
+  const shouldAdvance = state.pendingAdvance || state.activeTrial?.responseCommitted;
+  state.pendingAdvance = false;
+  state.activeTrial = null;
+  if (stage === 'meridian') return renderMeridianRunner();
+  if (renderAcuityRunner()) prepareAcuityTrial();
+  if (!shouldAdvance)
+    state.app.querySelector('[data-ac-status]').textContent = t('The unanswered target is presented again.');
 }
 
 function geometryChanged() {
   clearTimeout(state.geometryTimer);
-  if (!state.session?.calibration?.valid || !state.session.currentEye) return;
+  if (!hasLockedSession()) return;
   state.geometryTimer = window.setTimeout(() => {
-    if (!geometryMatches(state.session.calibration.geometry, captureGeometry()))
-      renderCalibrationInvalid(
-        'Browser zoom, viewport size, pixel ratio, or orientation changed during the run.',
-      );
+    ensureGeometry('Browser zoom, viewport size, pixel ratio, or orientation changed during the run.');
   }, 120);
+}
+
+function ensureGeometry(
+  reason = 'Browser zoom, viewport size, pixel ratio, or orientation changed after calibration.',
+) {
+  if (!hasLockedSession()) return true;
+  if (geometryMatches(state.session.calibration.geometry, captureGeometry())) return true;
+  return renderCalibrationInvalid(reason);
+}
+
+function hasLockedSession() {
+  return Boolean(state.session?.calibration?.valid && !state.session.result);
+}
+
+function themeChanged() {
+  if (!hasLockedSession() || currentTheme() === state.session.theme) return;
+  renderCalibrationInvalid('The light or dark surround changed after calibration.');
+}
+
+function currentTheme() {
+  return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+}
+
+function freezeTheme() {
+  const toggle = document.querySelector('[data-bronto-theme-toggle]');
+  if (!(toggle instanceof HTMLButtonElement)) return;
+  state.themeToggle = toggle;
+  state.themeToggleWasDisabled = toggle.disabled;
+  toggle.disabled = true;
+  toggle.setAttribute('aria-description', 'Theme is fixed during the calibrated Acutezza session.');
+}
+
+function releaseThemeFreeze() {
+  const toggle = state?.themeToggle;
+  if (!(toggle instanceof HTMLButtonElement)) return;
+  toggle.disabled = state.themeToggleWasDisabled;
+  toggle.removeAttribute('aria-description');
+  state.themeToggle = null;
+  state.themeToggleWasDisabled = false;
 }
 
 function renderCalibrationInvalid(reason) {
   clearRuntime();
   if (state.session?.calibration) state.session.calibration.valid = false;
+  releaseThemeFreeze();
   document.body.classList.remove('ac-running');
-  state.app.innerHTML = `<section class="ac-blocked ui-container"><span aria-hidden="true">!</span><p class="ui-eyebrow">Calibration invalid</p><h1>The measured geometry changed.</h1><p>${reason}</p><p>No unfinished value will be saved. Return to a stable display and calibrate again.</p><button class="ui-button ui-button--lg" type="button" data-action="ac-recalibrate">Recalibrate</button></section>`;
+  renderScreen(
+    `<section class="ac-blocked ui-container"><span aria-hidden="true">!</span><p class="ui-eyebrow">Calibration invalid</p><h1>The measured geometry changed.</h1><p>${reason}</p><p>No unfinished value will be saved. Return to a stable display and calibrate again.</p><button class="ui-button ui-button--lg" type="button" data-action="ac-recalibrate">Recalibrate</button></section>`,
+  );
+  return false;
 }
 
 function captureGeometry() {
@@ -765,7 +883,50 @@ function geometryMatches(left, right) {
   );
 }
 
+function guardShellNavigation(event) {
+  const link = event.target.closest?.('a[data-sense6-route]');
+  if (!link || !hasLockedSession()) return;
+  if (window.confirm('Stop the calibrated Acutezza session and leave? No unfinished result will be saved.'))
+    return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+}
+
+function guardLocaleNavigation(event) {
+  if (!event.target.matches?.('[data-locale-select]') || !hasLockedSession()) return;
+  if (
+    window.confirm(
+      'Changing language stops the calibrated Acutezza session. Leave without saving an unfinished result?',
+    )
+  )
+    return;
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  event.target.value = state.locale;
+}
+
+function guardBrowserNavigation(event) {
+  if (!hasLockedSession() || event.navigationType !== 'traverse' || !event.cancelable) return;
+  if (
+    window.confirm(
+      'Browser navigation stops the calibrated Acutezza session. Leave without saving an unfinished result?',
+    )
+  )
+    return;
+  event.preventDefault();
+}
+
+function guardPageExit(event) {
+  if (!hasLockedSession()) return;
+  event.preventDefault();
+  event.returnValue = '';
+}
+
 function wireEvents(signal) {
+  document.addEventListener('click', guardShellNavigation, { capture: true, signal });
+  document.addEventListener('change', guardLocaleNavigation, { capture: true, signal });
+  window.navigation?.addEventListener('navigate', guardBrowserNavigation, { signal });
+  window.addEventListener('beforeunload', guardPageExit, { signal });
   document.addEventListener(
     'click',
     (event) => {
@@ -889,6 +1050,64 @@ function clearRuntime() {
   state.geometryTimer = 0;
   state.responseOpen = false;
   state.activeTrial = null;
+  state.pendingAdvance = false;
+}
+
+function advanceCommittedTrial() {
+  if (!state.pendingAdvance || !state.session?.currentEye) return;
+  clearTimeout(state.feedbackTimer);
+  state.feedbackTimer = 0;
+  state.pendingAdvance = false;
+  state.activeTrial = null;
+  if (state.session.currentEye.stage === 'meridian') renderMeridianRunner();
+  else prepareAcuityTrial();
+}
+
+function withTrialIdentity(trial) {
+  state.trialSequence += 1;
+  return { ...trial, id: `acutezza-${state.trialSequence}`, responseCommitted: false };
+}
+
+function maximumAcuityCanvasBox() {
+  const shortWide = window.innerWidth >= 701 && window.innerHeight <= 760;
+  const blockBudget = window.innerHeight - (shortWide ? 192 : 350);
+  return Math.max(96, Math.floor(Math.min(340, window.innerWidth - 24, blockBudget)));
+}
+
+function availableAcuityCanvasBox() {
+  const stimulus = state.app.querySelector('.ac-stimulus');
+  const canvas = state.app.querySelector('[data-ac-optotype]');
+  if (!stimulus || !canvas) return maximumAcuityCanvasBox();
+  const style = getComputedStyle(stimulus);
+  const paddingInline =
+    Number.parseFloat(style.paddingInlineStart) + Number.parseFloat(style.paddingInlineEnd);
+  const paddingBlock = Number.parseFloat(style.paddingBlockStart) + Number.parseFloat(style.paddingBlockEnd);
+  const gap = Number.parseFloat(style.rowGap) || 0;
+  const statusHeight = state.app.querySelector('[data-ac-status]')?.getBoundingClientRect().height ?? 0;
+  const controlsHeight = state.app.querySelector('.ac-direction-pad')?.getBoundingClientRect().height ?? 0;
+  const feedbackHeight = state.app.querySelector('.ac-feedback')?.getBoundingClientRect().height ?? 0;
+  const shortWide = window.innerWidth >= 701 && window.innerHeight <= 760;
+  const reserved = shortWide
+    ? statusHeight + feedbackHeight + paddingBlock + gap * 2
+    : statusHeight + controlsHeight + feedbackHeight + paddingBlock + gap * 3;
+  const blockBudget = stimulus.clientHeight - reserved;
+  const inlineBudget = shortWide ? stimulus.clientWidth * 0.42 : stimulus.clientWidth - paddingInline;
+  return Math.max(1, Math.floor(Math.min(maximumAcuityCanvasBox(), blockBudget, inlineBudget)));
+}
+
+function renderScreen(markup) {
+  state.app.innerHTML = markup;
+  resetScrollAndFocus('h1');
+}
+
+function resetScrollAndFocus(selector) {
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  const heading = state.app.querySelector(selector);
+  if (heading) {
+    heading.tabIndex = -1;
+    heading.focus({ preventScroll: true });
+  }
+  requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
 }
 
 function directionLabel(direction) {
@@ -914,8 +1133,51 @@ function correctionLabel(correction) {
     { none: 'No correction', glasses: 'Glasses', contacts: 'Contact lenses' }[correction] ?? 'No correction'
   );
 }
+
+function contrastLabel() {
+  return state.session.contrast === null
+    ? t('Unavailable')
+    : `${Math.round(state.session.contrast * 100)}% ${t('nominal')}`;
+}
+
 function formatArcmin(value) {
   return `${formatNumber(value, { maximumFractionDigits: 2 })} arcmin`;
+}
+
+function formatBoundedAcuity(result) {
+  const prefix = result.atFloor ? '≤ ' : result.atCeiling ? '≥ ' : '';
+  return `${prefix}${formatArcmin(result.thresholdArcmin)}`;
+}
+
+function acuityInterval(result) {
+  const interval = t('{lower}–{upper} uncertainty interval', {
+    lower: formatArcmin(result.lowerArcmin),
+    upper: formatArcmin(result.upperArcmin),
+  });
+  const bound = acuityBoundLabel(result);
+  return bound ? `${interval} · ${bound}` : interval;
+}
+
+function acuityBoundLabel(result) {
+  if (result.atFloor) return t('upper bound at the display floor');
+  if (result.atCeiling) return t('lower bound at the display ceiling');
+  return '';
+}
+
+function acuityInterpretation(result, fallback) {
+  const bound = acuityBoundLabel(result);
+  const article = result.atFloor ? 'an' : 'a';
+  return bound ? `The estimate is ${article} ${bound}; do not read it as an exact threshold.` : fallback;
+}
+
+function clipboardAcuity(result) {
+  const bound = acuityBoundLabel(result);
+  const details = [
+    `${formatArcmin(result.lowerArcmin)}–${formatArcmin(result.upperArcmin)} interval`,
+    `controls ${result.controlCorrect} / ${result.controls}`,
+  ];
+  if (bound) details.push(bound);
+  return `${formatBoundedAcuity(result)} (${details.join('; ')})`;
 }
 
 function runtimeConfig() {
@@ -933,7 +1195,7 @@ function saveLast(result) {
   }
 }
 
-function saveJournalResult({ usable, bounded }) {
+function saveJournalResult({ setupQuality, usable, bounded, controlCorrect, controlCount }) {
   const measurements = state.session.eyeResults.flatMap((eye) => {
     const prefix = eye.eye;
     return [
@@ -957,10 +1219,19 @@ function saveJournalResult({ usable, bounded }) {
       distanceMm: state.session.calibration.distanceMm,
       calibrationState: state.session.calibration.state,
       cardWidthCssPx: Math.round(state.session.calibration.cardWidthCssPx),
+      contrastPercent: state.session.contrast === null ? null : state.session.contrast * 100,
+      theme: state.session.theme,
+      setupQuality,
+      controlsCorrect: controlCorrect,
+      controlsPresented: controlCount,
       interruptions: state.session.interruptions,
     },
     measurements,
-    notes: bounded ? ['display-range-bound'] : usable ? [] : ['setup-check-limited'],
+    notes: [
+      ...(bounded ? ['display-range-bound'] : []),
+      ...(!usable ? ['setup-check-limited'] : []),
+      ...(state.session.contrast === null ? ['low-contrast-unavailable'] : []),
+    ],
   });
   if (entry) appendJournalEntry(entry);
 }
