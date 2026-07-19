@@ -52,6 +52,7 @@ export function mount(context) {
     app: context.app,
     announcer: context.announcer,
     goHome: context.navigateHome,
+    lifecycle,
     locale: context.locale,
     session: null,
     config: runtimeConfig(),
@@ -80,6 +81,7 @@ export function mount(context) {
 function renderIntro() {
   stopClocks();
   state.session = null;
+  state.lifecycle.setActive(false);
   document.body.classList.remove('lab-mode', 'rx-running');
   document.title = t('Response speed and consistency — Riflessi | Sense6');
   const previous = loadLast();
@@ -179,6 +181,7 @@ function researchCard(eyebrow, title, body, href) {
 }
 
 function renderSetup() {
+  state.lifecycle.setActive(false);
   stopClocks();
   document.body.classList.add('lab-mode');
   document.body.classList.remove('rx-running');
@@ -269,6 +272,7 @@ function startSession() {
 }
 
 function renderInstrumentBrief(instrument) {
+  state.lifecycle.setActive(true, t('Leave this run? Your progress will be lost.'));
   stopClocks();
   state.session.instrument = instrument;
   state.session.block = null;
@@ -582,6 +586,7 @@ function finishCurrentInstrument() {
 }
 
 function renderResults() {
+  state.lifecycle.setActive(false);
   stopClocks();
   trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.riflessi);
   document.body.classList.add('lab-mode');
@@ -924,31 +929,6 @@ function wireEvents(signal) {
 
   document.addEventListener('visibilitychange', () => document.hidden && pauseRun(), { signal });
   window.addEventListener('blur', pauseRun, { signal });
-
-  document.addEventListener('click', guardShellNavigation, { capture: true, signal });
-  document.addEventListener('change', guardLocaleNavigation, { capture: true, signal });
-  window.addEventListener('beforeunload', guardPageUnload, { signal });
-}
-
-function guardShellNavigation(event) {
-  if (!event.target.closest?.('a[data-sense6-route]') || !hasActiveSession()) return;
-  if (confirmActiveExit('Leave the run? Your progress will be lost.')) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-}
-
-function guardLocaleNavigation(event) {
-  if (!event.target.matches?.('[data-locale-select]') || !hasActiveSession()) return;
-  if (confirmActiveExit('Leave the run? Your progress will be lost.')) return;
-  event.preventDefault();
-  event.stopImmediatePropagation();
-  event.target.value = state.locale;
-}
-
-function guardPageUnload(event) {
-  if (!hasActiveSession()) return;
-  event.preventDefault();
-  event.returnValue = '';
 }
 
 function hasActiveSession() {
@@ -960,9 +940,7 @@ function confirmActiveExit(message) {
 }
 
 function resetScreen() {
-  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  const title = state.app.querySelector('[data-rx-screen-title]');
-  title?.focus({ preventScroll: true });
+  state.lifecycle.present(state.app, { focus: '[data-rx-screen-title]' });
 }
 
 function eventTimestamp(event) {

@@ -359,6 +359,48 @@ test('the active-run Stop hook preserves a cancelled run and clears a confirmed 
   await expect(page.locator('[data-rx-chamber]')).toHaveCount(0);
 });
 
+test('browser Back cancellation preserves the exact active Riflessi trial', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Exercises Chromium history confirmation');
+  await page.addInitScript(() => {
+    window.__SENSE6_TEST_CONFIG__ = {
+      riflessi: {
+        anticipationMs: 0,
+        feedbackMs: 8,
+        signal: {
+          practiceTrials: 1,
+          scoredTrials: 1,
+          catchTrials: 0,
+          minWaitMs: 15_000,
+          maxWaitMs: 15_000,
+          responseTimeoutMs: 500,
+        },
+      },
+    };
+  });
+  await page.goto('/en/');
+  await page.locator('.exam-card__link[href="/en/riflessi/"]').click();
+  await prepareRiflessi(page);
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  const chamber = page.locator('[data-rx-chamber]');
+  await expect(chamber).toHaveAttribute('data-rx-state', 'waiting');
+  const trialMarkup = await chamber.innerHTML();
+  await expect(page.locator('[data-locale-select]')).toBeDisabled();
+  await expect(page.locator('[data-bronto-theme-toggle]')).toBeDisabled();
+
+  page.once('dialog', (dialog) => dialog.dismiss());
+  await page.evaluate(() => history.back());
+  await expect(page).toHaveURL(/\/en\/riflessi\/$/);
+  await expect(chamber).toHaveAttribute('data-rx-state', 'waiting');
+  expect(await chamber.innerHTML()).toBe(trialMarkup);
+
+  page.once('dialog', (dialog) => dialog.accept());
+  await page.evaluate(() => history.back());
+  await expect(page).toHaveURL(/\/en\/$/);
+  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.locator('[data-locale-select]')).toBeEnabled();
+  await expect(page.locator('[data-bronto-theme-toggle]')).toBeEnabled();
+});
+
 test('copied limited summaries retain quality, interruptions, and wrong-choice context', async ({
   page,
 }, testInfo) => {
