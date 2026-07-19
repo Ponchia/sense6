@@ -214,6 +214,41 @@ test('instrument rules include distance tolerance, run quality, and unverifiable
   });
 });
 
+test('Daltonia comparisons preserve its measured display environment', () => {
+  const setup = {
+    display: '100x100@2',
+    gamut: 'srgb',
+    theme: 'dark',
+    stimulusCssPixels: 104,
+    measurementDpr: 2,
+    measurementViewport: '390x844',
+    orientation: 'portrait-0',
+  };
+  const first = entry({ id: 'daltonia-one', examId: 'color-blindness', setup });
+  const same = entry({ ...first, id: 'daltonia-two' });
+  assert.deepEqual(compareJournalEntries(same, first), { status: 'comparable', reasons: [] });
+
+  const changedTheme = entry({
+    ...first,
+    id: 'daltonia-theme',
+    setup: { ...setup, theme: 'light' },
+  });
+  assert.deepEqual(compareJournalEntries(changedTheme, first), {
+    status: 'not-comparable',
+    reasons: ['changed:theme'],
+  });
+
+  const changedOrientation = entry({
+    ...first,
+    id: 'daltonia-landscape',
+    setup: { ...setup, orientation: 'landscape-90' },
+  });
+  assert.deepEqual(compareJournalEntries(changedOrientation, first), {
+    status: 'caution',
+    reasons: ['changed:orientation'],
+  });
+});
+
 test('measurement changes combine intervals and retain bound warnings', () => {
   const older = entry({
     id: 'before',
