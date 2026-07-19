@@ -10,6 +10,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- English, Italian, German, French, Spanish, and Portuguese interfaces across
+  the gallery, all four exams, safety/setup flows, live tasks, result screens,
+  accessibility labels, metadata, and copied summaries.
+- Locale-aware hash routes, first-visit browser-language detection, persistent
+  language selection, English fallback, localized number formatting, and
+  multilingual accessibility and responsive coverage.
 - Udito—a safe-listening, device-relative hearing lab with a headphone-like
   presentation check, adaptive upper-audibility boundary, and interleaved pitch
   discrimination tracks near 500 Hz and 2 kHz.

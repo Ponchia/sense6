@@ -40,7 +40,7 @@ const PLATE_EIGHT = [
 ];
 
 export function renderGallery(context) {
-  const { app, exams } = context;
+  const { app, exams, localeHref } = context;
   document.title = 'Sensoria — measure what your senses notice';
 
   app.innerHTML = `
@@ -53,7 +53,7 @@ export function renderGallery(context) {
           No account, no upload, no diagnosis theatre.
         </p>
         <div class="ui-cluster gallery-hero__actions">
-          <a class="ui-button ui-button--lg" href="#/udito">
+          <a class="ui-button ui-button--lg" href="${localeHref('udito')}">
             Try Udito <span aria-hidden="true">·</span> 6 min <span aria-hidden="true">→</span>
           </a>
           <a class="ui-link ui-link--cta" href="#tests">Explore all four tests</a>
@@ -102,7 +102,7 @@ export function renderGallery(context) {
         </p>
       </header>
       <div class="exam-grid">
-        ${exams.map(liveCard).join('')}
+        ${exams.map((meta) => liveCard(meta, localeHref)).join('')}
       </div>
     </section>
 
@@ -145,11 +145,11 @@ export function renderGallery(context) {
   return () => {};
 }
 
-function liveCard(meta) {
+function liveCard(meta, localeHref) {
   const details = TEST_DETAILS[meta.id];
   return `
     <article class="exam-card ui-card ui-card--interactive" style="--card-accent:${meta.accent}">
-      <a class="exam-card__link" href="#/${meta.id}">
+      <a class="exam-card__link" href="${localeHref(meta.id)}">
         <div class="exam-card__visual exam-card__visual--${meta.id}">
           ${previewVisual(meta.id)}
           <span class="exam-card__glyph" aria-hidden="true">${meta.glyph}</span>

@@ -71,9 +71,8 @@ a:focus-visible {
   text-decoration: none;
 }
 
-.brand::after {
+.brand__lab {
   color: var(--text-dim);
-  content: "/ PERCEPTION LAB";
   font-family: var(--mono);
   font-size: var(--text-2xs);
   font-weight: 500;
@@ -110,6 +109,39 @@ a:focus-visible {
 
 .theme-button {
   padding-inline: 0.75rem;
+}
+
+.locale-picker {
+  display: inline-flex;
+}
+
+.locale-picker select {
+  appearance: none;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  color: var(--text);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-wide);
+  min-block-size: 2.25rem;
+  padding: 0.45rem 1.8rem 0.45rem 0.65rem;
+  text-transform: uppercase;
+}
+
+.locale-picker::after {
+  align-self: center;
+  color: var(--text-dim);
+  content: "▾";
+  font-size: 0.65rem;
+  margin-inline-start: -1.25rem;
+  pointer-events: none;
+}
+
+.locale-picker select:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .hero {
@@ -1408,6 +1440,11 @@ a:focus-visible {
   .device-chip,
   .theme-button__label {
     display: none;
+  }
+
+  .locale-picker select {
+    inline-size: 3.8rem;
+    padding-inline: 0.45rem 1.2rem;
   }
 
   .hero {

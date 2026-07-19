@@ -1,5 +1,5 @@
 import { toast } from '@ponchia/ui/behaviors';
-
+import { formatNumber, t } from '../i18n.js';
 import {
   createAdaptiveRun,
   currentAdaptiveTrial,
@@ -501,11 +501,11 @@ function thresholdCard(axis) {
   }
   const spread = axis.limit
     ? `<p class="cb-threshold-card__spread"><span>${axis.limit === 'floor' ? 'lower' : 'upper'} measurement bound</span></p>`
-    : `<p class="cb-threshold-card__spread">±${axis.spread.toFixed(3)} <span>run spread</span></p>`;
+    : `<p class="cb-threshold-card__spread">±${formatNumber(axis.spread, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} <span>run spread</span></p>`;
   return `<article class="cb-scorecard cb-threshold-card">
     <div class="cb-scorecard__head">
       <div><h2>${axis.label}</h2><p>${axis.description}</p></div>
-      <strong>${prefix}${axis.threshold.toFixed(3)}</strong>
+      <strong>${prefix}${formatNumber(axis.threshold, { minimumFractionDigits: 3, maximumFractionDigits: 3 })}</strong>
     </div>
     ${spread}
     <p class="cb-scorecard__note">${note}</p>
@@ -595,11 +595,20 @@ async function copyResults() {
   const thresholds = result.axes
     .map((axis) => {
       const prefix = axis.limit === 'floor' ? '≤' : axis.limit === 'ceiling' ? '≥' : '';
-      const spread = axis.limit ? '' : ` ±${axis.spread.toFixed(3)}`;
-      return `${axis.label} ${prefix}${axis.threshold.toFixed(3)}${spread}`;
+      const spread = axis.limit
+        ? ''
+        : ` ±${formatNumber(axis.spread, { minimumFractionDigits: 3, maximumFractionDigits: 3 })}`;
+      return `${t(axis.label)} ${prefix}${formatNumber(axis.threshold, { minimumFractionDigits: 3, maximumFractionDigits: 3 })}${spread}`;
     })
     .join(', ');
-  const summary = `Daltonia experimental browser run — ${thresholds}; task controls ${result.controls.correct}/${result.controls.total}. Display-relative, unvalidated, and not diagnostic.`;
+  const summary = t(
+    'Daltonia experimental browser run — {thresholds}; task controls {correct}/{total}. Display-relative, unvalidated, and not diagnostic.',
+    {
+      thresholds,
+      correct: result.controls.correct,
+      total: result.controls.total,
+    },
+  );
   try {
     await navigator.clipboard.writeText(summary);
     toast('Run summary copied', { tone: 'success' });
@@ -661,14 +670,14 @@ function wireEvents(signal) {
       }
       if (name === 'cb-setup') renderSetup();
       if (name === 'cb-home') {
-        if (active && !window.confirm('End this experiment? Your progress will be lost.')) return;
+        if (active && !window.confirm(t('End this experiment? Your progress will be lost.'))) return;
         renderIntro();
       }
       if (name === 'cb-begin' && !action.disabled) startPractice();
       if (name === 'cb-practice-next') advancePractice();
       if (name === 'cb-copy') copyResults();
       if (name === 'gallery') {
-        if (active && !window.confirm('Leave the experiment? Your progress will be lost.')) return;
+        if (active && !window.confirm(t('Leave the experiment? Your progress will be lost.'))) return;
         goHome();
       }
     },

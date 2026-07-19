@@ -6,7 +6,8 @@ import * as colorBlindness from './exams/color-blindness.js';
 import * as riflessi from './exams/riflessi.js';
 import * as tetracromia from './exams/tetracromia.js';
 import * as udito from './exams/udito.js';
-import { navigate, startRouter } from './router.js';
+import { getLocale, initializeI18n, localeHref, setLocale, t, translateTree } from './i18n.js';
+import { currentRoute, navigate, startRouter } from './router.js';
 import { renderGallery } from './site.js';
 
 const app = document.querySelector('#app');
@@ -16,6 +17,11 @@ const gamutChip = document.querySelector('#gamut-chip');
 const exams = [tetracromia, colorBlindness, riflessi, udito];
 const registry = new Map(exams.map((exam) => [exam.meta.id, exam]));
 
+const initialLocale = window.location.hash.match(/^#\/([a-z]{2})(?:\/|$)/)?.[1];
+initializeI18n({
+  initialLocale,
+  onLocaleChange: (nextLocale) => navigate(currentRoute(), nextLocale),
+});
 initThemeToggle();
 detectDisplay();
 
@@ -26,12 +32,19 @@ function context() {
     app,
     announcer,
     gamutChip,
-    navigate,
-    navigateHome: () => navigate(''),
+    locale: getLocale(),
+    localeHref,
+    t,
+    navigate: (name) => navigate(name, getLocale()),
+    navigateHome: () => navigate('', getLocale()),
   };
 }
 
-startRouter((route) => {
+startRouter(({ route, locale }) => {
+  if (locale) setLocale(locale, { notify: false });
+  if (!locale) {
+    window.history.replaceState(null, '', localeHref(route));
+  }
   cleanup?.();
   cleanup = null;
   app.innerHTML = '';
@@ -47,11 +60,12 @@ startRouter((route) => {
   } else {
     cleanup = renderGallery({ ...context(), exams: exams.map((entry) => entry.meta) });
   }
+  translateTree(document);
 });
 
 function detectDisplay() {
   const p3 = window.matchMedia?.('(color-gamut: p3)').matches;
   const srgb = window.matchMedia?.('(color-gamut: srgb)').matches;
-  gamutChip.textContent = p3 ? 'P3 reported' : srgb ? 'sRGB reported' : 'Color gamut unknown';
+  gamutChip.textContent = p3 ? t('P3 reported') : srgb ? t('sRGB reported') : t('Color gamut unknown');
   gamutChip.dataset.gamut = p3 ? 'p3' : srgb ? 'srgb' : 'unknown';
 }
