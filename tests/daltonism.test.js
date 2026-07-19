@@ -8,6 +8,7 @@ import {
   CONFUSION_DIRECTIONS,
   createAdaptiveRun,
   currentAdaptiveTrial,
+  displayEnvironmentChange,
   lmsOf,
   makeTargetPair,
   ORIENTATIONS,
@@ -17,6 +18,43 @@ import {
 } from '../src/lib/daltonism.js';
 
 const fixedRandom = () => 0.25;
+
+const displayEnvironment = Object.freeze({
+  theme: 'light',
+  forcedColors: false,
+  dpr: 2,
+  orientation: 'portrait-primary',
+  viewportWidth: 390,
+  viewportHeight: 844,
+});
+
+test('display integrity changes invalidate a measured run', () => {
+  assert.equal(displayEnvironmentChange(displayEnvironment, { ...displayEnvironment }), null);
+  assert.equal(
+    displayEnvironmentChange(displayEnvironment, { ...displayEnvironment, theme: 'dark' }),
+    'theme',
+  );
+  assert.equal(
+    displayEnvironmentChange(displayEnvironment, { ...displayEnvironment, forcedColors: true }),
+    'forced-colors',
+  );
+  assert.equal(displayEnvironmentChange(displayEnvironment, { ...displayEnvironment, dpr: 3 }), 'dpr');
+  assert.equal(
+    displayEnvironmentChange(displayEnvironment, {
+      ...displayEnvironment,
+      orientation: 'landscape-primary',
+    }),
+    'orientation',
+  );
+  assert.equal(
+    displayEnvironmentChange(displayEnvironment, { ...displayEnvironment, viewportHeight: 700 }),
+    'geometry',
+  );
+  assert.equal(
+    displayEnvironmentChange(displayEnvironment, { ...displayEnvironment, viewportHeight: 843.5 }),
+    null,
+  );
+});
 
 test('display-model directions are normalized', () => {
   for (const direction of Object.values(CONFUSION_DIRECTIONS)) {

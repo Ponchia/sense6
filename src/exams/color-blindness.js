@@ -5,6 +5,7 @@ import {
   createAdaptiveRun,
   currentAdaptiveTrial,
   DEMO_TARGET,
+  displayEnvironmentChange,
   jitterDotColor,
   makeTargetPair,
   recordAdaptiveAnswer,
@@ -23,6 +24,7 @@ const RESULT_STORE = createResultStore({
   validate: (value) => isRecord(value) && value.schemaVersion === 2 && Array.isArray(value.thresholds),
 });
 const MOUNT_OWNER = Symbol('daltonia');
+const EDITABLE_CONTROL_SELECTOR = 'input, select, textarea, [contenteditable]:not([contenteditable="false"])';
 
 const DIRECTION_LABELS = {
   up: 'top',
@@ -70,12 +72,15 @@ export function mount(context) {
     phase: 'intro',
     practiceIndex: 0,
     practiceFeedback: null,
+    measurementEnvironment: null,
+    dprGuardCleanup: () => {},
   };
   state = mountState;
   wireEvents(lifecycle.signal);
   renderIntro();
 
   lifecycle.onCleanup(() => {
+    mountState.dprGuardCleanup();
     mountState.active = false;
     mountState.phase = 'intro';
     if (state === mountState) state = null;
@@ -84,6 +89,7 @@ export function mount(context) {
 }
 
 function renderIntro() {
+  state.dprGuardCleanup();
   state.active = false;
   state.phase = 'intro';
   document.body.classList.remove('lab-mode');
@@ -190,6 +196,7 @@ function researchCard(eyebrow, title, body, href) {
 }
 
 function renderSetup() {
+  state.dprGuardCleanup();
   state.active = false;
   state.phase = 'setup';
   document.body.classList.add('lab-mode');
@@ -246,6 +253,7 @@ function renderSetup() {
       </div>
     </section>
   `;
+  updateSetupEligibility();
 }
 
 function startPractice() {
@@ -272,7 +280,7 @@ function renderPractice() {
         <span class="trial-count"><b>0${state.practiceIndex + 1}</b> / 0${PRACTICE_TARGETS.length}</span>
       </div>
 
-      <div class="cb-stage ui-container cb-stage--practice">
+      <div class="cb-stage ui-container cb-stage--practice${correct ? ' is-answered' : ''}">
         <div class="cb-plate-wrap">
           <div class="cb-plate">
             <canvas data-target aria-label="Clear dotted practice target with a C-shaped gap"></canvas>
@@ -281,18 +289,9 @@ function renderPractice() {
 
         <div class="cb-answer">
           <p class="ui-eyebrow">Practice with feedback</p>
-          <h1 class="cb-prompt">Where is the clear gap?</h1>
+          <h1 class="cb-prompt" tabindex="-1" data-trial-focus>Where is the clear gap?</h1>
           <p class="cb-trial-hint">Learn the shape here. The measured targets will later become faint.</p>
-          <div class="cb-directions" role="group" aria-label="Choose the practice gap direction">
-            ${directionButton('up', correct)}
-            ${directionButton('left', correct)}
-            <span class="cb-directions__center" aria-hidden="true">C</span>
-            ${directionButton('right', correct)}
-            ${directionButton('down', correct)}
-          </div>
-          <button class="ui-button ui-button--ghost cb-unseen" type="button" data-orientation="unseen" ${correct ? 'disabled' : ''}>
-            No gap visible
-          </button>
+          ${correct ? '' : responseSetMarkup(true)}
           ${state.practiceFeedback ? practiceFeedbackMarkup(state.practiceFeedback) : ''}
           ${
             correct
@@ -311,6 +310,10 @@ function renderPractice() {
   requestAnimationFrame(() => {
     const canvas = state.app.querySelector('[data-target]');
     if (canvas) drawTarget(canvas, trial, trial.id);
+    const focusTarget = correct
+      ? state.app.querySelector('[data-action="cb-practice-next"]')
+      : state.app.querySelector('[data-trial-focus]');
+    focusTarget?.focus({ preventScroll: true });
   });
 }
 
@@ -350,8 +353,17 @@ function advancePractice() {
 }
 
 function beginAdaptiveRun() {
+  if (forcedColorsActive()) {
+    renderSetup();
+    announce('Turn off forced-colours or high-contrast mode before this colour task.');
+    return;
+  }
   const entropy = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}:${performance.now()}`;
   state.run = createAdaptiveRun(seededRandom(`daltonia:${entropy}`));
+  const practicePlate = state.app.querySelector('.cb-plate');
+  const stimulusCssPixels = Math.max(1, Math.round(practicePlate?.getBoundingClientRect().width ?? 320));
+  state.measurementEnvironment = captureMeasurementEnvironment(stimulusCssPixels);
+  armDprGuard();
   state.active = true;
   trackMetric(METRIC_EVENTS.testStarted, METRIC_TESTS.daltonia);
   state.phase = 'run';
@@ -375,7 +387,7 @@ function renderTrial() {
   document.title = `Response ${trialNumber}, up to ${total} — Daltonia | Sense6`;
 
   state.app.innerHTML = `
-    <section class="cb-view">
+    <section class="cb-view" data-measurement-active style="--cb-stimulus-size:${state.measurementEnvironment.stimulusCssPixels}px">
       <div class="lab-topbar ui-container ui-container--wide">
         <button class="back-link" type="button" data-action="cb-home"><span aria-hidden="true">×</span> End experiment</button>
         <p class="cb-topbar__label">Adaptive colour threshold</p>
@@ -396,18 +408,9 @@ function renderTrial() {
 
         <div class="cb-answer">
           <p class="ui-eyebrow">Adaptive response</p>
-          <h1 class="cb-prompt">Where is the gap?</h1>
+          <h1 class="cb-prompt" tabindex="-1" data-trial-focus>Where is the gap?</h1>
           <p class="cb-trial-hint">Some targets should disappear. Say so instead of guessing and that direction will become easier.</p>
-          <div class="cb-directions" role="group" aria-label="Choose the gap direction">
-            ${directionButton('up')}
-            ${directionButton('left')}
-            <span class="cb-directions__center" aria-hidden="true">C</span>
-            ${directionButton('right')}
-            ${directionButton('down')}
-          </div>
-          <button class="ui-button ui-button--ghost cb-unseen" type="button" data-orientation="unseen">
-            No gap visible
-          </button>
+          ${responseSetMarkup(false)}
           <p class="cb-key-hint">Keyboard: arrow keys · N for no gap</p>
         </div>
       </div>
@@ -417,7 +420,25 @@ function renderTrial() {
   requestAnimationFrame(() => {
     const canvas = state.app.querySelector('[data-target]');
     if (canvas) drawTarget(canvas, trial, `run-${trial.id}`);
+    state.app.querySelector('[data-trial-focus]')?.focus({ preventScroll: true });
   });
+}
+
+function responseSetMarkup(practice) {
+  const label = practice ? 'Choose the practice gap direction' : 'Choose the gap direction';
+  return `<div class="cb-response-set" role="group" aria-label="${label}">
+    <div class="cb-directions">
+      ${directionButton('up')}
+      ${directionButton('left')}
+      <span class="cb-directions__center" aria-hidden="true">C</span>
+      ${directionButton('right')}
+      ${directionButton('down')}
+    </div>
+    <button class="ui-button ui-button--ghost cb-unseen" type="button" data-orientation="unseen">
+      <span>No gap visible</span>
+      <small>${practice ? 'Practice with feedback' : 'Adaptive response'}</small>
+    </button>
+  </div>`;
 }
 
 function directionButton(direction, disabled = false) {
@@ -451,8 +472,10 @@ function renderResults() {
   window.scrollTo({ top: 0, behavior: 'instant' });
   document.title = t('Your display-relative thresholds — Daltonia | Sense6');
   const result = summarizeAdaptiveRun(state.run);
-  saveLast(result);
-  saveJournalResult(result);
+  const lastResultSaved = saveLast(result);
+  const journalSaved = saveJournalResult(result);
+  const storageOk = lastResultSaved && journalSaved;
+  state.dprGuardCleanup();
 
   state.app.innerHTML = `
     <section class="results-view ui-container ui-container--wide">
@@ -483,9 +506,23 @@ function renderResults() {
         </div>
       </div>
 
+      ${
+        storageOk
+          ? ''
+          : `<div class="cb-save-warning ui-alert ui-alert--warning" role="alert">
+              <div class="ui-alert__body">
+                <strong class="ui-alert__title">This result was not saved</strong>
+                <p>Browser storage is unavailable. Copy the run summary before leaving this page.</p>
+              </div>
+            </div>`
+      }
+
       <div class="results-actions">
-        <button class="ui-button ui-button--lg" type="button" data-action="cb-setup">Run again</button>
-        <button class="ui-button ui-button--ghost" type="button" data-action="cb-copy">Copy run summary</button>
+        ${
+          storageOk
+            ? '<button class="ui-button ui-button--lg" type="button" data-action="cb-setup">Run again</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-copy">Copy run summary</button>'
+            : '<button class="ui-button ui-button--lg" type="button" data-action="cb-copy">Copy run summary</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-setup">Run again</button>'
+        }
         <button class="ui-button ui-button--subtle" type="button" data-action="gallery">All tests</button>
       </div>
     </section>
@@ -627,7 +664,7 @@ function loadLast() {
 }
 
 function saveLast(result) {
-  RESULT_STORE.save({
+  return RESULT_STORE.save({
     schemaVersion: 2,
     thresholds: result.axes.map(({ type, threshold, spread }) => ({ type, threshold, spread })),
     controlOk: result.controlOk,
@@ -636,11 +673,19 @@ function saveLast(result) {
 }
 
 function saveJournalResult(result) {
+  const measurement = state.measurementEnvironment;
   const entry = createJournalEntry({
     examId: 'color-blindness',
     locale: state.locale,
     quality: result.controlOk ? 'usable' : 'limited',
-    setup: captureDisplayPassport(),
+    setup: {
+      ...captureDisplayPassport(),
+      theme: measurement?.theme ?? currentTheme(),
+      stimulusCssPixels: measurement?.stimulusCssPixels ?? null,
+      measurementViewport: measurement ? `${measurement.viewportWidth}x${measurement.viewportHeight}` : null,
+      measurementDpr: measurement?.dpr ?? window.devicePixelRatio ?? 1,
+      orientation: measurement?.orientation ?? currentOrientation(),
+    },
     measurements: result.axes.map((axis) => ({
       id: axis.type,
       value: axis.threshold,
@@ -649,7 +694,88 @@ function saveJournalResult(result) {
     })),
     notes: result.controlOk ? [] : ['task-controls-limited'],
   });
-  if (entry) appendJournalEntry(entry);
+  return entry ? appendJournalEntry(entry) : false;
+}
+
+function forcedColorsActive() {
+  return window.matchMedia?.('(forced-colors: active)').matches === true;
+}
+
+function currentTheme() {
+  return (
+    document.documentElement.dataset.theme ??
+    (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+  );
+}
+
+function currentOrientation() {
+  const viewportWidth = window.visualViewport?.width ?? window.innerWidth;
+  const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+  const aspect = viewportWidth > viewportHeight ? 'landscape' : 'portrait';
+  const angle = screen.orientation?.angle;
+  return Number.isFinite(angle) ? `${aspect}-${angle}` : aspect;
+}
+
+function captureMeasurementEnvironment(stimulusCssPixels) {
+  const viewport = window.visualViewport;
+  return {
+    theme: currentTheme(),
+    forcedColors: forcedColorsActive(),
+    dpr: window.devicePixelRatio || 1,
+    orientation: currentOrientation(),
+    viewportWidth: Math.round((viewport?.width ?? window.innerWidth) * 100) / 100,
+    viewportHeight: Math.round((viewport?.height ?? window.innerHeight) * 100) / 100,
+    stimulusCssPixels,
+  };
+}
+
+function armDprGuard() {
+  state.dprGuardCleanup();
+  const query = window.matchMedia?.(`(resolution: ${state.measurementEnvironment.dpr}dppx)`);
+  if (!query) return;
+  const validate = () => validateMeasurementEnvironment();
+  query.addEventListener('change', validate);
+  state.dprGuardCleanup = () => {
+    query.removeEventListener('change', validate);
+    state.dprGuardCleanup = () => {};
+  };
+}
+
+function validateMeasurementEnvironment() {
+  if (!state.active || state.phase !== 'run' || !state.measurementEnvironment) return;
+  const current = captureMeasurementEnvironment(state.measurementEnvironment.stimulusCssPixels);
+  const change = displayEnvironmentChange(state.measurementEnvironment, current);
+  if (change) invalidateMeasurement(change);
+}
+
+function invalidateMeasurement(reason) {
+  if (!state.active || state.phase !== 'run') return;
+  state.active = false;
+  state.phase = 'invalidated';
+  state.run = null;
+  state.dprGuardCleanup();
+  document.title = t('Prepare your display — Daltonia | Sense6');
+  state.app.innerHTML = `<section class="setup-view ui-container ui-container--wide cb-invalidated" data-invalidated-by="${reason}">
+    <div class="ui-alert ui-alert--warning" role="alert" tabindex="-1">
+      <div class="ui-alert__body">
+        <strong class="ui-alert__title">Display conditions changed</strong>
+        <p>This measured run stopped before a result. Nothing was saved. Return to setup and keep the theme, window, orientation, and display scale unchanged.</p>
+      </div>
+    </div>
+    <button class="ui-button ui-button--lg" type="button" data-action="cb-setup">Return to display setup</button>
+  </section>`;
+  state.app.querySelector('[role="alert"]')?.focus?.({ preventScroll: true });
+  announce('Display conditions changed. This measured run stopped and was not saved.');
+}
+
+function updateSetupEligibility() {
+  const ready = state.app.querySelector('#cb-ready');
+  const start = state.app.querySelector('#cb-start');
+  if (!ready || !start) return;
+  const blocked = forcedColorsActive();
+  start.disabled = !ready.checked || blocked;
+  const warning = state.app.querySelector('.forced-colors-warning');
+  warning?.setAttribute('aria-hidden', String(!blocked));
 }
 
 function wireEvents(signal) {
@@ -657,7 +783,7 @@ function wireEvents(signal) {
     'change',
     (event) => {
       if (event.target.matches('#cb-ready')) {
-        state.app.querySelector('#cb-start').disabled = !event.target.checked;
+        updateSetupEligibility();
       }
     },
     { signal },
@@ -699,7 +825,9 @@ function wireEvents(signal) {
   document.addEventListener(
     'keydown',
     (event) => {
-      if (!state.active) return;
+      if (!state.active || event.repeat || event.isComposing) return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target?.closest('.cb-stage') || target.closest(EDITABLE_CONTROL_SELECTOR)) return;
       if (event.key.toLowerCase() === 'n') {
         event.preventDefault();
         submitOrientation('unseen');
@@ -714,6 +842,21 @@ function wireEvents(signal) {
       if (!direction) return;
       event.preventDefault();
       submitOrientation(direction);
+    },
+    { signal },
+  );
+
+  const validateEnvironment = () => validateMeasurementEnvironment();
+  window.addEventListener('resize', validateEnvironment, { signal });
+  window.addEventListener('orientationchange', validateEnvironment, { signal });
+  window.visualViewport?.addEventListener('resize', validateEnvironment, { signal });
+  document.documentElement.addEventListener('bronto:themechange', validateEnvironment, { signal });
+  const forcedColors = window.matchMedia?.('(forced-colors: active)');
+  forcedColors?.addEventListener(
+    'change',
+    () => {
+      updateSetupEligibility();
+      validateMeasurementEnvironment();
     },
     { signal },
   );
