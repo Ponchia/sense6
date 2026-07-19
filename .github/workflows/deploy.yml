@@ -10,11 +10,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  verify:
+  verify-and-publish:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
       contents: read
+      deployments: write
 
     steps:
       - name: Check out the repository
@@ -34,32 +35,6 @@ jobs:
 
       - name: Verify the production bundle
         run: npm run check
-
-      - name: Store the verified bundle
-        uses: actions/upload-artifact@v4
-        with:
-          name: sense6-dist
-          path: dist/
-          if-no-files-found: error
-          retention-days: 1
-
-  publish:
-    needs: verify
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-      deployments: write
-
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@v6
-
-      - name: Restore the verified bundle
-        uses: actions/download-artifact@v4
-        with:
-          name: sense6-dist
-          path: dist/
 
       - name: Publish the verified bundle
         uses: cloudflare/wrangler-action@v3
