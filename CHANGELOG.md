@@ -12,7 +12,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 - A local-only, versioned multi-run journal with setup passports,
   instrument-specific comparability, uncertainty and bound-aware changes,
-  validated import/export, individual and complete deletion, six localized
+  validated import/export, individual and complete deletion, twelve localized
   routes, and recording from all five experiments.
 - An Acutezza external-validation protocol, machine-readable observation
   schema, and evidence validator for the physical-device, FrACT, test-retest,
@@ -25,9 +25,10 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   engineering roadmap for repeated-run history and suite scaling.
 - Cloudflare Pages deployment with the existing full verification gate,
   production security headers, and immutable asset caching.
-- English, Italian, German, French, Spanish, and Portuguese interfaces across
-  the gallery, all five exams, safety/setup flows, live tasks, result screens,
-  accessibility labels, metadata, and copied summaries.
+- English, Italian, German, French, Spanish, European and Brazilian Portuguese,
+  Arabic, Japanese, Korean, Hindi, and Simplified Chinese interfaces across the
+  gallery, all five exams, safety/setup flows, live tasks, result screens,
+  accessibility labels, metadata, privacy notice, journal, and copied summaries.
 - Localized static entry pages for every gallery, exam, and privacy route, with
   substantive no-JavaScript content, canonical and `hreflang` metadata,
   structured data, an exact sitemap, crawler policy, `llms.txt`, and a real 404.
@@ -35,6 +36,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   browser-language detection, persistent language selection, English fallback,
   localized number formatting, and multilingual accessibility and responsive
   coverage.
+- BCP 47-aware regional locale matching, Arabic right-to-left document flow,
+  non-Latin typography, and direction-isolated experimental controls that keep
+  physical left/right stimuli and numbered keyboard mappings stable.
 - Udito—a safe-listening, device-relative hearing lab with a headphone-like
   presentation check, adaptive upper-audibility boundary, and interleaved pitch
   discrimination tracks near 500 Hz and 2 kHz.

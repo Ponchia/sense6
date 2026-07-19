@@ -10,7 +10,7 @@ export const EXAMS = Object.freeze([
     blurb:
       'An adaptive colour-discrimination lab: three instruments measure the smallest hue steps you can resolve on this screen.',
     accent: 'var(--accent)',
-    duration: '≈ 4 min',
+    durationMinutes: 4,
     glyph: 'ΔE',
     category: 'Colour discrimination',
     facts: ['Adaptive difficulty', '3 instruments', 'Detailed profile'],
@@ -34,7 +34,7 @@ export const EXAMS = Object.freeze([
     blurb:
       'Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.',
     accent: '#3bd6a2',
-    duration: '≈ 3 min',
+    durationMinutes: 3,
     glyph: 'C',
     category: 'Colour-vision experiment',
     facts: ['Adaptive thresholds', '3 display directions', 'Run-relative result'],
@@ -58,7 +58,7 @@ export const EXAMS = Object.freeze([
     blurb:
       'Three short instruments separate a simple visual response from decision cost and within-run stability.',
     accent: '#f4b942',
-    duration: '≈ 7 min',
+    durationMinutes: 7,
     glyph: 'R',
     category: 'Response timing',
     facts: ['3 instruments', 'Device-relative timing', 'No composite score'],
@@ -85,7 +85,7 @@ export const EXAMS = Object.freeze([
     blurb:
       'Three listening instruments map this setup without pretending an uncalibrated browser is an audiometer.',
     accent: '#4cc9f0',
-    duration: '≈ 6 min',
+    durationMinutes: 6,
     glyph: 'U',
     category: 'Listening experiment',
     facts: ['3 instruments', 'Volume safety contract', 'No hearing label'],
@@ -106,7 +106,7 @@ export const EXAMS = Object.freeze([
     blurb:
       'Three per-eye instruments measure angular detail, low-contrast cost, and repeatable orientation preference without making a clinical claim.',
     accent: '#8357ff',
-    duration: '≈ 8 min',
+    durationMinutes: 8,
     glyph: 'A',
     category: 'Calibrated sharpness experiment',
     facts: ['Physical screen calibration', '3 per-eye instruments', 'No clinical label'],

@@ -1,0 +1,5 @@
+/pt-BR/* /pt-br/:splat 301
+/pt-PT/* /pt/:splat 301
+/zh-CN/* /zh-hans/:splat 301
+/zh-SG/* /zh-hans/:splat 301
+/zh-Hans/* /zh-hans/:splat 301

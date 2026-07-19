@@ -1,3 +1,5 @@
+import { supplementalPrivacy } from './locales/supplemental.js';
+
 const PRIVACY_EMAIL = 'privacy@sense6.net';
 
 export const PRIVACY_COPY = Object.freeze({
@@ -381,7 +383,7 @@ export function renderPrivacy(context) {
 }
 
 export function privacyCopy(locale) {
-  return PRIVACY_COPY[locale] ?? PRIVACY_COPY.en;
+  return PRIVACY_COPY[locale] ?? supplementalPrivacy(locale) ?? PRIVACY_COPY.en;
 }
 
 export function privacyHtml(text) {

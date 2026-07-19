@@ -84,7 +84,7 @@ async function expectHitTestableGeometry(page, selector, minimum) {
 test('landing page presents the method and passes an accessibility scan', async ({ page }) => {
   await page.goto('/en/tetracromia/');
 
-  await expect(page.getByRole('heading', { name: /How finely do you see color/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /How finely do you see colour/i })).toBeVisible();
   await expect(page.getByRole('button', { name: /Begin the color lab/i })).toBeVisible();
   await expect(page.getByRole('heading', { name: /An RGB screen cannot test tetrachromacy/i })).toBeVisible();
 

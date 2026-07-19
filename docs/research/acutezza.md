@@ -267,7 +267,7 @@ Add these components when implementation begins:
 - `tests/acuity.test.js`: deterministic schedules, simulated threshold recovery,
   posterior bounds, calibration math, and floor/ceiling behavior;
 - browser tests for zoom invalidation, visibility changes, keyboard/touch paths,
-  small-screen refusal, both eye blocks, accessibility, and all six locales.
+  small-screen refusal, both eye blocks, accessibility, and all twelve locales.
 
 The browser implementation now covers this shape. Registration as a public,
 nonclinical experiment does not satisfy or replace the external validation gates
@@ -293,7 +293,7 @@ below.
 
 The software implementation covers gates 1 and 2 with deterministic unit and
 simulation tests, and covers browser geometry invalidation, both eye blocks,
-keyboard and touch interaction, responsive layout, six locales, and automated
+keyboard and touch interaction, responsive layout, twelve locales, and automated
 accessibility checks. Gates 3–7 require physical-device, comparative, test-retest,
 or professional review and remain open.
 

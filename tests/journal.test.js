@@ -32,6 +32,13 @@ test('the journal stores newest-first portable entries and caps retained history
   assert.equal(entries.at(-1).id, 'run-2');
 });
 
+test('journal entries accept supported regional and script-qualified locales', () => {
+  for (const locale of ['pt-br', 'zh-hans']) {
+    assert.equal(createJournalEntry(entry({ locale }))?.locale, locale);
+  }
+  assert.equal(createJournalEntry(entry({ locale: 'zh-tw' })), null);
+});
+
 test('entry creation rejects malformed setup, measurements, dates, and identifiers', () => {
   assert.equal(createJournalEntry({ ...entry(), id: '', notes: [] }), null);
   assert.equal(createJournalEntry({ ...entry(), recordedAt: 'not-a-date', notes: [] }), null);

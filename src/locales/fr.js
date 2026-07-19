@@ -787,7 +787,7 @@ const rows = [
   ],
   ['How finely do you', 'Avec quelle finesse'],
   ['see', 'voyez-vous'],
-  ['color?', 'les couleurs ?'],
+  ['colour?', 'les couleurs ?'],
   ['Begin the color lab', 'Commencer le laboratoire couleur'],
   ['Set the room before the score.', 'Préparez la pièce avant la mesure.'],
   ['Which tile is different?', 'Quelle tuile est différente ?'],
@@ -1466,6 +1466,7 @@ rows.push(
   ['Sound {number}', 'Son {number}'],
   ['Adaptive · {count}', 'Adaptatif · {count}'],
   ['Interleaved · {count}', 'Entrelacé · {count}'],
+  ['≈ {minutes} min', '≈ {minutes} min'],
 );
 
 rows.push(
