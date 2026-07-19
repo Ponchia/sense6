@@ -80,7 +80,7 @@ function renderHome() {
     const hue = Math.round((index / 28) * 360);
     return `<span style="--bar-color: ${toRgbCss(0.7, 0.13, hue)}; --bar-delay: ${index * 18}ms"></span>`;
   }).join('');
-  const headingTail = t('color?');
+  const headingTail = t('colour?');
 
   state.app.innerHTML = `
     <section class="hero ui-container ui-container--wide" id="top">
