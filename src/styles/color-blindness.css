@@ -464,9 +464,13 @@
     grid-column: auto;
   }
 
+  .cb-topbar__label {
+    display: none;
+  }
+
   .cb-stage {
-    --cb-compact-answer: clamp(9.5rem, 40vw, 10rem);
-    --cb-compact-plate: clamp(9rem, 45vw, 12rem);
+    --cb-compact-answer: min(47.5vw, 10rem);
+    --cb-compact-plate: min(45vw, 12rem);
     align-items: center;
     gap: 0.5rem;
     grid-template-columns: minmax(0, var(--cb-compact-plate)) minmax(0, var(--cb-compact-answer));
@@ -520,7 +524,7 @@
   }
 
   .cb-direction small {
-    font-size: 0.55rem;
+    font-size: min(0.55rem, 11px);
   }
 
   .cb-unseen {
@@ -597,8 +601,8 @@
   }
 
   .cb-stage {
-    --cb-compact-answer: 9.5rem;
-    --cb-compact-plate: 11rem;
+    --cb-compact-answer: min(18vw, 9.5rem);
+    --cb-compact-plate: min(24vw, 11rem);
     align-items: center;
     gap: 1rem;
     grid-template-columns: var(--cb-compact-plate) var(--cb-compact-answer);

@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { expectJournalEntry } from './helpers/browser.js';
+import { expectInVisualViewport, expectJournalEntry, expectNoHorizontalOverflow } from './helpers/browser.js';
 
 const AUDITED_VIEWPORTS = [
   { width: 320, height: 568 },
@@ -297,4 +297,23 @@ test('storage failures produce a persistent recovery warning and contained resul
     });
   });
   expect(containment).toBe(true);
+});
+
+test('Daltonia remains operable at 320px with 200% text sizing', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Uses explicit text-only zoom geometry');
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('/en/color-blindness/');
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '32px';
+  });
+  await page.locator('[data-action="cb-setup"]').click();
+  await page.locator('#cb-ready').check();
+  await page.locator('#cb-start').click();
+
+  await expectNoHorizontalOverflow(page, '200% text Daltonia practice');
+  for (const orientation of ['up', 'left', 'right', 'down', 'unseen']) {
+    const answer = page.locator(`[data-orientation="${orientation}"]`);
+    await answer.scrollIntoViewIfNeeded();
+    await expectInVisualViewport(answer, `200% text ${orientation} answer`, { hitTest: true });
+  }
 });
