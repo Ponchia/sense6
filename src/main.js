@@ -8,6 +8,7 @@ import * as tetracromia from './exams/tetracromia.js';
 import * as udito from './exams/udito.js';
 import { getLocale, initializeI18n, localeHref, setLocale, t, translateTree } from './i18n.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from './metrics.js';
+import { renderPrivacy } from './privacy.js';
 import { currentRoute, navigate, startRouter } from './router.js';
 import { renderGallery } from './site.js';
 
@@ -54,7 +55,9 @@ startRouter(({ route, locale }) => {
   window.scrollTo({ top: 0, behavior: 'instant' });
 
   const exam = registry.get(route);
-  if (exam) {
+  if (route === 'privacy') {
+    cleanup = renderPrivacy(context());
+  } else if (exam) {
     cleanup = exam.mount(context());
   } else if (route) {
     // Unknown route — normalize to the gallery; the hashchange re-runs this.

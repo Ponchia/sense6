@@ -164,6 +164,33 @@ test('language routes translate, persist, and remain accessible', async ({ page 
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
+test('the privacy notice describes the deployed data boundary in every locale', async ({ page }) => {
+  const titles = {
+    en: 'Privacy at Sense6',
+    it: 'Privacy su Sense6',
+    de: 'Datenschutz bei Sense6',
+    fr: 'Confidentialité chez Sense6',
+    es: 'Privacidad en Sense6',
+    pt: 'Privacidade na Sense6',
+  };
+
+  await page.goto('/#/en/');
+  await page.getByRole('link', { name: 'Privacy', exact: true }).click();
+  await expect(page).toHaveURL(/#\/en\/privacy$/);
+  await expect(page.getByRole('heading', { level: 1, name: titles.en })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'privacy@sense6.net' })).toHaveCount(2);
+  await expect(page.getByText(/UTC day, test name, event name, and total count/i)).toBeVisible();
+  await expect(page.getByText(/does not store IP addresses, identifiers, fingerprints/i)).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+
+  for (const [locale, title] of Object.entries(titles)) {
+    await page.goto(`/#/${locale}/privacy`);
+    await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    await expect(page.getByRole('heading', { level: 1, name: title })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'privacy@sense6.net' })).toHaveCount(2);
+  }
+});
+
 test('language and theme controls do not overlap at narrow header widths', async ({ page }) => {
   for (const width of [320, 375, 640, 641, 700]) {
     await page.setViewportSize({ width, height: 800 });
