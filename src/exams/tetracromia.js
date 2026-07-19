@@ -14,6 +14,7 @@ const RESULT_STORE = createResultStore({
   validate: (value) => isRecord(value) && Number.isFinite(value.overall),
 });
 const MOUNT_OWNER = Symbol('tetracromia');
+const RESPONSE_GATE_MS = 180;
 
 let state = null;
 
@@ -31,14 +32,24 @@ export function mount(context) {
     selectedSequenceIndex: null,
     sequenceDrag: null,
     suppressNextSequenceClick: false,
+    responseReady: false,
+    responseGateToken: 0,
+    responseGateFrame: 0,
+    responseUnlockTimer: 0,
+    transitionFrame: 0,
+    fieldResizeObserver: null,
+    fieldRedrawFrame: 0,
   };
   state = mountState;
+  mountState.fieldResizeObserver =
+    typeof ResizeObserver === 'function' ? new ResizeObserver(scheduleFieldRedraw) : null;
   wireEvents(lifecycle.signal);
 
   detectDisplay();
   renderHome();
 
   lifecycle.onCleanup(() => {
+    cancelTrialEffects();
     mountState.session = null;
     mountState.labActive = false;
     if (state === mountState) state = null;
@@ -54,6 +65,7 @@ function detectDisplay() {
 }
 
 function renderHome() {
+  cancelTrialEffects();
   state.session = null;
   state.labActive = false;
   state.selectedSequenceIndex = null;
@@ -243,6 +255,7 @@ function testDescription(id) {
 }
 
 function renderSetup() {
+  cancelTrialEffects();
   document.body.classList.add('lab-mode');
   document.title = t('Prepare your screen — Tetracromia | Sense6');
   window.scrollTo({ top: 0, behavior: 'instant' });
@@ -258,7 +271,7 @@ function renderSetup() {
             Display settings and ambient light can move a color threshold. This one-minute check
             makes your run more repeatable.
           </p>
-          <div class="ui-alert ui-alert--info forced-colors-warning">
+          <div class="ui-alert ui-alert--info forced-colors-warning tetracromia-forced-colors-warning">
             <div class="ui-alert__body">
               <strong class="ui-alert__title">Color override detected</strong>
               <p>Turn off forced-colors or high-contrast mode before a visual color task.</p>
@@ -279,10 +292,10 @@ function renderSetup() {
             </div>
             <span class="ui-badge ui-badge--muted">${state.gamutChip.textContent}</span>
           </div>
-          <div class="calibration-steps" aria-label="Eleven brightness steps from black to white">
+          <div class="calibration-steps" role="img" aria-label="Eleven brightness steps from black to white">
             ${Array.from({ length: 11 }, (_, index) => `<span style="--step:${index / 10}"><b>${index}</b></span>`).join('')}
           </div>
-          <div class="calibration-gradient" aria-label="Continuous grayscale gradient"></div>
+          <div class="calibration-gradient" role="img" aria-label="Continuous grayscale gradient"></div>
           <p class="calibration-hint">Look for distinct edges above and a smooth ramp here—without a bright hotspot.</p>
           <label class="ui-check ready-check">
             <input type="checkbox" id="screen-ready" />
@@ -306,12 +319,13 @@ function startLab() {
   state.selectedSequenceIndex = null;
   document.body.classList.add('lab-mode');
   state.trialStartedAt = performance.now();
-  renderLab();
+  renderLab({ semanticTransition: true });
   announce('Instrument one. Threshold. Find the different tile.');
 }
 
-function renderLab() {
+function renderLab({ semanticTransition = false, restoreChoice = null } = {}) {
   if (!state.session) return;
+  state.fieldResizeObserver?.disconnect();
   const phase = state.session.phase;
   const phaseProgress = Math.round((state.session.trialIndex / phase.trials) * 100);
   const trial = state.session.currentTrial;
@@ -349,7 +363,7 @@ function renderLab() {
       </div>
 
       <div class="lab-stage ui-container">
-        <header class="trial-heading">
+        <header class="trial-heading" tabindex="-1">
           <p class="ui-eyebrow">Instrument ${phase.number} / ${phase.name}</p>
           <h1>${phasePrompt(phase.id)}</h1>
           <p>${phaseHelp(phase.id)}</p>
@@ -368,7 +382,19 @@ function renderLab() {
     </section>
   `;
 
-  if (trial.kind === 'field') requestAnimationFrame(() => drawFields(trial));
+  armResponseGate(restoreChoice === null ? null : `[data-choice="${restoreChoice}"]`);
+  if (trial.kind === 'field') {
+    const nonce = trial.nonce;
+    requestAnimationFrame(() => {
+      if (state.session?.currentTrial.nonce !== nonce) return;
+      drawFields(trial);
+      document.querySelectorAll('canvas[data-field]').forEach((canvas) => {
+        state.fieldResizeObserver?.observe(canvas);
+      });
+      scheduleFieldRedraw();
+    });
+  }
+  if (semanticTransition) positionLabTransition();
 }
 
 function phasePrompt(id) {
@@ -393,6 +419,7 @@ function renderThreshold(trial) {
             class="color-tile"
             type="button"
             data-choice="${index}"
+            disabled
             aria-label="Color tile ${index + 1}"
             style="--tile-color:${toRgbCss(color.l, color.c, color.h)}"
           ></button>`;
@@ -409,7 +436,7 @@ function renderField() {
         ${Array.from(
           { length: 4 },
           (_, index) => `
-          <button class="field-choice" type="button" data-choice="${index}" aria-label="Dotted field ${index + 1}">
+          <button class="field-choice" type="button" data-choice="${index}" aria-label="Dotted field ${index + 1}" disabled>
             <canvas data-field="${index}" aria-hidden="true"></canvas>
             <span aria-hidden="true">${String(index + 1).padStart(2, '0')}</span>
           </button>
@@ -451,6 +478,82 @@ function drawFields(trial) {
   });
 }
 
+function cancelResponseGate() {
+  state.responseGateToken += 1;
+  state.responseReady = false;
+  cancelAnimationFrame(state.responseGateFrame);
+  clearTimeout(state.responseUnlockTimer);
+  state.responseGateFrame = 0;
+  state.responseUnlockTimer = 0;
+}
+
+function cancelTrialEffects() {
+  if (!state) return;
+  cancelResponseGate();
+  cancelAnimationFrame(state.transitionFrame);
+  cancelAnimationFrame(state.fieldRedrawFrame);
+  state.transitionFrame = 0;
+  state.fieldRedrawFrame = 0;
+  state.fieldResizeObserver?.disconnect();
+}
+
+function armResponseGate(restoreFocusSelector) {
+  cancelResponseGate();
+  const mountedState = state;
+  const token = state.responseGateToken;
+  state.responseGateFrame = requestAnimationFrame(() => {
+    state.responseGateFrame = 0;
+    state.responseUnlockTimer = window.setTimeout(() => {
+      if (state !== mountedState || state.responseGateToken !== token || !state.session) return;
+      state.responseUnlockTimer = 0;
+      state.responseReady = true;
+      document.querySelectorAll('[data-choice], [data-action="submit-sequence"]').forEach((button) => {
+        button.disabled = false;
+      });
+      scheduleFieldRedraw();
+      if (restoreFocusSelector) {
+        document.querySelector(restoreFocusSelector)?.focus({ preventScroll: true });
+      }
+    }, RESPONSE_GATE_MS);
+  });
+}
+
+function claimTrialResponse() {
+  if (!state.responseReady) return false;
+  state.responseReady = false;
+  document.querySelectorAll('[data-choice], [data-action="submit-sequence"]').forEach((button) => {
+    button.disabled = true;
+  });
+  return true;
+}
+
+function positionLabTransition() {
+  cancelAnimationFrame(state.transitionFrame);
+  const mountedState = state;
+  state.transitionFrame = requestAnimationFrame(() => {
+    state.transitionFrame = 0;
+    if (state !== mountedState) return;
+    const heading = document.querySelector('.trial-heading');
+    if (!heading) return;
+    const chromeHeight = document.querySelector('.site-chrome')?.getBoundingClientRect().height ?? 0;
+    const top = Math.max(0, window.scrollY + heading.getBoundingClientRect().top - chromeHeight - 8);
+    window.scrollTo({ top, behavior: 'instant' });
+    heading.focus({ preventScroll: true });
+  });
+}
+
+function scheduleFieldRedraw() {
+  if (state?.session?.currentTrial.kind !== 'field') return;
+  cancelAnimationFrame(state.fieldRedrawFrame);
+  const mountedState = state;
+  const nonce = state.session.currentTrial.nonce;
+  state.fieldRedrawFrame = requestAnimationFrame(() => {
+    state.fieldRedrawFrame = 0;
+    if (state !== mountedState || state.session?.currentTrial.nonce !== nonce) return;
+    drawFields(state.session.currentTrial);
+  });
+}
+
 function renderSequence(trial) {
   const first = trial.colors[0];
   const last = trial.colors.at(-1);
@@ -487,7 +590,7 @@ function renderSequence(trial) {
           <button class="ui-button ui-button--ghost" type="button" data-action="move-sequence" data-direction="1" ${state.selectedSequenceIndex === null ? 'disabled' : ''}>
             Move right <span aria-hidden="true">→</span>
           </button>
-          <button class="ui-button" type="button" data-action="submit-sequence">Lock this order</button>
+          <button class="ui-button" type="button" data-action="submit-sequence" disabled>Lock this order</button>
         </div>
       </div>
     </div>
@@ -544,8 +647,8 @@ function syncSequenceUi(pulsePositions = []) {
   });
 }
 
-function answerChoice(choice) {
-  if (!state.session || state.session.phase.id === 'sequence') return;
+function answerChoice(choice, { restoreFocus = false } = {}) {
+  if (!state.session || state.session.phase.id === 'sequence' || !claimTrialResponse()) return;
   const phaseBefore = state.session.phase.id;
   const result = state.session.answerChoice(choice, performance.now() - state.trialStartedAt);
 
@@ -554,7 +657,8 @@ function answerChoice(choice) {
     return;
   }
 
-  if (state.session.phase.id !== phaseBefore) {
+  const phaseChanged = state.session.phase.id !== phaseBefore;
+  if (phaseChanged) {
     announce(
       `Instrument ${state.session.phase.number}. ${state.session.phase.name}. ${phasePrompt(state.session.phase.id)}`,
     );
@@ -564,7 +668,10 @@ function answerChoice(choice) {
 
   state.selectedSequenceIndex = null;
   state.trialStartedAt = performance.now();
-  renderLab();
+  renderLab({
+    semanticTransition: phaseChanged,
+    restoreChoice: !phaseChanged && restoreFocus ? choice : null,
+  });
   state.app.dataset.feedback = result.correct ? 'correct' : 'miss';
   const mountedApp = state.app;
   window.setTimeout(() => delete mountedApp.dataset.feedback, 260);
@@ -607,7 +714,7 @@ function moveSequence(direction) {
 }
 
 function submitSequence() {
-  if (state.session?.phase.id !== 'sequence') return;
+  if (state.session?.phase.id !== 'sequence' || !claimTrialResponse()) return;
   const result = state.session.submitSequence(performance.now() - state.trialStartedAt);
   state.selectedSequenceIndex = null;
 
@@ -622,6 +729,7 @@ function submitSequence() {
 }
 
 function renderResults() {
+  cancelTrialEffects();
   state.labActive = false;
   trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.tetracromia);
   document.body.classList.add('lab-mode');
@@ -633,7 +741,7 @@ function renderResults() {
   const profile = profileLabel(result.overall);
 
   state.app.innerHTML = `
-    <section class="results-view ui-container ui-container--wide">
+    <section class="results-view ui-container ui-container--wide" tabindex="-1">
       <div class="results-head">
         <div>
           <p class="ui-eyebrow">Session complete / ${formatDuration(result.elapsedMs)}</p>
@@ -694,7 +802,8 @@ function renderResults() {
     </section>
   `;
 
-  document.querySelector('#main').focus({ preventScroll: true });
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  document.querySelector('.results-view').focus({ preventScroll: true });
   announce(
     `Session complete. Your display-relative index is ${result.overall} out of 100. ${profile.title}.`,
   );
@@ -738,7 +847,7 @@ function renderRadar(profile) {
       const y = center + Math.sin(angle) * radius;
       const labelX = center + Math.cos(angle) * (radius + 24);
       const labelY = center + Math.sin(angle) * (radius + 24);
-      const anchor = Math.cos(angle) > 0.35 ? 'start' : Math.cos(angle) < -0.35 ? 'end' : 'middle';
+      const anchor = Math.cos(angle) > 0.35 ? 'end' : Math.cos(angle) < -0.35 ? 'start' : 'middle';
       return `
         <line class="profile-radar__axis" x1="${center}" y1="${center}" x2="${x}" y2="${y}" />
         <circle class="profile-radar__swatch" cx="${labelX}" cy="${labelY - 8}" r="6"
@@ -869,7 +978,7 @@ function wireEvents(signal) {
     (event) => {
       const choice = event.target.closest('[data-choice]');
       if (choice) {
-        answerChoice(Number(choice.dataset.choice));
+        answerChoice(Number(choice.dataset.choice), { restoreFocus: event.detail === 0 });
         return;
       }
 
@@ -919,6 +1028,7 @@ function wireEvents(signal) {
   document.addEventListener('pointermove', onSequencePointerMove, { signal });
   document.addEventListener('pointerup', onSequencePointerUp, { signal });
   document.addEventListener('pointercancel', onSequencePointerCancel, { signal });
+  window.addEventListener('resize', scheduleFieldRedraw, { signal });
 }
 
 /*
@@ -999,6 +1109,8 @@ function onSequencePointerDown(event) {
     startX: event.clientX,
     startY: event.clientY,
     lastX: event.clientX,
+    lastY: event.clientY,
+    cancelled: false,
     runLeft: runBounds.left,
     step: count > 1 ? (runBounds.width - tileBounds.width) / (count - 1) : tileBounds.width,
     count,
@@ -1010,12 +1122,15 @@ function onSequencePointerMove(event) {
   if (!state.sequenceDrag || event.pointerId !== state.sequenceDrag.pointerId) return;
   const drag = state.sequenceDrag;
   drag.lastX = event.clientX;
+  drag.lastY = event.clientY;
 
   if (!drag.started) {
-    if (
-      Math.abs(event.clientX - drag.startX) < DRAG_THRESHOLD_PX &&
-      Math.abs(event.clientY - drag.startY) < DRAG_THRESHOLD_PX
-    ) {
+    if (drag.cancelled) return;
+    const horizontalDistance = Math.abs(event.clientX - drag.startX);
+    const verticalDistance = Math.abs(event.clientY - drag.startY);
+    if (horizontalDistance < DRAG_THRESHOLD_PX && verticalDistance < DRAG_THRESHOLD_PX) return;
+    if (verticalDistance >= horizontalDistance) {
+      drag.cancelled = true;
       return;
     }
     drag.started = true;
