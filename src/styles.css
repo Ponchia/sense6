@@ -2579,10 +2579,9 @@ a:focus-visible {
 .gallery-hero {
   align-items: center;
   display: grid;
-  gap: clamp(3rem, 7vw, 8rem);
+  gap: clamp(2.5rem, 5vw, 6rem);
   grid-template-columns: minmax(0, 1.05fr) minmax(24rem, 0.75fr);
-  min-block-size: min(50rem, calc(100svh - 4.5rem));
-  padding-block: clamp(4rem, 8vw, 7rem);
+  padding-block: clamp(2.75rem, 5vw, 4rem);
 }
 
 .gallery-hero__copy {
@@ -2738,7 +2737,7 @@ a:focus-visible {
 }
 
 .tests-section {
-  padding-block: clamp(4rem, 8vw, 7rem);
+  padding-block: clamp(3rem, 6vw, 5rem);
   scroll-margin-block-start: 4rem;
 }
 
@@ -3170,8 +3169,8 @@ a:focus-visible {
 
 @media (max-width: 700px) {
   .gallery-hero {
-    gap: 3.5rem;
-    padding-block: 3.5rem 4.5rem;
+    gap: 2.5rem;
+    padding-block: 2.5rem 3.25rem;
   }
 
   .gallery-hero h1 {
