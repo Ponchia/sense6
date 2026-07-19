@@ -358,6 +358,7 @@ test('Acutezza calibrates the display and reports three separate non-clinical ob
   page,
 }) => {
   await installQuickAcutezza(page);
+  const metrics = await captureMetrics(page);
   await page.goto('/#/acutezza');
   await expect(page).toHaveURL(/#\/en\/acutezza$/);
   await expect(page.getByRole('heading', { name: /Calibrate the screen/i })).toBeVisible();
@@ -386,6 +387,13 @@ test('Acutezza calibrates the display and reports three separate non-clinical ob
   await expect(page.getByText(/not an eye examination/i)).toBeVisible();
   await expect(page.getByText(/Do not infer normal vision, 20\/20/i)).toBeVisible();
   await expect(page.getByText(/astigmatism axis/i)).toBeVisible();
+  await expect
+    .poll(() => metrics)
+    .toEqual([
+      { event: 'site_loaded', test: 'site' },
+      { event: 'test_started', test: 'acutezza' },
+      { event: 'test_completed', test: 'acutezza' },
+    ]);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 

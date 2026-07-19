@@ -11,6 +11,7 @@ export const METRIC_TESTS = Object.freeze({
   daltonia: 'daltonia',
   riflessi: 'riflessi',
   udito: 'udito',
+  acutezza: 'acutezza',
 });
 
 const ALLOWED_PAIRS = new Set([

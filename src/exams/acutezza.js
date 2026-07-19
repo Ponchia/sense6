@@ -22,6 +22,7 @@ import {
 } from '../lib/acuity.js';
 import { drawLandoltRing, drawMeridianField } from '../lib/optotypes.js';
 import { seededRandom } from '../lib/random.js';
+import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 
 export const meta = {
   id: 'acutezza',
@@ -519,6 +520,14 @@ function renderTransition(eyebrow, title, button, action) {
 }
 
 function continueAcuity() {
+  if (
+    session.currentEye.stage === 'high' &&
+    session.currentEye.high.records.length === 0 &&
+    !session.metricStarted
+  ) {
+    session.metricStarted = true;
+    trackMetric(METRIC_EVENTS.testStarted, METRIC_TESTS.acutezza);
+  }
   renderAcuityRunner();
   prepareAcuityTrial();
 }
@@ -610,6 +619,7 @@ function confirmNextEye() {
 
 function renderResults() {
   clearRuntime();
+  trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.acutezza);
   document.body.classList.add('lab-mode');
   const summaries = session.eyeResults.flatMap((result) => [result.high, result.low].filter(Boolean));
   const controlCorrect = summaries.reduce((sum, result) => sum + result.controlCorrect, 0);
