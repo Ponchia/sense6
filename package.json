@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "A private, research-grounded browser perception lab.",
+  "description": "A privacy-first collection of experimental browser perception tests.",
   "license": "MIT",
   "engines": {
     "node": ">=22"
@@ -17,9 +17,8 @@
     "test:coverage": "node --test --experimental-test-coverage --test-coverage-lines=95 --test-coverage-branches=80 --test-coverage-functions=90 --test-coverage-include='src/lib/*.js' tests/*.test.js",
     "test:static": "node --test tests/static-output.build.js",
     "test:e2e": "playwright test",
-    "validate:acutezza": "node scripts/validate-acutezza-evidence.mjs",
     "typecheck": "tsc -p jsconfig.json",
-    "check": "npm run lint && npm run typecheck && npm run test:coverage && npm run validate:acutezza && npm run build && npm run test:static && npm run test:e2e"
+    "check": "npm run lint && npm run typecheck && npm run test:coverage && npm run build && npm run test:static && npm run test:e2e"
   },
   "dependencies": {
     "@ponchia/ui": "^0.6.12"

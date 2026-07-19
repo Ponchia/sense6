@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { aboutCopy } from '../src/about.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { LOCALES, loadMessages, localeMetadata } from '../src/locales.js';
 import { privacyCopy } from '../src/privacy.js';
@@ -108,6 +109,32 @@ test('the privacy notice describes the deployed data boundary in every locale', 
     await expect(page.locator('html')).toHaveAttribute('dir', direction);
     await expect(page.getByRole('heading', { level: 1, name: privacyCopy(code).title })).toBeVisible();
     await expect(page.getByRole('link', { name: 'privacy@sense6.net' })).toHaveCount(2);
+  }
+});
+
+test('the About page explains authorship, methodology, and permanent limits in every locale', async ({
+  page,
+}) => {
+  await page.goto('/en/');
+  await page.getByRole('link', { name: 'About', exact: true }).click();
+  await expect(page).toHaveURL(/\/en\/about\/$/);
+  await expect(page.getByRole('heading', { level: 1, name: aboutCopy('en').title })).toBeVisible();
+  await expect(page.getByText('No certification or formal validation is planned.')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Zeno', exact: true })).toHaveCount(2);
+  await expect(page.getByRole('link', { name: 'privacy notice', exact: true })).toBeVisible();
+  await expect(page.locator('.about-experiment')).toHaveCount(5);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+
+  for (const { code, languageTag, direction } of LOCALES) {
+    await page.goto(`/${code}/about/`);
+    await expect(page.locator('html')).toHaveAttribute('lang', languageTag);
+    await expect(page.locator('html')).toHaveAttribute('dir', direction);
+    await expect(page.getByRole('heading', { level: 1, name: aboutCopy(code).title })).toBeVisible();
+    await expect
+      .poll(() =>
+        page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+      )
+      .toBe(true);
   }
 });
 

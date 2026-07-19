@@ -11,6 +11,8 @@ const rows = [
   ['Language', 'Sprache'],
   ['Measure carefully. Keep it private.', 'Sorgfältig messen. Privat bleiben.'],
   ['All tests', 'Alle Tests'],
+  ['About', 'Über Sense6'],
+  ['How Sense6 works', 'So funktioniert Sense6'],
   ['Anonymous daily counts · no cookies', 'Anonyme Tageszähler · keine Cookies'],
   ['Source', 'Quellcode'],
   ['Sense6 — measure what your senses notice', 'Sense6 — messen, was Ihre Sinne wahrnehmen'],

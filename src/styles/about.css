@@ -1,0 +1,239 @@
+/* ============================================================
+   About and methodology
+   ============================================================ */
+
+.about-view {
+  max-inline-size: 82rem;
+  padding-block: clamp(2rem, 5vw, 4rem) clamp(5rem, 9vw, 8rem);
+}
+
+.about-view__back {
+  margin-block-end: clamp(2rem, 5vw, 4rem);
+  text-decoration: none;
+}
+
+.about-hero {
+  align-items: end;
+  display: grid;
+  gap: clamp(2rem, 6vw, 6rem);
+  grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.65fr);
+  padding-block-end: clamp(2.5rem, 6vw, 5rem);
+}
+
+.about-hero h1 {
+  font-family: var(--display);
+  font-size: clamp(3.5rem, 8vw, 7rem);
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  line-height: 0.88;
+  margin: 1rem 0 1.5rem;
+  text-wrap: balance;
+}
+
+.about-hero__lede {
+  color: var(--text-soft);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  line-height: 1.55;
+  margin: 0;
+  max-inline-size: 48rem;
+}
+
+.about-hero__updated {
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  margin: 1.5rem 0 0;
+  text-transform: uppercase;
+}
+
+.about-summary {
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 2.5rem 1fr;
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.about-summary > span,
+.about-section__number {
+  color: var(--accent-text);
+  font-family: var(--display);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.about-summary h2,
+.about-facts h2 {
+  font-family: var(--display);
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.about-summary p,
+.about-facts p {
+  color: var(--text-dim);
+  line-height: 1.55;
+  margin: 0.65rem 0 0;
+}
+
+.about-facts {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding-block-end: clamp(3rem, 7vw, 6rem);
+}
+
+.about-facts .ui-card {
+  padding: clamp(1.15rem, 2vw, 1.6rem);
+}
+
+.about-sections {
+  border-block-start: 1px solid var(--line-strong);
+}
+
+.about-section {
+  border-block-end: 1px solid var(--line);
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  grid-template-columns: 3rem minmax(0, 1fr);
+  padding-block: clamp(2rem, 5vw, 3.5rem);
+}
+
+.about-section > div {
+  max-inline-size: 66rem;
+}
+
+.about-section h2 {
+  font-family: var(--display);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+  margin: 0 0 1.25rem;
+  text-wrap: balance;
+}
+
+.about-section > div > p {
+  color: var(--text-soft);
+  line-height: 1.7;
+  margin: 0;
+  max-inline-size: 54rem;
+}
+
+.about-section > div > p + p {
+  margin-block-start: 1rem;
+}
+
+.about-section a {
+  color: var(--accent-text);
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.about-experiments {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-block-start: 2rem;
+}
+
+.about-experiment {
+  padding: clamp(1.25rem, 3vw, 1.8rem);
+}
+
+.about-experiment h3 {
+  font-family: var(--display);
+  font-size: 1.5rem;
+  margin: 0 0 1rem;
+}
+
+.about-experiment dl,
+.about-experiment dd {
+  margin: 0;
+}
+
+.about-experiment dl {
+  display: grid;
+  gap: 1rem;
+}
+
+.about-experiment dt {
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-wide);
+  margin-block-end: 0.35rem;
+  text-transform: uppercase;
+}
+
+.about-experiment dd {
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+
+.about-research {
+  display: grid;
+  gap: 0;
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+}
+
+.about-research li {
+  border-block-start: 1px solid var(--line);
+}
+
+.about-research li:last-child {
+  border-block-end: 1px solid var(--line);
+}
+
+.about-research a {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding-block: 1rem;
+  text-decoration: none;
+}
+
+.about-research span {
+  color: var(--text-dim);
+  font-size: var(--text-sm);
+  text-align: end;
+}
+
+@media (max-width: 900px) {
+  .about-facts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .about-hero,
+  .about-experiments {
+    grid-template-columns: 1fr;
+  }
+
+  .about-section {
+    gap: 1rem;
+    grid-template-columns: 2rem minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .about-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .about-research a {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .about-research span {
+    text-align: start;
+  }
+}

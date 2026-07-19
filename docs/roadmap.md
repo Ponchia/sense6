@@ -3,8 +3,8 @@
 
 Status: current, 2026-07-19
 
-This document records the next product and engineering priorities for Sense6.
-It does not promise release dates. Each item stays behind its acceptance gates.
+This document records the current product and engineering priorities for
+Sense6. It does not promise release dates.
 
 ## 1. Private measurement journal: completed
 
@@ -44,28 +44,29 @@ The completed foundation includes:
 The journal is now a separate versioned store. Existing concise latest-or-best
 keys remain compatible and are not rewritten as journal history.
 
-## 2. Validate Acutezza beyond software verification
+## 2. Keep the experimental boundary explicit
 
-Acutezza is a calibrated browser sharpness experiment, not an online eye exam.
-Its public promise is **Calibrated sharpness and meridional clarity**, with an
-expected complete-run duration of about 7–9 minutes.
+Sense6 is permanently an experimental personal project for curiosity and fun.
+Formal scientific or clinical validation, certification, regulatory approval,
+and professional review are not product goals. The suite must not imply that
+any of them are planned.
 
-Follow the [Acutezza research and implementation brief](research/acutezza.md)
-and the operational
-[external-validation protocol](research/acutezza-validation-protocol.md).
-The nonclinical browser implementation now covers calibrated rendering,
-threshold recovery simulations, geometry invalidation, accessibility, responsive
-behavior, the twelve supported locales, a machine-readable observation contract,
-an evidence validator, and a prespecified collection and analysis protocol. The
-remaining work requires real participants and professional coordination:
-physical-device observations, paired FrACT comparison, test-retest evidence,
-and optometrist or ophthalmologist review. No such outcome is inferred from
-software checks.
+The localized About page is the public source of truth for this boundary. It
+explains authorship, how adaptive browser tasks work, what each experiment can
+and cannot describe, device dependence, privacy, and the difference between
+software verification and scientific validity. Experiment pages and copied
+results must remain consistent with it.
+
+Published research and standards may inform a task design. Automated tests may
+show that an implementation behaves as designed. Neither makes a Sense6 result
+validated, certified, diagnostic, or suitable for medical or occupational use.
 
 ## Maintenance gates
 
 - Review `src/crawler-policy.js` by its recorded deadline and whenever provider
   guidance changes.
+- Keep the About page, `llms.txt`, structured data, README, and experiment limits
+  aligned with the permanent experimental boundary.
 - Keep the entry and route bundle budgets green. Split more common or
   Tetracromia CSS only when a measured regression justifies the extra boundary.
 - Keep new structured feature copy separate from the legacy phrase catalogs.
@@ -75,6 +76,6 @@ software checks.
   modules first. Convert individual experiment modules incrementally when they
   are changed, rather than through an unreviewable suite-wide rewrite.
 
-Until those gates pass, keep every value labelled as a run-specific angular task
-threshold and make no clinical acuity, screening, diagnosis, or prescription
-claim.
+Keep every value labelled as a run-specific, device-relative observation. Make
+no clinical acuity, screening, diagnosis, prescription, certification, or
+scientific-validity claim.

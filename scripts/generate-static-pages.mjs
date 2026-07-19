@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { ABOUT_DATE_MODIFIED, aboutCopy, aboutMarkup } from '../src/about.js';
 import { CRAWLER_POLICY, renderRobots } from '../src/crawler-policy.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { journalCopy } from '../src/journal-copy.js';
@@ -26,7 +27,7 @@ await writePage('index.html', {
     'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
   main: rootMarkup(),
   alternates: galleryAlternates(),
-  structuredData: websiteData('en', '/'),
+  structuredData: websiteData('en'),
 });
 
 for (const { code: locale, languageTag, direction } of LOCALES) {
@@ -51,7 +52,6 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     alternates: galleryAlternates(),
     structuredData: websiteData(
       languageTag,
-      galleryPath,
       translate(
         'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',
       ),
@@ -73,6 +73,21 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
       structuredData: examData(definition, languageTag, path, translate),
     });
   }
+
+  const about = aboutCopy(locale);
+  const aboutPath = `/${locale}/about/`;
+  canonicalPaths.push(aboutPath);
+  await writePage(`${locale}/about/index.html`, {
+    locale,
+    languageTag,
+    direction,
+    path: aboutPath,
+    title: about.pageTitle,
+    description: about.description,
+    main: aboutMarkup(locale),
+    alternates: pageAlternates('about'),
+    structuredData: aboutData(about, languageTag, aboutPath),
+  });
 
   const journal = journalCopy(locale);
   const journalPath = `/${locale}/journal/`;
@@ -151,10 +166,12 @@ function localizeShell(html, locale) {
     .replace('>Theme<', `>${escapeHtml(tr('Theme'))}<`)
     .replace('Measure carefully. Keep it private.', escapeHtml(tr('Measure carefully. Keep it private.')))
     .replace('Anonymous daily counts · no cookies', escapeHtml(tr('Anonymous daily counts · no cookies')))
+    .replace('>About<', `>${escapeHtml(tr('About'))}<`)
     .replace('>Journal<', `>${escapeHtml(tr('Journal'))}<`)
     .replace('>Privacy<', `>${escapeHtml(tr('Privacy'))}<`)
     .replace('>All tests<', `>${escapeHtml(tr('All tests'))}<`)
     .replaceAll('href="/en/"', `href="/${locale}/"`)
+    .replace('href="/en/about/"', `href="/${locale}/about/"`)
     .replace('href="/en/journal/"', `href="/${locale}/journal/"`)
     .replace('href="/en/privacy/"', `href="/${locale}/privacy/"`)
     .replace(
@@ -184,6 +201,7 @@ function galleryMarkup(locale, tr) {
     <h1>${escapeHtml(tr('Sense6 — measure what your senses notice'))}</h1>
     <p>${escapeHtml(tr('Short, careful tests that turn what you notice into honest, device-relative results.'))}</p>
     <p>${escapeHtml(tr('No account, no answers or results uploaded, no diagnosis theatre.'))}</p>
+    <p><a data-sense6-route="about" href="/${locale}/about/">${escapeHtml(tr('How Sense6 works'))}</a></p>
     <h2>${escapeHtml(tr('Start with what you want to learn.'))}</h2>
     <div class="static-page-grid">${EXAMS.map(
       (definition) => `<article class="ui-card">
@@ -264,14 +282,57 @@ function pageAlternates(route) {
   ).join('\n    ')}\n    <link rel="alternate" hreflang="x-default" href="${ORIGIN}/en/${route}/">`;
 }
 
-function websiteData(locale, path, description = 'Private, device-relative browser perception experiments.') {
+function websiteData(locale, description = 'Private, device-relative browser perception experiments.') {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
+    '@id': `${ORIGIN}/#website`,
     name: 'Sense6',
-    url: `${ORIGIN}${path}`,
+    alternateName: 'Sense6 browser perception lab',
+    url: ORIGIN,
     inLanguage: locale,
     description,
+    creator: {
+      '@type': 'Person',
+      '@id': `${ORIGIN}/#creator`,
+      name: 'Zeno',
+      url: 'https://personal.brontolotto.observer',
+    },
+  };
+}
+
+function aboutData(copy, locale, path) {
+  return {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'AboutPage',
+        '@id': `${ORIGIN}${path}#page`,
+        url: `${ORIGIN}${path}`,
+        name: copy.pageTitle,
+        description: copy.description,
+        inLanguage: locale,
+        dateModified: ABOUT_DATE_MODIFIED,
+        about: { '@id': `${ORIGIN}/#website` },
+        mainEntity: { '@id': `${ORIGIN}/#website` },
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${ORIGIN}/#website`,
+        name: 'Sense6',
+        alternateName: 'Sense6 browser perception lab',
+        url: ORIGIN,
+        description: 'A privacy-first collection of experimental browser perception tests.',
+        inLanguage: LOCALES.map(({ languageTag }) => languageTag),
+        creator: { '@id': `${ORIGIN}/#creator` },
+      },
+      {
+        '@type': 'Person',
+        '@id': `${ORIGIN}/#creator`,
+        name: 'Zeno',
+        url: 'https://personal.brontolotto.observer',
+      },
+    ],
   };
 }
 
@@ -319,7 +380,7 @@ async function writeDiscoveryFiles() {
     .join('\n')}\n</urlset>\n`;
   await writeFile(join(DIST, 'sitemap.xml'), sitemap);
   await writeFile(join(DIST, 'robots.txt'), renderRobots(ORIGIN));
-  const llms = `# Sense6\n\nSense6 is a privacy-first collection of device-relative browser perception experiments. It does not provide medical screening or diagnosis. Answers and results stay in the browser; the service stores only anonymous daily activity totals.\n\n## Main pages\n\n- [English test gallery](${ORIGIN}/en/)\n- [Private measurement journal](${ORIGIN}/en/journal/)\n- [Privacy notice](${ORIGIN}/en/privacy/)\n\n## Crawler policy\n\n${CRAWLER_POLICY.intent} The policy was reviewed on ${CRAWLER_POLICY.reviewedAt} and must be reviewed again by ${CRAWLER_POLICY.reviewBy}. robots.txt is advisory; llms.txt is a discovery aid, not an access-control mechanism.\n\n## Experiments\n\n${EXAMS.map(
+  const llms = `# Sense6\n\nSense6 is a privacy-first collection of experimental, device-relative browser perception tests made for curiosity and fun. It is not validated, certified, diagnostic, or intended to become a medical product. Answers and results stay in the browser; the service stores only anonymous daily activity totals.\n\n## Main pages\n\n- [English test gallery](${ORIGIN}/en/)\n- [About Sense6 and its methodology](${ORIGIN}/en/about/)\n- [Private measurement journal](${ORIGIN}/en/journal/)\n- [Privacy notice](${ORIGIN}/en/privacy/)\n\n## Crawler policy\n\n${CRAWLER_POLICY.intent} The policy was reviewed on ${CRAWLER_POLICY.reviewedAt} and must be reviewed again by ${CRAWLER_POLICY.reviewBy}. robots.txt is advisory; llms.txt is a discovery aid, not an access-control mechanism.\n\n## Experiments\n\n${EXAMS.map(
     (definition) =>
       `- [${definition.name}](${ORIGIN}/en/${definition.route}/): ${definition.blurb} ${definition.limit}`,
   ).join(

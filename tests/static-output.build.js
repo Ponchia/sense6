@@ -12,6 +12,7 @@ const expectedPaths = [
   ...LOCALES.flatMap(({ code }) => [
     `/${code}/`,
     ...EXAMS.map(({ route }) => `/${code}/${route}/`),
+    `/${code}/about/`,
     `/${code}/journal/`,
     `/${code}/privacy/`,
   ]),
@@ -91,6 +92,8 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   }
 
   const llms = await readFile(new URL('llms.txt', DIST), 'utf8');
+  assert.match(llms, /not validated, certified, diagnostic, or intended to become a medical product/);
+  assert.match(llms, /\[About Sense6 and its methodology\]\(https:\/\/sense6\.net\/en\/about\/\)/);
   assert.match(llms, /\[Private measurement journal\]\(https:\/\/sense6\.net\/en\/journal\/\)/);
   for (const { name, route } of EXAMS) {
     assert.match(llms, new RegExp(`\\[${escapeRegex(name)}\\]\\(https://sense6\\.net/en/${route}/\\)`));
@@ -107,6 +110,19 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   const journal = await readFile(new URL('en/journal/index.html', DIST), 'utf8');
   assert.match(journal, /Your private measurement journal/);
   assert.match(journal, /Entries, setup passports, comparisons, imports, and exports stay on this device/);
+
+  const about = await readFile(new URL('en/about/index.html', DIST), 'utf8');
+  const aboutJson = JSON.parse(
+    about.match(/<script type="application\/ld\+json">(.+)<\/script>/)?.[1] ?? '{}',
+  );
+  assert.match(about, /Careful experiments\. Modest claims\./);
+  assert.match(about, /No certification or formal validation is planned\./);
+  assert.match(about, /href="https:\/\/personal\.brontolotto\.observer" rel="author">Zeno<\/a>/);
+  assert.deepEqual(
+    aboutJson['@graph'].map((entry) => entry['@type']),
+    ['AboutPage', 'WebSite', 'Person'],
+  );
+  assert.equal(aboutJson['@graph'][0].dateModified, '2026-07-19');
 });
 
 test('the entry bundle stays route-split and within its documented budget', async () => {
@@ -137,9 +153,9 @@ test('the entry bundle stays route-split and within its documented budget', asyn
   const entryCssBytes = await sumSizes([entryCss]);
   assert.ok(entryCssBytes <= 130_000, `entry CSS is ${entryCssBytes} bytes; budget is 130000`);
   const routeCss = files.filter((file) =>
-    /^(acutezza|color-blindness|riflessi|udito|journal|privacy)-.+\.css$/.test(file),
+    /^(about|acutezza|color-blindness|riflessi|udito|journal|privacy)-.+\.css$/.test(file),
   );
-  assert.equal(routeCss.length, 6);
+  assert.equal(routeCss.length, 7);
   assert.ok(
     entryCssBytes +
       Math.max(
