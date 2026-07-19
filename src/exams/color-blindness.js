@@ -86,7 +86,7 @@ function renderIntro() {
   active = false;
   phase = 'intro';
   document.body.classList.remove('lab-mode');
-  document.title = 'Experimental colour-vision check — Daltonia | Sensoria';
+  document.title = 'Experimental colour-vision check — Daltonia | Sense6';
 
   const previous = loadLast();
 
@@ -192,7 +192,7 @@ function renderSetup() {
   active = false;
   phase = 'setup';
   document.body.classList.add('lab-mode');
-  document.title = 'Prepare your display — Daltonia | Sensoria';
+  document.title = 'Prepare your display — Daltonia | Sense6';
   window.scrollTo({ top: 0, behavior: 'instant' });
 
   app.innerHTML = `
@@ -261,7 +261,7 @@ function startPractice() {
 function renderPractice() {
   const trial = PRACTICE_TARGETS[practiceIndex];
   const correct = practiceFeedback?.correct === true;
-  document.title = `Practice ${practiceIndex + 1} of ${PRACTICE_TARGETS.length} — Daltonia | Sensoria`;
+  document.title = `Practice ${practiceIndex + 1} of ${PRACTICE_TARGETS.length} — Daltonia | Sense6`;
 
   app.innerHTML = `
     <section class="cb-view">
@@ -370,7 +370,7 @@ function renderTrial() {
   const total = run.schedule.length;
   const trialNumber = run.responses.length + 1;
   const progress = Math.round((run.index / total) * 100);
-  document.title = `Response ${trialNumber}, up to ${total} — Daltonia | Sensoria`;
+  document.title = `Response ${trialNumber}, up to ${total} — Daltonia | Sense6`;
 
   app.innerHTML = `
     <section class="cb-view">
@@ -446,7 +446,7 @@ function renderResults() {
   phase = 'results';
   document.body.classList.add('lab-mode');
   window.scrollTo({ top: 0, behavior: 'instant' });
-  document.title = 'Your display-relative thresholds — Daltonia | Sensoria';
+  document.title = 'Your display-relative thresholds — Daltonia | Sense6';
   const result = summarizeAdaptiveRun(run);
   saveLast(result);
 

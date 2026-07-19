@@ -1,5 +1,5 @@
 /*
- * Sensoria gallery — the suite's front door. Live exams come from the module
+ * Sense6 gallery — the suite's front door. Live exams come from the module
  * registry; the roadmap is deliberately quieter so unfinished work never
  * competes with tests people can take now.
  */
@@ -41,12 +41,12 @@ const PLATE_EIGHT = [
 
 export function renderGallery(context) {
   const { app, exams, localeHref } = context;
-  document.title = 'Sensoria — measure what your senses notice';
+  document.title = 'Sense6 — measure what your senses notice';
 
   app.innerHTML = `
     <section class="gallery-hero ui-container ui-container--wide">
       <div class="gallery-hero__copy">
-        <p class="ui-eyebrow">Sensoria / private perception lab</p>
+        <p class="ui-eyebrow">Sense6 / private perception lab</p>
         <h1>Measure what your <em>senses notice.</em></h1>
         <p class="gallery-hero__lede">
           Short, careful tests that turn what you notice into honest, device-relative results.
@@ -58,7 +58,7 @@ export function renderGallery(context) {
           </a>
           <a class="ui-link ui-link--cta" href="#tests">Explore all four tests</a>
         </div>
-        <dl class="gallery-proof" aria-label="Sensoria at a glance">
+        <dl class="gallery-proof" aria-label="Sense6 at a glance">
           <div><dt>Live now</dt><dd>${String(exams.length).padStart(2, '0')} tests</dd></div>
           <div><dt>Time for all</dt><dd>≈ 20 min</dd></div>
           <div><dt>Data uploaded</dt><dd>None</dd></div>
@@ -77,7 +77,7 @@ export function renderGallery(context) {
           <div class="sense-map__orbit sense-map__orbit--inner"></div>
           <div class="sense-map__core">
             <strong>S</strong>
-            <small>Sensoria</small>
+            <small>Sense6</small>
           </div>
           <span class="sense-map__label sense-map__label--colour">Colour</span>
           <span class="sense-map__label sense-map__label--vision">Hearing</span>

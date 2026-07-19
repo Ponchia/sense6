@@ -10,6 +10,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- Cloudflare Pages deployment with the existing full verification gate,
+  production security headers, immutable asset caching, and canonical-domain
+  redirects.
 - English, Italian, German, French, Spanish, and Portuguese interfaces across
   the gallery, all four exams, safety/setup flows, live tasks, result screens,
   accessibility labels, metadata, and copied summaries.
@@ -24,7 +27,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   level-roved pitch comparisons, interruption recovery, and concise local-only
   results.
 - Udito unit, complete browser-journey, responsive, and accessibility coverage.
-- Multi-exam suite (Sensoria): a gallery landing and hash router hosting each
+- Multi-exam suite (Sense6): a gallery landing and hash router hosting each
   test as a self-contained mount/unmount module.
 - `Daltonia`: an experimental adaptive colour-vision check with randomized
   Landolt-C orientation, luminance-noise dots, three interleaved display-relative
@@ -49,12 +52,18 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 
+- The public suite name is now Sense6, and its canonical URL is
+  `https://sense6.net`.
+- Production hosting now serves the static bundle from Cloudflare Pages instead
+  of the personal Kubernetes cluster.
 - `Daltonia` now reports display-relative thresholds instead of fixed plate
   percentages or clinical-looking pass/fail categories. Its interface and
   research trail explicitly identify that the implementation isn't validated.
 
 ### Fixed
 
+- Playwright runs can select a strict, isolated server port so concurrent
+  worktrees do not reuse and later lose one another's development server.
 - `Daltonia` no longer forces a directional guess when no gap is visible or
   repeats up to six near-imperceptible trials at its minimum stimulus strength.
   It now includes feedback-based practice, an explicit no-gap response, and

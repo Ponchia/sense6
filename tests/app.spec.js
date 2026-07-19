@@ -41,13 +41,13 @@ const QUICK_UDITO = {
 
 async function installQuickRiflessi(page) {
   await page.addInitScript((configuration) => {
-    window.__SENSORIA_TEST_CONFIG__ = configuration;
+    window.__SENSE6_TEST_CONFIG__ = configuration;
   }, QUICK_RIFLESSI);
 }
 
 async function installQuickUdito(page) {
   await page.addInitScript((configuration) => {
-    window.__SENSORIA_TEST_CONFIG__ = configuration;
+    window.__SENSE6_TEST_CONFIG__ = configuration;
   }, QUICK_UDITO);
 }
 
@@ -205,7 +205,11 @@ test('every live exam has a localized European-language entry point', async ({ p
 });
 
 test('the first visit follows a supported browser language', async ({ browser }) => {
-  const context = await browser.newContext({ locale: 'fr-FR', baseURL: 'http://127.0.0.1:4173' });
+  const port = process.env.PLAYWRIGHT_PORT ?? '4173';
+  const context = await browser.newContext({
+    locale: 'fr-FR',
+    baseURL: `http://127.0.0.1:${port}`,
+  });
   const page = await context.newPage();
   await page.goto('/');
   await expect(page).toHaveURL(/#\/fr\/$/);

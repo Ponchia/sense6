@@ -20,7 +20,7 @@ export const meta = {
   glyph: 'R',
 };
 
-const STORAGE_KEY = 'sensoria:riflessi:last';
+const STORAGE_KEY = 'sense6:riflessi:last';
 const INSTRUMENTS = {
   signal: {
     number: '01',
@@ -86,7 +86,7 @@ function renderIntro() {
   stopClocks();
   session = null;
   document.body.classList.remove('lab-mode', 'rx-running');
-  document.title = 'Response speed and consistency — Riflessi | Sensoria';
+  document.title = 'Response speed and consistency — Riflessi | Sense6';
   const previous = loadLast();
 
   app.innerHTML = `
@@ -186,7 +186,7 @@ function renderSetup() {
   stopClocks();
   document.body.classList.add('lab-mode');
   document.body.classList.remove('rx-running');
-  document.title = 'Prepare your response setup — Riflessi | Sensoria';
+  document.title = 'Prepare your response setup — Riflessi | Sense6';
   window.scrollTo({ top: 0, behavior: 'instant' });
 
   app.innerHTML = `
@@ -278,7 +278,7 @@ function renderInstrumentBrief(instrument) {
   const info = INSTRUMENTS[instrument];
   document.body.classList.add('lab-mode');
   document.body.classList.remove('rx-running');
-  document.title = `${info.name} — Riflessi | Sensoria`;
+  document.title = `${info.name} — Riflessi | Sense6`;
   window.scrollTo({ top: 0, behavior: 'instant' });
 
   app.innerHTML = `
@@ -568,7 +568,7 @@ function renderResults() {
   stopClocks();
   document.body.classList.add('lab-mode');
   document.body.classList.remove('rx-running');
-  document.title = 'Your response profile — Riflessi | Sensoria';
+  document.title = 'Your response profile — Riflessi | Sense6';
   const expectedStability = config.stability.durationMs < 10_000 ? 1 : 6;
   const result = summarizeRiflessi(session.records, {
     signal: config.signal.scoredTrials,
@@ -904,7 +904,7 @@ function clearTrialClocks() {
 function runtimeConfig() {
   const testOverride =
     import.meta.env.DEV && /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
-      ? window.__SENSORIA_TEST_CONFIG__
+      ? window.__SENSE6_TEST_CONFIG__
       : null;
   return mergeReflexConfig(testOverride?.riflessi);
 }

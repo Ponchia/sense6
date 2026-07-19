@@ -1,6 +1,6 @@
 import { DEFAULT_LOCALE, LOCALE_CODES, LOCALES, MESSAGES } from './locales.js';
 
-const STORAGE_KEY = 'sensoria:locale';
+const STORAGE_KEY = 'sense6:locale';
 const textSources = new WeakMap();
 const attributeSources = new WeakMap();
 let locale = DEFAULT_LOCALE;

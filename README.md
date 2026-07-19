@@ -1,5 +1,5 @@
 <!-- vale off -->
-# Sensoria
+# Sense6
 <!-- vale on -->
 <!-- vale Vale.Spelling = NO -->
 
@@ -190,14 +190,14 @@ site shell. Product-specific stimulus geometry remains local to this project.
 
 ## Localization
 
-Sensoria supports English, Italian, German, French, Spanish, and Portuguese.
+Sense6 supports English, Italian, German, French, Spanish, and Portuguese.
 Locale-aware hash routes make every exam directly addressable, for example
 `#/it/udito`. Existing routes such as `#/udito` remain valid and are normalized
 to the active locale.
 
-On a first visit, Sensoria selects the first supported language reported by the
+On a first visit, Sense6 selects the first supported language reported by the
 browser and otherwise falls back to English. A choice made in the header is
-stored under `sensoria:locale` in local storage. Changing the language keeps the
+stored under `sense6:locale` in local storage. Changing the language keeps the
 current exam open. The runtime also updates the document language, page title,
 metadata, internal links, accessibility labels, number formatting, and copied
 result summaries.
@@ -243,21 +243,20 @@ npm run check
 
 ## Deploy
 
-Every push to `main` verifies the app and publishes an immutable
-Linux/AMD64 image to `ghcr.io/ponchia/tetracromia`. The workflow then pins that
-commit-specific image in `Ponchia/vps-infra`. Flux deploys the image from
-`deployments/tetracromia` without giving the app repository direct
-Kubernetes credentials.
+Every push to `main` runs the complete lint, unit, build, browser, responsive,
+and accessibility gate. After that gate passes, GitHub Actions builds `dist/`
+and uploads the verified static bundle directly to Cloudflare Pages.
 
 The production site is available at
-[`tetracromia.brontolotto.observer`](https://tetracromia.brontolotto.observer).
-The source repository and container stay private. Kubernetes receives the
-container through a namespace-scoped GHCR pull secret managed by External
-Secrets Operator and Vaultwarden.
+[`sense6.net`](https://sense6.net). Cloudflare Pages terminates TLS and serves
+the files from its edge; the site has no application server or origin in the
+personal Kubernetes cluster. The old
+[`tetracromia.brontolotto.observer`](https://tetracromia.brontolotto.observer)
+hostname redirects to the canonical domain.
 
-The deployment workflow requires the `VPS_INFRA_GITOPS_SSH_KEY` repository
-secret. Its public half is a write-enabled deploy key scoped to
-`Ponchia/vps-infra`.
+The deployment workflow requires the `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` repository secrets. Scope the token to Cloudflare Pages
+edits for the account that owns `sense6.net`.
 
 ## Scientific limits
 
