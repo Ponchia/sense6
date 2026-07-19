@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { onRequestPost } from '../functions/api/metric.js';
+import { onRequest } from '../functions/api/metric.js';
 
 const ORIGIN = 'https://sense6.net';
 
@@ -43,7 +43,7 @@ function database() {
 
 test('the metric endpoint increments one server-dated aggregate row', async () => {
   const db = database();
-  const result = await onRequestPost({
+  const result = await onRequest({
     request: request({ event: 'test_completed', test: 'udito' }),
     env: { ANALYTICS_DB: db.binding },
   });
@@ -58,11 +58,11 @@ test('the metric endpoint increments one server-dated aggregate row', async () =
 
 test('the metric endpoint rejects cross-origin and cross-site requests', async () => {
   const db = database();
-  const wrongOrigin = await onRequestPost({
+  const wrongOrigin = await onRequest({
     request: request({ event: 'site_loaded', test: 'site' }, { origin: 'https://example.com' }),
     env: { ANALYTICS_DB: db.binding },
   });
-  const crossSite = await onRequestPost({
+  const crossSite = await onRequest({
     request: request({ event: 'site_loaded', test: 'site' }, { 'sec-fetch-site': 'cross-site' }),
     env: { ANALYTICS_DB: db.binding },
   });
@@ -82,7 +82,7 @@ test('the metric endpoint accepts only the exact allowlisted schema', async () =
 
   for (const payload of invalidPayloads) {
     const db = database();
-    const result = await onRequestPost({
+    const result = await onRequest({
       request: request(payload),
       env: { ANALYTICS_DB: db.binding },
     });
@@ -92,15 +92,28 @@ test('the metric endpoint accepts only the exact allowlisted schema', async () =
 });
 
 test('the metric endpoint rejects oversized bodies and missing storage', async () => {
-  const tooLarge = await onRequestPost({
+  const tooLarge = await onRequest({
     request: request('x'.repeat(129)),
     env: { ANALYTICS_DB: database().binding },
   });
-  const unavailable = await onRequestPost({
+  const unavailable = await onRequest({
     request: request({ event: 'site_loaded', test: 'site' }),
     env: {},
   });
 
   assert.equal(tooLarge.status, 413);
   assert.equal(unavailable.status, 503);
+});
+
+test('the metric endpoint rejects non-POST methods without touching storage', async () => {
+  const db = database();
+  const result = await onRequest({
+    request: new Request(`${ORIGIN}/api/metric`),
+    env: { ANALYTICS_DB: db.binding },
+  });
+
+  assert.equal(result.status, 405);
+  assert.equal(result.headers.get('allow'), 'POST');
+  assert.equal(result.headers.get('cache-control'), 'no-store');
+  assert.equal(db.calls.length, 0);
 });

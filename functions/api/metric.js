@@ -6,8 +6,11 @@ const RESPONSE_HEADERS = {
   'content-type': 'text/plain; charset=utf-8',
 };
 
-function response(status, message = '') {
-  const headers = status === 204 ? { 'cache-control': 'no-store' } : RESPONSE_HEADERS;
+function response(status, message = '', extraHeaders = {}) {
+  const headers = {
+    ...(status === 204 ? { 'cache-control': 'no-store' } : RESPONSE_HEADERS),
+    ...extraHeaders,
+  };
   return new Response(message || null, { status, headers });
 }
 
@@ -61,7 +64,7 @@ function validPayload(payload) {
   );
 }
 
-export async function onRequestPost({ request, env }) {
+async function handleMetricPost({ request, env }) {
   if (!isSameOrigin(request)) return response(403, 'Forbidden');
   if (request.headers.get('content-type')?.split(';', 1)[0].trim() !== 'application/json') {
     return response(415, 'Unsupported media type');
@@ -93,4 +96,11 @@ export async function onRequestPost({ request, env }) {
   }
 
   return response(204);
+}
+
+export async function onRequest(context) {
+  if (context.request.method !== 'POST') {
+    return response(405, 'Method not allowed', { allow: 'POST' });
+  }
+  return handleMetricPost(context);
 }
