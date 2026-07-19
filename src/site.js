@@ -58,7 +58,7 @@ export function renderGallery(context) {
         </p>
       </header>
       <div class="exam-grid">
-        ${exams.map((meta) => liveCard(meta, localeHref)).join('')}
+        ${exams.map((meta) => liveCard(meta, localeHref, t)).join('')}
       </div>
     </section>
 
@@ -76,7 +76,7 @@ export function renderGallery(context) {
   return () => {};
 }
 
-function liveCard(meta, localeHref) {
+function liveCard(meta, localeHref, t) {
   return `
     <article class="exam-card ui-card ui-card--interactive" style="--card-accent:${meta.accent}">
       <a class="exam-card__link" data-sense6-route="${meta.route}" href="${localeHref(meta.route)}">
@@ -87,7 +87,7 @@ function liveCard(meta, localeHref) {
         <div class="exam-card__body">
           <div class="ui-cluster ui-cluster--between exam-card__meta">
             <span class="ui-eyebrow">${meta.category}</span>
-            <span class="ui-tag">${meta.duration}</span>
+            <span class="ui-tag">${t('≈ {minutes} min', { minutes: meta.durationMinutes })}</span>
           </div>
           <h3>${meta.name}</h3>
           <p class="exam-card__tagline">${meta.tagline}</p>

@@ -1,0 +1,116 @@
+export const privacy = Object.freeze({
+  title: 'Privacidade no Sense6',
+  eyebrow: 'Privacidade / linguagem clara',
+  updated: 'Última atualização: 19 de julho de 2026',
+  back: 'Todos os testes',
+  intro:
+    'Seus testes permanecem no seu dispositivo. O Sense6 mantém apenas totais diários anônimos de atividade e não usa cookies, rastreadores publicitários nem perfis de usuário.',
+  summaryTitle: 'Resumo',
+  summary:
+    'Não podemos ver suas respostas nem seus resultados e não tentamos reconhecer você entre uma visita e outra.',
+  sections: [
+    {
+      title: 'Quem é responsável',
+      paragraphs: [
+        'O Sense6 é um projeto independente operado na Suíça. Dúvidas e solicitações sobre privacidade podem ser enviadas para {email}.',
+      ],
+    },
+    {
+      title: 'O que permanece no seu navegador',
+      paragraphs: [
+        'As respostas, medições e resultados dos testes são processados no seu navegador e não são enviados ao Sense6. O idioma e o tema escolhidos, resumos dos resultados mais recentes ou melhores e o diário privado de várias sessões podem ser salvos no armazenamento local do navegador.',
+        'Você pode excluir uma entrada do diário, limpar o diário inteiro ou remover todas as informações apagando os dados do site sense6.net no seu navegador. Os recursos de copiar, importar e exportar só são executados quando você os escolhe. Um arquivo de diário exportado contém as medições e os detalhes de configuração exibidos para você.',
+      ],
+    },
+    {
+      title: 'Totais diários anônimos',
+      paragraphs: [
+        'O Sense6 conta os carregamentos do site e quando um teste identificado é iniciado ou concluído. Se forem adicionados downloads de relatórios, também poderá contar que um relatório foi baixado. O banco de dados armazena apenas o dia em UTC, o nome do teste, o nome do evento e a contagem total.',
+        'Esses são totais de atividade, não contagens de pessoas únicas. O banco de dados de métricas não armazena endereços IP, identificadores, fingerprints do navegador, agentes de usuário, sites de origem, horários exatos, respostas, pontuações nem o conteúdo de relatórios. Os totais anônimos são mantidos apenas enquanto forem úteis para compreender o serviço.',
+      ],
+    },
+    {
+      title: 'Hospedagem e segurança',
+      paragraphs: [
+        'O Sense6 usa o Cloudflare Pages para entregar o site, o Cloudflare D1 na União Europeia para os totais anônimos e os controles de segurança da Cloudflare para limitar abusos. Como qualquer provedor de hospedagem, a Cloudflare precisa processar informações técnicas das solicitações, como endereços IP e cabeçalhos, para entregar e proteger o serviço.',
+        'O Sense6 não usa essas informações técnicas para criar perfis, exibir anúncios ou medir visitantes únicos. A Cloudflare pode processá-las fora da Suíça ou do Espaço Econômico Europeu sob suas garantias contratuais. Consulte a {cloudflarePrivacy} e o {cloudflareDpa}.',
+        'O Sense6 não cria cookies e não inclui pixels publicitários, ferramentas de análise comportamental nem scripts de fingerprinting.',
+      ],
+    },
+    {
+      title: 'Base legal e seus direitos',
+      paragraphs: [
+        'Este aviso segue a Lei Federal Suíça de Proteção de Dados. Quando o GDPR se aplica, o processamento técnico mínimo necessário para entregar e proteger o Sense6 se baseia no nosso interesse legítimo em oferecer um serviço confiável que preserve a privacidade.',
+        'Você pode solicitar acesso, correção ou exclusão, ou apresentar uma objeção, entrando em contato pelo endereço {email}. Como os totais diários não contêm identificadores e não podem ser associados a uma pessoa, o Sense6 não consegue recuperar nem excluir uma métrica pertencente a um visitante específico.',
+      ],
+    },
+    {
+      title: 'Alterações',
+      paragraphs: [
+        'Se, no futuro, o Sense6 adicionar contas, envios, resultados salvos na nuvem, análises de terceiros ou outro processamento, este aviso e o projeto de privacidade serão revisados antes do lançamento desses recursos.',
+      ],
+    },
+  ],
+});
+
+export const journal = Object.freeze({
+  title: 'Seu diário privado de medições',
+  eyebrow: 'Diário local / apenas neste navegador',
+  intro:
+    'Revise sessões repetidas sem uma conta. Entradas, passaportes de configuração, comparações, importações e exportações permanecem neste dispositivo.',
+  privacy:
+    'O Sense6 nunca envia este diário. Um arquivo exportado contém suas medições e os detalhes de configuração; portanto, armazene-o onde preferir.',
+  emptyTitle: 'Nenhuma sessão registrada ainda',
+  empty: 'Conclua qualquer experimento do Sense6 e o resultado estruturado aparecerá aqui.',
+  filter: 'Exibir instrumento',
+  all: 'Todos os instrumentos',
+  export: 'Exportar diário',
+  import: 'Importar diário',
+  deleteAll: 'Excluir todas as entradas',
+  deleteOne: 'Excluir sessão',
+  back: 'Todos os testes',
+  setup: 'Passaporte de configuração',
+  measurements: 'Medições',
+  latest: 'Última sessão registrada',
+  compare: 'Comparação com a sessão anterior',
+  comparable: 'Comparável',
+  caution: 'Comparável com cautela',
+  notComparable: 'Não comparável',
+  noPrevious: 'Não há uma sessão anterior para este instrumento.',
+  change: 'Variação',
+  uncertainty: 'incerteza combinada',
+  noUncertainty: 'nenhum intervalo de incerteza fornecido',
+  bounded: 'um ou ambos os valores são limites da medição',
+  lowerBound: 'limite inferior',
+  upperBound: 'limite superior',
+  yes: 'sim',
+  no: 'não',
+  importSuccess: 'Diário importado.',
+  importFailure: 'O arquivo não é uma exportação válida do diário do Sense6.',
+  storageFailure: 'Não foi possível salvar o diário neste navegador.',
+  confirmAll: 'Excluir deste navegador todas as entradas salvas no diário do Sense6?',
+  confirmOne: 'Excluir esta sessão salva?',
+  entries: 'sessões salvas',
+  reasonInstrument: 'As sessões usam instrumentos diferentes.',
+  reasonSetup: 'Uma condição obrigatória da configuração mudou ou está ausente.',
+  reasonVolume: 'O volume do navegador não pode ser verificado entre as sessões.',
+  reasonLimited: 'Pelo menos uma sessão tem qualidade limitada de configuração ou medição.',
+  reasonMinor: 'Um detalhe da configuração mudou ou está ausente.',
+});
+
+export const setupLabels = Object.freeze([
+  'Tela',
+  'Área visível',
+  'Gama de cores',
+  'Modo de entrada',
+  'Cadência de quadros',
+  'Qualidade da cronometragem',
+  'Interrupções',
+  'Dispositivo de áudio',
+  'Taxa de amostragem',
+  'Volume fixo durante a sessão',
+  'Correção',
+  'Distância de visualização',
+  'Estado da calibração',
+  'Largura do cartão',
+]);

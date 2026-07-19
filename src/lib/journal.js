@@ -1,3 +1,5 @@
+import { LOCALE_CODES } from '../locale-metadata.js';
+
 const FORMAT = 'sense6-journal';
 const EXPORT_FORMAT = 'sense6-journal-export';
 const SCHEMA_VERSION = 1;
@@ -259,7 +261,7 @@ function isJournalEntry(value) {
     EXAM_IDS.has(value.examId) &&
     isIsoDate(value.recordedAt) &&
     typeof value.locale === 'string' &&
-    /^[a-z]{2}$/.test(value.locale) &&
+    LOCALE_CODES.has(value.locale) &&
     QUALITY.has(value.quality) &&
     validSetup(value.setup) &&
     Array.isArray(value.measurements) &&

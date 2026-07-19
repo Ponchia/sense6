@@ -19,7 +19,7 @@ await initializeI18n({
   onLocaleChange: async (nextLocale) => navigate(currentRoute(), nextLocale),
 });
 
-if (initialLocation.legacy) {
+if (initialLocation.legacy || !initialLocation.canonical) {
   navigate(initialLocation.route, initialLocation.locale ?? getLocale(), { replace: true });
 } else if (!initialLocation.locale) {
   navigate(initialLocation.route, getLocale(), { replace: true });

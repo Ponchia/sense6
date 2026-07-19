@@ -1,4 +1,4 @@
-import { DEFAULT_LOCALE, LOCALE_CODES, LOCALES, loadMessages } from './locales.js';
+import { DEFAULT_LOCALE, LOCALES, loadMessages, localeMetadata, resolveLocale } from './locales.js';
 
 const STORAGE_KEY = 'sense6:locale';
 const textSources = new WeakMap();
@@ -11,7 +11,7 @@ export async function initializeI18n({ initialLocale, onLocaleChange } = {}) {
   localeChangeHandler = onLocaleChange ?? null;
   locale = normalizeLocale(initialLocale) ?? storedLocale() ?? browserLocale() ?? DEFAULT_LOCALE;
   messages = await loadMessages(locale);
-  document.documentElement.lang = locale;
+  applyDocumentLocale();
   renderLocaleSelector();
   translateTree(document.documentElement);
   localizeInternalLinks(document);
@@ -28,7 +28,7 @@ export async function setLocale(nextLocale, { notify = true } = {}) {
   const nextMessages = await loadMessages(normalized);
   locale = normalized;
   messages = nextMessages;
-  document.documentElement.lang = locale;
+  applyDocumentLocale();
   try {
     localStorage.setItem(STORAGE_KEY, locale);
   } catch {
@@ -43,15 +43,20 @@ export async function setLocale(nextLocale, { notify = true } = {}) {
 }
 
 export function t(source, values = {}) {
-  const translated = messages.get(source) ?? source;
+  const translated = messages.get(source) ?? (Object.keys(values).length ? source : translateExact(source));
   return Object.entries(values).reduce(
-    (output, [key, value]) => output.replaceAll(`{${key}}`, String(value)),
+    (output, [key, value]) => output.replaceAll(`{${key}}`, interpolationValue(value)),
     translated,
   );
 }
 
+function interpolationValue(value) {
+  const rendered = String(value);
+  return localeMetadata(locale).direction === 'rtl' ? `\u2068${rendered}\u2069` : rendered;
+}
+
 export function formatNumber(value, options) {
-  return new Intl.NumberFormat(locale, options).format(value);
+  return new Intl.NumberFormat(localeMetadata(locale).languageTag, options).format(value);
 }
 
 export function localeHref(route = '', targetLocale = locale) {
@@ -132,15 +137,68 @@ function translateExact(source) {
   const direct = messages.get(normalized);
   if (direct) return direct;
   const countMatch = normalized.match(/^(\d+) (tests|trials|runs)$/);
-  return countMatch ? `${countMatch[1]} ${t(countMatch[2])}` : source;
+  if (countMatch) {
+    return `${interpolationValue(countMatch[1])} ${messages.get(countMatch[2]) ?? countMatch[2]}`;
+  }
+  return translateDynamicText(normalized) ?? source;
+}
+
+/**
+ * Translate live text whose variable values were already interpolated into the
+ * DOM. Catalog extraction intentionally records its stable phrases separately;
+ * selecting non-overlapping longest matches keeps those phrases localizable.
+ */
+function translateDynamicText(source) {
+  const candidates = [...messages]
+    .filter(([key, value]) => key !== value && !key.includes('{') && key.length > 1 && source.includes(key))
+    .sort(([left], [right]) => right.length - left.length);
+  if (!candidates.length) return null;
+
+  const occupied = new Uint8Array(source.length);
+  const matches = [];
+  for (const [key, value] of candidates) {
+    let offset = source.indexOf(key);
+    while (offset !== -1) {
+      const end = offset + key.length;
+      const overlaps = occupied.slice(offset, end).some(Boolean);
+      const beginsInsideWord = isWord(source[offset - 1]) && isWord(key[0]);
+      const endsInsideWord = isWord(key.at(-1)) && isWord(source[end]);
+      if (!overlaps && !beginsInsideWord && !endsInsideWord) {
+        occupied.fill(1, offset, end);
+        matches.push({ offset, end, value });
+      }
+      offset = source.indexOf(key, offset + key.length);
+    }
+  }
+  if (!matches.length) return null;
+
+  matches.sort((left, right) => left.offset - right.offset);
+  let cursor = 0;
+  let output = '';
+  for (const match of matches) {
+    output += dynamicFragment(source.slice(cursor, match.offset));
+    output += match.value;
+    cursor = match.end;
+  }
+  return output + dynamicFragment(source.slice(cursor));
+}
+
+function dynamicFragment(fragment) {
+  if (localeMetadata(locale).direction !== 'rtl' || !/[\p{L}\p{N}]/u.test(fragment)) return fragment;
+  return interpolationValue(fragment);
+}
+
+function isWord(value) {
+  return Boolean(value && /[\p{L}\p{N}]/u.test(value));
 }
 
 function renderLocaleSelector() {
   const selector = document.querySelector('[data-locale-select]');
   if (!selector) return;
-  selector.innerHTML = LOCALES.map((entry) => `<option value="${entry.code}">${entry.label}</option>`).join(
-    '',
-  );
+  selector.innerHTML = LOCALES.map(
+    (entry) =>
+      `<option value="${entry.code}" lang="${entry.languageTag}" dir="${entry.direction}">${entry.label}</option>`,
+  ).join('');
   selector.value = locale;
   selector.addEventListener('change', () => void setLocale(selector.value));
 }
@@ -152,9 +210,13 @@ function localizeInternalLinks(root) {
 }
 
 export function normalizeLocale(value) {
-  if (!value) return null;
-  const normalized = String(value).toLowerCase().split('-')[0];
-  return LOCALE_CODES.has(normalized) ? normalized : null;
+  return resolveLocale(value);
+}
+
+function applyDocumentLocale() {
+  const metadata = localeMetadata(locale);
+  document.documentElement.lang = metadata.languageTag;
+  document.documentElement.dir = metadata.direction;
 }
 
 function storedLocale() {

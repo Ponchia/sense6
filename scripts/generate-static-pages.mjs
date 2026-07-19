@@ -18,6 +18,8 @@ const catalogs = new Map(
 
 await writePage('index.html', {
   locale: 'en',
+  languageTag: 'en',
+  direction: 'ltr',
   path: '/',
   title: 'Sense6 — choose your language',
   description:
@@ -27,13 +29,19 @@ await writePage('index.html', {
   structuredData: websiteData('en', '/'),
 });
 
-for (const { code: locale } of LOCALES) {
+for (const { code: locale, languageTag, direction } of LOCALES) {
   const messages = await loadMessages(locale);
-  const translate = (source) => messages.get(source) ?? source;
+  const translate = (source, values = {}) =>
+    Object.entries(values).reduce(
+      (output, [key, value]) => output.replaceAll(`{${key}}`, String(value)),
+      messages.get(source) ?? source,
+    );
   const galleryPath = `/${locale}/`;
   canonicalPaths.push(galleryPath);
   await writePage(`${locale}/index.html`, {
     locale,
+    languageTag,
+    direction,
     path: galleryPath,
     title: translate('Sense6 — measure what your senses notice'),
     description: translate(
@@ -41,7 +49,13 @@ for (const { code: locale } of LOCALES) {
     ),
     main: galleryMarkup(locale, translate),
     alternates: galleryAlternates(),
-    structuredData: websiteData(locale, galleryPath),
+    structuredData: websiteData(
+      languageTag,
+      galleryPath,
+      translate(
+        'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',
+      ),
+    ),
   });
 
   for (const definition of EXAMS) {
@@ -49,12 +63,14 @@ for (const { code: locale } of LOCALES) {
     canonicalPaths.push(path);
     await writePage(`${locale}/${definition.route}/index.html`, {
       locale,
+      languageTag,
+      direction,
       path,
       title: translate(definition.pageTitle),
       description: translate(definition.blurb),
       main: examMarkup(definition, locale, translate),
       alternates: pageAlternates(definition.route),
-      structuredData: examData(definition, locale, path, translate),
+      structuredData: examData(definition, languageTag, path, translate),
     });
   }
 
@@ -63,12 +79,14 @@ for (const { code: locale } of LOCALES) {
   canonicalPaths.push(journalPath);
   await writePage(`${locale}/journal/index.html`, {
     locale,
+    languageTag,
+    direction,
     path: journalPath,
     title: `${journal.title} | Sense6`,
     description: journal.intro,
     main: journalMarkup(journal, locale),
     alternates: pageAlternates('journal'),
-    structuredData: webpageData(`${journal.title} | Sense6`, journal.intro, locale, journalPath),
+    structuredData: webpageData(`${journal.title} | Sense6`, journal.intro, languageTag, journalPath),
   });
 
   const copy = privacyCopy(locale);
@@ -76,12 +94,14 @@ for (const { code: locale } of LOCALES) {
   canonicalPaths.push(privacyPath);
   await writePage(`${locale}/privacy/index.html`, {
     locale,
+    languageTag,
+    direction,
     path: privacyPath,
     title: `${copy.title} | Sense6`,
     description: copy.intro,
     main: privacyMarkup(copy, locale),
     alternates: pageAlternates('privacy'),
-    structuredData: webpageData(`${copy.title} | Sense6`, copy.intro, locale, privacyPath),
+    structuredData: webpageData(`${copy.title} | Sense6`, copy.intro, languageTag, privacyPath),
   });
 }
 
@@ -91,7 +111,10 @@ await writeDiscoveryFiles();
 async function writePage(relativePath, page) {
   const json = JSON.stringify(page.structuredData);
   let html = localizeShell(template, page.locale);
-  html = html.replace(/<html lang="[^"]+"/, `<html lang="${page.locale}"`);
+  html = html.replace(
+    /<html lang="[^"]+"(?: dir="[^"]+")?/,
+    `<html lang="${page.languageTag}" dir="${page.direction}"`,
+  );
   html = replaceTitle(html, page.title);
   html = replaceMeta(html, 'name', 'description', page.description);
   html = replaceMeta(html, 'property', 'og:title', page.title);
@@ -129,10 +152,7 @@ function localizeShell(html, locale) {
     .replace('Measure carefully. Keep it private.', escapeHtml(tr('Measure carefully. Keep it private.')))
     .replace('Anonymous daily counts · no cookies', escapeHtml(tr('Anonymous daily counts · no cookies')))
     .replace('>Journal<', `>${escapeHtml(tr('Journal'))}<`)
-    .replace(
-      '>Privacy<',
-      `>${escapeHtml(privacyCopy(locale).title.replace(/ (at|chez|bei|en|na) Sense6$/, ''))}<`,
-    )
+    .replace('>Privacy<', `>${escapeHtml(tr('Privacy'))}<`)
     .replace('>All tests<', `>${escapeHtml(tr('All tests'))}<`)
     .replaceAll('href="/en/"', `href="/${locale}/"`)
     .replace('href="/en/journal/"', `href="/${locale}/journal/"`)
@@ -140,7 +160,8 @@ function localizeShell(html, locale) {
     .replace(
       `<select data-locale-select aria-label="${escapeAttribute(tr('Language'))}"></select>`,
       `<select data-locale-select aria-label="${escapeAttribute(tr('Language'))}">${LOCALES.map(
-        ({ code, label }) => `<option value="${code}"${code === locale ? ' selected' : ''}>${label}</option>`,
+        ({ code, languageTag, direction, label }) =>
+          `<option value="${code}" lang="${languageTag}" dir="${direction}"${code === locale ? ' selected' : ''}>${label}</option>`,
       ).join('')}</select>`,
     );
 }
@@ -151,7 +172,8 @@ function rootMarkup() {
     <h1>Measure what your senses notice.</h1>
     <p>Choose your language to read about private, device-relative perception experiments and open a test.</p>
     <nav class="static-language-list" aria-label="Language">${LOCALES.map(
-      ({ code, label }) => `<a href="/${code}/" hreflang="${code}">${label}</a>`,
+      ({ code, languageTag, direction, label }) =>
+        `<a href="/${code}/" hreflang="${languageTag}" lang="${languageTag}" dir="${direction}">${label}</a>`,
     ).join('')}</nav>
   </section>`;
 }
@@ -165,7 +187,7 @@ function galleryMarkup(locale, tr) {
     <h2>${escapeHtml(tr('Start with what you want to learn.'))}</h2>
     <div class="static-page-grid">${EXAMS.map(
       (definition) => `<article class="ui-card">
-        <p class="ui-eyebrow">${escapeHtml(tr(definition.category))} · ${escapeHtml(definition.duration)}</p>
+        <p class="ui-eyebrow">${escapeHtml(tr(definition.category))} · ${escapeHtml(tr('≈ {minutes} min', { minutes: definition.durationMinutes }))}</p>
         <h3><a data-sense6-route="${definition.route}" href="/${locale}/${definition.route}/">${escapeHtml(definition.name)}</a></h3>
         <p>${escapeHtml(tr(definition.tagline))}</p>
         <p>${escapeHtml(tr(definition.blurb))}</p>
@@ -176,9 +198,9 @@ function galleryMarkup(locale, tr) {
 
 function examMarkup(definition, locale, tr) {
   return `<article class="static-entry ui-container ui-container--wide" id="interactive-test">
-    <a data-sense6-route="" href="/${locale}/">← ${escapeHtml(tr('All tests'))}</a>
+    <a class="back-link" data-sense6-route="" href="/${locale}/"><span aria-hidden="true">←</span> ${escapeHtml(tr('All tests'))}</a>
     <header>
-      <p class="ui-eyebrow">${escapeHtml(tr(definition.category))} · ${escapeHtml(definition.duration)}</p>
+      <p class="ui-eyebrow">${escapeHtml(tr(definition.category))} · ${escapeHtml(tr('≈ {minutes} min', { minutes: definition.durationMinutes }))}</p>
       <h1>${escapeHtml(definition.name)} — ${escapeHtml(tr(definition.tagline))}</h1>
       <p>${escapeHtml(tr(definition.blurb))}</p>
       <a class="ui-button" href="#interactive-test">${escapeHtml(tr('Open test'))}</a>
@@ -205,7 +227,7 @@ function examMarkup(definition, locale, tr) {
 
 function privacyMarkup(copy, locale) {
   return `<article class="static-entry ui-container">
-    <a data-sense6-route="" href="/${locale}/">← ${escapeHtml(copy.back)}</a>
+    <a class="back-link" data-sense6-route="" href="/${locale}/"><span aria-hidden="true">←</span> ${escapeHtml(copy.back)}</a>
     <header><p class="ui-eyebrow">${escapeHtml(copy.eyebrow)}</p><h1>${escapeHtml(copy.title)}</h1><p>${escapeHtml(copy.intro)}</p><p>${escapeHtml(copy.updated)}</p></header>
     <aside><h2>${escapeHtml(copy.summaryTitle)}</h2><p>${escapeHtml(copy.summary)}</p></aside>
     ${copy.sections
@@ -221,7 +243,7 @@ function privacyMarkup(copy, locale) {
 
 function journalMarkup(copy, locale) {
   return `<article class="static-entry ui-container">
-    <a data-sense6-route="" href="/${locale}/">← ${escapeHtml(copy.back)}</a>
+    <a class="back-link" data-sense6-route="" href="/${locale}/"><span aria-hidden="true">←</span> ${escapeHtml(copy.back)}</a>
     <header><p class="ui-eyebrow">${escapeHtml(copy.eyebrow)}</p><h1>${escapeHtml(copy.title)}</h1><p>${escapeHtml(copy.intro)}</p></header>
     <aside><p><strong>${escapeHtml(copy.privacy)}</strong></p><p>${escapeHtml(copy.empty)}</p></aside>
     <section><h2>${escapeHtml(copy.setup)}</h2><p>${escapeHtml(copy.reasonSetup)} ${escapeHtml(copy.reasonMinor)}</p></section>
@@ -231,24 +253,25 @@ function journalMarkup(copy, locale) {
 
 function galleryAlternates() {
   return `${LOCALES.map(
-    ({ code }) => `<link rel="alternate" hreflang="${code}" href="${ORIGIN}/${code}/">`,
+    ({ code, languageTag }) => `<link rel="alternate" hreflang="${languageTag}" href="${ORIGIN}/${code}/">`,
   ).join('\n    ')}\n    <link rel="alternate" hreflang="x-default" href="${ORIGIN}/">`;
 }
 
 function pageAlternates(route) {
   return `${LOCALES.map(
-    ({ code }) => `<link rel="alternate" hreflang="${code}" href="${ORIGIN}/${code}/${route}/">`,
+    ({ code, languageTag }) =>
+      `<link rel="alternate" hreflang="${languageTag}" href="${ORIGIN}/${code}/${route}/">`,
   ).join('\n    ')}\n    <link rel="alternate" hreflang="x-default" href="${ORIGIN}/en/${route}/">`;
 }
 
-function websiteData(locale, path) {
+function websiteData(locale, path, description = 'Private, device-relative browser perception experiments.') {
   return {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Sense6',
     url: `${ORIGIN}${path}`,
     inLanguage: locale,
-    description: 'Private, device-relative browser perception experiments.',
+    description,
   };
 }
 
@@ -260,8 +283,6 @@ function examData(definition, locale, path, tr) {
     url: `${ORIGIN}${path}`,
     description: tr(definition.blurb),
     applicationCategory: 'EducationalApplication',
-    operatingSystem: 'Any modern browser',
-    browserRequirements: 'JavaScript and a modern browser are required for the interactive experiment.',
     isAccessibleForFree: true,
     inLanguage: locale,
     citation: definition.sources.map(([, href]) => href),

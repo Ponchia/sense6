@@ -1,3 +1,5 @@
+import { supplementalJournal, supplementalSetupLabels } from './locales/supplemental.js';
+
 /** @type {Readonly<Record<string, Readonly<Record<string, string>>>>} */
 const COPY = Object.freeze({
   en: copy({
@@ -406,7 +408,7 @@ const SETUP_LABELS = Object.freeze({
 
 /** @param {string} locale */
 export function journalCopy(locale) {
-  return COPY[locale] ?? COPY.en;
+  return COPY[locale] ?? supplementalJournal(locale) ?? COPY.en;
 }
 
 /** @param {string} id @param {(source: string) => string} [translate] */
@@ -427,7 +429,9 @@ export function journalMetricLabel(id, translate = (source) => source) {
 
 /** @param {string} key @param {string} locale */
 export function journalSetupLabel(key, locale) {
-  return (SETUP_LABELS[locale] ?? SETUP_LABELS.en)[key] ?? humanize(key);
+  const supplemental = supplementalSetupLabels(locale);
+  const labels = supplemental ? setupLabels(supplemental) : SETUP_LABELS[locale];
+  return (labels ?? SETUP_LABELS.en)[key] ?? humanize(key);
 }
 
 /** @param {Record<string, string>} value */
@@ -435,7 +439,7 @@ function copy(value) {
   return Object.freeze(value);
 }
 
-/** @param {string[]} labels */
+/** @param {readonly string[]} labels */
 function setupLabels(labels) {
   return Object.freeze(Object.fromEntries(SETUP_KEYS.map((key, index) => [key, labels[index]])));
 }

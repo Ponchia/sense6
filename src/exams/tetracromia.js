@@ -72,7 +72,7 @@ function renderHome() {
           <span aria-hidden="true">←</span> All tests
         </button>
         <p class="ui-eyebrow">Color perception / 03 instruments / about 4 minutes</p>
-        <h1>How finely do you <em>see</em> color?</h1>
+        <h1>How finely do you <em>see</em> colour?</h1>
         <p class="hero__lede">
           A careful, adaptive lab for the differences your display can reproduce—and your eyes can resolve.
         </p>
@@ -315,7 +315,7 @@ function renderLab() {
   const phase = state.session.phase;
   const phaseProgress = Math.round((state.session.trialIndex / phase.trials) * 100);
   const trial = state.session.currentTrial;
-  document.title = `${t(phase.name)} ${state.session.trialIndex + 1} of ${phase.trials} — Tetracromia | Sense6`;
+  document.title = `${t(phase.name)} ${state.session.trialIndex + 1} ${t('of')} ${phase.trials} — Tetracromia | Sense6`;
 
   state.app.innerHTML = `
     <section class="lab-view">
