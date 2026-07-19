@@ -11,6 +11,7 @@ import {
   summarizeAdaptiveRun,
 } from '../lib/daltonism.js';
 import { seededRandom } from '../lib/random.js';
+import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 
 export const meta = {
   id: 'color-blindness',
@@ -352,6 +353,7 @@ function beginAdaptiveRun() {
   const entropy = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}:${performance.now()}`;
   run = createAdaptiveRun(seededRandom(`daltonia:${entropy}`));
   active = true;
+  trackMetric(METRIC_EVENTS.testStarted, METRIC_TESTS.daltonia);
   phase = 'run';
   document.body.classList.add('lab-mode');
   window.scrollTo({ top: 0, behavior: 'instant' });
@@ -443,6 +445,7 @@ function submitOrientation(orientation) {
 
 function renderResults() {
   active = false;
+  trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.daltonia);
   phase = 'results';
   document.body.classList.add('lab-mode');
   window.scrollTo({ top: 0, behavior: 'instant' });

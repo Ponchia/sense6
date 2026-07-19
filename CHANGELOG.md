@@ -10,6 +10,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- Privacy-preserving product metrics that store only daily aggregate page-load,
+  measured-start, measured-completion, and future report-download counts in D1,
+  with no visitor or event records.
 - Acutezza's research and implementation brief, together with a product and
   engineering roadmap for repeated-run history and suite scaling.
 - Cloudflare Pages deployment with the existing full verification gate,

@@ -70,6 +70,14 @@ message(
   'Meça com cuidado. Mantenha tudo privado.',
 );
 message('All tests', 'Tutti i test', 'Alle Tests', 'Tous les tests', 'Todas las pruebas', 'Todos os testes');
+message(
+  'Anonymous daily counts · no cookies',
+  'Conteggi giornalieri anonimi · nessun cookie',
+  'Anonyme Tageszähler · keine Cookies',
+  'Comptages quotidiens anonymes · aucun cookie',
+  'Recuentos diarios anónimos · sin cookies',
+  'Contagens diárias anónimas · sem cookies',
+);
 message('Source', 'Codice sorgente', 'Quellcode', 'Code source', 'Código fuente', 'Código-fonte');
 message(
   'Sense6 — measure what your senses notice',
@@ -104,12 +112,12 @@ message(
   'Testes breves e cuidadosos transformam o que percebe em resultados honestos e relativos ao dispositivo.',
 );
 message(
-  'No account, no upload, no diagnosis theatre.',
-  'Nessun account, nessun caricamento, nessuna finta diagnosi.',
-  'Kein Konto, kein Upload, keine Scheindiagnose.',
-  'Aucun compte, aucun envoi, aucune mise en scène diagnostique.',
-  'Sin cuenta, sin envíos y sin teatro diagnóstico.',
-  'Sem conta, sem envios e sem teatro de diagnóstico.',
+  'No account, no answers or results uploaded, no diagnosis theatre.',
+  'Nessun account, nessuna risposta o risultato caricato, nessuna finta diagnosi.',
+  'Kein Konto, keine hochgeladenen Antworten oder Ergebnisse, keine Scheindiagnose.',
+  'Aucun compte, aucune réponse ni résultat envoyé, aucune mise en scène diagnostique.',
+  'Sin cuenta, sin respuestas ni resultados enviados y sin teatro diagnóstico.',
+  'Sem conta, sem respostas ou resultados enviados e sem teatro de diagnóstico.',
 );
 message(
   'device relative',
@@ -1575,7 +1583,14 @@ message(
 );
 message('Monotonic', 'Monotono', 'Monoton', 'Monotone', 'Monótono', 'Monotónico');
 message('Privacy', 'Privacy', 'Datenschutz', 'Confidentialité', 'Privacidad', 'Privacidade');
-message('Local only', 'Solo locale', 'Nur lokal', 'Local uniquement', 'Solo local', 'Apenas local');
+message(
+  'Answers stay local',
+  'Le risposte restano locali',
+  'Antworten bleiben lokal',
+  'Les réponses restent locales',
+  'Las respuestas son locales',
+  'As respostas ficam locais',
+);
 message('Back', 'Indietro', 'Zurück', 'Retour', 'Atrás', 'Voltar');
 message(
   'Leave lab',
@@ -2484,6 +2499,14 @@ message(
   'Aucun nom, compte ou envoi. Votre session reste dans ce navigateur.',
   'Sin nombres, cuenta ni envíos. Tu sesión permanece en este navegador.',
   'Sem nomes, conta ou envios. A sua sessão fica neste navegador.',
+);
+message(
+  'No names, no account, no result upload. Your session stays in this browser.',
+  'Nessun nome, account o risultato caricato. La sessione rimane in questo browser.',
+  'Keine Namen, kein Konto, kein Ergebnis-Upload. Ihre Sitzung bleibt in diesem Browser.',
+  'Aucun nom, compte ou résultat envoyé. Votre session reste dans ce navigateur.',
+  'Sin nombres, cuenta ni resultados enviados. Tu sesión permanece en este navegador.',
+  'Sem nomes, conta ou resultados enviados. A sua sessão fica neste navegador.',
 );
 message('trials', 'prove', 'Versuche', 'essais', 'ensayos', 'ensaios');
 message('runs', 'sessioni', 'Durchläufe', 'sessions', 'sesiones', 'sessões');
@@ -4076,12 +4099,20 @@ message(
   'Laboratório auditivo relativo ao dispositivo — Udito | Sense6',
 );
 message(
-  'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account, no upload, no diagnosis theatre.',
-  'Sense6 offre brevi e accurati test di percezione nel browser con risultati onesti e relativi al dispositivo. Nessun account, caricamento o finta diagnosi.',
-  'Sense6 bietet kurze, sorgfältige Wahrnehmungstests im Browser mit ehrlichen, gerätebezogenen Ergebnissen. Kein Konto, kein Upload, keine Scheindiagnose.',
-  'Sense6 propose des tests de perception courts et rigoureux dans le navigateur, avec des résultats honnêtes liés à l’appareil. Aucun compte, envoi ou faux diagnostic.',
-  'Sense6 ofrece pruebas de percepción breves y cuidadosas en el navegador, con resultados honestos relativos al dispositivo. Sin cuenta, envíos ni falsos diagnósticos.',
-  'O Sense6 oferece testes de perceção breves e cuidadosos no navegador, com resultados honestos relativos ao dispositivo. Sem conta, envios ou falsos diagnósticos.',
+  'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
+  'Sense6 offre brevi e accurati test di percezione nel browser con risultati onesti e relativi allo schermo. Nessun account e nessuna risposta o risultato caricato.',
+  'Sense6 bietet kurze, sorgfältige Wahrnehmungstests im Browser mit ehrlichen, bildschirmbezogenen Ergebnissen. Kein Konto und keine hochgeladenen Antworten oder Ergebnisse.',
+  'Sense6 propose des tests de perception courts et rigoureux dans le navigateur, avec des résultats honnêtes liés à l’écran. Aucun compte, aucune réponse ni résultat envoyé.',
+  'Sense6 ofrece pruebas de percepción breves y cuidadosas en el navegador, con resultados honestos relativos a la pantalla. Sin cuenta y sin respuestas ni resultados enviados.',
+  'O Sense6 oferece testes de perceção breves e cuidadosos no navegador, com resultados honestos relativos ao ecrã. Sem conta e sem respostas ou resultados enviados.',
+);
+message(
+  'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',
+  'Test privati nel browser per colore, tempi di risposta e udito. Risposte e risultati rimangono nel browser.',
+  'Private Browsertests für Farbe, Reaktionszeit und Hören. Antworten und Ergebnisse bleiben in Ihrem Browser.',
+  'Tests privés dans le navigateur pour la couleur, le temps de réponse et l’audition. Réponses et résultats restent dans votre navigateur.',
+  'Pruebas privadas en el navegador de color, tiempo de respuesta y audición. Las respuestas y los resultados permanecen en tu navegador.',
+  'Testes privados no navegador para cor, tempo de resposta e audição. As respostas e os resultados ficam no seu navegador.',
 );
 
 export const MESSAGE_COUNT = rows.length;
