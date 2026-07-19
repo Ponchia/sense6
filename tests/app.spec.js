@@ -89,6 +89,14 @@ test('the gallery lists exams, is accessible, and routes into one', async ({ pag
   await expect(page.locator('.sense-mark')).toHaveText('Sense6');
   await expect(page.locator('.sense-mark__signal')).toHaveCount(6);
   await expect(page.locator('.sense-map')).toHaveCount(0);
+  if ((await page.viewportSize()).width >= 960) {
+    const heroHeight = await page
+      .locator('.gallery-hero')
+      .evaluate((hero) => hero.getBoundingClientRect().height);
+    expect(heroHeight, 'gallery hero should not behave like a full-screen poster').toBeLessThan(
+      (await page.viewportSize()).height * 0.92,
+    );
+  }
   await expect(page.locator('.exam-card__link[href="#/en/tetracromia"]')).toBeVisible();
   await expect(page.locator('.exam-card__link[href="#/en/color-blindness"]')).toBeVisible();
   await expect(page.locator('.exam-card__link[href="#/en/riflessi"]')).toBeVisible();
