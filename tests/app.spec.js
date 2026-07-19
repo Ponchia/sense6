@@ -75,6 +75,11 @@ async function respondToChoice(page) {
 test('the gallery lists exams, is accessible, and routes into one', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.locator('.brand')).toHaveText('Sense6');
+  await expect(page.locator('.brand')).not.toContainText('Perception lab');
+  await expect(page.locator('.sense-mark')).toHaveText('Sense6');
+  await expect(page.locator('.sense-mark__signal')).toHaveCount(6);
+  await expect(page.locator('.sense-map')).toHaveCount(0);
   await expect(page.locator('.exam-card__link[href="#/en/tetracromia"]')).toBeVisible();
   await expect(page.locator('.exam-card__link[href="#/en/color-blindness"]')).toBeVisible();
   await expect(page.locator('.exam-card__link[href="#/en/riflessi"]')).toBeVisible();

@@ -62,14 +62,6 @@ message(
 message('Theme', 'Tema', 'Design', 'Thème', 'Tema', 'Tema');
 message('Language', 'Lingua', 'Sprache', 'Langue', 'Idioma', 'Idioma');
 message(
-  'Perception lab',
-  'Laboratorio della percezione',
-  'Wahrnehmungslabor',
-  'Laboratoire de perception',
-  'Laboratorio de percepción',
-  'Laboratório de perceção',
-);
-message(
   'Measure carefully. Keep it private.',
   'Misura con cura. Mantieni tutto privato.',
   'Sorgfältig messen. Privat bleiben.',
@@ -86,14 +78,6 @@ message(
   'Sense6 — mesurez ce que vos sens perçoivent',
   'Sense6 — mide lo que perciben tus sentidos',
   'Sense6 — meça o que os seus sentidos percebem',
-);
-message(
-  'Sense6 / private perception lab',
-  'Sense6 / laboratorio privato della percezione',
-  'Sense6 / privates Wahrnehmungslabor',
-  'Sense6 / laboratoire privé de perception',
-  'Sense6 / laboratorio privado de percepción',
-  'Sense6 / laboratório privado de perceção',
 );
 message(
   'Measure what your',
@@ -126,15 +110,6 @@ message(
   'Aucun compte, aucun envoi, aucune mise en scène diagnostique.',
   'Sin cuenta, sin envíos y sin teatro diagnóstico.',
   'Sem conta, sem envios e sem teatro de diagnóstico.',
-);
-message('Live signal', 'Segnale attivo', 'Live-Signal', 'Signal actif', 'Señal activa', 'Sinal ativo');
-message(
-  'Device relative',
-  'Relativo al dispositivo',
-  'Gerätebezogen',
-  'Lié à l’appareil',
-  'Relativo al dispositivo',
-  'Relativo ao dispositivo',
 );
 message(
   'device relative',
