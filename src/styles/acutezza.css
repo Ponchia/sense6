@@ -278,6 +278,10 @@
   margin-block-start: auto;
 }
 
+[data-theme="dark"] .ac-research__card :where(p:not(.ui-eyebrow), .ui-eyebrow--muted) {
+  color: var(--text-soft);
+}
+
 .ac-setup,
 .ac-results {
   padding-block: 2rem clamp(4rem, 8vw, 7rem);
