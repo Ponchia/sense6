@@ -5,6 +5,7 @@ import './styles.css';
 import * as colorBlindness from './exams/color-blindness.js';
 import * as riflessi from './exams/riflessi.js';
 import * as tetracromia from './exams/tetracromia.js';
+import * as udito from './exams/udito.js';
 import { navigate, startRouter } from './router.js';
 import { renderGallery } from './site.js';
 
@@ -12,7 +13,7 @@ const app = document.querySelector('#app');
 const announcer = document.querySelector('#announcer');
 const gamutChip = document.querySelector('#gamut-chip');
 
-const exams = [tetracromia, colorBlindness, riflessi];
+const exams = [tetracromia, colorBlindness, riflessi, udito];
 const registry = new Map(exams.map((exam) => [exam.meta.id, exam]));
 
 initThemeToggle();
