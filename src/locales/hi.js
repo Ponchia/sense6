@@ -11,6 +11,8 @@ const rows = [
   ['Language', 'भाषा'],
   ['Measure carefully. Keep it private.', 'ध्यान से मापें। इसे निजी रखें।'],
   ['All tests', 'सभी परीक्षण'],
+  ['About', 'Sense6 के बारे में'],
+  ['How Sense6 works', 'Sense6 कैसे काम करता है'],
   ['Anonymous daily counts · no cookies', 'अनाम दैनिक गणना · कोई कुकीज़ नहीं'],
   ['Source', 'सोर्स कोड'],
   ['Sense6 — measure what your senses notice', 'Sense6 — मापें कि आपकी इंद्रियाँ क्या महसूस करती हैं'],

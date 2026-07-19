@@ -60,6 +60,11 @@ startRouter(async ({ route, locale }) => {
     if (token !== renderToken) return;
     app.innerHTML = '';
     cleanup = renderJournal({ ...context(), exams: EXAMS });
+  } else if (route === 'about') {
+    const [{ renderAbout }] = await Promise.all([import('./about.js'), import('./styles/about.css')]);
+    if (token !== renderToken) return;
+    app.innerHTML = '';
+    cleanup = renderAbout(context());
   } else if (route === 'privacy') {
     const [{ renderPrivacy }] = await Promise.all([import('./privacy.js'), import('./styles/privacy.css')]);
     if (token !== renderToken) return;
