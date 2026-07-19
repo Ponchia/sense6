@@ -1426,5 +1426,142 @@ rows.push(
   ['Interleaved · {count}', 'Interleaved · {count}'],
 );
 
+rows.push(
+  [
+    'Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses, {wrongChoices} wrong choices',
+    'Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses, {wrongChoices} wrong choices',
+  ],
+  ['Interpret with caution: {evidence}', 'Interpret with caution: {evidence}'],
+  [
+    'Interpret with caution; repeat before comparing runs.',
+    'Interpret with caution; repeat before comparing runs.',
+  ],
+  [
+    'Keep this quiet and comfortable. Later signals use the same or a lower digital level.',
+    'Keep this quiet and comfortable. Later signals use the same or a lower digital level.',
+  ],
+  [
+    'Leave this listening run? Your progress will be lost.',
+    'Leave this listening run? Your progress will be lost.',
+  ],
+  ['Leave this run? Your progress will be lost.', 'Leave this run? Your progress will be lost.'],
+  ['End this run? Your progress will be lost.', 'End this run? Your progress will be lost.'],
+  [
+    'Listening stopped. No unfinished result was saved.',
+    'Listening stopped. No unfinished result was saved.',
+  ],
+  [
+    'Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials',
+    'Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials',
+  ],
+  [
+    'Play the maximum-level reference and confirm the volume contract first.',
+    'Play the maximum-level reference and confirm the volume contract first.',
+  ],
+  ['Playback interruptions: {count}', 'Playback interruptions: {count}'],
+  ['Playing maximum-level reference…', 'Playing maximum-level reference…'],
+  ['Portata control accuracy: {accuracy}', 'Portata control accuracy: {accuracy}'],
+  [
+    'Recorded. Look at the square and start the next sweep.',
+    'Recorded. Look at the square and start the next sweep.',
+  ],
+  ['Recorded. Next trial.', 'Recorded. Next trial.'],
+  ['Recorded. The difference will increase.', 'Recorded. The difference will increase.'],
+  [
+    'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
+    'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
+  ],
+  ['Run quality: {quality}', 'Run quality: {quality}'],
+  [
+    'Setup: {device}; {connection}; {sampleRate} Hz audio context',
+    'Setup: {device}; {connection}; {sampleRate} Hz audio context',
+  ],
+  [
+    'Setup: {distance} cm ({distanceState}); correction: {correction}',
+    'Setup: {distance} cm ({distanceState}); correction: {correction}',
+  ],
+  ['The dot is moving. Keep looking at the square.', 'The dot is moving. Keep looking at the square.'],
+  [
+    'The result is ready, but local storage was unavailable.',
+    'The result is ready, but local storage was unavailable.',
+  ],
+  ['The setup sample was steady.', 'The setup sample was steady.'],
+  [
+    'The sweep ended without a response. Start again or use a ruler-measured distance.',
+    'The sweep ended without a response. Start again or use a ruler-measured distance.',
+  ],
+  ['The unanswered target is presented again.', 'The unanswered target is presented again.'],
+  [
+    'This viewport is too narrow for a reliable sweep. Use landscape, a larger display, or a ruler-measured distance.',
+    'This viewport is too narrow for a reliable sweep. Use landscape, a larger display, or a ruler-measured distance.',
+  ],
+  ['Timing: {timing}; interruptions: {interruptions}', 'Timing: {timing}; interruptions: {interruptions}'],
+  [
+    'Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials',
+    'Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials',
+  ],
+  [
+    'Volume: self-reported unchanged during the run; the browser could not verify it.',
+    'Volume: self-reported unchanged during the run; the browser could not verify it.',
+  ],
+  ['indeterminate (display-range bound)', 'indeterminate (display-range bound)'],
+  ['lower bound at the display ceiling', 'lower bound at the display ceiling'],
+  ['upper bound at the display floor', 'upper bound at the display floor'],
+  [
+    '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
+    '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
+  ],
+  ['Usable run', 'Usable run'],
+  ['{name} response runner', '{name} response runner'],
+  ['Open private journal', 'Open private journal'],
+  [
+    'Color override detected. This run stopped and was not saved.',
+    'Color override detected. This run stopped and was not saved.',
+  ],
+  [
+    'Display conditions changed. This measured run stopped and was not saved.',
+    'Display conditions changed. This measured run stopped and was not saved.',
+  ],
+  [
+    'Instrument one. Threshold. Find the different tile.',
+    'Instrument one. Threshold. Find the different tile.',
+  ],
+  ['Practice one of two. Find the clear gap in the C.', 'Practice one of two. Find the clear gap in the C.'],
+  ['That tile is already at the edge.', 'That tile is already at the edge.'],
+  [
+    'The result is ready, but this browser did not allow local storage.',
+    'The result is ready, but this browser did not allow local storage.',
+  ],
+  ['Trial one. Choose where the gap in the C points.', 'Trial one. Choose where the gap in the C points.'],
+  [
+    'Turn off forced-colors or high-contrast mode before this color task.',
+    'Turn off forced-colors or high-contrast mode before this color task.',
+  ],
+  [
+    'Turn off forced-colours or high-contrast mode before this colour task.',
+    'Turn off forced-colours or high-contrast mode before this colour task.',
+  ],
+  ['Enter a distance from 30 to 100 centimetres.', 'Enter a distance from 30 to 100 centimetres.'],
+  ['The reference sound did not complete.', 'The reference sound did not complete.'],
+  [
+    'Vision task stopped. No unfinished result was saved.',
+    'Vision task stopped. No unfinished result was saved.',
+  ],
+  ['Tile {position} selected.', 'Tile {position} selected.'],
+  ['Tiles {first} and {second} swapped.', 'Tiles {first} and {second} swapped.'],
+  ['Tile moved to position {position}.', 'Tile moved to position {position}.'],
+  ['Order recorded. Run {current} of {total}.', 'Order recorded. Run {current} of {total}.'],
+  ['{name} listening runner', '{name} listening runner'],
+  ['Converged to the configured reversal target', 'Converged to the configured reversal target'],
+  ['Bounded at the technical frequency ceiling', 'Bounded at the technical frequency ceiling'],
+  ['Maximum trials reached before convergence', 'Maximum trials reached before convergence'],
+  ['Incomplete', 'Incomplete'],
+  [
+    'Leave this calibrated vision session? Your unfinished result will not be saved.',
+    'Leave this calibrated vision session? Your unfinished result will not be saved.',
+  ],
+  ['{eye} — {instrument}', '{eye} — {instrument}'],
+);
+
 export const MESSAGE_COUNT = rows.length;
 export default new Map(rows);

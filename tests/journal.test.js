@@ -165,6 +165,8 @@ test('instrument rules include distance tolerance, run quality, and unverifiable
     setup: {
       display: '100x100@1',
       correction: 'glasses',
+      contrastPercent: 20,
+      theme: 'light',
       distanceMm: 500,
       calibrationState: 'measured',
       cardWidthCssPx: 320,
@@ -185,6 +187,15 @@ test('instrument rules include distance tolerance, run quality, and unverifiable
   assert.deepEqual(compareJournalEntries(far, acutezza), {
     status: 'not-comparable',
     reasons: ['changed:distanceMm'],
+  });
+  const differentContrast = entry({
+    ...acutezza,
+    id: 'acutezza-contrast',
+    setup: { ...acutezza.setup, contrastPercent: 10 },
+  });
+  assert.deepEqual(compareJournalEntries(differentContrast, acutezza), {
+    status: 'not-comparable',
+    reasons: ['changed:contrastPercent'],
   });
 
   const audioSetup = {

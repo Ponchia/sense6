@@ -286,10 +286,10 @@ function renderInstrumentBrief(instrument) {
     <section class="rx-brief ui-container ui-container--wide">
       <div class="rx-brief__index" aria-hidden="true">${info.number}</div>
       <div class="rx-brief__copy">
-        <p class="ui-eyebrow">Instrument ${info.number} of 03 / ${info.eyebrow}</p>
-        <h1 tabindex="-1" data-rx-screen-title>${info.title}</h1>
-        <p class="rx-lede">${info.body}</p>
-        <p class="rx-brief__note"><span aria-hidden="true">◇</span>${info.note}</p>
+        <p class="ui-eyebrow">${t('Instrument')} ${info.number} ${t('of')} 03 / ${t(info.eyebrow)}</p>
+        <h1 tabindex="-1" data-rx-screen-title>${t(info.title)}</h1>
+        <p class="rx-lede">${t(info.body)}</p>
+        <p class="rx-brief__note"><span aria-hidden="true">◇</span>${t(info.note)}</p>
         <div class="rx-instructions">${inputInstructions(instrument)}</div>
         <button class="ui-button ui-button--lg" type="button" data-action="rx-begin-stage">
           ${instrument === 'stability' ? 'Start the 3-minute run' : 'Start practice'} <span aria-hidden="true">→</span>
@@ -368,9 +368,9 @@ function renderRunner() {
 
   state.app.innerHTML = `
     <section class="rx-runner" data-rx-instrument="${state.session.instrument}">
-      <h1 class="sr-only" tabindex="-1" data-rx-screen-title>${info.name} response runner</h1>
+      <h1 class="sr-only" tabindex="-1" data-rx-screen-title>${t('{name} response runner', { name: t(info.name) })}</h1>
       <header class="rx-runner__header">
-        <div><p class="ui-eyebrow">${info.number} / ${info.name}</p><strong data-rx-block>${stability ? 'Measured run' : state.session.block}</strong></div>
+        <div><p class="ui-eyebrow">${info.number} / ${t(info.name)}</p><strong data-rx-block>${t(stability ? 'Measured run' : state.session.block === 'practice' ? 'Practice' : 'Measured run')}</strong></div>
         <div class="rx-progress" role="progressbar" aria-label="Instrument progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="0% complete" data-rx-progressbar><i data-rx-progress></i></div>
         <span class="rx-runner__count" data-rx-count>${stability ? formatClock(state.config.stability.durationMs) : `0 / ${state.session.queue.length}`}</span>
         <button class="rx-runner__stop" type="button" data-action="rx-stop">Stop safely</button>

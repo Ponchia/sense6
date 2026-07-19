@@ -700,7 +700,7 @@ function selectSequence(index) {
 
   if (state.selectedSequenceIndex === null) {
     state.selectedSequenceIndex = index;
-    announce(`${t('tile')} ${index + 1} ${t('selected')}.`);
+    announce(t('Tile {position} selected.', { position: index + 1 }));
   } else if (state.selectedSequenceIndex === index) {
     state.selectedSequenceIndex = null;
   } else {
@@ -709,7 +709,7 @@ function selectSequence(index) {
     pulse = [state.selectedSequenceIndex, index];
     state.session.swapSequence(state.selectedSequenceIndex, index);
     state.selectedSequenceIndex = null;
-    announce(`${t('tile')} ${pulse[0] + 1} + ${index + 1}.`);
+    announce(t('Tiles {first} and {second} swapped.', { first: pulse[0] + 1, second: index + 1 }));
   }
 
   syncSequenceUi(pulse);
@@ -727,7 +727,7 @@ function moveSequence(direction) {
   state.selectedSequenceIndex += direction;
   syncSequenceUi(pulse);
   document.querySelector(`[data-sequence-index="${state.selectedSequenceIndex}"]`)?.focus();
-  announce(`${t('tile')} → ${state.selectedSequenceIndex + 1}.`);
+  announce(t('Tile moved to position {position}.', { position: state.selectedSequenceIndex + 1 }));
 }
 
 function submitSequence() {
@@ -742,7 +742,10 @@ function submitSequence() {
 
   state.trialStartedAt = performance.now();
   announce(
-    `${t('Recorded. Next trial.')} ${t('Run')} ${state.session.trialIndex + 1} ${t('of')} ${state.session.phase.trials}.`,
+    t('Order recorded. Run {current} of {total}.', {
+      current: state.session.trialIndex + 1,
+      total: state.session.phase.trials,
+    }),
   );
   renderLab();
 }
@@ -1132,7 +1135,7 @@ function endSequenceDrag(commit) {
     if (state.session.insertSequence(drag.index, target)) {
       state.selectedSequenceIndex = null;
       syncSequenceUi([target]);
-      announce(`Tile moved to position ${target + 1}.`);
+      announce(t('Tile moved to position {position}.', { position: target + 1 }));
       document.querySelector(`[data-sequence-index="${target}"]`)?.focus();
       return;
     }

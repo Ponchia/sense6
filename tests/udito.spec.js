@@ -92,6 +92,24 @@ test('Udito completes three safe-listening instruments and keeps results separat
   await expect(page.getByRole('heading', { name: /Your private measurement journal/i })).toBeVisible();
 });
 
+test('German Udito stages localize generated listening labels', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Single-browser locale journey');
+  await installQuickUdito(page);
+  await page.goto('/de/udito/');
+  await page.locator('[data-action="au-setup"]').click();
+  await page.locator('[data-action="au-reference"]').click();
+  await expect(page.locator('[data-au-reference-status]')).toContainText(
+    'Referenz nach Audiouhr abgeschlossen',
+  );
+  await page.locator('[data-au-consent]').check();
+  await page.locator('[data-action="au-start"]').click();
+  await expect(page.locator('.au-brief__copy')).toContainText('Kopfhörer-Konfidenz');
+  await expect(page.getByRole('heading', { name: 'Welcher Ton ist am leisesten?' })).toBeVisible();
+  await page.locator('[data-action="au-begin-stage"]').click();
+  await expect(page.getByRole('heading', { name: 'Hörtest für Cuffie' })).toBeAttached();
+  await expect(page.locator('.au-runner__header strong')).toHaveText('Übung');
+});
+
 test('the mobile Udito setup and listening runner stay inside the viewport', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile-only geometry check');
   await installQuickUdito(page);

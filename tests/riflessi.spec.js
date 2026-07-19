@@ -127,6 +127,21 @@ test('Riflessi completes all three instruments and reports separate device-relat
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
+test('German Riflessi stages localize generated runner labels', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Single-browser locale journey');
+  await installQuickRiflessi(page);
+  await page.goto('/de/riflessi/');
+  await page.locator('[data-action="rx-setup"]').click();
+  await page.locator('[data-action="rx-mode"][data-mode="keyboard"]').click();
+  await page.locator('[data-rx-consent]').check();
+  await page.locator('[data-action="rx-start"]').click();
+  await expect(page.locator('.rx-brief__copy')).toContainText('Einfache visuelle Reaktion');
+  await expect(page.getByRole('heading', { name: 'Ein Signal. Eine Aktion.' })).toBeVisible();
+  await page.locator('[data-action="rx-begin-stage"]').click();
+  await expect(page.getByRole('heading', { name: 'Reaktionstest für Segnale' })).toBeAttached();
+  await expect(page.locator('[data-rx-block]')).toHaveText('Übung');
+});
+
 test('the mobile Riflessi setup and response chamber stay inside the viewport', async ({
   page,
 }, testInfo) => {
@@ -288,6 +303,9 @@ test('short portrait and landscape runners reset stale scroll and expose the who
 test('the 320px runner reflows at 200% text sizing', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'Uses explicit text-only zoom geometry');
   await installQuickRiflessi(page);
+  await page.addInitScript(() => {
+    window.__SENSE6_TEST_CONFIG__.riflessi.signal.responseTimeoutMs = 15_000;
+  });
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto('/en/riflessi/');
   await page.evaluate(() => {

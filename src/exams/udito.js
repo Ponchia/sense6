@@ -279,7 +279,7 @@ async function playReference() {
       'The reference did not complete on the audio clock. Check browser audio output and play it again.',
     );
     button.textContent = t('Play reference again');
-    toast('The reference sound did not complete.');
+    toast(t('The reference sound did not complete.'));
   } finally {
     button.disabled = false;
   }
@@ -337,7 +337,7 @@ function renderBrief(instrument) {
     <section class="au-brief ui-container ui-container--wide">
       <div class="au-brief__index" aria-hidden="true">${info.number}</div>
       <div class="au-brief__copy">
-        <p class="ui-eyebrow">Instrument ${info.number} of 03 / ${info.eyebrow}</p><h1>${info.title}</h1><p class="au-lede">${info.body}</p>
+        <p class="ui-eyebrow">${t('Instrument')} ${info.number} ${t('of')} 03 / ${t(info.eyebrow)}</p><h1>${t(info.title)}</h1><p class="au-lede">${t(info.body)}</p>
         <div class="au-brief__rules">${briefRules(instrument)}</div>
         <button class="ui-button ui-button--lg" type="button" data-action="au-begin-stage">${instrument === 'headphones' ? 'Start practice' : `Start ${info.name}`} <span aria-hidden="true">→</span></button>
       </div>
@@ -388,7 +388,8 @@ function renderRunner() {
   const choices = state.session.instrument === 'pitch' ? 2 : 3;
   state.app.innerHTML = `
     <section class="au-runner" data-au-runner data-au-instrument="${state.session.instrument}" style="--au-choices: ${choices}">
-      <header class="au-runner__header"><div><p class="ui-eyebrow">${info.number} / ${info.name}</p><strong>${state.session.block === 'practice' ? 'Practice' : 'Adaptive run'}</strong></div><span data-au-count>Preparing…</span><button type="button" data-action="au-stop" aria-keyshortcuts="Escape">Stop safely</button></header>
+      <h1 class="sr-only" tabindex="-1" data-au-runner-heading>${t('{name} listening runner', { name: t(info.name) })}</h1>
+      <header class="au-runner__header"><div><p class="ui-eyebrow">${info.number} / ${t(info.name)}</p><strong>${t(state.session.block === 'practice' ? 'Practice' : 'Adaptive run')}</strong></div><span data-au-count>Preparing…</span><button type="button" data-action="au-stop" aria-keyshortcuts="Escape">Stop safely</button></header>
       <div class="au-listening">
         <p class="au-listening__status" data-au-status role="status" aria-live="polite" tabindex="-1">Preparing the sounds…</p>
         <div class="au-intervals" data-au-intervals aria-hidden="true">${Array.from({ length: choices }, (_, index) => `<div><span>${index + 1}</span><i></i></div>`).join('')}</div>
@@ -828,7 +829,7 @@ function copyResults() {
     }),
     t('Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials', {
       boundary: formatHertz(range),
-      completion: completionReasonLabel(range.completionReason),
+      completion: t(completionReasonLabel(range.completionReason)),
       reversals: range.reversals,
       trials: range.trials,
     }),
@@ -837,7 +838,7 @@ function copyResults() {
       t('Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials', {
         anchor: formatNumber(item.anchorHz),
         step: formatPitch(pitch, item.anchorHz),
-        completion: completionReasonLabel(item.completionReason),
+        completion: t(completionReasonLabel(item.completionReason)),
         reversals: item.reversals,
         trials: item.trials,
       }),

@@ -322,7 +322,7 @@ function hardSetupDifferences(newer, older) {
 function hardFields(examId) {
   if (examId === 'riflessi') return ['display', 'inputMode'];
   if (examId === 'udito') return ['device', 'connection', 'sampleRate'];
-  if (examId === 'acutezza') return ['display', 'correction'];
+  if (examId === 'acutezza') return ['display', 'correction', 'contrastPercent', 'theme'];
   if (examId === 'color-blindness')
     return ['display', 'gamut', 'theme', 'stimulusCssPixels', 'measurementDpr'];
   return ['display', 'gamut'];

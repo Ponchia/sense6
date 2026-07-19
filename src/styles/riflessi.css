@@ -1113,6 +1113,25 @@ body.rx-running > .ui-sitefooter {
   }
 }
 
+@media (max-width: 360px) {
+  .rx-runner__header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .rx-runner__header > div:first-child,
+  .rx-runner__footer > span {
+    display: none;
+  }
+
+  .rx-runner__count {
+    grid-column: 1;
+  }
+
+  .rx-runner__stop {
+    grid-column: 2;
+  }
+}
+
 @media (max-height: 500px) {
   .rx-runner__header {
     padding-block: 0.45rem;

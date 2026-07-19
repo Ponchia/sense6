@@ -158,7 +158,8 @@ test('Acutezza advances exactly once when visibility changes during committed fe
 
 test('Acutezza guards summary entry, theme, and shell navigation after calibration', async ({ page }) => {
   await installQuickAcutezza(page);
-  await page.goto('/en/acutezza/');
+  await page.goto('/en/');
+  await page.locator('.exam-card__link[href="/en/acutezza/"]').click();
   await completeAcutezzaCalibration(page);
   await expect(page.getByRole('button', { name: /Toggle light and dark theme/i })).toBeDisabled();
 
@@ -167,10 +168,9 @@ test('Acutezza guards summary entry, theme, and shell navigation after calibrati
   await expect(page).toHaveURL(/\/en\/acutezza\/$/);
   await expect(page.getByRole('heading', { name: /physical scale/i })).toBeVisible();
 
-  await page.evaluate(() => window.history.pushState(null, '', '?transient-history-entry'));
   page.once('dialog', (dialog) => dialog.dismiss());
   await page.evaluate(() => window.history.back());
-  await expect(page).toHaveURL(/\/en\/acutezza\/\?transient-history-entry$/);
+  await expect(page).toHaveURL(/\/en\/acutezza\/$/);
   await expect(page.getByRole('heading', { name: /physical scale/i })).toBeVisible();
 
   await page.evaluate(() => {
@@ -188,6 +188,25 @@ test('Acutezza guards summary entry, theme, and shell navigation after calibrati
     document.documentElement.dataset.theme = 'dark';
   });
   await expect(page.getByText(/light or dark surround changed/i)).toBeVisible();
+});
+
+test('German Acutezza calibration and runner keep generated labels localized', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Single-browser locale journey');
+  await installQuickAcutezza(page);
+  await page.goto('/de/acutezza/');
+  await page.locator('[data-action="ac-prepare"]').click();
+  await page.locator('[data-ac-consent]').check();
+  await page.locator('[data-action="ac-card"]').click();
+  await page.locator('[data-action="ac-confirm-card"]').click();
+  await page.locator('[data-action="ac-manual-distance"]').click();
+  await page.locator('[data-ac-manual-distance]').fill('50');
+  await page.locator('[data-action="ac-confirm-manual-distance"]').click();
+  await page.locator('[data-action="ac-contrast-visible"]').click();
+  await expect(page.getByRole('button', { name: /Rechtes Auge vorbereiten/i })).toBeVisible();
+  await expect(page.locator('[data-locale-select]')).toBeDisabled();
+  await page.locator('[data-action="ac-first-eye"]').click();
+  await page.locator('[data-action="ac-begin-eye"]').click();
+  await expect(page.getByRole('heading', { name: 'Rechtes Auge — Übung' })).toBeFocused();
 });
 
 test('Acutezza accepts repeatable blind-spot sweeps as measured calibration', async ({ page }, testInfo) => {

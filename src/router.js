@@ -1,5 +1,5 @@
-import { LOCALE_CODES } from './locales.js';
 import { allowsNavigation } from './lib/navigation.js';
+import { LOCALE_CODES } from './locales.js';
 
 const HISTORY_INDEX = '__sense6Index';
 let historyIndex = 0;
