@@ -28,7 +28,7 @@ export const meta = {
   glyph: 'U',
 };
 
-const STORAGE_KEY = 'sensoria:udito:last';
+const STORAGE_KEY = 'sense6:udito:last';
 const INSTRUMENTS = {
   headphones: {
     number: '01',
@@ -89,7 +89,7 @@ function renderIntro() {
   session = null;
   referencePlayed = false;
   document.body.classList.remove('lab-mode', 'au-running');
-  document.title = 'Device-relative hearing lab — Udito | Sensoria';
+  document.title = 'Device-relative hearing lab — Udito | Sense6';
   const previous = loadLast();
 
   app.innerHTML = `
@@ -182,7 +182,7 @@ function renderSetup() {
   referencePlayed = false;
   document.body.classList.add('lab-mode');
   document.body.classList.remove('au-running');
-  document.title = 'Prepare your audio setup — Udito | Sensoria';
+  document.title = 'Prepare your audio setup — Udito | Sense6';
   window.scrollTo({ top: 0, behavior: 'instant' });
   const supported = audio.supported;
   app.innerHTML = `
@@ -282,7 +282,7 @@ function renderBrief(instrument) {
   const info = INSTRUMENTS[instrument];
   document.body.classList.add('lab-mode');
   document.body.classList.remove('au-running');
-  document.title = `${info.name} — Udito | Sensoria`;
+  document.title = `${info.name} — Udito | Sense6`;
   app.innerHTML = `
     <section class="au-brief ui-container ui-container--wide">
       <div class="au-brief__index" aria-hidden="true">${info.number}</div>
@@ -492,7 +492,7 @@ function renderResults() {
   stopPlayback();
   document.body.classList.add('lab-mode');
   document.body.classList.remove('au-running');
-  document.title = 'Your listening profile — Udito | Sensoria';
+  document.title = 'Your listening profile — Udito | Sense6';
   const headphones = summarizeHeadphones(session.headphoneRecords, config.headphones.passCorrect);
   const range = summarizeRange(session.rangeTrack);
   const pitch = summarizePitch(session.pitchTracks);
@@ -690,7 +690,7 @@ function wireEvents(signal) {
 function runtimeConfig() {
   const override =
     import.meta.env.DEV && /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
-      ? window.__SENSORIA_TEST_CONFIG__?.udito
+      ? window.__SENSE6_TEST_CONFIG__?.udito
       : null;
   return mergeHearingConfig(override);
 }

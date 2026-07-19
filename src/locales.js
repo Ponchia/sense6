@@ -26,12 +26,12 @@ message(
   'Ir para o conteúdo',
 );
 message(
-  'Sensoria — all tests',
-  'Sensoria — tutti i test',
-  'Sensoria — alle Tests',
-  'Sensoria — tous les tests',
-  'Sensoria — todas las pruebas',
-  'Sensoria — todos os testes',
+  'Sense6 — all tests',
+  'Sense6 — tutti i test',
+  'Sense6 — alle Tests',
+  'Sense6 — tous les tests',
+  'Sense6 — todas las pruebas',
+  'Sense6 — todos os testes',
 );
 message(
   'Checking display…',
@@ -80,20 +80,20 @@ message(
 message('All tests', 'Tutti i test', 'Alle Tests', 'Tous les tests', 'Todas las pruebas', 'Todos os testes');
 message('Source', 'Codice sorgente', 'Quellcode', 'Code source', 'Código fuente', 'Código-fonte');
 message(
-  'Sensoria — measure what your senses notice',
-  'Sensoria — misura ciò che i tuoi sensi percepiscono',
-  'Sensoria — messen, was Ihre Sinne wahrnehmen',
-  'Sensoria — mesurez ce que vos sens perçoivent',
-  'Sensoria — mide lo que perciben tus sentidos',
-  'Sensoria — meça o que os seus sentidos percebem',
+  'Sense6 — measure what your senses notice',
+  'Sense6 — misura ciò che i tuoi sensi percepiscono',
+  'Sense6 — messen, was Ihre Sinne wahrnehmen',
+  'Sense6 — mesurez ce que vos sens perçoivent',
+  'Sense6 — mide lo que perciben tus sentidos',
+  'Sense6 — meça o que os seus sentidos percebem',
 );
 message(
-  'Sensoria / private perception lab',
-  'Sensoria / laboratorio privato della percezione',
-  'Sensoria / privates Wahrnehmungslabor',
-  'Sensoria / laboratoire privé de perception',
-  'Sensoria / laboratorio privado de percepción',
-  'Sensoria / laboratório privado de perceção',
+  'Sense6 / private perception lab',
+  'Sense6 / laboratorio privato della percezione',
+  'Sense6 / privates Wahrnehmungslabor',
+  'Sense6 / laboratoire privé de perception',
+  'Sense6 / laboratorio privado de percepción',
+  'Sense6 / laboratório privado de perceção',
 );
 message(
   'Measure what your',
@@ -1193,12 +1193,12 @@ message(
 message('Adaptive', 'Adattivo', 'Adaptiv', 'Adaptatif', 'Adaptativo', 'Adaptativo');
 message('Interleaved', 'Intercalato', 'Verschachtelt', 'Entrelacé', 'Intercalado', 'Intercalado');
 message(
-  'Your listening profile — Udito | Sensoria',
-  'Il tuo profilo di ascolto — Udito | Sensoria',
-  'Ihr Hörprofil — Udito | Sensoria',
-  'Votre profil d’écoute — Udito | Sensoria',
-  'Tu perfil auditivo — Udito | Sensoria',
-  'O seu perfil auditivo — Udito | Sensoria',
+  'Your listening profile — Udito | Sense6',
+  'Il tuo profilo di ascolto — Udito | Sense6',
+  'Ihr Hörprofil — Udito | Sense6',
+  'Votre profil d’écoute — Udito | Sense6',
+  'Tu perfil auditivo — Udito | Sense6',
+  'O seu perfil auditivo — Udito | Sense6',
 );
 message(
   'Udito / this setup / this run',
@@ -2008,12 +2008,12 @@ message(
   'Toque na nova posição para a trocar ou use as setas.',
 );
 message(
-  'Your colour profile — Tetracromia | Sensoria',
-  'Il tuo profilo cromatico — Tetracromia | Sensoria',
-  'Ihr Farbprofil — Tetracromia | Sensoria',
-  'Votre profil chromatique — Tetracromia | Sensoria',
-  'Tu perfil cromático — Tetracromia | Sensoria',
-  'O seu perfil cromático — Tetracromia | Sensoria',
+  'Your colour profile — Tetracromia | Sense6',
+  'Il tuo profilo cromatico — Tetracromia | Sense6',
+  'Ihr Farbprofil — Tetracromia | Sense6',
+  'Votre profil chromatique — Tetracromia | Sense6',
+  'Tu perfil cromático — Tetracromia | Sense6',
+  'O seu perfil cromático — Tetracromia | Sense6',
 );
 message(
   'Session complete',
@@ -3632,12 +3632,12 @@ message(
 );
 
 message(
-  'Your response profile — Riflessi | Sensoria',
-  'Il tuo profilo di risposta — Riflessi | Sensoria',
-  'Ihr Reaktionsprofil — Riflessi | Sensoria',
-  'Votre profil de réponse — Riflessi | Sensoria',
-  'Tu perfil de respuesta — Riflessi | Sensoria',
-  'O seu perfil de resposta — Riflessi | Sensoria',
+  'Your response profile — Riflessi | Sense6',
+  'Il tuo profilo di risposta — Riflessi | Sense6',
+  'Ihr Reaktionsprofil — Riflessi | Sense6',
+  'Votre profil de réponse — Riflessi | Sense6',
+  'Tu perfil de respuesta — Riflessi | Sense6',
+  'O seu perfil de resposta — Riflessi | Sense6',
 );
 message(
   'Riflessi / this run / this device',
@@ -3917,44 +3917,44 @@ message(
   'Sair da experiência? O progresso será perdido.',
 );
 message(
-  'Prepare your screen — Tetracromia | Sensoria',
-  'Prepara lo schermo — Tetracromia | Sensoria',
-  'Bildschirm vorbereiten — Tetracromia | Sensoria',
-  'Préparez votre écran — Tetracromia | Sensoria',
-  'Prepara la pantalla — Tetracromia | Sensoria',
-  'Prepare o ecrã — Tetracromia | Sensoria',
+  'Prepare your screen — Tetracromia | Sense6',
+  'Prepara lo schermo — Tetracromia | Sense6',
+  'Bildschirm vorbereiten — Tetracromia | Sense6',
+  'Préparez votre écran — Tetracromia | Sense6',
+  'Prepara la pantalla — Tetracromia | Sense6',
+  'Prepare o ecrã — Tetracromia | Sense6',
 );
 message(
-  'Prepare your display — Daltonia | Sensoria',
-  'Prepara lo schermo — Daltonia | Sensoria',
-  'Bildschirm vorbereiten — Daltonia | Sensoria',
-  'Préparez votre écran — Daltonia | Sensoria',
-  'Prepara la pantalla — Daltonia | Sensoria',
-  'Prepare o ecrã — Daltonia | Sensoria',
+  'Prepare your display — Daltonia | Sense6',
+  'Prepara lo schermo — Daltonia | Sense6',
+  'Bildschirm vorbereiten — Daltonia | Sense6',
+  'Préparez votre écran — Daltonia | Sense6',
+  'Prepara la pantalla — Daltonia | Sense6',
+  'Prepare o ecrã — Daltonia | Sense6',
 );
 message(
-  'Your display-relative thresholds — Daltonia | Sensoria',
-  'Le tue soglie relative allo schermo — Daltonia | Sensoria',
-  'Ihre bildschirmbezogenen Schwellen — Daltonia | Sensoria',
-  'Vos seuils liés à l’écran — Daltonia | Sensoria',
-  'Tus umbrales relativos a la pantalla — Daltonia | Sensoria',
-  'Os seus limiares relativos ao ecrã — Daltonia | Sensoria',
+  'Your display-relative thresholds — Daltonia | Sense6',
+  'Le tue soglie relative allo schermo — Daltonia | Sense6',
+  'Ihre bildschirmbezogenen Schwellen — Daltonia | Sense6',
+  'Vos seuils liés à l’écran — Daltonia | Sense6',
+  'Tus umbrales relativos a la pantalla — Daltonia | Sense6',
+  'Os seus limiares relativos ao ecrã — Daltonia | Sense6',
 );
 message(
-  'Prepare your response setup — Riflessi | Sensoria',
-  'Prepara la configurazione di risposta — Riflessi | Sensoria',
-  'Reaktionseinrichtung vorbereiten — Riflessi | Sensoria',
-  'Préparez votre dispositif de réponse — Riflessi | Sensoria',
-  'Prepara la configuración de respuesta — Riflessi | Sensoria',
-  'Prepare a configuração de resposta — Riflessi | Sensoria',
+  'Prepare your response setup — Riflessi | Sense6',
+  'Prepara la configurazione di risposta — Riflessi | Sense6',
+  'Reaktionseinrichtung vorbereiten — Riflessi | Sense6',
+  'Préparez votre dispositif de réponse — Riflessi | Sense6',
+  'Prepara la configuración de respuesta — Riflessi | Sense6',
+  'Prepare a configuração de resposta — Riflessi | Sense6',
 );
 message(
-  'Prepare your audio setup — Udito | Sensoria',
-  'Prepara la configurazione audio — Udito | Sensoria',
-  'Audioeinrichtung vorbereiten — Udito | Sensoria',
-  'Préparez votre installation audio — Udito | Sensoria',
-  'Prepara la configuración de audio — Udito | Sensoria',
-  'Prepare a configuração áudio — Udito | Sensoria',
+  'Prepare your audio setup — Udito | Sense6',
+  'Prepara la configurazione audio — Udito | Sense6',
+  'Audioeinrichtung vorbereiten — Udito | Sense6',
+  'Préparez votre installation audio — Udito | Sense6',
+  'Prepara la configuración de audio — Udito | Sense6',
+  'Prepare a configuração áudio — Udito | Sense6',
 );
 message(
   'Reference played',
@@ -4161,44 +4161,44 @@ message(
 );
 
 message(
-  'Tetracromia — colour discrimination | Sensoria',
-  'Tetracromia — discriminazione cromatica | Sensoria',
-  'Tetracromia — Farbdiskrimination | Sensoria',
-  'Tetracromia — discrimination des couleurs | Sensoria',
-  'Tetracromia — discriminación del color | Sensoria',
-  'Tetracromia — discriminação de cores | Sensoria',
+  'Tetracromia — colour discrimination | Sense6',
+  'Tetracromia — discriminazione cromatica | Sense6',
+  'Tetracromia — Farbdiskrimination | Sense6',
+  'Tetracromia — discrimination des couleurs | Sense6',
+  'Tetracromia — discriminación del color | Sense6',
+  'Tetracromia — discriminação de cores | Sense6',
 );
 message(
-  'Experimental colour-vision check — Daltonia | Sensoria',
-  'Test sperimentale della visione cromatica — Daltonia | Sensoria',
-  'Experimenteller Farbsehtest — Daltonia | Sensoria',
-  'Test expérimental de vision des couleurs — Daltonia | Sensoria',
-  'Prueba experimental de visión cromática — Daltonia | Sensoria',
-  'Teste experimental de visão cromática — Daltonia | Sensoria',
+  'Experimental colour-vision check — Daltonia | Sense6',
+  'Test sperimentale della visione cromatica — Daltonia | Sense6',
+  'Experimenteller Farbsehtest — Daltonia | Sense6',
+  'Test expérimental de vision des couleurs — Daltonia | Sense6',
+  'Prueba experimental de visión cromática — Daltonia | Sense6',
+  'Teste experimental de visão cromática — Daltonia | Sense6',
 );
 message(
-  'Response speed and consistency — Riflessi | Sensoria',
-  'Velocità e costanza della risposta — Riflessi | Sensoria',
-  'Reaktionsgeschwindigkeit und Konstanz — Riflessi | Sensoria',
-  'Vitesse et régularité de réponse — Riflessi | Sensoria',
-  'Velocidad y constancia de respuesta — Riflessi | Sensoria',
-  'Velocidade e consistência da resposta — Riflessi | Sensoria',
+  'Response speed and consistency — Riflessi | Sense6',
+  'Velocità e costanza della risposta — Riflessi | Sense6',
+  'Reaktionsgeschwindigkeit und Konstanz — Riflessi | Sense6',
+  'Vitesse et régularité de réponse — Riflessi | Sense6',
+  'Velocidad y constancia de respuesta — Riflessi | Sense6',
+  'Velocidade e consistência da resposta — Riflessi | Sense6',
 );
 message(
-  'Device-relative hearing lab — Udito | Sensoria',
-  'Laboratorio uditivo relativo al dispositivo — Udito | Sensoria',
-  'Gerätebezogenes Hörlabor — Udito | Sensoria',
-  'Laboratoire auditif lié à l’appareil — Udito | Sensoria',
-  'Laboratorio auditivo relativo al dispositivo — Udito | Sensoria',
-  'Laboratório auditivo relativo ao dispositivo — Udito | Sensoria',
+  'Device-relative hearing lab — Udito | Sense6',
+  'Laboratorio uditivo relativo al dispositivo — Udito | Sense6',
+  'Gerätebezogenes Hörlabor — Udito | Sense6',
+  'Laboratoire auditif lié à l’appareil — Udito | Sense6',
+  'Laboratorio auditivo relativo al dispositivo — Udito | Sense6',
+  'Laboratório auditivo relativo ao dispositivo — Udito | Sense6',
 );
 message(
-  'Sensoria offers short, careful browser perception tests with honest, screen-relative results. No account, no upload, no diagnosis theatre.',
-  'Sensoria offre brevi e accurati test di percezione nel browser con risultati onesti e relativi al dispositivo. Nessun account, caricamento o finta diagnosi.',
-  'Sensoria bietet kurze, sorgfältige Wahrnehmungstests im Browser mit ehrlichen, gerätebezogenen Ergebnissen. Kein Konto, kein Upload, keine Scheindiagnose.',
-  'Sensoria propose des tests de perception courts et rigoureux dans le navigateur, avec des résultats honnêtes liés à l’appareil. Aucun compte, envoi ou faux diagnostic.',
-  'Sensoria ofrece pruebas de percepción breves y cuidadosas en el navegador, con resultados honestos relativos al dispositivo. Sin cuenta, envíos ni falsos diagnósticos.',
-  'O Sensoria oferece testes de perceção breves e cuidadosos no navegador, com resultados honestos relativos ao dispositivo. Sem conta, envios ou falsos diagnósticos.',
+  'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account, no upload, no diagnosis theatre.',
+  'Sense6 offre brevi e accurati test di percezione nel browser con risultati onesti e relativi al dispositivo. Nessun account, caricamento o finta diagnosi.',
+  'Sense6 bietet kurze, sorgfältige Wahrnehmungstests im Browser mit ehrlichen, gerätebezogenen Ergebnissen. Kein Konto, kein Upload, keine Scheindiagnose.',
+  'Sense6 propose des tests de perception courts et rigoureux dans le navigateur, avec des résultats honnêtes liés à l’appareil. Aucun compte, envoi ou faux diagnostic.',
+  'Sense6 ofrece pruebas de percepción breves y cuidadosas en el navegador, con resultados honestos relativos al dispositivo. Sin cuenta, envíos ni falsos diagnósticos.',
+  'O Sense6 oferece testes de perceção breves e cuidadosos no navegador, com resultados honestos relativos ao dispositivo. Sem conta, envios ou falsos diagnósticos.',
 );
 
 export const MESSAGE_COUNT = rows.length;

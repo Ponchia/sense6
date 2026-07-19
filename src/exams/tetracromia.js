@@ -59,7 +59,7 @@ function renderHome() {
   labActive = false;
   selectedSequenceIndex = null;
   document.body.classList.remove('lab-mode');
-  document.title = 'Tetracromia — colour discrimination | Sensoria';
+  document.title = 'Tetracromia — colour discrimination | Sense6';
 
   const spectrumBars = Array.from({ length: 28 }, (_, index) => {
     const hue = Math.round((index / 28) * 360);
@@ -245,7 +245,7 @@ function testDescription(id) {
 
 function renderSetup() {
   document.body.classList.add('lab-mode');
-  document.title = 'Prepare your screen — Tetracromia | Sensoria';
+  document.title = 'Prepare your screen — Tetracromia | Sense6';
   window.scrollTo({ top: 0, behavior: 'instant' });
 
   app.innerHTML = `
@@ -315,7 +315,7 @@ function renderLab() {
   const phase = session.phase;
   const phaseProgress = Math.round((session.trialIndex / phase.trials) * 100);
   const trial = session.currentTrial;
-  document.title = `${phase.name} ${session.trialIndex + 1} of ${phase.trials} — Tetracromia | Sensoria`;
+  document.title = `${phase.name} ${session.trialIndex + 1} of ${phase.trials} — Tetracromia | Sense6`;
 
   app.innerHTML = `
     <section class="lab-view">
@@ -613,7 +613,7 @@ function submitSequence() {
 function renderResults() {
   labActive = false;
   document.body.classList.add('lab-mode');
-  document.title = 'Your colour profile — Tetracromia | Sensoria';
+  document.title = 'Your colour profile — Tetracromia | Sense6';
   const result = session.results();
   const previous = loadBestResult();
   if (!previous || result.overall > previous.overall) saveBestResult(result);
