@@ -13,6 +13,13 @@ test('the gallery lists exams, is accessible, and routes into one', async ({ pag
   await expect(page.locator('.brand')).not.toContainText('Perception lab');
   await expect(page.locator('.sense-mark')).toHaveText('Sense6');
   await expect(page.locator('.sense-mark__signal')).toHaveCount(6);
+  await expect(page.locator('.gallery-hero__boundary')).toHaveText(
+    'Experimental perception tests for curiosity and fun—not medical tests or diagnoses.',
+  );
+  await expect(page.locator('.gallery-hero__lede')).toContainText(
+    'No account, no answers or results uploaded.',
+  );
+  await expect(page.getByText(/diagnosis theatre/i)).toHaveCount(0);
   await expect(page.locator('.sense-map')).toHaveCount(0);
   if ((await page.viewportSize()).width >= 960) {
     const heroHeight = await page
@@ -82,6 +89,12 @@ test('language routes translate, persist, and remain accessible', async ({ page 
     await expect(page.locator('html')).toHaveAttribute('dir', direction);
     const heading = messages.get('Start with what you want to learn.');
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
+    await expect(page.locator('.gallery-hero__boundary')).toHaveText(
+      messages.get('Experimental perception tests for curiosity and fun—not medical tests or diagnoses.'),
+    );
+    await expect(page.locator('.gallery-hero__lede')).toContainText(
+      messages.get('No account, no answers or results uploaded.'),
+    );
   }
 
   await page.locator('[data-locale-select]').selectOption('de');

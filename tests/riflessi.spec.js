@@ -96,6 +96,9 @@ test('Riflessi completes all three instruments and reports separate device-relat
   await page.getByRole('button', { name: /^Keyboard/i }).click();
   const start = page.getByRole('button', { name: /Begin instrument 01/i });
   await expect(start).toBeDisabled();
+  await expect(page.locator('.experiment-boundary')).toHaveText(
+    /recreational experiment for curiosity and fun—not a medical test or diagnosis/i,
+  );
   await page.getByLabel(/I understand this measures this browser/i).check();
   await expect(start).toBeEnabled();
   await start.click();

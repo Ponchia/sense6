@@ -115,6 +115,9 @@ test('screen setup gates the adaptive lab and advances into the field instrument
   await expect(start).toBeDisabled();
   await expect(page.getByRole('img', { name: /Eleven brightness steps/i })).toBeVisible();
   await expect(page.getByRole('img', { name: /Continuous grayscale gradient/i })).toBeVisible();
+  await expect(page.locator('.experiment-boundary')).toHaveText(
+    /recreational experiment for curiosity and fun—not a medical test or diagnosis/i,
+  );
   const setupResults = await new AxeBuilder({ page }).analyze();
   expect(setupResults.violations).toEqual([]);
   await page.getByLabel(/I can distinguish the steps/i).check();

@@ -1862,6 +1862,22 @@ a:focus-visible {
   max-inline-size: 40rem;
 }
 
+.gallery-hero__boundary {
+  background: var(--panel);
+  border-inline-start: 0.3rem solid var(--accent);
+  color: var(--text);
+  font-weight: 700;
+  line-height: 1.45;
+  margin-block: 1.25rem 0;
+  max-inline-size: 42rem;
+  padding: 0.85rem 1rem;
+}
+
+.experiment-boundary {
+  display: block;
+  margin-block-end: 0.35rem;
+}
+
 .gallery-heading > *,
 .exam-card__body,
 .exam-card__facts,

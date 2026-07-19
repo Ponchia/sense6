@@ -97,6 +97,9 @@ test('the Daltonia experiment renders adaptive targets and reports non-clinical 
   await page.getByRole('button', { name: /Start the experiment/i }).click();
   const begin = page.getByRole('button', { name: /Start practice/i });
   await expect(begin).toBeDisabled();
+  await expect(page.locator('.experiment-boundary')).toHaveText(
+    /recreational experiment for curiosity and fun—not a medical test or diagnosis/i,
+  );
   await page.getByLabel(/My colour filters are off and I understand/i).check();
   await expect(begin).toBeEnabled();
   await begin.click();
