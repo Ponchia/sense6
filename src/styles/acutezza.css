@@ -290,6 +290,11 @@ body.ac-active {
   display: flex;
   flex-direction: column;
   min-inline-size: 0;
+  /* Text tokens switch immediately with the theme. Keep the card surface in
+     lockstep so the transition cannot pass through a low-contrast midpoint. */
+  transition:
+    border-color var(--duration-base) var(--ease-standard),
+    transform var(--duration-base) var(--ease-standard);
 }
 .ac-research__card .ui-link {
   margin-block-start: auto;
