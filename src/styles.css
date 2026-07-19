@@ -20,8 +20,8 @@ html {
 }
 
 body {
-  min-inline-size: 20rem;
-  overflow-x: hidden;
+  min-inline-size: 0;
+  overflow-x: clip;
 }
 
 body::before {
@@ -68,7 +68,20 @@ a:focus-visible {
 }
 
 .brand {
+  flex: 0 0 auto;
+  font-size: clamp(1.05rem, 3.2vw, 1.3rem);
+  font-weight: 850;
+  letter-spacing: 0.035em;
+  line-height: 1;
+  padding-block: 0.45rem;
   text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand::before {
+  block-size: 0.62rem;
+  box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--accent) 16%, transparent);
+  inline-size: 0.62rem;
 }
 
 .brand__six {
@@ -143,6 +156,12 @@ a:focus-visible {
 .locale-picker select:focus-visible {
   outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
+}
+
+.locale-picker select:disabled,
+.theme-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
 }
 
 .hero {
@@ -1437,6 +1456,10 @@ a:focus-visible {
     gap: 0.5rem;
   }
 
+  .site-chrome .ui-siteheader__actions {
+    min-inline-size: 0;
+  }
+
   .brand::after,
   .device-chip,
   .theme-button__label {
@@ -1448,6 +1471,7 @@ a:focus-visible {
   }
 
   .locale-picker select {
+    min-inline-size: clamp(5.75rem, 31vw, 7rem);
     padding-inline: 0.45rem 1.2rem;
   }
 
@@ -1658,6 +1682,7 @@ a:focus-visible {
 
 .gallery-hero__copy {
   max-inline-size: 54rem;
+  min-inline-size: 0;
 }
 
 .gallery-hero h1 {
@@ -1668,6 +1693,8 @@ a:focus-visible {
   line-height: 0.84;
   margin: 1.2rem 0 1.6rem;
   max-inline-size: 11ch;
+  hyphens: auto;
+  overflow-wrap: anywhere;
   text-wrap: balance;
 }
 

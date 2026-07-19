@@ -1,4 +1,9 @@
 import { LOCALE_CODES } from './locales.js';
+import { allowsNavigation } from './lib/navigation.js';
+
+const HISTORY_INDEX = '__sense6Index';
+let historyIndex = 0;
+let approvedHref = null;
 
 export function currentLocation(location = window.location) {
   const legacy = parseParts(location.hash.replace(/^#\/?/, ''));
@@ -14,17 +19,73 @@ export function currentRoute() {
 
 export function navigate(name, locale = 'en', { replace = false } = {}) {
   const route = String(name).replace(/^\/+|\/+$/g, '');
+  const current = currentLocation();
+  if (
+    (current.route !== route || current.locale !== locale) &&
+    !allowsNavigation({ route, locale, legacy: false })
+  ) {
+    return false;
+  }
   const target = `/${locale}/${route ? `${route}/` : ''}`;
   if (`${window.location.pathname}${window.location.search}${window.location.hash}` === target) {
     window.dispatchEvent(new PopStateEvent('popstate'));
-    return;
+    return true;
   }
-  window.history[replace ? 'replaceState' : 'pushState'](null, '', target);
+  const nextIndex = replace ? historyIndex : historyIndex + 1;
+  approvedHref = target;
+  window.history[replace ? 'replaceState' : 'pushState']({ [HISTORY_INDEX]: nextIndex }, '', target);
+  historyIndex = nextIndex;
   window.dispatchEvent(new PopStateEvent('popstate'));
+  return true;
 }
 
 export function startRouter(onRoute) {
-  const handle = () => void onRoute(currentLocation());
+  const initialState = window.history.state ?? {};
+  historyIndex = Number.isInteger(initialState[HISTORY_INDEX]) ? initialState[HISTORY_INDEX] : 0;
+  if (!Number.isInteger(initialState[HISTORY_INDEX])) {
+    window.history.replaceState({ ...initialState, [HISTORY_INDEX]: historyIndex }, '', window.location.href);
+  }
+  let acceptedIndex = historyIndex;
+  let acceptedLocation = currentLocation();
+  let acceptedHref = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  let restoringIndex = null;
+
+  const handle = () => {
+    const stateIndex = window.history.state?.[HISTORY_INDEX];
+    const nextIndex = Number.isInteger(stateIndex) ? stateIndex : historyIndex;
+    historyIndex = nextIndex;
+
+    if (restoringIndex !== null && nextIndex === restoringIndex) {
+      restoringIndex = null;
+      return;
+    }
+
+    const next = currentLocation();
+    const nextHref = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+    const wasApproved = approvedHref === nextHref;
+    if (wasApproved) approvedHref = null;
+    const routeChanged = next.locale !== acceptedLocation.locale || next.route !== acceptedLocation.route;
+    if (routeChanged && !wasApproved && !allowsNavigation(next)) {
+      const delta = acceptedIndex - nextIndex;
+      if (delta) {
+        restoringIndex = acceptedIndex;
+        window.history.go(delta);
+      } else {
+        window.history.replaceState(
+          { ...(window.history.state ?? {}), [HISTORY_INDEX]: acceptedIndex },
+          '',
+          acceptedHref,
+        );
+        historyIndex = acceptedIndex;
+      }
+      return;
+    }
+
+    acceptedIndex = nextIndex;
+    acceptedLocation = next;
+    acceptedHref = nextHref;
+    void onRoute(next);
+  };
   const handleClick = (event) => {
     const link = event.target.closest?.('a[data-sense6-route]');
     if (!link || event.defaultPrevented || event.button !== 0) return;

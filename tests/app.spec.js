@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { expectInVisualViewport, expectNoHorizontalOverflow } from './helpers/browser.js';
 
 test('the gallery lists exams, is accessible, and routes into one', async ({ page }) => {
   await page.goto('/');
@@ -122,6 +123,18 @@ test('language and theme controls do not overlap at narrow header widths', async
     await page.goto('/en/');
     await page.locator('[data-locale-select]').selectOption('pt');
     await expect(page).toHaveURL(/\/pt\/$/);
+    await expectInVisualViewport(page.locator('.brand'), `brand at ${width}px`, {
+      clearOfChrome: false,
+      hitTest: true,
+    });
+    await expectInVisualViewport(page.locator('[data-locale-select]'), `language selector at ${width}px`, {
+      clearOfChrome: false,
+      hitTest: true,
+    });
+    await expectInVisualViewport(page.locator('[data-bronto-theme-toggle]'), `theme control at ${width}px`, {
+      clearOfChrome: false,
+      hitTest: true,
+    });
 
     const geometry = await page.evaluate(() => {
       const localeElement = document.querySelector('[data-locale-select]');
@@ -229,6 +242,10 @@ test('the first visit follows a supported browser language', async ({ browser })
 
 test('long German labels remain inside the mobile viewport', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile-only localization geometry check');
+  await page.goto('/de/');
+  await expectNoHorizontalOverflow(page, 'German gallery');
+  await expectInVisualViewport(page.locator('.gallery-hero h1'), 'German gallery heading');
+
   await page.goto('/de/udito/');
   await page.getByRole('button', { name: /Hörlabor vorbereiten/i }).click();
   await expect

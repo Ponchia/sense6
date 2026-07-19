@@ -52,7 +52,7 @@ startRouter(async ({ route, locale }) => {
 
   cleanup?.();
   cleanup = null;
-  document.body.classList.remove('lab-mode');
+  document.body.classList.remove('lab-mode', 'measurement-active');
   window.scrollTo({ top: 0, behavior: 'instant' });
 
   if (route === 'journal') {

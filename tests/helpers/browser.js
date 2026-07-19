@@ -1,5 +1,72 @@
 import { expect } from '@playwright/test';
 
+/**
+ * Assert that an element is usable in the current visual viewport without scrolling.
+ * This catches vertical clipping and sticky-header obstruction that scrollWidth-only
+ * checks miss. Set hitTest for controls that must be the topmost target at their centre.
+ */
+export async function expectInVisualViewport(locator, label, { clearOfChrome = true, hitTest = false } = {}) {
+  await expect(locator, `${label} should be visible`).toBeVisible();
+  const geometry = await locator.evaluate(
+    (element, options) => {
+      const rect = element.getBoundingClientRect();
+      const viewport = window.visualViewport;
+      const viewportLeft = viewport?.offsetLeft ?? 0;
+      const viewportTop = viewport?.offsetTop ?? 0;
+      const viewportRight = viewportLeft + (viewport?.width ?? document.documentElement.clientWidth);
+      const viewportBottom = viewportTop + (viewport?.height ?? document.documentElement.clientHeight);
+      const chrome = document.querySelector('.site-chrome');
+      const chromeRect = chrome?.getBoundingClientRect();
+      const chromeStyle = chrome ? getComputedStyle(chrome) : null;
+      const chromeBottom =
+        options.clearOfChrome && chromeRect && chromeStyle?.display !== 'none'
+          ? Math.max(viewportTop, chromeRect.bottom)
+          : viewportTop;
+      const centreX = Math.min(viewportRight - 1, Math.max(viewportLeft, rect.left + rect.width / 2));
+      const centreY = Math.min(viewportBottom - 1, Math.max(viewportTop, rect.top + rect.height / 2));
+      const hit = options.hitTest ? document.elementFromPoint(centreX, centreY) : element;
+
+      return {
+        bottom: rect.bottom,
+        chromeBottom,
+        height: rect.height,
+        hit: !options.hitTest || element.contains(hit),
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        viewportBottom,
+        viewportLeft,
+        viewportRight,
+      };
+    },
+    { clearOfChrome, hitTest },
+  );
+
+  expect(geometry.height, `${label} should have a rendered height`).toBeGreaterThan(0);
+  expect(geometry.left, `${label} should not be clipped on the left`).toBeGreaterThanOrEqual(
+    geometry.viewportLeft - 1,
+  );
+  expect(geometry.right, `${label} should not be clipped on the right`).toBeLessThanOrEqual(
+    geometry.viewportRight + 1,
+  );
+  expect(geometry.top, `${label} should clear the sticky header`).toBeGreaterThanOrEqual(
+    geometry.chromeBottom - 1,
+  );
+  expect(geometry.bottom, `${label} should fit above the viewport bottom`).toBeLessThanOrEqual(
+    geometry.viewportBottom + 1,
+  );
+  expect(geometry.hit, `${label} should receive a centre-point hit test`).toBe(true);
+}
+
+export async function expectNoHorizontalOverflow(page, label = 'page') {
+  await expect
+    .poll(
+      () => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+      { message: `${label} should not overflow horizontally` },
+    )
+    .toBe(true);
+}
+
 const QUICK_RIFLESSI = {
   riflessi: {
     anticipationMs: 0,
