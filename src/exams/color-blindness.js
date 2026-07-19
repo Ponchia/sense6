@@ -658,9 +658,9 @@ async function copyResults() {
   );
   try {
     await navigator.clipboard.writeText(summary);
-    toast('Run summary copied', { tone: 'success' });
+    toast(t('Run summary copied'), { tone: 'success' });
   } catch {
-    toast('Could not access the clipboard', { tone: 'danger' });
+    toast(t('Could not access the clipboard'), { tone: 'danger' });
   }
 }
 

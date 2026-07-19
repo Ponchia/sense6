@@ -451,6 +451,9 @@ test('Sequence permits vertical touch scrolling and retains horizontal insertion
 test('German landing and results stay contained across narrow widths', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'Single-browser narrow containment matrix');
   await page.goto('/de/tetracromia/');
+  await expect(
+    page.getByRole('heading', { name: 'Wie fein können Sie Farben unterscheiden?' }),
+  ).toBeVisible();
   const widths = [320, 360, 390, 412];
 
   for (const width of widths) {
@@ -470,12 +473,21 @@ test('German landing and results stay contained across narrow widths', async ({ 
   await page.locator('[data-action="setup"]').first().click();
   await page.locator('#screen-ready').check();
   await page.locator('[data-action="start"]').click();
+  await expect(page.getByRole('button', { name: 'Farbkachel 1', exact: true })).toBeEnabled();
+  await expect(page.locator('.trial-heading')).toContainText('Schwelle');
   await answerTrials(page, '[data-choice="0"]', 14);
+  await expect(page.getByRole('button', { name: 'Gepunktetes Feld 1', exact: true })).toBeEnabled();
+  await expect(page.locator('.trial-heading')).toContainText('Feld');
   await answerTrials(page, '[data-choice="0"]', 12);
+  await expect(page.getByRole('group', { name: 'Spur zur Farbtonsortierung' })).toBeVisible();
+  await expect(page.locator('.trial-heading')).toContainText('Reihenfolge');
   await page.locator('[data-action="submit-sequence"]').click();
   await page.locator('[data-action="submit-sequence"]').click();
   await page.locator('[data-action="submit-sequence"]').click();
   await expect(page.locator('.results-view')).toBeVisible();
+  await expect(page.locator('.results-head')).toContainText('Sitzung abgeschlossen');
+  await expect(page.locator('.result-details')).toContainText('Feinster Schritt');
+  await expect(page.locator('.result-details')).toContainText('Farbtonsortierung zwischen festen Ankern');
 
   for (const width of widths) {
     await page.setViewportSize({ width, height: 844 });

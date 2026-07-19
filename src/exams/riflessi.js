@@ -244,7 +244,7 @@ function selectMode(mode) {
 function startSession() {
   const consent = state.app.querySelector('[data-rx-consent]');
   if (!consent?.checked) {
-    toast('Please acknowledge the device-relative limit before starting.');
+    toast(t('Please acknowledge the device-relative limit before starting.'));
     consent?.focus();
     return;
   }
@@ -835,8 +835,8 @@ function copyResults() {
   ].join('\n');
   navigator.clipboard
     ?.writeText(text)
-    .then(() => toast('Result summary copied.'))
-    .catch(() => toast('Copy was unavailable in this browser.'));
+    .then(() => toast(t('Result summary copied.')))
+    .catch(() => toast(t('Copy was unavailable in this browser.')));
 }
 
 function wireEvents(signal) {

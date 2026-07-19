@@ -78,6 +78,7 @@ function renderHome() {
     const hue = Math.round((index / 28) * 360);
     return `<span style="--bar-color: ${toRgbCss(0.7, 0.13, hue)}; --bar-delay: ${index * 18}ms"></span>`;
   }).join('');
+  const headingTail = t('color?');
 
   state.app.innerHTML = `
     <section class="hero ui-container ui-container--wide" id="top">
@@ -86,7 +87,7 @@ function renderHome() {
           <span aria-hidden="true">←</span> All tests
         </button>
         <p class="ui-eyebrow">Color perception / 03 instruments / about 4 minutes</p>
-        <h1>How finely do you <em>see</em> color?</h1>
+        <h1>${t('How finely do you')} <em>${t('see')}</em>${headingTail === '?' ? '' : ' '}${headingTail}</h1>
         <p class="hero__lede">
           A careful, adaptive lab for the differences your display can reproduce—and your eyes can resolve.
         </p>
@@ -341,7 +342,7 @@ function renderLab({ semanticTransition = false, restoreChoice = null } = {}) {
   const phase = state.session.phase;
   const phaseProgress = Math.round((state.session.trialIndex / phase.trials) * 100);
   const trial = state.session.currentTrial;
-  document.title = `${t(phase.name)} ${state.session.trialIndex + 1} of ${phase.trials} — Tetracromia | Sense6`;
+  document.title = `${t(phase.name)} ${state.session.trialIndex + 1} ${t('of')} ${phase.trials} — Tetracromia | Sense6`;
 
   state.app.innerHTML = `
     <section class="lab-view">
@@ -356,7 +357,7 @@ function renderLab({ semanticTransition = false, restoreChoice = null } = {}) {
                   ? 'current'
                   : 'upcoming';
             return `<li data-status="${status}" ${status === 'current' ? 'aria-current="step"' : ''}>
-              <span>${item.number}</span><strong>${item.name}</strong>
+              <span>${item.number}</span><strong>${t(item.name)}</strong>
             </li>`;
           }).join('')}
         </ol>
@@ -376,9 +377,9 @@ function renderLab({ semanticTransition = false, restoreChoice = null } = {}) {
 
       <div class="lab-stage ui-container">
         <header class="trial-heading" tabindex="-1">
-          <p class="ui-eyebrow">Instrument ${phase.number} / ${phase.name}</p>
-          <h1>${phasePrompt(phase.id)}</h1>
-          <p>${phaseHelp(phase.id)}</p>
+          <p class="ui-eyebrow">${t('Instrument')} ${phase.number} / ${t(phase.name)}</p>
+          <h1>${t(phasePrompt(phase.id))}</h1>
+          <p>${t(phaseHelp(phase.id))}</p>
         </header>
 
         ${trial.kind === 'threshold' ? renderThreshold(trial) : ''}
@@ -432,7 +433,7 @@ function renderThreshold(trial) {
             type="button"
             data-choice="${index}"
             disabled
-            aria-label="Color tile ${index + 1}"
+            aria-label="${t('Color tile')} ${index + 1}"
             style="--tile-color:${toRgbCss(color.l, color.c, color.h)}"
           ></button>`;
         }).join('')}
@@ -448,7 +449,7 @@ function renderField() {
         ${Array.from(
           { length: 4 },
           (_, index) => `
-          <button class="field-choice" type="button" data-choice="${index}" aria-label="Dotted field ${index + 1}" disabled>
+          <button class="field-choice" type="button" data-choice="${index}" aria-label="${t('Dotted field')} ${index + 1}" disabled>
             <canvas data-field="${index}" aria-hidden="true"></canvas>
             <span aria-hidden="true">${String(index + 1).padStart(2, '0')}</span>
           </button>
@@ -572,8 +573,8 @@ function renderSequence(trial) {
 
   return `
     <div class="test-chamber sequence-chamber">
-      <div class="sequence-track" role="group" aria-label="Hue ordering track">
-        ${sequenceAnchor(first, 'Start anchor')}
+      <div class="sequence-track" role="group" aria-label="${t('Hue ordering track')}">
+        ${sequenceAnchor(first, t('Start anchor'))}
         <div class="sequence-run" id="sequence-run">
           ${trial.order
             .map((colorIndex, position) => {
@@ -583,14 +584,18 @@ function renderSequence(trial) {
               class="sequence-tile ${selected ? 'is-selected' : ''}"
               type="button"
               data-sequence-index="${position}"
-              aria-label="Movable color tile ${position + 1} of ${trial.order.length}${selected ? ', selected' : ''}"
+              aria-label="${t('Movable color tile {position} of {total}{selected}', {
+                position: position + 1,
+                total: trial.order.length,
+                selected: selected ? t(', selected') : '',
+              })}"
               aria-pressed="${selected}"
               style="--tile-color:${toRgbCss(color.l, color.c, color.h)};--pos:${position}"
             ><span>${String(position + 1).padStart(2, '0')}</span></button>`;
             })
             .join('')}
         </div>
-        ${sequenceAnchor(last, 'End anchor')}
+        ${sequenceAnchor(last, t('End anchor'))}
       </div>
 
       <div class="sequence-controls">
@@ -616,10 +621,10 @@ function sequenceAnchor(color, label) {
 }
 
 function sequenceStatusText() {
-  const run = `Run ${state.session.trialIndex + 1} of ${state.session.phase.trials}`;
+  const run = `${t('Run')} ${state.session.trialIndex + 1} ${t('of')} ${state.session.phase.trials}`;
   return state.selectedSequenceIndex === null
-    ? `${run} — drag a tile into place, or tap two tiles to swap them.`
-    : `${run} — tile ${state.selectedSequenceIndex + 1} selected. Tap its new place to swap, or use the arrows.`;
+    ? `${run} — ${t('drag a tile into place, or tap two tiles to swap them.')}`
+    : `${run} — ${t('tile')} ${state.selectedSequenceIndex + 1} ${t('selected')}. ${t('Tap its new place to swap, or use the arrows.')}`;
 }
 
 /**
@@ -653,7 +658,7 @@ function syncSequenceUi(pulsePositions = []) {
   });
 
   const status = document.querySelector('#sequence-status');
-  if (status) status.textContent = t(sequenceStatusText());
+  if (status) status.textContent = sequenceStatusText();
   document.querySelectorAll('[data-action="move-sequence"]').forEach((button) => {
     button.disabled = state.selectedSequenceIndex === null;
   });
@@ -672,7 +677,7 @@ function answerChoice(choice, { restoreFocus = false } = {}) {
   const phaseChanged = state.session.phase.id !== phaseBefore;
   if (phaseChanged) {
     announce(
-      `Instrument ${state.session.phase.number}. ${state.session.phase.name}. ${phasePrompt(state.session.phase.id)}`,
+      `${t('Instrument')} ${state.session.phase.number}. ${t(state.session.phase.name)}. ${t(phasePrompt(state.session.phase.id))}`,
     );
   } else {
     announce(result.correct ? 'Recorded. Next trial.' : 'Recorded. The difference will increase.');
@@ -695,7 +700,7 @@ function selectSequence(index) {
 
   if (state.selectedSequenceIndex === null) {
     state.selectedSequenceIndex = index;
-    announce(`Tile ${index + 1} selected.`);
+    announce(`${t('tile')} ${index + 1} ${t('selected')}.`);
   } else if (state.selectedSequenceIndex === index) {
     state.selectedSequenceIndex = null;
   } else {
@@ -704,7 +709,7 @@ function selectSequence(index) {
     pulse = [state.selectedSequenceIndex, index];
     state.session.swapSequence(state.selectedSequenceIndex, index);
     state.selectedSequenceIndex = null;
-    announce(`Tiles ${pulse[0] + 1} and ${index + 1} swapped.`);
+    announce(`${t('tile')} ${pulse[0] + 1} + ${index + 1}.`);
   }
 
   syncSequenceUi(pulse);
@@ -722,7 +727,7 @@ function moveSequence(direction) {
   state.selectedSequenceIndex += direction;
   syncSequenceUi(pulse);
   document.querySelector(`[data-sequence-index="${state.selectedSequenceIndex}"]`)?.focus();
-  announce(`Tile moved to position ${state.selectedSequenceIndex + 1}.`);
+  announce(`${t('tile')} → ${state.selectedSequenceIndex + 1}.`);
 }
 
 function submitSequence() {
@@ -736,7 +741,9 @@ function submitSequence() {
   }
 
   state.trialStartedAt = performance.now();
-  announce(`Order recorded. Run ${state.session.trialIndex + 1} of ${state.session.phase.trials}.`);
+  announce(
+    `${t('Recorded. Next trial.')} ${t('Run')} ${state.session.trialIndex + 1} ${t('of')} ${state.session.phase.trials}.`,
+  );
   renderLab();
 }
 
@@ -757,11 +764,11 @@ function renderResults() {
     <section class="results-view ui-container ui-container--wide" tabindex="-1">
       <div class="results-head">
         <div>
-          <p class="ui-eyebrow">Session complete / ${formatDuration(result.elapsedMs)}</p>
+          <p class="ui-eyebrow">${t('Session complete')} / ${formatDuration(result.elapsedMs)}</p>
           <h1>Your visible boundary, on this display.</h1>
           <p>${profile.detail}</p>
         </div>
-        <div class="score-lockup" aria-label="Session acuity index ${result.overall} out of 100">
+        <div class="score-lockup" aria-label="${t('Session index')} ${result.overall} / 100">
           <span>Session index</span>
           <strong>${result.overall}</strong>
           <small>/ 100</small>
@@ -786,9 +793,9 @@ function renderResults() {
         </article>
 
         <div class="result-details">
-          ${resultMetric('01', 'Threshold', result.thresholdScore, `Finest step ≈ ${formatNumber(result.thresholdDegrees, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}° of hue (ΔEOK ${formatNumber(result.thresholdDelta, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`, `${result.thresholdAccuracy}% correct · smaller angle = finer vision`)}
-          ${resultMetric('02', 'Field', result.fieldScore, `Finest shift ≈ ${formatNumber(result.fieldDegrees, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}° of hue through noise (ΔEOK ${formatNumber(result.fieldDelta, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`, `${result.fieldAccuracy}% correct · smaller angle = finer vision`)}
-          ${resultMetric('03', 'Sequence', result.sequenceScore, 'Hue ordering between fixed anchors', '100 = perfect order · each out-of-place pair costs points')}
+          ${resultMetric('01', 'Threshold', result.thresholdScore, `${t('Finest step')} ≈ ${formatNumber(result.thresholdDegrees, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}° ${t('of hue')} (ΔEOK ${formatNumber(result.thresholdDelta, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`, `${result.thresholdAccuracy}% ${t('correct · smaller angle = finer vision')}`)}
+          ${resultMetric('02', 'Field', result.fieldScore, `${t('Finest shift')} ≈ ${formatNumber(result.fieldDegrees, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}° ${t('of hue')} ${t('through noise')} (ΔEOK ${formatNumber(result.fieldDelta, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`, `${result.fieldAccuracy}% ${t('correct · smaller angle = finer vision')}`)}
+          ${resultMetric('03', 'Sequence', result.sequenceScore, t('Hue ordering between fixed anchors'), `100 = ${t('perfect order · each out-of-place pair costs points')}`)}
         </div>
       </div>
 
@@ -826,12 +833,12 @@ function resultMetric(number, title, score, detail, note) {
   return `<article class="result-metric">
     <div class="result-metric__head">
       <span>${number}</span>
-      <div><h3>${title}</h3><p>${detail}</p></div>
+      <div><h3>${t(title)}</h3><p>${detail}</p></div>
       <strong>${score}</strong>
     </div>
     <div class="metric-meter">
       <div class="metric-meter__row"><span>${note}</span><strong>${score}/100</strong></div>
-      <div class="ui-meter ui-meter--accent" role="meter" aria-label="${title} score" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${score}">
+      <div class="ui-meter ui-meter--accent" role="meter" aria-label="${t(title)} — ${score}/100" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${score}">
         <span class="ui-meter__fill" style="--value:${score}"></span>
       </div>
     </div>
@@ -961,9 +968,9 @@ async function copyResults() {
 
   try {
     await navigator.clipboard.writeText(summary);
-    toast('Result summary copied', { tone: 'success' });
+    toast(t('Result summary copied'), { tone: 'success' });
   } catch {
-    toast('Could not access the clipboard', { tone: 'danger' });
+    toast(t('Could not access the clipboard'), { tone: 'danger' });
   }
 }
 
