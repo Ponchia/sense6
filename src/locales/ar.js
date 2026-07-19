@@ -1394,6 +1394,137 @@ const rows = [
   ['Adaptive · {count}', 'متكيّف · {count}'],
   ['Interleaved · {count}', 'متداخل · {count}'],
   ['≈ {minutes} min', 'حوالي {minutes} دقائق'],
+  [
+    'Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses, {wrongChoices} wrong choices',
+    'الأحداث: {falseStarts} بدايات مبكرة، و{anticipations} استجابات استباقية، و{misses} استجابات فائتة، و{wrongChoices} اختيارات خاطئة',
+  ],
+  ['Interpret with caution: {evidence}', 'فسّر النتيجة بحذر: {evidence}'],
+  [
+    'Interpret with caution; repeat before comparing runs.',
+    'فسّر النتيجة بحذر؛ كرّر الاختبار قبل مقارنة الجولات.',
+  ],
+  [
+    'Keep this quiet and comfortable. Later signals use the same or a lower digital level.',
+    'حافظ على مستوى صوت هادئ ومريح. تستخدم الإشارات اللاحقة المستوى الرقمي نفسه أو مستوى أقل.',
+  ],
+  ['Leave this listening run? Your progress will be lost.', 'هل تريد مغادرة جولة الاستماع هذه؟ سيضيع تقدمك.'],
+  ['Leave this run? Your progress will be lost.', 'هل تريد مغادرة هذه الجولة؟ سيضيع تقدمك.'],
+  ['End this run? Your progress will be lost.', 'هل تريد إنهاء هذه الجولة؟ سيضيع تقدمك.'],
+  [
+    'Listening stopped. No unfinished result was saved.',
+    'توقف اختبار الاستماع. لم تُحفظ أي نتيجة غير مكتملة.',
+  ],
+  [
+    'Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials',
+    'فرق طبقة الصوت قرب {anchor} Hz: {step}؛ {completion}؛ {reversals} انعكاسات / {trials} محاولات',
+  ],
+  [
+    'Play the maximum-level reference and confirm the volume contract first.',
+    'شغّل النغمة المرجعية ذات المستوى الأقصى وأكّد تعليمات مستوى الصوت أولًا.',
+  ],
+  ['Playback interruptions: {count}', 'انقطاعات التشغيل: {count}'],
+  ['Playing maximum-level reference…', 'جارٍ تشغيل النغمة المرجعية ذات المستوى الأقصى…'],
+  ['Portata control accuracy: {accuracy}', 'دقة التحكم في Portata: {accuracy}'],
+  [
+    'Recorded. Look at the square and start the next sweep.',
+    'تم التسجيل. انظر إلى المربع وابدأ جولة المسح التالية.',
+  ],
+  ['Recorded. Next trial.', 'تم التسجيل. المحاولة التالية.'],
+  ['Recorded. The difference will increase.', 'تم التسجيل. سيزداد الفرق.'],
+  [
+    'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
+    'اكتمل تشغيل النغمة المرجعية وفق ساعة الصوت · سياق بمعدل {sampleRate} Hz · لا تغيّر مستوى الصوت الآن.',
+  ],
+  ['Run quality: {quality}', 'جودة الجولة: {quality}'],
+  [
+    'Setup: {device}; {connection}; {sampleRate} Hz audio context',
+    'الإعداد: {device}؛ {connection}؛ سياق صوت بمعدل {sampleRate} Hz',
+  ],
+  [
+    'Setup: {distance} cm ({distanceState}); correction: {correction}',
+    'الإعداد: {distance} سم ({distanceState})؛ تصحيح البصر: {correction}',
+  ],
+  ['The dot is moving. Keep looking at the square.', 'النقطة تتحرك. واصل النظر إلى المربع.'],
+  [
+    'The result is ready, but local storage was unavailable.',
+    'النتيجة جاهزة، لكن التخزين المحلي لم يكن متاحًا.',
+  ],
+  ['The setup sample was steady.', 'كانت عينة الإعداد مستقرة.'],
+  [
+    'The sweep ended without a response. Start again or use a ruler-measured distance.',
+    'انتهت جولة المسح من دون استجابة. ابدأ من جديد أو استخدم مسافة قستها بمسطرة.',
+  ],
+  ['The unanswered target is presented again.', 'يُعرض الهدف الذي لم تُجب عنه مرة أخرى.'],
+  [
+    'This viewport is too narrow for a reliable sweep. Use landscape, a larger display, or a ruler-measured distance.',
+    'إطار العرض ضيق جدًا لإجراء مسح موثوق. استخدم الوضع الأفقي، أو شاشة أكبر، أو مسافة مقيسة بمسطرة.',
+  ],
+  ['Timing: {timing}; interruptions: {interruptions}', 'التوقيت: {timing}؛ الانقطاعات: {interruptions}'],
+  [
+    'Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials',
+    'الحد الأعلى في الجولة: {boundary}؛ {completion}؛ {reversals} انعكاسات / {trials} محاولات',
+  ],
+  [
+    'Volume: self-reported unchanged during the run; the browser could not verify it.',
+    'مستوى الصوت: وفقًا لإفادتك، ظل دون تغيير خلال الجولة؛ ولم يتمكن المتصفح من التحقق من ذلك.',
+  ],
+  ['indeterminate (display-range bound)', 'غير محدد (مقيّد بنطاق الشاشة)'],
+  ['lower bound at the display ceiling', 'حد أدنى عند أقصى قدرة للشاشة'],
+  ['upper bound at the display floor', 'حد أعلى عند أدنى قدرة للشاشة'],
+  [
+    '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
+    '{eye}: فجوة عالية التباين {gap}؛ فجوة منخفضة التباين {low}؛ أثر انخفاض التباين {cost}؛ الاتجاهات الزوالية {meridians}',
+  ],
+  ['Usable run', 'جولة صالحة للاستخدام'],
+  ['{name} response runner', 'مشغّل استجابة {name}'],
+  ['Open private journal', 'فتح السجل الخاص'],
+  [
+    'Color override detected. This run stopped and was not saved.',
+    'تم اكتشاف تجاوز لإعدادات الألوان. توقفت هذه الجولة ولم تُحفظ.',
+  ],
+  [
+    'Display conditions changed. This measured run stopped and was not saved.',
+    'تغيرت ظروف الشاشة. توقفت هذه الجولة المقاسة ولم تُحفظ.',
+  ],
+  ['Instrument one. Threshold. Find the different tile.', 'الأداة الأولى. العتبة. اعثر على المربع المختلف.'],
+  [
+    'Practice one of two. Find the clear gap in the C.',
+    'التدريب الأول من اثنين. اعثر على الفجوة الواضحة في حرف C.',
+  ],
+  ['That tile is already at the edge.', 'هذا المربع موجود بالفعل عند الحافة.'],
+  [
+    'The result is ready, but this browser did not allow local storage.',
+    'النتيجة جاهزة، لكن هذا المتصفح لم يسمح بالتخزين المحلي.',
+  ],
+  [
+    'Trial one. Choose where the gap in the C points.',
+    'المحاولة الأولى. اختر الاتجاه الذي تشير إليه فجوة حرف C.',
+  ],
+  [
+    'Turn off forced-colors or high-contrast mode before this color task.',
+    'أوقف وضع الألوان المفروضة أو وضع التباين العالي قبل مهمة الألوان هذه.',
+  ],
+  [
+    'Turn off forced-colours or high-contrast mode before this colour task.',
+    'أوقف وضع الألوان المفروضة أو وضع التباين العالي قبل مهمة الألوان هذه.',
+  ],
+  ['Enter a distance from 30 to 100 centimetres.', 'أدخل مسافة من 30 إلى 100 سنتيمتر.'],
+  ['The reference sound did not complete.', 'لم يكتمل تشغيل الصوت المرجعي.'],
+  ['Vision task stopped. No unfinished result was saved.', 'توقفت مهمة الرؤية. لم تُحفظ أي نتيجة غير مكتملة.'],
+  ['Tile {position} selected.', 'تم تحديد المربع {position}.'],
+  ['Tiles {first} and {second} swapped.', 'تم تبديل موضعي المربعين {first} و{second}.'],
+  ['Tile moved to position {position}.', 'نُقل المربع إلى الموضع {position}.'],
+  ['Order recorded. Run {current} of {total}.', 'تم تسجيل الترتيب. الجولة {current} من {total}.'],
+  ['{name} listening runner', 'مشغّل استماع {name}'],
+  ['Converged to the configured reversal target', 'تقارب المسار إلى العدد المحدد من الانعكاسات'],
+  ['Bounded at the technical frequency ceiling', 'وصل إلى الحد التقني الأعلى للتردد'],
+  ['Maximum trials reached before convergence', 'بلغ الحد الأقصى للمحاولات قبل التقارب'],
+  ['Incomplete', 'غير مكتمل'],
+  [
+    'Leave this calibrated vision session? Your unfinished result will not be saved.',
+    'هل تريد مغادرة جلسة الرؤية المُعايرة هذه؟ لن تُحفظ نتيجتك غير المكتملة.',
+  ],
+  ['{eye} — {instrument}', '{eye} — {instrument}'],
 ];
 
 export const MESSAGE_COUNT = rows.length;

@@ -1403,6 +1403,140 @@ const rows = [
   ['Adaptive · {count}', '適応型 · {count}'],
   ['Interleaved · {count}', '交互提示 · {count}'],
   ['≈ {minutes} min', '約{minutes}分'],
+  [
+    'Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses, {wrongChoices} wrong choices',
+    'イベント: 誤スタート {falseStarts}回、早すぎる反応 {anticipations}回、無反応 {misses}回、誤選択 {wrongChoices}回',
+  ],
+  ['Interpret with caution: {evidence}', '注意して解釈してください: {evidence}'],
+  [
+    'Interpret with caution; repeat before comparing runs.',
+    '注意して解釈し、測定間を比較する前に再測定してください。',
+  ],
+  [
+    'Keep this quiet and comfortable. Later signals use the same or a lower digital level.',
+    '静かで快適な環境を保ってください。以降の信号は同じか、それ以下のデジタルレベルで再生されます。',
+  ],
+  [
+    'Leave this listening run? Your progress will be lost.',
+    'この聴取測定から退出しますか？進行状況は失われます。',
+  ],
+  ['Leave this run? Your progress will be lost.', 'この測定から退出しますか？進行状況は失われます。'],
+  ['End this run? Your progress will be lost.', 'この測定を終了しますか？進行状況は失われます。'],
+  [
+    'Listening stopped. No unfinished result was saved.',
+    '聴取測定を中止しました。未完了の結果は保存されませんでした。',
+  ],
+  [
+    'Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials',
+    '{anchor} Hz付近の音高ステップ: {step}、{completion}、反転 {reversals}回 / 試行 {trials}回',
+  ],
+  [
+    'Play the maximum-level reference and confirm the volume contract first.',
+    '先に最大レベルの基準音を再生し、音量に関する確認事項に同意してください。',
+  ],
+  ['Playback interruptions: {count}', '再生の中断: {count}回'],
+  ['Playing maximum-level reference…', '最大レベルの基準音を再生中…'],
+  ['Portata control accuracy: {accuracy}', 'Portata の操作精度: {accuracy}'],
+  [
+    'Recorded. Look at the square and start the next sweep.',
+    '記録しました。四角を見つめ、次のスイープを開始してください。',
+  ],
+  ['Recorded. Next trial.', '記録しました。次の試行です。'],
+  ['Recorded. The difference will increase.', '記録しました。差を大きくします。'],
+  [
+    'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
+    'オーディオクロック上で基準音の再生が完了 · {sampleRate} Hzコンテキスト · ここからは音量を変えないでください。',
+  ],
+  ['Run quality: {quality}', '測定品質: {quality}'],
+  [
+    'Setup: {device}; {connection}; {sampleRate} Hz audio context',
+    '環境: {device}、{connection}、{sampleRate} Hzオーディオコンテキスト',
+  ],
+  [
+    'Setup: {distance} cm ({distanceState}); correction: {correction}',
+    '設定: 距離 {distance} cm（{distanceState}）、視力矯正: {correction}',
+  ],
+  ['The dot is moving. Keep looking at the square.', '点が移動しています。四角を見続けてください。'],
+  [
+    'The result is ready, but local storage was unavailable.',
+    '結果の準備はできましたが、ローカルストレージを利用できませんでした。',
+  ],
+  ['The setup sample was steady.', '準備時のサンプルは安定していました。'],
+  [
+    'The sweep ended without a response. Start again or use a ruler-measured distance.',
+    '回答しないままスイープが終了しました。再開するか、定規で測った距離を使ってください。',
+  ],
+  ['The unanswered target is presented again.', '未回答の視標をもう一度表示します。'],
+  [
+    'This viewport is too narrow for a reliable sweep. Use landscape, a larger display, or a ruler-measured distance.',
+    'この表示領域は狭すぎて、信頼できるスイープを行えません。横向きにするか、より大きな画面または定規で測った距離を使用してください。',
+  ],
+  ['Timing: {timing}; interruptions: {interruptions}', 'タイミング: {timing}、中断: {interruptions}'],
+  [
+    'Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials',
+    '上限付近の測定: {boundary}、{completion}、反転 {reversals}回 / 試行 {trials}回',
+  ],
+  [
+    'Volume: self-reported unchanged during the run; the browser could not verify it.',
+    '音量: 測定中に変えていないとの自己申告です。ブラウザでは確認できませんでした。',
+  ],
+  ['indeterminate (display-range bound)', '判定不能（表示範囲の限界）'],
+  ['lower bound at the display ceiling', 'ディスプレイ上限での下限値'],
+  ['upper bound at the display floor', 'ディスプレイ下限での上限値'],
+  [
+    '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
+    '{eye}: 高コントラストの切れ目 {gap}、低コントラストの切れ目 {low}、コントラストによる低下 {cost}、方向別 {meridians}',
+  ],
+  ['Usable run', '有効な測定'],
+  ['{name} response runner', '{name} 反応テスト'],
+  ['Open private journal', '非公開ジャーナルを開く'],
+  [
+    'Color override detected. This run stopped and was not saved.',
+    '色の上書きを検出しました。この測定は停止し、保存されませんでした。',
+  ],
+  [
+    'Display conditions changed. This measured run stopped and was not saved.',
+    '表示条件が変わりました。この測定は停止し、保存されませんでした。',
+  ],
+  ['Instrument one. Threshold. Find the different tile.', '測定1、閾値。異なるタイルを見つけてください。'],
+  [
+    'Practice one of two. Find the clear gap in the C.',
+    '練習 1/2。Cのはっきりした切れ目を見つけてください。',
+  ],
+  ['That tile is already at the edge.', 'そのタイルはすでに端にあります。'],
+  [
+    'The result is ready, but this browser did not allow local storage.',
+    '結果の準備はできましたが、このブラウザではローカルストレージが許可されませんでした。',
+  ],
+  ['Trial one. Choose where the gap in the C points.', '試行1。Cの切れ目の方向を選んでください。'],
+  [
+    'Turn off forced-colors or high-contrast mode before this color task.',
+    '強制カラーまたはハイコントラストモードをオフにしてから、この色課題を行ってください。',
+  ],
+  [
+    'Turn off forced-colours or high-contrast mode before this colour task.',
+    '強制カラーまたはハイコントラストモードをオフにしてから、この色課題を行ってください。',
+  ],
+  ['Enter a distance from 30 to 100 centimetres.', '30〜100 cmの範囲で距離を入力してください。'],
+  ['The reference sound did not complete.', '基準音の再生が完了しませんでした。'],
+  [
+    'Vision task stopped. No unfinished result was saved.',
+    '視覚課題を中止しました。未完了の結果は保存されませんでした。',
+  ],
+  ['Tile {position} selected.', 'タイル {position} を選択しました。'],
+  ['Tiles {first} and {second} swapped.', 'タイル {first} と {second} を入れ替えました。'],
+  ['Tile moved to position {position}.', 'タイルを位置 {position} に移動しました。'],
+  ['Order recorded. Run {current} of {total}.', '順序を記録しました。測定 {current}/{total}。'],
+  ['{name} listening runner', '{name} 聴取テスト'],
+  ['Converged to the configured reversal target', '設定された反転回数に達して収束'],
+  ['Bounded at the technical frequency ceiling', '技術的な周波数上限に到達'],
+  ['Maximum trials reached before convergence', '収束前に最大試行回数に到達'],
+  ['Incomplete', '未完了'],
+  [
+    'Leave this calibrated vision session? Your unfinished result will not be saved.',
+    'この較正済み視覚セッションから退出しますか？未完了の結果は保存されません。',
+  ],
+  ['{eye} — {instrument}', '{eye} — {instrument}'],
 ];
 
 export const MESSAGE_COUNT = rows.length;

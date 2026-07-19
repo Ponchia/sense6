@@ -1312,5 +1312,121 @@ const rows = [
   ['≈ {minutes} min', '约 {minutes} 分钟'],
 ];
 
+rows.push(
+  [
+    'Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses, {wrongChoices} wrong choices',
+    '事件：抢先反应 {falseStarts} 次，预判反应 {anticipations} 次，漏答 {misses} 次，错误选择 {wrongChoices} 次',
+  ],
+  ['Interpret with caution: {evidence}', '请谨慎解读：{evidence}'],
+  ['Interpret with caution; repeat before comparing runs.', '请谨慎解读；请先重测，再比较不同测量。'],
+  [
+    'Keep this quiet and comfortable. Later signals use the same or a lower digital level.',
+    '保持安静且音量舒适。后续信号使用相同或更低的数字电平。',
+  ],
+  ['Leave this listening run? Your progress will be lost.', '要离开本次听觉测量吗？进度将丢失。'],
+  ['Leave this run? Your progress will be lost.', '要离开本次测量吗？进度将丢失。'],
+  ['End this run? Your progress will be lost.', '要结束本次测量吗？进度将丢失。'],
+  ['Listening stopped. No unfinished result was saved.', '听觉测量已停止。未完成的结果未保存。'],
+  [
+    'Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials',
+    '{anchor} Hz 附近的音高差：{step}；{completion}；{reversals} 次反转 / {trials} 次试验',
+  ],
+  [
+    'Play the maximum-level reference and confirm the volume contract first.',
+    '请先播放最高电平参考音并确认音量约定。',
+  ],
+  ['Playback interruptions: {count}', '播放中断：{count} 次'],
+  ['Playing maximum-level reference…', '正在播放最高电平参考音…'],
+  ['Portata control accuracy: {accuracy}', 'Portata 控制正确率：{accuracy}'],
+  ['Recorded. Look at the square and start the next sweep.', '已记录。请注视方块并开始下一次扫描。'],
+  ['Recorded. Next trial.', '已记录。进入下一次试验。'],
+  ['Recorded. The difference will increase.', '已记录。接下来会增大差异。'],
+  [
+    'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
+    '参考音已按音频时钟完整播放 · {sampleRate} Hz 音频上下文 · 现在起不要改变音量。',
+  ],
+  ['Run quality: {quality}', '测量质量：{quality}'],
+  [
+    'Setup: {device}; {connection}; {sampleRate} Hz audio context',
+    '设置：{device}；{connection}；{sampleRate} Hz 音频上下文',
+  ],
+  [
+    'Setup: {distance} cm ({distanceState}); correction: {correction}',
+    '设置：{distance} cm（{distanceState}）；视力矫正：{correction}',
+  ],
+  ['The dot is moving. Keep looking at the square.', '圆点正在移动。请继续注视方块。'],
+  ['The result is ready, but local storage was unavailable.', '结果已生成，但本地存储不可用。'],
+  ['The setup sample was steady.', '设置采样保持稳定。'],
+  [
+    'The sweep ended without a response. Start again or use a ruler-measured distance.',
+    '扫描结束时未收到反应。请重新开始，或使用直尺实测距离。',
+  ],
+  ['The unanswered target is presented again.', '未作答的视标再次呈现。'],
+  [
+    'This viewport is too narrow for a reliable sweep. Use landscape, a larger display, or a ruler-measured distance.',
+    '当前视口太窄，无法可靠扫描。请横屏使用、更换更大的显示器，或使用直尺实测距离。',
+  ],
+  ['Timing: {timing}; interruptions: {interruptions}', '计时：{timing}；中断：{interruptions}'],
+  [
+    'Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials',
+    '本次可听上限：{boundary}；{completion}；{reversals} 次反转 / {trials} 次试验',
+  ],
+  [
+    'Volume: self-reported unchanged during the run; the browser could not verify it.',
+    '音量：自述在测量期间未改变；浏览器无法核实。',
+  ],
+  ['indeterminate (display-range bound)', '无法确定（受显示范围限制）'],
+  ['lower bound at the display ceiling', '在显示上限处得到下界'],
+  ['upper bound at the display floor', '在显示下限处得到上界'],
+  [
+    '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
+    '{eye}：高对比度缺口 {gap}；低对比度缺口 {low}；对比度影响 {cost}；子午线方向 {meridians}',
+  ],
+  ['Usable run', '测量可用'],
+  ['{name} response runner', '{name} 反应测试'],
+  ['Open private journal', '打开私密日志'],
+  [
+    'Color override detected. This run stopped and was not saved.',
+    '检测到颜色覆盖。本次测量已停止且未保存。',
+  ],
+  [
+    'Display conditions changed. This measured run stopped and was not saved.',
+    '显示条件发生变化。本次测量已停止且未保存。',
+  ],
+  ['Instrument one. Threshold. Find the different tile.', '第一项测量：阈值。找出不同的色块。'],
+  ['Practice one of two. Find the clear gap in the C.', '两次练习中的第一次。找出 C 形环上的清晰缺口。'],
+  ['That tile is already at the edge.', '该色块已经位于边缘。'],
+  [
+    'The result is ready, but this browser did not allow local storage.',
+    '结果已生成，但此浏览器不允许使用本地存储。',
+  ],
+  ['Trial one. Choose where the gap in the C points.', '第一次试验。选择 C 形环缺口所指的方向。'],
+  [
+    'Turn off forced-colors or high-contrast mode before this color task.',
+    '进行此色彩任务前，请关闭强制颜色或高对比度模式。',
+  ],
+  [
+    'Turn off forced-colours or high-contrast mode before this colour task.',
+    '进行此色彩任务前，请关闭强制颜色或高对比度模式。',
+  ],
+  ['Enter a distance from 30 to 100 centimetres.', '请输入 30 到 100 厘米之间的距离。'],
+  ['The reference sound did not complete.', '参考音未完整播放。'],
+  ['Vision task stopped. No unfinished result was saved.', '视觉任务已停止。未完成的结果未保存。'],
+  ['Tile {position} selected.', '已选择色块 {position}。'],
+  ['Tiles {first} and {second} swapped.', '色块 {first} 与 {second} 已交换位置。'],
+  ['Tile moved to position {position}.', '色块已移至位置 {position}。'],
+  ['Order recorded. Run {current} of {total}.', '顺序已记录。第 {current}/{total} 次测量。'],
+  ['{name} listening runner', '{name} 听觉测试'],
+  ['Converged to the configured reversal target', '已收敛至配置的反转目标'],
+  ['Bounded at the technical frequency ceiling', '受技术频率上限限制'],
+  ['Maximum trials reached before convergence', '达到最大试验次数时仍未收敛'],
+  ['Incomplete', '未完成'],
+  [
+    'Leave this calibrated vision session? Your unfinished result will not be saved.',
+    '要离开本次校准视觉测量吗？未完成的结果将不会保存。',
+  ],
+  ['{eye} — {instrument}', '{eye} — {instrument}'],
+);
+
 export const MESSAGE_COUNT = rows.length;
 export default new Map(rows);

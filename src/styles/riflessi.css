@@ -2,6 +2,21 @@
    Riflessi — device-relative response lab
    ============================================================ */
 
+body:has(#app :is(.rx-intro, .rx-setup, .rx-brief, .rx-runner, .rx-transition, .rx-results)) {
+  min-inline-size: min(20rem, 100vi);
+}
+
+body.rx-running {
+  min-inline-size: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body.rx-running > .site-chrome,
+body.rx-running > .ui-sitefooter {
+  display: none;
+}
+
 .rx-intro {
   padding-block: 2rem clamp(3rem, 7vw, 6rem);
 }
@@ -493,9 +508,12 @@
 }
 
 .rx-runner {
+  block-size: 100svh;
   display: grid;
-  grid-template-rows: auto minmax(28rem, 1fr) auto;
-  min-block-size: calc(100svh - 5.5rem);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  inline-size: 100%;
+  min-block-size: 100svh;
+  overflow: hidden;
 }
 
 .rx-runner__header,
@@ -508,7 +526,7 @@
 
 .rx-runner__header {
   border-block-end: 1px solid var(--line);
-  grid-template-columns: auto minmax(8rem, 1fr) auto;
+  grid-template-columns: auto minmax(8rem, 1fr) auto auto;
   padding-block: 1rem;
 }
 
@@ -538,6 +556,19 @@
   transition: inline-size 180ms linear;
 }
 
+.rx-runner__stop {
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-wide);
+  min-block-size: 2.75rem;
+  padding: 0.55rem 0.75rem;
+  text-transform: uppercase;
+}
+
 .rx-chamber {
   background:
     linear-gradient(var(--line) 1px, transparent 1px),
@@ -546,6 +577,7 @@
   display: grid;
   min-block-size: 0;
   overflow: hidden;
+  overscroll-behavior: contain;
   place-items: center;
   position: relative;
   transition: background-color 100ms ease;
@@ -562,11 +594,11 @@
 
 .rx-chamber::before {
   block-size: 1px;
-  inline-size: min(48vw, 34rem);
+  inline-size: min(48vw, 48svh, 34rem);
 }
 
 .rx-chamber::after {
-  block-size: min(48vw, 34rem);
+  block-size: min(48vw, 48svh, 34rem);
   inline-size: 1px;
 }
 
@@ -593,13 +625,11 @@
   border: 1px solid var(--line-strong);
   border-radius: 50%;
   display: flex;
-  inline-size: clamp(9rem, 22vw, 15rem);
+  inline-size: min(clamp(9rem, 22vw, 15rem), 45vmin);
   justify-content: center;
   opacity: 0.16;
   position: relative;
-  transition:
-    opacity 70ms linear,
-    transform 70ms linear;
+  transition: none;
   z-index: 2;
 }
 
@@ -637,6 +667,10 @@
   line-height: 1;
 }
 
+.rx-chamber:not([data-rx-state="live"]) .rx-arrow {
+  visibility: hidden;
+}
+
 .rx-chamber[data-rx-state="live"] .rx-target {
   opacity: 1;
   transform: scale(1.04);
@@ -656,6 +690,9 @@
 .rx-choice-zones button {
   inset: 0;
   position: absolute;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 .rx-response-pad {
@@ -1021,12 +1058,12 @@
   }
 
   .rx-runner {
-    grid-template-rows: auto minmax(25rem, 1fr) auto;
+    grid-template-rows: auto minmax(0, 1fr) auto;
   }
 
   .rx-runner__header {
     gap: 0.75rem;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: minmax(0, 1fr) auto auto;
   }
 
   .rx-progress {
@@ -1036,6 +1073,11 @@
 
   .rx-runner__count {
     grid-column: 2;
+    grid-row: 1;
+  }
+
+  .rx-runner__stop {
+    grid-column: 3;
     grid-row: 1;
   }
 
@@ -1071,10 +1113,57 @@
   }
 }
 
+@media (max-width: 360px) {
+  .rx-runner__header {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .rx-runner__header > div:first-child,
+  .rx-runner__footer > span {
+    display: none;
+  }
+
+  .rx-runner__count {
+    grid-column: 1;
+  }
+
+  .rx-runner__stop {
+    grid-column: 2;
+  }
+}
+
+@media (max-height: 500px) {
+  .rx-runner__header {
+    padding-block: 0.45rem;
+  }
+
+  .rx-runner__footer {
+    padding-block: 0.4rem;
+  }
+
+  .rx-chamber__status {
+    inset-block-start: 0.5rem;
+    padding-block: 0.3rem;
+  }
+
+  .rx-target {
+    inline-size: min(clamp(6rem, 22vw, 11rem), 42vmin);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .mini-reflex span,
   .rx-scope__sweep,
   .rx-calibration__pulse i {
     animation: none;
+  }
+}
+
+@layer bronto {
+  @media (prefers-reduced-motion: reduce) {
+    .rx-target {
+      /* biome-ignore lint/complexity/noImportantStyles: Override Ponchia's layered 0.01ms floor for timing integrity. */
+      transition-duration: 0s !important;
+    }
   }
 }

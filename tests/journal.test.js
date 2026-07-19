@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { journalSetupLabel } from '../src/journal-copy.js';
 import {
   appendJournalEntry,
   captureDisplayPassport,
@@ -171,6 +172,8 @@ test('instrument rules include distance tolerance, run quality, and unverifiable
     setup: {
       display: '100x100@1',
       correction: 'glasses',
+      contrastPercent: 20,
+      theme: 'light',
       distanceMm: 500,
       calibrationState: 'measured',
       cardWidthCssPx: 320,
@@ -192,8 +195,22 @@ test('instrument rules include distance tolerance, run quality, and unverifiable
     status: 'not-comparable',
     reasons: ['changed:distanceMm'],
   });
+  const differentContrast = entry({
+    ...acutezza,
+    id: 'acutezza-contrast',
+    setup: { ...acutezza.setup, contrastPercent: 10 },
+  });
+  assert.deepEqual(compareJournalEntries(differentContrast, acutezza), {
+    status: 'not-comparable',
+    reasons: ['changed:contrastPercent'],
+  });
 
-  const audioSetup = { device: 'headphones', sampleRate: 48_000, interruptions: 0 };
+  const audioSetup = {
+    device: 'headphones',
+    connection: 'wired',
+    sampleRate: 48_000,
+    interruptions: 0,
+  };
   const audio = entry({ id: 'audio-one', examId: 'udito', setup: audioSetup });
   const audioLimited = entry({
     id: 'audio-two',
@@ -205,6 +222,67 @@ test('instrument rules include distance tolerance, run quality, and unverifiable
     status: 'caution',
     reasons: ['volume-not-verifiable', 'limited-run'],
   });
+  const changedConnection = entry({
+    ...audio,
+    id: 'audio-wireless',
+    setup: { ...audioSetup, connection: 'bluetooth' },
+  });
+  assert.deepEqual(compareJournalEntries(changedConnection, audio), {
+    status: 'not-comparable',
+    reasons: ['changed:connection'],
+  });
+});
+
+test('Daltonia comparisons preserve its measured display environment', () => {
+  const setup = {
+    display: '100x100@2',
+    gamut: 'srgb',
+    theme: 'dark',
+    stimulusCssPixels: 104,
+    measurementDpr: 2,
+    measurementViewport: '390x844',
+    orientation: 'portrait-0',
+  };
+  const first = entry({ id: 'daltonia-one', examId: 'color-blindness', setup });
+  const same = entry({ ...first, id: 'daltonia-two' });
+  assert.deepEqual(compareJournalEntries(same, first), { status: 'comparable', reasons: [] });
+
+  const changedTheme = entry({
+    ...first,
+    id: 'daltonia-theme',
+    setup: { ...setup, theme: 'light' },
+  });
+  assert.deepEqual(compareJournalEntries(changedTheme, first), {
+    status: 'not-comparable',
+    reasons: ['changed:theme'],
+  });
+
+  const changedOrientation = entry({
+    ...first,
+    id: 'daltonia-landscape',
+    setup: { ...setup, orientation: 'landscape-90' },
+  });
+  assert.deepEqual(compareJournalEntries(changedOrientation, first), {
+    status: 'caution',
+    reasons: ['changed:orientation'],
+  });
+});
+
+test('the journal labels enriched setup evidence in every supported language', () => {
+  const connections = {
+    en: 'Connection',
+    it: 'Connessione',
+    de: 'Verbindung',
+    fr: 'Connexion',
+    es: 'Conexión',
+    pt: 'Ligação',
+  };
+  for (const [locale, label] of Object.entries(connections)) {
+    assert.equal(journalSetupLabel('connection', locale), label);
+    assert.notEqual(journalSetupLabel('contrastPercent', locale), 'Contrast Percent');
+    assert.notEqual(journalSetupLabel('measurementDpr', locale), 'Measurement Dpr');
+  }
+  assert.equal(journalSetupLabel('contrastPercent', 'de'), 'Nennkontrast');
 });
 
 test('measurement changes combine intervals and retain bound warnings', () => {

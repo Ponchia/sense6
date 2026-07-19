@@ -1376,6 +1376,134 @@ const rows = [
   ['Adaptive · {count}', 'एडेप्टिव · {count}'],
   ['Interleaved · {count}', 'इंटरलीव्ड · {count}'],
   ['≈ {minutes} min', 'लगभग {minutes} मिनट'],
+  [
+    'Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses, {wrongChoices} wrong choices',
+    'घटनाएँ: {falseStarts} गलत शुरुआत, {anticipations} समय-पूर्व प्रतिक्रियाएँ, {misses} छूटी प्रतिक्रियाएँ, {wrongChoices} गलत चयन',
+  ],
+  ['Interpret with caution: {evidence}', 'सावधानी से व्याख्या करें: {evidence}'],
+  [
+    'Interpret with caution; repeat before comparing runs.',
+    'सावधानी से व्याख्या करें; सत्रों की तुलना करने से पहले परीक्षण दोहराएँ।',
+  ],
+  [
+    'Keep this quiet and comfortable. Later signals use the same or a lower digital level.',
+    'आवाज़ धीमी और आरामदायक रखें। बाद के संकेत इसी या इससे कम डिजिटल स्तर का उपयोग करेंगे।',
+  ],
+  [
+    'Leave this listening run? Your progress will be lost.',
+    'क्या आप इस श्रवण सत्र से बाहर निकलना चाहते हैं? आपकी प्रगति मिट जाएगी।',
+  ],
+  [
+    'Leave this run? Your progress will be lost.',
+    'क्या आप इस सत्र से बाहर निकलना चाहते हैं? आपकी प्रगति मिट जाएगी।',
+  ],
+  ['End this run? Your progress will be lost.', 'क्या आप यह सत्र समाप्त करना चाहते हैं? आपकी प्रगति मिट जाएगी।'],
+  [
+    'Listening stopped. No unfinished result was saved.',
+    'श्रवण परीक्षण रोक दिया गया। कोई अधूरा परिणाम सहेजा नहीं गया।',
+  ],
+  [
+    'Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials',
+    '{anchor} Hz के पास पिच अंतर: {step}; {completion}; {reversals} पलटाव / {trials} प्रयास',
+  ],
+  [
+    'Play the maximum-level reference and confirm the volume contract first.',
+    'अधिकतम स्तर का संदर्भ चलाएँ और पहले वॉल्यूम सुरक्षा की शर्तों की पुष्टि करें।',
+  ],
+  ['Playback interruptions: {count}', 'प्लेबैक में रुकावटें: {count}'],
+  ['Playing maximum-level reference…', 'अधिकतम स्तर का संदर्भ चल रहा है…'],
+  ['Portata control accuracy: {accuracy}', 'Portata नियंत्रण की सटीकता: {accuracy}'],
+  ['Recorded. Look at the square and start the next sweep.', 'दर्ज हो गया। वर्ग को देखें और अगला स्वीप शुरू करें।'],
+  ['Recorded. Next trial.', 'दर्ज हो गया। अगला प्रयास।'],
+  ['Recorded. The difference will increase.', 'दर्ज हो गया। अंतर बढ़ेगा।'],
+  [
+    'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
+    'ऑडियो घड़ी के अनुसार संदर्भ पूरा हुआ · {sampleRate} Hz ऑडियो संदर्भ · अब वॉल्यूम न बदलें।',
+  ],
+  ['Run quality: {quality}', 'सत्र की गुणवत्ता: {quality}'],
+  [
+    'Setup: {device}; {connection}; {sampleRate} Hz audio context',
+    'सेटअप: {device}; {connection}; {sampleRate} Hz ऑडियो संदर्भ',
+  ],
+  [
+    'Setup: {distance} cm ({distanceState}); correction: {correction}',
+    'सेटअप: {distance} सेमी ({distanceState}); दृष्टि-सुधार: {correction}',
+  ],
+  ['The dot is moving. Keep looking at the square.', 'बिंदु चल रहा है। वर्ग को देखते रहें।'],
+  ['The result is ready, but local storage was unavailable.', 'परिणाम तैयार है, लेकिन लोकल स्टोरेज उपलब्ध नहीं था।'],
+  ['The setup sample was steady.', 'सेटअप का नमूना स्थिर था।'],
+  [
+    'The sweep ended without a response. Start again or use a ruler-measured distance.',
+    'स्वीप बिना प्रतिक्रिया के समाप्त हो गया। फिर से शुरू करें या पैमाने से मापी गई दूरी का उपयोग करें।',
+  ],
+  ['The unanswered target is presented again.', 'बिना उत्तर वाला लक्ष्य फिर से प्रस्तुत किया गया है।'],
+  [
+    'This viewport is too narrow for a reliable sweep. Use landscape, a larger display, or a ruler-measured distance.',
+    'विश्वसनीय स्वीप के लिए यह व्यूपोर्ट बहुत संकरा है। लैंडस्केप मोड, बड़े डिस्प्ले या पैमाने से मापी गई दूरी का उपयोग करें।',
+  ],
+  ['Timing: {timing}; interruptions: {interruptions}', 'समय: {timing}; रुकावटें: {interruptions}'],
+  [
+    'Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials',
+    'सत्र की ऊपरी सीमा: {boundary}; {completion}; {reversals} पलटाव / {trials} प्रयास',
+  ],
+  [
+    'Volume: self-reported unchanged during the run; the browser could not verify it.',
+    'वॉल्यूम: आपके अनुसार सत्र के दौरान यह नहीं बदला; ब्राउज़र इसकी पुष्टि नहीं कर सका।',
+  ],
+  ['indeterminate (display-range bound)', 'अनिर्धारित (डिस्प्ले-परास की सीमा पर)'],
+  ['lower bound at the display ceiling', 'डिस्प्ले की अधिकतम सीमा पर निचली सीमा'],
+  ['upper bound at the display floor', 'डिस्प्ले की न्यूनतम सीमा पर ऊपरी सीमा'],
+  [
+    '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
+    '{eye}: उच्च-कंट्रास्ट गैप {gap}; कम-कंट्रास्ट गैप {low}; कंट्रास्ट की अतिरिक्त कठिनाई {cost}; दिशाएँ {meridians}',
+  ],
+  ['Usable run', 'उपयोग योग्य सत्र'],
+  ['{name} response runner', '{name} प्रतिक्रिया संचालक'],
+  ['Open private journal', 'निजी जर्नल खोलें'],
+  [
+    'Color override detected. This run stopped and was not saved.',
+    'रंग ओवरराइड मिला। यह सत्र रोक दिया गया और सहेजा नहीं गया।',
+  ],
+  [
+    'Display conditions changed. This measured run stopped and was not saved.',
+    'डिस्प्ले की स्थितियाँ बदल गईं। यह मापन सत्र रोक दिया गया और सहेजा नहीं गया।',
+  ],
+  ['Instrument one. Threshold. Find the different tile.', 'उपकरण एक। थ्रेशोल्ड। अलग टाइल खोजें।'],
+  ['Practice one of two. Find the clear gap in the C.', 'दो अभ्यासों में पहला। C में स्पष्ट गैप खोजें।'],
+  ['That tile is already at the edge.', 'वह टाइल पहले से किनारे पर है।'],
+  [
+    'The result is ready, but this browser did not allow local storage.',
+    'परिणाम तैयार है, लेकिन इस ब्राउज़र ने लोकल स्टोरेज की अनुमति नहीं दी।',
+  ],
+  ['Trial one. Choose where the gap in the C points.', 'पहला प्रयास। चुनें कि C का गैप किस दिशा में है।'],
+  [
+    'Turn off forced-colors or high-contrast mode before this color task.',
+    'इस रंग-कार्य से पहले फ़ोर्स्ड कलर्स या हाई-कंट्रास्ट मोड बंद करें।',
+  ],
+  [
+    'Turn off forced-colours or high-contrast mode before this colour task.',
+    'इस रंग-कार्य से पहले फ़ोर्स्ड कलर्स या हाई-कंट्रास्ट मोड बंद करें।',
+  ],
+  ['Enter a distance from 30 to 100 centimetres.', '30 से 100 सेंटीमीटर की दूरी दर्ज करें।'],
+  ['The reference sound did not complete.', 'संदर्भ ध्वनि पूरी नहीं हुई।'],
+  [
+    'Vision task stopped. No unfinished result was saved.',
+    'दृष्टि परीक्षण रोक दिया गया। कोई अधूरा परिणाम सहेजा नहीं गया।',
+  ],
+  ['Tile {position} selected.', 'टाइल {position} चुनी गई।'],
+  ['Tiles {first} and {second} swapped.', 'टाइल {first} और {second} की जगहें आपस में बदली गईं।'],
+  ['Tile moved to position {position}.', 'टाइल को स्थान {position} पर ले जाया गया।'],
+  ['Order recorded. Run {current} of {total}.', 'क्रम दर्ज किया गया। सत्र {current} / {total}।'],
+  ['{name} listening runner', '{name} श्रवण संचालक'],
+  ['Converged to the configured reversal target', 'निर्धारित पलटाव लक्ष्य तक अभिसरण हुआ'],
+  ['Bounded at the technical frequency ceiling', 'तकनीकी आवृत्ति की अधिकतम सीमा पर सीमित'],
+  ['Maximum trials reached before convergence', 'अभिसरण से पहले अधिकतम प्रयास पूरे हुए'],
+  ['Incomplete', 'अधूरा'],
+  [
+    'Leave this calibrated vision session? Your unfinished result will not be saved.',
+    'क्या आप इस कैलिब्रेटेड दृष्टि सत्र से बाहर निकलना चाहते हैं? आपका अधूरा परिणाम सहेजा नहीं जाएगा।',
+  ],
+  ['{eye} — {instrument}', '{eye} — {instrument}'],
 ];
 
 export const MESSAGE_COUNT = rows.length;

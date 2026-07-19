@@ -4,6 +4,7 @@ import { aboutCopy } from '../src/about.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { LOCALES, loadMessages, localeMetadata } from '../src/locales.js';
 import { privacyCopy } from '../src/privacy.js';
+import { expectInVisualViewport, expectNoHorizontalOverflow } from './helpers/browser.js';
 
 test('the gallery lists exams, is accessible, and routes into one', async ({ page }) => {
   await page.goto('/');
@@ -138,12 +139,34 @@ test('the About page explains authorship, methodology, and permanent limits in e
 });
 
 test('language and theme controls do not overlap at narrow header widths', async ({ page }) => {
-  for (const width of [320, 375, 640]) {
+  test.setTimeout(90_000);
+  for (const width of [320, 375, 640, 641, 700]) {
     await page.setViewportSize({ width, height: 800 });
     await page.goto('/en/');
-    for (const { code } of LOCALES) {
+    const locales = width <= 640 ? LOCALES : LOCALES.filter(({ code }) => code === 'pt');
+    for (const { code } of locales) {
       await page.locator('[data-locale-select]').selectOption(code);
       await expect(page).toHaveURL(new RegExp(`/${code}/$`));
+      await expectInVisualViewport(page.locator('.brand'), `${code} brand at ${width}px`, {
+        clearOfChrome: false,
+        hitTest: true,
+      });
+      await expectInVisualViewport(
+        page.locator('[data-locale-select]'),
+        `${code} language selector at ${width}px`,
+        {
+          clearOfChrome: false,
+          hitTest: true,
+        },
+      );
+      await expectInVisualViewport(
+        page.locator('[data-bronto-theme-toggle]'),
+        `${code} theme control at ${width}px`,
+        {
+          clearOfChrome: false,
+          hitTest: true,
+        },
+      );
 
       const geometry = await page.evaluate(() => {
         const localeElement = document.querySelector('[data-locale-select]');
@@ -262,6 +285,10 @@ test('the first visit follows a supported browser language', async ({ browser })
 
 test('long German labels remain inside the mobile viewport', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile-only localization geometry check');
+  await page.goto('/de/');
+  await expectNoHorizontalOverflow(page, 'German gallery');
+  await expectInVisualViewport(page.locator('.gallery-hero h1'), 'German gallery heading');
+
   await page.goto('/de/udito/');
   await page.getByRole('button', { name: /Hörlabor vorbereiten/i }).click();
   await expect
@@ -277,6 +304,27 @@ test('long German labels remain inside the mobile viewport', async ({ page }, te
       page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
     )
     .toBe(true);
+});
+
+test('the shared shell reflows at 200% text size without hidden controls', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Mobile-only text reflow check');
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('/de/');
+  await page.addStyleTag({ content: 'html { font-size: 200% !important; }' });
+
+  await expectNoHorizontalOverflow(page, '200% text gallery');
+  await expectInVisualViewport(page.locator('.brand'), '200% text brand', {
+    clearOfChrome: false,
+    hitTest: true,
+  });
+  await expectInVisualViewport(page.locator('[data-locale-select]'), '200% text language selector', {
+    clearOfChrome: false,
+    hitTest: true,
+  });
+  await expectInVisualViewport(page.locator('[data-bronto-theme-toggle]'), '200% text theme control', {
+    clearOfChrome: false,
+    hitTest: true,
+  });
 });
 
 function escapeRegex(value) {

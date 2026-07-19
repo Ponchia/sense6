@@ -129,9 +129,16 @@ test('the entry bundle stays route-split and within its documented budget', asyn
   const files = await readdir(new URL('assets/', DIST));
   const entry = files.find((file) => /^index-.+\.js$/.test(file));
   const english = files.find((file) => /^en-.+\.js$/.test(file));
-  const metrics = files.find((file) => /^metrics-.+\.js$/.test(file));
-  assert.ok(entry && english && metrics);
-  const initialBytes = await sumSizes([entry, english, metrics]);
+  let sharedRuntime;
+  for (const file of files.filter((candidate) => candidate.endsWith('.js'))) {
+    const source = await readFile(new URL(`assets/${file}`, DIST), 'utf8');
+    if (source.includes('site_loaded') && source.includes('test_started')) {
+      sharedRuntime = file;
+      break;
+    }
+  }
+  assert.ok(entry && english && sharedRuntime);
+  const initialBytes = await sumSizes([entry, english, sharedRuntime]);
   assert.ok(initialBytes <= 110_000, `initial English JS is ${initialBytes} bytes; budget is 110000`);
   for (const { id } of EXAMS)
     assert.ok(

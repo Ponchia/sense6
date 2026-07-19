@@ -36,6 +36,14 @@ export const DEFAULT_HEARING_CONFIG = Object.freeze({
   }),
 });
 
+export const HEARING_DIGITAL_LEVELS = Object.freeze({
+  reference: 1.12,
+  headphones: 1,
+  range: 0.82,
+  pitchBase: 0.78,
+  pitchRoveMaxDb: 3,
+});
+
 export function mergeHearingConfig(override = {}) {
   const safeOverride = override ?? {};
   return {
@@ -74,6 +82,7 @@ export function createRangeTrack(maxHz, options = {}) {
     records: [],
     controls: [],
     complete: false,
+    completionReason: null,
   };
 }
 
@@ -124,27 +133,41 @@ export function recordRangeResponse(track, trial, selectedInterval) {
     direction,
     nextFrequencyHz: track.frequencyHz,
   });
-  track.complete =
-    track.records.length >= track.config.maxTrials ||
-    (track.records.length >= track.config.minTrials &&
-      track.reversals.length >= track.config.targetReversals);
+  const converged =
+    track.records.length >= track.config.minTrials && track.reversals.length >= track.config.targetReversals;
+  if (converged) {
+    track.complete = true;
+    track.completionReason = hasTechnicalCeilingEvidence(track) ? 'technical-ceiling' : 'converged';
+  } else if (track.records.length >= track.config.maxTrials) {
+    track.complete = true;
+    track.completionReason = hasTechnicalCeilingEvidence(track) ? 'technical-ceiling' : 'max-trials';
+  }
   return track;
 }
 
 export function summarizeRange(track) {
   const reversalWindow = track.reversals.slice(-6);
-  const thresholdHz = reversalWindow.length ? roundTo(median(reversalWindow), 100) : null;
-  const atCeiling =
-    track.records.filter(
-      (record) =>
-        record.correct && Math.abs(record.frequencyHz - track.config.maxHz) < track.config.maxHz * 0.001,
-    ).length >= 2;
+  const atCeiling = hasTechnicalCeilingEvidence(track);
+  const completionReason = track.completionReason ?? 'incomplete';
+  const settled =
+    completionReason === 'technical-ceiling' ||
+    (completionReason === 'converged' && reversalWindow.length > 0);
+  const thresholdHz =
+    settled && (atCeiling || reversalWindow.length)
+      ? atCeiling
+        ? track.config.maxHz
+        : roundTo(median(reversalWindow), 100)
+      : null;
   return {
-    thresholdHz: atCeiling ? track.config.maxHz : thresholdHz,
+    thresholdHz,
     spreadHz: reversalWindow.length >= 2 ? roundTo(range(reversalWindow), 100) : null,
     atCeiling,
+    settled,
+    completionReason,
     reversals: track.reversals.length,
     trials: track.records.length,
+    controlTrials: track.controls.length,
+    expectedControls: track.config.controlAt.length,
     controlAccuracyPercent: percentCorrect(track.controls),
   };
 }
@@ -160,6 +183,7 @@ export function createPitchTracks(options = {}) {
     reversals: [],
     records: [],
     complete: false,
+    completionReason: null,
   }));
 }
 
@@ -214,20 +238,29 @@ export function recordPitchResponse(tracks, trial, selectedInterval) {
     direction,
     nextDeltaPercent: track.deltaPercent,
   });
-  track.complete =
-    track.records.length >= track.config.maxTrials ||
-    (track.records.length >= track.config.minTrials &&
-      track.reversals.length >= track.config.targetReversals);
+  const converged =
+    track.records.length >= track.config.minTrials && track.reversals.length >= track.config.targetReversals;
+  if (converged) {
+    track.complete = true;
+    track.completionReason = 'converged';
+  } else if (track.records.length >= track.config.maxTrials) {
+    track.complete = true;
+    track.completionReason = 'max-trials';
+  }
   return tracks;
 }
 
 export function summarizePitch(tracks) {
   return tracks.map((track) => {
     const reversalWindow = track.reversals.slice(-4);
+    const completionReason = track.completionReason ?? 'incomplete';
+    const settled = completionReason === 'converged' && reversalWindow.length > 0;
     return {
       anchorHz: track.anchorHz,
-      thresholdPercent: reversalWindow.length ? roundTo(median(reversalWindow), 0.1) : null,
+      thresholdPercent: settled && reversalWindow.length ? roundTo(median(reversalWindow), 0.1) : null,
       spreadPercent: reversalWindow.length >= 2 ? roundTo(range(reversalWindow), 0.1) : null,
+      settled,
+      completionReason,
       reversals: track.reversals.length,
       trials: track.records.length,
       accuracyPercent: percentCorrect(track.records),
@@ -258,6 +291,15 @@ export function median(values) {
   const sorted = [...values].sort((left, right) => left - right);
   const middle = Math.floor(sorted.length / 2);
   return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+}
+
+function hasTechnicalCeilingEvidence(track) {
+  return (
+    track.records.filter(
+      (record) =>
+        record.correct && Math.abs(record.frequencyHz - track.config.maxHz) < track.config.maxHz * 0.001,
+    ).length >= 2
+  );
 }
 
 function percentCorrect(records) {

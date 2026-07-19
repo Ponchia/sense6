@@ -17,8 +17,10 @@ import {
   recordAcuityResponse,
   summarizeAcuity,
   summarizeBlindSpot,
+  summarizeContrastCost,
   summarizeMeridians,
 } from '../src/lib/acuity.js';
+import { drawLandoltRing, drawMeridianField, setSquareCanvasSize } from '../src/lib/optotypes.js';
 import { seededRandom } from '../src/lib/random.js';
 
 test('card and blind-spot calibration recover physical scale and distance', () => {
@@ -124,4 +126,100 @@ test('low-contrast colors and within-run cost remain explicit', () => {
   assert.match(colors.target, /^rgb\(/);
   assert.equal(percentContrastCost(2, 3), 50);
   assert.equal(percentContrastCost(null, 3), null);
+  assert.deepEqual(
+    summarizeContrastCost(
+      { thresholdArcmin: 2, atFloor: false, atCeiling: false },
+      { thresholdArcmin: 3, atFloor: false, atCeiling: false },
+    ),
+    { value: 50, bounded: false },
+  );
+  assert.deepEqual(
+    summarizeContrastCost(
+      { thresholdArcmin: 2, atFloor: true, atCeiling: false },
+      { thresholdArcmin: 3, atFloor: false, atCeiling: false },
+    ),
+    { value: null, bounded: true },
+  );
 });
+
+test('canvas sizing defeats independent responsive axis constraints', () => {
+  const canvas = {
+    style: {
+      inlineSize: '',
+      blockSize: '',
+      maxInlineSize: '78vw',
+      maxBlockSize: '42svh',
+      aspectRatio: '',
+    },
+  };
+  setSquareCanvasSize(canvas, 237.5);
+  assert.deepEqual(canvas.style, {
+    inlineSize: '237.5px',
+    blockSize: '237.5px',
+    maxInlineSize: 'none',
+    maxBlockSize: 'none',
+    aspectRatio: '1 / 1',
+  });
+  assert.throws(() => setSquareCanvasSize(canvas, 0), /positive/);
+});
+
+test('optotype renderers keep square backing stores and execute complete drawing paths', () => {
+  const landolt = fakeCanvas();
+  const ring = drawLandoltRing(landolt.canvas, {
+    boxCssPx: 100,
+    devicePixelRatio: 2,
+    diameterCssPx: 25,
+    orientationDegrees: 90,
+    supersample: 2,
+  });
+  assert.deepEqual(ring, { backing: 400, diameter: 100, unit: 20 });
+  assert.equal(landolt.canvas.width, 400);
+  assert.equal(landolt.canvas.height, 400);
+  assert.equal(landolt.calls.filter(([name]) => name === 'arc').length, 2);
+  assert.ok(landolt.calls.some(([name]) => name === 'fillRect'));
+
+  const meridian = fakeCanvas();
+  const field = drawMeridianField(meridian.canvas, {
+    angleDegrees: 60,
+    boxCssPx: 90,
+    devicePixelRatio: 1,
+    phase: 0.75,
+    scale: 1.5,
+    supersample: 2,
+  });
+  assert.equal(field.backing, 180);
+  assert.equal(field.spacing, 21);
+  assert.equal(meridian.canvas.width, 180);
+  assert.equal(meridian.canvas.height, 180);
+  assert.ok(meridian.calls.some(([name]) => name === 'clip'));
+  assert.ok(meridian.calls.filter(([name]) => name === 'stroke').length > 2);
+});
+
+function fakeCanvas() {
+  const calls = [];
+  const context = {};
+  for (const name of [
+    'arc',
+    'beginPath',
+    'clip',
+    'fill',
+    'fillRect',
+    'lineTo',
+    'moveTo',
+    'restore',
+    'rotate',
+    'save',
+    'setTransform',
+    'stroke',
+    'translate',
+  ]) {
+    context[name] = (...args) => calls.push([name, ...args]);
+  }
+  const canvas = {
+    getContext: () => context,
+    height: 0,
+    style: {},
+    width: 0,
+  };
+  return { calls, canvas };
+}

@@ -20,8 +20,8 @@ html {
 }
 
 body {
-  min-inline-size: 20rem;
-  overflow-x: hidden;
+  min-inline-size: 0;
+  overflow-x: clip;
 }
 
 body::before {
@@ -43,6 +43,11 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
+#app :where(h1, h2, h3, p, li, a, strong, button) {
+  hyphens: auto;
+  overflow-wrap: anywhere;
+}
+
 button:focus-visible,
 a:focus-visible {
   outline: 2px solid var(--focus-ring);
@@ -59,6 +64,11 @@ a:focus-visible {
   white-space: nowrap;
 }
 
+.ui-skiplink {
+  max-inline-size: calc(100vw - 2rem);
+  overflow-wrap: anywhere;
+}
+
 .site-chrome {
   backdrop-filter: blur(18px);
   background: color-mix(in srgb, var(--bg) 91%, transparent);
@@ -68,7 +78,20 @@ a:focus-visible {
 }
 
 .brand {
+  flex: 0 0 auto;
+  font-size: clamp(1.05rem, 3.2vw, 1.3rem);
+  font-weight: 850;
+  letter-spacing: 0.035em;
+  line-height: 1;
+  padding-block: 0.45rem;
   text-decoration: none;
+  white-space: nowrap;
+}
+
+.brand::before {
+  block-size: 0.62rem;
+  box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--accent) 16%, transparent);
+  inline-size: 0.62rem;
 }
 
 .brand__six {
@@ -145,6 +168,12 @@ a:focus-visible {
   outline-offset: 2px;
 }
 
+.locale-picker select:disabled,
+.theme-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
 .hero {
   align-items: center;
   display: grid;
@@ -156,6 +185,26 @@ a:focus-visible {
 
 .hero__copy {
   max-inline-size: 50rem;
+  min-inline-size: 0;
+}
+
+.hero__copy .ui-eyebrow,
+.hero__lede,
+.hero__limit,
+.section-heading .ui-eyebrow,
+.section-heading h2,
+.closing-cta .ui-eyebrow,
+.closing-cta h2,
+.source-list a {
+  hyphens: auto;
+  overflow-wrap: anywhere;
+}
+
+.section-heading > *,
+.closing-cta > *,
+.source-list,
+.source-list li {
+  min-inline-size: 0;
 }
 
 .hero h1,
@@ -493,6 +542,11 @@ a:focus-visible {
   grid-template-columns: 0.85fr 1.15fr;
 }
 
+.method__layout > *,
+:where(.method) .method-steps li > * {
+  min-inline-size: 0;
+}
+
 .method .ui-eyebrow {
   color: color-mix(in srgb, var(--accent) 74%, white);
 }
@@ -536,6 +590,10 @@ a:focus-visible {
   padding-block: 1.5rem;
 }
 
+:where(.method) .method-steps li {
+  grid-template-columns: 3rem minmax(0, 1fr);
+}
+
 .method-steps li:last-child {
   border-block-end: 1px solid var(--method-step-line);
 }
@@ -552,6 +610,10 @@ a:focus-visible {
   font-size: 1.2rem;
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
+}
+
+:where(.method) .method-steps strong {
+  overflow-wrap: anywhere;
 }
 
 .method-steps p {
@@ -574,11 +636,16 @@ a:focus-visible {
 
 .science__sources {
   align-self: end;
+  grid-template-columns: minmax(0, 1fr);
+  min-inline-size: 0;
+  overflow: hidden;
   padding: 1.5rem;
 }
 
 .source-list {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  inline-size: 100%;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -595,6 +662,7 @@ a:focus-visible {
   font-size: var(--text-sm);
   gap: 1rem;
   justify-content: space-between;
+  min-inline-size: 0;
   padding-block: 1rem;
   text-decoration: none;
 }
@@ -602,6 +670,13 @@ a:focus-visible {
 .source-list a::after {
   color: var(--accent-text);
   content: "↗";
+}
+
+.science__sources .ui-eyebrow,
+.closing-cta .ui-button {
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .closing-cta {
@@ -644,6 +719,25 @@ a:focus-visible {
   gap: clamp(3rem, 8vw, 9rem);
   grid-template-columns: 0.9fr 1.1fr;
   margin-block-start: clamp(3rem, 8vh, 7rem);
+}
+
+.setup-grid > *,
+.setup-copy,
+.setup-panel {
+  min-inline-size: 0;
+}
+
+.setup-panel {
+  grid-template-columns: minmax(0, 1fr);
+  overflow: hidden;
+}
+
+.setup-panel .ui-card__head {
+  flex-wrap: wrap;
+}
+
+.setup-panel .ui-card__head > * {
+  min-inline-size: 0;
 }
 
 .setup-copy h1 {
@@ -756,6 +850,12 @@ a:focus-visible {
   display: none;
 }
 
+@media (forced-colors: active) {
+  .tetracromia-forced-colors-warning {
+    display: block;
+  }
+}
+
 .lab-view {
   min-block-size: calc(100svh - 4.5rem);
   padding-block-end: 3rem;
@@ -866,11 +966,44 @@ a:focus-visible {
    viewports — the tile comparison only works when every tile is on screen. */
 @media (min-width: 641px) {
   .threshold-chamber {
-    max-inline-size: min(58rem, calc((100svh - 25rem) * 1.3));
+    max-inline-size: min(58rem, max(16.25rem, calc((100svh - 25rem) * 1.3)));
   }
 
   .field-chamber {
-    max-inline-size: min(58rem, calc((100svh - 25rem) * 1.7));
+    max-inline-size: min(58rem, max(22.75rem, calc((100svh - 25rem) * 1.7)));
+  }
+}
+
+@media (min-width: 641px) and (max-height: 31.25rem) {
+  .lab-topbar {
+    padding-block: 0.35rem;
+  }
+
+  .lab-stage {
+    padding-block-start: 0.65rem;
+  }
+
+  .trial-heading {
+    margin-block-end: 0.5rem;
+  }
+
+  .trial-heading h1 {
+    font-size: clamp(1.65rem, 5vw, 2.1rem);
+    margin-block: 0.3rem 0.2rem;
+  }
+
+  .trial-heading > p:last-child {
+    font-size: 0.72rem;
+    line-height: 1.2;
+  }
+
+  .test-chamber {
+    margin-block: 0.5rem 1rem;
+    padding: 0.65rem;
+  }
+
+  .trial-meta {
+    margin-block-start: 1rem;
   }
 }
 
@@ -1022,7 +1155,7 @@ a:focus-visible {
   animation-delay: calc(var(--pos, 0) * 35ms);
   cursor: grab;
   padding: 0;
-  touch-action: none;
+  touch-action: pan-y;
 }
 
 .sequence-tile:active {
@@ -1164,6 +1297,17 @@ a:focus-visible {
   padding-block: clamp(3rem, 8vw, 7rem) 3rem;
 }
 
+.results-head > *,
+.results-head > div:first-child,
+.results-grid > *,
+.profile-card,
+.profile-card .ui-card__head > *,
+.result-details,
+.result-metric,
+.result-metric__head > * {
+  min-inline-size: 0;
+}
+
 .results-head h1 {
   font-size: clamp(3rem, 7vw, 7rem);
   max-inline-size: 11ch;
@@ -1208,7 +1352,7 @@ a:focus-visible {
 .results-grid {
   display: grid;
   gap: 1px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   background: var(--line);
   border: 1px solid var(--line);
   margin-block: 3rem;
@@ -1218,6 +1362,10 @@ a:focus-visible {
   border: 0;
   border-radius: 0;
   padding: clamp(1.25rem, 4vw, 2.5rem);
+}
+
+.profile-card .ui-card__head {
+  flex-wrap: wrap;
 }
 
 .profile-card h2 {
@@ -1232,7 +1380,7 @@ a:focus-visible {
   display: block;
   inline-size: min(100%, 30rem);
   margin: 1rem auto;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .profile-radar__grid {
@@ -1315,6 +1463,7 @@ a:focus-visible {
   font-family: var(--mono);
   font-size: var(--text-xs);
   margin: 0.35rem 0 0;
+  overflow-wrap: anywhere;
 }
 
 .result-metric__head > strong {
@@ -1368,10 +1517,13 @@ a:focus-visible {
 
 @media (max-width: 900px) {
   .hero,
-  .setup-grid,
   .method__layout,
   .science {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .setup-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .hero {
@@ -1428,13 +1580,18 @@ a:focus-visible {
   }
 
   .results-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 @media (max-width: 640px) {
   .site-chrome .ui-siteheader {
     gap: 0.5rem;
+  }
+
+  .site-chrome .ui-siteheader__actions {
+    max-inline-size: 100%;
+    min-inline-size: 0;
   }
 
   .brand::after,
@@ -1447,7 +1604,14 @@ a:focus-visible {
     display: none;
   }
 
+  .locale-picker {
+    flex: 1 1 5.75rem;
+    min-inline-size: 0;
+  }
+
   .locale-picker select {
+    inline-size: 100%;
+    min-inline-size: 0;
     padding-inline: 0.45rem 1.2rem;
   }
 
@@ -1464,12 +1628,19 @@ a:focus-visible {
     font-size: clamp(3.25rem, 17vw, 5.2rem);
   }
 
+  .hero h1,
+  .results-head h1 {
+    hyphens: auto;
+    max-inline-size: 100%;
+    overflow-wrap: anywhere;
+  }
+
   .hero__actions > * {
     inline-size: 100%;
   }
 
   .hero__instrument {
-    inline-size: min(86vw, 25rem);
+    inline-size: min(100%, 86vw, 25rem);
   }
 
   .section {
@@ -1574,7 +1745,12 @@ a:focus-visible {
   }
 
   .result-metric__head {
-    grid-template-columns: 1.7rem 1fr auto;
+    grid-template-columns: 1.7rem minmax(0, 1fr) auto;
+  }
+
+  .metric-meter__row {
+    align-items: start;
+    flex-wrap: wrap;
   }
 }
 
@@ -1658,6 +1834,7 @@ a:focus-visible {
 
 .gallery-hero__copy {
   max-inline-size: 54rem;
+  min-inline-size: 0;
 }
 
 .gallery-hero h1 {
@@ -1668,6 +1845,8 @@ a:focus-visible {
   line-height: 0.84;
   margin: 1.2rem 0 1.6rem;
   max-inline-size: 11ch;
+  hyphens: auto;
+  overflow-wrap: anywhere;
   text-wrap: balance;
 }
 
@@ -1681,6 +1860,22 @@ a:focus-visible {
   font-size: clamp(1.1rem, 2vw, 1.45rem);
   line-height: 1.5;
   max-inline-size: 40rem;
+}
+
+.gallery-heading > *,
+.exam-card__body,
+.exam-card__facts,
+.exam-card__facts li {
+  min-inline-size: 0;
+}
+
+.gallery-heading h2,
+.gallery-heading .ui-eyebrow,
+.exam-card .ui-eyebrow,
+.exam-card__facts li {
+  hyphens: auto;
+  overflow-wrap: anywhere;
+  white-space: normal;
 }
 
 .gallery-hero__about {

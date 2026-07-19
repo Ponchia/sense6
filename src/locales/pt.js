@@ -1453,5 +1453,154 @@ rows.push(
   ['≈ {minutes} min', '≈ {minutes} min'],
 );
 
+rows.push(
+  [
+    'Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses, {wrongChoices} wrong choices',
+    'Eventos: {falseStarts} falsos arranques, {anticipations} antecipações, {misses} sinais falhados, {wrongChoices} escolhas erradas',
+  ],
+  ['Interpret with caution: {evidence}', 'Interpretar com cautela: {evidence}'],
+  [
+    'Interpret with caution; repeat before comparing runs.',
+    'Interprete com cautela; repita antes de comparar sessões.',
+  ],
+  [
+    'Keep this quiet and comfortable. Later signals use the same or a lower digital level.',
+    'Mantenha o som baixo e confortável. Os sinais seguintes usam o mesmo nível digital ou um nível inferior.',
+  ],
+  [
+    'Leave this listening run? Your progress will be lost.',
+    'Sair desta sessão de audição? O progresso será perdido.',
+  ],
+  ['Leave this run? Your progress will be lost.', 'Sair desta sessão? O progresso será perdido.'],
+  ['End this run? Your progress will be lost.', 'Terminar esta sessão? O progresso será perdido.'],
+  [
+    'Listening stopped. No unfinished result was saved.',
+    'Audição interrompida. Nenhum resultado incompleto foi guardado.',
+  ],
+  [
+    'Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials',
+    'Passo de altura perto de {anchor} Hz: {step}; {completion}; {reversals} inversões / {trials} ensaios',
+  ],
+  [
+    'Play the maximum-level reference and confirm the volume contract first.',
+    'Primeiro reproduza a referência de nível máximo e confirme o compromisso de volume.',
+  ],
+  ['Playback interruptions: {count}', 'Interrupções de reprodução: {count}'],
+  ['Playing maximum-level reference…', 'A reproduzir a referência de nível máximo…'],
+  ['Portata control accuracy: {accuracy}', 'Exatidão dos controlos Portata: {accuracy}'],
+  [
+    'Recorded. Look at the square and start the next sweep.',
+    'Registado. Olhe para o quadrado e inicie a passagem seguinte.',
+  ],
+  ['Recorded. Next trial.', 'Registado. Ensaio seguinte.'],
+  ['Recorded. The difference will increase.', 'Registado. A diferença vai aumentar.'],
+  [
+    'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
+    'Referência concluída pelo relógio de áudio · contexto de {sampleRate} Hz · mantenha agora o volume inalterado.',
+  ],
+  ['Run quality: {quality}', 'Qualidade da sessão: {quality}'],
+  [
+    'Setup: {device}; {connection}; {sampleRate} Hz audio context',
+    'Configuração: {device}; {connection}; contexto de áudio de {sampleRate} Hz',
+  ],
+  [
+    'Setup: {distance} cm ({distanceState}); correction: {correction}',
+    'Configuração: {distance} cm ({distanceState}); correção: {correction}',
+  ],
+  [
+    'The dot is moving. Keep looking at the square.',
+    'O ponto está a mover-se. Continue a olhar para o quadrado.',
+  ],
+  [
+    'The result is ready, but local storage was unavailable.',
+    'O resultado está pronto, mas o armazenamento local não estava disponível.',
+  ],
+  ['The setup sample was steady.', 'A amostra de configuração foi estável.'],
+  [
+    'The sweep ended without a response. Start again or use a ruler-measured distance.',
+    'A passagem terminou sem resposta. Recomece ou use uma distância medida com uma régua.',
+  ],
+  ['The unanswered target is presented again.', 'O alvo sem resposta é apresentado novamente.'],
+  [
+    'This viewport is too narrow for a reliable sweep. Use landscape, a larger display, or a ruler-measured distance.',
+    'Esta área visível é demasiado estreita para uma passagem fiável. Use orientação horizontal, um ecrã maior ou uma distância medida com uma régua.',
+  ],
+  [
+    'Timing: {timing}; interruptions: {interruptions}',
+    'Temporização: {timing}; interrupções: {interruptions}',
+  ],
+  [
+    'Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials',
+    'Limite superior da sessão: {boundary}; {completion}; {reversals} inversões / {trials} ensaios',
+  ],
+  [
+    'Volume: self-reported unchanged during the run; the browser could not verify it.',
+    'Volume: declarado sem alterações durante a sessão; o navegador não o conseguiu verificar.',
+  ],
+  ['indeterminate (display-range bound)', 'indeterminado (limite do intervalo do ecrã)'],
+  ['lower bound at the display ceiling', 'limite inferior no máximo do ecrã'],
+  ['upper bound at the display floor', 'limite superior no mínimo do ecrã'],
+  [
+    '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
+    '{eye}: abertura de alto contraste {gap}; abertura de baixo contraste {low}; custo de contraste {cost}; meridianos {meridians}',
+  ],
+  ['Usable run', 'Sessão utilizável'],
+  ['{name} response runner', 'Teste de resposta: {name}'],
+  ['Open private journal', 'Abrir o diário privado'],
+  [
+    'Color override detected. This run stopped and was not saved.',
+    'Foi detetada uma substituição de cores. A sessão foi interrompida e não foi guardada.',
+  ],
+  [
+    'Display conditions changed. This measured run stopped and was not saved.',
+    'As condições do ecrã mudaram. A sessão medida foi interrompida e não foi guardada.',
+  ],
+  [
+    'Instrument one. Threshold. Find the different tile.',
+    'Instrumento um. Limiar. Encontre a peça diferente.',
+  ],
+  [
+    'Practice one of two. Find the clear gap in the C.',
+    'Prática um de dois. Encontre a abertura nítida no C.',
+  ],
+  ['That tile is already at the edge.', 'Essa peça já está na extremidade.'],
+  [
+    'The result is ready, but this browser did not allow local storage.',
+    'O resultado está pronto, mas este navegador não permitiu armazenamento local.',
+  ],
+  [
+    'Trial one. Choose where the gap in the C points.',
+    'Ensaio um. Escolha para onde aponta a abertura do C.',
+  ],
+  [
+    'Turn off forced-colors or high-contrast mode before this color task.',
+    'Desative as cores forçadas ou o modo de alto contraste antes desta tarefa de cor.',
+  ],
+  [
+    'Turn off forced-colours or high-contrast mode before this colour task.',
+    'Desative as cores forçadas ou o modo de alto contraste antes desta tarefa de cor.',
+  ],
+  ['Enter a distance from 30 to 100 centimetres.', 'Introduza uma distância entre 30 e 100 centímetros.'],
+  ['The reference sound did not complete.', 'O som de referência não foi concluído.'],
+  [
+    'Vision task stopped. No unfinished result was saved.',
+    'Tarefa visual interrompida. Nenhum resultado incompleto foi guardado.',
+  ],
+  ['Tile {position} selected.', 'Peça {position} selecionada.'],
+  ['Tiles {first} and {second} swapped.', 'Peças {first} e {second} trocadas.'],
+  ['Tile moved to position {position}.', 'Peça movida para a posição {position}.'],
+  ['Order recorded. Run {current} of {total}.', 'Ordem registada. Passagem {current} de {total}.'],
+  ['{name} listening runner', 'Teste de audição: {name}'],
+  ['Converged to the configured reversal target', 'Convergiu no objetivo de inversões configurado'],
+  ['Bounded at the technical frequency ceiling', 'Limitado pelo máximo técnico de frequência'],
+  ['Maximum trials reached before convergence', 'Número máximo de ensaios atingido antes da convergência'],
+  ['Incomplete', 'Incompleto'],
+  [
+    'Leave this calibrated vision session? Your unfinished result will not be saved.',
+    'Sair desta sessão visual calibrada? O resultado incompleto não será guardado.',
+  ],
+  ['{eye} — {instrument}', '{eye} — {instrument}'],
+);
+
 export const MESSAGE_COUNT = rows.length;
 export default new Map(rows);

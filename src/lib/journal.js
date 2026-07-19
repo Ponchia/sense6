@@ -323,8 +323,10 @@ function hardSetupDifferences(newer, older) {
 /** @param {string} examId */
 function hardFields(examId) {
   if (examId === 'riflessi') return ['display', 'inputMode'];
-  if (examId === 'udito') return ['device', 'sampleRate'];
-  if (examId === 'acutezza') return ['display', 'correction'];
+  if (examId === 'udito') return ['device', 'connection', 'sampleRate'];
+  if (examId === 'acutezza') return ['display', 'correction', 'contrastPercent', 'theme'];
+  if (examId === 'color-blindness')
+    return ['display', 'gamut', 'theme', 'stimulusCssPixels', 'measurementDpr'];
   return ['display', 'gamut'];
 }
 
@@ -333,6 +335,7 @@ function cautionFields(examId) {
   if (examId === 'riflessi') return ['frameCadence'];
   if (examId === 'udito') return ['interruptions'];
   if (examId === 'acutezza') return ['calibrationState', 'cardWidthCssPx'];
+  if (examId === 'color-blindness') return ['measurementViewport', 'orientation'];
   return ['viewport'];
 }
 

@@ -14,8 +14,7 @@ export function drawLandoltRing(
   const backing = Math.max(1, Math.round(boxCssPx * renderScale));
   canvas.width = backing;
   canvas.height = backing;
-  canvas.style.inlineSize = `${boxCssPx}px`;
-  canvas.style.blockSize = `${boxCssPx}px`;
+  setSquareCanvasSize(canvas, boxCssPx);
   const context = canvas.getContext('2d', { alpha: false });
   context.setTransform(1, 0, 0, 1, 0, 0);
   context.fillStyle = background;
@@ -58,8 +57,7 @@ export function drawMeridianField(
   const backing = Math.max(1, Math.round(boxCssPx * renderScale));
   canvas.width = backing;
   canvas.height = backing;
-  canvas.style.inlineSize = `${boxCssPx}px`;
-  canvas.style.blockSize = `${boxCssPx}px`;
+  setSquareCanvasSize(canvas, boxCssPx);
   const context = canvas.getContext('2d', { alpha: false });
   context.fillStyle = background;
   context.fillRect(0, 0, backing, backing);
@@ -86,4 +84,14 @@ export function drawMeridianField(
   context.arc(backing / 2, backing / 2, backing * 0.42, 0, Math.PI * 2);
   context.stroke();
   return { backing, spacing };
+}
+
+export function setSquareCanvasSize(canvas, boxCssPx) {
+  if (!(boxCssPx > 0)) throw new RangeError('Canvas size must be positive');
+  const size = `${boxCssPx}px`;
+  canvas.style.inlineSize = size;
+  canvas.style.blockSize = size;
+  canvas.style.maxInlineSize = 'none';
+  canvas.style.maxBlockSize = 'none';
+  canvas.style.aspectRatio = '1 / 1';
 }

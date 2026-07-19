@@ -14,6 +14,8 @@ const RESULT_STORE = createResultStore({
   validate: (value) => isRecord(value) && Number.isFinite(value.overall),
 });
 const MOUNT_OWNER = Symbol('tetracromia');
+const RESPONSE_GATE_MS = 180;
+const RAPID_TOUCH_COMMIT_MS = 600;
 
 let state = null;
 
@@ -24,6 +26,7 @@ export function mount(context) {
     announcer: context.announcer,
     gamutChip: context.gamutChip,
     goHome: context.navigateHome,
+    lifecycle,
     locale: context.locale,
     session: null,
     labActive: false,
@@ -31,14 +34,25 @@ export function mount(context) {
     selectedSequenceIndex: null,
     sequenceDrag: null,
     suppressNextSequenceClick: false,
+    lastTouchCommitAt: Number.NEGATIVE_INFINITY,
+    responseReady: false,
+    responseGateToken: 0,
+    responseGateFrame: 0,
+    responseUnlockTimer: 0,
+    transitionFrame: 0,
+    fieldResizeObserver: null,
+    fieldRedrawFrame: 0,
   };
   state = mountState;
+  mountState.fieldResizeObserver =
+    typeof ResizeObserver === 'function' ? new ResizeObserver(scheduleFieldRedraw) : null;
   wireEvents(lifecycle.signal);
 
   detectDisplay();
   renderHome();
 
   lifecycle.onCleanup(() => {
+    cancelTrialEffects();
     mountState.session = null;
     mountState.labActive = false;
     if (state === mountState) state = null;
@@ -54,8 +68,10 @@ function detectDisplay() {
 }
 
 function renderHome() {
+  cancelTrialEffects();
   state.session = null;
   state.labActive = false;
+  state.lifecycle.setActive(false);
   state.selectedSequenceIndex = null;
   document.body.classList.remove('lab-mode');
   document.title = t('Tetracromia — colour discrimination | Sense6');
@@ -64,6 +80,7 @@ function renderHome() {
     const hue = Math.round((index / 28) * 360);
     return `<span style="--bar-color: ${toRgbCss(0.7, 0.13, hue)}; --bar-delay: ${index * 18}ms"></span>`;
   }).join('');
+  const headingTail = t('colour?');
 
   state.app.innerHTML = `
     <section class="hero ui-container ui-container--wide" id="top">
@@ -72,7 +89,7 @@ function renderHome() {
           <span aria-hidden="true">←</span> All tests
         </button>
         <p class="ui-eyebrow">Color perception / 03 instruments / about 4 minutes</p>
-        <h1>How finely do you <em>see</em> colour?</h1>
+        <h1>${t('How finely do you')} <em>${t('see')}</em>${headingTail === '?' ? '' : ' '}${headingTail}</h1>
         <p class="hero__lede">
           A careful, adaptive lab for the differences your display can reproduce—and your eyes can resolve.
         </p>
@@ -243,6 +260,10 @@ function testDescription(id) {
 }
 
 function renderSetup() {
+  cancelTrialEffects();
+  state.session = null;
+  state.labActive = false;
+  state.lifecycle.setActive(false);
   document.body.classList.add('lab-mode');
   document.title = t('Prepare your screen — Tetracromia | Sense6');
   window.scrollTo({ top: 0, behavior: 'instant' });
@@ -258,7 +279,7 @@ function renderSetup() {
             Display settings and ambient light can move a color threshold. This one-minute check
             makes your run more repeatable.
           </p>
-          <div class="ui-alert ui-alert--info forced-colors-warning">
+          <div class="ui-alert ui-alert--info forced-colors-warning tetracromia-forced-colors-warning">
             <div class="ui-alert__body">
               <strong class="ui-alert__title">Color override detected</strong>
               <p>Turn off forced-colors or high-contrast mode before a visual color task.</p>
@@ -279,10 +300,10 @@ function renderSetup() {
             </div>
             <span class="ui-badge ui-badge--muted">${state.gamutChip.textContent}</span>
           </div>
-          <div class="calibration-steps" aria-label="Eleven brightness steps from black to white">
+          <div class="calibration-steps" role="img" aria-label="Eleven brightness steps from black to white">
             ${Array.from({ length: 11 }, (_, index) => `<span style="--step:${index / 10}"><b>${index}</b></span>`).join('')}
           </div>
-          <div class="calibration-gradient" aria-label="Continuous grayscale gradient"></div>
+          <div class="calibration-gradient" role="img" aria-label="Continuous grayscale gradient"></div>
           <p class="calibration-hint">Look for distinct edges above and a smooth ramp here—without a bright hotspot.</p>
           <label class="ui-check ready-check">
             <input type="checkbox" id="screen-ready" />
@@ -296,22 +317,30 @@ function renderSetup() {
       </div>
     </section>
   `;
+  updateSetupEligibility();
 }
 
 function startLab() {
+  if (forcedColorsActive()) {
+    updateSetupEligibility();
+    announce('Turn off forced-colors or high-contrast mode before this color task.');
+    return;
+  }
   const seed = `${Date.now()}-${crypto.getRandomValues(new Uint32Array(1))[0]}`;
   state.session = new ColorLabSession(seed);
   state.labActive = true;
+  state.lifecycle.setActive(true, t('Leave the lab? Your progress will be lost.'));
   trackMetric(METRIC_EVENTS.testStarted, METRIC_TESTS.tetracromia);
   state.selectedSequenceIndex = null;
   document.body.classList.add('lab-mode');
   state.trialStartedAt = performance.now();
-  renderLab();
+  renderLab({ semanticTransition: true });
   announce('Instrument one. Threshold. Find the different tile.');
 }
 
-function renderLab() {
+function renderLab({ semanticTransition = false, restoreChoice = null } = {}) {
   if (!state.session) return;
+  state.fieldResizeObserver?.disconnect();
   const phase = state.session.phase;
   const phaseProgress = Math.round((state.session.trialIndex / phase.trials) * 100);
   const trial = state.session.currentTrial;
@@ -330,7 +359,7 @@ function renderLab() {
                   ? 'current'
                   : 'upcoming';
             return `<li data-status="${status}" ${status === 'current' ? 'aria-current="step"' : ''}>
-              <span>${item.number}</span><strong>${item.name}</strong>
+              <span>${item.number}</span><strong>${t(item.name)}</strong>
             </li>`;
           }).join('')}
         </ol>
@@ -349,10 +378,10 @@ function renderLab() {
       </div>
 
       <div class="lab-stage ui-container">
-        <header class="trial-heading">
-          <p class="ui-eyebrow">Instrument ${phase.number} / ${phase.name}</p>
-          <h1>${phasePrompt(phase.id)}</h1>
-          <p>${phaseHelp(phase.id)}</p>
+        <header class="trial-heading" tabindex="-1">
+          <p class="ui-eyebrow">${t('Instrument')} ${phase.number} / ${t(phase.name)}</p>
+          <h1>${t(phasePrompt(phase.id))}</h1>
+          <p>${t(phaseHelp(phase.id))}</p>
         </header>
 
         ${trial.kind === 'threshold' ? renderThreshold(trial) : ''}
@@ -368,7 +397,19 @@ function renderLab() {
     </section>
   `;
 
-  if (trial.kind === 'field') requestAnimationFrame(() => drawFields(trial));
+  armResponseGate(restoreChoice === null ? null : `[data-choice="${restoreChoice}"]`);
+  if (trial.kind === 'field') {
+    const nonce = trial.nonce;
+    requestAnimationFrame(() => {
+      if (state.session?.currentTrial.nonce !== nonce) return;
+      drawFields(trial);
+      document.querySelectorAll('canvas[data-field]').forEach((canvas) => {
+        state.fieldResizeObserver?.observe(canvas);
+      });
+      scheduleFieldRedraw();
+    });
+  }
+  if (semanticTransition) positionLabTransition();
 }
 
 function phasePrompt(id) {
@@ -393,7 +434,8 @@ function renderThreshold(trial) {
             class="color-tile"
             type="button"
             data-choice="${index}"
-            aria-label="Color tile ${index + 1}"
+            disabled
+            aria-label="${t('Color tile')} ${index + 1}"
             style="--tile-color:${toRgbCss(color.l, color.c, color.h)}"
           ></button>`;
         }).join('')}
@@ -409,7 +451,7 @@ function renderField() {
         ${Array.from(
           { length: 4 },
           (_, index) => `
-          <button class="field-choice" type="button" data-choice="${index}" aria-label="Dotted field ${index + 1}">
+          <button class="field-choice" type="button" data-choice="${index}" aria-label="${t('Dotted field')} ${index + 1}" disabled>
             <canvas data-field="${index}" aria-hidden="true"></canvas>
             <span aria-hidden="true">${String(index + 1).padStart(2, '0')}</span>
           </button>
@@ -423,31 +465,111 @@ function renderField() {
 function drawFields(trial) {
   document.querySelectorAll('canvas[data-field]').forEach((canvas) => {
     const index = Number(canvas.dataset.field);
-    const bounds = canvas.getBoundingClientRect();
+    // Layout dimensions stay stable while the choice's hover transform animates.
+    // getBoundingClientRect() includes that transform and could leave the backing
+    // store undersized after the pointer happened to rest over a field.
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.max(1, Math.round(bounds.width * ratio));
-    canvas.height = Math.max(1, Math.round(bounds.height * ratio));
+    canvas.width = Math.max(1, Math.round(width * ratio));
+    canvas.height = Math.max(1, Math.round(height * ratio));
     const context = canvas.getContext('2d');
     context.scale(ratio, ratio);
     context.fillStyle = '#747472';
-    context.fillRect(0, 0, bounds.width, bounds.height);
+    context.fillRect(0, 0, width, height);
 
     const random = seededRandom(`${trial.nonce}:${index}`);
     const base = index === trial.answer ? trial.target : trial.reference;
-    const count = Math.round((bounds.width * bounds.height) / 145);
+    const count = Math.round((width * height) / 145);
 
     for (let dot = 0; dot < count; dot += 1) {
       const lightness = base.l + (random() - 0.5) * 0.105;
       const chroma = Math.max(0.035, base.c + (random() - 0.5) * 0.036);
       const hue = base.h + (random() - 0.5) * 4.5;
       const radius = 2.2 + random() * 4.8;
-      const x = radius + random() * (bounds.width - radius * 2);
-      const y = radius + random() * (bounds.height - radius * 2);
+      const x = radius + random() * (width - radius * 2);
+      const y = radius + random() * (height - radius * 2);
       context.beginPath();
       context.arc(x, y, radius, 0, Math.PI * 2);
       context.fillStyle = toRgbCss(lightness, chroma, hue);
       context.fill();
     }
+  });
+}
+
+function cancelResponseGate() {
+  state.responseGateToken += 1;
+  state.responseReady = false;
+  cancelAnimationFrame(state.responseGateFrame);
+  clearTimeout(state.responseUnlockTimer);
+  state.responseGateFrame = 0;
+  state.responseUnlockTimer = 0;
+}
+
+function cancelTrialEffects() {
+  if (!state) return;
+  cancelResponseGate();
+  cancelAnimationFrame(state.transitionFrame);
+  cancelAnimationFrame(state.fieldRedrawFrame);
+  state.transitionFrame = 0;
+  state.fieldRedrawFrame = 0;
+  state.fieldResizeObserver?.disconnect();
+}
+
+function armResponseGate(restoreFocusSelector) {
+  cancelResponseGate();
+  const mountedState = state;
+  const token = state.responseGateToken;
+  state.responseGateFrame = requestAnimationFrame(() => {
+    state.responseGateFrame = 0;
+    state.responseUnlockTimer = window.setTimeout(() => {
+      if (state !== mountedState || state.responseGateToken !== token || !state.session) return;
+      state.responseUnlockTimer = 0;
+      state.responseReady = true;
+      document.querySelectorAll('[data-choice], [data-action="submit-sequence"]').forEach((button) => {
+        button.disabled = false;
+      });
+      scheduleFieldRedraw();
+      if (restoreFocusSelector) {
+        document.querySelector(restoreFocusSelector)?.focus({ preventScroll: true });
+      }
+    }, RESPONSE_GATE_MS);
+  });
+}
+
+function claimTrialResponse() {
+  if (!state.responseReady) return false;
+  state.responseReady = false;
+  document.querySelectorAll('[data-choice], [data-action="submit-sequence"]').forEach((button) => {
+    button.disabled = true;
+  });
+  return true;
+}
+
+function positionLabTransition() {
+  cancelAnimationFrame(state.transitionFrame);
+  const mountedState = state;
+  state.transitionFrame = requestAnimationFrame(() => {
+    state.transitionFrame = 0;
+    if (state !== mountedState) return;
+    const heading = document.querySelector('.trial-heading');
+    if (!heading) return;
+    const chromeHeight = document.querySelector('.site-chrome')?.getBoundingClientRect().height ?? 0;
+    const top = Math.max(0, window.scrollY + heading.getBoundingClientRect().top - chromeHeight - 8);
+    window.scrollTo({ top, behavior: 'instant' });
+    heading.focus({ preventScroll: true });
+  });
+}
+
+function scheduleFieldRedraw() {
+  if (state?.session?.currentTrial.kind !== 'field') return;
+  cancelAnimationFrame(state.fieldRedrawFrame);
+  const mountedState = state;
+  const nonce = state.session.currentTrial.nonce;
+  state.fieldRedrawFrame = requestAnimationFrame(() => {
+    state.fieldRedrawFrame = 0;
+    if (state !== mountedState || state.session?.currentTrial.nonce !== nonce) return;
+    drawFields(state.session.currentTrial);
   });
 }
 
@@ -457,8 +579,8 @@ function renderSequence(trial) {
 
   return `
     <div class="test-chamber sequence-chamber">
-      <div class="sequence-track" role="group" aria-label="Hue ordering track">
-        ${sequenceAnchor(first, 'Start anchor')}
+      <div class="sequence-track" role="group" aria-label="${t('Hue ordering track')}">
+        ${sequenceAnchor(first, t('Start anchor'))}
         <div class="sequence-run" id="sequence-run">
           ${trial.order
             .map((colorIndex, position) => {
@@ -468,14 +590,18 @@ function renderSequence(trial) {
               class="sequence-tile ${selected ? 'is-selected' : ''}"
               type="button"
               data-sequence-index="${position}"
-              aria-label="Movable color tile ${position + 1} of ${trial.order.length}${selected ? ', selected' : ''}"
+              aria-label="${t('Movable color tile {position} of {total}{selected}', {
+                position: position + 1,
+                total: trial.order.length,
+                selected: selected ? t(', selected') : '',
+              })}"
               aria-pressed="${selected}"
               style="--tile-color:${toRgbCss(color.l, color.c, color.h)};--pos:${position}"
             ><span>${String(position + 1).padStart(2, '0')}</span></button>`;
             })
             .join('')}
         </div>
-        ${sequenceAnchor(last, 'End anchor')}
+        ${sequenceAnchor(last, t('End anchor'))}
       </div>
 
       <div class="sequence-controls">
@@ -487,7 +613,7 @@ function renderSequence(trial) {
           <button class="ui-button ui-button--ghost" type="button" data-action="move-sequence" data-direction="1" ${state.selectedSequenceIndex === null ? 'disabled' : ''}>
             Move right <span aria-hidden="true">→</span>
           </button>
-          <button class="ui-button" type="button" data-action="submit-sequence">Lock this order</button>
+          <button class="ui-button" type="button" data-action="submit-sequence" disabled>Lock this order</button>
         </div>
       </div>
     </div>
@@ -501,10 +627,10 @@ function sequenceAnchor(color, label) {
 }
 
 function sequenceStatusText() {
-  const run = `Run ${state.session.trialIndex + 1} of ${state.session.phase.trials}`;
+  const run = `${t('Run')} ${state.session.trialIndex + 1} ${t('of')} ${state.session.phase.trials}`;
   return state.selectedSequenceIndex === null
-    ? `${run} — drag a tile into place, or tap two tiles to swap them.`
-    : `${run} — tile ${state.selectedSequenceIndex + 1} selected. Tap its new place to swap, or use the arrows.`;
+    ? `${run} — ${t('drag a tile into place, or tap two tiles to swap them.')}`
+    : `${run} — ${t('tile')} ${state.selectedSequenceIndex + 1} ${t('selected')}. ${t('Tap its new place to swap, or use the arrows.')}`;
 }
 
 /**
@@ -538,14 +664,14 @@ function syncSequenceUi(pulsePositions = []) {
   });
 
   const status = document.querySelector('#sequence-status');
-  if (status) status.textContent = t(sequenceStatusText());
+  if (status) status.textContent = sequenceStatusText();
   document.querySelectorAll('[data-action="move-sequence"]').forEach((button) => {
     button.disabled = state.selectedSequenceIndex === null;
   });
 }
 
-function answerChoice(choice) {
-  if (!state.session || state.session.phase.id === 'sequence') return;
+function answerChoice(choice, { restoreFocus = false } = {}) {
+  if (!state.session || state.session.phase.id === 'sequence' || !claimTrialResponse()) return;
   const phaseBefore = state.session.phase.id;
   const result = state.session.answerChoice(choice, performance.now() - state.trialStartedAt);
 
@@ -554,9 +680,10 @@ function answerChoice(choice) {
     return;
   }
 
-  if (state.session.phase.id !== phaseBefore) {
+  const phaseChanged = state.session.phase.id !== phaseBefore;
+  if (phaseChanged) {
     announce(
-      `Instrument ${state.session.phase.number}. ${state.session.phase.name}. ${phasePrompt(state.session.phase.id)}`,
+      `${t('Instrument')} ${state.session.phase.number}. ${t(state.session.phase.name)}. ${t(phasePrompt(state.session.phase.id))}`,
     );
   } else {
     announce(result.correct ? 'Recorded. Next trial.' : 'Recorded. The difference will increase.');
@@ -564,7 +691,10 @@ function answerChoice(choice) {
 
   state.selectedSequenceIndex = null;
   state.trialStartedAt = performance.now();
-  renderLab();
+  renderLab({
+    semanticTransition: phaseChanged,
+    restoreChoice: !phaseChanged && restoreFocus ? choice : null,
+  });
   state.app.dataset.feedback = result.correct ? 'correct' : 'miss';
   const mountedApp = state.app;
   window.setTimeout(() => delete mountedApp.dataset.feedback, 260);
@@ -576,7 +706,7 @@ function selectSequence(index) {
 
   if (state.selectedSequenceIndex === null) {
     state.selectedSequenceIndex = index;
-    announce(`Tile ${index + 1} selected.`);
+    announce(t('Tile {position} selected.', { position: index + 1 }));
   } else if (state.selectedSequenceIndex === index) {
     state.selectedSequenceIndex = null;
   } else {
@@ -585,7 +715,7 @@ function selectSequence(index) {
     pulse = [state.selectedSequenceIndex, index];
     state.session.swapSequence(state.selectedSequenceIndex, index);
     state.selectedSequenceIndex = null;
-    announce(`Tiles ${pulse[0] + 1} and ${index + 1} swapped.`);
+    announce(t('Tiles {first} and {second} swapped.', { first: pulse[0] + 1, second: index + 1 }));
   }
 
   syncSequenceUi(pulse);
@@ -603,11 +733,11 @@ function moveSequence(direction) {
   state.selectedSequenceIndex += direction;
   syncSequenceUi(pulse);
   document.querySelector(`[data-sequence-index="${state.selectedSequenceIndex}"]`)?.focus();
-  announce(`Tile moved to position ${state.selectedSequenceIndex + 1}.`);
+  announce(t('Tile moved to position {position}.', { position: state.selectedSequenceIndex + 1 }));
 }
 
 function submitSequence() {
-  if (state.session?.phase.id !== 'sequence') return;
+  if (state.session?.phase.id !== 'sequence' || !claimTrialResponse()) return;
   const result = state.session.submitSequence(performance.now() - state.trialStartedAt);
   state.selectedSequenceIndex = null;
 
@@ -617,12 +747,19 @@ function submitSequence() {
   }
 
   state.trialStartedAt = performance.now();
-  announce(`Order recorded. Run ${state.session.trialIndex + 1} of ${state.session.phase.trials}.`);
+  announce(
+    t('Order recorded. Run {current} of {total}.', {
+      current: state.session.trialIndex + 1,
+      total: state.session.phase.trials,
+    }),
+  );
   renderLab();
 }
 
 function renderResults() {
+  cancelTrialEffects();
   state.labActive = false;
+  state.lifecycle.setActive(false);
   trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.tetracromia);
   document.body.classList.add('lab-mode');
   document.title = t('Your colour profile — Tetracromia | Sense6');
@@ -633,14 +770,14 @@ function renderResults() {
   const profile = profileLabel(result.overall);
 
   state.app.innerHTML = `
-    <section class="results-view ui-container ui-container--wide">
+    <section class="results-view ui-container ui-container--wide" tabindex="-1">
       <div class="results-head">
         <div>
-          <p class="ui-eyebrow">Session complete / ${formatDuration(result.elapsedMs)}</p>
+          <p class="ui-eyebrow">${t('Session complete')} / ${formatDuration(result.elapsedMs)}</p>
           <h1>Your visible boundary, on this display.</h1>
           <p>${profile.detail}</p>
         </div>
-        <div class="score-lockup" aria-label="Session acuity index ${result.overall} out of 100">
+        <div class="score-lockup" aria-label="${t('Session index')} ${result.overall} / 100">
           <span>Session index</span>
           <strong>${result.overall}</strong>
           <small>/ 100</small>
@@ -665,9 +802,9 @@ function renderResults() {
         </article>
 
         <div class="result-details">
-          ${resultMetric('01', 'Threshold', result.thresholdScore, `Finest step ≈ ${formatNumber(result.thresholdDegrees, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}° of hue (ΔEOK ${formatNumber(result.thresholdDelta, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`, `${result.thresholdAccuracy}% correct · smaller angle = finer vision`)}
-          ${resultMetric('02', 'Field', result.fieldScore, `Finest shift ≈ ${formatNumber(result.fieldDegrees, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}° of hue through noise (ΔEOK ${formatNumber(result.fieldDelta, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`, `${result.fieldAccuracy}% correct · smaller angle = finer vision`)}
-          ${resultMetric('03', 'Sequence', result.sequenceScore, 'Hue ordering between fixed anchors', '100 = perfect order · each out-of-place pair costs points')}
+          ${resultMetric('01', 'Threshold', result.thresholdScore, `${t('Finest step')} ≈ ${formatNumber(result.thresholdDegrees, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}° ${t('of hue')} (ΔEOK ${formatNumber(result.thresholdDelta, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`, `${result.thresholdAccuracy}% ${t('correct · smaller angle = finer vision')}`)}
+          ${resultMetric('02', 'Field', result.fieldScore, `${t('Finest shift')} ≈ ${formatNumber(result.fieldDegrees, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}° ${t('of hue')} ${t('through noise')} (ΔEOK ${formatNumber(result.fieldDelta, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`, `${result.fieldAccuracy}% ${t('correct · smaller angle = finer vision')}`)}
+          ${resultMetric('03', 'Sequence', result.sequenceScore, t('Hue ordering between fixed anchors'), `100 = ${t('perfect order · each out-of-place pair costs points')}`)}
         </div>
       </div>
 
@@ -694,7 +831,8 @@ function renderResults() {
     </section>
   `;
 
-  document.querySelector('#main').focus({ preventScroll: true });
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  document.querySelector('.results-view').focus({ preventScroll: true });
   announce(
     `Session complete. Your display-relative index is ${result.overall} out of 100. ${profile.title}.`,
   );
@@ -704,12 +842,12 @@ function resultMetric(number, title, score, detail, note) {
   return `<article class="result-metric">
     <div class="result-metric__head">
       <span>${number}</span>
-      <div><h3>${title}</h3><p>${detail}</p></div>
+      <div><h3>${t(title)}</h3><p>${detail}</p></div>
       <strong>${score}</strong>
     </div>
     <div class="metric-meter">
       <div class="metric-meter__row"><span>${note}</span><strong>${score}/100</strong></div>
-      <div class="ui-meter ui-meter--accent" role="meter" aria-label="${title} score" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${score}">
+      <div class="ui-meter ui-meter--accent" role="meter" aria-label="${t(title)} — ${score}/100" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${score}">
         <span class="ui-meter__fill" style="--value:${score}"></span>
       </div>
     </div>
@@ -738,7 +876,7 @@ function renderRadar(profile) {
       const y = center + Math.sin(angle) * radius;
       const labelX = center + Math.cos(angle) * (radius + 24);
       const labelY = center + Math.sin(angle) * (radius + 24);
-      const anchor = Math.cos(angle) > 0.35 ? 'start' : Math.cos(angle) < -0.35 ? 'end' : 'middle';
+      const anchor = Math.cos(angle) > 0.35 ? 'end' : Math.cos(angle) < -0.35 ? 'start' : 'middle';
       return `
         <line class="profile-radar__axis" x1="${center}" y1="${center}" x2="${x}" y2="${y}" />
         <circle class="profile-radar__swatch" cx="${labelX}" cy="${labelY - 8}" r="6"
@@ -839,9 +977,9 @@ async function copyResults() {
 
   try {
     await navigator.clipboard.writeText(summary);
-    toast('Result summary copied', { tone: 'success' });
+    toast(t('Result summary copied'), { tone: 'success' });
   } catch {
-    toast('Could not access the clipboard', { tone: 'danger' });
+    toast(t('Could not access the clipboard'), { tone: 'danger' });
   }
 }
 
@@ -853,12 +991,35 @@ function announce(message) {
   });
 }
 
+function forcedColorsActive() {
+  return window.matchMedia?.('(forced-colors: active)').matches === true;
+}
+
+function updateSetupEligibility() {
+  const ready = state.app.querySelector('#screen-ready');
+  const start = state.app.querySelector('#start-lab');
+  if (!ready || !start) return;
+  const blocked = forcedColorsActive();
+  start.disabled = !ready.checked || blocked;
+  state.app
+    .querySelector('.tetracromia-forced-colors-warning')
+    ?.setAttribute('aria-hidden', String(!blocked));
+}
+
+function isRepeatedTouchCommit(event) {
+  if (event.pointerType !== 'touch') return false;
+  const elapsed = event.timeStamp - state.lastTouchCommitAt;
+  if (elapsed >= 0 && elapsed < RAPID_TOUCH_COMMIT_MS) return true;
+  state.lastTouchCommitAt = event.timeStamp;
+  return false;
+}
+
 function wireEvents(signal) {
   document.addEventListener(
     'change',
     (event) => {
       if (event.target.matches('#screen-ready')) {
-        document.querySelector('#start-lab').disabled = !event.target.checked;
+        updateSetupEligibility();
       }
     },
     { signal },
@@ -869,7 +1030,8 @@ function wireEvents(signal) {
     (event) => {
       const choice = event.target.closest('[data-choice]');
       if (choice) {
-        answerChoice(Number(choice.dataset.choice));
+        if (isRepeatedTouchCommit(event)) return;
+        answerChoice(Number(choice.dataset.choice), { restoreFocus: event.detail === 0 });
         return;
       }
 
@@ -897,7 +1059,7 @@ function wireEvents(signal) {
         state.goHome();
       }
       if (action.dataset.action === 'move-sequence') moveSequence(Number(action.dataset.direction));
-      if (action.dataset.action === 'submit-sequence') submitSequence();
+      if (action.dataset.action === 'submit-sequence' && !isRepeatedTouchCommit(event)) submitSequence();
       if (action.dataset.action === 'copy-results') copyResults();
     },
     { signal },
@@ -919,6 +1081,19 @@ function wireEvents(signal) {
   document.addEventListener('pointermove', onSequencePointerMove, { signal });
   document.addEventListener('pointerup', onSequencePointerUp, { signal });
   document.addEventListener('pointercancel', onSequencePointerCancel, { signal });
+  window.addEventListener('resize', scheduleFieldRedraw, { signal });
+  window.matchMedia?.('(forced-colors: active)').addEventListener(
+    'change',
+    () => {
+      if (state.labActive && forcedColorsActive()) {
+        renderSetup();
+        announce('Color override detected. This run stopped and was not saved.');
+        return;
+      }
+      updateSetupEligibility();
+    },
+    { signal },
+  );
 }
 
 /*
@@ -975,7 +1150,7 @@ function endSequenceDrag(commit) {
     if (state.session.insertSequence(drag.index, target)) {
       state.selectedSequenceIndex = null;
       syncSequenceUi([target]);
-      announce(`Tile moved to position ${target + 1}.`);
+      announce(t('Tile moved to position {position}.', { position: target + 1 }));
       document.querySelector(`[data-sequence-index="${target}"]`)?.focus();
       return;
     }
@@ -999,6 +1174,8 @@ function onSequencePointerDown(event) {
     startX: event.clientX,
     startY: event.clientY,
     lastX: event.clientX,
+    lastY: event.clientY,
+    cancelled: false,
     runLeft: runBounds.left,
     step: count > 1 ? (runBounds.width - tileBounds.width) / (count - 1) : tileBounds.width,
     count,
@@ -1010,12 +1187,15 @@ function onSequencePointerMove(event) {
   if (!state.sequenceDrag || event.pointerId !== state.sequenceDrag.pointerId) return;
   const drag = state.sequenceDrag;
   drag.lastX = event.clientX;
+  drag.lastY = event.clientY;
 
   if (!drag.started) {
-    if (
-      Math.abs(event.clientX - drag.startX) < DRAG_THRESHOLD_PX &&
-      Math.abs(event.clientY - drag.startY) < DRAG_THRESHOLD_PX
-    ) {
+    if (drag.cancelled) return;
+    const horizontalDistance = Math.abs(event.clientX - drag.startX);
+    const verticalDistance = Math.abs(event.clientY - drag.startY);
+    if (horizontalDistance < DRAG_THRESHOLD_PX && verticalDistance < DRAG_THRESHOLD_PX) return;
+    if (verticalDistance >= horizontalDistance) {
+      drag.cancelled = true;
       return;
     }
     drag.started = true;

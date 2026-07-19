@@ -10,6 +10,23 @@
   --ac-accent-text: #aa8cff;
 }
 
+body.ac-active {
+  min-inline-size: 0;
+}
+
+.ac-active :where(h1, h2, h3, button, dd) {
+  overflow-wrap: anywhere;
+}
+
+.ac-active :where(.ui-container, .ui-container--wide) {
+  min-inline-size: 0;
+}
+
+.ac-active [data-bronto-theme-toggle]:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 .mini-acuity {
   block-size: 100%;
   inset: 0;
@@ -273,6 +290,11 @@
   display: flex;
   flex-direction: column;
   min-inline-size: 0;
+  /* Text tokens switch immediately with the theme. Keep the card surface in
+     lockstep so the transition cannot pass through a low-contrast midpoint. */
+  transition:
+    border-color var(--duration-base) var(--ease-standard),
+    transform var(--duration-base) var(--ease-standard);
 }
 .ac-research__card .ui-link {
   margin-block-start: auto;
@@ -615,14 +637,25 @@
 .ac-running {
   overflow: hidden;
 }
+body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
+  display: none;
+}
 .ac-runner {
   background: var(--bg);
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto 1fr auto;
+  inline-size: 100%;
   inset: 0;
+  max-inline-size: 100%;
   min-block-size: 100svh;
+  min-inline-size: 0;
+  overflow: hidden;
   position: fixed;
   z-index: 40;
+}
+.ac-runner > * {
+  min-inline-size: 0;
 }
 .ac-runner__header,
 .ac-runner__footer {
@@ -632,7 +665,7 @@
   font-size: var(--text-xs);
   gap: 1rem;
   letter-spacing: var(--tracking-wide);
-  padding: 0.8rem clamp(0.8rem, 3vw, 2rem);
+  padding: 8px clamp(8px, 3vw, 24px);
   text-transform: uppercase;
 }
 .ac-runner__header {
@@ -642,12 +675,27 @@
 .ac-runner__header p {
   margin: 0 0 0.2rem;
 }
+.ac-runner__header h1 {
+  font-family: var(--mono);
+  font-size: inherit;
+  font-weight: 700;
+  letter-spacing: inherit;
+  line-height: 1.2;
+  margin: 0;
+  text-transform: uppercase;
+}
 .ac-runner__header > button {
+  align-items: center;
   background: none;
   border: 0;
   color: var(--text-dim);
   cursor: pointer;
+  display: inline-flex;
   font: inherit;
+  justify-content: center;
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  padding: 6px 8px;
   text-decoration: underline;
 }
 .ac-runner__footer {
@@ -661,7 +709,7 @@
   text-align: end;
 }
 .ac-stimulus {
-  align-content: center;
+  align-content: safe center;
   display: grid;
   gap: clamp(0.7rem, 2vh, 1.4rem);
   justify-items: center;
@@ -674,20 +722,22 @@
   font-family: var(--display);
   font-size: clamp(1.25rem, 3vw, 2rem);
   margin: 0;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
   text-align: center;
 }
 .ac-stimulus canvas {
   background: #f4f4f2;
-  border: 1px solid var(--line);
+  border: 0;
   display: block;
-  max-block-size: 42svh;
-  max-inline-size: min(78vw, 24rem);
+  flex: none;
+  outline: 1px solid var(--line);
 }
 
 .ac-direction-pad {
   display: grid;
-  gap: 0.25rem;
-  grid-template-columns: repeat(3, 3.5rem);
+  gap: 4px;
+  grid-template-columns: repeat(3, minmax(44px, 56px));
 }
 .ac-direction-pad button {
   align-items: center;
@@ -698,9 +748,10 @@
   display: flex;
   font-family: var(--display);
   font-size: 1.35rem;
+  flex-wrap: wrap;
   gap: 0.25rem;
   justify-content: center;
-  min-block-size: 3rem;
+  min-block-size: 44px;
   padding: 0.3rem;
 }
 .ac-direction-pad button:hover:not(:disabled) {
@@ -757,23 +808,23 @@
 }
 
 .ac-meridian {
-  align-content: center;
+  align-content: safe center;
   display: grid;
-  gap: clamp(1rem, 3vh, 2rem);
+  gap: clamp(8px, 3vh, 24px);
   justify-items: center;
   min-block-size: 0;
   overflow: auto;
-  padding: 1rem;
+  padding: 8px;
 }
 .ac-meridian__fields {
   display: flex;
-  gap: clamp(0.5rem, 3vw, 2rem);
+  gap: clamp(4px, 3vw, 24px);
 }
 .ac-meridian__fields canvas {
   background: #f4f4f2;
-  border: 1px solid var(--line);
+  border: 0;
   display: block;
-  max-inline-size: 42vw;
+  outline: 1px solid var(--line);
 }
 .ac-meridian__choices {
   display: grid;
@@ -1011,6 +1062,22 @@
 }
 
 @media (max-width: 700px) {
+  .ac-active .ui-siteheader {
+    flex-wrap: nowrap;
+    min-inline-size: 0;
+  }
+  .ac-active .ui-siteheader__actions {
+    flex: 1 1 auto;
+    justify-content: end;
+    min-inline-size: 0;
+  }
+  .ac-active .locale-picker {
+    min-inline-size: 0;
+  }
+  .ac-active .locale-picker select {
+    inline-size: min(7rem, 28vw);
+    min-inline-size: 0;
+  }
   .ac-hero {
     min-block-size: 0;
   }
@@ -1050,15 +1117,9 @@
     margin-block-end: 2rem;
   }
   .ac-runner__header {
-    gap: 0.6rem;
-    grid-template-columns: 1fr auto;
-  }
-  .ac-runner__header > span {
-    grid-column: 2;
-    grid-row: 1;
-  }
-  .ac-runner__header > button {
-    grid-column: 1 / -1;
+    gap: 6px;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    padding-block: 6px;
   }
   .ac-runner__footer {
     grid-template-columns: 1fr;
@@ -1066,15 +1127,12 @@
   .ac-runner__footer span:not(:first-child) {
     display: none;
   }
-  .ac-stimulus canvas {
-    max-inline-size: min(86vw, 22rem);
-  }
   .ac-meridian__choices {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     inline-size: min(100%, 28rem);
   }
   .ac-meridian__choices button {
-    min-block-size: 3.2rem;
+    min-block-size: 44px;
   }
   .ac-between {
     grid-template-columns: 1fr;
@@ -1118,6 +1176,51 @@
   }
   .ac-stimulus canvas {
     max-block-size: 55svh;
+  }
+  .ac-meridian {
+    grid-template-columns: auto minmax(24rem, 1fr);
+    grid-template-rows: auto 1fr auto;
+  }
+  .ac-meridian > p,
+  .ac-meridian .ac-feedback {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-height: 600px) {
+  .ac-calibration {
+    padding-block: 1rem;
+  }
+  .ac-calibration h1 {
+    font-size: 2rem;
+    line-height: 1;
+    margin-block: 0.3rem 0.6rem;
+  }
+  .ac-calibration__head > p:last-child {
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+  .ac-card-stage {
+    gap: 0.55rem;
+    margin-block: 0.75rem;
+    padding-block: 0.75rem;
+  }
+}
+
+@media (max-height: 600px) and (min-width: 701px) {
+  .ac-calibration:not(.ac-distance) {
+    align-items: start;
+    display: grid;
+    gap: 0.6rem clamp(1.5rem, 4vw, 3rem);
+    grid-template-columns: minmax(17rem, 0.8fr) minmax(22rem, 1.2fr);
+  }
+  .ac-calibration:not(.ac-distance) .ac-card-stage {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    margin-block: 0;
+  }
+  .ac-calibration:not(.ac-distance) .ac-calibration__actions {
+    margin-block-start: 0;
   }
 }
 

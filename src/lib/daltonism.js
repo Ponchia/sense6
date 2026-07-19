@@ -108,6 +108,25 @@ export const ADAPTIVE_CONFIG = Object.freeze({
   controlStrength: 0.32,
 });
 
+/**
+ * Identify display changes that make a browser-relative measurement run
+ * incomparable with the conditions captured at its start.
+ */
+export function displayEnvironmentChange(baseline, current) {
+  if (!baseline || !current) return 'missing';
+  if (baseline.forcedColors !== current.forcedColors) return 'forced-colors';
+  if (baseline.theme !== current.theme) return 'theme';
+  if (baseline.dpr !== current.dpr) return 'dpr';
+  if (baseline.orientation !== current.orientation) return 'orientation';
+  if (
+    Math.abs(baseline.viewportWidth - current.viewportWidth) > 1 ||
+    Math.abs(baseline.viewportHeight - current.viewportHeight) > 1
+  ) {
+    return 'geometry';
+  }
+  return null;
+}
+
 export const DEMO_TARGET = Object.freeze({
   type: 'deutan',
   orientation: 'right',

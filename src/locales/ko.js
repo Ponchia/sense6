@@ -1400,6 +1400,137 @@ const rows = [
   ['Adaptive · {count}', '적응형 · {count}'],
   ['Interleaved · {count}', '교차 진행 · {count}'],
   ['≈ {minutes} min', '약 {minutes}분'],
+  [
+    'Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses, {wrongChoices} wrong choices',
+    '이벤트: 오출발 {falseStarts}회, 조기 반응 {anticipations}회, 놓침 {misses}회, 오선택 {wrongChoices}회',
+  ],
+  ['Interpret with caution: {evidence}', '주의해서 해석하세요: {evidence}'],
+  [
+    'Interpret with caution; repeat before comparing runs.',
+    '주의해서 해석하고, 회차를 비교하기 전에 다시 측정하세요.',
+  ],
+  [
+    'Keep this quiet and comfortable. Later signals use the same or a lower digital level.',
+    '조용하고 편안한 환경을 유지하세요. 이후 신호는 같은 디지털 레벨 또는 더 낮은 레벨로 재생됩니다.',
+  ],
+  [
+    'Leave this listening run? Your progress will be lost.',
+    '이 듣기 측정을 나가시겠어요? 진행 상황이 사라집니다.',
+  ],
+  ['Leave this run? Your progress will be lost.', '이 측정을 나가시겠어요? 진행 상황이 사라집니다.'],
+  ['End this run? Your progress will be lost.', '이 측정을 종료하시겠어요? 진행 상황이 사라집니다.'],
+  [
+    'Listening stopped. No unfinished result was saved.',
+    '듣기 측정을 중단했습니다. 완료되지 않은 결과는 저장되지 않았습니다.',
+  ],
+  [
+    'Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials',
+    '{anchor} Hz 부근의 음높이 간격: {step}; {completion}; 반전 {reversals}회 / 시도 {trials}회',
+  ],
+  [
+    'Play the maximum-level reference and confirm the volume contract first.',
+    '최대 레벨 기준음을 재생하고 먼저 음량 지침을 확인하세요.',
+  ],
+  ['Playback interruptions: {count}', '재생 중단: {count}회'],
+  ['Playing maximum-level reference…', '최대 레벨 기준음 재생 중…'],
+  ['Portata control accuracy: {accuracy}', 'Portata 조작 정확도: {accuracy}'],
+  [
+    'Recorded. Look at the square and start the next sweep.',
+    '기록했습니다. 사각형을 바라보고 다음 스윕을 시작하세요.',
+  ],
+  ['Recorded. Next trial.', '기록했습니다. 다음 시도입니다.'],
+  ['Recorded. The difference will increase.', '기록했습니다. 차이가 커집니다.'],
+  [
+    'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
+    '오디오 시계 기준으로 기준음 재생 완료 · {sampleRate} Hz 컨텍스트 · 이제 음량을 바꾸지 마세요.',
+  ],
+  ['Run quality: {quality}', '측정 품질: {quality}'],
+  [
+    'Setup: {device}; {connection}; {sampleRate} Hz audio context',
+    '설정: {device}; {connection}; {sampleRate} Hz 오디오 컨텍스트',
+  ],
+  [
+    'Setup: {distance} cm ({distanceState}); correction: {correction}',
+    '설정: {distance} cm ({distanceState}); 시력 교정: {correction}',
+  ],
+  ['The dot is moving. Keep looking at the square.', '점이 움직이고 있습니다. 사각형을 계속 바라보세요.'],
+  [
+    'The result is ready, but local storage was unavailable.',
+    '결과가 준비되었지만 로컬 저장소를 사용할 수 없습니다.',
+  ],
+  ['The setup sample was steady.', '설정 샘플이 안정적이었습니다.'],
+  [
+    'The sweep ended without a response. Start again or use a ruler-measured distance.',
+    '응답 없이 스윕이 끝났습니다. 다시 시작하거나 자로 잰 거리를 사용하세요.',
+  ],
+  ['The unanswered target is presented again.', '응답하지 않은 시표가 다시 표시됩니다.'],
+  [
+    'This viewport is too narrow for a reliable sweep. Use landscape, a larger display, or a ruler-measured distance.',
+    '이 화면 영역은 신뢰할 수 있는 스윕을 하기에는 너무 좁습니다. 가로 방향, 더 큰 화면 또는 자로 잰 거리를 사용하세요.',
+  ],
+  ['Timing: {timing}; interruptions: {interruptions}', '타이밍: {timing}; 중단: {interruptions}'],
+  [
+    'Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials',
+    '상한 측정값: {boundary}; {completion}; 반전 {reversals}회 / 시도 {trials}회',
+  ],
+  [
+    'Volume: self-reported unchanged during the run; the browser could not verify it.',
+    '음량: 측정 중 바꾸지 않았다고 직접 확인함; 브라우저에서는 검증할 수 없었습니다.',
+  ],
+  ['indeterminate (display-range bound)', '판정 불가(화면 표시 범위 한계)'],
+  ['lower bound at the display ceiling', '화면 상한에서의 하한값'],
+  ['upper bound at the display floor', '화면 하한에서의 상한값'],
+  [
+    '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
+    '{eye}: 고대비 틈 {gap}; 저대비 틈 {low}; 대비 비용 {cost}; 경선 {meridians}',
+  ],
+  ['Usable run', '유효한 측정'],
+  ['{name} response runner', '{name} 반응 테스트'],
+  ['Open private journal', '비공개 기록 열기'],
+  [
+    'Color override detected. This run stopped and was not saved.',
+    '색상 재정의를 감지했습니다. 이 측정은 중단되었고 저장되지 않았습니다.',
+  ],
+  [
+    'Display conditions changed. This measured run stopped and was not saved.',
+    '화면 조건이 변경되었습니다. 이 측정은 중단되었고 저장되지 않았습니다.',
+  ],
+  ['Instrument one. Threshold. Find the different tile.', '도구 1. 역치. 다른 타일을 찾으세요.'],
+  ['Practice one of two. Find the clear gap in the C.', '연습 1/2. C의 선명한 틈을 찾으세요.'],
+  ['That tile is already at the edge.', '해당 타일은 이미 가장자리에 있습니다.'],
+  [
+    'The result is ready, but this browser did not allow local storage.',
+    '결과가 준비되었지만 이 브라우저에서는 로컬 저장소 사용이 허용되지 않았습니다.',
+  ],
+  ['Trial one. Choose where the gap in the C points.', '시도 1. C의 틈이 향한 방향을 고르세요.'],
+  [
+    'Turn off forced-colors or high-contrast mode before this color task.',
+    '강제 색상 또는 고대비 모드를 끄고 이 색상 과제를 시작하세요.',
+  ],
+  [
+    'Turn off forced-colours or high-contrast mode before this colour task.',
+    '강제 색상 또는 고대비 모드를 끄고 이 색상 과제를 시작하세요.',
+  ],
+  ['Enter a distance from 30 to 100 centimetres.', '30~100센티미터 사이의 거리를 입력하세요.'],
+  ['The reference sound did not complete.', '기준음 재생이 완료되지 않았습니다.'],
+  [
+    'Vision task stopped. No unfinished result was saved.',
+    '시각 과제를 중단했습니다. 완료되지 않은 결과는 저장되지 않았습니다.',
+  ],
+  ['Tile {position} selected.', '타일 {position}을 선택했습니다.'],
+  ['Tiles {first} and {second} swapped.', '타일 {first}와 {second}의 위치를 바꿨습니다.'],
+  ['Tile moved to position {position}.', '타일을 {position}번 위치로 옮겼습니다.'],
+  ['Order recorded. Run {current} of {total}.', '순서를 기록했습니다. {total}회 중 {current}회.'],
+  ['{name} listening runner', '{name} 듣기 테스트'],
+  ['Converged to the configured reversal target', '설정된 반전 목표에 도달하여 수렴'],
+  ['Bounded at the technical frequency ceiling', '기술적 주파수 상한에 도달'],
+  ['Maximum trials reached before convergence', '수렴 전에 최대 시도 횟수에 도달'],
+  ['Incomplete', '미완료'],
+  [
+    'Leave this calibrated vision session? Your unfinished result will not be saved.',
+    '이 보정된 시각 세션을 나가시겠어요? 완료되지 않은 결과는 저장되지 않습니다.',
+  ],
+  ['{eye} — {instrument}', '{eye} — {instrument}'],
 ];
 
 export const MESSAGE_COUNT = rows.length;

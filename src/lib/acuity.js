@@ -321,6 +321,15 @@ export function percentContrastCost(highThresholdArcmin, lowThresholdArcmin) {
   return roundTo((lowThresholdArcmin / highThresholdArcmin - 1) * 100, 1);
 }
 
+export function summarizeContrastCost(high, low) {
+  if (!high || !low) return { value: null, bounded: false };
+  const bounded = high.atFloor || high.atCeiling || low.atFloor || low.atCeiling;
+  return {
+    value: bounded ? null : percentContrastCost(high.thresholdArcmin, low.thresholdArcmin),
+    bounded,
+  };
+}
+
 function updatePosterior(track, stimulusArcmin, correct) {
   const stimulusLog = Math.log10(stimulusArcmin);
   track.posterior = normalize(
