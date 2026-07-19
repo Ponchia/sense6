@@ -1,4 +1,5 @@
 import { toast } from '@ponchia/ui/behaviors';
+import '../styles/color-blindness.css';
 import { formatNumber, t } from '../i18n.js';
 import {
   createAdaptiveRun,
@@ -10,19 +11,17 @@ import {
   rgbCss,
   summarizeAdaptiveRun,
 } from '../lib/daltonism.js';
+import { createExamLifecycle } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
+import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 
-export const meta = {
-  id: 'color-blindness',
-  name: 'Daltonia',
-  tagline: 'Adaptive browser colour-vision experiment',
-  blurb:
-    'Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.',
-  accent: '#3bd6a2',
-  duration: '≈ 3 min',
-  glyph: 'C',
-};
+const RESULT_STORE = createResultStore({
+  key: 'sense6:daltonia:last',
+  legacyKeys: ['daltonia-last'],
+  validate: (value) => isRecord(value) && value.schemaVersion === 2 && Array.isArray(value.thresholds),
+});
+const MOUNT_OWNER = Symbol('daltonia');
 
 const DIRECTION_LABELS = {
   up: 'top',
@@ -55,43 +54,42 @@ const PRACTICE_TARGETS = [
   },
 ];
 
-let app = null;
-let announcer = null;
-let gamutChip = null;
-let goHome = null;
-let run = null;
-let active = false;
-let phase = 'intro';
-let practiceIndex = 0;
-let practiceFeedback = null;
+let state = null;
 
 export function mount(context) {
-  app = context.app;
-  announcer = context.announcer;
-  gamutChip = context.gamutChip;
-  goHome = context.navigateHome;
-
-  const controller = new AbortController();
-  wireEvents(controller.signal);
+  const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClasses: ['lab-mode'] });
+  const mountState = {
+    app: context.app,
+    announcer: context.announcer,
+    gamutChip: context.gamutChip,
+    goHome: context.navigateHome,
+    run: null,
+    active: false,
+    phase: 'intro',
+    practiceIndex: 0,
+    practiceFeedback: null,
+  };
+  state = mountState;
+  wireEvents(lifecycle.signal);
   renderIntro();
 
-  return () => {
-    controller.abort();
-    active = false;
-    phase = 'intro';
-    document.body.classList.remove('lab-mode');
-  };
+  lifecycle.onCleanup(() => {
+    mountState.active = false;
+    mountState.phase = 'intro';
+    if (state === mountState) state = null;
+  });
+  return lifecycle.dispose;
 }
 
 function renderIntro() {
-  active = false;
-  phase = 'intro';
+  state.active = false;
+  state.phase = 'intro';
   document.body.classList.remove('lab-mode');
-  document.title = 'Experimental colour-vision check — Daltonia | Sense6';
+  document.title = t('Experimental colour-vision check — Daltonia | Sense6');
 
   const previous = loadLast();
 
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="cb-intro ui-container ui-container--wide">
       <button class="back-link exam-back" type="button" data-action="gallery">
         <span aria-hidden="true">←</span> All tests
@@ -109,7 +107,7 @@ function renderIntro() {
             <button class="ui-button ui-button--lg" type="button" data-action="cb-setup">
               Start the experiment <span aria-hidden="true">→</span>
             </button>
-            <a class="ui-link ui-link--cta" href="#/color-blindness" data-action="cb-how">How it works</a>
+            <a class="ui-link ui-link--cta" href="#cb-how" data-action="cb-how">How it works</a>
           </div>
           <p class="hero__limit">
             <span aria-hidden="true">◇</span>
@@ -175,7 +173,7 @@ function renderIntro() {
   `;
 
   requestAnimationFrame(() => {
-    const canvas = app.querySelector('[data-preview-target]');
+    const canvas = state.app.querySelector('[data-preview-target]');
     if (canvas) drawTarget(canvas, DEMO_TARGET, 'preview');
   });
 }
@@ -190,13 +188,13 @@ function researchCard(eyebrow, title, body, href) {
 }
 
 function renderSetup() {
-  active = false;
-  phase = 'setup';
+  state.active = false;
+  state.phase = 'setup';
   document.body.classList.add('lab-mode');
-  document.title = 'Prepare your display — Daltonia | Sense6';
+  document.title = t('Prepare your display — Daltonia | Sense6');
   window.scrollTo({ top: 0, behavior: 'instant' });
 
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="setup-view ui-container ui-container--wide">
       <button class="back-link" type="button" data-action="cb-home"><span aria-hidden="true">←</span> Back</button>
       <div class="setup-grid">
@@ -226,7 +224,7 @@ function renderSetup() {
               <p class="ui-eyebrow ui-eyebrow--muted">Display check</p>
               <h2>Ready to begin</h2>
             </div>
-            <span class="ui-badge ui-badge--muted">${gamutChip.textContent}</span>
+            <span class="ui-badge ui-badge--muted">${state.gamutChip.textContent}</span>
           </div>
           <div class="cb-swatch-row" aria-hidden="true">
             ${['#c94f4f', '#d98a3d', '#c9b83d', '#5aa54f', '#3f8fbf', '#7a5ac9']
@@ -249,10 +247,10 @@ function renderSetup() {
 }
 
 function startPractice() {
-  active = true;
-  phase = 'practice';
-  practiceIndex = 0;
-  practiceFeedback = null;
+  state.active = true;
+  state.phase = 'practice';
+  state.practiceIndex = 0;
+  state.practiceFeedback = null;
   document.body.classList.add('lab-mode');
   window.scrollTo({ top: 0, behavior: 'instant' });
   renderPractice();
@@ -260,16 +258,16 @@ function startPractice() {
 }
 
 function renderPractice() {
-  const trial = PRACTICE_TARGETS[practiceIndex];
-  const correct = practiceFeedback?.correct === true;
-  document.title = `Practice ${practiceIndex + 1} of ${PRACTICE_TARGETS.length} — Daltonia | Sense6`;
+  const trial = PRACTICE_TARGETS[state.practiceIndex];
+  const correct = state.practiceFeedback?.correct === true;
+  document.title = `Practice ${state.practiceIndex + 1} of ${PRACTICE_TARGETS.length} — Daltonia | Sense6`;
 
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="cb-view">
       <div class="lab-topbar ui-container ui-container--wide">
         <button class="back-link" type="button" data-action="cb-home"><span aria-hidden="true">×</span> End experiment</button>
         <p class="cb-topbar__label">Learn the C-gap task</p>
-        <span class="trial-count"><b>0${practiceIndex + 1}</b> / 0${PRACTICE_TARGETS.length}</span>
+        <span class="trial-count"><b>0${state.practiceIndex + 1}</b> / 0${PRACTICE_TARGETS.length}</span>
       </div>
 
       <div class="cb-stage ui-container cb-stage--practice">
@@ -293,11 +291,11 @@ function renderPractice() {
           <button class="ui-button ui-button--ghost cb-unseen" type="button" data-orientation="unseen" ${correct ? 'disabled' : ''}>
             No gap visible
           </button>
-          ${practiceFeedback ? practiceFeedbackMarkup(practiceFeedback) : ''}
+          ${state.practiceFeedback ? practiceFeedbackMarkup(state.practiceFeedback) : ''}
           ${
             correct
               ? `<button class="ui-button ui-button--lg" type="button" data-action="cb-practice-next">${
-                  practiceIndex === PRACTICE_TARGETS.length - 1
+                  state.practiceIndex === PRACTICE_TARGETS.length - 1
                     ? 'Begin measured run'
                     : 'Next practice target'
                 } <span aria-hidden="true">→</span></button>`
@@ -309,7 +307,7 @@ function renderPractice() {
   `;
 
   requestAnimationFrame(() => {
-    const canvas = app.querySelector('[data-target]');
+    const canvas = state.app.querySelector('[data-target]');
     if (canvas) drawTarget(canvas, trial, trial.id);
   });
 }
@@ -325,36 +323,36 @@ function practiceFeedbackMarkup(feedback) {
 }
 
 function submitPracticeAnswer(answer) {
-  if (practiceFeedback?.correct) return;
-  const trial = PRACTICE_TARGETS[practiceIndex];
+  if (state.practiceFeedback?.correct) return;
+  const trial = PRACTICE_TARGETS[state.practiceIndex];
   const correct = answer === trial.orientation;
-  practiceFeedback = {
+  state.practiceFeedback = {
     correct,
     message: correct
       ? `The gap is on the ${DIRECTION_LABELS[trial.orientation]}.`
       : `This clear practice gap is on the ${DIRECTION_LABELS[trial.orientation]}. Follow the open side of the coloured C.`,
   };
   renderPractice();
-  announce(practiceFeedback.message);
+  announce(state.practiceFeedback.message);
 }
 
 function advancePractice() {
-  practiceIndex += 1;
-  practiceFeedback = null;
-  if (practiceIndex >= PRACTICE_TARGETS.length) {
+  state.practiceIndex += 1;
+  state.practiceFeedback = null;
+  if (state.practiceIndex >= PRACTICE_TARGETS.length) {
     beginAdaptiveRun();
     return;
   }
   renderPractice();
-  announce(`Practice ${practiceIndex + 1} of ${PRACTICE_TARGETS.length}. Find the clear gap.`);
+  announce(`Practice ${state.practiceIndex + 1} of ${PRACTICE_TARGETS.length}. Find the clear gap.`);
 }
 
 function beginAdaptiveRun() {
   const entropy = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}:${performance.now()}`;
-  run = createAdaptiveRun(seededRandom(`daltonia:${entropy}`));
-  active = true;
+  state.run = createAdaptiveRun(seededRandom(`daltonia:${entropy}`));
+  state.active = true;
   trackMetric(METRIC_EVENTS.testStarted, METRIC_TESTS.daltonia);
-  phase = 'run';
+  state.phase = 'run';
   document.body.classList.add('lab-mode');
   window.scrollTo({ top: 0, behavior: 'instant' });
   renderTrial();
@@ -362,19 +360,19 @@ function beginAdaptiveRun() {
 }
 
 function renderTrial() {
-  if (!active || !run) return;
-  const trial = currentAdaptiveTrial(run);
+  if (!state.active || !state.run) return;
+  const trial = currentAdaptiveTrial(state.run);
   if (!trial) {
     renderResults();
     return;
   }
 
-  const total = run.schedule.length;
-  const trialNumber = run.responses.length + 1;
-  const progress = Math.round((run.index / total) * 100);
+  const total = state.run.schedule.length;
+  const trialNumber = state.run.responses.length + 1;
+  const progress = Math.round((state.run.index / total) * 100);
   document.title = `Response ${trialNumber}, up to ${total} — Daltonia | Sense6`;
 
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="cb-view">
       <div class="lab-topbar ui-container ui-container--wide">
         <button class="back-link" type="button" data-action="cb-home"><span aria-hidden="true">×</span> End experiment</button>
@@ -415,7 +413,7 @@ function renderTrial() {
   `;
 
   requestAnimationFrame(() => {
-    const canvas = app.querySelector('[data-target]');
+    const canvas = state.app.querySelector('[data-target]');
     if (canvas) drawTarget(canvas, trial, `run-${trial.id}`);
   });
 }
@@ -428,32 +426,32 @@ function directionButton(direction, disabled = false) {
 }
 
 function submitOrientation(orientation) {
-  if (!active) return;
-  if (phase === 'practice') {
+  if (!state.active) return;
+  if (state.phase === 'practice') {
     submitPracticeAnswer(orientation);
     return;
   }
-  if (phase !== 'run' || !run) return;
-  recordAdaptiveAnswer(run, orientation);
-  if (run.index >= run.schedule.length) {
+  if (state.phase !== 'run' || !state.run) return;
+  recordAdaptiveAnswer(state.run, orientation);
+  if (state.run.index >= state.run.schedule.length) {
     renderResults();
     return;
   }
   renderTrial();
-  announce(`Response ${run.responses.length + 1}. Choose a direction or no gap visible.`);
+  announce(`Response ${state.run.responses.length + 1}. Choose a direction or no gap visible.`);
 }
 
 function renderResults() {
-  active = false;
+  state.active = false;
   trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.daltonia);
-  phase = 'results';
+  state.phase = 'results';
   document.body.classList.add('lab-mode');
   window.scrollTo({ top: 0, behavior: 'instant' });
-  document.title = 'Your display-relative thresholds — Daltonia | Sense6';
-  const result = summarizeAdaptiveRun(run);
+  document.title = t('Your display-relative thresholds — Daltonia | Sense6');
+  const result = summarizeAdaptiveRun(state.run);
   saveLast(result);
 
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="results-view ui-container ui-container--wide">
       <div class="results-head">
         <div>
@@ -587,14 +585,15 @@ function samplesLandoltC(x, y, size, orientation) {
 }
 
 function announce(message) {
-  announcer.textContent = '';
+  const mountedAnnouncer = state.announcer;
+  mountedAnnouncer.textContent = '';
   requestAnimationFrame(() => {
-    announcer.textContent = message;
+    mountedAnnouncer.textContent = t(message);
   });
 }
 
 async function copyResults() {
-  const result = summarizeAdaptiveRun(run);
+  const result = summarizeAdaptiveRun(state.run);
   const thresholds = result.axes
     .map((axis) => {
       const prefix = axis.limit === 'floor' ? '≤' : axis.limit === 'ceiling' ? '≥' : '';
@@ -621,26 +620,16 @@ async function copyResults() {
 }
 
 function loadLast() {
-  try {
-    const saved = JSON.parse(localStorage.getItem('daltonia-last'));
-    return saved?.schemaVersion === 2 ? saved : null;
-  } catch {
-    return null;
-  }
+  return RESULT_STORE.load();
 }
 
 function saveLast(result) {
-  try {
-    localStorage.setItem(
-      'daltonia-last',
-      JSON.stringify({
-        schemaVersion: 2,
-        thresholds: result.axes.map(({ type, threshold, spread }) => ({ type, threshold, spread })),
-        controlOk: result.controlOk,
-        savedAt: new Date().toISOString(),
-      }),
-    );
-  } catch {}
+  RESULT_STORE.save({
+    schemaVersion: 2,
+    thresholds: result.axes.map(({ type, threshold, spread }) => ({ type, threshold, spread })),
+    controlOk: result.controlOk,
+    savedAt: new Date().toISOString(),
+  });
 }
 
 function wireEvents(signal) {
@@ -648,7 +637,7 @@ function wireEvents(signal) {
     'change',
     (event) => {
       if (event.target.matches('#cb-ready')) {
-        app.querySelector('#cb-start').disabled = !event.target.checked;
+        state.app.querySelector('#cb-start').disabled = !event.target.checked;
       }
     },
     { signal },
@@ -669,19 +658,19 @@ function wireEvents(signal) {
 
       if (name === 'cb-how') {
         event.preventDefault();
-        app.querySelector('#cb-how')?.scrollIntoView({ behavior: 'smooth' });
+        state.app.querySelector('#cb-how')?.scrollIntoView({ behavior: 'smooth' });
       }
       if (name === 'cb-setup') renderSetup();
       if (name === 'cb-home') {
-        if (active && !window.confirm(t('End this experiment? Your progress will be lost.'))) return;
+        if (state.active && !window.confirm(t('End this experiment? Your progress will be lost.'))) return;
         renderIntro();
       }
       if (name === 'cb-begin' && !action.disabled) startPractice();
       if (name === 'cb-practice-next') advancePractice();
       if (name === 'cb-copy') copyResults();
       if (name === 'gallery') {
-        if (active && !window.confirm(t('Leave the experiment? Your progress will be lost.'))) return;
-        goHome();
+        if (state.active && !window.confirm(t('Leave the experiment? Your progress will be lost.'))) return;
+        state.goHome();
       }
     },
     { signal },
@@ -690,7 +679,7 @@ function wireEvents(signal) {
   document.addEventListener(
     'keydown',
     (event) => {
-      if (!active) return;
+      if (!state.active) return;
       if (event.key.toLowerCase() === 'n') {
         event.preventDefault();
         submitOrientation('unseen');

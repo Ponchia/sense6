@@ -2,34 +2,35 @@ import '@ponchia/ui';
 import { initThemeToggle } from '@ponchia/ui/behaviors';
 import './styles.css';
 
-import * as acutezza from './exams/acutezza.js';
-import * as colorBlindness from './exams/color-blindness.js';
-import * as riflessi from './exams/riflessi.js';
-import * as tetracromia from './exams/tetracromia.js';
-import * as udito from './exams/udito.js';
-import { getLocale, initializeI18n, localeHref, setLocale, t, translateTree } from './i18n.js';
+import { EXAM_BY_ID, EXAMS, loadExam } from './exams/registry.js';
+import { getLocale, initializeI18n, localeHref, localizedRoot, setLocale, t, translateTree } from './i18n.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from './metrics.js';
-import { renderPrivacy } from './privacy.js';
-import { currentRoute, navigate, startRouter } from './router.js';
+import { currentLocation, currentRoute, navigate, startRouter } from './router.js';
 import { renderGallery } from './site.js';
 
-const app = document.querySelector('#app');
+const appElement = document.querySelector('#app');
+const app = localizedRoot(appElement);
 const announcer = document.querySelector('#announcer');
 const gamutChip = document.querySelector('#gamut-chip');
+const initialLocation = currentLocation();
 
-const exams = [tetracromia, colorBlindness, riflessi, udito, acutezza];
-const registry = new Map(exams.map((exam) => [exam.meta.id, exam]));
-
-const initialLocale = window.location.hash.match(/^#\/([a-z]{2})(?:\/|$)/)?.[1];
-initializeI18n({
-  initialLocale,
-  onLocaleChange: (nextLocale) => navigate(currentRoute(), nextLocale),
+await initializeI18n({
+  initialLocale: initialLocation.locale,
+  onLocaleChange: async (nextLocale) => navigate(currentRoute(), nextLocale),
 });
+
+if (initialLocation.legacy) {
+  navigate(initialLocation.route, initialLocation.locale ?? getLocale(), { replace: true });
+} else if (!initialLocation.locale) {
+  navigate(initialLocation.route, getLocale(), { replace: true });
+}
+
 initThemeToggle();
 detectDisplay();
 trackMetric(METRIC_EVENTS.siteLoaded, METRIC_TESTS.site);
 
 let cleanup = null;
+let renderToken = 0;
 
 function context() {
   return {
@@ -44,29 +45,36 @@ function context() {
   };
 }
 
-startRouter(({ route, locale }) => {
-  if (locale) setLocale(locale, { notify: false });
-  if (!locale) {
-    window.history.replaceState(null, '', localeHref(route));
-  }
+startRouter(async ({ route, locale }) => {
+  const token = ++renderToken;
+  if (locale && locale !== getLocale()) await setLocale(locale, { notify: false });
+  if (token !== renderToken) return;
+
   cleanup?.();
   cleanup = null;
-  app.innerHTML = '';
   document.body.classList.remove('lab-mode');
   window.scrollTo({ top: 0, behavior: 'instant' });
 
-  const exam = registry.get(route);
   if (route === 'privacy') {
+    const [{ renderPrivacy }] = await Promise.all([import('./privacy.js'), import('./styles/privacy.css')]);
+    if (token !== renderToken) return;
+    app.innerHTML = '';
     cleanup = renderPrivacy(context());
-  } else if (exam) {
+  } else if (EXAM_BY_ID.has(route)) {
+    const definition = EXAM_BY_ID.get(route);
+    const exam = await loadExam(route);
+    if (token !== renderToken || !exam) return;
+    app.innerHTML = '';
     cleanup = exam.mount(context());
+    document.title = t(definition.pageTitle);
   } else if (route) {
-    // Unknown route — normalize to the gallery; the hashchange re-runs this.
-    navigate('');
+    navigate('', getLocale(), { replace: true });
   } else {
-    cleanup = renderGallery({ ...context(), exams: exams.map((entry) => entry.meta) });
+    app.innerHTML = '';
+    cleanup = renderGallery({ ...context(), exams: EXAMS });
   }
-  translateTree(document);
+  translateTree(appElement);
+  updateShellLinks();
 });
 
 function detectDisplay() {
@@ -74,4 +82,10 @@ function detectDisplay() {
   const srgb = window.matchMedia?.('(color-gamut: srgb)').matches;
   gamutChip.textContent = p3 ? t('P3 reported') : srgb ? t('sRGB reported') : t('Color gamut unknown');
   gamutChip.dataset.gamut = p3 ? 'p3' : srgb ? 'srgb' : 'unknown';
+}
+
+function updateShellLinks() {
+  for (const link of document.querySelectorAll('a[data-sense6-route]')) {
+    link.href = localeHref(link.dataset.sense6Route);
+  }
 }

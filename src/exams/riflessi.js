@@ -1,5 +1,7 @@
 import { toast } from '@ponchia/ui/behaviors';
+import '../styles/riflessi.css';
 import { t } from '../i18n.js';
+import { createExamLifecycle } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
 import {
   createChoiceSchedule,
@@ -8,20 +10,12 @@ import {
   randomWait,
   summarizeRiflessi,
 } from '../lib/reflexes.js';
+import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 
-export const meta = {
-  id: 'riflessi',
-  name: 'Riflessi',
-  tagline: 'Response speed, choice cost & consistency',
-  blurb:
-    'Three short instruments separate a simple visual response from decision cost and within-run stability.',
-  accent: '#f4b942',
-  duration: '≈ 7 min',
-  glyph: 'R',
-};
-
 const STORAGE_KEY = 'sense6:riflessi:last';
+const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isRecord });
+const MOUNT_OWNER = Symbol('riflessi');
 const INSTRUMENTS = {
   signal: {
     number: '01',
@@ -49,48 +43,46 @@ const INSTRUMENTS = {
   },
 };
 
-let app = null;
-let announcer = null;
-let goHome = null;
-let session = null;
-let config = null;
-let selectedMode = 'keyboard';
-let timeoutId = 0;
-let deadlineId = 0;
-let clockId = 0;
-let frameId = 0;
-let activeTrial = null;
-let trialState = 'idle';
-let onsetAt = 0;
-let expectedOnsetAt = 0;
+let state = null;
 
 export function mount(context) {
-  app = context.app;
-  announcer = context.announcer;
-  goHome = context.navigateHome;
-  selectedMode = window.matchMedia?.('(pointer: coarse)').matches ? 'pointer' : 'keyboard';
-  config = runtimeConfig();
-
-  const controller = new AbortController();
-  wireEvents(controller.signal);
+  const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClasses: ['lab-mode', 'rx-running'] });
+  const mountState = {
+    app: context.app,
+    announcer: context.announcer,
+    goHome: context.navigateHome,
+    session: null,
+    config: runtimeConfig(),
+    selectedMode: window.matchMedia?.('(pointer: coarse)').matches ? 'pointer' : 'keyboard',
+    timeoutId: 0,
+    deadlineId: 0,
+    clockId: 0,
+    frameId: 0,
+    activeTrial: null,
+    trialState: 'idle',
+    onsetAt: 0,
+    expectedOnsetAt: 0,
+  };
+  state = mountState;
+  wireEvents(lifecycle.signal);
   renderIntro();
 
-  return () => {
-    controller.abort();
+  lifecycle.onCleanup(() => {
     stopClocks();
-    session = null;
-    document.body.classList.remove('lab-mode', 'rx-running');
-  };
+    mountState.session = null;
+    if (state === mountState) state = null;
+  });
+  return lifecycle.dispose;
 }
 
 function renderIntro() {
   stopClocks();
-  session = null;
+  state.session = null;
   document.body.classList.remove('lab-mode', 'rx-running');
-  document.title = 'Response speed and consistency — Riflessi | Sense6';
+  document.title = t('Response speed and consistency — Riflessi | Sense6');
   const previous = loadLast();
 
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="rx-intro ui-container ui-container--wide">
       <button class="back-link exam-back" type="button" data-action="rx-home">
         <span aria-hidden="true">←</span> All tests
@@ -107,7 +99,7 @@ function renderIntro() {
             <button class="ui-button ui-button--lg" type="button" data-action="rx-setup">
               Prepare the lab <span aria-hidden="true">→</span>
             </button>
-            <a class="ui-link ui-link--cta" href="#/riflessi" data-action="rx-method">See the method</a>
+            <a class="ui-link ui-link--cta" href="#rx-method" data-action="rx-method">See the method</a>
           </div>
           <p class="hero__limit"><span aria-hidden="true">◇</span> Browser and device latency remain in every measurement.</p>
           ${
@@ -187,10 +179,10 @@ function renderSetup() {
   stopClocks();
   document.body.classList.add('lab-mode');
   document.body.classList.remove('rx-running');
-  document.title = 'Prepare your response setup — Riflessi | Sense6';
+  document.title = t('Prepare your response setup — Riflessi | Sense6');
   window.scrollTo({ top: 0, behavior: 'instant' });
 
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="rx-setup ui-container ui-container--wide">
       <button class="back-link" type="button" data-action="rx-intro"><span aria-hidden="true">←</span> Back</button>
       <div class="rx-setup__grid">
@@ -200,10 +192,10 @@ function renderSetup() {
           <p class="rx-lede">Use the same device and input mode when comparing runs. Keep this tab visible and silence interruptions.</p>
           <fieldset class="rx-mode-picker">
             <legend>How will you respond?</legend>
-            <button class="rx-mode ${selectedMode === 'keyboard' ? 'is-selected' : ''}" type="button" data-action="rx-mode" data-mode="keyboard" aria-pressed="${selectedMode === 'keyboard'}">
+            <button class="rx-mode ${state.selectedMode === 'keyboard' ? 'is-selected' : ''}" type="button" data-action="rx-mode" data-mode="keyboard" aria-pressed="${state.selectedMode === 'keyboard'}">
               <span class="rx-mode__key" aria-hidden="true">space</span><strong>Keyboard</strong><small>Space, then ← / →</small>
             </button>
-            <button class="rx-mode ${selectedMode === 'pointer' ? 'is-selected' : ''}" type="button" data-action="rx-mode" data-mode="pointer" aria-pressed="${selectedMode === 'pointer'}">
+            <button class="rx-mode ${state.selectedMode === 'pointer' ? 'is-selected' : ''}" type="button" data-action="rx-mode" data-mode="pointer" aria-pressed="${state.selectedMode === 'pointer'}">
               <span class="rx-mode__tap" aria-hidden="true">●</span><strong>Touch / pointer</strong><small>Tap the chamber or side</small>
             </button>
           </fieldset>
@@ -234,8 +226,8 @@ function renderSetup() {
 }
 
 function selectMode(mode) {
-  selectedMode = mode;
-  for (const button of app.querySelectorAll('[data-action="rx-mode"]')) {
+  state.selectedMode = mode;
+  for (const button of state.app.querySelectorAll('[data-action="rx-mode"]')) {
     const selected = button.dataset.mode === mode;
     button.classList.toggle('is-selected', selected);
     button.setAttribute('aria-pressed', String(selected));
@@ -243,7 +235,7 @@ function selectMode(mode) {
 }
 
 function startSession() {
-  const consent = app.querySelector('[data-rx-consent]');
+  const consent = state.app.querySelector('[data-rx-consent]');
   if (!consent?.checked) {
     toast('Please acknowledge the device-relative limit before starting.');
     consent?.focus();
@@ -251,8 +243,8 @@ function startSession() {
   }
 
   const seed = `${Date.now()}-${Math.random()}`;
-  session = {
-    inputMode: selectedMode,
+  state.session = {
+    inputMode: state.selectedMode,
     instrument: 'signal',
     block: null,
     queue: [],
@@ -260,8 +252,8 @@ function startSession() {
     records: { signal: [], choice: [], stability: [] },
     random: seededRandom(seed),
     diagnostics: {
-      frameMedianMs: Number(app.querySelector('[data-rx-cadence]')?.dataset.frameMs) || null,
-      droppedFrames: Number(app.querySelector('[data-rx-cadence]')?.dataset.dropped) || 0,
+      frameMedianMs: Number(state.app.querySelector('[data-rx-cadence]')?.dataset.frameMs) || null,
+      droppedFrames: Number(state.app.querySelector('[data-rx-cadence]')?.dataset.dropped) || 0,
       lateOnsets: 0,
       onsets: 0,
       interruptions: 0,
@@ -274,15 +266,15 @@ function startSession() {
 
 function renderInstrumentBrief(instrument) {
   stopClocks();
-  session.instrument = instrument;
-  session.block = null;
+  state.session.instrument = instrument;
+  state.session.block = null;
   const info = INSTRUMENTS[instrument];
   document.body.classList.add('lab-mode');
   document.body.classList.remove('rx-running');
-  document.title = `${info.name} — Riflessi | Sense6`;
+  document.title = `${t(info.name)} — Riflessi | Sense6`;
   window.scrollTo({ top: 0, behavior: 'instant' });
 
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="rx-brief ui-container ui-container--wide">
       <div class="rx-brief__index" aria-hidden="true">${info.number}</div>
       <div class="rx-brief__copy">
@@ -300,7 +292,7 @@ function renderInstrumentBrief(instrument) {
 }
 
 function inputInstructions(instrument) {
-  if (session.inputMode === 'keyboard') {
+  if (state.session.inputMode === 'keyboard') {
     return instrument === 'choice'
       ? '<span class="rx-key">←</span><span class="rx-key">→</span><p>Rest one hand near the arrow keys. Use the matching key.</p>'
       : '<span class="rx-key rx-key--wide">space</span><p>Rest one thumb or finger on Space. Do not hold it down.</p>';
@@ -311,31 +303,31 @@ function inputInstructions(instrument) {
 }
 
 function beginStage() {
-  if (session.instrument === 'stability') {
-    session.block = 'scored';
-    session.index = 0;
-    session.stabilityEndsAt = performance.now() + config.stability.durationMs;
+  if (state.session.instrument === 'stability') {
+    state.session.block = 'scored';
+    state.session.index = 0;
+    state.session.stabilityEndsAt = performance.now() + state.config.stability.durationMs;
     renderRunner();
-    deadlineId = window.setTimeout(finishCurrentInstrument, config.stability.durationMs);
-    clockId = window.setInterval(updateRunnerProgress, 250);
+    state.deadlineId = window.setTimeout(finishCurrentInstrument, state.config.stability.durationMs);
+    state.clockId = window.setInterval(updateRunnerProgress, 250);
     prepareStabilityTrial();
     return;
   }
 
-  session.block = 'practice';
-  session.index = 0;
-  session.queue = makeSchedule(session.instrument, true);
+  state.session.block = 'practice';
+  state.session.index = 0;
+  state.session.queue = makeSchedule(state.session.instrument, true);
   renderRunner();
   prepareQueuedTrial();
 }
 
 function beginScoredBlock() {
-  session.block = 'scored';
-  if (session.instrument === 'signal') {
+  state.session.block = 'scored';
+  if (state.session.instrument === 'signal') {
     trackMetric(METRIC_EVENTS.testStarted, METRIC_TESTS.riflessi);
   }
-  session.index = 0;
-  session.queue = makeSchedule(session.instrument, false);
+  state.session.index = 0;
+  state.session.queue = makeSchedule(state.session.instrument, false);
   renderRunner();
   prepareQueuedTrial();
 }
@@ -343,34 +335,34 @@ function beginScoredBlock() {
 function makeSchedule(instrument, practice) {
   if (instrument === 'signal') {
     return createSignalSchedule({
-      trials: practice ? config.signal.practiceTrials : config.signal.scoredTrials,
-      catches: practice ? 0 : config.signal.catchTrials,
-      minWaitMs: config.signal.minWaitMs,
-      maxWaitMs: config.signal.maxWaitMs,
-      random: session.random,
+      trials: practice ? state.config.signal.practiceTrials : state.config.signal.scoredTrials,
+      catches: practice ? 0 : state.config.signal.catchTrials,
+      minWaitMs: state.config.signal.minWaitMs,
+      maxWaitMs: state.config.signal.maxWaitMs,
+      random: state.session.random,
     });
   }
   return createChoiceSchedule({
-    trials: practice ? config.choice.practiceTrials : config.choice.scoredTrials,
-    minWaitMs: config.choice.minWaitMs,
-    maxWaitMs: config.choice.maxWaitMs,
-    random: session.random,
+    trials: practice ? state.config.choice.practiceTrials : state.config.choice.scoredTrials,
+    minWaitMs: state.config.choice.minWaitMs,
+    maxWaitMs: state.config.choice.maxWaitMs,
+    random: state.session.random,
   });
 }
 
 function renderRunner() {
   stopClocks();
   document.body.classList.add('lab-mode', 'rx-running');
-  const info = INSTRUMENTS[session.instrument];
-  const choice = session.instrument === 'choice';
-  const stability = session.instrument === 'stability';
+  const info = INSTRUMENTS[state.session.instrument];
+  const choice = state.session.instrument === 'choice';
+  const stability = state.session.instrument === 'stability';
 
-  app.innerHTML = `
-    <section class="rx-runner" data-rx-instrument="${session.instrument}">
+  state.app.innerHTML = `
+    <section class="rx-runner" data-rx-instrument="${state.session.instrument}">
       <header class="rx-runner__header">
-        <div><p class="ui-eyebrow">${info.number} / ${info.name}</p><strong data-rx-block>${stability ? 'Measured run' : session.block}</strong></div>
+        <div><p class="ui-eyebrow">${info.number} / ${info.name}</p><strong data-rx-block>${stability ? 'Measured run' : state.session.block}</strong></div>
         <div class="rx-progress" aria-label="Instrument progress"><i data-rx-progress></i></div>
-        <span class="rx-runner__count" data-rx-count>${stability ? formatClock(config.stability.durationMs) : `0 / ${session.queue.length}`}</span>
+        <span class="rx-runner__count" data-rx-count>${stability ? formatClock(state.config.stability.durationMs) : `0 / ${state.session.queue.length}`}</span>
       </header>
       <div class="rx-chamber" data-rx-chamber data-rx-state="waiting">
         <div class="rx-chamber__status" aria-live="polite" data-rx-status>Wait for the signal</div>
@@ -380,17 +372,17 @@ function renderRunner() {
         ${
           choice
             ? `<div class="rx-choice-zones">
-                <button type="button" data-rx-response="left" aria-label="Respond left"><span aria-hidden="true">←</span><small>${session.inputMode === 'keyboard' ? 'left key' : 'tap left'}</small></button>
-                <button type="button" data-rx-response="right" aria-label="Respond right"><span aria-hidden="true">→</span><small>${session.inputMode === 'keyboard' ? 'right key' : 'tap right'}</small></button>
+                <button type="button" data-rx-response="left" aria-label="Respond left"><span aria-hidden="true">←</span><small>${state.session.inputMode === 'keyboard' ? 'left key' : 'tap left'}</small></button>
+                <button type="button" data-rx-response="right" aria-label="Respond right"><span aria-hidden="true">→</span><small>${state.session.inputMode === 'keyboard' ? 'right key' : 'tap right'}</small></button>
               </div>`
             : `<button class="rx-response-pad" type="button" data-rx-response="signal" aria-label="Respond to signal">
-                <span>${session.inputMode === 'keyboard' ? 'press space' : 'tap chamber'}</span>
+                <span>${state.session.inputMode === 'keyboard' ? 'press space' : 'tap chamber'}</span>
               </button>`
         }
         <div class="rx-feedback" data-rx-feedback aria-live="polite"></div>
       </div>
       <footer class="rx-runner__footer">
-        <span>Respond only after the signal</span><span>${session.inputMode === 'pointer' ? 'Touch / pointer' : 'Keyboard'} timing</span>
+        <span>Respond only after the signal</span><span>${state.session.inputMode === 'pointer' ? 'Touch / pointer' : 'Keyboard'} timing</span>
       </footer>
     </section>
   `;
@@ -398,112 +390,118 @@ function renderRunner() {
 }
 
 function prepareQueuedTrial() {
-  if (!session || session.index >= session.queue.length) {
+  if (!state.session || state.session.index >= state.session.queue.length) {
     finishBlock();
     return;
   }
-  activeTrial = session.queue[session.index];
-  prepareTrial(activeTrial, config[session.instrument].responseTimeoutMs);
+  state.activeTrial = state.session.queue[state.session.index];
+  prepareTrial(state.activeTrial, state.config[state.session.instrument].responseTimeoutMs);
 }
 
 function prepareStabilityTrial() {
-  if (!session || performance.now() >= session.stabilityEndsAt) {
+  if (!state.session || performance.now() >= state.session.stabilityEndsAt) {
     finishCurrentInstrument();
     return;
   }
-  activeTrial = {
+  state.activeTrial = {
     kind: 'signal',
-    waitMs: randomWait(config.stability.minWaitMs, config.stability.maxWaitMs, session.random),
+    waitMs: randomWait(
+      state.config.stability.minWaitMs,
+      state.config.stability.maxWaitMs,
+      state.session.random,
+    ),
   };
-  prepareTrial(activeTrial, config.stability.responseTimeoutMs);
+  prepareTrial(state.activeTrial, state.config.stability.responseTimeoutMs);
 }
 
 function prepareTrial(trial, responseTimeoutMs) {
   clearTrialClocks();
-  trialState = 'waiting';
-  onsetAt = 0;
-  const chamber = app.querySelector('[data-rx-chamber]');
+  state.trialState = 'waiting';
+  state.onsetAt = 0;
+  const chamber = state.app.querySelector('[data-rx-chamber]');
   chamber?.setAttribute('data-rx-state', 'waiting');
-  const status = app.querySelector('[data-rx-status]');
-  if (status) status.textContent = 'Wait for the signal';
-  const feedback = app.querySelector('[data-rx-feedback]');
+  const status = state.app.querySelector('[data-rx-status]');
+  if (status) status.textContent = t('Wait for the signal');
+  const feedback = state.app.querySelector('[data-rx-feedback]');
   if (feedback) feedback.textContent = '';
-  const arrow = app.querySelector('[data-rx-arrow]');
+  const arrow = state.app.querySelector('[data-rx-arrow]');
   if (arrow && trial.side) {
     arrow.textContent = trial.side === 'left' ? '←' : '→';
     arrow.dataset.side = trial.side;
   }
   updateRunnerProgress();
-  expectedOnsetAt = performance.now() + trial.waitMs;
-  timeoutId = window.setTimeout(() => {
+  state.expectedOnsetAt = performance.now() + trial.waitMs;
+  state.timeoutId = window.setTimeout(() => {
     if (trial.kind === 'catch') {
-      trialState = 'catch';
-      timeoutId = window.setTimeout(() => recordOutcome('catch-correct'), responseTimeoutMs);
+      state.trialState = 'catch';
+      state.timeoutId = window.setTimeout(() => recordOutcome('catch-correct'), responseTimeoutMs);
       return;
     }
-    frameId = requestAnimationFrame((timestamp) => revealSignal(timestamp, responseTimeoutMs));
+    state.frameId = requestAnimationFrame((timestamp) => revealSignal(timestamp, responseTimeoutMs));
   }, trial.waitMs);
 }
 
 function revealSignal(timestamp, responseTimeoutMs) {
-  trialState = 'live';
-  onsetAt = timestamp;
-  session.diagnostics.onsets += 1;
-  const tolerance = Math.max(12, (session.diagnostics.frameMedianMs || 16.7) * 1.5);
-  if (timestamp - expectedOnsetAt > tolerance) session.diagnostics.lateOnsets += 1;
-  const chamber = app.querySelector('[data-rx-chamber]');
+  state.trialState = 'live';
+  state.onsetAt = timestamp;
+  state.session.diagnostics.onsets += 1;
+  const tolerance = Math.max(12, (state.session.diagnostics.frameMedianMs || 16.7) * 1.5);
+  if (timestamp - state.expectedOnsetAt > tolerance) state.session.diagnostics.lateOnsets += 1;
+  const chamber = state.app.querySelector('[data-rx-chamber]');
   chamber?.setAttribute('data-rx-state', 'live');
-  const status = app.querySelector('[data-rx-status]');
+  const status = state.app.querySelector('[data-rx-status]');
   if (status)
-    status.textContent = session.instrument === 'choice' ? 'Choose the matching side' : 'Respond now';
-  timeoutId = window.setTimeout(() => recordOutcome('miss'), responseTimeoutMs);
+    status.textContent = t(
+      state.session.instrument === 'choice' ? 'Choose the matching side' : 'Respond now',
+    );
+  state.timeoutId = window.setTimeout(() => recordOutcome('miss'), responseTimeoutMs);
 }
 
 function handleResponse(response, event) {
-  if (!session || !document.body.classList.contains('rx-running')) return;
-  if (session.inputMode === 'keyboard' && event.type === 'pointerdown') return;
-  if (session.inputMode === 'pointer' && event.type === 'keydown') return;
+  if (!state.session || !document.body.classList.contains('rx-running')) return;
+  if (state.session.inputMode === 'keyboard' && event.type === 'pointerdown') return;
+  if (state.session.inputMode === 'pointer' && event.type === 'keydown') return;
 
-  if (trialState === 'waiting' || trialState === 'catch') {
+  if (state.trialState === 'waiting' || state.trialState === 'catch') {
     recordOutcome('false-start');
     return;
   }
-  if (trialState !== 'live') return;
+  if (state.trialState !== 'live') return;
 
-  const rt = eventTimestamp(event) - onsetAt;
-  if (rt < config.anticipationMs) {
+  const rt = eventTimestamp(event) - state.onsetAt;
+  if (rt < state.config.anticipationMs) {
     recordOutcome('anticipation', rt);
     return;
   }
-  if (session.instrument === 'choice') {
-    recordOutcome(response === activeTrial.side ? 'correct' : 'wrong', rt);
+  if (state.session.instrument === 'choice') {
+    recordOutcome(response === state.activeTrial.side ? 'correct' : 'wrong', rt);
     return;
   }
   recordOutcome('correct', rt);
 }
 
 function recordOutcome(outcome, rt = null) {
-  if (!session || ['feedback', 'paused', 'idle'].includes(trialState)) return;
+  if (!state.session || ['feedback', 'paused', 'idle'].includes(state.trialState)) return;
   clearTrialClocks();
-  trialState = 'feedback';
-  const isScored = session.block === 'scored';
+  state.trialState = 'feedback';
+  const isScored = state.session.block === 'scored';
   if (isScored && outcome !== 'catch-correct') {
-    session.records[session.instrument].push({ outcome, rt });
+    state.session.records[state.session.instrument].push({ outcome, rt });
   }
-  const chamber = app.querySelector('[data-rx-chamber]');
+  const chamber = state.app.querySelector('[data-rx-chamber]');
   chamber?.setAttribute('data-rx-state', outcomeClass(outcome));
-  const feedback = app.querySelector('[data-rx-feedback]');
-  if (feedback) feedback.textContent = feedbackText(outcome, rt);
+  const feedback = state.app.querySelector('[data-rx-feedback]');
+  if (feedback) feedback.textContent = t(feedbackText(outcome, rt));
 
-  if (session.instrument !== 'stability') session.index += 1;
-  timeoutId = window.setTimeout(() => {
-    if (!session) return;
-    if (session.instrument === 'stability') {
+  if (state.session.instrument !== 'stability') state.session.index += 1;
+  state.timeoutId = window.setTimeout(() => {
+    if (!state.session) return;
+    if (state.session.instrument === 'stability') {
       prepareStabilityTrial();
     } else {
       prepareQueuedTrial();
     }
-  }, config.feedbackMs);
+  }, state.config.feedbackMs);
 }
 
 function outcomeClass(outcome) {
@@ -523,7 +521,7 @@ function feedbackText(outcome, rt) {
 function finishBlock() {
   stopClocks();
   document.body.classList.remove('rx-running');
-  if (session.block === 'practice') {
+  if (state.session.block === 'practice') {
     renderPracticeComplete();
   } else {
     finishCurrentInstrument();
@@ -531,31 +529,31 @@ function finishBlock() {
 }
 
 function renderPracticeComplete() {
-  const info = INSTRUMENTS[session.instrument];
-  app.innerHTML = `
+  const info = INSTRUMENTS[state.session.instrument];
+  state.app.innerHTML = `
     <section class="rx-transition ui-container">
       <span class="rx-transition__mark" aria-hidden="true">✓</span>
       <p class="ui-eyebrow">${info.name} / practice complete</p>
       <h1>Now the measured block.</h1>
-      <p>Keep the same hand position. Early responses, misses, and ${session.instrument === 'choice' ? 'wrong sides' : 'no-signal responses'} will be recorded.</p>
+      <p>Keep the same hand position. Early responses, misses, and ${state.session.instrument === 'choice' ? 'wrong sides' : 'no-signal responses'} will be recorded.</p>
       <button class="ui-button ui-button--lg" type="button" data-action="rx-begin-scored">Begin measured block <span aria-hidden="true">→</span></button>
     </section>
   `;
 }
 
 function finishCurrentInstrument() {
-  if (!session) return;
+  if (!state.session) return;
   stopClocks();
   document.body.classList.remove('rx-running');
-  const completed = session.instrument;
+  const completed = state.session.instrument;
   if (completed === 'stability') {
     renderResults();
     return;
   }
   const next = completed === 'signal' ? 'choice' : 'stability';
-  const valid = session.records[completed].filter((record) => record.outcome === 'correct').length;
-  const total = session.records[completed].length;
-  app.innerHTML = `
+  const valid = state.session.records[completed].filter((record) => record.outcome === 'correct').length;
+  const total = state.session.records[completed].length;
+  state.app.innerHTML = `
     <section class="rx-transition ui-container">
       <span class="rx-transition__mark" aria-hidden="true">${INSTRUMENTS[completed].number}</span>
       <p class="ui-eyebrow">Instrument complete</p>
@@ -573,19 +571,24 @@ function renderResults() {
   trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.riflessi);
   document.body.classList.add('lab-mode');
   document.body.classList.remove('rx-running');
-  document.title = 'Your response profile — Riflessi | Sense6';
-  const expectedStability = config.stability.durationMs < 10_000 ? 1 : 6;
-  const result = summarizeRiflessi(session.records, {
-    signal: config.signal.scoredTrials,
-    choice: config.choice.scoredTrials,
+  document.title = t('Your response profile — Riflessi | Sense6');
+  const expectedStability = state.config.stability.durationMs < 10_000 ? 1 : 6;
+  const result = summarizeRiflessi(state.session.records, {
+    signal: state.config.signal.scoredTrials,
+    choice: state.config.choice.scoredTrials,
     stability: expectedStability,
   });
-  const timing = timingHealth(session.diagnostics);
-  const stored = { ...result, inputMode: session.inputMode, timing: timing.label, recordedAt: Date.now() };
+  const timing = timingHealth(state.session.diagnostics);
+  const stored = {
+    ...result,
+    inputMode: state.session.inputMode,
+    timing: timing.label,
+    recordedAt: Date.now(),
+  };
   saveLast(stored);
-  session.result = result;
+  state.session.result = result;
 
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="rx-results ui-container ui-container--wide">
       <button class="back-link" type="button" data-action="rx-home"><span aria-hidden="true">←</span> All tests</button>
       <header class="rx-results__hero">
@@ -611,7 +614,7 @@ function renderResults() {
           <p class="ui-eyebrow">Response events</p><h2>What accompanied the medians.</h2>
           <dl>
             <div><dt>False starts</dt><dd>${result.events.falseStarts}</dd></div>
-            <div><dt>Under ${config.anticipationMs} ms</dt><dd>${result.events.anticipations}</dd></div>
+            <div><dt>Under ${state.config.anticipationMs} ms</dt><dd>${result.events.anticipations}</dd></div>
             <div><dt>Missed signals</dt><dd>${result.events.misses}</dd></div>
             <div><dt>Wrong choices</dt><dd>${result.events.wrongChoices}</dd></div>
           </dl>
@@ -619,9 +622,9 @@ function renderResults() {
         <article class="ui-card rx-timing">
           <p class="ui-eyebrow">Timing context</p><h2>${timing.label}</h2><p>${timing.copy}</p>
           <dl>
-            <div><dt>Input</dt><dd>${session.inputMode === 'pointer' ? 'Touch / pointer' : 'Keyboard'}</dd></div>
-            <div><dt>Frame cadence</dt><dd>${session.diagnostics.frameMedianMs ? `≈ ${session.diagnostics.frameMedianMs.toFixed(1)} ms` : 'Unknown'}</dd></div>
-            <div><dt>Interrupted trials</dt><dd>${session.diagnostics.interruptions}</dd></div>
+            <div><dt>Input</dt><dd>${state.session.inputMode === 'pointer' ? 'Touch / pointer' : 'Keyboard'}</dd></div>
+            <div><dt>Frame cadence</dt><dd>${state.session.diagnostics.frameMedianMs ? `≈ ${state.session.diagnostics.frameMedianMs.toFixed(1)} ms` : 'Unknown'}</dd></div>
+            <div><dt>Interrupted trials</dt><dd>${state.session.diagnostics.interruptions}</dd></div>
           </dl>
         </article>
       </div>
@@ -664,18 +667,18 @@ function driftCopy(value) {
 }
 
 function updateRunnerProgress() {
-  if (!session) return;
-  const progress = app.querySelector('[data-rx-progress]');
-  const count = app.querySelector('[data-rx-count]');
+  if (!state.session) return;
+  const progress = state.app.querySelector('[data-rx-progress]');
+  const count = state.app.querySelector('[data-rx-count]');
   if (!progress || !count) return;
-  if (session.instrument === 'stability') {
-    const remaining = Math.max(0, session.stabilityEndsAt - performance.now());
-    const complete = 1 - remaining / config.stability.durationMs;
+  if (state.session.instrument === 'stability') {
+    const remaining = Math.max(0, state.session.stabilityEndsAt - performance.now());
+    const complete = 1 - remaining / state.config.stability.durationMs;
     progress.style.inlineSize = `${Math.min(100, Math.max(0, complete * 100))}%`;
     count.textContent = formatClock(remaining);
   } else {
-    progress.style.inlineSize = `${(session.index / session.queue.length) * 100}%`;
-    count.textContent = `${Math.min(session.index + 1, session.queue.length)} / ${session.queue.length}`;
+    progress.style.inlineSize = `${(state.session.index / state.session.queue.length) * 100}%`;
+    count.textContent = `${Math.min(state.session.index + 1, state.session.queue.length)} / ${state.session.queue.length}`;
   }
 }
 
@@ -685,17 +688,18 @@ function formatClock(milliseconds) {
 }
 
 function pauseRun() {
-  if (!session || !document.body.classList.contains('rx-running') || trialState === 'paused') return;
+  if (!state.session || !document.body.classList.contains('rx-running') || state.trialState === 'paused')
+    return;
   clearTrialClocks();
-  if (session.instrument === 'stability') {
-    window.clearTimeout(deadlineId);
-    window.clearInterval(clockId);
+  if (state.session.instrument === 'stability') {
+    window.clearTimeout(state.deadlineId);
+    window.clearInterval(state.clockId);
   }
-  trialState = 'paused';
-  session.pauseStartedAt = performance.now();
-  session.diagnostics.interruptions += 1;
+  state.trialState = 'paused';
+  state.session.pauseStartedAt = performance.now();
+  state.session.diagnostics.interruptions += 1;
   document.body.classList.remove('rx-running');
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="rx-transition ui-container" data-rx-paused>
       <span class="rx-transition__mark" aria-hidden="true">Ⅱ</span><p class="ui-eyebrow">Timing paused</p>
       <h1>This trial was interrupted.</h1><p>The current trial has been discarded. Return when this tab can stay visible and focused.</p>
@@ -704,15 +708,15 @@ function pauseRun() {
 }
 
 function resumeRun() {
-  if (!session) return;
-  if (session.instrument === 'stability') {
-    session.stabilityEndsAt += performance.now() - session.pauseStartedAt;
+  if (!state.session) return;
+  if (state.session.instrument === 'stability') {
+    state.session.stabilityEndsAt += performance.now() - state.session.pauseStartedAt;
   }
   renderRunner();
-  if (session.instrument === 'stability') {
-    const remaining = Math.max(0, session.stabilityEndsAt - performance.now());
-    deadlineId = window.setTimeout(finishCurrentInstrument, remaining);
-    clockId = window.setInterval(updateRunnerProgress, 250);
+  if (state.session.instrument === 'stability') {
+    const remaining = Math.max(0, state.session.stabilityEndsAt - performance.now());
+    state.deadlineId = window.setTimeout(finishCurrentInstrument, remaining);
+    state.clockId = window.setInterval(updateRunnerProgress, 250);
     prepareStabilityTrial();
   } else {
     prepareQueuedTrial();
@@ -723,18 +727,18 @@ function measureFrameCadence() {
   const intervals = [];
   let previous = 0;
   const sample = (timestamp) => {
-    if (!app.querySelector('[data-rx-cadence]')) return;
+    if (!state.app.querySelector('[data-rx-cadence]')) return;
     if (previous) intervals.push(timestamp - previous);
     previous = timestamp;
     if (intervals.length < 45) {
-      frameId = requestAnimationFrame(sample);
+      state.frameId = requestAnimationFrame(sample);
       return;
     }
     const sorted = [...intervals].sort((left, right) => left - right);
     const frameMs = sorted[Math.floor(sorted.length / 2)];
     const dropped = intervals.filter((value) => value > frameMs * 1.8).length;
-    const output = app.querySelector('[data-rx-cadence]');
-    const note = app.querySelector('[data-rx-cadence-note]');
+    const output = state.app.querySelector('[data-rx-cadence]');
+    const note = state.app.querySelector('[data-rx-cadence-note]');
     if (output) {
       output.textContent = `≈ ${frameMs.toFixed(1)} ms / frame`;
       output.dataset.frameMs = String(frameMs);
@@ -742,10 +746,10 @@ function measureFrameCadence() {
     }
     if (note)
       note.textContent = dropped
-        ? `${dropped} long frame interval${dropped === 1 ? '' : 's'} observed in the sample.`
-        : 'The setup sample was steady.';
+        ? t('{count} long frame intervals observed in the sample.', { count: dropped })
+        : t('The setup sample was steady.');
   };
-  frameId = requestAnimationFrame(sample);
+  state.frameId = requestAnimationFrame(sample);
 }
 
 function timingHealth(diagnostics) {
@@ -763,11 +767,11 @@ function timingHealth(diagnostics) {
 }
 
 function copyResults() {
-  if (!session?.result) return;
-  const result = session.result;
+  if (!state.session?.result) return;
+  const result = state.session.result;
   const text = [
     t('Riflessi — device-relative response profile'),
-    t('Input: {input}', { input: t(session.inputMode === 'pointer' ? 'touch / pointer' : 'keyboard') }),
+    t('Input: {input}', { input: t(state.session.inputMode === 'pointer' ? 'touch / pointer' : 'keyboard') }),
     t('Signal median: {value} ms', { value: metric(result.signal.medianMs) }),
     t('Choice median: {median} ms; accuracy: {accuracy}%; cost: {cost} ms', {
       median: metric(result.choice.medianMs),
@@ -801,7 +805,7 @@ function wireEvents(signal) {
       if (action.matches('a')) event.preventDefault();
       switch (action.dataset.action) {
         case 'rx-home':
-          goHome();
+          state.goHome();
           break;
         case 'rx-intro':
           renderIntro();
@@ -810,7 +814,7 @@ function wireEvents(signal) {
           renderSetup();
           break;
         case 'rx-method':
-          app.querySelector('#rx-method')?.scrollIntoView({ behavior: 'smooth' });
+          state.app.querySelector('#rx-method')?.scrollIntoView({ behavior: 'smooth' });
           break;
         case 'rx-mode':
           selectMode(action.dataset.mode);
@@ -845,7 +849,7 @@ function wireEvents(signal) {
     'change',
     (event) => {
       if (!event.target.matches('[data-rx-consent]')) return;
-      const start = app.querySelector('[data-action="rx-start"]');
+      const start = state.app.querySelector('[data-action="rx-start"]');
       if (start) start.disabled = !event.target.checked;
     },
     { signal },
@@ -863,11 +867,11 @@ function wireEvents(signal) {
   document.addEventListener(
     'keydown',
     (event) => {
-      if (event.repeat || !session || session.inputMode !== 'keyboard') return;
+      if (event.repeat || !state.session || state.session.inputMode !== 'keyboard') return;
       let response = null;
-      if (session.instrument === 'choice' && event.key === 'ArrowLeft') response = 'left';
-      if (session.instrument === 'choice' && event.key === 'ArrowRight') response = 'right';
-      if (session.instrument !== 'choice' && (event.code === 'Space' || event.key === ' '))
+      if (state.session.instrument === 'choice' && event.key === 'ArrowLeft') response = 'left';
+      if (state.session.instrument === 'choice' && event.key === 'ArrowRight') response = 'right';
+      if (state.session.instrument !== 'choice' && (event.code === 'Space' || event.key === ' '))
         response = 'signal';
       if (response) {
         event.preventDefault();
@@ -887,23 +891,23 @@ function eventTimestamp(event) {
 }
 
 function announce(message) {
-  if (announcer) announcer.textContent = message;
+  if (state.announcer) state.announcer.textContent = t(message);
 }
 
 function stopClocks() {
   clearTrialClocks();
-  window.clearTimeout(deadlineId);
-  window.clearInterval(clockId);
-  deadlineId = 0;
-  clockId = 0;
-  trialState = 'idle';
+  window.clearTimeout(state.deadlineId);
+  window.clearInterval(state.clockId);
+  state.deadlineId = 0;
+  state.clockId = 0;
+  state.trialState = 'idle';
 }
 
 function clearTrialClocks() {
-  window.clearTimeout(timeoutId);
-  cancelAnimationFrame(frameId);
-  timeoutId = 0;
-  frameId = 0;
+  window.clearTimeout(state.timeoutId);
+  cancelAnimationFrame(state.frameId);
+  state.timeoutId = 0;
+  state.frameId = 0;
 }
 
 function runtimeConfig() {
@@ -915,17 +919,11 @@ function runtimeConfig() {
 }
 
 function saveLast(result) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
-  } catch {
+  if (!RESULT_STORE.save(result)) {
     announce('The result is ready, but this browser did not allow local storage.');
   }
 }
 
 function loadLast() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY));
-  } catch {
-    return null;
-  }
+  return RESULT_STORE.load();
 }

@@ -18,11 +18,15 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Cloudflare Pages deployment with the existing full verification gate,
   production security headers, and immutable asset caching.
 - English, Italian, German, French, Spanish, and Portuguese interfaces across
-  the gallery, all four exams, safety/setup flows, live tasks, result screens,
+  the gallery, all five exams, safety/setup flows, live tasks, result screens,
   accessibility labels, metadata, and copied summaries.
-- Locale-aware hash routes, first-visit browser-language detection, persistent
-  language selection, English fallback, localized number formatting, and
-  multilingual accessibility and responsive coverage.
+- Localized static entry pages for every gallery, exam, and privacy route, with
+  substantive no-JavaScript content, canonical and `hreflang` metadata,
+  structured data, an exact sitemap, crawler policy, `llms.txt`, and a real 404.
+- Locale-aware canonical paths, historic hash-link compatibility, first-visit
+  browser-language detection, persistent language selection, English fallback,
+  localized number formatting, and multilingual accessibility and responsive
+  coverage.
 - Udito—a safe-listening, device-relative hearing lab with a headphone-like
   presentation check, adaptive upper-audibility boundary, and interleaved pitch
   discrimination tracks near 500 Hz and 2 kHz.
@@ -31,7 +35,7 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   level-roved pitch comparisons, interruption recovery, and concise local-only
   results.
 - Udito unit, complete browser-journey, responsive, and accessibility coverage.
-- Multi-exam suite (Sense6): a gallery landing and hash router hosting each
+- Multi-exam suite (Sense6): a gallery landing and client router hosting each
   test as a self-contained mount/unmount module.
 - `Daltonia`: an experimental adaptive colour-vision check with randomized
   Landolt-C orientation, luminance-noise dots, three interleaved display-relative
@@ -51,6 +55,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Scientific limits and source trail for the test design.
 - GitHub Actions verification for formatting, unit, build, browser, responsive,
   and accessibility checks.
+- A shared exam registry, lazy experiment loading, per-language locale chunks,
+  versioned and validated result persistence, and an idempotent experiment
+  lifecycle with abort-driven cleanup.
+- Typed-JavaScript contract checks, coverage thresholds for shared lifecycle
+  and persistence code, generated-static-output tests, and production bundle
+  budgets.
 
 ### Changed
 
@@ -63,6 +73,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   `https://sense6.net`.
 - Production hosting now serves the static bundle from Cloudflare Pages instead
   of the personal Kubernetes cluster.
+- Experiment routes now use crawlable localized paths and load only the active
+  experiment and language instead of the complete suite on first visit.
 - Cloudflare Single Redirect rules send `www.sense6.net` and the former
   `tetracromia.brontolotto.observer` hostname to the canonical domain.
 - `Daltonia` now reports display-relative thresholds instead of fixed plate

@@ -3,11 +3,12 @@
 <!-- vale on -->
 <!-- vale Vale.Spelling = NO -->
 
-A small collection of honest, browser-based perception tests. Each exam is a
-self-contained module mounted by a hash router behind a shared shell; results
-and answers remain local. The service stores only anonymous daily totals for
-page loads, measured-test starts, measured-test completions, and future report
-downloads.
+A small collection of honest, browser-based perception tests. Every gallery,
+exam, and privacy route has a substantive localized HTML entry page for people,
+search engines, and text-retrieval tools. JavaScript then mounts the selected
+experiment as a progressively enhanced module; results and answers remain
+local. The service stores only anonymous daily totals for page loads,
+measured-test starts, measured-test completions, and future report downloads.
 
 Live exams:
 
@@ -30,8 +31,12 @@ Live exams:
   clarity observations for each eye. It reports angular task thresholds and
   uncertainty, never 20/20, a diagnosis, astigmatism, or a prescription.
 
-Adding an exam: create `src/exams/<id>.js` exporting `meta` and `mount(context)`
-(return a cleanup function), then register it in `src/main.js`.
+Adding an exam: create `src/exams/<id>.js` exporting `mount(context)` (return a
+cleanup function), add its metadata and lazy loader to `src/exams/registry.js`,
+and add localized source phrases to every file in `src/locales/`. Keep
+experiment-specific styles beside the other route styles and extend the unit,
+static-output, and browser tests. The registry is the single source for routes,
+gallery facts, metadata, metrics, static pages, and runtime module loading.
 
 Acutezza's source-backed [research and implementation
 brief](docs/research/acutezza.md) records the method, product boundary, completed
@@ -39,8 +44,9 @@ software checks, and the external validation still required before making any
 clinical claim.
 
 The [product and engineering roadmap](docs/roadmap.md) records the next work:
-private repeated-run history, shared experiment lifecycle primitives, bundle
-scaling, and Acutezza's external validation work.
+private repeated-run history and Acutezza's external validation. The shared
+lifecycle, versioned persistence, route-level loading, and bundle budgets are
+now established foundations.
 
 ## Background
 
@@ -226,9 +232,9 @@ site shell. Product-specific stimulus geometry remains local to this project.
 ## Localization
 
 Sense6 supports English, Italian, German, French, Spanish, and Portuguese.
-Locale-aware hash routes make every exam directly addressable, for example
-`#/it/udito`. Existing routes such as `#/udito` remain valid and are normalized
-to the active locale.
+Locale-aware paths make every exam directly addressable, for example
+`/it/udito/`. Historic hash links such as `#/it/udito` and `#/udito` remain
+valid and are replaced with the corresponding canonical path in the browser.
 
 On a first visit, Sense6 selects the first supported language reported by the
 browser and otherwise falls back to English. A choice made in the header is
@@ -237,11 +243,32 @@ current exam open. The runtime also updates the document language, page title,
 metadata, internal links, accessibility labels, number formatting, and copied
 result summaries.
 
-English source phrases and their five translations live in `src/locales.js`.
-Add each new user-facing phrase there with the same placeholders in every
-language. `tests/i18n.test.js` rejects missing values, duplicate English source
-phrases, and placeholder drift. Browser tests cover locale routing, detection,
+English source phrases and their five translations live in
+`src/locales/<language>.js`. Only the active language catalog is loaded. Add
+each new user-facing phrase with the same placeholders in every language and
+translate dynamic text explicitly where it is rendered. `tests/i18n.test.js`
+rejects missing values, duplicate English source phrases, and placeholder
+drift. Browser tests cover locale routing, legacy links, detection,
 persistence, accessibility, and mobile overflow.
+
+## Static discovery and crawler policy
+
+`npm run build` creates localized static entry pages for the root, all six
+galleries, all 30 exam routes, and all six privacy routes. Each route contains
+useful content without JavaScript, a unique title and description, a canonical
+URL, reciprocal `hreflang` links, truthful structured data, research links, and
+real internal links. The build also creates an exact sitemap, `robots.txt`, an
+optional `llms.txt` discovery summary, and a script-free `404.html` so unknown
+paths don't become indexable soft-404 responses.
+
+The default policy allows conventional search and user-directed retrieval
+crawlers. It disallows `GPTBot` and `ClaudeBot`, which are associated with model
+training rather than a user's immediate request. Review that deliberate product
+choice whenever the crawler policy changes; `llms.txt` is a convenience, not an
+access-control mechanism. Preview deployments send `X-Robots-Tag: noindex`.
+
+Static pages are generated from `src/exams/registry.js`, the locale catalogs,
+and the privacy copy. Don't hand-edit files under `dist/`.
 
 ## Develop and test
 
@@ -258,10 +285,29 @@ Check the JavaScript and CSS source with Biome:
 npm run lint
 ```
 
+Check the typed JavaScript contracts:
+
+```sh
+npm run typecheck
+```
+
+Run unit tests with enforced coverage for shared storage and lifecycle code:
+
+```sh
+npm run test:coverage
+```
+
 Build the production bundle:
 
 ```sh
 npm run build
+```
+
+Verify the generated routes, metadata, crawler files, security policy, and
+bundle budgets:
+
+```sh
+npm run test:static
 ```
 
 Run the browser, accessibility, and responsive checks:
@@ -270,7 +316,7 @@ Run the browser, accessibility, and responsive checks:
 npm run test:e2e
 ```
 
-Run all four gates:
+Run every gate:
 
 ```sh
 npm run check
@@ -279,9 +325,15 @@ npm run check
 ## Deploy
 
 Every push to `main` runs the complete lint, unit, build, browser, responsive,
-and accessibility gate. GitHub Actions stores the resulting `dist/` directory
-as a short-lived artifact and uploads those exact verified files to Cloudflare
-Pages after the gate passes.
+accessibility, static-output, and bundle-budget gate. The deploy job builds and
+verifies one `dist/` directory, then uploads that same directory directly to
+Cloudflare Pages. Pull requests run the same checks without deploying.
+
+The initial route budget is at most 110 kB of raw JavaScript. The entry CSS is
+limited to 130 kB raw, and entry plus the largest route stylesheet is limited to
+150 kB raw. `tests/static-output.build.js` fails when a bundle crosses those
+ceilings. The budgets intentionally use uncompressed sizes so regressions stay
+visible independently of transfer compression.
 
 The production site is available at
 [`sense6.net`](https://sense6.net). Cloudflare Pages terminates TLS and serves

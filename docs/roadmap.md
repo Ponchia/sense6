@@ -25,28 +25,27 @@ The journal must:
 Before release, test schema migrations, storage limits, malformed imports,
 cross-locale summaries, and deletion of individual or all saved runs.
 
-## 2. Extract shared experiment lifecycle primitives
+## Completed engineering foundations
 
-Complete this work before adding several more experiments. Preserve the current
-vanilla JavaScript architecture and keep stimulus generation, adaptive math, and
-result interpretation inside each experiment.
+The suite now preserves its vanilla JavaScript architecture while sharing only
+the behavior that was already repeated. Experiment-specific stimulus
+generation, adaptive math, and result interpretation remain inside each module.
 
-Extract only behavior that is already repeated:
+The completed foundation includes:
 
-- mount, cleanup, interruption, and visibility handling;
-- setup gates and experiment progress;
-- versioned local persistence and copied or exported summaries;
-- common result layouts and setup-quality labels; and
-- test-only configuration boundaries.
+- an idempotent mount lifecycle with abort-driven listener cleanup;
+- versioned, validated local persistence with legacy-result migration;
+- one registry for routes, gallery copy, metadata, metrics, and lazy loading;
+- route-level experiment modules and language-level locale chunks;
+- substantive localized static entry pages and crawler discovery artifacts;
+- strict typed-JavaScript checks for shared contracts; and
+- enforced JavaScript and CSS production bundle budgets.
 
-Load experiment modules by route and split locale catalogs by language so a
-visitor does not download every experiment and translation on first load. Add a
-documented production bundle budget and fail CI when it regresses materially.
+The private journal remains separate product work: the storage adapter can
+migrate a concise last or best result, but it doesn't yet keep a multi-run
+history or provide import and export.
 
-The refactor is complete when all existing unit, browser, responsive, and
-accessibility tests pass without changing experiment behavior or result copy.
-
-## 3. Validate Acutezza beyond software verification
+## 2. Validate Acutezza beyond software verification
 
 Acutezza is a calibrated browser sharpness experiment, not an online eye exam.
 Its public promise is **Calibrated sharpness and meridional clarity**, with an

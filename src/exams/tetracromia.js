@@ -1,73 +1,69 @@
 import { toast } from '@ponchia/ui/behaviors';
 import { formatNumber, t } from '../i18n.js';
 import { toRgbCss } from '../lib/color.js';
+import { createExamLifecycle } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
 import { ColorLabSession, PHASES } from '../lib/session.js';
+import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 
-export const meta = {
-  id: 'tetracromia',
-  name: 'Tetracromia',
-  tagline: 'How finely do you see colour?',
-  blurb:
-    'An adaptive colour-discrimination lab: three instruments measure the smallest hue steps you can resolve on this screen.',
-  accent: 'var(--accent)',
-  duration: '≈ 4 min',
-  glyph: 'ΔE',
-};
+const RESULT_STORE = createResultStore({
+  key: 'sense6:tetracromia:best',
+  legacyKeys: ['tetracromia-best'],
+  validate: (value) => isRecord(value) && Number.isFinite(value.overall),
+});
+const MOUNT_OWNER = Symbol('tetracromia');
 
-let app = null;
-let announcer = null;
-let gamutChip = null;
-let goHome = null;
-let session = null;
-let labActive = false;
-let trialStartedAt = 0;
-let selectedSequenceIndex = null;
-let sequenceDrag = null;
-let suppressNextSequenceClick = false;
+let state = null;
 
 export function mount(context) {
-  app = context.app;
-  announcer = context.announcer;
-  gamutChip = context.gamutChip;
-  goHome = context.navigateHome;
-
-  const controller = new AbortController();
-  const { signal } = controller;
-  wireEvents(signal);
+  const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClasses: ['lab-mode'] });
+  const mountState = {
+    app: context.app,
+    announcer: context.announcer,
+    gamutChip: context.gamutChip,
+    goHome: context.navigateHome,
+    session: null,
+    labActive: false,
+    trialStartedAt: 0,
+    selectedSequenceIndex: null,
+    sequenceDrag: null,
+    suppressNextSequenceClick: false,
+  };
+  state = mountState;
+  wireEvents(lifecycle.signal);
 
   detectDisplay();
   renderHome();
 
-  return () => {
-    controller.abort();
-    session = null;
-    labActive = false;
-    document.body.classList.remove('lab-mode');
-  };
+  lifecycle.onCleanup(() => {
+    mountState.session = null;
+    mountState.labActive = false;
+    if (state === mountState) state = null;
+  });
+  return lifecycle.dispose;
 }
 
 function detectDisplay() {
   const p3 = window.matchMedia?.('(color-gamut: p3)').matches;
   const srgb = window.matchMedia?.('(color-gamut: srgb)').matches;
-  gamutChip.textContent = p3 ? 'P3 reported' : srgb ? 'sRGB reported' : 'Color gamut unknown';
-  gamutChip.dataset.gamut = p3 ? 'p3' : srgb ? 'srgb' : 'unknown';
+  state.gamutChip.textContent = p3 ? t('P3 reported') : srgb ? t('sRGB reported') : t('Color gamut unknown');
+  state.gamutChip.dataset.gamut = p3 ? 'p3' : srgb ? 'srgb' : 'unknown';
 }
 
 function renderHome() {
-  session = null;
-  labActive = false;
-  selectedSequenceIndex = null;
+  state.session = null;
+  state.labActive = false;
+  state.selectedSequenceIndex = null;
   document.body.classList.remove('lab-mode');
-  document.title = 'Tetracromia — colour discrimination | Sense6';
+  document.title = t('Tetracromia — colour discrimination | Sense6');
 
   const spectrumBars = Array.from({ length: 28 }, (_, index) => {
     const hue = Math.round((index / 28) * 360);
     return `<span style="--bar-color: ${toRgbCss(0.7, 0.13, hue)}; --bar-delay: ${index * 18}ms"></span>`;
   }).join('');
 
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="hero ui-container ui-container--wide" id="top">
       <div class="hero__copy">
         <button class="back-link exam-back" type="button" data-action="gallery">
@@ -246,10 +242,10 @@ function testDescription(id) {
 
 function renderSetup() {
   document.body.classList.add('lab-mode');
-  document.title = 'Prepare your screen — Tetracromia | Sense6';
+  document.title = t('Prepare your screen — Tetracromia | Sense6');
   window.scrollTo({ top: 0, behavior: 'instant' });
 
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="setup-view ui-container ui-container--wide">
       <button class="back-link" type="button" data-action="home"><span aria-hidden="true">←</span> Leave lab</button>
       <div class="setup-grid">
@@ -279,7 +275,7 @@ function renderSetup() {
               <p class="ui-eyebrow ui-eyebrow--muted">Black → white</p>
               <h2>11-step check</h2>
             </div>
-            <span class="ui-badge ui-badge--muted">${gamutChip.textContent}</span>
+            <span class="ui-badge ui-badge--muted">${state.gamutChip.textContent}</span>
           </div>
           <div class="calibration-steps" aria-label="Eleven brightness steps from black to white">
             ${Array.from({ length: 11 }, (_, index) => `<span style="--step:${index / 10}"><b>${index}</b></span>`).join('')}
@@ -302,37 +298,41 @@ function renderSetup() {
 
 function startLab() {
   const seed = `${Date.now()}-${crypto.getRandomValues(new Uint32Array(1))[0]}`;
-  session = new ColorLabSession(seed);
-  labActive = true;
+  state.session = new ColorLabSession(seed);
+  state.labActive = true;
   trackMetric(METRIC_EVENTS.testStarted, METRIC_TESTS.tetracromia);
-  selectedSequenceIndex = null;
+  state.selectedSequenceIndex = null;
   document.body.classList.add('lab-mode');
-  trialStartedAt = performance.now();
+  state.trialStartedAt = performance.now();
   renderLab();
   announce('Instrument one. Threshold. Find the different tile.');
 }
 
 function renderLab() {
-  if (!session) return;
-  const phase = session.phase;
-  const phaseProgress = Math.round((session.trialIndex / phase.trials) * 100);
-  const trial = session.currentTrial;
-  document.title = `${phase.name} ${session.trialIndex + 1} of ${phase.trials} — Tetracromia | Sense6`;
+  if (!state.session) return;
+  const phase = state.session.phase;
+  const phaseProgress = Math.round((state.session.trialIndex / phase.trials) * 100);
+  const trial = state.session.currentTrial;
+  document.title = `${t(phase.name)} ${state.session.trialIndex + 1} of ${phase.trials} — Tetracromia | Sense6`;
 
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="lab-view">
       <div class="lab-topbar ui-container ui-container--wide">
         <button class="back-link" type="button" data-action="home"><span aria-hidden="true">×</span> End session</button>
         <ol class="phase-list" aria-label="Lab progress">
           ${PHASES.map((item, index) => {
             const status =
-              index < session.phaseIndex ? 'complete' : index === session.phaseIndex ? 'current' : 'upcoming';
+              index < state.session.phaseIndex
+                ? 'complete'
+                : index === state.session.phaseIndex
+                  ? 'current'
+                  : 'upcoming';
             return `<li data-status="${status}" ${status === 'current' ? 'aria-current="step"' : ''}>
               <span>${item.number}</span><strong>${item.name}</strong>
             </li>`;
           }).join('')}
         </ol>
-        <span class="trial-count"><b>${String(session.trialIndex + 1).padStart(2, '0')}</b> / ${String(phase.trials).padStart(2, '0')}</span>
+        <span class="trial-count"><b>${String(state.session.trialIndex + 1).padStart(2, '0')}</b> / ${String(phase.trials).padStart(2, '0')}</span>
       </div>
 
       <div
@@ -461,7 +461,7 @@ function renderSequence(trial) {
           ${trial.order
             .map((colorIndex, position) => {
               const color = trial.colors[colorIndex];
-              const selected = selectedSequenceIndex === position;
+              const selected = state.selectedSequenceIndex === position;
               return `<button
               class="sequence-tile ${selected ? 'is-selected' : ''}"
               type="button"
@@ -479,10 +479,10 @@ function renderSequence(trial) {
       <div class="sequence-controls">
         <p id="sequence-status">${sequenceStatusText()}</p>
         <div class="ui-cluster">
-          <button class="ui-button ui-button--ghost" type="button" data-action="move-sequence" data-direction="-1" ${selectedSequenceIndex === null ? 'disabled' : ''}>
+          <button class="ui-button ui-button--ghost" type="button" data-action="move-sequence" data-direction="-1" ${state.selectedSequenceIndex === null ? 'disabled' : ''}>
             <span aria-hidden="true">←</span> Move left
           </button>
-          <button class="ui-button ui-button--ghost" type="button" data-action="move-sequence" data-direction="1" ${selectedSequenceIndex === null ? 'disabled' : ''}>
+          <button class="ui-button ui-button--ghost" type="button" data-action="move-sequence" data-direction="1" ${state.selectedSequenceIndex === null ? 'disabled' : ''}>
             Move right <span aria-hidden="true">→</span>
           </button>
           <button class="ui-button" type="button" data-action="submit-sequence">Lock this order</button>
@@ -499,10 +499,10 @@ function sequenceAnchor(color, label) {
 }
 
 function sequenceStatusText() {
-  const run = `Run ${session.trialIndex + 1} of ${session.phase.trials}`;
-  return selectedSequenceIndex === null
+  const run = `Run ${state.session.trialIndex + 1} of ${state.session.phase.trials}`;
+  return state.selectedSequenceIndex === null
     ? `${run} — drag a tile into place, or tap two tiles to swap them.`
-    : `${run} — tile ${selectedSequenceIndex + 1} selected. Tap its new place to swap, or use the arrows.`;
+    : `${run} — tile ${state.selectedSequenceIndex + 1} selected. Tap its new place to swap, or use the arrows.`;
 }
 
 /**
@@ -511,18 +511,22 @@ function sequenceStatusText() {
  * exercise "resetting".
  */
 function syncSequenceUi(pulsePositions = []) {
-  const trial = session.currentTrial;
+  const trial = state.session.currentTrial;
 
   document.querySelectorAll('[data-sequence-index]').forEach((tile) => {
     const position = Number(tile.dataset.sequenceIndex);
     const color = trial.colors[trial.order[position]];
-    const selected = selectedSequenceIndex === position;
+    const selected = state.selectedSequenceIndex === position;
     tile.style.setProperty('--tile-color', toRgbCss(color.l, color.c, color.h));
     tile.classList.toggle('is-selected', selected);
     tile.setAttribute('aria-pressed', String(selected));
     tile.setAttribute(
       'aria-label',
-      `Movable color tile ${position + 1} of ${trial.order.length}${selected ? ', selected' : ''}`,
+      t('Movable color tile {position} of {total}{selected}', {
+        position: position + 1,
+        total: trial.order.length,
+        selected: selected ? t(', selected') : '',
+      }),
     );
     tile.classList.remove('is-swapped');
     if (pulsePositions.includes(position)) {
@@ -532,50 +536,53 @@ function syncSequenceUi(pulsePositions = []) {
   });
 
   const status = document.querySelector('#sequence-status');
-  if (status) status.textContent = sequenceStatusText();
+  if (status) status.textContent = t(sequenceStatusText());
   document.querySelectorAll('[data-action="move-sequence"]').forEach((button) => {
-    button.disabled = selectedSequenceIndex === null;
+    button.disabled = state.selectedSequenceIndex === null;
   });
 }
 
 function answerChoice(choice) {
-  if (!session || session.phase.id === 'sequence') return;
-  const phaseBefore = session.phase.id;
-  const result = session.answerChoice(choice, performance.now() - trialStartedAt);
+  if (!state.session || state.session.phase.id === 'sequence') return;
+  const phaseBefore = state.session.phase.id;
+  const result = state.session.answerChoice(choice, performance.now() - state.trialStartedAt);
 
   if (result.done) {
     renderResults();
     return;
   }
 
-  if (session.phase.id !== phaseBefore) {
-    announce(`Instrument ${session.phase.number}. ${session.phase.name}. ${phasePrompt(session.phase.id)}`);
+  if (state.session.phase.id !== phaseBefore) {
+    announce(
+      `Instrument ${state.session.phase.number}. ${state.session.phase.name}. ${phasePrompt(state.session.phase.id)}`,
+    );
   } else {
     announce(result.correct ? 'Recorded. Next trial.' : 'Recorded. The difference will increase.');
   }
 
-  selectedSequenceIndex = null;
-  trialStartedAt = performance.now();
+  state.selectedSequenceIndex = null;
+  state.trialStartedAt = performance.now();
   renderLab();
-  app.dataset.feedback = result.correct ? 'correct' : 'miss';
-  window.setTimeout(() => delete app.dataset.feedback, 260);
+  state.app.dataset.feedback = result.correct ? 'correct' : 'miss';
+  const mountedApp = state.app;
+  window.setTimeout(() => delete mountedApp.dataset.feedback, 260);
 }
 
 function selectSequence(index) {
-  if (session?.phase.id !== 'sequence') return;
+  if (state.session?.phase.id !== 'sequence') return;
   let pulse = [];
 
-  if (selectedSequenceIndex === null) {
-    selectedSequenceIndex = index;
+  if (state.selectedSequenceIndex === null) {
+    state.selectedSequenceIndex = index;
     announce(`Tile ${index + 1} selected.`);
-  } else if (selectedSequenceIndex === index) {
-    selectedSequenceIndex = null;
+  } else if (state.selectedSequenceIndex === index) {
+    state.selectedSequenceIndex = null;
   } else {
     // One-shot swap: clear the selection afterwards so the next tap starts
     // fresh instead of silently arming another swap.
-    pulse = [selectedSequenceIndex, index];
-    session.swapSequence(selectedSequenceIndex, index);
-    selectedSequenceIndex = null;
+    pulse = [state.selectedSequenceIndex, index];
+    state.session.swapSequence(state.selectedSequenceIndex, index);
+    state.selectedSequenceIndex = null;
     announce(`Tiles ${pulse[0] + 1} and ${index + 1} swapped.`);
   }
 
@@ -584,45 +591,45 @@ function selectSequence(index) {
 }
 
 function moveSequence(direction) {
-  if (selectedSequenceIndex === null || !session) return;
-  const moved = session.moveSequence(selectedSequenceIndex, direction);
+  if (state.selectedSequenceIndex === null || !state.session) return;
+  const moved = state.session.moveSequence(state.selectedSequenceIndex, direction);
   if (!moved) {
     announce('That tile is already at the edge.');
     return;
   }
-  const pulse = [selectedSequenceIndex, selectedSequenceIndex + direction];
-  selectedSequenceIndex += direction;
+  const pulse = [state.selectedSequenceIndex, state.selectedSequenceIndex + direction];
+  state.selectedSequenceIndex += direction;
   syncSequenceUi(pulse);
-  document.querySelector(`[data-sequence-index="${selectedSequenceIndex}"]`)?.focus();
-  announce(`Tile moved to position ${selectedSequenceIndex + 1}.`);
+  document.querySelector(`[data-sequence-index="${state.selectedSequenceIndex}"]`)?.focus();
+  announce(`Tile moved to position ${state.selectedSequenceIndex + 1}.`);
 }
 
 function submitSequence() {
-  if (session?.phase.id !== 'sequence') return;
-  const result = session.submitSequence(performance.now() - trialStartedAt);
-  selectedSequenceIndex = null;
+  if (state.session?.phase.id !== 'sequence') return;
+  const result = state.session.submitSequence(performance.now() - state.trialStartedAt);
+  state.selectedSequenceIndex = null;
 
   if (result.done) {
     renderResults();
     return;
   }
 
-  trialStartedAt = performance.now();
-  announce(`Order recorded. Run ${session.trialIndex + 1} of ${session.phase.trials}.`);
+  state.trialStartedAt = performance.now();
+  announce(`Order recorded. Run ${state.session.trialIndex + 1} of ${state.session.phase.trials}.`);
   renderLab();
 }
 
 function renderResults() {
-  labActive = false;
+  state.labActive = false;
   trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.tetracromia);
   document.body.classList.add('lab-mode');
-  document.title = 'Your colour profile — Tetracromia | Sense6';
-  const result = session.results();
+  document.title = t('Your colour profile — Tetracromia | Sense6');
+  const result = state.session.results();
   const previous = loadBestResult();
   if (!previous || result.overall > previous.overall) saveBestResult(result);
   const profile = profileLabel(result.overall);
 
-  app.innerHTML = `
+  state.app.innerHTML = `
     <section class="results-view ui-container ui-container--wide">
       <div class="results-head">
         <div>
@@ -791,25 +798,16 @@ function formatDuration(milliseconds) {
 }
 
 function loadBestResult() {
-  try {
-    return JSON.parse(localStorage.getItem('tetracromia-best'));
-  } catch {
-    return null;
-  }
+  return RESULT_STORE.load();
 }
 
 function saveBestResult(result) {
-  try {
-    localStorage.setItem(
-      'tetracromia-best',
-      JSON.stringify({ overall: result.overall, savedAt: new Date().toISOString() }),
-    );
-  } catch {}
+  RESULT_STORE.save({ overall: result.overall, savedAt: new Date().toISOString() });
 }
 
 async function copyResults() {
-  if (!session) return;
-  const result = session.results();
+  if (!state.session) return;
+  const result = state.session.results();
   const summary = t(
     'Tetracromia — {overall}/100 screen-level color discrimination. Threshold {threshold}, Field {field}, Sequence {sequence}. Device-relative, not diagnostic.',
     {
@@ -829,9 +827,10 @@ async function copyResults() {
 }
 
 function announce(message) {
-  announcer.textContent = '';
+  const mountedAnnouncer = state.announcer;
+  mountedAnnouncer.textContent = '';
   requestAnimationFrame(() => {
-    announcer.textContent = message;
+    mountedAnnouncer.textContent = t(message);
   });
 }
 
@@ -857,8 +856,8 @@ function wireEvents(signal) {
 
       const sequenceTile = event.target.closest('[data-sequence-index]');
       if (sequenceTile) {
-        if (suppressNextSequenceClick) {
-          suppressNextSequenceClick = false;
+        if (state.suppressNextSequenceClick) {
+          state.suppressNextSequenceClick = false;
           return;
         }
         selectSequence(Number(sequenceTile.dataset.sequenceIndex));
@@ -871,12 +870,12 @@ function wireEvents(signal) {
       if (action.dataset.action === 'setup') renderSetup();
       if (action.dataset.action === 'start' && !action.disabled) startLab();
       if (action.dataset.action === 'home') {
-        if (labActive && !window.confirm(t('End this session? Your progress will be lost.'))) return;
+        if (state.labActive && !window.confirm(t('End this session? Your progress will be lost.'))) return;
         renderHome();
       }
       if (action.dataset.action === 'gallery') {
-        if (labActive && !window.confirm(t('Leave the lab? Your progress will be lost.'))) return;
-        goHome();
+        if (state.labActive && !window.confirm(t('Leave the lab? Your progress will be lost.'))) return;
+        state.goHome();
       }
       if (action.dataset.action === 'move-sequence') moveSequence(Number(action.dataset.direction));
       if (action.dataset.action === 'submit-sequence') submitSequence();
@@ -891,7 +890,7 @@ function wireEvents(signal) {
       const tile = event.target.closest('[data-sequence-index]');
       if (!tile || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
       event.preventDefault();
-      selectedSequenceIndex = Number(tile.dataset.sequenceIndex);
+      state.selectedSequenceIndex = Number(tile.dataset.sequenceIndex);
       moveSequence(event.key === 'ArrowLeft' ? -1 : 1);
     },
     { signal },
@@ -934,8 +933,8 @@ function previewDragShift(drag, targetIndex) {
 }
 
 function endSequenceDrag(commit) {
-  const drag = sequenceDrag;
-  sequenceDrag = null;
+  const drag = state.sequenceDrag;
+  state.sequenceDrag = null;
   if (!drag) return;
 
   const tiles = sequenceTiles();
@@ -946,15 +945,16 @@ function endSequenceDrag(commit) {
   document.querySelector('#sequence-run')?.classList.remove('is-reordering');
 
   if (!drag.started) return;
-  suppressNextSequenceClick = true;
+  state.suppressNextSequenceClick = true;
+  const mountedState = state;
   window.setTimeout(() => {
-    suppressNextSequenceClick = false;
+    mountedState.suppressNextSequenceClick = false;
   }, 120);
 
-  if (commit && session?.phase.id === 'sequence') {
+  if (commit && state.session?.phase.id === 'sequence') {
     const target = dragTargetIndex(drag, drag.lastX);
-    if (session.insertSequence(drag.index, target)) {
-      selectedSequenceIndex = null;
+    if (state.session.insertSequence(drag.index, target)) {
+      state.selectedSequenceIndex = null;
       syncSequenceUi([target]);
       announce(`Tile moved to position ${target + 1}.`);
       document.querySelector(`[data-sequence-index="${target}"]`)?.focus();
@@ -966,14 +966,14 @@ function endSequenceDrag(commit) {
 
 function onSequencePointerDown(event) {
   const tile = event.target.closest('[data-sequence-index]');
-  if (!tile || session?.phase.id !== 'sequence' || !event.isPrimary || event.button !== 0) return;
+  if (!tile || state.session?.phase.id !== 'sequence' || !event.isPrimary || event.button !== 0) return;
 
   const run = document.querySelector('#sequence-run');
   const runBounds = run.getBoundingClientRect();
   const tileBounds = tile.getBoundingClientRect();
-  const count = session.currentTrial.order.length;
+  const count = state.session.currentTrial.order.length;
 
-  sequenceDrag = {
+  state.sequenceDrag = {
     pointerId: event.pointerId,
     index: Number(tile.dataset.sequenceIndex),
     started: false,
@@ -988,8 +988,8 @@ function onSequencePointerDown(event) {
 }
 
 function onSequencePointerMove(event) {
-  if (!sequenceDrag || event.pointerId !== sequenceDrag.pointerId) return;
-  const drag = sequenceDrag;
+  if (!state.sequenceDrag || event.pointerId !== state.sequenceDrag.pointerId) return;
+  const drag = state.sequenceDrag;
   drag.lastX = event.clientX;
 
   if (!drag.started) {
@@ -1012,11 +1012,11 @@ function onSequencePointerMove(event) {
 }
 
 function onSequencePointerUp(event) {
-  if (!sequenceDrag || event.pointerId !== sequenceDrag.pointerId) return;
+  if (!state.sequenceDrag || event.pointerId !== state.sequenceDrag.pointerId) return;
   endSequenceDrag(true);
 }
 
 function onSequencePointerCancel(event) {
-  if (!sequenceDrag || event.pointerId !== sequenceDrag.pointerId) return;
+  if (!state.sequenceDrag || event.pointerId !== state.sequenceDrag.pointerId) return;
   endSequenceDrag(false);
 }
