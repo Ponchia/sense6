@@ -113,6 +113,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   setup provenance, and instrument-specific quality evidence.
 - Result and copied-summary language consistently describes run-level
   observations, while keeping the recreational, nonclinical boundary visible.
+- The shared interface now uses Bronto UI 0.7, supported alert anatomy and
+  semantic tones, and an automated class-and-token contract check in CI.
 - Gallery CSS now loads only on the gallery route. Bundle checks discover every
   route stylesheet and enforce separate entry, route, and combined ceilings.
 - Metrics and journal validation now consume the exam service contract instead

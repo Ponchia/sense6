@@ -32,7 +32,7 @@
 }
 
 .au-scope-option small {
-  color: var(--text-muted);
+  color: var(--text-dim);
 }
 
 .au-intro {
@@ -860,7 +860,7 @@
   max-inline-size: 45rem;
 }
 
-.au-results__hero + .ui-notice {
+.au-results__hero + .ui-alert {
   margin-block-start: 2rem;
 }
 

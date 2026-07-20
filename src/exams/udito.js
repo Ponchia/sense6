@@ -211,7 +211,7 @@ function renderSetup() {
           <p class="ui-eyebrow">Audio setup / keep volume unchanged after this screen</p>
           <h1>Quiet room.<br>Low volume.<br>Headphones.</h1>
           <p class="au-lede">Take off hearing protection only if you normally would. If you use hearing aids or another listening device, leave your usual setup unchanged and record it below.</p>
-          <div class="ui-notice"><strong>Sound sensitivity comes first.</strong><p>If you have tinnitus, hyperacusis, or sounds are uncomfortable today, skip the experiment or stop immediately. Sense6 cannot measure sound pressure.</p></div>
+          <div class="ui-alert ui-alert--warning"><strong class="ui-alert__title">Sound sensitivity comes first.</strong><p class="ui-alert__body">If you have tinnitus, hyperacusis, or sounds are uncomfortable today, skip the experiment or stop immediately. Sense6 cannot measure sound pressure.</p></div>
           ${
             supported
               ? `<div class="au-reference">
@@ -219,7 +219,7 @@ function renderSetup() {
                   <div class="au-reference__meter" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
                   <p data-au-reference-status role="status" aria-live="polite">Start device volume low before playing. This 1 kHz preview represents the loudest digital level used later; it does not measure acoustic output.</p>
                 </div>`
-              : `<div class="ui-notice ui-notice--danger" role="alert"><strong>Web Audio is unavailable.</strong><p>Udito cannot present controlled intervals in this browser. Try a current browser with audio enabled.</p></div>`
+              : `<div class="ui-alert ui-alert--danger" role="alert"><strong class="ui-alert__title">Web Audio is unavailable.</strong><p class="ui-alert__body">Udito cannot present controlled intervals in this browser. Try a current browser with audio enabled.</p></div>`
           }
           <label class="au-device-label">Listening setup
             <select data-au-device ${supported ? '' : 'disabled'}>
@@ -704,7 +704,7 @@ function renderResults() {
     <section class="au-results ui-container ui-container--wide">
       <button class="back-link" type="button" data-action="au-home"><span aria-hidden="true">←</span> ${m('nav.allTests')}</button>
       <header class="au-results__hero"><div><p class="ui-eyebrow">Udito / this setup / this run</p><h1>${includesPitch ? 'Three listening measures.' : 'Two focused listening measures.'}<br><em>No hearing label.</em></h1><p>${usable ? 'The setup checks and adaptive tracks produced coherent run-level observations.' : 'At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.'}</p></div><div class="au-results__stamp ${usable ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>${includesPitch ? '03' : '02'} / 03</strong></div></header>
-      <div class="ui-notice ${journalSaved ? '' : 'ui-notice--danger'}" data-au-journal-status role="${journalSaved ? 'status' : 'alert'}"><strong>${journalSaved ? 'Saved to the private journal on this device.' : 'Journal entry not saved.'}</strong><p>${journalSaved ? 'The structured run context is available for later same-setup comparison.' : 'The result remains available here and can still be copied, but it was not added to the private journal.'}</p></div>
+      <div class="ui-alert ${journalSaved ? 'ui-alert--success' : 'ui-alert--danger'}" data-au-journal-status role="${journalSaved ? 'status' : 'alert'}"><strong class="ui-alert__title">${journalSaved ? 'Saved to the private journal on this device.' : 'Journal entry not saved.'}</strong><p class="ui-alert__body">${journalSaved ? 'The structured run context is available for later same-setup comparison.' : 'The result remains available here and can still be copied, but it was not added to the private journal.'}</p></div>
       <div class="au-result-grid">
         ${resultCard('01', 'Headphone confidence', headphones.headphoneLike ? 'Headphone-like' : 'Uncertain', `${headphones.correct} / ${headphones.trials}`, 'A phase-based presentation check, not hardware detection.')}
         ${resultCard('02', 'Upper run boundary', formatHertz(range), rangeDetail(range), range.atCeiling && range.settled ? 'Reached the technical frequency ceiling; your personal boundary may be higher.' : 'Relative to this device, self-reported unchanged volume, room, and audio sample rate.')}
