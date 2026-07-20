@@ -155,45 +155,28 @@ function renderIntro() {
         </div>
       </section>
 
-      <section class="au-safety section ui-container ui-container--wide" aria-labelledby="au-safety-title">
-        <div><p class="ui-eyebrow">Before listening</p><h2 id="au-safety-title">Comfort sets the ceiling.</h2></div>
-        <div class="au-safety__copy">
-          <p>Start with device volume low. Raise it only until the reference is quiet and comfortable, never beyond about 60%. Then lock it for the whole run.</p>
-          <p><strong>Never raise volume to chase a missing high tone.</strong> Stop immediately for discomfort, pain, pressure, or ringing.</p>
+      <section class="method section au-safety" aria-labelledby="au-safety-title">
+        <div class="ui-container ui-container--wide method__layout">
+          <div class="method__intro"><p class="ui-eyebrow">Before listening</p><h2 id="au-safety-title">Comfort sets the ceiling.</h2><p>Start with device volume low. Raise it only until the reference is quiet and comfortable, never beyond about 60%. Then lock it for the whole run.</p></div>
+          <div class="au-safety__copy">
+            <div class="au-safety-meter" aria-hidden="true">${Array.from({ length: 12 }, (_, index) => `<i style="--level:${index}"></i>`).join('')}<span>60%</span></div>
+            <p><strong>Never raise volume to chase a missing high tone.</strong> Stop immediately for discomfort, pain, pressure, or ringing.</p>
+          </div>
         </div>
       </section>
 
-      <section class="au-research section ui-container ui-container--wide" aria-labelledby="au-research-title">
-        <div class="section-heading">
-          <div><p class="ui-eyebrow">Research trail</p><h2 id="au-research-title">What informed Udito.</h2></div>
+      <section class="science au-research section ui-container ui-container--wide" aria-labelledby="au-research-title">
+        <div class="science__statement">
+          <p class="ui-eyebrow">Research trail</p>
+          <h2 id="au-research-title">What informed Udito.</h2>
           <p>Established task structures inform the experiment. Consumer audio hardware remains uncalibrated.</p>
         </div>
-        <div class="ui-grid au-research__grid">
-          ${researchCard(
-            'Headphone confidence',
-            'Woods et al., 2017',
-            'A six-trial, three-alternative phase-cancellation task informs Cuffie and its cautious setup language.',
-            'https://doi.org/10.3758/s13414-017-1361-2',
-          )}
-          ${researchCard(
-            'Adaptive thresholds',
-            'Levitt, 1971',
-            'Transformed up-down staircases inform the reversal-based Portata and Intonazione estimates.',
-            'https://doi.org/10.1121/1.1912375',
-          )}
-          ${researchCard(
-            'Browser psychoacoustics',
-            'Grassi et al., 2024',
-            'Web and mobile adaptive frequency-discrimination work supports the browser task structure—not clinical interpretation.',
-            'https://pubmed.ncbi.nlm.nih.gov/38709452/',
-          )}
-          ${researchCard(
-            'Safe listening',
-            'WHO–ITU standard',
-            'Safe-listening guidance informs the low reference, volume lock, short tones, and stop warnings.',
-            'https://www.who.int/publications-detail-redirect/9789241515276',
-          )}
-        </div>
+        <aside class="ui-card science__sources"><p class="ui-eyebrow ui-eyebrow--muted">Research trail</p><ul class="source-list">
+          <li><a href="https://doi.org/10.3758/s13414-017-1361-2" target="_blank" rel="noreferrer">Woods et al., 2017</a></li>
+          <li><a href="https://doi.org/10.1121/1.1912375" target="_blank" rel="noreferrer">Levitt, 1971</a></li>
+          <li><a href="https://pubmed.ncbi.nlm.nih.gov/38709452/" target="_blank" rel="noreferrer">Grassi et al., 2024</a></li>
+          <li><a href="https://www.who.int/publications-detail-redirect/9789241515276" target="_blank" rel="noreferrer">WHO–ITU standard</a></li>
+        </ul></aside>
       </section>
 
       <section class="closing-cta au-closing ui-container ui-container--wide">
@@ -203,10 +186,6 @@ function renderIntro() {
     </div>
   `;
   focusStage('h1', 'Udito listening lab ready.');
-}
-
-function researchCard(eyebrow, title, body, href) {
-  return `<article class="ui-card au-research__card"><p class="ui-eyebrow ui-eyebrow--muted">${eyebrow}</p><h3>${title}</h3><p>${body}</p><a class="ui-link" href="${href}" target="_blank" rel="noreferrer">Read the primary source <span aria-hidden="true">↗</span></a></article>`;
 }
 
 function instrumentVisual(id) {

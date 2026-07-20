@@ -89,6 +89,8 @@ test('Riflessi completes all three instruments and reports separate device-relat
   await expect(page.getByRole('heading', { name: /What informed Riflessi/i })).toBeVisible();
   await expect(page.locator('.rx-signal-strip i')).toHaveCount(48);
   await expect(page.locator('.rx-instrument-visual')).toHaveCount(3);
+  await expect(page.locator('.rx-boundary.method')).toBeVisible();
+  await expect(page.locator('.rx-research .source-list li')).toHaveCount(3);
   await expect(page.locator('.rx-closing').getByRole('button', { name: /Open test/i })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole('link', { name: /See the method/i }).click();

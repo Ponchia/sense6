@@ -155,31 +155,32 @@ function renderIntro() {
         </div>
       </section>
 
-      <section class="rx-research section ui-container ui-container--wide" aria-labelledby="rx-research-title">
-        <div class="section-heading">
-          <div><p class="ui-eyebrow">Research trail</p><h2 id="rx-research-title">What informed Riflessi.</h2></div>
+      <section class="method section rx-boundary">
+        <div class="ui-container ui-container--wide method__layout">
+          <div class="method__intro">
+            <p class="ui-eyebrow">Method and limits</p>
+            <h2>Browser and device latency remain in every measurement.</h2>
+            <p>Compare only on the same device and input. Not a clinical or population score.</p>
+          </div>
+          <ol class="method-steps">
+            <li><span>1</span><div><strong>Simple and choice response</strong><p>A transparent reaction-time task with practice, randomized intervals, and separate simple and choice measures.</p></div></li>
+            <li><span>2</span><div><strong>Brief vigilance task</strong><p>The three-minute PVT-B informs the sustained-response duration and emphasis on lapses and false starts.</p></div></li>
+            <li><span>3</span><div><strong>Browser timing reality</strong><p>Browser experiments can be precise enough for many effects, while input hardware and presentation still add latency.</p></div></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="science rx-research section ui-container ui-container--wide" aria-labelledby="rx-research-title">
+        <div class="science__statement">
+          <p class="ui-eyebrow">Research trail</p>
+          <h2 id="rx-research-title">What informed Riflessi.</h2>
           <p>Established task structures inform the design. They do not validate an uncontrolled browser as a clinical instrument.</p>
         </div>
-        <div class="ui-grid rx-research__grid">
-          ${researchCard(
-            'Simple and choice response',
-            'Deary, Liewald & Nissan, 2011',
-            'A transparent reaction-time task with practice, randomized intervals, and separate simple and choice measures.',
-            'https://doi.org/10.3758/s13428-010-0024-1',
-          )}
-          ${researchCard(
-            'Brief vigilance task',
-            'Basner & Dinges, 2011',
-            'The three-minute PVT-B informs the sustained-response duration and emphasis on lapses and false starts.',
-            'https://pmc.ncbi.nlm.nih.gov/articles/PMC3197786/',
-          )}
-          ${researchCard(
-            'Browser timing reality',
-            'Bridges et al., 2020',
-            'Browser experiments can be precise enough for many effects, while input hardware and presentation still add latency.',
-            'https://doi.org/10.7717/peerj.9414',
-          )}
-        </div>
+        <aside class="ui-card science__sources"><p class="ui-eyebrow ui-eyebrow--muted">Research trail</p><ul class="source-list">
+          <li><a href="https://doi.org/10.3758/s13428-010-0024-1" target="_blank" rel="noreferrer">Deary, Liewald &amp; Nissan, 2011</a></li>
+          <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3197786/" target="_blank" rel="noreferrer">Basner &amp; Dinges, 2011</a></li>
+          <li><a href="https://doi.org/10.7717/peerj.9414" target="_blank" rel="noreferrer">Bridges et al., 2020</a></li>
+        </ul></aside>
       </section>
 
       <section class="closing-cta rx-closing ui-container ui-container--wide">
@@ -194,13 +195,6 @@ function renderIntro() {
     </div>
   `;
   resetScreen();
-}
-
-function researchCard(eyebrow, title, body, href) {
-  return `<article class="ui-card rx-research__card">
-    <p class="ui-eyebrow ui-eyebrow--muted">${eyebrow}</p><h3>${title}</h3><p>${body}</p>
-    <a class="ui-link" href="${href}" target="_blank" rel="noreferrer">Read the primary source <span aria-hidden="true">↗</span></a>
-  </article>`;
 }
 
 function instrumentVisual(id) {

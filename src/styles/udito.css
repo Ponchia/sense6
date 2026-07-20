@@ -297,8 +297,7 @@
   margin: 0.5rem 0;
 }
 
-.au-instrument-list p:last-child,
-.au-research__card p:not(.ui-eyebrow) {
+.au-instrument-list p:last-child {
   color: var(--text-dim);
   line-height: 1.6;
 }
@@ -333,54 +332,45 @@
 }
 
 .au-safety {
-  align-items: start;
-  border-block: 1px solid var(--line);
-  display: grid;
-  gap: clamp(2rem, 8vw, 9rem);
-  grid-template-columns: 0.8fr 1.2fr;
-}
-
-.au-safety h2 {
-  font-family: var(--display);
-  font-size: clamp(2.4rem, 5vw, 4.6rem);
-  letter-spacing: -0.05em;
-  line-height: 0.94;
-  margin: 0.8rem 0 0;
+  --accent: #4cc9f0;
 }
 
 .au-safety__copy {
-  border-inline-start: 3px solid #169dc7;
-  padding-inline-start: clamp(1.3rem, 4vw, 3rem);
-}
-
-.au-safety__copy p {
-  font-size: clamp(1.1rem, 2vw, 1.35rem);
-  line-height: 1.65;
-  margin-block: 0 1.5rem;
-}
-
-.au-safety__copy p:last-child {
-  margin: 0;
-}
-
-.au-research__grid {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.au-research__card {
-  display: flex;
-  flex-direction: column;
+  align-content: center;
+  display: grid;
+  gap: 2rem;
   min-inline-size: 0;
 }
 
-.au-research__card h3 {
-  font-family: var(--display);
-  font-size: 1.4rem;
-  margin: 0.7rem 0 0;
+.au-safety-meter {
+  align-items: end;
+  block-size: clamp(8rem, 16vw, 12rem);
+  border-block-end: 1px solid color-mix(in srgb, var(--method-ink) 32%, transparent);
+  display: grid;
+  gap: clamp(2px, 0.5vw, 0.6rem);
+  grid-template-columns: repeat(12, 1fr);
+  position: relative;
 }
 
-.au-research__card .ui-link {
-  margin-block-start: auto;
+.au-safety-meter i {
+  background: #4cc9f0;
+  block-size: calc(12% + var(--level) * 6%);
+  opacity: calc(0.25 + var(--level) * 0.06);
+}
+
+.au-safety-meter span {
+  color: #4cc9f0;
+  font-family: var(--display);
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  position: absolute;
+}
+
+.au-safety__copy > p {
+  color: color-mix(in srgb, var(--method-ink) 78%, transparent);
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  line-height: 1.65;
+  margin: 0;
 }
 
 .au-closing h2 em {
@@ -979,8 +969,7 @@
     justify-self: start;
   }
 
-  .au-instrument-list,
-  .au-research__grid {
+  .au-instrument-list {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -1008,7 +997,6 @@
   }
 
   .au-instrument-list,
-  .au-research__grid,
   .au-result-grid,
   .au-context-grid {
     grid-template-columns: 1fr;
@@ -1020,10 +1008,6 @@
 
   .au-instrument-visual {
     block-size: 11rem;
-  }
-
-  .au-safety {
-    grid-template-columns: 1fr;
   }
 
   .au-brief {

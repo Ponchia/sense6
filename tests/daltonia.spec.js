@@ -83,13 +83,15 @@ test('the Daltonia experiment renders adaptive targets and reports non-clinical 
   await expect(page.getByRole('heading', { name: /What informed Daltonia/i })).toBeVisible();
   await expect(page.locator('.cb-signal-strip i')).toHaveCount(36);
   await expect(page.locator('.cb-axis-display__card')).toHaveCount(3);
+  await expect(page.locator('.cb-boundary.method')).toBeVisible();
+  await expect(page.locator('.cb-research .source-list li')).toHaveCount(3);
   await expect(page.locator('.cb-closing').getByRole('button', { name: /Open test/i })).toBeVisible();
 
   const methodColours = await page.evaluate(() => {
-    const target = document.querySelector('.cb-steps strong');
+    const target = document.querySelector('.cb-boundary .method-steps strong');
     return {
       text: getComputedStyle(target).color,
-      background: getComputedStyle(document.documentElement).backgroundColor,
+      background: getComputedStyle(document.querySelector('.cb-boundary')).backgroundColor,
     };
   });
   expect(methodColours.text).not.toEqual(methodColours.background);
