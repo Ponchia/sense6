@@ -169,6 +169,10 @@ test('the entry bundle stays route-split and within its documented budget', asyn
     routeCss.some((file) => /^gallery-.+\.css$/.test(file)),
     'gallery CSS must remain route-scoped',
   );
+  assert.ok(
+    routeCss.some((file) => /^tetracromia-.+\.css$/.test(file)),
+    'Tetracromia CSS must remain route-scoped',
+  );
   const routeCssSizes = await Promise.all(
     routeCss.map(async (file) => [file, (await stat(new URL(`assets/${file}`, DIST))).size]),
   );

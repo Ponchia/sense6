@@ -72,6 +72,26 @@ test('the metric endpoint rejects cross-origin and cross-site requests', async (
   assert.equal(db.calls.length, 0);
 });
 
+test('the metric endpoint rejects same-origin requests on preview deployments', async () => {
+  const previewOrigin = 'https://pr-33.sense6.pages.dev';
+  const db = database();
+  const result = await onRequest({
+    request: new Request(`${previewOrigin}/api/metric`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        origin: previewOrigin,
+        'sec-fetch-site': 'same-origin',
+      },
+      body: JSON.stringify({ event: 'site_loaded', test: 'site' }),
+    }),
+    env: { ANALYTICS_DB: db.binding },
+  });
+
+  assert.equal(result.status, 403);
+  assert.equal(db.calls.length, 0);
+});
+
 test('the metric endpoint accepts only the exact allowlisted schema', async () => {
   const invalidPayloads = [
     { event: 'answer_submitted', test: 'udito' },

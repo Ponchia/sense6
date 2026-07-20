@@ -8,12 +8,16 @@
     "noEmit": true,
     "skipLibCheck": true,
     "strict": true,
-    "target": "ES2023"
+    "target": "ES2023",
+    "types": ["vite/client"]
   },
   "include": [
     "src/crawler-policy.js",
     "src/exams/contracts.js",
     "src/exams/landing.js",
+    "src/exams/views/acutezza-intro.js",
+    "src/exams/views/tetracromia-home.js",
+    "src/i18n/catalog-audit.js",
     "src/i18n/message-ids.js",
     "src/journal-copy.js",
     "src/lib/journal.js",

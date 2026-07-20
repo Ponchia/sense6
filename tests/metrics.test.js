@@ -1,7 +1,16 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { isAllowedMetric, METRIC_EVENTS, METRIC_TESTS, sendMetric } from '../src/metrics.js';
+import {
+  isAllowedMetric,
+  isProductionMetricOrigin,
+  METRIC_EVENTS,
+  METRIC_TESTS,
+  PRODUCTION_METRIC_ORIGIN,
+  sendMetric,
+} from '../src/metrics.js';
+
+const PRODUCTION_LOCATION = { origin: PRODUCTION_METRIC_ORIGIN };
 
 test('the metric allowlist accepts only defined event and test pairs', () => {
   assert.equal(isAllowedMetric(METRIC_EVENTS.siteLoaded, METRIC_TESTS.site), true);
@@ -21,7 +30,12 @@ test('sendMetric sends a credential-free, no-referrer request', async () => {
     return { ok: true };
   };
 
-  const sent = await sendMetric(METRIC_EVENTS.testStarted, METRIC_TESTS.riflessi, fetchImpl);
+  const sent = await sendMetric(
+    METRIC_EVENTS.testStarted,
+    METRIC_TESTS.riflessi,
+    fetchImpl,
+    PRODUCTION_LOCATION,
+  );
 
   assert.equal(sent, true);
   assert.equal(capturedUrl, '/api/metric');
@@ -43,8 +57,29 @@ test('sendMetric ignores invalid metrics and transport failures', async () => {
     throw new Error('offline');
   };
 
-  assert.equal(await sendMetric('unknown', METRIC_TESTS.site, fetchImpl), false);
+  assert.equal(await sendMetric('unknown', METRIC_TESTS.site, fetchImpl, PRODUCTION_LOCATION), false);
   assert.equal(requests, 0);
-  assert.equal(await sendMetric(METRIC_EVENTS.siteLoaded, METRIC_TESTS.site, fetchImpl), false);
+  assert.equal(
+    await sendMetric(METRIC_EVENTS.siteLoaded, METRIC_TESTS.site, fetchImpl, PRODUCTION_LOCATION),
+    false,
+  );
   assert.equal(requests, 1);
+});
+
+test('metrics stay disabled away from the canonical production origin', async () => {
+  let requests = 0;
+  const fetchImpl = async () => {
+    requests += 1;
+    return { ok: true };
+  };
+
+  assert.equal(isProductionMetricOrigin(PRODUCTION_LOCATION), true);
+  assert.equal(isProductionMetricOrigin({ origin: 'https://pr-33.sense6.pages.dev' }), false);
+  assert.equal(
+    await sendMetric(METRIC_EVENTS.siteLoaded, METRIC_TESTS.site, fetchImpl, {
+      origin: 'https://pr-33.sense6.pages.dev',
+    }),
+    false,
+  );
+  assert.equal(requests, 0);
 });

@@ -44,10 +44,11 @@ and uncertainty, but it can't turn a browser task into a clinical instrument.
 | Shell and router | `src/main.js`, `src/router.js` | Resolve locale-aware routes, mount one view, and dispose the previous view |
 | Service contracts | `src/exams/contracts.js` | Define experiment identity, metric names, and journal-comparison policy |
 | Presentation registry | `src/exams/registry.js` | Define gallery and static-page metadata plus lazy experiment loaders |
-| Experiment controllers | `src/exams/*.js` | Coordinate setup, presentation, response handling, and results for one experiment |
+| Experiment controllers | `src/exams/*.js` | Coordinate setup, response handling, phase changes, and results for one experiment |
+| Experiment views | `src/exams/views/*.js` | Produce pure markup for large landing or phase views without owning runtime state |
 | Domain models | `src/lib/*.js` | Implement adaptive tracks, schedules, summaries, persistence, and lifecycle behavior |
 | Shared landing views | `src/exams/landing.js` | Render repeated instrument, method, and research structures |
-| Localization | `src/i18n.js`, `src/i18n/message-ids.js`, `src/locales/` | Load one catalog, translate stable shared IDs and legacy source-keyed prose, and apply locale metadata |
+| Localization | `src/i18n.js`, `src/i18n/message-ids.js`, `src/i18n/catalog-audit.js`, `src/locales/` | Load one catalog, translate stable shared IDs and legacy source-keyed prose, apply locale metadata, and report catalog drift |
 | Static generator | `scripts/generate-static-pages.mjs` | Produce localized discovery HTML, metadata, sitemap, crawler files, and the 404 page |
 | Local journal | `src/lib/journal.js`, `src/journal.js` | Validate, store, compare, import, export, and render structured runs |
 | Anonymous metrics | `src/metrics.js`, `functions/api/metric.js` | Allowlist client events and increment daily aggregate counts |
@@ -65,12 +66,12 @@ and uncertainty, but it can't turn a browser task into a clinical instrument.
    function.
 5. Pure domain modules generate trials and summarize answers. The controller
    presents those values but doesn't duplicate the numerical model.
-6. A completed run writes a validated journal entry locally and sends only an
-   allowlisted completion counter.
+6. A completed run writes a validated journal entry locally. On the canonical
+   production origin only, it also sends an allowlisted completion counter.
 
-Render tokens prevent a slower dynamic import from overwriting a newer
-route. Gallery, experiment, About, privacy, and journal styles load on their
-own route where practical.
+Render tokens prevent a slower dynamic import from overwriting a newer route.
+Gallery, Tetracromia, the other experiments, About, privacy, and journal styles
+load on their own route where practical.
 
 ## Data and privacy
 
@@ -102,8 +103,15 @@ partially registered experiment fails early.
 ## Quality gates
 
 `npm run check` is the release gate. It covers formatting, strict typed
-JavaScript, unit coverage, production build, static output, browser journeys,
-responsive layouts, and accessibility.
+JavaScript, locale-catalog integrity, unit coverage, production build, static
+output, browser journeys, responsive layouts, and accessibility. Chromium and
+the mobile Chromium profile run the complete journey suite. Focused critical
+journeys also run in Firefox and WebKit.
+
+CI gives the release gate ten minutes. Crossing that ceiling is a signal to
+shard the Playwright workload rather than silently accepting a slower feedback
+loop. Dependency installation and Pages publication sit outside that measured
+verification window.
 
 Raw bundle ceilings are:
 
@@ -117,16 +125,34 @@ a filename allowlist.
 
 ## Known pressure points
 
-Experiment controllers still contain substantial phase-specific view and event
-orchestration. Don't address that with a suite-wide base controller. When you
-change one phase, extract its pure markup or state transition behind a small
-typed interface and keep the measurement behavior covered.
+Experiment controllers still contain substantial phase-specific event
+orchestration. Acutezza's intro and Tetracromia's home view establish the
+incremental pattern: don't add a suite-wide base controller. When you change
+one phase, extract its pure markup or state transition behind a small typed
+interface and keep the measurement behavior covered.
 
 Legacy localization uses English source prose as catalog keys. Stable IDs now
-cover reusable controls and safety boundaries. Migrate older prose when it
-changes. A wholesale key conversion would create translation risk without a
-user-visible benefit.
+cover reusable controls and safety boundaries. `npm run locales:check` reports
+catalog progress, missing or duplicate keys, missing stable IDs, source-equal
+strings, and placeholder drift. Migrate older prose when it changes. A
+wholesale key conversion would create translation risk without a user-visible
+benefit.
 
-Tetracromia still shares part of the entry style sheet because several shell
-and laboratory patterns use it. Split that CSS only when selector
-ownership is clear or the entry approaches its ceiling.
+Shared shell, method, setup, and result primitives remain in the entry style
+sheet because several experiments use them. Tetracromia-owned visuals and
+phase layouts live in `src/styles/tetracromia.css`; keep that ownership boundary
+when expanding the color lab.
+
+## Delivery environments
+
+Every same-repository pull request first passes the complete release gate and
+then publishes that exact `dist/` directory to a stable Cloudflare Pages branch
+preview. CI smoke-tests the real preview URL, including substantive localized
+HTML, `X-Robots-Tag: noindex`, and a closed metrics endpoint. Fork pull requests
+run verification without receiving deployment credentials or a preview.
+
+Production remains `https://sense6.net`. Both the client and the Pages Function
+require that exact origin before writing an anonymous metric, so Pages project
+URLs and branch previews cannot contaminate production counts. A push to `main`
+repeats the release gate and publishes the verified bundle to the production
+branch.
