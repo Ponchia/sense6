@@ -747,7 +747,7 @@
   }
 
   .hero__instrument {
-    inline-size: min(82vw, 31rem);
+    inline-size: min(100%, 82vw, 31rem);
   }
 
   .test-index {
