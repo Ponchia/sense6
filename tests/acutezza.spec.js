@@ -51,6 +51,9 @@ test('Acutezza calibrates the display and reports three separate non-clinical ob
   await expect(page.getByRole('heading', { name: /What informed Acutezza/i })).toBeVisible();
   await expect(page.locator('.ac-calibration-strip i')).toHaveCount(41);
   await expect(page.locator('.ac-instrument-visual')).toHaveCount(3);
+  await expect(page.locator('.ac-safety.method')).toBeVisible();
+  await expect(page.locator('.ac-safety-ruler i')).toHaveCount(18);
+  await expect(page.locator('.ac-research .source-list li')).toHaveCount(4);
   await expect(page.locator('.ac-closing').getByRole('button', { name: /Open test/i })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole('button', { name: /Toggle light and dark theme/i }).click();

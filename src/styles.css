@@ -54,6 +54,10 @@ a:focus-visible {
   outline-offset: 3px;
 }
 
+#app h1[tabindex="-1"]:focus {
+  outline: 0;
+}
+
 .sr-only {
   block-size: 1px;
   clip: rect(0 0 0 0);
@@ -537,8 +541,11 @@ a:focus-visible {
 }
 
 .method {
-  background: var(--text);
-  color: var(--bg);
+  --method-ink: #f4f4ed;
+  --method-surface: #0a0a0a;
+
+  background: var(--method-surface);
+  color: var(--method-ink);
 }
 
 .method__layout {
@@ -561,14 +568,18 @@ a:focus-visible {
    Daltonia reuses the step list on a normal surface. */
 .method h2,
 .method .method-steps strong {
-  color: var(--bg);
+  color: var(--method-ink);
 }
 
 .method__intro > p:last-child {
-  color: color-mix(in srgb, var(--bg) 72%, transparent);
+  color: color-mix(in srgb, var(--method-ink) 72%, transparent);
   font-size: 1.08rem;
   line-height: 1.65;
   max-inline-size: 36rem;
+}
+
+.method p strong {
+  color: inherit;
 }
 
 .method-steps {
@@ -582,9 +593,9 @@ a:focus-visible {
 }
 
 .method .method-steps {
-  --method-step-ink: var(--bg);
-  --method-step-muted: color-mix(in srgb, var(--bg) 65%, transparent);
-  --method-step-line: color-mix(in srgb, var(--bg) 22%, transparent);
+  --method-step-ink: var(--method-ink);
+  --method-step-muted: color-mix(in srgb, var(--method-ink) 65%, transparent);
+  --method-step-line: color-mix(in srgb, var(--method-ink) 22%, transparent);
 }
 
 .method-steps li {

@@ -310,40 +310,13 @@ body.rx-running > .ui-sitefooter {
   margin: 0.35rem 0 0.75rem;
 }
 
-.rx-instrument-list li p:last-child,
-.rx-research__card > p:last-of-type {
+.rx-instrument-list li p:last-child {
   color: var(--text-dim);
   line-height: 1.6;
 }
 
-.rx-research__grid {
-  --grid-gap: 1px;
-  --grid-min: 18rem;
-
-  background: var(--line);
-  border: 1px solid var(--line);
-}
-
-.rx-research__card {
-  border: 0;
-  border-radius: 0;
-  gap: 0.75rem;
-  padding: clamp(1.5rem, 3vw, 2.25rem);
-}
-
-.rx-research__card h3 {
-  font-family: var(--display);
-  font-size: 1.45rem;
-  margin: 0;
-}
-
-.rx-research__card p,
-.rx-research__card a {
-  margin: 0;
-}
-
-.rx-research__card a {
-  margin-block-start: auto;
+.rx-boundary {
+  --accent: #f4b942;
 }
 
 .rx-closing h2 em {

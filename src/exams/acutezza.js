@@ -133,10 +133,20 @@ function renderIntro() {
             .join('')}</ol>
         </div>
       </section>
-      <section class="ac-safety section ui-container ui-container--wide" aria-labelledby="ac-safety-title"><div><p class="ui-eyebrow">Before testing</p><h2 id="ac-safety-title">Comfort and context come first.</h2></div><div class="ac-safety__copy"><p>Use your usual correction for this distance. Cover one eye without pressing it, keep your head upright, and stop for discomfort.</p><p><strong>Sudden vision loss, severe eye pain, new flashes or floaters, or a curtain-like shadow needs prompt professional assessment.</strong> Do not delay care to take this test.</p></div></section>
-      <section class="ac-research section ui-container ui-container--wide" aria-labelledby="ac-research-title">
-        <div class="section-heading"><div><p class="ui-eyebrow">Research trail</p><h2 id="ac-research-title">What informed Acutezza.</h2></div><p>Published methods shape the task. They do not make this implementation clinically validated.</p></div>
-        <div class="ui-grid ac-research__grid">${researchCard('Calibration', 'Li et al., 2020', 'A physical card and blind-spot sweeps establish screen scale and estimated viewing distance.', 'https://www.nature.com/articles/s41598-019-57204-1')}${researchCard('Standard optotype', 'ISO 8596:2017', 'The Landolt ring provides language-independent, eight-direction geometry.', 'https://www.iso.org/standard/69042.html')}${researchCard('Adaptive burden', 'Bach, 2024', 'Eighteen eight-choice trials balance precision and effort in FrACT research.', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC11868300/')}${researchCard('Urgent symptoms', 'National Eye Institute', 'Safety copy reflects guidance for sudden floaters, flashes, or curtain-like shadows.', 'https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/floaters')}</div>
+      <section class="method section ac-safety" aria-labelledby="ac-safety-title">
+        <div class="ui-container ui-container--wide method__layout">
+          <div class="method__intro"><p class="ui-eyebrow">Before testing</p><h2 id="ac-safety-title">Comfort and context come first.</h2><p>Use your usual correction for this distance. Cover one eye without pressing it, keep your head upright, and stop for discomfort.</p></div>
+          <div class="ac-safety__copy"><div class="ac-safety-ruler" aria-hidden="true">${Array.from({ length: 18 }, (_, index) => `<i style="--mark:${index}"></i>`).join('')}<span>Keep distance fixed</span></div><p><strong>Sudden vision loss, severe eye pain, new flashes or floaters, or a curtain-like shadow needs prompt professional assessment.</strong> Do not delay care to take this test.</p></div>
+        </div>
+      </section>
+      <section class="science ac-research section ui-container ui-container--wide" aria-labelledby="ac-research-title">
+        <div class="science__statement"><p class="ui-eyebrow">Research trail</p><h2 id="ac-research-title">What informed Acutezza.</h2><p>Published methods shape the task. They do not make this implementation clinically validated.</p></div>
+        <aside class="ui-card science__sources"><p class="ui-eyebrow ui-eyebrow--muted">Research trail</p><ul class="source-list">
+          <li><a href="https://www.nature.com/articles/s41598-019-57204-1" target="_blank" rel="noreferrer">Li et al., 2020</a></li>
+          <li><a href="https://www.iso.org/standard/69042.html" target="_blank" rel="noreferrer">ISO 8596:2017</a></li>
+          <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11868300/" target="_blank" rel="noreferrer">Bach, 2024</a></li>
+          <li><a href="https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/floaters" target="_blank" rel="noreferrer">National Eye Institute</a></li>
+        </ul></aside>
       </section>
 
       <section class="closing-cta ac-closing ui-container ui-container--wide">
@@ -144,10 +154,6 @@ function renderIntro() {
         <button class="ui-button ui-button--lg" type="button" data-action="ac-prepare-closing">Open test <span aria-hidden="true">→</span></button>
       </section>
     </div>`);
-}
-
-function researchCard(eyebrow, title, body, href) {
-  return `<article class="ui-card ac-research__card"><p class="ui-eyebrow ui-eyebrow--muted">${eyebrow}</p><h3>${title}</h3><p>${body}</p><a class="ui-link" href="${href}" target="_blank" rel="noreferrer">Read the primary source <span aria-hidden="true">↗</span></a></article>`;
 }
 
 function instrumentVisual(id) {

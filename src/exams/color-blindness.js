@@ -146,7 +146,7 @@ function renderIntro() {
         <div class="ui-container ui-container--wide">
           <div class="section-heading">
             <div>
-              <p class="ui-eyebrow">Method and limits</p>
+              <p class="ui-eyebrow">Three display directions</p>
               <h2>An adaptive task, not a plate score.</h2>
             </div>
             <p>The design borrows established psychophysical techniques without claiming their clinical validation.</p>
@@ -156,43 +156,35 @@ function renderIntro() {
             <div class="cb-axis-display__card cb-axis-display__card--m"><span>M</span><i></i><i></i><i></i></div>
             <div class="cb-axis-display__card cb-axis-display__card--s"><span>S</span><i></i><i></i><i></i></div>
           </div>
-          <ol class="method-steps cb-steps">
+        </div>
+      </section>
+
+      <section class="method section cb-boundary">
+        <div class="ui-container ui-container--wide method__layout">
+          <div class="method__intro">
+            <p class="ui-eyebrow">Method and limits</p>
+            <h2>Run-relative output</h2>
+            <p>You receive thresholds and run spread, not a normal/deficient label or a clinical score.</p>
+          </div>
+          <ol class="method-steps">
             <li><span>1</span><div><strong>Practice first</strong><p>Two clear targets teach the C-gap interaction with immediate feedback before any threshold is measured.</p></div></li>
             <li><span>2</span><div><strong>Luminance noise</strong><p>Target and field dots share the same brightness variation, reducing a consistent lightness cue.</p></div></li>
             <li><span>3</span><div><strong>Three staircases</strong><p>Directions become harder after correct responses. “No gap visible” counts as a miss and makes that direction easier.</p></div></li>
-            <li><span>4</span><div><strong>Run-relative output</strong><p>You receive thresholds and run spread, not a normal/deficient label or a clinical score.</p></div></li>
           </ol>
         </div>
       </section>
 
-      <section class="cb-research section ui-container ui-container--wide" aria-labelledby="cb-research-title">
-        <div class="section-heading">
-          <div>
-            <p class="ui-eyebrow">Research trail</p>
-            <h2 id="cb-research-title">What informed Daltonia.</h2>
-          </div>
+      <section class="science cb-research section ui-container ui-container--wide" aria-labelledby="cb-research-title">
+        <div class="science__statement">
+          <p class="ui-eyebrow">Research trail</p>
+          <h2 id="cb-research-title">What informed Daltonia.</h2>
           <p>These sources inform the stimulus model and task design. They do not validate this implementation.</p>
         </div>
-        <div class="ui-grid cb-research__grid">
-          ${researchCard(
-            'Adaptive colour thresholds',
-            'Regan, Reffin & Mollon, 1994',
-            'Random Landolt-C orientation, spatial and luminance noise, and interleaved confusion-line staircases.',
-            'https://doi.org/10.1016/0042-6989(94)90203-8',
-          )}
-          ${researchCard(
-            'Cone-contrast testing',
-            'Rabin, Gooch & Ivan, 2011',
-            'Randomized cone-specific optotypes and validation against anomaloscope and plate results.',
-            'https://doi.org/10.1167/iovs.10-6283',
-          )}
-          ${researchCard(
-            'Modern screener validation',
-            'Evans et al., 2025',
-            'A multicentre comparison on calibrated displays demonstrates the evidence required for screening claims.',
-            'https://doi.org/10.1364/JOSAA.544985',
-          )}
-        </div>
+        <aside class="ui-card science__sources"><p class="ui-eyebrow ui-eyebrow--muted">Research trail</p><ul class="source-list">
+          <li><a href="https://doi.org/10.1016/0042-6989(94)90203-8" target="_blank" rel="noreferrer">Regan, Reffin &amp; Mollon, 1994</a></li>
+          <li><a href="https://doi.org/10.1167/iovs.10-6283" target="_blank" rel="noreferrer">Rabin, Gooch &amp; Ivan, 2011</a></li>
+          <li><a href="https://doi.org/10.1364/JOSAA.544985" target="_blank" rel="noreferrer">Evans et al., 2025</a></li>
+        </ul></aside>
       </section>
 
       <section class="closing-cta cb-closing ui-container ui-container--wide">
@@ -211,15 +203,6 @@ function renderIntro() {
     const canvas = state.app.querySelector('[data-preview-target]');
     if (canvas) drawTarget(canvas, DEMO_TARGET, 'preview');
   });
-}
-
-function researchCard(eyebrow, title, body, href) {
-  return `<article class="ui-card cb-research__card">
-    <p class="ui-eyebrow ui-eyebrow--muted">${eyebrow}</p>
-    <h3>${title}</h3>
-    <p>${body}</p>
-    <a class="ui-link" href="${href}" target="_blank" rel="noreferrer">Read the primary source <span aria-hidden="true">↗</span></a>
-  </article>`;
 }
 
 function renderSetup() {

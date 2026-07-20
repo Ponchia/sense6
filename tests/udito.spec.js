@@ -17,6 +17,9 @@ test('Udito completes three safe-listening instruments and keeps results separat
   await expect(page.getByRole('heading', { name: /What informed Udito/i })).toBeVisible();
   await expect(page.locator('.au-signal-strip i')).toHaveCount(56);
   await expect(page.locator('.au-instrument-visual')).toHaveCount(3);
+  await expect(page.locator('.au-safety.method')).toBeVisible();
+  await expect(page.locator('.au-safety-meter i')).toHaveCount(12);
+  await expect(page.locator('.au-research .source-list li')).toHaveCount(4);
   await expect(page.locator('.au-closing').getByRole('button', { name: /Open test/i })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole('button', { name: /Toggle light and dark theme/i }).click();
