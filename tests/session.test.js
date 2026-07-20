@@ -56,6 +56,19 @@ test('insertSequence removes the tile and re-inserts it, shifting the rest', () 
   assert.equal(lab.insertSequence(0, 7), false);
 });
 
+test('sequence swaps preserve state when an index is out of range', () => {
+  const lab = new ColorLabSession('swap-guards');
+  while (lab.phase.id !== 'sequence') lab.answerChoice(lab.currentTrial.answer, 100);
+
+  const before = [...lab.currentTrial.order];
+  assert.equal(lab.swapSequence(-1, 0), false);
+  assert.equal(lab.swapSequence(0, before.length), false);
+  assert.deepEqual(lab.currentTrial.order, before);
+
+  assert.equal(lab.swapSequence(0, 1), true);
+  assert.deepEqual(lab.currentTrial.order.slice(0, 2), [before[1], before[0]]);
+});
+
 test('phase-specific operations reject invalid state transitions', () => {
   const lab = new ColorLabSession('state-guards');
 

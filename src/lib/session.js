@@ -105,7 +105,11 @@ export function staircaseThreshold(staircase) {
   if (samples.length === 0) return staircase.level;
   const ordered = [...samples].sort((first, second) => first - second);
   const middle = Math.floor(ordered.length / 2);
-  return ordered.length % 2 === 0 ? (ordered[middle - 1] + ordered[middle]) / 2 : ordered[middle];
+  const upper = ordered[middle];
+  if (upper === undefined) return staircase.level;
+  if (ordered.length % 2 !== 0) return upper;
+  const lower = ordered[middle - 1];
+  return lower === undefined ? staircase.level : (lower + upper) / 2;
 }
 
 /** @param {readonly number[]} order */
@@ -113,9 +117,9 @@ export function sequenceScore(order) {
   const count = order.length;
   let inversions = 0;
 
-  for (let first = 0; first < count; first += 1) {
-    for (let second = first + 1; second < count; second += 1) {
-      if (order[first] > order[second]) inversions += 1;
+  for (const [first, value] of order.entries()) {
+    for (const later of order.slice(first + 1)) {
+      if (value > later) inversions += 1;
     }
   }
 
@@ -148,9 +152,9 @@ function createDiscriminationTrial(random, staircase, kind, baseFamilyHue) {
 /** @param {RandomSource} random @param {number} round @returns {SequenceTrial} */
 function createSequenceTrial(random, round) {
   const count = 9;
-  const starts = [8, 126, 238];
+  const starts = /** @type {const} */ ([8, 126, 238]);
   const span = 92;
-  const start = starts[round % starts.length] + (random() - 0.5) * 8;
+  const start = (starts[round % starts.length] ?? starts[0]) + (random() - 0.5) * 8;
   const colors = Array.from({ length: count }, (_, index) => ({
     id: index,
     l: 0.7,
@@ -264,9 +268,22 @@ export class ColorLabSession {
   /** @param {number} firstIndex @param {number} secondIndex */
   swapSequence(firstIndex, secondIndex) {
     const trial = this.requireSequenceTrial();
+    if (
+      firstIndex < 0 ||
+      secondIndex < 0 ||
+      firstIndex >= trial.order.length ||
+      secondIndex >= trial.order.length
+    ) {
+      return false;
+    }
     const order = [...trial.order];
-    [order[firstIndex], order[secondIndex]] = [order[secondIndex], order[firstIndex]];
+    const first = order[firstIndex];
+    const second = order[secondIndex];
+    if (first === undefined || second === undefined) return false;
+    order[firstIndex] = second;
+    order[secondIndex] = first;
     this.currentTrial = { ...trial, order };
+    return true;
   }
 
   /** @param {number} index @param {number} direction */
@@ -274,8 +291,7 @@ export class ColorLabSession {
     const trial = this.requireSequenceTrial();
     const target = index + direction;
     if (target < 0 || target >= trial.order.length) return false;
-    this.swapSequence(index, target);
-    return true;
+    return this.swapSequence(index, target);
   }
 
   /** @param {number} fromIndex @param {number} toIndex */

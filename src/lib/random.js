@@ -56,8 +56,22 @@ export function shuffle(values, random) {
 
   for (let index = result.length - 1; index > 0; index -= 1) {
     const swapIndex = randomInt(random, index + 1);
-    [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
+    const current = requiredElement(result[index], 'shuffle current index');
+    const swap = requiredElement(result[swapIndex], 'shuffle target index');
+    result[index] = swap;
+    result[swapIndex] = current;
   }
 
   return result;
+}
+
+/**
+ * @template T
+ * @param {T | undefined} value
+ * @param {string} label
+ * @returns {T}
+ */
+function requiredElement(value, label) {
+  if (value === undefined) throw new RangeError(`Missing ${label}`);
+  return value;
 }

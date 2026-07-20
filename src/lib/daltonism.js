@@ -21,21 +21,25 @@
 /** @typedef {'up' | 'right' | 'down' | 'left'} Orientation */
 /** @typedef {'up' | 'down'} StaircaseDirection */
 /** @typedef {'floor' | 'ceiling'} AxisLimit */
-/** @typedef {{ label: string, description: string, background: readonly number[] }} AxisConfig */
+/** @typedef {readonly [number, number, number]} RgbVector */
+/** @typedef {{ label: string, description: string, background: RgbVector }} AxisConfig */
+/** @typedef {{ field: RgbVector, target: RgbVector, fieldLinear: RgbVector, targetLinear: RgbVector }} TargetPair */
 /** @typedef {{ forcedColors: boolean, theme: string, dpr: number, orientation: string, viewportWidth: number, viewportHeight: number }} DisplayEnvironment */
 /** @typedef {{ strength: number, correct: boolean }} AxisPresentation */
 /** @typedef {{ strength: number, step: number, correctStreak: number, lastDirection: StaircaseDirection | null, reversals: number[], presentations: AxisPresentation[], boundaryMisses: number, finished: boolean, limit: AxisLimit | null }} AxisState */
 /** @typedef {{ id: string, type: TrialType, orientation: Orientation }} AdaptiveSlot */
-/** @typedef {AdaptiveSlot & { label: string, description: string, background: readonly number[], strength: number }} AdaptiveTrial */
+/** @typedef {AdaptiveSlot & { label: string, description: string, background: RgbVector, strength: number }} AdaptiveTrial */
 /** @typedef {{ trialId: string, type: TrialType, orientation: Orientation, answer: string, strength: number, correct: boolean }} AdaptiveResponse */
 /** @typedef {{ index: number, schedule: AdaptiveSlot[], axes: Record<AxisType, AxisState>, controls: { correct: number, total: number }, responses: AdaptiveResponse[] }} AdaptiveRun */
 
+/** @type {readonly [RgbVector, RgbVector, RgbVector]} */
 const RGB_TO_LMS = [
   [0.31399022, 0.63951294, 0.04649755],
   [0.15537241, 0.75789446, 0.08670142],
   [0.01775239, 0.10944209, 0.87256922],
 ];
 
+/** @type {readonly [RgbVector, RgbVector, RgbVector]} */
 const LMS_TO_RGB = [
   [5.47221206, -4.6419601, 0.16963708],
   [-1.1252419, 2.29317094, -0.1678952],
@@ -52,10 +56,10 @@ function clamp01(value) {
   return clamp(value, 0, 1);
 }
 
-/** @param {readonly number[]} vector */
+/** @param {RgbVector} vector @returns {[number, number, number]} */
 function normalize(vector) {
   const length = Math.hypot(...vector) || 1;
-  return vector.map((component) => component / length);
+  return [vector[0] / length, vector[1] / length, vector[2] / length];
 }
 
 /** @param {number} value */
@@ -78,7 +82,10 @@ function shuffled(values, random) {
   const copy = [...values];
   for (let index = copy.length - 1; index > 0; index -= 1) {
     const target = Math.floor(random() * (index + 1));
-    [copy[index], copy[target]] = [copy[target], copy[index]];
+    const current = requiredElement(copy[index], 'shuffle current index');
+    const swap = requiredElement(copy[target], 'shuffle target index');
+    copy[index] = swap;
+    copy[target] = current;
   }
   return copy;
 }
@@ -95,11 +102,11 @@ export function linearToSrgb(value) {
   return Math.round(clamp01(encoded) * 255);
 }
 
-/** @type {Record<TrialType, number[]>} */
+/** @type {Record<TrialType, RgbVector>} */
 export const CONFUSION_DIRECTIONS = {
-  protan: normalize(LMS_TO_RGB.map((row) => row[0])),
-  deutan: normalize(LMS_TO_RGB.map((row) => row[1])),
-  tritan: normalize(LMS_TO_RGB.map((row) => row[2])),
+  protan: normalize([LMS_TO_RGB[0][0], LMS_TO_RGB[1][0], LMS_TO_RGB[2][0]]),
+  deutan: normalize([LMS_TO_RGB[0][1], LMS_TO_RGB[1][1], LMS_TO_RGB[2][1]]),
+  tritan: normalize([LMS_TO_RGB[0][2], LMS_TO_RGB[1][2], LMS_TO_RGB[2][2]]),
   // A deliberately conspicuous mixed chromatic/luminance direction for task
   // controls. Passing it checks interaction and attention, not calibration.
   control: normalize([0.65, -0.2, 0.73]),
@@ -169,9 +176,13 @@ export const DEMO_TARGET = Object.freeze({
   background: AXIS_CONFIGS.deutan.background,
 });
 
-/** @param {readonly number[]} linearRgb */
+/** @param {RgbVector} linearRgb @returns {[number, number, number]} */
 export function lmsOf(linearRgb) {
-  return RGB_TO_LMS.map((row) => row[0] * linearRgb[0] + row[1] * linearRgb[1] + row[2] * linearRgb[2]);
+  return [
+    dotProduct(RGB_TO_LMS[0], linearRgb),
+    dotProduct(RGB_TO_LMS[1], linearRgb),
+    dotProduct(RGB_TO_LMS[2], linearRgb),
+  ];
 }
 
 /**
@@ -179,18 +190,26 @@ export function lmsOf(linearRgb) {
  * Both values are retained in linear sRGB so luminance noise can be applied
  * before encoding for canvas.
  *
- * @param {readonly number[]} backgroundLinear
+ * @param {RgbVector} backgroundLinear
  * @param {TrialType} type
  * @param {number} strength
+ * @returns {TargetPair}
  */
 export function makeTargetPair(backgroundLinear, type, strength) {
   const direction = CONFUSION_DIRECTIONS[type] ?? CONFUSION_DIRECTIONS.deutan;
-  const targetLinear = backgroundLinear.map((channel, index) =>
-    clamp01(channel + direction[index] * strength),
-  );
+  /** @type {[number, number, number]} */
+  const targetLinear = [
+    clamp01(backgroundLinear[0] + direction[0] * strength),
+    clamp01(backgroundLinear[1] + direction[1] * strength),
+    clamp01(backgroundLinear[2] + direction[2] * strength),
+  ];
   return {
-    field: backgroundLinear.map(linearToSrgb),
-    target: targetLinear.map(linearToSrgb),
+    field: [
+      linearToSrgb(backgroundLinear[0]),
+      linearToSrgb(backgroundLinear[1]),
+      linearToSrgb(backgroundLinear[2]),
+    ],
+    target: [linearToSrgb(targetLinear[0]), linearToSrgb(targetLinear[1]), linearToSrgb(targetLinear[2])],
     fieldLinear: backgroundLinear,
     targetLinear,
   };
@@ -199,21 +218,26 @@ export function makeTargetPair(backgroundLinear, type, strength) {
 /**
  * Apply the same luminance-noise distribution to target and field dots.
  *
- * @param {readonly number[]} baseLinear
+ * @param {RgbVector} baseLinear
  * @param {RandomSource} random
  * @param {number} luminanceJitter
+ * @returns {RgbVector}
  */
 export function jitterDotColor(baseLinear, random, luminanceJitter = 0.18) {
   const scale = 1 + (random() - 0.5) * 2 * luminanceJitter;
-  return baseLinear.map((channel) => linearToSrgb(channel * scale));
+  return [
+    linearToSrgb(baseLinear[0] * scale),
+    linearToSrgb(baseLinear[1] * scale),
+    linearToSrgb(baseLinear[2] * scale),
+  ];
 }
 
-/** @param {readonly number[]} channels */
+/** @param {RgbVector} channels */
 export function rgbCss(channels) {
   return `rgb(${channels[0]} ${channels[1]} ${channels[2]})`;
 }
 
-/** @param {readonly number[]} a @param {readonly number[]} b */
+/** @param {RgbVector} a @param {RgbVector} b */
 export function srgbDistance(a, b) {
   const rMean = (a[0] + b[0]) / 2;
   const dr = a[0] - b[0];
@@ -253,7 +277,10 @@ function buildSchedule(random) {
   return schedule.map((type, index) => ({
     id: `${type}-${index + 1}`,
     type,
-    orientation: ORIENTATIONS[Math.floor(random() * ORIENTATIONS.length)],
+    orientation: requiredElement(
+      ORIENTATIONS[Math.floor(random() * ORIENTATIONS.length)],
+      'adaptive orientation',
+    ),
   }));
 }
 
@@ -353,7 +380,9 @@ function updateStaircase(state, correct) {
 /** @param {AdaptiveRun} run */
 function skipFinishedAxisSlots(run) {
   while (run.index < run.schedule.length) {
-    const nextType = run.schedule[run.index].type;
+    const next = run.schedule[run.index];
+    if (!next) throw new RangeError('Adaptive schedule index is missing');
+    const nextType = next.type;
     if (nextType === 'control' || !run.axes[nextType].finished) return;
     run.index += 1;
   }
@@ -445,4 +474,20 @@ export function summarizeAdaptiveRun(run) {
       ? 'Lower values mean you followed a smaller colour shift in that direction on this display. The three directions are not clinical scores and should not be compared as diagnoses.'
       : 'Too many high-contrast task controls were missed to interpret the adaptive thresholds. Check the instructions and viewing setup, then try again.',
   };
+}
+
+/** @param {RgbVector} left @param {RgbVector} right */
+function dotProduct(left, right) {
+  return left[0] * right[0] + left[1] * right[1] + left[2] * right[2];
+}
+
+/**
+ * @template T
+ * @param {T | undefined} value
+ * @param {string} label
+ * @returns {T}
+ */
+function requiredElement(value, label) {
+  if (value === undefined) throw new RangeError(`Missing ${label}`);
+  return value;
 }

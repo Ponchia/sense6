@@ -82,7 +82,9 @@ export function createHeadphoneTrials({ count, practice = false, random = Math.r
   return Array.from({ length: count }, () => {
     const quietInterval = randomIndex(3, random);
     const remaining = [0, 1, 2].filter((index) => index !== quietInterval);
-    const antiPhaseInterval = practice ? null : remaining[randomIndex(remaining.length, random)];
+    const antiPhaseInterval = practice
+      ? null
+      : requiredElement(remaining[randomIndex(remaining.length, random)], 'headphone anti-phase interval');
     return {
       kind: 'headphones',
       quietInterval,
@@ -222,7 +224,7 @@ export function nextPitchTrial(tracks, random = Math.random) {
   if (!open.length) return null;
   const shortest = Math.min(...open.map((track) => track.records.length));
   const candidates = open.filter((track) => track.records.length <= shortest + 1);
-  const track = candidates[randomIndex(candidates.length, random)];
+  const track = requiredElement(candidates[randomIndex(candidates.length, random)], 'pitch track');
   return {
     kind: 'pitch',
     anchorHz: track.anchorHz,
@@ -328,7 +330,22 @@ export function median(values) {
   if (!values.length) return null;
   const sorted = [...values].sort((left, right) => left - right);
   const middle = Math.floor(sorted.length / 2);
-  return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+  const upper = sorted[middle];
+  if (upper === undefined) return null;
+  if (sorted.length % 2) return upper;
+  const lower = sorted[middle - 1];
+  return lower === undefined ? null : (lower + upper) / 2;
+}
+
+/**
+ * @template T
+ * @param {T | undefined} value
+ * @param {string} label
+ * @returns {T}
+ */
+function requiredElement(value, label) {
+  if (value === undefined) throw new RangeError(`Missing ${label}`);
+  return value;
 }
 
 /** @param {RangeTrack} track */

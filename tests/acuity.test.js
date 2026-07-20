@@ -71,6 +71,18 @@ test('Bayesian tracks move toward a simulated threshold and keep controls out of
   assert.ok(summary.upperArcmin > summary.thresholdArcmin);
 });
 
+test('acuity tracks reject invalid sizes and corrupted schedules explicitly', () => {
+  assert.throws(() => createAcuityTrack({ trials: 0 }), /trials must be positive/i);
+
+  const missingOrientation = createAcuityTrack({ trials: 1 });
+  missingOrientation.orientations = [];
+  assert.throws(() => nextAcuityTrial(missingOrientation), /orientation schedule is empty/i);
+
+  const missingPosterior = createAcuityTrack({ trials: 1 });
+  missingPosterior.posterior = [];
+  assert.throws(() => summarizeAcuity(missingPosterior), /missing acuity posterior/i);
+});
+
 test('orientation schedules are balanced and deterministic', () => {
   const first = createOrientationSchedule(18, seededRandom('directions'));
   const second = createOrientationSchedule(18, seededRandom('directions'));
@@ -117,6 +129,13 @@ test('meridian schedules cover every pair at both scales and require replication
   );
   assert.equal(inconsistent.stable, false);
   assert.equal(inconsistent.preferredAngle, null);
+});
+
+test('meridian schedules reject sparse angle inputs', () => {
+  assert.throws(
+    () => createMeridianSchedule({ angles: [0, undefined, 60] }),
+    /angle schedule contains a missing value/i,
+  );
 });
 
 test('low-contrast colors and within-run cost remain explicit', () => {

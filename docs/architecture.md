@@ -112,8 +112,10 @@ The type gate automatically includes every module under `src/lib/`,
 `src/exams/views/`, `src/i18n/`, and `src/locales/`, plus named shared runtime
 boundaries and controller declarations. The ratchet fails if the configuration
 omits a strict file. It also rejects type-suppression comments and explicit
-JSDoc `any`. Values crossing browser and storage boundaries still require
-runtime validation.
+JSDoc `any`. `noUncheckedIndexedAccess` requires fixed tuples or explicit
+handling for array, record, regular-expression, and other indexed lookups.
+Values crossing browser and storage boundaries still require runtime
+validation.
 
 CI gives the release gate ten minutes. Crossing that ceiling is a signal to
 shard the Playwright workload rather than silently accepting a slower feedback

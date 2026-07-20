@@ -45,6 +45,8 @@ The completed foundation includes:
 - an automatic strict typed-JavaScript ratchet covering every domain model,
   experiment view, locale catalog, and localization helper, plus shared routing
   boundaries;
+- unchecked indexed-access protection, fixed-size numerical tuples, and
+  explicit missing-value behavior across those strict boundaries;
 - checked public declarations for every lazy-loaded experiment controller;
 - guarded phase variants for the Tetracromia session and fail-closed browser and
   persistence boundaries; and
@@ -82,10 +84,11 @@ validated, certified, diagnostic, or suitable for medical or occupational use.
   `src/i18n/message-ids.js`. Migrate older source-keyed prose when it changes;
   don't create a high-risk catalog rewrite only to change key shape.
 - Keep the strict typed-JavaScript roots and public controller declarations
-  green. Convert one controller's internal state transitions when that
-  controller changes, rather than through an unreviewable suite-wide rewrite.
-  Revisit `.ts` modules only under the evidence-based conditions in architecture
-  decision record 0005.
+  green, including unchecked indexed-access protection. Model fixed-size data
+  as tuples and guard variable or external lookups. Convert one controller's
+  internal state transitions when that controller changes, rather than through
+  an unreviewable suite-wide rewrite. Revisit `.ts` modules only under the
+  evidence-based conditions in architecture decision record 0005.
 - Add runtime guards and malformed-input tests whenever code crosses storage,
   browser API, dynamic import, or phase-transition boundaries. Types alone do
   not validate those values.

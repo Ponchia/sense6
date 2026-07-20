@@ -23,13 +23,18 @@ measurement-specific complexity.
 
 ## Decision
 
-- Keep vanilla ECMAScript modules, Vite, and JSDoc-based strict checking.
+- Keep vanilla ECMAScript modules, Vite, and JSDoc-based strict checking. Enable
+  `noUncheckedIndexedAccess` so array, tuple, record, and regular-expression
+  lookups can't silently produce an unchecked value.
 - Require every domain module, locale catalog, localization helper, and reusable
   experiment view to pass `npm run typecheck`. A ratchet discovers files under
   those roots automatically so new files can't silently remain unchecked.
 - Reject type-suppression comments and explicit JSDoc `any` declarations in the
   strict program. Narrow values at storage, DOM, locale, audio, and dynamic
   import boundaries.
+- Represent fixed-size numerical values as tuples. Guard variable-length and
+  external lookups, and fail explicitly when a missing value means the state is
+  corrupt. Don't use casts only to hide an unchecked lookup.
 - Give every experiment controller a checked public module declaration. Convert
   controller internals one stable state transition at a time when that
   controller changes.
@@ -58,3 +63,8 @@ are more verbose than TypeScript syntax.
 Runtime behavior and deployment remain unchanged. The stricter program makes a
 future file-by-file TypeScript migration smaller because its domain contracts
 and module seams already exist.
+
+The compiler now exposes missing array and record values at review time. Some
+valid loops require explicit tuple contracts or local guards, but those checks
+also document whether absence is a fallback, a rejected action, or corrupt
+state.

@@ -16,3 +16,7 @@ test('shuffle is repeatable and preserves every member', () => {
   assert.deepEqual(first, second);
   assert.deepEqual([...first].sort(), values);
 });
+
+test('shuffle rejects random sources outside the documented half-open range', () => {
+  assert.throws(() => shuffle([1, 2], () => 1), /missing shuffle target index/i);
+});

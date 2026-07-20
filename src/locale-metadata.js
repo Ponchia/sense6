@@ -59,7 +59,9 @@ const LOCALE_ALIASES = new Map(
 
 /** @param {string} locale @returns {LocaleMetadata} */
 export function localeMetadata(locale) {
-  return LOCALE_BY_CODE.get(locale) ?? LOCALES[0];
+  const metadata = LOCALE_BY_CODE.get(locale) ?? LOCALE_BY_CODE.get(DEFAULT_LOCALE);
+  if (!metadata) throw new Error('Default locale metadata is unavailable');
+  return metadata;
 }
 
 /** @param {unknown} value @returns {LocaleCode | null} */
@@ -70,7 +72,7 @@ export function resolveLocale(value) {
   const alias = LOCALE_ALIASES.get(normalized);
   if (alias) return alias;
   const subtags = normalized.split('-');
-  const base = subtags[0];
+  const base = subtags[0] ?? '';
   if (base === 'pt' && subtags.includes('br')) return 'pt-br';
   if (base === 'zh') {
     return subtags.some((subtag) => ['hans', 'cn', 'sg'].includes(subtag)) ? 'zh-hans' : null;

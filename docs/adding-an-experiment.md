@@ -53,7 +53,10 @@ model to the browser.
 Every module under `src/lib/` enters the strict typed-JavaScript program
 automatically. Use JSDoc variants for phase-specific state, narrow unknown
 inputs, and add runtime guards at transitions that events or stored data can
-reach. Don't bypass the gate with suppression comments or explicit `any`.
+reach. Model fixed-size vectors and matrices as tuples. Handle a missing value
+explicitly whenever you index a variable-length array, record, capture group,
+or schedule. Don't bypass the gate with suppression comments, explicit `any`,
+or a cast whose only purpose is to hide an unchecked lookup.
 
 Use explicit bounds and quality states. Don't invent precision, population
 norms, clinical labels, or a suite-wide score.

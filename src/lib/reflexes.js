@@ -69,7 +69,11 @@ export function createChoiceSchedule({ trials, minWaitMs, maxWaitMs, random }) {
   const waits = balancedWaits(trials, minWaitMs, maxWaitMs, random);
   const shuffledSides = shuffle(sides, random);
 
-  return waits.map((waitMs, index) => ({ kind: 'choice', side: shuffledSides[index], waitMs }));
+  return waits.map((waitMs, index) => ({
+    kind: 'choice',
+    side: requiredElement(shuffledSides[index], 'choice side'),
+    waitMs,
+  }));
 }
 
 /** @param {number} minWaitMs @param {number} maxWaitMs @param {RandomSource} random */
@@ -82,7 +86,11 @@ export function median(values) {
   if (!values.length) return null;
   const sorted = [...values].sort((left, right) => left - right);
   const middle = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
+  const upper = sorted[middle];
+  if (upper === undefined) return null;
+  if (sorted.length % 2 !== 0) return upper;
+  const lower = sorted[middle - 1];
+  return lower === undefined ? null : (lower + upper) / 2;
 }
 
 /** @param {readonly number[]} values @param {number} proportion */
@@ -90,7 +98,7 @@ export function percentile(values, proportion) {
   if (!values.length) return null;
   const sorted = [...values].sort((left, right) => left - right);
   const index = Math.max(0, Math.min(sorted.length - 1, Math.ceil(proportion * sorted.length) - 1));
-  return sorted[index];
+  return sorted[index] ?? null;
 }
 
 /** @param {readonly number[]} values */
@@ -188,4 +196,15 @@ function correctTimes(records = []) {
       ? [record.rt]
       : [],
   );
+}
+
+/**
+ * @template T
+ * @param {T | undefined} value
+ * @param {string} label
+ * @returns {T}
+ */
+function requiredElement(value, label) {
+  if (value === undefined) throw new RangeError(`Missing ${label}`);
+  return value;
 }
