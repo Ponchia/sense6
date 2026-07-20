@@ -48,6 +48,11 @@ brief](docs/research/acutezza.md) records the method, product boundary, complete
 software checks, and the permanent distinction between implementation
 verification and scientific validity.
 
+The cross-test [evidence and product
+audit](docs/research/five-test-evidence-and-product-audit.md) reviews the shipped
+protocol, duration, references, competitors, interface, result completeness,
+open-source precedents, and recommended next work for all five experiments.
+
 The [product and engineering roadmap](docs/roadmap.md) records the completed
 private repeated-run journal and the permanent experimental product boundary.
 The shared lifecycle, versioned persistence, route-level loading, and bundle

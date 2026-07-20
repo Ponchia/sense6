@@ -10,6 +10,10 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- A source-backed evidence and product audit of all five experiments, covering
+  shipped doses and timings, reference gaps, competitor and open-source
+  precedents, interface findings, result completeness, depth choices, and a
+  prioritized integrity and validation backlog.
 - An architecture overview, an experiment extension guide, and an accepted
   decision record for continuing with incremental typed JavaScript.
 - A typed exam service contract that centralizes experiment identity, analytics

@@ -6,6 +6,16 @@
 Status: implemented as a permanently experimental, nonclinical browser task;
 no certification or formal validation planned, 2026-07-19
 
+Update, 2026-07-20: this brief records the design that preceded implementation.
+The later cross-test [evidence and product
+audit](five-test-evidence-and-product-audit.md) is the current decision source
+for the shipped protocol. Its null simulations found that the implemented
+Meridiani schedule can report a stable preference about 15–16% of the time
+without a stable signal, and its control audit found permissive one-control
+paths. Treat the current Meridiani score as unsupported until the P0 redesign;
+the calibration and Landolt-gap rationale below remain applicable within the
+boundaries stated here and in the audit.
+
 Acutezza is a calibrated browser sharpness experiment, not an online eye exam.
 It describes what a person resolved on one screen, at one estimated
 distance, with one stated correction. It must not diagnose astigmatism, produce
