@@ -246,6 +246,7 @@
   min-inline-size: 0;
   overflow: hidden;
   padding: 0;
+  transition: transform var(--duration-base) var(--ease-standard);
 }
 
 .exam-card__link {

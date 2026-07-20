@@ -703,6 +703,7 @@ test('Acutezza completes both scopes through every audited mobile viewport witho
       if (viewport.width === 320) await expectAcutezzaAtTwoHundredPercent(page, `${label} practice runner`);
       await answerAcutezzaTarget(page);
 
+      await expect(page.getByRole('button', { name: /Begin Nitidezza/i })).toBeVisible();
       await expectAcutezzaPageToReflow(page, `${label} practice transition`);
       await expectAcutezzaActionsToBeReachable(page, `${label} practice transition`);
       if (viewport.width === 320)
@@ -711,6 +712,7 @@ test('Acutezza completes both scopes through every audited mobile viewport witho
       await answerAcutezzaTarget(page);
       await answerAcutezzaTarget(page);
       if (scope === 'standard') {
+        await expect(page.getByRole('button', { name: /Continue to Contrasto/i })).toBeVisible();
         await expectAcutezzaPageToReflow(page, `${label} condition transition`);
         await expectAcutezzaActionsToBeReachable(page, `${label} condition transition`);
         if (viewport.width === 320)
