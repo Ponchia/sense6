@@ -87,6 +87,15 @@ export class HearingAudio {
     return this.waitForAudioTime(startAt + durationSeconds + 0.03, token);
   }
 
+  async playAudibilityAnchors() {
+    return this.playIntervals(
+      [200, 500, 2000].map((frequencyHz) => ({
+        frequencyHz,
+        gain: HEARING_DIGITAL_LEVELS.pitchBase,
+      })),
+    );
+  }
+
   /** @param {HeadphoneTrial} trial @param {(index: number) => void} [onInterval] */
   async playHeadphoneTrial(trial, onInterval) {
     const intervals = [0, 1, 2].map((index) => ({

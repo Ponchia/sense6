@@ -432,6 +432,28 @@ body.rx-running > .ui-sitefooter {
   max-inline-size: 40rem;
 }
 
+.rx-setup-field {
+  color: var(--text-dim);
+  display: grid;
+  font-family: var(--mono);
+  font-size: var(--text-xs);
+  gap: 0.55rem;
+  letter-spacing: var(--tracking-wide);
+  margin-block-start: 1.5rem;
+  text-transform: uppercase;
+}
+
+.rx-setup-field select {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font: inherit;
+  letter-spacing: normal;
+  min-block-size: 3rem;
+  padding-inline: 0.75rem;
+  text-transform: none;
+}
+
 .rx-consent input {
   accent-color: #f4b942;
   block-size: 1.15rem;

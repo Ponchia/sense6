@@ -224,7 +224,7 @@ test('every live exam has a localized entry point in every language', async ({ p
   test.skip(testInfo.project.name === 'mobile', 'Localization routing is viewport-independent');
   test.setTimeout(90_000);
   const headingSources = {
-    tetracromia: ['How finely do you', 'see', 'colour?'],
+    tetracromia: ['Notice colour in', 'three different ways'],
     'color-blindness': ['Find the gap', 'in the dots'],
     riflessi: ['Notice the signal.', 'Measure the response.'],
     udito: ['Listen for the boundary.', 'Keep the limits audible.'],
@@ -236,7 +236,7 @@ test('every live exam has a localized entry point in every language', async ({ p
       await page.goto(`/${code}/${route}/`);
       await expect(page.locator('html')).toHaveAttribute('lang', languageTag);
       const expected = headingSources[route].map((source) => escapeRegex(messages.get(source))).join('\\s*');
-      const suffix = route === 'color-blindness' ? '\\.' : '';
+      const suffix = ['tetracromia', 'color-blindness'].includes(route) ? '\\.' : '';
       await expect(page.locator('main h1')).toHaveText(new RegExp(`^${expected}${suffix}$`, 'u'));
       await expect(page.locator('[data-locale-select]')).toHaveValue(code);
     }

@@ -1,6 +1,6 @@
 /** @typedef {{ title: string, body: string }} MethodStep */
 /** @typedef {{ number: string, name: string, eyebrow: string, body: string }} InstrumentSummary */
-/** @typedef {readonly [label: string, href: string]} ResearchSource */
+/** @typedef {import('./sources.js').EvidenceSource} ResearchSource */
 /** @typedef {{ className: string, titleId: string, title: string, description: string, sources: readonly ResearchSource[], label: string }} ResearchSection */
 
 /**
@@ -56,13 +56,18 @@ export function renderResearchSection(section) {
           <ul class="source-list">
             ${section.sources
               .map(
-                ([label, href]) =>
-                  `<li><a href="${escapeAttribute(href)}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a></li>`,
+                ({ label, href, role }) =>
+                  `<li><span class="source-role">${escapeHtml(sourceRoleLabel(role))}</span><a href="${escapeAttribute(href)}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a></li>`,
               )
               .join('')}
           </ul>
         </aside>
       </section>`;
+}
+
+/** @param {ResearchSource['role']} role */
+function sourceRoleLabel(role) {
+  return SOURCE_ROLE_LABELS[role];
 }
 
 /** @param {string} value */
@@ -79,3 +84,5 @@ function escapeHtml(value) {
 function escapeAttribute(value) {
   return escapeHtml(value);
 }
+
+import { SOURCE_ROLE_LABELS } from './sources.js';

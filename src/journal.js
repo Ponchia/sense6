@@ -163,6 +163,11 @@ function qualitySource(quality) {
 
 function reasonLabel(reason, copy) {
   if (reason === 'different-instrument') return copy.reasonInstrument;
+  if (
+    reason === 'legacy-protocol' ||
+    ['methodVersion', 'profileId', 'configDigest', 'stimulusVersion'].some((field) => reason.includes(field))
+  )
+    return copy.reasonProtocol ?? journalCopy('en').reasonProtocol;
   if (reason === 'volume-not-verifiable') return copy.reasonVolume;
   if (reason === 'limited-run') return copy.reasonLimited;
   if (reason.startsWith('changed:') || reason.startsWith('missing:'))

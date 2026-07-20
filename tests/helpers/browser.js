@@ -118,7 +118,6 @@ const QUICK_ACUTEZZA = {
     },
     high: { trials: 2, controlAt: [] },
     low: { trials: 2, controlAt: [], contrast: 0.1 },
-    meridian: { angles: [0, 60, 120], scales: [1, 1.5] },
   },
 };
 
@@ -140,8 +139,9 @@ export async function installQuickAcutezza(page) {
   }, QUICK_ACUTEZZA);
 }
 
-export async function completeAcutezzaCalibration(page) {
+export async function completeAcutezzaCalibration(page, { scope = 'standard' } = {}) {
   await page.getByRole('button', { name: /Prepare the vision lab/i }).click();
+  if (scope === 'focused') await page.locator('[data-action="ac-scope"][data-scope="focused"]').click();
   await expect(page.locator('.experiment-boundary')).toHaveText(
     /recreational experiment for curiosity and fun—not a medical test or diagnosis/i,
   );
@@ -151,7 +151,7 @@ export async function completeAcutezzaCalibration(page) {
   await page.getByRole('button', { name: /Use a ruler-measured distance/i }).click();
   await page.getByLabel(/Distance in centimetres/i).fill('50');
   await page.getByRole('button', { name: /Use measured distance/i }).click();
-  await page.getByRole('button', { name: /Yes, clearly/i }).click();
+  if (scope === 'standard') await page.getByRole('button', { name: /Yes, clearly/i }).click();
 }
 
 export async function answerAcutezzaTarget(page, correct = true) {
@@ -162,7 +162,7 @@ export async function answerAcutezzaTarget(page, correct = true) {
   await page.locator(`[data-ac-direction="${response}"]`).click();
 }
 
-export async function completeAcutezzaEye(page, { missPractice = false } = {}) {
+export async function completeAcutezzaEye(page, { missPractice = false, includeContrast = true } = {}) {
   await page.getByRole('button', { name: /Start practice/i }).click();
   if (missPractice) {
     await answerAcutezzaTarget(page, false);
@@ -172,14 +172,22 @@ export async function completeAcutezzaEye(page, { missPractice = false } = {}) {
   await page.getByRole('button', { name: /Begin Nitidezza/i }).click();
   await answerAcutezzaTarget(page);
   await answerAcutezzaTarget(page);
-  await page.getByRole('button', { name: /Continue to Contrasto/i }).click();
+  if (!includeContrast) return;
+  const contrast = page.getByRole('button', { name: /Continue to Contrasto/i });
+  await expect(contrast).toBeVisible();
+  await contrast.click();
   await answerAcutezzaTarget(page);
   await answerAcutezzaTarget(page);
-  await page.getByRole('button', { name: /Continue to Meridiani/i }).click();
-  for (let comparison = 0; comparison < 6; comparison += 1) {
-    await expect(page.locator('[data-ac-meridian="left"]')).toBeVisible();
-    await page.getByRole('button', { name: /No difference/i }).click();
-  }
+}
+
+export async function completeUditoSetup(page) {
+  await page.getByRole('button', { name: /Play maximum-level reference|Play reference again/i }).click();
+  await expect(page.getByText(/Reference completed on the audio clock/i)).toBeVisible();
+  await page.getByRole('button', { name: /Play 200 Hz, 500 Hz, and 2 kHz audibility anchors/i }).click();
+  const anchors = page.getByLabel(/I heard all three anchors comfortably/i);
+  await expect(anchors).toBeEnabled();
+  await anchors.check();
+  await page.getByLabel(/The reference is quiet and comfortable/i).check();
 }
 
 export async function answerCurrentSoundTrial(page) {

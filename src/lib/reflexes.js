@@ -6,7 +6,7 @@ import { shuffle } from './random.js';
 /** @typedef {{ durationMs: number, minWaitMs: number, maxWaitMs: number, responseTimeoutMs: number }} StabilityConfig */
 /** @typedef {{ anticipationMs: number, feedbackMs: number, signal: SignalConfig, choice: ChoiceConfig, stability: StabilityConfig }} ReflexConfig */
 /** @typedef {Partial<Omit<ReflexConfig, 'signal' | 'choice' | 'stability'>> & { signal?: Partial<SignalConfig>, choice?: Partial<ChoiceConfig>, stability?: Partial<StabilityConfig> }} ReflexConfigOverride */
-/** @typedef {'correct' | 'wrong' | 'miss' | 'false-start' | 'anticipation'} ReflexOutcome */
+/** @typedef {'correct' | 'wrong' | 'miss' | 'false-start' | 'anticipation' | 'catch-correct'} ReflexOutcome */
 /** @typedef {{ outcome: ReflexOutcome, rt?: number | null }} ReflexRecord */
 /** @typedef {{ signal: ReflexRecord[], choice: ReflexRecord[], stability: ReflexRecord[] }} ReflexRecords */
 
@@ -112,7 +112,7 @@ export function roundToFive(value) {
   return typeof value === 'number' && Number.isFinite(value) ? Math.round(value / 5) * 5 : null;
 }
 
-/** @param {ReflexRecords} records @param {Partial<Record<'signal' | 'choice' | 'stability', number>>} expected */
+/** @param {ReflexRecords} records @param {{ signal?: number, signalScheduled?: number, choice?: number, stability?: number, catches?: number, interruptions?: number }} expected */
 export function summarizeRiflessi(records, expected = {}) {
   const signalTimes = correctTimes(records.signal);
   const choiceTimes = correctTimes(records.choice);
@@ -129,26 +129,44 @@ export function summarizeRiflessi(records, expected = {}) {
   const firstHalfMedian = median(firstHalf);
   const secondHalfMedian = median(secondHalf);
   const choiceAttempts = records.choice.filter((record) =>
-    ['correct', 'wrong', 'miss'].includes(record.outcome),
+    ['correct', 'wrong'].includes(record.outcome),
   ).length;
+  const choiceScheduled = expected.choice ?? records.choice.length;
+  const signalScheduled = expected.signalScheduled ?? expected.signal ?? records.signal.length;
+  const catchesPassed = records.signal.filter((record) => record.outcome === 'catch-correct').length;
   const allRecords = [...records.signal, ...records.choice, ...records.stability];
-  const requiredSignal = Math.max(1, Math.floor((expected.signal ?? 20) * 0.6));
-  const requiredChoice = Math.max(1, Math.floor((expected.choice ?? 32) * 0.6));
-  const requiredStability = Math.max(1, expected.stability ?? 6);
+  const requiredSignal = Math.ceil((expected.signal ?? signalTimes.length) * 0.8);
+  const requiredChoice = Math.ceil(choiceScheduled * 0.8);
+  const requiredStability = expected.stability ?? 6;
+  const reasons = [];
+  if (records.signal.length !== signalScheduled) reasons.push('signal-schedule-incomplete');
+  if (records.choice.length !== choiceScheduled) reasons.push('choice-schedule-incomplete');
+  if (signalTimes.length < requiredSignal) reasons.push('signal-valid-responses-low');
+  if (choiceTimes.length < requiredChoice) reasons.push('choice-valid-responses-low');
+  if (stabilityTimes.length < requiredStability) reasons.push('sustained-valid-responses-low');
+  if (catchesPassed !== (expected.catches ?? 0)) reasons.push('signal-catches-failed');
+  if ((expected.interruptions ?? 0) > 0) reasons.push('timing-interrupted');
 
   return {
     signal: {
       medianMs: roundToFive(signalMedian),
-      spreadMs: roundToFive(medianAbsoluteDeviation(signalTimes)),
+      withinRunSpreadMs: roundToFive(medianAbsoluteDeviation(signalTimes)),
       valid: signalTimes.length,
+      scheduled: signalScheduled,
     },
     choice: {
       medianMs: roundToFive(choiceMedian),
-      accuracyPercent: choiceAttempts ? Math.round((choiceTimes.length / choiceAttempts) * 100) : null,
-      costMs:
+      conditionalAccuracyPercent: choiceAttempts
+        ? Math.round((choiceTimes.length / choiceAttempts) * 100)
+        : null,
+      scheduledAccuracyPercent: choiceScheduled
+        ? Math.round((choiceTimes.length / choiceScheduled) * 100)
+        : null,
+      blockDifferenceMs:
         signalMedian === null || choiceMedian === null ? null : roundToFive(choiceMedian - signalMedian),
       valid: choiceTimes.length,
       attempts: choiceAttempts,
+      scheduled: choiceScheduled,
     },
     stability: {
       medianMs: roundToFive(stabilityMedian),
@@ -167,11 +185,11 @@ export function summarizeRiflessi(records, expected = {}) {
       anticipations: allRecords.filter((record) => record.outcome === 'anticipation').length,
       misses: allRecords.filter((record) => record.outcome === 'miss').length,
       wrongChoices: records.choice.filter((record) => record.outcome === 'wrong').length,
+      catchesPassed,
+      catchesScheduled: expected.catches ?? 0,
     },
-    usable:
-      signalTimes.length >= requiredSignal &&
-      choiceTimes.length >= requiredChoice &&
-      stabilityTimes.length >= requiredStability,
+    qualityReasons: reasons,
+    usable: reasons.length === 0,
   };
 }
 

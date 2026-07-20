@@ -18,11 +18,13 @@ import { seededRandom } from '../lib/random.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 import { renderMethodSteps, renderResearchSection } from './landing.js';
+import { protocolPassport } from './protocols.js';
+import { sourcesFor } from './sources.js';
 
 const RESULT_STORE = createResultStore({
   key: 'sense6:daltonia:last',
   legacyKeys: ['daltonia-last'],
-  validate: (value) => isRecord(value) && value.schemaVersion === 2 && Array.isArray(value.thresholds),
+  validate: (value) => isRecord(value) && value.schemaVersion === 3 && Array.isArray(value.levels),
 });
 const MOUNT_OWNER = Symbol('daltonia');
 const EDITABLE_CONTROL_SELECTOR = 'input, select, textarea, [contenteditable]:not([contenteditable="false"])';
@@ -60,22 +62,18 @@ const PRACTICE_TARGETS = [
 const METHOD_STEPS = [
   {
     title: 'Practice first',
-    body: 'Two clear targets teach the C-gap interaction with immediate feedback before any threshold is measured.',
+    body: 'Two clear targets teach the C-gap interaction with immediate feedback before the exploratory track.',
   },
   {
     title: 'Luminance noise',
-    body: 'Target and field dots share the same brightness variation, reducing a consistent lightness cue.',
+    body: 'Target and field are luminance-matched in linear sRGB and share the same dot-level brightness variation.',
   },
   {
     title: 'Three staircases',
-    body: 'Directions become harder after correct responses. “No gap visible” counts as a miss and makes that direction easier.',
+    body: 'Directions become harder after correct responses. “No gap visible” counts as a miss and makes that display direction easier.',
   },
 ];
-const RESEARCH_SOURCES = [
-  ['Regan, Reffin & Mollon, 1994', 'https://doi.org/10.1016/0042-6989(94)90203-8'],
-  ['Rabin, Gooch & Ivan, 2011', 'https://doi.org/10.1167/iovs.10-6283'],
-  ['Evans et al., 2025', 'https://doi.org/10.1364/JOSAA.544985'],
-];
+const RESEARCH_SOURCES = sourcesFor('color-blindness');
 
 let state = null;
 
@@ -95,6 +93,8 @@ export function mount(context) {
     practiceFeedback: null,
     measurementEnvironment: null,
     dprGuardCleanup: () => {},
+    responseOpen: false,
+    renderToken: 0,
   };
   state = mountState;
   wireEvents(lifecycle.signal);
@@ -131,8 +131,7 @@ function renderIntro() {
           <h1>Find the gap <em>in the dots</em>.</h1>
           <p class="cb-lede">
             A C-shaped target becomes harder to separate from its field. Three independent
-            staircases estimate the smallest colour shift you follow in each display-relative
-            direction during this run.
+            staircases record where each short display-relative track ends during this run.
           </p>
           <div class="ui-cluster cb-hero__actions">
             <button class="ui-button ui-button--lg" type="button" data-action="cb-setup">
@@ -146,7 +145,7 @@ function renderIntro() {
           </p>
           ${
             previous
-              ? '<p class="previous-score">Last run on this browser: <strong>display-relative thresholds recorded</strong></p>'
+              ? '<p class="previous-score">Last run on this browser: <strong>exploratory adaptive levels recorded</strong></p>'
               : ''
           }
         </div>
@@ -184,7 +183,7 @@ function renderIntro() {
           <div class="method__intro">
             <p class="ui-eyebrow">${m('section.methodLimits')}</p>
             <h2>Run-relative output</h2>
-            <p>You receive thresholds and run spread, not a normal/deficient label or a clinical score.</p>
+            <p>You receive ending adaptive levels and track evidence, not cone thresholds, a normal/deficient label, or a clinical score.</p>
           </div>
           ${renderMethodSteps(METHOD_STEPS)}
         </div>
@@ -235,7 +234,7 @@ function renderSetup() {
           <p class="ui-eyebrow">Viewing setup / 01 of 01</p>
           <h1>Colour filters off, please.</h1>
           <p class="setup-lede">
-            The thresholds only describe this browser, display, lighting, and viewing position.
+            The adaptive track only describes this browser, display, lighting, and viewing position.
             Colour-shifting features can move them substantially.
           </p>
           <div class="ui-alert ui-alert--info forced-colors-warning">
@@ -267,7 +266,7 @@ function renderSetup() {
           <p class="calibration-hint">These six swatches are a gross display check, not colour calibration.</p>
           <label class="ui-check ready-check">
             <input type="checkbox" id="cb-ready" />
-            <span><strong class="experiment-boundary">I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.</strong>My colour filters are off and I understand this is an unvalidated browser experiment.</span>
+            <span><strong class="experiment-boundary">I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.</strong> My colour filters are off and I understand this is an unvalidated browser experiment.</span>
           </label>
           <button class="ui-button ui-button--lg" id="cb-start" type="button" data-action="cb-begin" disabled>
             Start practice <span aria-hidden="true">→</span>
@@ -409,13 +408,16 @@ function renderTrial() {
   const total = state.run.schedule.length;
   const trialNumber = state.run.responses.length + 1;
   const progress = Math.round((state.run.index / total) * 100);
+  state.responseOpen = false;
+  state.renderToken += 1;
+  const renderToken = state.renderToken;
   document.title = `Response ${trialNumber}, up to ${total} — Daltonia | Sense6`;
 
   state.app.innerHTML = `
     <section class="cb-view" data-measurement-active style="--cb-stimulus-size:${state.measurementEnvironment.stimulusCssPixels}px">
       <div class="lab-topbar ui-container ui-container--wide">
         <button class="back-link" type="button" data-action="cb-home"><span aria-hidden="true">×</span> End experiment</button>
-        <p class="cb-topbar__label">Adaptive colour threshold</p>
+        <p class="cb-topbar__label">Exploratory adaptive colour track</p>
         <span class="trial-count"><b>${String(trialNumber).padStart(2, '0')}</b> / ≤${String(total).padStart(2, '0')}</span>
       </div>
 
@@ -435,7 +437,7 @@ function renderTrial() {
           <p class="ui-eyebrow">Adaptive response</p>
           <h1 class="cb-prompt" tabindex="-1" data-trial-focus>Where is the gap?</h1>
           <p class="cb-trial-hint">Some targets should disappear. Say so instead of guessing and that direction will become easier.</p>
-          ${responseSetMarkup(false)}
+          ${responseSetMarkup(false, true)}
           <p class="cb-key-hint">Keyboard: arrow keys · N for no gap</p>
         </div>
       </div>
@@ -443,23 +445,31 @@ function renderTrial() {
   `;
 
   requestAnimationFrame(() => {
+    if (state.renderToken !== renderToken || !state.active) return;
     const canvas = state.app.querySelector('[data-target]');
     if (canvas) drawTarget(canvas, trial, `run-${trial.id}`);
-    state.app.querySelector('[data-trial-focus]')?.focus({ preventScroll: true });
+    requestAnimationFrame(() => {
+      if (state.renderToken !== renderToken || !state.active) return;
+      state.responseOpen = true;
+      state.app.querySelectorAll('[data-orientation]').forEach((button) => {
+        button.disabled = false;
+      });
+      state.app.querySelector('[data-trial-focus]')?.focus({ preventScroll: true });
+    });
   });
 }
 
-function responseSetMarkup(practice) {
+function responseSetMarkup(practice, disabled = false) {
   const label = practice ? 'Choose the practice gap direction' : 'Choose the gap direction';
   return `<div class="cb-response-set" role="group" aria-label="${label}">
     <div class="cb-directions">
-      ${directionButton('up')}
-      ${directionButton('left')}
+      ${directionButton('up', disabled)}
+      ${directionButton('left', disabled)}
       <span class="cb-directions__center" aria-hidden="true">C</span>
-      ${directionButton('right')}
-      ${directionButton('down')}
+      ${directionButton('right', disabled)}
+      ${directionButton('down', disabled)}
     </div>
-    <button class="ui-button ui-button--ghost cb-unseen" type="button" data-orientation="unseen">
+    <button class="ui-button ui-button--ghost cb-unseen" type="button" data-orientation="unseen" ${disabled ? 'disabled' : ''}>
       <span>No gap visible</span>
       <small>${practice ? 'Practice with feedback' : 'Adaptive response'}</small>
     </button>
@@ -475,12 +485,18 @@ function directionButton(direction, disabled = false) {
 
 function submitOrientation(orientation) {
   if (!state.active) return;
+  if (!['up', 'right', 'down', 'left', 'unseen'].includes(orientation)) return;
   if (state.phase === 'practice') {
     submitPracticeAnswer(orientation);
     return;
   }
   if (state.phase !== 'run' || !state.run) return;
-  recordAdaptiveAnswer(state.run, orientation);
+  if (!state.responseOpen) return;
+  state.responseOpen = false;
+  state.app.querySelectorAll('[data-orientation]').forEach((button) => {
+    button.disabled = true;
+  });
+  if (!recordAdaptiveAnswer(state.run, orientation)) return;
   if (state.run.index >= state.run.schedule.length) {
     renderResults();
     return;
@@ -496,7 +512,7 @@ function renderResults() {
   state.phase = 'results';
   document.body.classList.add('lab-mode');
   window.scrollTo({ top: 0, behavior: 'instant' });
-  document.title = t('Your display-relative thresholds — Daltonia | Sense6');
+  document.title = t('Your display-relative adaptive levels — Daltonia | Sense6');
   const result = summarizeAdaptiveRun(state.run);
   const lastResultSaved = saveLast(result);
   const journalSaved = saveJournalResult(result);
@@ -511,8 +527,8 @@ function renderResults() {
           <h1>${result.title}.</h1>
           <p>${result.detail}</p>
         </div>
-        <div class="cb-verdict cb-verdict--${result.controlOk ? 'threshold' : 'inconclusive'}" aria-hidden="true">
-          <span>${result.controlOk ? '≈' : '?'}</span>
+        <div class="cb-verdict cb-verdict--${result.controlStatus === 'failed' ? 'inconclusive' : 'threshold'}" aria-hidden="true">
+          <span>${result.controlStatus === 'passed' ? '≈' : result.controlStatus === 'caution' ? '!' : '?'}</span>
         </div>
       </div>
 
@@ -546,8 +562,8 @@ function renderResults() {
       <div class="results-actions">
         ${
           storageOk
-            ? '<button class="ui-button ui-button--lg" type="button" data-action="cb-setup">Run again</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-copy">Copy run summary</button>'
-            : '<button class="ui-button ui-button--lg" type="button" data-action="cb-copy">Copy run summary</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-setup">Run again</button>'
+            ? '<button class="ui-button ui-button--lg" type="button" data-action="cb-setup">Repeat independently</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-copy">Copy run summary</button>'
+            : '<button class="ui-button ui-button--lg" type="button" data-action="cb-copy">Copy run summary</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-setup">Repeat independently</button>'
         }
         <button class="ui-button ui-button--subtle" type="button" data-action="gallery">${m('nav.allTests')}</button>
       </div>
@@ -562,17 +578,17 @@ function thresholdCard(axis) {
   const prefix = axis.limit === 'floor' ? '≤' : axis.limit === 'ceiling' ? '≥' : '';
   let note = `${axis.stability === 'settled' ? 'Staircase settled' : 'Limited reversals'} · ${axis.reversals} reversals`;
   if (axis.limit === 'floor') {
-    note = `Experiment floor confirmed · ${axis.presentations} presentations`;
+    note = `Track reached its minimum colour separation · ${axis.presentations} presentations`;
   } else if (axis.limit === 'ceiling') {
-    note = `Experiment maximum reached · ${axis.presentations} presentations`;
+    note = `Track reached its maximum colour separation · ${axis.presentations} presentations`;
   }
   const spread = axis.limit
-    ? `<p class="cb-threshold-card__spread"><span>${axis.limit === 'floor' ? 'lower' : 'upper'} measurement bound</span></p>`
-    : `<p class="cb-threshold-card__spread">±${formatNumber(axis.spread, { minimumFractionDigits: 3, maximumFractionDigits: 3 })} <span>run spread</span></p>`;
+    ? `<p class="cb-threshold-card__spread"><span>${axis.limit === 'floor' ? 'upper bound on required separation (≤)' : 'lower bound on required separation (≥)'}</span></p>`
+    : `<p class="cb-threshold-card__spread">${formatNumber(axis.spread, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} <span>adaptive-track spread, not uncertainty</span></p>`;
   return `<article class="cb-scorecard cb-threshold-card">
     <div class="cb-scorecard__head">
       <div><h2>${axis.label}</h2><p>${axis.description}</p></div>
-      <strong>${prefix}${formatNumber(axis.threshold, { minimumFractionDigits: 3, maximumFractionDigits: 3 })}</strong>
+      <strong>${prefix}${formatNumber(axis.threshold, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
     </div>
     ${spread}
     <p class="cb-scorecard__note">${note}</p>
@@ -586,9 +602,11 @@ function controlCard(result) {
       <strong>${result.controls.correct}/${result.controls.total}</strong>
     </div>
     <p class="cb-scorecard__note">${
-      result.controlOk
-        ? 'Enough controls were read to report this run.'
-        : 'Too many controls were missed; repeat before interpreting thresholds.'
+      result.controlStatus === 'passed'
+        ? 'All controls passed; the short-run observations can be shown.'
+        : result.controlStatus === 'caution'
+          ? 'Two of three controls passed; keep these observations only with a caution.'
+          : 'Fewer than two controls passed; do not treat these observations as usable.'
     }</p>
   </article>`;
 }
@@ -660,23 +678,16 @@ function announce(message) {
 
 async function copyResults() {
   const result = summarizeAdaptiveRun(state.run);
-  const thresholds = result.axes
+  const levels = result.axes
     .map((axis) => {
       const prefix = axis.limit === 'floor' ? '≤' : axis.limit === 'ceiling' ? '≥' : '';
       const spread = axis.limit
         ? ''
-        : ` ±${formatNumber(axis.spread, { minimumFractionDigits: 3, maximumFractionDigits: 3 })}`;
-      return `${t(axis.label)} ${prefix}${formatNumber(axis.threshold, { minimumFractionDigits: 3, maximumFractionDigits: 3 })}${spread}`;
+        : ` (track spread ${formatNumber(axis.spread, { maximumFractionDigits: 2 })})`;
+      return `${t(axis.label)} ${prefix}${formatNumber(axis.threshold, { maximumFractionDigits: 2 })}${spread}`;
     })
     .join(', ');
-  const summary = t(
-    'Daltonia experimental browser run — {thresholds}; task controls {correct}/{total}. Display-relative, unvalidated, and not diagnostic.',
-    {
-      thresholds,
-      correct: result.controls.correct,
-      total: result.controls.total,
-    },
-  );
+  const summary = `Daltonia exploratory browser run — ending adaptive levels: ${levels}; task controls ${result.controls.correct}/${result.controls.total}. Display-relative HPE/sRGB coordinates, unvalidated, not cone thresholds, and not diagnostic.`;
   try {
     await navigator.clipboard.writeText(summary);
     toast(t('Run summary copied'), { tone: 'success' });
@@ -691,8 +702,8 @@ function loadLast() {
 
 function saveLast(result) {
   return RESULT_STORE.save({
-    schemaVersion: 2,
-    thresholds: result.axes.map(({ type, threshold, spread }) => ({ type, threshold, spread })),
+    schemaVersion: 3,
+    levels: result.axes.map(({ type, threshold, spread }) => ({ type, level: threshold, spread })),
     controlOk: result.controlOk,
     savedAt: new Date().toISOString(),
   });
@@ -703,7 +714,8 @@ function saveJournalResult(result) {
   const entry = createJournalEntry({
     examId: 'color-blindness',
     locale: state.locale,
-    quality: result.controlOk ? 'usable' : 'limited',
+    quality: result.controlOk ? 'usable' : result.controlStatus === 'caution' ? 'caution' : 'limited',
+    protocol: protocolPassport('color-blindness'),
     setup: {
       ...captureDisplayPassport(),
       theme: measurement?.theme ?? currentTheme(),
@@ -712,13 +724,33 @@ function saveJournalResult(result) {
       measurementDpr: measurement?.dpr ?? window.devicePixelRatio ?? 1,
       orientation: measurement?.orientation ?? currentOrientation(),
     },
+    qualityEvidence: {
+      controlsCorrect: result.controls.correct,
+      controlsScheduled: result.controls.total,
+      controlStatus: result.controlStatus,
+      responseCount: state.run?.responses.length ?? 0,
+      protanPresentations: result.axes.find(({ type }) => type === 'protan')?.presentations ?? 0,
+      deutanPresentations: result.axes.find(({ type }) => type === 'deutan')?.presentations ?? 0,
+      tritanPresentations: result.axes.find(({ type }) => type === 'tritan')?.presentations ?? 0,
+      protanReversals: result.axes.find(({ type }) => type === 'protan')?.reversals ?? 0,
+      deutanReversals: result.axes.find(({ type }) => type === 'deutan')?.reversals ?? 0,
+      tritanReversals: result.axes.find(({ type }) => type === 'tritan')?.reversals ?? 0,
+      protanLimit: result.axes.find(({ type }) => type === 'protan')?.limit ?? 'none',
+      deutanLimit: result.axes.find(({ type }) => type === 'deutan')?.limit ?? 'none',
+      tritanLimit: result.axes.find(({ type }) => type === 'tritan')?.limit ?? 'none',
+    },
     measurements: result.axes.map((axis) => ({
       id: axis.type,
       value: axis.threshold,
       unit: 'relative',
-      ...(axis.limit ? { bound: axis.limit === 'floor' ? 'upper' : 'lower' } : { uncertainty: axis.spread }),
+      ...(axis.limit ? { bound: axis.limit === 'floor' ? 'upper' : 'lower' } : {}),
     })),
-    notes: result.controlOk ? [] : ['task-controls-limited'],
+    notes:
+      result.controlStatus === 'passed'
+        ? ['exploratory-display-direction-levels']
+        : result.controlStatus === 'caution'
+          ? ['exploratory-display-direction-levels', 'one-task-control-missed']
+          : ['task-controls-limited'],
   });
   return entry ? appendJournalEntry(entry) : false;
 }
@@ -777,6 +809,8 @@ function validateMeasurementEnvironment() {
 function invalidateMeasurement(reason) {
   if (!state.active || state.phase !== 'run') return;
   state.active = false;
+  state.responseOpen = false;
+  state.renderToken += 1;
   state.lifecycle.setActive(false);
   state.phase = 'invalidated';
   state.run = null;
@@ -878,6 +912,15 @@ function wireEvents(signal) {
   window.addEventListener('orientationchange', validateEnvironment, { signal });
   window.visualViewport?.addEventListener('resize', validateEnvironment, { signal });
   document.documentElement.addEventListener('bronto:themechange', validateEnvironment, { signal });
+  document.addEventListener(
+    'visibilitychange',
+    () => {
+      if (document.visibilityState === 'hidden' && state.active && state.phase === 'run') {
+        invalidateMeasurement('visibility');
+      }
+    },
+    { signal },
+  );
   const forcedColors = window.matchMedia?.('(forced-colors: active)');
   forcedColors?.addEventListener(
     'change',

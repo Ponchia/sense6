@@ -404,17 +404,7 @@
   cursor: crosshair;
   forced-color-adjust: none;
   padding: 0;
-  transition:
-    transform 100ms ease,
-    filter 100ms ease;
-}
-
-@media (hover: hover) {
-  .color-tile:hover,
-  .field-choice:hover {
-    filter: brightness(1.025);
-    transform: scale(0.975);
-  }
+  transition: transform 100ms ease;
 }
 
 .color-tile:active,
@@ -426,30 +416,6 @@
 .field-choice:focus-visible {
   outline: 3px solid white;
   outline-offset: -6px;
-}
-
-#app[data-feedback="correct"] .test-chamber {
-  animation: chamber-correct 240ms ease-out;
-}
-
-#app[data-feedback="miss"] .test-chamber {
-  animation: chamber-miss 240ms ease-out;
-}
-
-@keyframes chamber-correct {
-  50% {
-    box-shadow:
-      0 0 0 0.75rem var(--success-soft),
-      0 0 0 calc(0.75rem + 2px) var(--success);
-  }
-}
-
-@keyframes chamber-miss {
-  50% {
-    box-shadow:
-      0 0 0 0.75rem var(--warning-soft),
-      0 0 0 calc(0.75rem + 2px) var(--warning);
-  }
 }
 
 .field-grid {
@@ -467,9 +433,7 @@
   overflow: hidden;
   padding: 0;
   position: relative;
-  transition:
-    transform 100ms ease,
-    filter 100ms ease;
+  transition: transform 100ms ease;
 }
 
 .field-choice canvas {
@@ -704,67 +668,7 @@
   margin-block: 3rem;
 }
 
-.profile-card {
-  border: 0;
-  border-radius: 0;
-  padding: clamp(1.25rem, 4vw, 2.5rem);
-}
-
-.profile-card .ui-card__head {
-  flex-wrap: wrap;
-}
-
-.profile-card h2 {
-  font-family: var(--display);
-  font-size: clamp(1.6rem, 3vw, 2.5rem);
-  line-height: 1.1;
-  margin: 0.5rem 0 0;
-  max-inline-size: 17ch;
-}
-
-.profile-radar {
-  display: block;
-  inline-size: min(100%, 30rem);
-  margin: 1rem auto;
-  overflow: hidden;
-}
-
-.profile-radar__grid {
-  fill: none;
-  stroke: var(--line);
-  stroke-width: 1;
-}
-
-.profile-radar__axis {
-  stroke: var(--line);
-  stroke-width: 1;
-}
-
-.profile-radar__area {
-  fill: color-mix(in srgb, var(--text) 10%, transparent);
-  stroke: var(--text);
-  stroke-width: 2;
-}
-
-.profile-radar__point {
-  stroke: var(--panel-strong);
-  stroke-width: 2;
-}
-
-.profile-radar__swatch {
-  stroke: color-mix(in srgb, var(--text) 25%, transparent);
-  stroke-width: 1;
-}
-
-.profile-radar__label {
-  fill: var(--text-dim);
-  font-family: var(--mono);
-  font-size: 10.5px;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-}
-
-.profile-explain {
+.observation-explain {
   color: var(--text-dim);
   font-size: var(--text-sm);
   line-height: 1.55;
@@ -798,7 +702,7 @@
   font-weight: 700;
 }
 
-.result-metric h3 {
+.result-metric h2 {
   font-family: var(--display);
   font-size: 1.45rem;
   margin: 0;

@@ -17,8 +17,8 @@ test('the local journal compares, filters, exports, and deletes runs accessibly'
   await page.goto('/en/journal/');
   await expect(page.getByRole('heading', { name: 'Your private measurement journal' })).toBeVisible();
   await expect(page.locator('[data-journal-entry]')).toHaveCount(2);
-  await expect(page.getByText('Comparable', { exact: true })).toBeVisible();
-  await expect(page.getByText(/Change \+3 \/100/)).toBeVisible();
+  await expect(page.getByText('Not comparable', { exact: true })).toBeVisible();
+  await expect(page.getByText(/different or legacy experiment protocols/i)).toBeVisible();
   await expect(page.getByText('100x100@1', { exact: true })).toHaveCount(2);
 
   const download = page.waitForEvent('download');
@@ -42,7 +42,7 @@ test('journal data recorded in another locale remains readable through localized
   await expect(page.locator('html')).toHaveAttribute('lang', 'it');
   await expect(page.getByRole('heading', { name: 'Il tuo diario privato delle misurazioni' })).toBeVisible();
   await expect(page.getByLabel('Mostra strumento')).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Tetracromia' })).toHaveCount(2);
+  await expect(page.getByRole('heading', { name: /Laboratorio colore su schermo/i })).toHaveCount(2);
   await expect(page.getByText('Indice della sessione', { exact: true })).toHaveCount(2);
   await expect(page.getByText('Schermo', { exact: true })).toHaveCount(2);
 });

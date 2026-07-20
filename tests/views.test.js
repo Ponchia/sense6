@@ -12,7 +12,8 @@ test('the Acutezza intro is a pure view with stable actions and sections', () =>
   assert.match(markup, /data-action="ac-prepare"/);
   assert.match(markup, /message:nav\.allTests/);
   assert.match(markup, /Last run on this browser: <strong>measured<\/strong>/);
-  assert.equal((markup.match(/class="ac-instrument-visual /g) ?? []).length, 3);
+  assert.equal((markup.match(/class="ac-instrument-visual /g) ?? []).length, 2);
+  assert.match(markup, /Meridiani scoring is suspended/);
 });
 
 test('the Tetracromia home view renders the supplied phase contract', () => {

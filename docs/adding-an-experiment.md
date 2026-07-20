@@ -11,6 +11,11 @@ rules, output units, uncertainty, bounds, and claims the result must not make.
 Identify sources that inform the task. Research inspiration doesn't make the
 implementation validated.
 
+Decide whether the experiment has one protocol or several genuinely different
+scopes. A shorter scope omits independent instruments. It doesn't silently run
+fewer trials under the same result name. Freeze the method before using repeated
+runs as evidence of consistency.
+
 Choose a stable lowercase route ID. Changing it later affects URLs, local
 storage, journal exports, metrics, and static discovery.
 
@@ -31,9 +36,20 @@ same IDs and unique metrics.
 ## 2. Register presentation metadata
 
 Add one frozen entry to `src/exams/registry.js`. Include the route, public
-name, localized source phrases, duration, limit, sources, and lazy loader.
+name, localized source phrases, duration, limit, and lazy loader.
 Static generation, gallery cards, route lookup, and metadata consume this
 registry.
+
+Add the experiment's canonical sources to `src/exams/sources.js`. Give every
+source one honest role: `method`, `boundary`, `comparator`, or `validation`.
+Use `validation` only for research on the exact frozen Sense6 implementation.
+The interactive page, localized static route, and `llms.txt` consume this
+ledger.
+
+Add a frozen passport to `src/exams/protocols.js` for every selectable scope.
+Record a method version, profile ID, schedule digest, stopping rule, and
+interpretation boundary. Changing a method or scope must create a different
+journal cohort.
 
 Add `src/exams/<id>.d.ts` beside the controller and expose its `mount` through
 the shared `ExamModule` contract in `src/exams/module-contract.d.ts`. The
@@ -61,6 +77,10 @@ or a cast whose only purpose is to hide an unchecked lookup.
 Use explicit bounds and quality states. Don't invent precision, population
 norms, clinical labels, or a suite-wide score.
 
+Assert the production schedule and stopping rules in unit tests. Accelerated
+browser fixtures may shorten waits and trial counts only through localhost test
+configuration; they aren't substitutes for production-dose invariants.
+
 ## 4. Add the controller and views
 
 Create `src/exams/<id>.js` and export `mount(context)`. The mount must:
@@ -82,9 +102,11 @@ sources.
 ## 5. Add journal recording
 
 Create a language-neutral journal entry when the result becomes visible. Record
-the service-contract setup fields, separate named measurements, units, quality,
-uncertainty, bounds, and machine-readable notes. Add comparison and
-round-trip tests.
+the exact protocol passport, service-contract setup fields, quality evidence,
+separate named measurements, units, explicit uncertainty, bounds, and
+machine-readable notes. Add comparison, migration, and round-trip tests. Don't
+derive uncertainty from an interval unless the estimator defines it as
+uncertainty.
 
 Version any separate latest-result store and validate reads. Preserve a legacy
 key only when one already exists.
@@ -108,7 +130,8 @@ placeholder drift. `npm run check` fails on structural catalog errors or when a
 locale exceeds the current source-equal-string ceiling.
 
 Translate accessibility names, announcements, page titles, copied summaries,
-setup labels, and error states—not only visible landing copy. Verify
+scope names, evidence-role labels, setup labels, and error states—not only
+visible landing copy. Verify
 right-to-left flow and narrow layouts when controls have spatial meaning.
 
 ## 7. Add route-scoped styles
@@ -138,12 +161,13 @@ npm run test:static
 npm run test:e2e
 ```
 
-Add browser coverage for the complete happy path, interruption, retry behavior,
-keyboard use, pointer use, result recording, accessibility, and
-responsive layouts. Keep the full behavioral matrix in Chromium and mobile
-Chromium. Add the smallest critical setup-and-interaction journey to the focused
-Firefox and WebKit suite when a new experiment depends on a browser API or
-route style sheet. The ratchet discovers modules in the strict roots
+Add browser coverage for each selectable scope, the complete happy path,
+pre-paint and duplicate-response protection, interruption, retry behavior,
+keyboard use, pointer use, result recording, accessibility, and responsive
+layouts. Keep the full behavioral matrix in Chromium and mobile Chromium. Add
+one complete critical journey and one invalidation path to the focused Firefox
+and WebKit suite when a new experiment depends on a browser API or route style
+sheet. The ratchet discovers modules in the strict roots
 automatically. Add a named runtime boundary to `jsconfig.json` and the
 type-ratchet script together when it lives elsewhere.
 

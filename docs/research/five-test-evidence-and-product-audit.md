@@ -4,8 +4,9 @@
 <!-- vale Vale.Spelling = NO -->
 <!-- markdownlint-disable MD013 -->
 
-Status: decision report; audited against `main` at
-`04b24134a56b080bac6461b01762409b7c5970ce`, 2026-07-20
+Status: accepted and implemented; evidence audit performed against `main` at
+`04b24134a56b080bac6461b01762409b7c5970ce`; implementation tracked in PR 37,
+2026-07-20
 
 This report reviews the scientific basis, shipped protocol, public duration,
 result completeness, interface, competitors, reusable open-source work, and
@@ -28,11 +29,11 @@ adding new constructs or longer protocols.
 
 | Test | Current public burden | Timing finding | Product decision |
 | --- | ---: | --- | --- |
-| Tetracromia | 26 forced choices and 3 ordering blocks; about 4 minutes advertised | Plausible, but too short for the current threshold, hue-profile, and composite-score language | Reframe as **Screen Colour Lab**, remove unsupported outputs, then redesign a Standard protocol |
-| Daltonia | 20–41 total practice/measured/control presentations; about 3 minutes | Plausible for a short display-relative track, not for precise cone-contrast thresholds or screening | Repair stimulus and response integrity; keep a custom exploratory colour-direction result |
-| Riflessi | 8 practice + 22 signal events; 8 practice + 32 choice events; 180-second sustained block; about 7 minutes | Honest | Keep the protocol, tighten quality and interpretation, and offer task bundles |
-| Udito | 42–74 audible presentations plus reference; about 6 minutes | Honest | Keep the three measures separate; repair control scheduling, bounds, and uncertainty |
-| Acutezza | 53 or 72 responses per eye, depending on contrast availability; 106 or 144 for two eyes | Already a deep protocol; 6–10 minutes is plausible | Keep calibrated sharpness, repair controls and provenance, and suspend the current Meridiani score |
+| Tetracromia | 26 forced choices and 3 ordering blocks; about 4 minutes advertised | Plausible, but too short for a stable threshold or composite | Reframed as **Screen Colour Lab** with three separate observations |
+| Daltonia | 20–41 total practice, measured, and control presentations; about 3 minutes | Plausible for a short display-relative track, not for cone thresholds or screening | Stimulus and response integrity repaired; result remains exploratory |
+| Riflessi | 8 practice + 22 signal events; 8 practice + 32 choice events; 180-second sustained block; about 7 minutes | Honest | Quality, interpretation, setup evidence, and selectable task bundles shipped |
+| Udito | 42–74 audible presentations plus reference and anchors; about 6 minutes | Honest | Separate measures, control scheduling, bounds, and setup gates repaired |
+| Acutezza | 24 Focused or 44 Standard interactions per eye; 48 or 88 for two eyes | Already a deep protocol; 4–8 minutes is plausible | Calibrated sharpness repaired; Meridiani implementation removed |
 
 The recommendation is **not** to replace all five tests with generic Quick,
 Standard, and Deep versions. Use three distinct choices:
@@ -47,6 +48,29 @@ Standard, and Deep versions. Use three distinct choices:
 A no-score tutorial can precede difficult tasks. A research protocol can exist
 when a genuinely different, long method is justified, but it must not inherit a
 consumer result name without its own evidence.
+
+## Implementation status
+
+The product and software corrections identified by this report are complete.
+The implementation deliberately does not claim that automated checks establish
+construct validity, external validation, population norms, or clinical meaning.
+
+| Area | Implemented outcome |
+| --- | --- |
+| Protocol identity | Frozen method and scope passports; legacy schema-one entries migrate to a separate cohort; changed methods don't compare |
+| Source integrity | One categorized ledger generates interactive, localized static, and text-discovery source surfaces; exact Sense6 validation remains empty |
+| Tetracromia | Screen Colour Lab wording; three observations; no composite, band, meter, best result, profile, or radar; resize invalidates the run |
+| Daltonia | First-paint and duplicate-response lock; input validation; matched linear-sRGB luminance distributions; controls, bounds, and evidence retained |
+| Riflessi | Signal, signal + choice, and complete scopes; strengthened quality gates; full denominators, physical setup, interruptions, and safer interpretation |
+| Udito | Focused and Standard scopes; maximum-level reference and audibility anchors; controls before stopping; recent ceiling evidence; final volume confirmation |
+| Acutezza | Focused and Standard scopes; per-condition controls; actual contrast and calibration provenance; distance recheck; lower precision; 90% model intervals; Meridiani code removed |
+| Verification | Production-dose invariants, focused-scope journeys, P0 regressions, and selected full Firefox and WebKit journeys added |
+
+The remaining work is evidence generation, not an unfinished application fix:
+observer simulations, participant comprehension and timing work, agreement
+analysis, and any independently designed future protocol. Those activities can
+support better recreational wording. They must not turn Sense6 into a screening,
+diagnostic, medical, occupational, or population-classification service.
 
 ## How this audit was performed
 
@@ -185,7 +209,7 @@ Keep it only as an exploratory **Screen Colour Lab** until P0 work is complete.
 Tetracromia may remain a secondary brand, but the current title and search
 framing should no longer outweigh the otherwise clear RGB limitation.
 
-### Tetracromia shipped protocol
+### Tetracromia audited baseline protocol
 
 | Stage | Current protocol |
 | --- | --- |
@@ -293,7 +317,7 @@ The real Cambridge Colour Test and physical FM100 define the scientific
 reference boundary. X-Rite's online ordering challenge provides a useful
 drag-and-drop and disclosure precedent. Sense6 is stronger than the marketing
 comparators on privacy, accessibility, method visibility, and its setup
-boundary; its current result screen is less cautious than its own landing page.
+boundary; its audited result screen was less cautious than its own landing page.
 
 Potentially reusable or useful independent implementations:
 
@@ -351,7 +375,7 @@ The protocol is short but not automatically too short for an exploratory
 track. The immediate issues are a pre-paint response race, residual luminance
 cues, sparse controls, heuristic uncertainty, and over-specific result words.
 
-### Daltonia shipped protocol
+### Daltonia audited baseline protocol
 
 - Two successful high-contrast practice responses are required.
 - Three independent protan-like, deutan-like, and tritan-like display axes are
@@ -371,7 +395,7 @@ The measured/control dose is 18–39; including successful practice gives 20–4
 An all-correct path is 33 because of floating-point boundary progression. There
 is no response deadline, so three minutes is plausible but not an upper bound.
 
-### Daltonia completeness and protocol risks
+### Daltonia baseline completeness and protocol risks
 
 - Response buttons become active before the new canvas is guaranteed to have
   painted. A pre-paint or double submission can score against a stimulus that
@@ -475,7 +499,7 @@ seven-minute duration is honest. Segnale is the strongest construct; Scelta and
 Tenuta remain useful descriptive tasks if the result stops borrowing stronger
 psychometric language than their custom designs support.
 
-### Riflessi shipped protocol and timing
+### Riflessi audited baseline protocol and timing
 
 | Instrument | Current protocol |
 | --- | --- |
@@ -564,7 +588,7 @@ cannot be inferred from a similar interface.
 - **Segnale:** about 2 minutes, reporting only device-relative simple response.
 - **Segnale + Scelta:** about 4 minutes, reporting the two tasks and their
   descriptive difference.
-- **Complete profile:** about 7 minutes, including the existing 180-second
+- **Complete set:** about 7 minutes, including the existing 180-second
   Tenuta block.
 - **Repeat for consistency:** repeat the identical selected bundle, preferably
   on another day with the same device/input. Do not pool or retain only the best.
@@ -596,7 +620,7 @@ confidence. It does not prove headphones were used, validate the other two
 instruments, or establish auditory sensitivity. Portata and Intonazione remain
 exploratory.
 
-### Udito shipped protocol and timing
+### Udito audited baseline protocol and timing
 
 | Stage | Current protocol |
 | --- | --- |
@@ -615,7 +639,7 @@ reference, 0.053 for Cuffie, 0.044 for Portata, and 0.058 for Intonazione. These
 digital values support internal consistency, not SPL safety; browser code does
 not know headphone sensitivity, fit, system gain, or ambient sound.
 
-### Udito completeness and protocol risks
+### Udito baseline completeness and protocol risks
 
 - Portata can converge before presentation 18 and therefore omit its second
   control, then fail a result gate that expects both controls.
@@ -681,10 +705,10 @@ an appropriate calibration chain.
 
 ### Udito modes and backlog
 
-- **Focused 3–4 minute profile:** reference, Cuffie, and a repaired complete
+- **Focused 3–4 minute scope:** reference, Cuffie, and a repaired complete
   Portata track.
-- **Standard 5–7 minute profile:** all three repaired instruments.
-- **Deep 10–14 minute profile:** Standard plus independent,
+- **Standard 5–7 minute scope:** all three repaired instruments.
+- **Deep 10–14 minute research protocol:** Standard plus independent,
   counterbalanced Portata and Intonazione repeats, with a break and setup
   reconfirmation. Present repeatability rather than a more exact-looking single
   number.
@@ -713,7 +737,7 @@ acuity. Contrasto can report a within-run cost under nominal rendered contrast;
 it is not contrast sensitivity. The current Meridiani result is not defensible
 as a stable orientation preference and should be suspended until redesigned.
 
-### Acutezza shipped protocol and timing
+### Acutezza audited baseline protocol and timing
 
 Setup asks for adult/correction/eye state, card-size calibration against an
 85.6 mm card, and three blind-spot sweeps. A 30–100 cm median with spread no more
@@ -734,7 +758,7 @@ With contrast, the protocol is 72 responses per eye and 144 for both eyes.
 Without contrast, it is 53 per eye and 106 for both. All are self-paced. The
 current roughly eight-minute estimate is plausible, not a measured bound.
 
-### Acutezza completeness and protocol risks
+### Acutezza baseline completeness and protocol risks
 
 The highest-priority finding is a null-model failure in Meridiani. The code
 calls the result stable when its pairwise direction agrees sufficiently across
@@ -842,7 +866,7 @@ outside the product plan.
 
 ## Portfolio backlog
 
-### P0: result integrity before expansion
+### P0: result integrity completed
 
 1. Repair the Tetracromia outputs and stimulus lifecycle.
 2. Fix Daltonia's pre-paint response race, luminance/provenance wording, bounds,
@@ -856,7 +880,7 @@ outside the product plan.
    exploratory versions.
 7. Fix the five setup-consent whitespace defects.
 
-### P1: maintainable measurement foundations
+### P1: maintainable measurement foundations completed
 
 1. Create the categorized canonical source ledger and generate every source
    surface from it.
@@ -867,7 +891,8 @@ outside the product plan.
 4. Define a shared quality-evidence vocabulary while leaving each experiment's
    estimator and interpretation inside its domain module.
 5. Measure completion, abandonment, interruption, and comprehension before
-   promising new duration ranges.
+   promising new duration ranges. This remains future participant evidence and
+   requires a separate consent and privacy decision.
 
 ### P2: evidence after protocols freeze
 
@@ -898,13 +923,13 @@ outside the product plan.
 
 The evidence supports these decisions now:
 
-- [ ] Approve the P0 integrity tranche across all five tests.
-- [ ] Approve protocol versioning and the canonical source ledger.
-- [ ] Approve scope selection and independent repeatability as the product model.
-- [ ] Defer the Tetracromia research-depth map and any new Daltonia ellipse.
-- [ ] Suspend Acutezza Meridiani scoring until a redesigned protocol survives
+- [x] Approve the P0 integrity tranche across all five tests.
+- [x] Approve protocol versioning and the canonical source ledger.
+- [x] Approve scope selection and independent repeatability as the product model.
+- [x] Defer the Tetracromia research-depth map and any new Daltonia ellipse.
+- [x] Suspend Acutezza Meridiani scoring until a redesigned protocol survives
   null simulation and a pilot.
-- [ ] Keep participant/external validation optional and downstream of frozen
+- [x] Keep participant/external validation optional and downstream of frozen
   protocols, consistent with the permanent recreational boundary.
 
 ## Remaining evidence gaps
@@ -925,14 +950,15 @@ checking, and codespell. A separate online check resolved all 49 external links;
 publisher sites that deliberately returned HTTP 403 were accepted only after
 their canonical targets had been verified.
 
-The application gate passed Biome, the 46-module strict typed-JavaScript
-ratchet, TypeScript declaration checking, all 12 locale catalogs, 102 unit and
-coverage tests, the production build, and 3 static-output tests. Chromium,
-mobile Chromium, Chromium smoke, and Firefox produced 101 passing browser tests
-with 35 intentional project skips.
+The application gate passed Biome, the 47-module strict typed-JavaScript
+ratchet, TypeScript declaration checking, all 12 locale catalogs, 109 unit and
+coverage tests, the production build, and 3 static-output tests. Combined
+library coverage is 97.62% lines, 82.48% branches, and 94.34% functions.
+Chromium, mobile Chromium, Chromium smoke, and Firefox produced 113 passing
+browser tests with 35 intentional project-specific skips.
 
-The complete `npm run check` could not launch its two WebKit smoke cases because
+The complete `npm run check` could not launch its four WebKit journeys because
 the GitOps-managed development host lacks WebKit's native GTK and GStreamer
-libraries. Those two cases failed before loading Sense6 or executing an
+libraries. Those cases failed before loading Sense6 or executing an
 application assertion. WebKit remains a CI/preflight requirement; this report
 does not mark it as locally verified.

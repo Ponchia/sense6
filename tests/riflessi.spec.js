@@ -7,12 +7,40 @@ import {
   respondWithKey,
 } from './helpers/browser.js';
 
-async function prepareRiflessi(page, mode = 'keyboard') {
+async function prepareRiflessi(page, mode = 'keyboard', scope = 'complete') {
   await page.getByRole('button', { name: /Prepare the lab/i }).click();
   await page.getByRole('button', { name: mode === 'pointer' ? /^Touch \/ pointer/i : /^Keyboard/i }).click();
+  await page.locator(`[data-rx-scope-picker] [data-scope="${scope}"]`).click();
   await page.getByLabel(/I understand this measures this browser/i).check();
-  await page.getByRole('button', { name: /Begin instrument 01/i }).click();
+  await page.getByRole('button', { name: /Begin selected scope/i }).click();
 }
+
+test('Riflessi signal scope ends independently without placeholder instruments', async ({ page }) => {
+  await installQuickRiflessi(page);
+  await page.goto('/en/riflessi/');
+  await prepareRiflessi(page, 'keyboard', 'signal');
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  await respondWithKey(page, 'Space');
+  await page.getByRole('button', { name: /Begin measured block/i }).click();
+  const total = Number(
+    await page.locator('[data-rx-count]').evaluate((element) => element.textContent.split('/')[1]),
+  );
+  for (let trial = 0; trial < total; trial += 1) await respondWithKey(page, 'Space');
+
+  await expect(page.getByRole('heading', { name: /more than one dimension/i })).toBeVisible();
+  await expect(page.locator('.rx-metric')).toHaveCount(1);
+  await expect(page.locator('.rx-results__stamp')).toContainText('01 / 03');
+  await expect(page.getByText('Choice response', { exact: true })).toHaveCount(0);
+  await expectJournalEntry(page, 'riflessi');
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const journal = JSON.parse(localStorage.getItem('sense6:journal') ?? 'null');
+        return journal.entries.find((entry) => entry.examId === 'riflessi').protocol.profileId;
+      }),
+    )
+    .toBe('signal');
+});
 
 async function finishSignalAndOpenChoice(page) {
   await page.getByRole('button', { name: /Start practice/i }).click();
@@ -90,7 +118,7 @@ test('Riflessi completes all three instruments and reports separate device-relat
   await expect(page.locator('.rx-signal-strip i')).toHaveCount(48);
   await expect(page.locator('.rx-instrument-visual')).toHaveCount(3);
   await expect(page.locator('.rx-boundary.method')).toBeVisible();
-  await expect(page.locator('.rx-research .source-list li')).toHaveCount(3);
+  await expect(page.locator('.rx-research .source-list li')).toHaveCount(5);
   await expect(page.locator('.rx-closing').getByRole('button', { name: /Open test/i })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole('link', { name: /See the method/i }).click();
@@ -99,7 +127,7 @@ test('Riflessi completes all three instruments and reports separate device-relat
 
   await page.getByRole('button', { name: /Prepare the lab/i }).click();
   await page.getByRole('button', { name: /^Keyboard/i }).click();
-  const start = page.getByRole('button', { name: /Begin instrument 01/i });
+  const start = page.getByRole('button', { name: /Begin selected scope/i });
   await expect(start).toBeDisabled();
   await expect(page.locator('.experiment-boundary')).toHaveText(
     /recreational experiment for curiosity and fun—not a medical test or diagnosis/i,
@@ -159,7 +187,7 @@ test('the mobile Riflessi setup and response chamber stay inside the viewport', 
   await page.getByRole('button', { name: /Prepare the lab/i }).click();
   await page.getByRole('button', { name: /^Touch \/ pointer/i }).click();
   await page.getByLabel(/I understand this measures this browser/i).check();
-  await page.getByRole('button', { name: /Begin instrument 01/i }).click();
+  await page.getByRole('button', { name: /Begin selected scope/i }).click();
   await page.getByRole('button', { name: /Start practice/i }).click();
   await expect(page.locator('[data-rx-chamber]')).toHaveAttribute('data-rx-state', 'live');
 

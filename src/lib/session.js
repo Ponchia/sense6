@@ -1,4 +1,4 @@
-import { circularHueDistance, deltaEok } from './color.js';
+import { deltaEok } from './color.js';
 import { randomInt, seededRandom, shuffle } from './random.js';
 
 /** @typedef {() => number} RandomSource */
@@ -23,21 +23,21 @@ export const PHASES = [
   {
     id: 'threshold',
     number: '01',
-    name: 'Threshold',
+    name: 'Tile choices',
     short: 'Find the different tile.',
     trials: 14,
   },
   {
     id: 'field',
     number: '02',
-    name: 'Field',
+    name: 'Dot fields',
     short: 'Find the shifted dot field.',
     trials: 12,
   },
   {
     id: 'sequence',
     number: '03',
-    name: 'Sequence',
+    name: 'Hue ordering',
     short: 'Put each hue run in order.',
     trials: 3,
   },
@@ -196,7 +196,7 @@ export class ColorLabSession {
 
   /**
    * Draw hue families from a shuffled deck that refills when empty, so every
-   * family is sampled evenly across a phase and the hue profile has data in
+   * family is sampled evenly across a phase and the hue observations have data in
    * every direction.
    */
   /** @param {DiscriminationKind} kind */
@@ -332,30 +332,29 @@ export class ColorLabSession {
   results() {
     const thresholdLevel = staircaseThreshold(this.staircases.threshold);
     const fieldLevel = staircaseThreshold(this.staircases.field);
-    const thresholdDelta = this.levelToDelta('threshold', thresholdLevel);
-    const fieldDelta = this.levelToDelta('field', fieldLevel);
-    const sequence = Math.round(
+    const orderedPairsPercent = Math.round(
       this.responses.sequence.reduce((sum, response) => sum + response.score, 0) /
         Math.max(1, this.responses.sequence.length),
     );
-    const thresholdAccuracy = accuracy(this.responses.threshold);
-    const fieldAccuracy = accuracy(this.responses.field);
-    const thresholdScore = discriminationScore(thresholdDelta);
-    const fieldScore = discriminationScore(fieldDelta);
-    const overall = Math.round(thresholdScore * 0.35 + fieldScore * 0.35 + sequence * 0.3);
 
     return {
-      overall,
-      thresholdScore,
-      fieldScore,
-      sequenceScore: sequence,
-      thresholdDegrees: thresholdLevel,
-      fieldDegrees: fieldLevel,
-      thresholdDelta,
-      fieldDelta,
-      thresholdAccuracy,
-      fieldAccuracy,
-      hueProfile: hueProfile([...this.responses.threshold, ...this.responses.field]),
+      tile: discriminationObservation(
+        this.responses.threshold,
+        this.staircases.threshold,
+        thresholdLevel,
+        this.levelToDelta('threshold', thresholdLevel),
+      ),
+      field: discriminationObservation(
+        this.responses.field,
+        this.staircases.field,
+        fieldLevel,
+        this.levelToDelta('field', fieldLevel),
+      ),
+      ordering: {
+        orderedPairsPercent,
+        runs: this.responses.sequence.length,
+        runPercentages: this.responses.sequence.map(({ score }) => score),
+      },
       elapsedMs: [...this.responses.threshold, ...this.responses.field, ...this.responses.sequence].reduce(
         (sum, response) => sum + response.elapsedMs,
         0,
@@ -393,37 +392,22 @@ function accuracy(responses) {
   return Math.round((responses.filter(({ correct }) => correct).length / responses.length) * 100);
 }
 
-/** @param {number} delta */
-function discriminationScore(delta) {
-  return Math.round(Math.max(0, Math.min(100, 112 - delta * 22)));
-}
-
-/** @param {number} hue */
-function nearestFamilyIndex(hue) {
-  let nearest = 0;
-  let nearestDistance = Number.POSITIVE_INFINITY;
-  HUE_FAMILIES.forEach((family, index) => {
-    const distance = circularHueDistance(hue, family.hue);
-    if (distance < nearestDistance) {
-      nearestDistance = distance;
-      nearest = index;
-    }
-  });
-  return nearest;
-}
-
 /**
- * Share of correct choices per hue family. The staircase keeps overall
- * difficulty near the observer's boundary, so differences between families
- * show relative strengths rather than absolute ability.
- *
  * @param {DiscriminationResponse[]} responses
+ * @param {Staircase} staircase
+ * @param {number} level
+ * @param {number} delta
  */
-function hueProfile(responses) {
-  return HUE_FAMILIES.map((family, index) => {
-    const inFamily = responses.filter(({ hue }) => nearestFamilyIndex(hue) === index);
-    if (inFamily.length === 0) return { ...family, score: null, trials: 0 };
-    const correct = inFamily.filter((response) => response.correct).length;
-    return { ...family, score: Math.round((correct / inFamily.length) * 100), trials: inFamily.length };
-  });
+function discriminationObservation(responses, staircase, level, delta) {
+  const presentedLevels = responses.map(({ level: presented }) => presented);
+  return {
+    adaptiveLevelDegrees: Math.round(level * 10) / 10,
+    deltaEok: Math.round(delta * 1000) / 1000,
+    accuracyPercent: accuracy(responses),
+    correct: responses.filter(({ correct }) => correct).length,
+    presentations: responses.length,
+    reversals: staircase.reversals.length,
+    presentedMinimum: Math.round(Math.min(...presentedLevels) * 10) / 10,
+    presentedMaximum: Math.round(Math.max(...presentedLevels) * 10) / 10,
+  };
 }

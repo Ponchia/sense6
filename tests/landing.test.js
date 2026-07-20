@@ -20,7 +20,7 @@ test('research sections preserve the shared structure and safe links', () => {
     title: 'What informed the example.',
     description: 'Evidence shapes it.',
     label: 'Research trail',
-    sources: [['A & B', 'https://example.com/?a=1&b=2']],
+    sources: [{ id: 'example', role: 'method', label: 'A & B', href: 'https://example.com/?a=1&b=2' }],
   });
   assert.match(html, /aria-labelledby="example-title"/);
   assert.match(html, /class="science example-research section/);

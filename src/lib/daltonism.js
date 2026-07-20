@@ -1,15 +1,15 @@
 /*
  * Daltonia's display-colour model and adaptive threshold logic.
  *
- * The fixed matrix below is a normalized, D65-referenced LMS approximation for
- * linear sRGB. It is useful for choosing repeatable cone-like stimulus
+ * The fixed matrix below follows the common Hunt–Pointer–Estévez transform
+ * multiplied by the standard linear-sRGB-to-XYZ matrix. It is useful for choosing repeatable cone-like stimulus
  * directions on an sRGB display, but it does not measure an observer's cone
  * fundamentals or the spectral output of their device. The product copy must
  * therefore describe these as display-relative directions, never as exact cone
  * excitations.
  *
  * Background:
- * - CIE 2006 LMS cone fundamentals: https://doi.org/10.25039/CIE.DS.tijidesg
+ * - IEC 61966-2-1 sRGB: https://webstore.iec.ch/en/publication/6169
  * - sRGB transfer and primary definitions: https://www.w3.org/TR/css-color-4/#color-conversion-code
  * - Dichromat simulation model: https://doi.org/10.1364/JOSAA.14.002647
  * - Anomalous-trichromacy model: https://doi.org/10.1109/TVCG.2009.113
@@ -45,6 +45,9 @@ const LMS_TO_RGB = [
   [-1.1252419, 2.29317094, -0.1678952],
   [0.02980165, -0.19318073, 1.16364789],
 ];
+
+/** @type {RgbVector} */
+const LINEAR_SRGB_LUMINANCE = [0.2126, 0.7152, 0.0722];
 
 /** @param {number} value @param {number} minimum @param {number} maximum */
 function clamp(value, minimum, maximum) {
@@ -198,10 +201,19 @@ export function lmsOf(linearRgb) {
 export function makeTargetPair(backgroundLinear, type, strength) {
   const direction = CONFUSION_DIRECTIONS[type] ?? CONFUSION_DIRECTIONS.deutan;
   /** @type {[number, number, number]} */
-  const targetLinear = [
+  const directedTarget = [
     clamp01(backgroundLinear[0] + direction[0] * strength),
     clamp01(backgroundLinear[1] + direction[1] * strength),
     clamp01(backgroundLinear[2] + direction[2] * strength),
+  ];
+  const fieldLuminance = dotProduct(LINEAR_SRGB_LUMINANCE, backgroundLinear);
+  const targetLuminance = dotProduct(LINEAR_SRGB_LUMINANCE, directedTarget);
+  const luminanceScale = targetLuminance > 0 ? fieldLuminance / targetLuminance : 1;
+  /** @type {[number, number, number]} */
+  const targetLinear = [
+    clamp01(directedTarget[0] * luminanceScale),
+    clamp01(directedTarget[1] * luminanceScale),
+    clamp01(directedTarget[2] * luminanceScale),
   ];
   return {
     field: [
@@ -397,6 +409,7 @@ function skipFinishedAxisSlots(run) {
 export function recordAdaptiveAnswer(run, answer) {
   const trial = currentAdaptiveTrial(run);
   if (!trial) return null;
+  if (answer !== 'unseen' && !ORIENTATIONS.includes(/** @type {Orientation} */ (answer))) return null;
 
   const correct = answer === trial.orientation;
   if (trial.type === 'control') {
@@ -463,16 +476,31 @@ function summarizeAxis(type, state) {
  * @param {AdaptiveRun} run
  */
 export function summarizeAdaptiveRun(run) {
-  const controlOk = run.controls.total === ADAPTIVE_CONFIG.controlTrials && run.controls.correct >= 2;
+  const controlStatus =
+    run.controls.total !== ADAPTIVE_CONFIG.controlTrials || run.controls.correct < 2
+      ? 'failed'
+      : run.controls.correct === ADAPTIVE_CONFIG.controlTrials
+        ? 'passed'
+        : 'caution';
+  const controlOk = controlStatus === 'passed';
   return {
     complete: run.index >= run.schedule.length,
     controlOk,
     controls: { ...run.controls },
+    controlStatus,
     axes: AXIS_TYPES.map((type) => summarizeAxis(type, run.axes[type])),
-    title: controlOk ? 'Display-relative thresholds from this run' : 'Run inconclusive — repeat the controls',
-    detail: controlOk
-      ? 'Lower values mean you followed a smaller colour shift in that direction on this display. The three directions are not clinical scores and should not be compared as diagnoses.'
-      : 'Too many high-contrast task controls were missed to interpret the adaptive thresholds. Check the instructions and viewing setup, then try again.',
+    title:
+      controlStatus === 'passed'
+        ? 'Display-relative adaptive levels from this run'
+        : controlStatus === 'caution'
+          ? 'Display-relative observations with a control caution'
+          : 'Run inconclusive — repeat the controls',
+    detail:
+      controlStatus === 'passed'
+        ? 'Lower values mean the short adaptive track ended at a smaller colour shift in that direction on this display. These are not precise thresholds, cone measurements, clinical scores, or diagnoses.'
+        : controlStatus === 'caution'
+          ? 'Two of three high-contrast task controls passed. The observations are retained with a caution, but should not be treated as a strong run.'
+          : 'Fewer than two high-contrast task controls passed, so the adaptive levels are not treated as usable. Check the instructions and viewing setup, then try again.',
   };
 }
 

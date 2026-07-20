@@ -55,7 +55,36 @@ The completed foundation includes:
 The journal is now a separate versioned store. Existing concise latest-or-best
 keys remain compatible and are not rewritten as journal history.
 
-## 2. Keep the experimental boundary explicit
+## 2. Experiment integrity: completed
+
+The five-test evidence audit produced one result-integrity tranche across every
+experiment. The implementation now:
+
+- stores an exact protocol and scope passport with every new journal entry and
+  keeps legacy or changed methods out of comparisons;
+- generates interactive, static, and text-discovery research trails from one
+  categorized source ledger without implying validation;
+- presents Screen Colour Lab as three fixed-dose observations with no composite,
+  score band, best result, radar, or stable-threshold claim;
+- locks Daltonia responses through first paint and against duplicates, uses
+  matched linear-sRGB luminance distributions, and reports adaptive levels with
+  controls and explicit bounds;
+- offers three Riflessi scopes with complete denominators, accuracy, quality
+  gates, physical setup, interruptions, and separate timing observations;
+- offers Focused and Standard Udito scopes with a maximum-level reference,
+  audibility anchors, guaranteed Portata controls, recent ceiling evidence, and
+  a final unchanged-volume check;
+- offers Focused and Standard Acutezza scopes with per-eye and per-condition
+  controls, calibration provenance, actual contrast, distance recheck, bounds,
+  and 90% model intervals; and
+- removes the invalid Meridiani implementation and scorer from production code.
+
+Each selectable scope has an accelerated browser journey. Production schedules
+remain separate unit-test invariants. A full Screen Colour Lab result and its
+display-invalidation path run in the focused Chromium, Firefox, and WebKit
+suite.
+
+## 3. Keep the experimental boundary explicit
 
 Sense6 is permanently an experimental personal project for curiosity and fun.
 Formal scientific or clinical validation, certification, regulatory approval,
@@ -71,6 +100,31 @@ results must remain consistent with it.
 Published research and standards may inform a task design. Automated tests may
 show that an implementation behaves as designed. Neither makes a Sense6 result
 validated, certified, diagnostic, or suitable for medical or occupational use.
+
+## Incremental future work
+
+Keep future work evidence-driven and small enough to review:
+
+1. Add deterministic observer simulations for each adaptive method and its
+   declared failure modes. Don't change a frozen production protocol in the
+   same pull request as the simulation harness.
+2. Redesign Screen Colour Lab Standard only after the proposed schedule survives
+   simulation. Keep the current fixed 29-block lab available as an explicitly
+   exploratory protocol until then.
+3. Design any future orientation experiment independently. Don't restore
+   Meridiani code until a null observer, inconsistent observer, and replicated
+   orientation effect behave as declared.
+4. Measure instruction comprehension, completion time, abandonment, fatigue,
+   and repeat usability only with a consented study and a separate privacy
+   decision. Don't add identifiable raw-result collection to the product.
+5. Use local repeated-run exports to design agreement summaries before adding
+   stronger repeatability wording. Don't introduce population norms,
+   classifications, screening, or clinical claims.
+
+Formal scientific or clinical validation, certification, regulatory approval,
+and professional endorsement remain outside the product plan. Future evidence
+work improves an honest recreational experiment; it doesn't turn Sense6 into a
+medical service.
 
 ## Maintenance gates
 

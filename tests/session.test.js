@@ -102,16 +102,14 @@ test('a complete deterministic session produces bounded results', () => {
   }
 
   const result = lab.results();
-  assert.equal(result.sequenceScore, 100);
-  assert.equal(result.thresholdAccuracy, 100);
-  assert.equal(result.fieldAccuracy, 100);
-  assert.ok(result.overall >= 0 && result.overall <= 100);
-  assert.equal(result.hueProfile.length, HUE_FAMILIES.length);
-  assert.ok(
-    result.hueProfile.every(
-      ({ label, score, trials }) => typeof label === 'string' && trials > 0 && score >= 0 && score <= 100,
-    ),
-  );
+  assert.equal(result.ordering.orderedPairsPercent, 100);
+  assert.equal(result.ordering.runs, 3);
+  assert.equal(result.tile.accuracyPercent, 100);
+  assert.equal(result.tile.presentations, 14);
+  assert.equal(result.field.accuracyPercent, 100);
+  assert.equal(result.field.presentations, 12);
+  assert.equal('overall' in result, false);
+  assert.equal('hueProfile' in result, false);
 });
 
 test('hue families are sampled evenly across each discrimination phase', () => {

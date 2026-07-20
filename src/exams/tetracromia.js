@@ -6,18 +6,14 @@ import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '
 import { createExamLifecycle } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
 import { ColorLabSession, PHASES } from '../lib/session.js';
-import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
+import { protocolPassport } from './protocols.js';
 import { tetracromiaHomeMarkup } from './views/tetracromia-home.js';
 
-const RESULT_STORE = createResultStore({
-  key: 'sense6:tetracromia:best',
-  legacyKeys: ['tetracromia-best'],
-  validate: (value) => isRecord(value) && Number.isFinite(value.overall),
-});
 const MOUNT_OWNER = Symbol('tetracromia');
 const RESPONSE_GATE_MS = 180;
 const RAPID_TOUCH_COMMIT_MS = 600;
+/** @typedef {{ width: number, height: number, dpr: number, gamut: string }} VisualEnvironment */
 
 let state = null;
 
@@ -42,12 +38,10 @@ export function mount(context) {
     responseGateFrame: 0,
     responseUnlockTimer: 0,
     transitionFrame: 0,
-    fieldResizeObserver: null,
     fieldRedrawFrame: 0,
+    measurementEnvironment: null,
   };
   state = mountState;
-  mountState.fieldResizeObserver =
-    typeof ResizeObserver === 'function' ? new ResizeObserver(scheduleFieldRedraw) : null;
   wireEvents(lifecycle.signal);
 
   detectDisplay();
@@ -96,10 +90,10 @@ function renderSetup() {
       <div class="setup-grid">
         <div class="setup-copy">
           <p class="ui-eyebrow">Screen check / 01 of 01</p>
-          <h1>Set the room before the score.</h1>
+          <h1>Set the room before the observations.</h1>
           <p class="setup-lede">
-            Display settings and ambient light can move a color threshold. This one-minute check
-            makes your run more repeatable.
+            Display settings and ambient light can change what appears visible. This one-minute
+            check makes the 29-block run easier to repeat under similar conditions.
           </p>
           <div class="ui-alert ui-alert--info forced-colors-warning tetracromia-forced-colors-warning">
             <div class="ui-alert__body">
@@ -129,7 +123,7 @@ function renderSetup() {
           <p class="calibration-hint">Look for distinct edges above and a smooth ramp here—without a bright hotspot.</p>
           <label class="ui-check ready-check">
             <input type="checkbox" id="screen-ready" />
-            <span><strong class="experiment-boundary">I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.</strong>I can distinguish the steps and my color-shifting filters are off.</span>
+            <span><strong class="experiment-boundary">I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.</strong> I can distinguish the steps and my color-shifting filters are off.</span>
           </label>
           <button class="ui-button ui-button--lg" id="start-lab" type="button" data-action="start" disabled>
             Start instrument 01 <span aria-hidden="true">→</span>
@@ -150,6 +144,7 @@ function startLab() {
   }
   const seed = `${Date.now()}-${crypto.getRandomValues(new Uint32Array(1))[0]}`;
   state.session = new ColorLabSession(seed);
+  state.measurementEnvironment = captureVisualEnvironment();
   state.labActive = true;
   state.lifecycle.setActive(true, t('Leave the lab? Your progress will be lost.'));
   trackMetric(METRIC_EVENTS.testStarted, METRIC_TESTS.tetracromia);
@@ -157,14 +152,13 @@ function startLab() {
   document.body.classList.add('lab-mode');
   state.trialStartedAt = performance.now();
   renderLab({ semanticTransition: true });
-  announce('Instrument one. Threshold. Find the different tile.');
+  announce('Instrument one. Tile observation. Find the different tile.');
 }
 
 function renderLab({ semanticTransition = false, restoreChoice = null } = {}) {
   if (!state.session) return;
-  state.fieldResizeObserver?.disconnect();
   const phase = state.session.phase;
-  const phaseProgress = Math.round((state.session.trialIndex / phase.trials) * 100);
+  const overallProgress = state.session.progress;
   const trial = state.session.currentTrial;
   document.title = `${t(phase.name)} ${state.session.trialIndex + 1} ${t('of')} ${phase.trials} — Tetracromia | Sense6`;
 
@@ -191,12 +185,12 @@ function renderLab({ semanticTransition = false, restoreChoice = null } = {}) {
       <div
         class="ui-progress lab-progress"
         role="progressbar"
-        aria-label="Current instrument progress"
+        aria-label="Whole run progress"
         aria-valuemin="0"
         aria-valuemax="100"
-        aria-valuenow="${phaseProgress}"
+        aria-valuenow="${overallProgress}"
       >
-        <div class="ui-progress__bar" style="--value:${phaseProgress}"></div>
+        <div class="ui-progress__bar" style="--value:${overallProgress}"></div>
       </div>
 
       <div class="lab-stage ui-container">
@@ -212,7 +206,7 @@ function renderLab({ semanticTransition = false, restoreChoice = null } = {}) {
 
         <div class="trial-meta">
           <span><i aria-hidden="true"></i> Neutral surround</span>
-          <span>Adaptive difficulty</span>
+          <span>${state.session.completedTrials + 1} of ${state.session.totalTrials} total blocks</span>
           <span>No answer is stored online</span>
         </div>
       </div>
@@ -225,10 +219,6 @@ function renderLab({ semanticTransition = false, restoreChoice = null } = {}) {
     requestAnimationFrame(() => {
       if (state.session?.currentTrial.nonce !== nonce) return;
       drawFields(trial);
-      document.querySelectorAll('canvas[data-field]').forEach((canvas) => {
-        state.fieldResizeObserver?.observe(canvas);
-      });
-      scheduleFieldRedraw();
     });
   }
   if (semanticTransition) positionLabTransition();
@@ -300,7 +290,7 @@ function drawFields(trial) {
     context.fillStyle = '#747472';
     context.fillRect(0, 0, width, height);
 
-    const random = seededRandom(`${trial.nonce}:${index}`);
+    const random = seededRandom(`${trial.nonce}:common-field-noise`);
     const base = index === trial.answer ? trial.target : trial.reference;
     const count = Math.round((width * height) / 145);
 
@@ -335,7 +325,6 @@ function cancelTrialEffects() {
   cancelAnimationFrame(state.fieldRedrawFrame);
   state.transitionFrame = 0;
   state.fieldRedrawFrame = 0;
-  state.fieldResizeObserver?.disconnect();
 }
 
 function armResponseGate(restoreFocusSelector) {
@@ -384,15 +373,12 @@ function positionLabTransition() {
 }
 
 function scheduleFieldRedraw() {
-  if (state?.session?.currentTrial.kind !== 'field') return;
-  cancelAnimationFrame(state.fieldRedrawFrame);
-  const mountedState = state;
-  const nonce = state.session.currentTrial.nonce;
-  state.fieldRedrawFrame = requestAnimationFrame(() => {
-    state.fieldRedrawFrame = 0;
-    if (state !== mountedState || state.session?.currentTrial.nonce !== nonce) return;
-    drawFields(state.session.currentTrial);
-  });
+  if (!state?.labActive || !state.measurementEnvironment) return;
+  if (visualEnvironmentChanged(state.measurementEnvironment, captureVisualEnvironment())) {
+    invalidateVisualRun(
+      'The display size changed. This run stopped before saving; restart after the layout is stable.',
+    );
+  }
 }
 
 function renderSequence(trial) {
@@ -508,7 +494,7 @@ function answerChoice(choice, { restoreFocus = false } = {}) {
       `${t('Instrument')} ${state.session.phase.number}. ${t(state.session.phase.name)}. ${t(phasePrompt(state.session.phase.id))}`,
     );
   } else {
-    announce(result.correct ? 'Recorded. Next trial.' : 'Recorded. The difference will increase.');
+    announce('Response recorded. Next trial.');
   }
 
   state.selectedSequenceIndex = null;
@@ -517,9 +503,6 @@ function answerChoice(choice, { restoreFocus = false } = {}) {
     semanticTransition: phaseChanged,
     restoreChoice: !phaseChanged && restoreFocus ? choice : null,
   });
-  state.app.dataset.feedback = result.correct ? 'correct' : 'miss';
-  const mountedApp = state.app;
-  window.setTimeout(() => delete mountedApp.dataset.feedback, 260);
 }
 
 function selectSequence(index) {
@@ -584,175 +567,67 @@ function renderResults() {
   state.lifecycle.setActive(false);
   trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.tetracromia);
   document.body.classList.add('lab-mode');
-  document.title = t('Your colour profile — Tetracromia | Sense6');
+  document.title = t('Screen Colour Lab observations — Tetracromia | Sense6');
   const result = state.session.results();
-  const previous = loadBestResult();
-  if (!previous || result.overall > previous.overall) saveBestResult(result);
   saveJournalResult(result);
-  const profile = profileLabel(result.overall);
 
   state.app.innerHTML = `
     <section class="results-view ui-container ui-container--wide" tabindex="-1">
       <div class="results-head">
         <div>
           <p class="ui-eyebrow">${t('Session complete')} / ${formatDuration(result.elapsedMs)}</p>
-          <h1>Your visible boundary, on this display.</h1>
-          <p>${profile.detail}</p>
+          <h1>Three observations from one short screen-colour run.</h1>
+          <p>Keep the tasks separate. This fixed 29-block experiment is too short to establish a stable threshold, stable hue characteristic, or overall ability score.</p>
         </div>
-        <div class="score-lockup" aria-label="${t('Session index')} ${result.overall} / 100">
-          <span>Session index</span>
-          <strong>${result.overall}</strong>
-          <small>/ 100</small>
+        <div class="score-lockup" aria-label="29 completed blocks">
+          <span>Completed</span>
+          <strong>29</strong>
+          <small>blocks</small>
         </div>
       </div>
 
-      <div class="results-grid">
-        <article class="profile-card ui-card">
-          <div class="ui-card__head">
-            <div>
-              <p class="ui-eyebrow ui-eyebrow--muted">Hue profile</p>
-              <h2>${profile.title}</h2>
-            </div>
-            <span class="ui-badge ui-badge--accent">Display-relative</span>
-          </div>
-          ${renderRadar(result.hueProfile)}
-          <p class="profile-explain">
-            Each spoke is one hue region, drawn in its real color. The dot shows the share of
-            discrimination trials you answered correctly there — the test keeps overall difficulty
-            near your limit, so shorter spokes mark your relatively weaker directions.
-          </p>
-        </article>
-
-        <div class="result-details">
-          ${resultMetric('01', 'Threshold', result.thresholdScore, `${t('Finest step')} ≈ ${formatNumber(result.thresholdDegrees, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}° ${t('of hue')} (ΔEOK ${formatNumber(result.thresholdDelta, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`, `${result.thresholdAccuracy}% ${t('correct · smaller angle = finer vision')}`)}
-          ${resultMetric('02', 'Field', result.fieldScore, `${t('Finest shift')} ≈ ${formatNumber(result.fieldDegrees, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}° ${t('of hue')} ${t('through noise')} (ΔEOK ${formatNumber(result.fieldDelta, { minimumFractionDigits: 2, maximumFractionDigits: 2 })})`, `${result.fieldAccuracy}% ${t('correct · smaller angle = finer vision')}`)}
-          ${resultMetric('03', 'Sequence', result.sequenceScore, t('Hue ordering between fixed anchors'), `100 = ${t('perfect order · each out-of-place pair costs points')}`)}
-        </div>
+      <div class="result-details">
+        ${observationMetric('01', 'Tile choices', `${result.tile.correct} of ${result.tile.presentations} correct`, `The adaptive level ended near ${formatNumber(result.tile.adaptiveLevelDegrees, { maximumFractionDigits: 1 })}° of OKLCH hue (ΔEOK ${formatNumber(result.tile.deltaEok, { maximumFractionDigits: 3 })}).`, `Presented range ${result.tile.presentedMinimum}°–${result.tile.presentedMaximum}° · ${result.tile.reversals} direction changes`)}
+        ${observationMetric('02', 'Dot-field choices', `${result.field.correct} of ${result.field.presentations} correct`, `The adaptive level ended near ${formatNumber(result.field.adaptiveLevelDegrees, { maximumFractionDigits: 1 })}° of OKLCH hue (ΔEOK ${formatNumber(result.field.deltaEok, { maximumFractionDigits: 3 })}).`, `Presented range ${result.field.presentedMinimum}°–${result.field.presentedMaximum}° · ${result.field.reversals} direction changes`)}
+        ${observationMetric('03', 'Hue ordering', `${result.ordering.orderedPairsPercent}% of pairs ordered`, `Mean pair ordering across ${result.ordering.runs} fixed-anchor arcs.`, `Run values: ${result.ordering.runPercentages.join('%, ')}%`)}
       </div>
 
       <div class="result-note ui-alert ui-alert--info">
         <div class="ui-alert__body">
           <strong class="ui-alert__title">How to read this</strong>
           <p>
-            Threshold and Field report the smallest hue difference you kept answering correctly,
-            found adaptively (the app floor is 1.2°, near what an sRGB screen can render).
-            The session index weighs them 35% + 35%, plus 30% for Sequence. Scores describe this
-            run on this browser and screen — useful for comparing your own sessions under similar
-            conditions, not a population percentile, diagnosis, or evidence for tetrachromacy.
+            The ending adaptive levels summarize where this brief run happened to finish; they are
+            not stable thresholds or uncertainty estimates. Ordering is a separate task. None of
+            these observations is a population score, diagnosis, clinical screen, or evidence for
+            tetrachromacy. A repeat is stored independently—Sense6 never pools runs or keeps a best.
           </p>
         </div>
       </div>
 
       <div class="results-actions">
-        <button class="ui-button ui-button--lg" type="button" data-action="setup">Run again</button>
+        <button class="ui-button ui-button--lg" type="button" data-action="setup">Repeat independently</button>
         <button class="ui-button ui-button--ghost" type="button" data-action="copy-results">Copy summary</button>
         <button class="ui-button ui-button--subtle" type="button" data-action="home">Return to method</button>
       </div>
-
-      ${previous ? `<p class="previous-score">Previous best on this browser: <strong>${previous.overall}/100</strong></p>` : ''}
     </section>
   `;
 
   window.scrollTo({ top: 0, behavior: 'instant' });
   document.querySelector('.results-view').focus({ preventScroll: true });
   announce(
-    `Session complete. Your display-relative index is ${result.overall} out of 100. ${profile.title}.`,
+    'Session complete. Three separate short-run observations are ready. No overall score was calculated.',
   );
 }
 
-function resultMetric(number, title, score, detail, note) {
+function observationMetric(number, title, value, detail, note) {
   return `<article class="result-metric">
     <div class="result-metric__head">
       <span>${number}</span>
-      <div><h3>${t(title)}</h3><p>${detail}</p></div>
-      <strong>${score}</strong>
+      <div><h2>${t(title)}</h2><p>${detail}</p></div>
+      <strong>${value}</strong>
     </div>
-    <div class="metric-meter">
-      <div class="metric-meter__row"><span>${note}</span><strong>${score}/100</strong></div>
-      <div class="ui-meter ui-meter--accent" role="meter" aria-label="${t(title)} — ${score}/100" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${score}">
-        <span class="ui-meter__fill" style="--value:${score}"></span>
-      </div>
-    </div>
+    <p class="observation-explain">${note}</p>
   </article>`;
-}
-
-function renderRadar(profile) {
-  const center = 160;
-  const radius = 100;
-  const inner = 24;
-  const count = profile.length;
-  const angleAt = (index) => -Math.PI / 2 + (index * Math.PI * 2) / count;
-
-  const points = profile
-    .map(({ score }, index) => {
-      const angle = angleAt(index);
-      const distance = inner + (radius - inner) * ((score ?? 0) / 100);
-      return `${center + Math.cos(angle) * distance},${center + Math.sin(angle) * distance}`;
-    })
-    .join(' ');
-
-  const axes = profile
-    .map((family, index) => {
-      const angle = angleAt(index);
-      const x = center + Math.cos(angle) * radius;
-      const y = center + Math.sin(angle) * radius;
-      const labelX = center + Math.cos(angle) * (radius + 24);
-      const labelY = center + Math.sin(angle) * (radius + 24);
-      const anchor = Math.cos(angle) > 0.35 ? 'end' : Math.cos(angle) < -0.35 ? 'start' : 'middle';
-      return `
-        <line class="profile-radar__axis" x1="${center}" y1="${center}" x2="${x}" y2="${y}" />
-        <circle class="profile-radar__swatch" cx="${labelX}" cy="${labelY - 8}" r="6"
-          fill="${toRgbCss(0.7, 0.12, family.hue)}" />
-        <text class="profile-radar__label" x="${labelX}" y="${labelY + 8}" text-anchor="${anchor}">
-          ${family.label} ${family.score ?? '–'}
-        </text>`;
-    })
-    .join('');
-
-  const summary = profile
-    .map(({ label, score }) => `${label} ${score === null ? 'no data' : `${score} percent`}`)
-    .join(', ');
-
-  return `<svg class="profile-radar" viewBox="0 0 320 320" role="img"
-    aria-label="Hue discrimination profile, share of correct answers per hue region: ${summary}">
-    <g class="profile-radar__grid">
-      <circle cx="${center}" cy="${center}" r="${inner}" />
-      <circle cx="${center}" cy="${center}" r="${Math.round(inner + (radius - inner) * 0.5)}" />
-      <circle cx="${center}" cy="${center}" r="${radius}" />
-    </g>
-    ${axes}
-    <polygon class="profile-radar__area" points="${points}" />
-    ${points
-      .split(' ')
-      .map((point, index) => {
-        const [x, y] = point.split(',');
-        return `<circle class="profile-radar__point" cx="${x}" cy="${y}" r="4.5"
-          fill="${toRgbCss(0.7, 0.12, profile[index].hue)}" />`;
-      })
-      .join('')}
-  </svg>`;
-}
-
-function profileLabel(score) {
-  if (score >= 86)
-    return {
-      title: 'Very fine screen-level discrimination',
-      detail: 'You resolved small display differences consistently across the three instruments.',
-    };
-  if (score >= 72)
-    return {
-      title: 'Fine screen-level discrimination',
-      detail: 'You resolved subtle display differences with a stable overall profile.',
-    };
-  if (score >= 56)
-    return {
-      title: 'Moderate screen-level discrimination',
-      detail: 'You found clear differences; the finest steps were less consistent in this run.',
-    };
-  return {
-    title: 'Broad screen-level discrimination',
-    detail: 'The smallest display steps were difficult in this run. Screen setup and fatigue can matter.',
-  };
 }
 
 function formatDuration(milliseconds) {
@@ -760,26 +635,27 @@ function formatDuration(milliseconds) {
   return `${Math.floor(seconds / 60)}m ${String(seconds % 60).padStart(2, '0')}s`;
 }
 
-function loadBestResult() {
-  return RESULT_STORE.load();
-}
-
-function saveBestResult(result) {
-  RESULT_STORE.save({ overall: result.overall, savedAt: new Date().toISOString() });
-}
-
 function saveJournalResult(result) {
   const entry = createJournalEntry({
     examId: 'tetracromia',
     locale: state.locale,
-    quality: 'usable',
+    quality: 'caution',
+    protocol: protocolPassport('tetracromia'),
     setup: captureDisplayPassport(),
+    qualityEvidence: {
+      tilePresentations: result.tile.presentations,
+      fieldPresentations: result.field.presentations,
+      orderingRuns: result.ordering.runs,
+      tileReversals: result.tile.reversals,
+      fieldReversals: result.field.reversals,
+      interrupted: false,
+    },
     measurements: [
-      { id: 'overall', value: result.overall, unit: '/100' },
-      { id: 'threshold-degrees', value: result.thresholdDegrees, unit: '° hue' },
-      { id: 'field-degrees', value: result.fieldDegrees, unit: '° hue' },
-      { id: 'sequence-score', value: result.sequenceScore, unit: '/100' },
+      { id: 'tile-adaptive-level', value: result.tile.adaptiveLevelDegrees, unit: '° hue' },
+      { id: 'field-adaptive-level', value: result.field.adaptiveLevelDegrees, unit: '° hue' },
+      { id: 'ordered-pairs', value: result.ordering.orderedPairsPercent, unit: '%' },
     ],
+    notes: ['short-exploratory-protocol', 'not-a-stable-threshold'],
   });
   if (entry) appendJournalEntry(entry);
 }
@@ -787,15 +663,7 @@ function saveJournalResult(result) {
 async function copyResults() {
   if (!state.session) return;
   const result = state.session.results();
-  const summary = t(
-    'Tetracromia — {overall}/100 screen-level color discrimination. Threshold {threshold}, Field {field}, Sequence {sequence}. Device-relative, not diagnostic.',
-    {
-      overall: result.overall,
-      threshold: result.thresholdScore,
-      field: result.fieldScore,
-      sequence: result.sequenceScore,
-    },
-  );
+  const summary = `Screen Colour Lab (Tetracromia) — tile ${result.tile.correct}/${result.tile.presentations} at an ending adaptive level near ${result.tile.adaptiveLevelDegrees}°; field ${result.field.correct}/${result.field.presentations} near ${result.field.adaptiveLevelDegrees}°; ordering ${result.ordering.orderedPairsPercent}% of pairs. Short-run, display-relative observations—not thresholds, a clinical test, or a diagnosis.`;
 
   try {
     await navigator.clipboard.writeText(summary);
@@ -826,6 +694,33 @@ function updateSetupEligibility() {
   state.app
     .querySelector('.tetracromia-forced-colors-warning')
     ?.setAttribute('aria-hidden', String(!blocked));
+}
+
+function captureVisualEnvironment() {
+  return {
+    width: Math.round(window.visualViewport?.width ?? window.innerWidth),
+    height: Math.round(window.visualViewport?.height ?? window.innerHeight),
+    dpr: window.devicePixelRatio || 1,
+    gamut: state.gamutChip.dataset.gamut ?? 'unknown',
+  };
+}
+
+/** @param {VisualEnvironment} baseline @param {VisualEnvironment} current */
+function visualEnvironmentChanged(baseline, current) {
+  return (
+    baseline.dpr !== current.dpr ||
+    baseline.gamut !== current.gamut ||
+    Math.abs(baseline.width - current.width) > 1 ||
+    Math.abs(baseline.height - current.height) > 1
+  );
+}
+
+/** @param {string} message */
+function invalidateVisualRun(message) {
+  if (!state.labActive) return;
+  state.measurementEnvironment = null;
+  renderSetup();
+  announce(message);
 }
 
 function isRepeatedTouchCommit(event) {
@@ -904,12 +799,22 @@ function wireEvents(signal) {
   document.addEventListener('pointerup', onSequencePointerUp, { signal });
   document.addEventListener('pointercancel', onSequencePointerCancel, { signal });
   window.addEventListener('resize', scheduleFieldRedraw, { signal });
+  document.addEventListener(
+    'visibilitychange',
+    () => {
+      if (document.visibilityState === 'hidden') {
+        invalidateVisualRun(
+          'The page was hidden. This run stopped before saving; restart when you can keep it visible.',
+        );
+      }
+    },
+    { signal },
+  );
   window.matchMedia?.('(forced-colors: active)').addEventListener(
     'change',
     () => {
       if (state.labActive && forcedColorsActive()) {
-        renderSetup();
-        announce('Color override detected. This run stopped and was not saved.');
+        invalidateVisualRun('Color override detected. This run stopped and was not saved.');
         return;
       }
       updateSetupEligibility();

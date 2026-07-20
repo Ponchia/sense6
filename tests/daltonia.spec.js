@@ -74,9 +74,7 @@ async function trialGeometry(page) {
   });
 }
 
-test('the Daltonia experiment renders adaptive targets and reports non-clinical thresholds', async ({
-  page,
-}) => {
+test('the Daltonia experiment renders adaptive targets and reports non-clinical levels', async ({ page }) => {
   await page.goto('/en/color-blindness/');
   await expect(page.getByRole('heading', { name: /Find the gap in the dots/i })).toBeVisible();
   await expect(page.getByText('Three staircases', { exact: true })).toBeVisible();
@@ -84,7 +82,7 @@ test('the Daltonia experiment renders adaptive targets and reports non-clinical 
   await expect(page.locator('.cb-signal-strip i')).toHaveCount(36);
   await expect(page.locator('.cb-axis-display__card')).toHaveCount(3);
   await expect(page.locator('.cb-boundary.method')).toBeVisible();
-  await expect(page.locator('.cb-research .source-list li')).toHaveCount(3);
+  await expect(page.locator('.cb-research .source-list li')).toHaveCount(6);
   await expect(page.locator('.cb-closing').getByRole('button', { name: /Open test/i })).toBeVisible();
 
   const methodColours = await page.evaluate(() => {
@@ -118,7 +116,7 @@ test('the Daltonia experiment renders adaptive targets and reports non-clinical 
   await page.getByRole('button', { name: /Gap at right/i }).click();
   await expect(page.getByText(/That is the gap/i)).toBeVisible();
   await expect(page.getByRole('button', { name: /Next practice target/i })).toBeFocused();
-  await page.keyboard.press('n');
+  await page.locator('.cb-prompt').dispatchEvent('keydown', { key: 'n' });
   await expect(page.getByText(/That is the gap/i)).toBeVisible();
   await page.getByRole('button', { name: /Next practice target/i }).click();
   await page.getByRole('button', { name: /Gap at top/i }).click();
@@ -156,6 +154,44 @@ test('the Daltonia experiment renders adaptive targets and reports non-clinical 
 
   const resultScan = await new AxeBuilder({ page }).analyze();
   expect(resultScan.violations).toEqual([]);
+});
+
+test('Daltonia rejects pre-paint and duplicate measured responses', async ({ page }) => {
+  await startPractice(page);
+  await page.locator('[data-orientation="right"]').click();
+  await page.locator('[data-action="cb-practice-next"]').click();
+  await page.locator('[data-orientation="up"]').click();
+
+  await page.evaluate(() => {
+    const native = window.requestAnimationFrame;
+    const queue = [];
+    window.__sense6RafProbe = { native, queue };
+    window.requestAnimationFrame = (callback) => {
+      queue.push(callback);
+      return queue.length;
+    };
+  });
+  await page.locator('[data-action="cb-practice-next"]').click();
+  await expect(page.locator('[data-orientation="unseen"]')).toBeDisabled();
+  await page.keyboard.press('n');
+  await expect(page.locator('.trial-count b')).toHaveText('01');
+
+  await page.evaluate(() => {
+    const probe = window.__sense6RafProbe;
+    while (probe.queue.length) probe.queue.shift()(performance.now());
+    window.requestAnimationFrame = probe.native;
+    delete window.__sense6RafProbe;
+  });
+  await expect(page.locator('[data-orientation="unseen"]')).toBeEnabled();
+  await page.evaluate(() => {
+    const dispatch = () =>
+      document
+        .querySelector('.cb-prompt')
+        .dispatchEvent(new KeyboardEvent('keydown', { key: 'n', bubbles: true }));
+    dispatch();
+    dispatch();
+  });
+  await expect(page.locator('.trial-count b')).toHaveText('02');
 });
 
 test('the complete mobile trial is visible and hit-testable at every audited viewport', async ({

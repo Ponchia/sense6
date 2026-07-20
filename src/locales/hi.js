@@ -1,3 +1,5 @@
+import { registryRows } from './registry-copy.js';
+
 // Hindi catalog; edit this locale directly.
 /** @type {Array<[string, string]>} */
 const rows = [
@@ -1516,5 +1518,6 @@ const rows = [
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 ];
 
-export const MESSAGE_COUNT = rows.length;
-export default new Map(rows);
+const catalogRows = [...rows, ...registryRows('hi')];
+export const MESSAGE_COUNT = catalogRows.length;
+export default new Map(catalogRows);

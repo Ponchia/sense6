@@ -260,10 +260,6 @@ body.ac-active {
   opacity: 0.28;
 }
 
-.ac-instrument-visual--meridian {
-  background: repeating-conic-gradient(#8357ff 0 1deg, transparent 1deg 15deg);
-}
-
 .ac-instrument-list h3 {
   font-family: var(--display);
   margin: 0.5rem 0;
@@ -743,8 +739,7 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
   overflow: auto;
   padding: 0.6rem;
 }
-.ac-stimulus > p,
-.ac-meridian > p {
+.ac-stimulus > p {
   font-family: var(--display);
   font-size: clamp(1.25rem, 3vw, 2rem);
   margin: 0;
@@ -831,49 +826,6 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
   color: var(--text-dim);
   line-height: 1.65;
   max-inline-size: 48rem;
-}
-
-.ac-meridian {
-  align-content: safe center;
-  display: grid;
-  gap: clamp(8px, 3vh, 24px);
-  justify-items: center;
-  min-block-size: 0;
-  overflow: auto;
-  padding: 8px;
-}
-.ac-meridian__fields {
-  display: flex;
-  gap: clamp(4px, 3vw, 24px);
-}
-.ac-meridian__fields canvas {
-  background: #f4f4f2;
-  border: 0;
-  display: block;
-  outline: 1px solid var(--line);
-}
-.ac-meridian__choices {
-  display: grid;
-  gap: 1px;
-  grid-template-columns: repeat(3, minmax(8rem, 14rem));
-}
-.ac-meridian__choices button {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  color: var(--text);
-  cursor: pointer;
-  font-family: var(--mono);
-  min-block-size: 4.5rem;
-  padding: 0.8rem;
-}
-.ac-meridian__choices button:hover:not(:disabled) {
-  border-color: #8357ff;
-}
-/* biome-ignore lint/style/noDescendingSpecificity: Route splitting preserves this established cascade. */
-.ac-meridian__choices small {
-  color: var(--ac-accent-text);
-  display: block;
-  margin-block-start: 0.35rem;
 }
 
 .ac-between {
@@ -1148,13 +1100,6 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
   .ac-runner__footer span:not(:first-child) {
     display: none;
   }
-  .ac-meridian__choices {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    inline-size: min(100%, 28rem);
-  }
-  .ac-meridian__choices button {
-    min-block-size: 44px;
-  }
   .ac-between {
     grid-template-columns: 1fr;
   }
@@ -1197,14 +1142,6 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
   }
   .ac-stimulus canvas {
     max-block-size: 55svh;
-  }
-  .ac-meridian {
-    grid-template-columns: auto minmax(24rem, 1fr);
-    grid-template-rows: auto 1fr auto;
-  }
-  .ac-meridian > p,
-  .ac-meridian .ac-feedback {
-    grid-column: 1 / -1;
   }
 }
 

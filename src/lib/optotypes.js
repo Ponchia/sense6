@@ -55,68 +55,6 @@ export function drawLandoltRing(
   return { backing, diameter, unit };
 }
 
-/**
- * @typedef {object} MeridianFieldOptions
- * @property {number} angleDegrees
- * @property {number} [scale]
- * @property {number} [phase]
- * @property {string} [target]
- * @property {string} [background]
- * @property {number} [boxCssPx]
- * @property {number} [devicePixelRatio]
- * @property {number} [supersample]
- */
-
-/**
- * @param {HTMLCanvasElement} canvas
- * @param {MeridianFieldOptions} options
- */
-export function drawMeridianField(
-  canvas,
-  {
-    angleDegrees,
-    scale = 1,
-    phase = 0,
-    target = 'rgb(25 25 25)',
-    background = 'rgb(244 244 242)',
-    boxCssPx = 190,
-    devicePixelRatio = window.devicePixelRatio || 1,
-    supersample = 3,
-  },
-) {
-  const renderScale = Math.max(1, devicePixelRatio) * supersample;
-  const backing = Math.max(1, Math.round(boxCssPx * renderScale));
-  canvas.width = backing;
-  canvas.height = backing;
-  setSquareCanvasSize(canvas, boxCssPx);
-  const context = requireCanvasContext(canvas);
-  context.fillStyle = background;
-  context.fillRect(0, 0, backing, backing);
-  context.save();
-  context.beginPath();
-  context.arc(backing / 2, backing / 2, backing * 0.42, 0, Math.PI * 2);
-  context.clip();
-  context.translate(backing / 2, backing / 2);
-  context.rotate((angleDegrees * Math.PI) / 180);
-  context.translate((phase - 0.5) * renderScale, 0);
-  context.strokeStyle = target;
-  context.lineWidth = Math.max(renderScale * 0.7 * scale, 1);
-  const spacing = renderScale * 7 * scale;
-  for (let y = -backing; y <= backing; y += spacing) {
-    context.beginPath();
-    context.moveTo(-backing, y);
-    context.lineTo(backing, y);
-    context.stroke();
-  }
-  context.restore();
-  context.strokeStyle = target;
-  context.lineWidth = Math.max(1, renderScale * 0.35);
-  context.beginPath();
-  context.arc(backing / 2, backing / 2, backing * 0.42, 0, Math.PI * 2);
-  context.stroke();
-  return { backing, spacing };
-}
-
 /** @param {HTMLCanvasElement} canvas @param {number} boxCssPx */
 export function setSquareCanvasSize(canvas, boxCssPx) {
   if (!(boxCssPx > 0)) throw new RangeError('Canvas size must be positive');
