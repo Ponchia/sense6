@@ -100,11 +100,12 @@ function renderIntro() {
   const previous = loadLast();
 
   state.app.innerHTML = `
-    <section class="cb-intro ui-container ui-container--wide">
-      <button class="back-link exam-back" type="button" data-action="gallery">
-        <span aria-hidden="true">←</span> All tests
-      </button>
-      <div class="cb-hero">
+    <div class="cb-intro">
+      <section class="cb-intro__hero ui-container ui-container--wide">
+        <button class="back-link exam-back" type="button" data-action="gallery">
+          <span aria-hidden="true">←</span> All tests
+        </button>
+        <div class="cb-hero">
         <div class="cb-hero__copy">
           <p class="ui-eyebrow">Colour vision / adaptive experiment / about 3 minutes</p>
           <h1>Find the gap <em>in the dots</em>.</h1>
@@ -132,25 +133,39 @@ function renderIntro() {
         <div class="cb-hero__plate" aria-hidden="true">
           <canvas data-preview-target></canvas>
         </div>
-      </div>
-
-      <div class="cb-explain section" id="cb-how">
-        <div class="section-heading">
-          <div>
-            <p class="ui-eyebrow">Method and limits</p>
-            <h2>An adaptive task, not a plate score.</h2>
-          </div>
-          <p>The design borrows established psychophysical techniques without claiming their clinical validation.</p>
         </div>
-        <ol class="method-steps cb-steps">
-          <li><span>1</span><div><strong>Practice first</strong><p>Two clear targets teach the C-gap interaction with immediate feedback before any threshold is measured.</p></div></li>
-          <li><span>2</span><div><strong>Luminance noise</strong><p>Target and field dots share the same brightness variation, reducing a consistent lightness cue.</p></div></li>
-          <li><span>3</span><div><strong>Three staircases</strong><p>Directions become harder after correct responses. “No gap visible” counts as a miss and makes that direction easier.</p></div></li>
-          <li><span>4</span><div><strong>Run-relative output</strong><p>You receive thresholds and run spread, not a normal/deficient label or a clinical score.</p></div></li>
-        </ol>
+      </section>
+
+      <div class="cb-signal-strip" aria-hidden="true">
+        ${Array.from({ length: 36 }, (_, index) => `<i style="--dot:${index};--band:${index % 3}"></i>`).join(
+          '',
+        )}
       </div>
 
-      <section class="cb-research section" aria-labelledby="cb-research-title">
+      <section class="cb-explain section" id="cb-how">
+        <div class="ui-container ui-container--wide">
+          <div class="section-heading">
+            <div>
+              <p class="ui-eyebrow">Method and limits</p>
+              <h2>An adaptive task, not a plate score.</h2>
+            </div>
+            <p>The design borrows established psychophysical techniques without claiming their clinical validation.</p>
+          </div>
+          <div class="cb-axis-display" aria-hidden="true">
+            <div class="cb-axis-display__card cb-axis-display__card--l"><span>L</span><i></i><i></i><i></i></div>
+            <div class="cb-axis-display__card cb-axis-display__card--m"><span>M</span><i></i><i></i><i></i></div>
+            <div class="cb-axis-display__card cb-axis-display__card--s"><span>S</span><i></i><i></i><i></i></div>
+          </div>
+          <ol class="method-steps cb-steps">
+            <li><span>1</span><div><strong>Practice first</strong><p>Two clear targets teach the C-gap interaction with immediate feedback before any threshold is measured.</p></div></li>
+            <li><span>2</span><div><strong>Luminance noise</strong><p>Target and field dots share the same brightness variation, reducing a consistent lightness cue.</p></div></li>
+            <li><span>3</span><div><strong>Three staircases</strong><p>Directions become harder after correct responses. “No gap visible” counts as a miss and makes that direction easier.</p></div></li>
+            <li><span>4</span><div><strong>Run-relative output</strong><p>You receive thresholds and run spread, not a normal/deficient label or a clinical score.</p></div></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="cb-research section ui-container ui-container--wide" aria-labelledby="cb-research-title">
         <div class="section-heading">
           <div>
             <p class="ui-eyebrow">Research trail</p>
@@ -179,7 +194,17 @@ function renderIntro() {
           )}
         </div>
       </section>
-    </section>
+
+      <section class="closing-cta cb-closing ui-container ui-container--wide">
+        <div>
+          <p class="ui-eyebrow">Colour vision / adaptive experiment / about 3 minutes</p>
+          <h2>Adaptive browser colour-vision experiment</h2>
+        </div>
+        <button class="ui-button ui-button--lg" type="button" data-action="cb-setup-closing">
+          Open test <span aria-hidden="true">→</span>
+        </button>
+      </section>
+    </div>
   `;
 
   requestAnimationFrame(() => {
@@ -812,7 +837,7 @@ function wireEvents(signal) {
         event.preventDefault();
         state.app.querySelector('#cb-how')?.scrollIntoView({ behavior: 'smooth' });
       }
-      if (name === 'cb-setup') renderSetup();
+      if (name === 'cb-setup' || name === 'cb-setup-closing') renderSetup();
       if (name === 'cb-home') {
         if (state.active && !window.confirm(t('End this experiment? Your progress will be lost.'))) return;
         renderIntro();

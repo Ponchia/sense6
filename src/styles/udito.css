@@ -5,7 +5,11 @@
 .au-intro {
   --au-accent: #169dc7;
 
-  padding-block: 2rem clamp(3rem, 7vw, 6rem);
+  padding-block-end: clamp(3rem, 7vw, 6rem);
+}
+
+.au-intro__hero {
+  padding-block-start: 2rem;
 }
 
 .au-hero {
@@ -184,17 +188,107 @@
 
 .au-instrument-list li {
   background: var(--panel);
+  min-inline-size: 0;
+  overflow: hidden;
+}
+
+.au-instrument-copy {
   display: grid;
   gap: 1.5rem;
   grid-template-rows: auto 1fr;
-  min-inline-size: 0;
   padding: clamp(1.4rem, 3vw, 2.2rem);
 }
 
-.au-instrument-list li > span {
+.au-instrument-copy > span {
   color: var(--accent-text);
   font-family: var(--display);
   font-size: 3rem;
+}
+
+.au-instrument-visual {
+  align-items: center;
+  background: color-mix(in srgb, #169dc7 9%, var(--panel));
+  block-size: clamp(10rem, 18vw, 15rem);
+  border-block-end: 1px solid var(--line);
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  padding: 2rem;
+  position: relative;
+}
+
+.au-instrument-visual--headphones {
+  gap: clamp(1rem, 3vw, 2rem);
+}
+
+.au-instrument-visual--headphones i {
+  align-items: end;
+  background: linear-gradient(to top, #169dc7 0 82%, var(--panel) 82%);
+  border: 1px solid var(--line-strong);
+  display: flex;
+  inline-size: clamp(2.5rem, 6vw, 4rem);
+  min-block-size: 65%;
+  padding: 0.45rem;
+}
+
+.au-instrument-visual--headphones i::after {
+  content: none;
+}
+
+.au-instrument-visual--headphones i:nth-child(2) {
+  background: linear-gradient(to top, color-mix(in srgb, #169dc7 55%, var(--panel)) 0 28%, var(--panel) 28%);
+}
+
+.au-instrument-visual--range {
+  align-items: end;
+  gap: 3px;
+}
+
+.au-instrument-visual--range i {
+  background: color-mix(in srgb, #169dc7 75%, var(--text));
+  block-size: calc(1rem + var(--tone) * 0.35rem);
+  flex: 1;
+  max-block-size: 92%;
+  opacity: calc(1 - var(--tone) * 0.035);
+}
+
+.au-instrument-visual--pitch {
+  align-content: center;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.au-instrument-visual--pitch span {
+  background: #169dc7;
+  block-size: 3.5rem;
+  clip-path: polygon(
+    0 48%,
+    6% 28%,
+    12% 76%,
+    18% 18%,
+    24% 68%,
+    30% 38%,
+    38% 82%,
+    46% 24%,
+    54% 70%,
+    62% 14%,
+    70% 62%,
+    78% 34%,
+    86% 74%,
+    94% 40%,
+    100% 52%
+  );
+  display: block;
+  inline-size: min(100%, 17rem);
+}
+
+.au-instrument-visual--pitch i {
+  display: none;
+}
+
+.au-instrument-visual--pitch span:last-child {
+  opacity: 0.48;
+  transform: translateX(2px);
 }
 
 .au-instrument-list h3 {
@@ -207,6 +301,35 @@
 .au-research__card p:not(.ui-eyebrow) {
   color: var(--text-dim);
   line-height: 1.6;
+}
+
+.au-method {
+  background:
+    radial-gradient(
+      circle at 78% 28%,
+      color-mix(in srgb, #169dc7 15%, transparent) 0 8rem,
+      transparent 8.1rem
+    ),
+    linear-gradient(145deg, color-mix(in srgb, #169dc7 8%, var(--panel)), var(--bg));
+  border-block: 1px solid var(--line);
+}
+
+.au-signal-strip {
+  align-items: center;
+  background: var(--text);
+  display: flex;
+  gap: clamp(1px, 0.22vw, 4px);
+  min-block-size: clamp(3rem, 5vw, 4.75rem);
+  overflow: hidden;
+  padding-inline: clamp(0.5rem, 2vw, 2rem);
+}
+
+.au-signal-strip i {
+  background: color-mix(in srgb, #4cc9f0 78%, white);
+  block-size: calc(0.4rem + sin(var(--wave) * 31deg) * sin(var(--wave) * 31deg) * 3rem);
+  flex: 1;
+  max-inline-size: 1.5rem;
+  opacity: 0.8;
 }
 
 .au-safety {
@@ -258,6 +381,15 @@
 
 .au-research__card .ui-link {
   margin-block-start: auto;
+}
+
+.au-closing h2 em {
+  color: var(--accent-text);
+  font-style: normal;
+}
+
+.au-closing .ui-button {
+  flex: 0 0 auto;
 }
 
 .au-setup {
@@ -883,8 +1015,11 @@
   }
 
   .au-instrument-list li {
-    grid-template-columns: 3rem 1fr;
-    grid-template-rows: none;
+    display: block;
+  }
+
+  .au-instrument-visual {
+    block-size: 11rem;
   }
 
   .au-safety {

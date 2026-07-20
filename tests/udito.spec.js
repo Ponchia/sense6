@@ -15,6 +15,9 @@ test('Udito completes three safe-listening instruments and keeps results separat
 
   await expect(page.getByRole('heading', { name: /Listen for the boundary/i })).toBeVisible();
   await expect(page.getByRole('heading', { name: /What informed Udito/i })).toBeVisible();
+  await expect(page.locator('.au-signal-strip i')).toHaveCount(56);
+  await expect(page.locator('.au-instrument-visual')).toHaveCount(3);
+  await expect(page.locator('.au-closing').getByRole('button', { name: /Open test/i })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole('button', { name: /Toggle light and dark theme/i }).click();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);

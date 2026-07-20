@@ -13,6 +13,8 @@ test('the gallery lists exams, is accessible, and routes into one', async ({ pag
   await expect(page.locator('.brand')).not.toContainText('Perception lab');
   await expect(page.locator('.sense-mark')).toHaveText('Sense6');
   await expect(page.locator('.sense-mark__signal')).toHaveCount(6);
+  await expect(page.locator('.ui-sitefooter__links > span')).toHaveCount(0);
+  await expect(page.locator('.ui-sitefooter__links > a')).toHaveCount(4);
   await expect(page.locator('.gallery-hero__boundary')).toHaveText(
     'Experimental perception tests for curiosity and fun—not medical tests or diagnoses.',
   );
@@ -112,6 +114,8 @@ test('the privacy notice describes the deployed data boundary in every locale', 
   await expect(page).toHaveURL(/\/en\/privacy\/$/);
   await expect(page.getByRole('heading', { level: 1, name: privacyCopy('en').title })).toBeVisible();
   await expect(page.getByRole('link', { name: 'privacy@sense6.net' })).toHaveCount(2);
+  await expect(page.locator('.privacy-vault__device i')).toHaveCount(9);
+  await expect(page.locator('.privacy-boundary')).toBeVisible();
   await expect(page.getByText(/UTC day, test name, event name, and total count/i)).toBeVisible();
   await expect(page.getByText(/does not store IP addresses, identifiers, fingerprints/i)).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
@@ -135,7 +139,10 @@ test('the About page explains authorship, methodology, and permanent limits in e
   await expect(page.getByText('No certification or formal validation is planned.')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Zeno', exact: true })).toHaveCount(2);
   await expect(page.getByRole('link', { name: 'privacy notice', exact: true })).toBeVisible();
+  await expect(page.locator('.about-orbit i')).toHaveCount(6);
+  await expect(page.locator('.about-signal > span')).toHaveCount(5);
   await expect(page.locator('.about-experiment')).toHaveCount(5);
+  await expect(page.locator('.about-experiment__signal')).toHaveCount(5);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
   for (const { code, languageTag, direction } of LOCALES) {
