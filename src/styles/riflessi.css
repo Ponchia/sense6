@@ -18,7 +18,11 @@ body.rx-running > .ui-sitefooter {
 }
 
 .rx-intro {
-  padding-block: 2rem clamp(3rem, 7vw, 6rem);
+  padding-block-end: clamp(3rem, 7vw, 6rem);
+}
+
+.rx-intro__hero {
+  padding-block-start: 2rem;
 }
 
 .rx-hero {
@@ -175,7 +179,35 @@ body.rx-running > .ui-sitefooter {
 }
 
 .rx-method {
-  border-block-start: 1px solid var(--line);
+  background:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px), color-mix(in srgb, #f4b942 7%, var(--panel));
+  background-size: 2rem 2rem;
+  border-block: 1px solid var(--line);
+}
+
+.rx-signal-strip {
+  align-items: center;
+  background: var(--text);
+  display: grid;
+  gap: clamp(2px, 0.35vw, 6px);
+  grid-template-columns: repeat(48, 1fr);
+  min-block-size: clamp(3rem, 5vw, 4.5rem);
+  overflow: hidden;
+  padding-inline: clamp(0.5rem, 2vw, 2rem);
+}
+
+.rx-signal-strip i {
+  background: color-mix(in srgb, #f4b942 78%, white);
+  block-size: calc(0.35rem + sin(var(--tick) * 29deg) * sin(var(--tick) * 29deg) * 2.2rem);
+  opacity: 0.82;
+}
+
+.rx-signal-strip i:nth-child(7n) {
+  background: var(--bg);
+  block-size: 70%;
+  inline-size: 2px;
+  justify-self: center;
 }
 
 .rx-instrument-list {
@@ -191,17 +223,85 @@ body.rx-running > .ui-sitefooter {
 
 .rx-instrument-list li {
   background: var(--panel);
-  display: grid;
-  gap: 2rem;
-  grid-template-rows: auto 1fr;
   min-inline-size: 0;
+  overflow: hidden;
+}
+
+.rx-instrument-copy {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-rows: auto 1fr;
   padding: clamp(1.5rem, 3vw, 2.5rem);
 }
 
-.rx-instrument-list li > span {
+.rx-instrument-copy > span {
   color: var(--accent-text);
   font-family: var(--display);
   font-size: 1.5rem;
+}
+
+.rx-instrument-visual {
+  align-items: center;
+  background: color-mix(in srgb, #f4b942 10%, var(--panel));
+  block-size: clamp(10rem, 18vw, 15rem);
+  border-block-end: 1px solid var(--line);
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.rx-instrument-visual--signal::before,
+.rx-instrument-visual--signal span {
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, #f4b942 56%, var(--line));
+  border-radius: 50%;
+  content: "";
+  inline-size: 54%;
+  position: absolute;
+}
+
+.rx-instrument-visual--signal span {
+  border-style: dashed;
+  inline-size: 78%;
+}
+
+.rx-visual-signal {
+  aspect-ratio: 1;
+  background: #f4b942;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1.2rem color-mix(in srgb, #f4b942 18%, transparent);
+  inline-size: 1.8rem;
+  z-index: 1;
+}
+
+.rx-instrument-visual--choice {
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.rx-instrument-visual--choice i {
+  color: #b77b00;
+  font-family: var(--display);
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-style: normal;
+}
+
+.rx-instrument-visual--choice span {
+  background: #f4b942;
+  block-size: 56%;
+  inline-size: 1px;
+}
+
+.rx-instrument-visual--stability {
+  align-items: end;
+  gap: 3px;
+  padding: 2rem;
+}
+
+.rx-instrument-visual--stability i {
+  background: color-mix(in srgb, #f4b942 72%, var(--text));
+  block-size: calc(1.5rem + sin(var(--bar) * 37deg) * sin(var(--bar) * 37deg) * 5rem);
+  flex: 1;
 }
 
 .rx-instrument-list h3 {
@@ -244,6 +344,15 @@ body.rx-running > .ui-sitefooter {
 
 .rx-research__card a {
   margin-block-start: auto;
+}
+
+.rx-closing h2 em {
+  color: var(--accent-text);
+  font-style: normal;
+}
+
+.rx-closing .ui-button {
+  flex: 0 0 auto;
 }
 
 .rx-setup {
@@ -1006,8 +1115,15 @@ body.rx-running > .ui-sitefooter {
   }
 
   .rx-instrument-list li {
-    grid-template-columns: 3rem 1fr;
-    grid-template-rows: none;
+    display: grid;
+    grid-template-columns: minmax(12rem, 0.7fr) minmax(0, 1.3fr);
+  }
+
+  .rx-instrument-visual {
+    block-size: auto;
+    border-block-end: 0;
+    border-inline-end: 1px solid var(--line);
+    min-block-size: 14rem;
   }
 
   .rx-brief {
@@ -1034,6 +1150,25 @@ body.rx-running > .ui-sitefooter {
   .rx-hero__actions > *,
   .rx-results__actions > * {
     inline-size: 100%;
+  }
+
+  .rx-signal-strip {
+    grid-template-columns: repeat(32, 1fr);
+  }
+
+  .rx-signal-strip i:nth-child(n + 33) {
+    display: none;
+  }
+
+  .rx-instrument-list li {
+    display: block;
+  }
+
+  .rx-instrument-visual {
+    block-size: 11rem;
+    border-block-end: 1px solid var(--line);
+    border-inline-end: 0;
+    min-block-size: 0;
   }
 
   .rx-mode-picker,

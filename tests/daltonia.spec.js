@@ -81,6 +81,9 @@ test('the Daltonia experiment renders adaptive targets and reports non-clinical 
   await expect(page.getByRole('heading', { name: /Find the gap in the dots/i })).toBeVisible();
   await expect(page.getByText('Three staircases', { exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: /What informed Daltonia/i })).toBeVisible();
+  await expect(page.locator('.cb-signal-strip i')).toHaveCount(36);
+  await expect(page.locator('.cb-axis-display__card')).toHaveCount(3);
+  await expect(page.locator('.cb-closing').getByRole('button', { name: /Open test/i })).toBeVisible();
 
   const methodColours = await page.evaluate(() => {
     const target = document.querySelector('.cb-steps strong');

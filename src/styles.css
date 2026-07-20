@@ -77,6 +77,11 @@ a:focus-visible {
   z-index: var(--z-sticky);
 }
 
+.ui-sitefooter__links {
+  justify-content: flex-end;
+  margin-inline-start: auto;
+}
+
 .brand {
   flex: 0 0 auto;
   font-size: clamp(1.05rem, 3.2vw, 1.3rem);

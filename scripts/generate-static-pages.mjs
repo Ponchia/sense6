@@ -165,7 +165,6 @@ function localizeShell(html, locale) {
     )
     .replace('>Theme<', `>${escapeHtml(tr('Theme'))}<`)
     .replace('Measure carefully. Keep it private.', escapeHtml(tr('Measure carefully. Keep it private.')))
-    .replace('Anonymous daily counts · no cookies', escapeHtml(tr('Anonymous daily counts · no cookies')))
     .replace('>About<', `>${escapeHtml(tr('About'))}<`)
     .replace('>Journal<', `>${escapeHtml(tr('Journal'))}<`)
     .replace('>Privacy<', `>${escapeHtml(tr('Privacy'))}<`)

@@ -67,7 +67,11 @@ body.ac-active {
 }
 
 .ac-intro {
-  padding-block: 2rem clamp(3rem, 7vw, 6rem);
+  padding-block-end: clamp(3rem, 7vw, 6rem);
+}
+
+.ac-intro__hero {
+  padding-block-start: 2rem;
 }
 
 .ac-hero {
@@ -102,7 +106,8 @@ body.ac-active {
 }
 
 .ac-hero h1 em,
-.ac-results__hero h1 em {
+.ac-results__hero h1 em,
+.ac-closing h2 em {
   color: var(--ac-accent-text);
   font-style: normal;
 }
@@ -229,17 +234,34 @@ body.ac-active {
 
 .ac-instrument-list li {
   background: var(--panel);
+  overflow: hidden;
+}
+
+.ac-instrument-copy {
   display: grid;
   gap: 1.5rem;
   grid-template-rows: auto 1fr;
-  min-inline-size: 0;
   padding: clamp(1.4rem, 3vw, 2.2rem);
 }
 
-.ac-instrument-list li > span {
+.ac-instrument-copy > span {
   color: var(--ac-accent-text);
   font-family: var(--display);
   font-size: 3rem;
+}
+
+.ac-instrument-visual {
+  block-size: clamp(10rem, 18vw, 15rem);
+  border-block-end: 1px solid var(--line);
+  position: relative;
+}
+
+.ac-instrument-visual--low .mini-acuity {
+  opacity: 0.28;
+}
+
+.ac-instrument-visual--meridian {
+  background: repeating-conic-gradient(#8357ff 0 1deg, transparent 1deg 15deg);
 }
 
 .ac-instrument-list h3,
@@ -255,6 +277,15 @@ body.ac-active {
 .ac-research__card p:not(.ui-eyebrow) {
   color: var(--text-dim);
   line-height: 1.6;
+}
+
+.ac-method {
+  background: color-mix(in srgb, #8357ff 7%, var(--panel));
+}
+
+.ac-calibration-strip {
+  background: repeating-linear-gradient(90deg, var(--text) 0 1rem, #aa8cff 1rem calc(1rem + 1px));
+  block-size: clamp(3rem, 5vw, 4.75rem);
 }
 
 .ac-safety {

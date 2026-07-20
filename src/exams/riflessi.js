@@ -87,11 +87,12 @@ function renderIntro() {
   const previous = loadLast();
 
   state.app.innerHTML = `
-    <section class="rx-intro ui-container ui-container--wide">
-      <button class="back-link exam-back" type="button" data-action="rx-home">
-        <span aria-hidden="true">←</span> All tests
-      </button>
-      <div class="rx-hero">
+    <div class="rx-intro">
+      <section class="rx-intro__hero ui-container ui-container--wide">
+        <button class="back-link exam-back" type="button" data-action="rx-home">
+          <span aria-hidden="true">←</span> All tests
+        </button>
+        <div class="rx-hero">
         <div class="rx-hero__copy">
           <p class="ui-eyebrow">Response lab / three instruments / about 7 minutes</p>
           <h1 tabindex="-1" data-rx-screen-title>Notice the signal.<br><em>Measure the response.</em></h1>
@@ -120,29 +121,41 @@ function renderIntro() {
           </div>
           <div class="rx-hero__readout"><span>Signal</span><strong>ready</strong><i></i></div>
         </div>
+        </div>
+      </section>
+
+      <div class="rx-signal-strip" aria-hidden="true">
+        ${Array.from({ length: 48 }, (_, index) => `<i style="--tick:${index}"></i>`).join('')}
       </div>
 
       <section class="rx-method section" id="rx-method" aria-labelledby="rx-method-title">
-        <div class="section-heading">
-          <div>
-            <p class="ui-eyebrow">Method and limits</p>
-            <h2 id="rx-method-title">Three questions, kept separate.</h2>
+        <div class="ui-container ui-container--wide">
+          <div class="section-heading">
+            <div>
+              <p class="ui-eyebrow">Method and limits</p>
+              <h2 id="rx-method-title">Three questions, kept separate.</h2>
+            </div>
+            <p>No percentile, “brain age,” or reflex rating. Each instrument answers a narrower question.</p>
           </div>
-          <p>No percentile, “brain age,” or reflex rating. Each instrument answers a narrower question.</p>
-        </div>
-        <ol class="rx-instrument-list">
-          ${Object.values(INSTRUMENTS)
-            .map(
-              (instrument) => `<li>
-                <span>${instrument.number}</span>
-                <div><p class="ui-eyebrow ui-eyebrow--muted">${instrument.eyebrow}</p><h3>${instrument.name}</h3><p>${instrument.body}</p></div>
+          <ol class="rx-instrument-list">
+            ${Object.entries(INSTRUMENTS)
+              .map(
+                ([id, instrument]) => `<li>
+                <div class="rx-instrument-visual rx-instrument-visual--${id}" aria-hidden="true">
+                  ${instrumentVisual(id)}
+                </div>
+                <div class="rx-instrument-copy">
+                  <span>${instrument.number}</span>
+                  <div><p class="ui-eyebrow ui-eyebrow--muted">${instrument.eyebrow}</p><h3>${instrument.name}</h3><p>${instrument.body}</p></div>
+                </div>
               </li>`,
-            )
-            .join('')}
-        </ol>
+              )
+              .join('')}
+          </ol>
+        </div>
       </section>
 
-      <section class="rx-research section" aria-labelledby="rx-research-title">
+      <section class="rx-research section ui-container ui-container--wide" aria-labelledby="rx-research-title">
         <div class="section-heading">
           <div><p class="ui-eyebrow">Research trail</p><h2 id="rx-research-title">What informed Riflessi.</h2></div>
           <p>Established task structures inform the design. They do not validate an uncontrolled browser as a clinical instrument.</p>
@@ -168,7 +181,17 @@ function renderIntro() {
           )}
         </div>
       </section>
-    </section>
+
+      <section class="closing-cta rx-closing ui-container ui-container--wide">
+        <div>
+          <p class="ui-eyebrow">Response lab / three instruments / about 7 minutes</p>
+          <h2>Response speed, choice cost &amp; consistency</h2>
+        </div>
+        <button class="ui-button ui-button--lg" type="button" data-action="rx-setup-closing">
+          Open test <span aria-hidden="true">→</span>
+        </button>
+      </section>
+    </div>
   `;
   resetScreen();
 }
@@ -178,6 +201,12 @@ function researchCard(eyebrow, title, body, href) {
     <p class="ui-eyebrow ui-eyebrow--muted">${eyebrow}</p><h3>${title}</h3><p>${body}</p>
     <a class="ui-link" href="${href}" target="_blank" rel="noreferrer">Read the primary source <span aria-hidden="true">↗</span></a>
   </article>`;
+}
+
+function instrumentVisual(id) {
+  if (id === 'signal') return '<i class="rx-visual-signal"></i><span></span>';
+  if (id === 'choice') return '<i>←</i><span></span><i>→</i>';
+  return Array.from({ length: 12 }, (_, index) => `<i style="--bar:${index}"></i>`).join('');
 }
 
 function renderSetup() {
@@ -854,6 +883,7 @@ function wireEvents(signal) {
           renderIntro();
           break;
         case 'rx-setup':
+        case 'rx-setup-closing':
           renderSetup();
           break;
         case 'rx-method':

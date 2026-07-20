@@ -1020,8 +1020,12 @@ export function aboutMarkup(locale, hrefFor = (route) => `/${locale}/${route ? `
     <a class="back-link about-view__back" data-sense6-route="" href="${escapeAttribute(hrefFor(''))}"><span aria-hidden="true">←</span> ${escapeHtml(page.back)}</a>
     <header class="about-hero">
       <div><p class="ui-eyebrow">${escapeHtml(page.eyebrow)}</p><h1>${escapeHtml(page.title)}</h1><p class="about-hero__lede">${escapeHtml(page.intro)}</p><p class="about-hero__updated">${escapeHtml(page.updated)}</p></div>
-      <aside class="about-summary" aria-labelledby="about-summary-title"><span aria-hidden="true">S6</span><div><h2 id="about-summary-title">${escapeHtml(page.summaryTitle)}</h2><p>${escapeHtml(page.summary)}</p></div></aside>
+      <div class="about-hero__instrument">
+        <div class="about-orbit" aria-hidden="true"><span>S6</span>${Array.from({ length: 6 }, (_, index) => `<i style="--signal:${index}"></i>`).join('')}</div>
+        <aside class="about-summary" aria-labelledby="about-summary-title"><span aria-hidden="true">S6</span><div><h2 id="about-summary-title">${escapeHtml(page.summaryTitle)}</h2><p>${escapeHtml(page.summary)}</p></div></aside>
+      </div>
     </header>
+    <div class="about-signal" aria-hidden="true">${EXAMS.map((exam, index) => `<span style="--experiment-accent:${escapeAttribute(exam.accent)};--position:${index}"><i>${escapeHtml(exam.glyph)}</i></span>`).join('')}</div>
     <section class="about-facts" aria-label="${escapeAttribute(page.summaryTitle)}">${page.facts
       .map(
         ([title, body]) =>
@@ -1054,7 +1058,7 @@ function sectionMarkup(number, title, paragraphs, page, hrefFor) {
 
 function experimentMarkup(exam, page, hrefFor) {
   const boundary = page.experiments[exam.id];
-  return `<article class="about-experiment ui-card"><h3><a data-sense6-route="${escapeAttribute(exam.route)}" href="${escapeAttribute(hrefFor(exam.route))}">${escapeHtml(exam.name)}</a></h3><dl><div><dt>${escapeHtml(page.exploresLabel)}</dt><dd>${escapeHtml(boundary[0])}</dd></div><div><dt>${escapeHtml(page.cannotLabel)}</dt><dd>${escapeHtml(boundary[1])}</dd></div></dl></article>`;
+  return `<article class="about-experiment ui-card" style="--experiment-accent:${escapeAttribute(exam.accent)}"><div class="about-experiment__signal" aria-hidden="true"><span>${escapeHtml(exam.glyph)}</span><i></i></div><div class="about-experiment__copy"><h3><a data-sense6-route="${escapeAttribute(exam.route)}" href="${escapeAttribute(hrefFor(exam.route))}">${escapeHtml(exam.name)}</a></h3><dl><div><dt>${escapeHtml(page.exploresLabel)}</dt><dd>${escapeHtml(boundary[0])}</dd></div><div><dt>${escapeHtml(page.cannotLabel)}</dt><dd>${escapeHtml(boundary[1])}</dd></div></dl></div></article>`;
 }
 
 function aboutHtml(text, page, hrefFor) {

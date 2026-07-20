@@ -111,9 +111,10 @@ function renderIntro() {
   const previous = loadLast();
 
   state.app.innerHTML = `
-    <section class="au-intro ui-container ui-container--wide">
-      <button class="back-link exam-back" type="button" data-action="au-home"><span aria-hidden="true">←</span> All tests</button>
-      <div class="au-hero">
+    <div class="au-intro">
+      <section class="au-intro__hero ui-container ui-container--wide">
+        <button class="back-link exam-back" type="button" data-action="au-home"><span aria-hidden="true">←</span> All tests</button>
+        <div class="au-hero">
         <div class="au-hero__copy">
           <p class="ui-eyebrow">Listening lab / three instruments / about 6 minutes</p>
           <h1>Listen for the boundary.<br><em>Keep the limits audible.</em></h1>
@@ -130,24 +131,31 @@ function renderIntro() {
           <div class="au-wave">${Array.from({ length: 42 }, (_, index) => `<i style="--bar:${index}"></i>`).join('')}</div>
           <div class="au-scope__readout"><span>Output</span><strong>device relative</strong></div>
         </div>
+        </div>
+      </section>
+
+      <div class="au-signal-strip" aria-hidden="true">
+        ${Array.from({ length: 56 }, (_, index) => `<i style="--wave:${index}"></i>`).join('')}
       </div>
 
       <section class="au-method section" id="au-method" aria-labelledby="au-method-title">
-        <div class="section-heading">
-          <div><p class="ui-eyebrow">Method and limits</p><h2 id="au-method-title">Three questions. No synthetic score.</h2></div>
-          <p>The instruments stay separate because confidence in the setup is not the same thing as audibility or pitch discrimination.</p>
+        <div class="ui-container ui-container--wide">
+          <div class="section-heading">
+            <div><p class="ui-eyebrow">Method and limits</p><h2 id="au-method-title">Three questions. No synthetic score.</h2></div>
+            <p>The instruments stay separate because confidence in the setup is not the same thing as audibility or pitch discrimination.</p>
+          </div>
+          <ol class="au-instrument-list">
+            ${Object.entries(INSTRUMENTS)
+              .map(
+                ([id, item]) =>
+                  `<li><div class="au-instrument-visual au-instrument-visual--${id}" aria-hidden="true">${instrumentVisual(id)}</div><div class="au-instrument-copy"><span>${item.number}</span><div><p class="ui-eyebrow ui-eyebrow--muted">${item.eyebrow}</p><h3>${item.name}</h3><p>${item.body}</p></div></div></li>`,
+              )
+              .join('')}
+          </ol>
         </div>
-        <ol class="au-instrument-list">
-          ${Object.values(INSTRUMENTS)
-            .map(
-              (item) =>
-                `<li><span>${item.number}</span><div><p class="ui-eyebrow ui-eyebrow--muted">${item.eyebrow}</p><h3>${item.name}</h3><p>${item.body}</p></div></li>`,
-            )
-            .join('')}
-        </ol>
       </section>
 
-      <section class="au-safety section" aria-labelledby="au-safety-title">
+      <section class="au-safety section ui-container ui-container--wide" aria-labelledby="au-safety-title">
         <div><p class="ui-eyebrow">Before listening</p><h2 id="au-safety-title">Comfort sets the ceiling.</h2></div>
         <div class="au-safety__copy">
           <p>Start with device volume low. Raise it only until the reference is quiet and comfortable, never beyond about 60%. Then lock it for the whole run.</p>
@@ -155,7 +163,7 @@ function renderIntro() {
         </div>
       </section>
 
-      <section class="au-research section" aria-labelledby="au-research-title">
+      <section class="au-research section ui-container ui-container--wide" aria-labelledby="au-research-title">
         <div class="section-heading">
           <div><p class="ui-eyebrow">Research trail</p><h2 id="au-research-title">What informed Udito.</h2></div>
           <p>Established task structures inform the experiment. Consumer audio hardware remains uncalibrated.</p>
@@ -187,13 +195,27 @@ function renderIntro() {
           )}
         </div>
       </section>
-    </section>
+
+      <section class="closing-cta au-closing ui-container ui-container--wide">
+        <div><p class="ui-eyebrow">Listening lab / three instruments / about 6 minutes</p><h2>Headphone confidence, audibility &amp; pitch</h2></div>
+        <button class="ui-button ui-button--lg" type="button" data-action="au-setup-closing">Open test <span aria-hidden="true">→</span></button>
+      </section>
+    </div>
   `;
   focusStage('h1', 'Udito listening lab ready.');
 }
 
 function researchCard(eyebrow, title, body, href) {
   return `<article class="ui-card au-research__card"><p class="ui-eyebrow ui-eyebrow--muted">${eyebrow}</p><h3>${title}</h3><p>${body}</p><a class="ui-link" href="${href}" target="_blank" rel="noreferrer">Read the primary source <span aria-hidden="true">↗</span></a></article>`;
+}
+
+function instrumentVisual(id) {
+  if (id === 'headphones') return '<i></i><i></i><i></i>';
+  if (id === 'range') {
+    return Array.from({ length: 18 }, (_, index) => `<i style="--tone:${index}"></i>`).join('');
+  }
+  const wave = Array.from({ length: 14 }, (_, index) => `<i style="--tone:${index}"></i>`).join('');
+  return `<span>${wave}</span><span>${wave}</span>`;
 }
 
 function renderSetup() {
@@ -891,6 +913,7 @@ function wireEvents(signal) {
           renderIntro();
           break;
         case 'au-setup':
+        case 'au-setup-closing':
           renderSetup();
           break;
         case 'au-method':

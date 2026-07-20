@@ -102,9 +102,10 @@ function renderIntro() {
   document.title = t('Calibrated sharpness experiment — Acutezza | Sense6');
   const previous = loadLast();
   renderScreen(`
-    <section class="ac-intro ui-container ui-container--wide">
-      <button class="back-link exam-back" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button>
-      <div class="ac-hero">
+    <div class="ac-intro">
+      <section class="ac-intro__hero ui-container ui-container--wide">
+        <button class="back-link exam-back" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button>
+        <div class="ac-hero">
         <div class="ac-hero__copy">
           <p class="ui-eyebrow">Vision lab / three instruments / about 8 minutes</p>
           <h1>Calibrate the screen.<br><em>Resolve the opening.</em></h1>
@@ -114,26 +115,44 @@ function renderIntro() {
           ${previous ? `<p class="previous-score">Last run on this browser: <strong>${previous.setupQuality}</strong></p>` : ''}
         </div>
         <div class="ac-scope" aria-hidden="true"><div class="ac-scope__ring"><i></i><span></span></div><div class="ac-scope__axis ac-scope__axis--one"></div><div class="ac-scope__axis ac-scope__axis--two"></div><div class="ac-scope__readout"><span>Gap angle</span><strong>calibrated</strong></div></div>
-      </div>
-      <section class="ac-method section" id="ac-method" aria-labelledby="ac-method-title">
-        <div class="section-heading"><div><p class="ui-eyebrow">Method and limits</p><h2 id="ac-method-title">Three observations. No composite score.</h2></div><p>High-contrast detail, low-contrast cost, and directional preference remain separate.</p></div>
-        <ol class="ac-instrument-list">${Object.values(INSTRUMENTS)
-          .map(
-            (item) =>
-              `<li><span>${item.number}</span><div><p class="ui-eyebrow ui-eyebrow--muted">${item.eyebrow}</p><h3>${item.name}</h3><p>${item.body}</p></div></li>`,
-          )
-          .join('')}</ol>
+        </div>
       </section>
-      <section class="ac-safety section" aria-labelledby="ac-safety-title"><div><p class="ui-eyebrow">Before testing</p><h2 id="ac-safety-title">Comfort and context come first.</h2></div><div class="ac-safety__copy"><p>Use your usual correction for this distance. Cover one eye without pressing it, keep your head upright, and stop for discomfort.</p><p><strong>Sudden vision loss, severe eye pain, new flashes or floaters, or a curtain-like shadow needs prompt professional assessment.</strong> Do not delay care to take this test.</p></div></section>
-      <section class="ac-research section" aria-labelledby="ac-research-title">
+
+      <div class="ac-calibration-strip" aria-hidden="true">
+        ${Array.from({ length: 41 }, (_, index) => `<i style="--mark:${index}"></i>`).join('')}
+      </div>
+
+      <section class="ac-method section" id="ac-method" aria-labelledby="ac-method-title">
+        <div class="ui-container ui-container--wide">
+          <div class="section-heading"><div><p class="ui-eyebrow">Method and limits</p><h2 id="ac-method-title">Three observations. No composite score.</h2></div><p>High-contrast detail, low-contrast cost, and directional preference remain separate.</p></div>
+          <ol class="ac-instrument-list">${Object.entries(INSTRUMENTS)
+            .map(
+              ([id, item]) =>
+                `<li><div class="ac-instrument-visual ac-instrument-visual--${id}" aria-hidden="true">${instrumentVisual(id)}</div><div class="ac-instrument-copy"><span>${item.number}</span><div><p class="ui-eyebrow ui-eyebrow--muted">${item.eyebrow}</p><h3>${item.name}</h3><p>${item.body}</p></div></div></li>`,
+            )
+            .join('')}</ol>
+        </div>
+      </section>
+      <section class="ac-safety section ui-container ui-container--wide" aria-labelledby="ac-safety-title"><div><p class="ui-eyebrow">Before testing</p><h2 id="ac-safety-title">Comfort and context come first.</h2></div><div class="ac-safety__copy"><p>Use your usual correction for this distance. Cover one eye without pressing it, keep your head upright, and stop for discomfort.</p><p><strong>Sudden vision loss, severe eye pain, new flashes or floaters, or a curtain-like shadow needs prompt professional assessment.</strong> Do not delay care to take this test.</p></div></section>
+      <section class="ac-research section ui-container ui-container--wide" aria-labelledby="ac-research-title">
         <div class="section-heading"><div><p class="ui-eyebrow">Research trail</p><h2 id="ac-research-title">What informed Acutezza.</h2></div><p>Published methods shape the task. They do not make this implementation clinically validated.</p></div>
         <div class="ui-grid ac-research__grid">${researchCard('Calibration', 'Li et al., 2020', 'A physical card and blind-spot sweeps establish screen scale and estimated viewing distance.', 'https://www.nature.com/articles/s41598-019-57204-1')}${researchCard('Standard optotype', 'ISO 8596:2017', 'The Landolt ring provides language-independent, eight-direction geometry.', 'https://www.iso.org/standard/69042.html')}${researchCard('Adaptive burden', 'Bach, 2024', 'Eighteen eight-choice trials balance precision and effort in FrACT research.', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC11868300/')}${researchCard('Urgent symptoms', 'National Eye Institute', 'Safety copy reflects guidance for sudden floaters, flashes, or curtain-like shadows.', 'https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/floaters')}</div>
       </section>
-    </section>`);
+
+      <section class="closing-cta ac-closing ui-container ui-container--wide">
+        <div><p class="ui-eyebrow">Vision lab / three instruments / about 8 minutes</p><h2>Calibrated sharpness &amp; meridional clarity</h2></div>
+        <button class="ui-button ui-button--lg" type="button" data-action="ac-prepare-closing">Open test <span aria-hidden="true">→</span></button>
+      </section>
+    </div>`);
 }
 
 function researchCard(eyebrow, title, body, href) {
   return `<article class="ui-card ac-research__card"><p class="ui-eyebrow ui-eyebrow--muted">${eyebrow}</p><h3>${title}</h3><p>${body}</p><a class="ui-link" href="${href}" target="_blank" rel="noreferrer">Read the primary source <span aria-hidden="true">↗</span></a></article>`;
+}
+
+function instrumentVisual(id) {
+  if (id !== 'meridian') return '<div class="mini-acuity"><i></i><span></span></div>';
+  return Array.from({ length: 12 }, (_, index) => `<i style="--line:${index}"></i>`).join('');
 }
 
 function renderPreparation() {
@@ -882,6 +901,7 @@ function wireEvents(signal) {
         'ac-home': () => state.goHome(),
         'ac-intro': renderIntro,
         'ac-prepare': renderPreparation,
+        'ac-prepare-closing': renderPreparation,
         'ac-method': () => state.app.querySelector('#ac-method')?.scrollIntoView({ behavior: 'smooth' }),
         'ac-card': beginCalibration,
         'ac-card-smaller': () => adjustCard(-4),

@@ -352,14 +352,23 @@ export function renderPrivacy(context) {
           <p class="privacy-hero__lede">${copy.intro}</p>
           <p class="privacy-hero__updated">${copy.updated}</p>
         </div>
-        <aside class="privacy-summary" aria-labelledby="privacy-summary-title">
-          <span aria-hidden="true">00</span>
-          <div>
-            <h2 id="privacy-summary-title">${copy.summaryTitle}</h2>
-            <p>${copy.summary}</p>
+        <div class="privacy-hero__instrument">
+          <div class="privacy-vault" aria-hidden="true">
+            <div class="privacy-vault__device">${Array.from({ length: 9 }, (_, index) => `<i style="--point:${index}"></i>`).join('')}<span></span></div>
+            <div class="privacy-vault__channel"><i></i><i></i><i></i></div>
+            <div class="privacy-vault__total">∑</div>
           </div>
-        </aside>
+          <aside class="privacy-summary" aria-labelledby="privacy-summary-title">
+            <span aria-hidden="true">00</span>
+            <div>
+              <h2 id="privacy-summary-title">${copy.summaryTitle}</h2>
+              <p>${copy.summary}</p>
+            </div>
+          </aside>
+        </div>
       </header>
+
+      <div class="privacy-boundary" aria-hidden="true"><span></span><i></i><i></i><i></i><strong>0→∑</strong></div>
 
       <div class="privacy-sections">
         ${copy.sections
