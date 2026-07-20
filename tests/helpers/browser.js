@@ -59,12 +59,33 @@ export async function expectInVisualViewport(locator, label, { clearOfChrome = t
 }
 
 export async function expectNoHorizontalOverflow(page, label = 'page') {
-  await expect
-    .poll(
-      () => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
-      { message: `${label} should not overflow horizontally` },
-    )
-    .toBe(true);
+  try {
+    await expect
+      .poll(
+        () =>
+          page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+        { message: `${label} should not overflow horizontally` },
+      )
+      .toBe(true);
+  } catch (error) {
+    const geometry = await page.evaluate(() => ({
+      clientWidth: document.documentElement.clientWidth,
+      offenders: [...document.querySelectorAll('body *')]
+        .map((element) => {
+          const rect = element.getBoundingClientRect();
+          return {
+            className: element.className,
+            left: Math.round(rect.left),
+            right: Math.round(rect.right),
+            tagName: element.tagName,
+          };
+        })
+        .filter(({ left, right }) => left < -1 || right > document.documentElement.clientWidth + 1)
+        .slice(0, 8),
+      scrollWidth: document.documentElement.scrollWidth,
+    }));
+    throw new Error(`${error.message}\n${JSON.stringify(geometry)}`, { cause: error });
+  }
 }
 
 const QUICK_RIFLESSI = {

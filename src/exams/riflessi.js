@@ -227,15 +227,15 @@ function renderSetup() {
             </button>
           </fieldset>
           <fieldset class="rx-mode-picker" data-rx-scope-picker>
-            <legend>How much do you want to run?</legend>
-            ${scopeButton('signal', 'Segnale', 'about 2 minutes')}
-            ${scopeButton('signal-choice', 'Segnale + Scelta', 'about 4 minutes')}
-            ${scopeButton('complete', 'Complete set', 'about 7 minutes')}
+            <legend>${t('How much do you want to run?')}</legend>
+            ${scopeButton('signal', 'Segnale', t('about 2 minutes'))}
+            ${scopeButton('signal-choice', 'Segnale + Scelta', t('about 4 minutes'))}
+            ${scopeButton('complete', 'Complete set', t('about 7 minutes'))}
           </fieldset>
-          <label class="rx-setup-field">Physical setup
+          <label class="rx-setup-field">${t('Physical setup')}
             <select data-rx-position>
-              <option value="seated-stable">Seated · device on a stable surface</option>
-              <option value="handheld-or-standing">Handheld or standing</option>
+              <option value="seated-stable">${t('Seated · device on a stable surface')}</option>
+              <option value="handheld-or-standing">${t('Handheld or standing')}</option>
             </select>
           </label>
           <label class="rx-consent">
@@ -243,7 +243,7 @@ function renderSetup() {
             <span><strong class="experiment-boundary">I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.</strong> I understand this measures this browser, device, input, and moment—not a clinical trait.</span>
           </label>
           <button class="ui-button ui-button--lg" type="button" data-action="rx-start" disabled>
-            Begin selected scope <span aria-hidden="true">→</span>
+            ${t('Begin selected scope')} <span aria-hidden="true">→</span>
           </button>
         </div>
         <aside class="rx-calibration" aria-label="Timing readiness">
@@ -684,17 +684,17 @@ function renderResults() {
         <div>
           <p class="ui-eyebrow">Riflessi / this run / this device</p>
           <h1 tabindex="-1" data-rx-screen-title>Your response has <em>more than one dimension.</em></h1>
-          <p>${result.usable ? 'The selected instruments captured enough clean responses for separate run-level observations.' : 'Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.'}</p>
+          <p>${result.usable ? t('The selected instruments captured enough clean responses for separate run-level observations.') : t('Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.')}</p>
         </div>
         <div class="rx-results__stamp ${result.usable ? '' : 'is-limited'}"><span>${result.usable ? 'Run usable' : 'Limited run'}</span><strong>${String(scopeInstrumentCount(state.session.scope)).padStart(2, '0')} / 03</strong></div>
       </header>
 
       <div class="rx-result-grid">
-        ${metricCard('01', 'Typical signal response', metric(result.signal.medianMs), 'ms', `Median of ${result.signal.valid} clean simple responses from ${result.signal.scheduled} scheduled events. Within-run spread: ${metric(result.signal.withinRunSpreadMs)} ms; this is not estimate uncertainty.`)}
-        ${includesChoice ? metricCard('02', 'Choice response', metric(result.choice.medianMs), 'ms', `${metric(result.choice.scheduledAccuracyPercent)}% correct across all ${result.choice.scheduled} scheduled choices; ${metric(result.choice.conditionalAccuracyPercent)}% among left/right responses.`) : ''}
-        ${includesChoice ? metricCard('Δ', 'Descriptive block difference', signedMetric(result.choice.blockDifferenceMs), 'ms', 'Choice-block median minus the earlier simple-response median. Fixed order and different motor responses remain confounded.') : ''}
-        ${includesStability ? metricCard('03', 'Sustained response', metric(result.stability.medianMs), 'ms', `Median of ${result.stability.valid} clean responses across this custom sustained block.`) : ''}
-        ${includesStability ? metricCard('20%', 'Slow-response tail', signedMetric(result.stability.slowestGapMs), 'ms', 'A descriptive slow-tail difference for this custom block—not a PVT lapse count.') : ''}
+        ${metricCard('01', t('Typical signal response'), metric(result.signal.medianMs), 'ms', t('Median of {valid} clean simple responses from {scheduled} scheduled events. Within-run spread: {spread} ms; this is not estimate uncertainty.', { valid: result.signal.valid, scheduled: result.signal.scheduled, spread: metric(result.signal.withinRunSpreadMs) }))}
+        ${includesChoice ? metricCard('02', t('Choice response'), metric(result.choice.medianMs), 'ms', t('{scheduledAccuracy}% correct across all {scheduled} scheduled choices; {conditionalAccuracy}% among left/right responses.', { scheduledAccuracy: metric(result.choice.scheduledAccuracyPercent), scheduled: result.choice.scheduled, conditionalAccuracy: metric(result.choice.conditionalAccuracyPercent) })) : ''}
+        ${includesChoice ? metricCard('Δ', t('Descriptive block difference'), signedMetric(result.choice.blockDifferenceMs), 'ms', t('Choice-block median minus the earlier simple-response median. Fixed order and different motor responses remain confounded.')) : ''}
+        ${includesStability ? metricCard('03', t('Sustained response'), metric(result.stability.medianMs), 'ms', t('Median of {valid} clean responses across this custom sustained block.', { valid: result.stability.valid })) : ''}
+        ${includesStability ? metricCard('20%', t('Slow-response tail'), signedMetric(result.stability.slowestGapMs), 'ms', t('A descriptive slow-tail difference for this custom block—not a PVT lapse count.')) : ''}
         ${includesStability ? metricCard('↗', 'Within-run drift', signedMetric(result.stability.driftMs), 'ms', driftCopy(result.stability.driftMs)) : ''}
       </div>
 
@@ -705,15 +705,15 @@ function renderResults() {
             <div><dt>False starts</dt><dd>${result.events.falseStarts}</dd></div>
             <div><dt>Under ${state.config.anticipationMs} ms</dt><dd>${result.events.anticipations}</dd></div>
             <div><dt>Missed signals</dt><dd>${result.events.misses}</dd></div>
-            <div><dt>Wrong choices</dt><dd>${result.events.wrongChoices}</dd></div>
-            <div><dt>No-signal checks</dt><dd>${result.events.catchesPassed} / ${result.events.catchesScheduled}</dd></div>
+            ${includesChoice ? `<div><dt>Wrong choices</dt><dd>${result.events.wrongChoices}</dd></div>` : ''}
+            <div><dt>${t('No-signal checks')}</dt><dd>${result.events.catchesPassed} / ${result.events.catchesScheduled}</dd></div>
           </dl>
         </article>
         <article class="ui-card rx-timing">
           <p class="ui-eyebrow">Timing context</p><h2>${timing.label}</h2><p>${timing.copy}</p>
           <dl>
             <div><dt>Input</dt><dd>${state.session.inputMode === 'pointer' ? 'Touch / pointer' : 'Keyboard'}</dd></div>
-            <div><dt>Physical setup</dt><dd>${state.session.physicalSetup}</dd></div>
+            <div><dt>${t('Physical setup')}</dt><dd>${physicalSetupLabel(state.session.physicalSetup)}</dd></div>
             <div><dt>Frame cadence</dt><dd>${state.session.diagnostics.frameMedianMs ? `≈ ${state.session.diagnostics.frameMedianMs.toFixed(1)} ms` : 'Unknown'}</dd></div>
             <div><dt>Interrupted trials</dt><dd>${state.session.diagnostics.interruptions}</dd></div>
           </dl>
@@ -727,7 +727,7 @@ function renderResults() {
       </aside>
 
       <div class="ui-cluster rx-results__actions">
-        <button class="ui-button" type="button" data-action="rx-restart">Repeat this scope independently</button>
+        <button class="ui-button" type="button" data-action="rx-restart">${t('Repeat this scope independently')}</button>
         <button class="ui-button ui-button--ghost" type="button" data-action="rx-copy">Copy result summary</button>
       </div>
     </section>
@@ -751,6 +751,12 @@ function scopeInstrumentCount(scope) {
 /** @param {'signal' | 'choice' | 'stability'} instrument */
 function scopeInstrumentOrdinal(instrument) {
   return { signal: 1, choice: 2, stability: 3 }[instrument];
+}
+
+function physicalSetupLabel(value) {
+  return value === 'handheld-or-standing'
+    ? t('Handheld or standing')
+    : t('Seated · device on a stable surface');
 }
 
 function metric(value) {
@@ -901,7 +907,9 @@ function copyResults() {
   if (!state.session?.result) return;
   const result = state.session.result;
   const timing = timingHealth(state.session.diagnostics);
-  const text = [
+  const includesChoice = state.session.scope !== 'signal';
+  const includesStability = state.session.scope === 'complete';
+  const lines = [
     t('Riflessi — device-relative response observations'),
     t('Input: {input}', { input: t(state.session.inputMode === 'pointer' ? 'touch / pointer' : 'keyboard') }),
     t('Run quality: {quality}', { quality: t(result.usable ? 'Usable run' : 'Limited run') }),
@@ -910,18 +918,30 @@ function copyResults() {
       interruptions: state.session.diagnostics.interruptions,
     }),
     t('Signal median: {value} ms', { value: metric(result.signal.medianMs) }),
-    t('Choice median: {median} ms; accuracy: {accuracy}%; cost: {cost} ms', {
-      median: metric(result.choice.medianMs),
-      accuracy: metric(result.choice.scheduledAccuracyPercent),
-      cost: signedMetric(result.choice.blockDifferenceMs),
-    }),
-    t('Sustained median: {median} ms; slow tail: {tail} ms; drift: {drift} ms', {
-      median: metric(result.stability.medianMs),
-      tail: signedMetric(result.stability.slowestGapMs),
-      drift: signedMetric(result.stability.driftMs),
-    }),
+  ];
+  if (includesChoice) {
+    lines.push(
+      t('Choice median: {median} ms; accuracy: {accuracy}%; cost: {cost} ms', {
+        median: metric(result.choice.medianMs),
+        accuracy: metric(result.choice.scheduledAccuracyPercent),
+        cost: signedMetric(result.choice.blockDifferenceMs),
+      }),
+    );
+  }
+  if (includesStability) {
+    lines.push(
+      t('Sustained median: {median} ms; slow tail: {tail} ms; drift: {drift} ms', {
+        median: metric(result.stability.medianMs),
+        tail: signedMetric(result.stability.slowestGapMs),
+        drift: signedMetric(result.stability.driftMs),
+      }),
+    );
+  }
+  lines.push(
     t(
-      'Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses, {wrongChoices} wrong choices',
+      includesChoice
+        ? 'Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses, {wrongChoices} wrong choices'
+        : 'Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses',
       {
         falseStarts: result.events.falseStarts,
         anticipations: result.events.anticipations,
@@ -930,7 +950,8 @@ function copyResults() {
       },
     ),
     t('Compare only on the same device and input. Not a clinical or population score.'),
-  ].join('\n');
+  );
+  const text = lines.join('\n');
   navigator.clipboard
     ?.writeText(text)
     .then(() => toast(t('Result summary copied.')))

@@ -81,6 +81,70 @@ async function expectHitTestableGeometry(page, selector, minimum) {
   expect(geometry.allHit).toBe(true);
 }
 
+async function expectReadableMobileResults(page, label) {
+  await expectNoHorizontalOverflow(page, label);
+  const geometry = await page.evaluate(() => {
+    const heading = document.querySelector('.results-head h1').getBoundingClientRect();
+    const intro = document.querySelector('.results-head > div:first-child').getBoundingClientRect();
+    const score = document.querySelector('.score-lockup').getBoundingClientRect();
+    const details = document.querySelector('.result-details').getBoundingClientRect();
+    const metrics = [...document.querySelectorAll('.result-metric')].map((metric) => {
+      const head = metric.querySelector('.result-metric__head').getBoundingClientRect();
+      const copy = metric.querySelector('.result-metric__head > div').getBoundingClientRect();
+      const value = metric.querySelector('.result-metric__head > strong').getBoundingClientRect();
+      const explanation = metric.querySelector('.observation-explain').getBoundingClientRect();
+      const minimumTextWidth = Math.min(112, head.width / 2);
+      return {
+        contained: head.left >= details.left && head.right <= details.right,
+        explanationBelow: explanation.top >= head.bottom - 1,
+        explanationFullWidth: explanation.width >= head.width - 1,
+        textColumnReadable: copy.width >= minimumTextWidth,
+        valueBelowCopy: value.top >= copy.bottom - 1,
+        valueContained: value.left >= head.left && value.right <= head.right,
+        valueReadable: value.width >= minimumTextWidth,
+      };
+    });
+
+    return {
+      headingContained: heading.left >= 0 && heading.right <= innerWidth,
+      headingHasUsefulWidth: heading.width >= Math.min(240, innerWidth * 0.75),
+      scoreBelowIntro: score.top >= intro.bottom - 1,
+      scoreContained: score.left >= 0 && score.right <= innerWidth,
+      scoreHasUsefulWidth: score.width >= Math.min(240, innerWidth * 0.75),
+      metrics,
+    };
+  });
+
+  expect(geometry.headingContained).toBe(true);
+  expect(geometry.headingHasUsefulWidth).toBe(true);
+  expect(geometry.scoreBelowIntro).toBe(true);
+  expect(geometry.scoreContained).toBe(true);
+  expect(geometry.scoreHasUsefulWidth).toBe(true);
+  expect(geometry.metrics).toHaveLength(3);
+  for (const metric of geometry.metrics) {
+    expect(metric).toEqual({
+      contained: true,
+      explanationBelow: true,
+      explanationFullWidth: true,
+      textColumnReadable: true,
+      valueBelowCopy: true,
+      valueContained: true,
+      valueReadable: true,
+    });
+  }
+}
+
+async function centerBelowStickyChrome(locator) {
+  await locator.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+    const chromeBottom = document.querySelector('.site-chrome')?.getBoundingClientRect().bottom ?? 0;
+    const usableCenter = chromeBottom + (viewportHeight - chromeBottom) / 2;
+    const elementCenter = rect.top + rect.height / 2;
+    window.scrollBy({ behavior: 'instant', top: elementCenter - usableCenter });
+  });
+}
+
 test('landing page presents the method and passes an accessibility scan', async ({ page }) => {
   await page.goto('/en/tetracromia/');
 
@@ -237,6 +301,7 @@ test('pointer drag reorders tiles by insertion and tap-swap is one-shot', async 
 test('short landscape keeps discrimination stimuli visible, meaningful, and hit-testable', async ({
   page,
 }, testInfo) => {
+  test.setTimeout(60_000);
   test.skip(testInfo.project.name !== 'chromium', 'Desktop Chromium supplies the pointer geometry lane');
 
   for (const viewport of [
@@ -244,7 +309,18 @@ test('short landscape keeps discrimination stimuli visible, meaningful, and hit-
     { width: 667, height: 375 },
   ]) {
     await page.setViewportSize(viewport);
-    await startLab(page);
+    await page.goto('/en/tetracromia/');
+    await expectNoHorizontalOverflow(page, `${viewport.width}x${viewport.height} landing`);
+    await page.locator('[data-action="setup"]').first().click();
+    await expectNoHorizontalOverflow(page, `${viewport.width}x${viewport.height} setup`);
+    await page.locator('#screen-ready').check();
+    const start = page.locator('[data-action="start"]');
+    await start.scrollIntoViewIfNeeded();
+    await expectInVisualViewport(start, `${viewport.width}x${viewport.height} start action`, {
+      hitTest: true,
+    });
+    await start.click();
+    await expect(page.locator('[data-choice="0"]')).toBeEnabled();
 
     await page.mouse.move(0, 0);
     await expectHitTestableGeometry(page, '.color-tile', { count: 16, width: 50, height: 38 });
@@ -259,6 +335,46 @@ test('short landscape keeps discrimination stimuli visible, meaningful, and hit-
     const fieldBox = await page.locator('.field-choice').first().boundingBox();
     await page.mouse.click(fieldBox.x + fieldBox.width / 2, fieldBox.y + fieldBox.height / 2);
     await expect(page.locator('.trial-count b')).toHaveText('02');
+
+    if (viewport.width === 844) {
+      await answerTrials(page, '[data-choice="0"]', 11);
+      const submit = page.locator('[data-action="submit-sequence"]');
+      await expect(submit).toBeEnabled();
+      await submit.click();
+      await submit.click();
+      await submit.click();
+      await expect(page.locator('.results-view')).toBeVisible();
+      await expectNoHorizontalOverflow(page, '844x390 results');
+      const resultsContained = await page.evaluate(() => {
+        const details = document.querySelector('.result-details').getBoundingClientRect();
+        const score = document.querySelector('.score-lockup').getBoundingClientRect();
+        const intro = document.querySelector('.results-head > div:first-child').getBoundingClientRect();
+        const metrics = [...document.querySelectorAll('.result-metric')].every((metric) => {
+          const head = metric.querySelector('.result-metric__head').getBoundingClientRect();
+          const copy = metric.querySelector('.result-metric__head > div').getBoundingClientRect();
+          const value = metric.querySelector('.result-metric__head > strong').getBoundingClientRect();
+          const explanation = metric.querySelector('.observation-explain').getBoundingClientRect();
+          return (
+            head.left >= details.left &&
+            head.right <= details.right &&
+            copy.width >= 240 &&
+            value.width >= 120 &&
+            explanation.top >= head.bottom - 1 &&
+            explanation.width >= head.width - 1
+          );
+        });
+        return {
+          metrics,
+          scoreBelowIntro: score.top >= intro.bottom - 1,
+          scoreContained: score.left >= 0 && score.right <= innerWidth,
+        };
+      });
+      expect(resultsContained).toEqual({ metrics: true, scoreBelowIntro: true, scoreContained: true });
+      for (const action of await page.locator('.results-actions .ui-button').all()) {
+        await action.scrollIntoViewIfNeeded();
+        await expectInVisualViewport(action, '844x390 result action', { hitTest: true });
+      }
+    }
   }
 });
 
@@ -435,16 +551,21 @@ test('Sequence permits vertical touch scrolling and retains horizontal insertion
   expect(afterHorizontal.slice(0, 3)).toEqual(beforeVertical.slice(1, 4));
 });
 
-test('German landing and results stay contained across narrow widths', async ({ page }, testInfo) => {
+test('German landing and results reflow readably across narrow viewports', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'Single-browser narrow containment matrix');
   await page.goto('/de/tetracromia/');
   await expect(
     page.getByRole('heading', { name: /Farbe auf drei verschiedene Arten wahrnehmen/i }),
   ).toBeVisible();
-  const widths = [320, 360, 390, 412];
+  const viewports = [
+    { width: 320, height: 568 },
+    { width: 360, height: 800 },
+    { width: 390, height: 844 },
+    { width: 412, height: 915 },
+  ];
 
-  for (const width of widths) {
-    await page.setViewportSize({ width, height: 844 });
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
     const landing = await page.evaluate(() => {
       const heading = document.querySelector('.hero h1');
       const bounds = heading.getBoundingClientRect();
@@ -475,33 +596,21 @@ test('German landing and results stay contained across narrow widths', async ({ 
   await expect(page.locator('.results-head')).toContainText('Sitzung abgeschlossen');
   await expect(page.locator('.result-details')).toContainText('Kachelauswahl');
   await expect(page.locator('.result-details')).toContainText('Farbtonreihenfolge');
+  await page
+    .locator('.result-metric__head > strong')
+    .nth(1)
+    .evaluate((value) => {
+      value.textContent = '12 von 12 Farbentscheidungen richtig eingeordnet';
+    });
 
-  for (const width of widths) {
-    await page.setViewportSize({ width, height: 844 });
-    const containment = await page.evaluate(() => {
-      const heading = document.querySelector('.results-head h1');
-      const headingBounds = heading.getBoundingClientRect();
-      return {
-        noPageOverflow: document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-        headingContained:
-          headingBounds.left >= 0 &&
-          headingBounds.right <= innerWidth &&
-          heading.scrollWidth <= heading.clientWidth,
-        resultsContained: [...document.querySelectorAll('.result-metric')].every((metric) => {
-          const bounds = metric.getBoundingClientRect();
-          return bounds.left >= 0 && bounds.right <= innerWidth;
-        }),
-      };
-    });
-    expect(containment).toEqual({
-      noPageOverflow: true,
-      headingContained: true,
-      resultsContained: true,
-    });
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    await expectReadableMobileResults(page, `${viewport.width}x${viewport.height} German results`);
   }
 });
 
 test('Tetracromia remains operable at 320px with 200% text sizing', async ({ page }, testInfo) => {
+  test.setTimeout(90_000);
   test.skip(testInfo.project.name !== 'chromium', 'Uses explicit text-only zoom geometry');
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto('/de/tetracromia/');
@@ -519,6 +628,22 @@ test('Tetracromia remains operable at 320px with 200% text sizing', async ({ pag
   const firstChoice = page.locator('[data-choice="0"]');
   await firstChoice.scrollIntoViewIfNeeded();
   await expectInVisualViewport(firstChoice, '200% text Threshold choice', { hitTest: true });
+
+  await answerTrials(page, '[data-choice="0"]', 14);
+  await expectNoHorizontalOverflow(page, '200% text Tetracromia Field');
+  await answerTrials(page, '[data-choice="0"]', 12);
+  await expectNoHorizontalOverflow(page, '200% text Tetracromia Sequence');
+  const submit = page.locator('[data-action="submit-sequence"]');
+  await submit.click();
+  await submit.click();
+  await submit.click();
+
+  await expect(page.locator('.results-view')).toBeVisible();
+  await expectReadableMobileResults(page, '320px Tetracromia results at 200% text');
+  for (const action of await page.locator('.results-actions .ui-button').all()) {
+    await centerBelowStickyChrome(action);
+    await expectInVisualViewport(action, '200% text result action', { hitTest: true });
+  }
 });
 
 test('mobile layout stays inside the viewport through setup and the first trial', async ({

@@ -1,3 +1,4 @@
+import { mobileUxRows } from './mobile-ux-copy.js';
 import { registryRows } from './registry-copy.js';
 
 // Japanese locale catalog. English source keys are the stable message identifiers.
@@ -1551,6 +1552,6 @@ const rows = [
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 ];
 
-const catalogRows = [...rows, ...registryRows('ja')];
+const catalogRows = [...rows, ...registryRows('ja'), ...mobileUxRows('ja')];
 export const MESSAGE_COUNT = catalogRows.length;
 export default new Map(catalogRows);

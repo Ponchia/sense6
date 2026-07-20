@@ -1,5 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { createAdaptiveRun, currentAdaptiveTrial, recordAdaptiveAnswer } from '../src/lib/daltonism.js';
+import { seededRandom } from '../src/lib/random.js';
 import { expectInVisualViewport, expectJournalEntry, expectNoHorizontalOverflow } from './helpers/browser.js';
 
 const AUDITED_VIEWPORTS = [
@@ -9,6 +11,13 @@ const AUDITED_VIEWPORTS = [
   { width: 412, height: 915 },
   { width: 844, height: 390 },
 ];
+const DALTONIA_RESULT_SEED = 'mobile-result-audit';
+
+async function installDeterministicDaltonia(page) {
+  await page.addInitScript((seed) => {
+    window.__SENSE6_TEST_CONFIG__ = { daltonia: { seed } };
+  }, DALTONIA_RESULT_SEED);
+}
 
 async function startPractice(page, locale = 'en') {
   await page.goto(`/${locale}/color-blindness/`);
@@ -32,6 +41,47 @@ async function finishWithNoGap(page) {
     if (await page.locator('.results-view').count()) return;
     await page.locator('[data-orientation="unseen"]').click();
   }
+}
+
+async function finishWithCorrectAnswers(page) {
+  const mirror = createAdaptiveRun(seededRandom(`daltonia:${DALTONIA_RESULT_SEED}`));
+  for (let response = 0; response < 39; response += 1) {
+    const trial = currentAdaptiveTrial(mirror);
+    if (!trial) break;
+    await page.locator(`[data-orientation="${trial.orientation}"]`).click();
+    recordAdaptiveAnswer(mirror, trial.orientation);
+  }
+  await expect(page.locator('.results-view')).toBeVisible();
+  expect(mirror.controls).toEqual({ correct: 3, total: 3 });
+}
+
+async function expectNoNarrowTextColumns(page, rootSelector, label) {
+  const narrow = await page.locator(rootSelector).evaluate((root) =>
+    [
+      ...root.querySelectorAll(
+        'h1, h2, p, label span, .cb-verdict strong, .cb-verdict small, .cb-scorecard__value > span, .ui-button',
+      ),
+    ]
+      .filter((element) => element.getClientRects().length > 0 && element.textContent.trim().length > 4)
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        const fontSize = Number.parseFloat(getComputedStyle(element).fontSize);
+        return { text: element.textContent.trim(), width: rect.width, minimum: fontSize * 1.5 };
+      })
+      .filter(({ width, minimum }) => width + 0.5 < minimum),
+  );
+  expect(narrow, `${label}: ${JSON.stringify(narrow)}`).toEqual([]);
+}
+
+async function centerBelowStickyChrome(locator) {
+  await locator.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+    const chromeBottom = document.querySelector('.site-chrome')?.getBoundingClientRect().bottom ?? 0;
+    const usableCenter = chromeBottom + (viewportHeight - chromeBottom) / 2;
+    const elementCenter = rect.top + rect.height / 2;
+    window.scrollBy({ behavior: 'instant', top: elementCenter - usableCenter });
+  });
 }
 
 async function trialGeometry(page) {
@@ -257,6 +307,78 @@ test('the primary mobile landing action appears before the decorative preview', 
   expect(priority).toEqual({ actionVisible: true, actionBeforePreview: true });
 });
 
+test('mobile setup keeps its checkbox and primary action reachable across audited viewports', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Mobile-only setup geometry check');
+  for (const locale of ['en', 'de']) {
+    for (const viewport of AUDITED_VIEWPORTS) {
+      await page.setViewportSize(viewport);
+      await page.goto(`/${locale}/color-blindness/`);
+      await expectNoHorizontalOverflow(page, `${locale} ${viewport.width}x${viewport.height} landing`);
+      await page.locator('[data-action="cb-setup"]').click();
+      await expect(page.locator('.experiment-boundary')).toBeVisible();
+      await expectNoHorizontalOverflow(page, `${locale} ${viewport.width}x${viewport.height} setup`);
+      const ready = page.locator('#cb-ready');
+      await ready.scrollIntoViewIfNeeded();
+      await expectInVisualViewport(ready, `${locale} ${viewport.width}x${viewport.height} setup checkbox`, {
+        hitTest: true,
+      });
+      await ready.check();
+      const start = page.locator('#cb-start');
+      await start.scrollIntoViewIfNeeded();
+      await expectInVisualViewport(start, `${locale} ${viewport.width}x${viewport.height} setup CTA`, {
+        hitTest: true,
+      });
+    }
+  }
+});
+
+test('real passing results explain adaptive levels and control evidence at every viewport', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'Mobile-only result geometry check');
+  await installDeterministicDaltonia(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await startMeasuredRun(page, 'de');
+  await finishWithCorrectAnswers(page);
+
+  await expect(page.locator('.results-head h1')).toContainText(
+    'Bildschirmbezogene adaptive Stufen dieses Durchlaufs',
+  );
+  await expect(page.locator('.cb-verdict')).toContainText('Kontrollen bestanden');
+  await expect(page.locator('.cb-verdict')).toContainText('3/3 richtig / geplant');
+  await expect(page.locator('.cb-threshold-card')).toHaveCount(3);
+  await expect(page.locator('.cb-threshold-card .cb-scorecard__value > span')).toHaveText([
+    'Adaptive Endstufe',
+    'Adaptive Endstufe',
+    'Adaptive Endstufe',
+  ]);
+  await expect(page.locator('.cb-scorecard--control')).toContainText(
+    '3 von 3 geplanten Kontrollen mit kontrastreicher Lücke wurden richtig beantwortet.',
+  );
+  await expect(page.locator('.result-note')).toContainText('weder bestätigen noch ausschließen');
+
+  const resultScan = await new AxeBuilder({ page }).analyze();
+  expect(resultScan.violations).toEqual([]);
+
+  for (const viewport of AUDITED_VIEWPORTS) {
+    await page.setViewportSize(viewport);
+    await expectNoHorizontalOverflow(page, `${viewport.width}x${viewport.height} passing results`);
+    await expectNoNarrowTextColumns(
+      page,
+      '.results-view',
+      `${viewport.width}x${viewport.height} passing results`,
+    );
+    for (const action of await page.locator('.results-actions .ui-button').all()) {
+      await action.scrollIntoViewIfNeeded();
+      await expectInVisualViewport(action, `${viewport.width}x${viewport.height} result action`, {
+        hitTest: true,
+      });
+    }
+  }
+});
+
 test('shortcuts ignore the locale select and focus returns after a keyboard answer', async ({ page }) => {
   await startMeasuredRun(page);
   const initialCount = await page.locator('.trial-count b').textContent();
@@ -357,7 +479,47 @@ test('Daltonia remains operable at 320px with 200% text sizing', async ({ page }
   await expectNoHorizontalOverflow(page, '200% text Daltonia practice');
   for (const orientation of ['up', 'left', 'right', 'down', 'unseen']) {
     const answer = page.locator(`[data-orientation="${orientation}"]`);
-    await answer.scrollIntoViewIfNeeded();
+    await centerBelowStickyChrome(answer);
     await expectInVisualViewport(answer, `200% text ${orientation} answer`, { hitTest: true });
+  }
+});
+
+test('Daltonia results reflow at 320px with 200% text sizing', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Uses explicit text-only zoom geometry');
+  await installDeterministicDaltonia(page);
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('/en/color-blindness/');
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '32px';
+  });
+  await expectNoHorizontalOverflow(page, '200% text Daltonia landing');
+  await page.locator('[data-action="cb-setup"]').click();
+  await expectNoHorizontalOverflow(page, '200% text Daltonia setup');
+  await expectNoNarrowTextColumns(page, '.setup-view', '200% text Daltonia setup');
+  const ready = page.locator('#cb-ready');
+  await ready.scrollIntoViewIfNeeded();
+  await expectInVisualViewport(ready, '200% text setup checkbox', { hitTest: true });
+  await ready.check();
+  const start = page.locator('#cb-start');
+  await start.scrollIntoViewIfNeeded();
+  await expectInVisualViewport(start, '200% text setup CTA', { hitTest: true });
+  await start.click();
+  await page.locator('[data-orientation="right"]').click();
+  await page.locator('[data-action="cb-practice-next"]').click();
+  await page.locator('[data-orientation="up"]').click();
+  await page.locator('[data-action="cb-practice-next"]').click();
+  await finishWithCorrectAnswers(page);
+
+  await expect(
+    page.getByRole('heading', { name: 'Display-relative adaptive levels from this run.' }),
+  ).toBeVisible();
+  await expect(page.locator('.cb-scorecard--control')).toContainText(
+    '3 of 3 scheduled high-contrast gap controls were answered correctly.',
+  );
+  await expectNoHorizontalOverflow(page, '200% text Daltonia results');
+  await expectNoNarrowTextColumns(page, '.results-view', '200% text Daltonia results');
+  for (const action of await page.locator('.results-actions .ui-button').all()) {
+    await action.scrollIntoViewIfNeeded();
+    await expectInVisualViewport(action, '200% text result action', { hitTest: true });
   }
 });

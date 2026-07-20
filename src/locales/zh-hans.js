@@ -1,3 +1,4 @@
+import { mobileUxRows } from './mobile-ux-copy.js';
 import { registryRows } from './registry-copy.js';
 
 // Simplified Chinese locale catalog. English source keys are the stable message identifiers.
@@ -1440,6 +1441,6 @@ rows.push(
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 );
 
-const catalogRows = [...rows, ...registryRows('zh-hans')];
+const catalogRows = [...rows, ...registryRows('zh-hans'), ...mobileUxRows('zh-hans')];
 export const MESSAGE_COUNT = catalogRows.length;
 export default new Map(catalogRows);

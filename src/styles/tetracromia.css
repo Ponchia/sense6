@@ -747,7 +747,7 @@
   }
 
   .hero__instrument {
-    inline-size: min(82vw, 31rem);
+    inline-size: min(100%, 82vw, 31rem);
   }
 
   .test-index {
@@ -873,8 +873,47 @@
     display: none;
   }
 
+  .score-lockup {
+    grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+    max-inline-size: 100%;
+    min-inline-size: 0;
+  }
+
+  .score-lockup strong {
+    font-size: clamp(4rem, 18vw, 7rem);
+  }
+
+  .results-head h1 {
+    font-size: clamp(2rem, 10vw, 4rem);
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+
+  .result-details {
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+
+  .result-metric {
+    padding: clamp(1rem, 5vw, 1.5rem);
+  }
+
   .result-metric__head {
-    grid-template-columns: 1.7rem minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    grid-template-columns: 1.7rem minmax(0, 1fr);
+  }
+
+  .result-metric__head > strong {
+    grid-column: 2;
+    inline-size: 100%;
+    line-height: 1.05;
+  }
+
+  #app .result-metric p,
+  #app .result-metric__head > strong {
+    hyphens: auto;
+    overflow-wrap: break-word;
+    word-break: normal;
   }
 
   .metric-meter__row {

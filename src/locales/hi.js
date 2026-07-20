@@ -1,3 +1,4 @@
+import { mobileUxRows } from './mobile-ux-copy.js';
 import { registryRows } from './registry-copy.js';
 
 // Hindi catalog; edit this locale directly.
@@ -1518,6 +1519,6 @@ const rows = [
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 ];
 
-const catalogRows = [...rows, ...registryRows('hi')];
+const catalogRows = [...rows, ...registryRows('hi'), ...mobileUxRows('hi')];
 export const MESSAGE_COUNT = catalogRows.length;
 export default new Map(catalogRows);

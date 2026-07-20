@@ -37,6 +37,160 @@ async function completeCalibrationFromCard(page) {
   await page.getByRole('button', { name: /Yes, clearly/i }).click();
 }
 
+const ACUTEZZA_MOBILE_VIEWPORTS = [
+  { width: 320, height: 568 },
+  { width: 360, height: 800 },
+  { width: 390, height: 844 },
+  { width: 412, height: 915 },
+  { width: 844, height: 390 },
+];
+
+async function expectAcutezzaPageToReflow(page, label) {
+  const geometry = await page.evaluate(() => {
+    const viewport = window.visualViewport;
+    const viewportLeft = viewport?.offsetLeft ?? 0;
+    const viewportRight = viewportLeft + (viewport?.width ?? document.documentElement.clientWidth);
+    const visibleText = [
+      ...document.querySelectorAll(
+        '.ac-setup h1, .ac-scope-option, .ac-calibration h1, .ac-calibration button, .ac-calibration-summary h1, .ac-calibration-summary dd, .ac-eye-brief h1, .ac-eye-brief li, .ac-transition h1, .ac-transition button, .ac-between h1, .ac-between aside, .ac-between button, .ac-distance-result h1, .ac-distance-result button, .ac-results h1, .ac-results h2, .ac-metric > strong, .ac-metric > small, .ac-context-grid dt, .ac-context-grid dd, .ac-results button',
+      ),
+    ].filter((element) => {
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    });
+    return {
+      clientWidth: document.documentElement.clientWidth,
+      narrowText: visibleText
+        .filter((element) => {
+          const text = element.textContent.trim();
+          const fontSize = Number.parseFloat(getComputedStyle(element).fontSize);
+          return text.length >= 8 && element.getBoundingClientRect().width < fontSize * 2.5;
+        })
+        .map((element) => ({
+          className: element.className,
+          text: element.textContent.trim(),
+          width: Math.round(element.getBoundingClientRect().width),
+        })),
+      offenders: [...document.querySelectorAll('body *')]
+        .filter((element) => {
+          const style = getComputedStyle(element);
+          if (style.display === 'none' || style.position === 'fixed') return false;
+          const rect = element.getBoundingClientRect();
+          return rect.left < viewportLeft - 1 || rect.right > viewportRight + 1;
+        })
+        .slice(0, 8)
+        .map((element) => ({
+          className: element.className,
+          left: Math.round(element.getBoundingClientRect().left),
+          right: Math.round(element.getBoundingClientRect().right),
+          tagName: element.tagName,
+        })),
+      scrollWidth: document.documentElement.scrollWidth,
+    };
+  });
+  expect(geometry, label).toEqual({
+    clientWidth: geometry.clientWidth,
+    narrowText: [],
+    offenders: [],
+    scrollWidth: geometry.clientWidth,
+  });
+}
+
+async function expectAcutezzaActionsToBeReachable(page, label) {
+  const actions = page.locator('main button:visible');
+  for (let index = 0; index < (await actions.count()); index += 1) {
+    const action = actions.nth(index);
+    await action.scrollIntoViewIfNeeded();
+    const geometry = await action.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const viewport = window.visualViewport;
+      const viewportLeft = viewport?.offsetLeft ?? 0;
+      const viewportTop = viewport?.offsetTop ?? 0;
+      const viewportRight = viewportLeft + (viewport?.width ?? window.innerWidth);
+      const viewportBottom = viewportTop + (viewport?.height ?? window.innerHeight);
+      const hit = document.elementFromPoint(
+        Math.min(viewportRight - 1, Math.max(viewportLeft, rect.left + rect.width / 2)),
+        Math.min(viewportBottom - 1, Math.max(viewportTop, rect.top + rect.height / 2)),
+      );
+      return {
+        bottom: rect.bottom,
+        height: rect.height,
+        hit: hit === element || element.contains(hit),
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        viewportBottom,
+        viewportLeft,
+        viewportRight,
+        viewportTop,
+        width: rect.width,
+      };
+    });
+    expect(geometry.left, `${label} action ${index} left`).toBeGreaterThanOrEqual(geometry.viewportLeft - 1);
+    expect(geometry.right, `${label} action ${index} right`).toBeLessThanOrEqual(geometry.viewportRight + 1);
+    expect(geometry.top, `${label} action ${index} top`).toBeGreaterThanOrEqual(geometry.viewportTop - 1);
+    expect(geometry.bottom, `${label} action ${index} bottom`).toBeLessThanOrEqual(
+      geometry.viewportBottom + 1,
+    );
+    expect(geometry.width, `${label} action ${index} width`).toBeGreaterThanOrEqual(44);
+    expect(geometry.height, `${label} action ${index} height`).toBeGreaterThanOrEqual(44);
+    expect(geometry.hit, `${label} action ${index} hit target`).toBe(true);
+  }
+}
+
+async function expectAcutezzaAtTwoHundredPercent(page, label) {
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '200%';
+  });
+  await expectAcutezzaPageToReflow(page, `${label} at 200% text`);
+  await expectAcutezzaActionsToBeReachable(page, `${label} at 200% text`);
+  await page.evaluate(() => {
+    document.documentElement.style.fontSize = '';
+    document.querySelector('.ac-stimulus')?.scrollTo(0, 0);
+  });
+}
+
+async function expectDisplayedAcuityToMatchJournal(page) {
+  const result = await page.evaluate(() => {
+    const number = (value) => Number.parseFloat(value.replace(',', '.'));
+    const displayed = [...document.querySelectorAll('.ac-metric')].map((card) => {
+      const valueText = card.querySelector(':scope > strong').textContent.trim();
+      const intervalText = card.querySelector(':scope > small').textContent.trim();
+      const value = valueText.match(/\d+(?:[.,]\d+)?/);
+      const interval = intervalText.match(
+        /^(\d+(?:[.,]\d+)?) arcmin–(\d+(?:[.,]\d+)?) arcmin 90% model interval/,
+      );
+      return {
+        bound: valueText.startsWith('≤') ? 'upper' : valueText.startsWith('≥') ? 'lower' : null,
+        lower: interval ? number(interval[1]) : null,
+        upper: interval ? number(interval[2]) : null,
+        value: value ? number(value[0]) : null,
+      };
+    });
+    const journal = JSON.parse(localStorage.getItem('sense6:journal') ?? 'null');
+    const entry = journal.entries.find((candidate) => candidate.examId === 'acutezza');
+    return {
+      displayed,
+      stored: entry.measurements
+        .filter((measurement) => measurement.unit === 'arcmin')
+        .map(({ bound = null, lower, upper, value }) => ({ bound, lower, upper, value })),
+    };
+  });
+
+  expect(result.displayed).toHaveLength(result.stored.length);
+  for (let index = 0; index < result.stored.length; index += 1) {
+    const displayed = result.displayed[index];
+    const stored = result.stored[index];
+    expect(displayed.bound, `metric ${index} bound`).toBe(stored.bound);
+    expect(displayed.value, `metric ${index} value`).toBeCloseTo(stored.value, 1);
+    expect(displayed.lower, `metric ${index} interval lower`).toBeCloseTo(stored.lower, 1);
+    expect(displayed.upper, `metric ${index} interval upper`).toBeCloseTo(stored.upper, 1);
+    expect(stored.lower, `metric ${index} stored lower`).toBeLessThanOrEqual(stored.value);
+    expect(stored.value, `metric ${index} stored value`).toBeLessThanOrEqual(stored.upper);
+  }
+}
+
 test('Acutezza calibrates the display and reports separate non-clinical observations', async ({
   context,
   page,
@@ -223,10 +377,16 @@ test('Acutezza guards summary entry, theme, and shell navigation after calibrati
 test('German Acutezza calibration and runner keep generated labels localized', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'Single-browser locale journey');
   await installQuickAcutezza(page);
+  await page.setViewportSize({ width: 320, height: 568 });
   await page.goto('/de/acutezza/');
   await page.locator('[data-action="ac-prepare"]').click();
+  await expect(page.locator('.experiment-boundary')).toContainText(/Freizeitexperiment/);
+  await expectAcutezzaPageToReflow(page, 'German setup at 320x568');
+  await expectAcutezzaAtTwoHundredPercent(page, 'German setup at 320x568');
   await page.locator('[data-ac-consent]').check();
   await page.locator('[data-action="ac-card"]').click();
+  await expect(page.getByRole('heading', { name: /echte Karte/i })).toBeVisible();
+  await expectAcutezzaAtTwoHundredPercent(page, 'German card calibration at 320x568');
   await page.locator('[data-action="ac-confirm-card"]').click();
   await page.locator('[data-action="ac-manual-distance"]').click();
   await page.locator('[data-ac-manual-distance]').fill('50');
@@ -235,8 +395,10 @@ test('German Acutezza calibration and runner keep generated labels localized', a
   await expect(page.getByRole('button', { name: /Rechtes Auge vorbereiten/i })).toBeVisible();
   await expect(page.locator('[data-locale-select]')).toBeDisabled();
   await page.locator('[data-action="ac-first-eye"]').click();
+  await expectAcutezzaAtTwoHundredPercent(page, 'German first-eye card at 320x568');
   await page.locator('[data-action="ac-begin-eye"]').click();
   await expect(page.getByRole('heading', { name: 'Rechtes Auge — Übung' })).toBeFocused();
+  await expectAcutezzaAtTwoHundredPercent(page, 'German runner at 320x568');
 });
 
 test('Acutezza accepts repeatable blind-spot sweeps as measured calibration', async ({ page }, testInfo) => {
@@ -486,4 +648,115 @@ test('the mobile Acutezza setup and target controls remain inside the viewport',
     )
     .toBe(true);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test('Acutezza completes both scopes through every audited mobile viewport without broken reflow', async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(180_000);
+  test.skip(testInfo.project.name !== 'chromium', 'Uses an explicit responsive viewport matrix');
+  await installQuickAcutezza(page);
+
+  for (const viewport of ACUTEZZA_MOBILE_VIEWPORTS) {
+    for (const scope of ['focused', 'standard']) {
+      const label = `${scope} ${viewport.width}x${viewport.height}`;
+      await page.setViewportSize(viewport);
+      await page.goto('/en/acutezza/');
+      await page.getByRole('button', { name: /Prepare the vision lab/i }).click();
+      if (scope === 'focused') {
+        await page.locator('[data-action="ac-scope"][data-scope="focused"]').click();
+      }
+      await expect(page.locator(`[data-action="ac-scope"][data-scope="${scope}"]`)).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+
+      await expectAcutezzaPageToReflow(page, `${label} setup`);
+      await expectAcutezzaActionsToBeReachable(page, `${label} setup`);
+      if (viewport.width === 320) await expectAcutezzaAtTwoHundredPercent(page, `${label} setup`);
+      await page.getByLabel(/I am 18 or older/i).check();
+      await page.getByRole('button', { name: /Calibrate the screen/i }).click();
+      await expectAcutezzaPageToReflow(page, `${label} card calibration`);
+      await expectAcutezzaActionsToBeReachable(page, `${label} card calibration`);
+      if (viewport.width === 320) await expectAcutezzaAtTwoHundredPercent(page, `${label} card calibration`);
+
+      await page.getByRole('button', { name: /The edges match/i }).click();
+      await page.getByRole('button', { name: /Use a ruler-measured distance/i }).click();
+      await expectAcutezzaPageToReflow(page, `${label} distance entry`);
+      await page.getByLabel(/Distance in centimetres/i).fill('50');
+      await page.getByRole('button', { name: /Use measured distance/i }).click();
+      if (scope === 'standard') {
+        await expectAcutezzaPageToReflow(page, `${label} contrast check`);
+        await page.getByRole('button', { name: /Yes, clearly/i }).click();
+      }
+
+      await expectAcutezzaPageToReflow(page, `${label} calibration summary`);
+      await expectAcutezzaActionsToBeReachable(page, `${label} calibration summary`);
+      if (viewport.width === 320)
+        await expectAcutezzaAtTwoHundredPercent(page, `${label} calibration summary`);
+      await page.getByRole('button', { name: /Prepare Right eye/i }).click();
+      await expectAcutezzaPageToReflow(page, `${label} first-eye card`);
+      await expectAcutezzaActionsToBeReachable(page, `${label} first-eye card`);
+      if (viewport.width === 320) await expectAcutezzaAtTwoHundredPercent(page, `${label} first-eye card`);
+      await page.getByRole('button', { name: /Start practice/i }).click();
+      await expectAcutezzaPageToReflow(page, `${label} practice runner`);
+      if (viewport.width === 320) await expectAcutezzaAtTwoHundredPercent(page, `${label} practice runner`);
+      await answerAcutezzaTarget(page);
+
+      await expectAcutezzaPageToReflow(page, `${label} practice transition`);
+      await expectAcutezzaActionsToBeReachable(page, `${label} practice transition`);
+      if (viewport.width === 320)
+        await expectAcutezzaAtTwoHundredPercent(page, `${label} practice transition`);
+      await page.getByRole('button', { name: /Begin Nitidezza/i }).click();
+      await answerAcutezzaTarget(page);
+      await answerAcutezzaTarget(page);
+      if (scope === 'standard') {
+        await expectAcutezzaPageToReflow(page, `${label} condition transition`);
+        await expectAcutezzaActionsToBeReachable(page, `${label} condition transition`);
+        if (viewport.width === 320)
+          await expectAcutezzaAtTwoHundredPercent(page, `${label} condition transition`);
+        await page.getByRole('button', { name: /Continue to Contrasto/i }).click();
+        await answerAcutezzaTarget(page);
+        await answerAcutezzaTarget(page);
+      }
+
+      await expectAcutezzaPageToReflow(page, `${label} between-eye card`);
+      await expectAcutezzaActionsToBeReachable(page, `${label} between-eye card`);
+      if (viewport.width === 320) await expectAcutezzaAtTwoHundredPercent(page, `${label} between-eye card`);
+      await page.getByRole('button', { name: /Check distance, then test Left eye/i }).click();
+      await expectAcutezzaPageToReflow(page, `${label} distance recheck`);
+      await expectAcutezzaActionsToBeReachable(page, `${label} distance recheck`);
+      if (viewport.width === 320) await expectAcutezzaAtTwoHundredPercent(page, `${label} distance recheck`);
+      await page.getByRole('button', { name: /Setup unchanged/i }).click();
+      await expectAcutezzaPageToReflow(page, `${label} second-eye card`);
+      if (viewport.width === 320) await expectAcutezzaAtTwoHundredPercent(page, `${label} second-eye card`);
+      await page.getByRole('button', { name: /Start practice/i }).click();
+      await answerAcutezzaTarget(page);
+      await page.getByRole('button', { name: /Begin Nitidezza/i }).click();
+      await answerAcutezzaTarget(page);
+      await answerAcutezzaTarget(page);
+      if (scope === 'standard') {
+        await page.getByRole('button', { name: /Continue to Contrasto/i }).click();
+        await answerAcutezzaTarget(page);
+        await answerAcutezzaTarget(page);
+      }
+
+      await expect(page.getByRole('heading', { name: /Separate observations/i })).toBeVisible();
+      await expect(page.locator('.ac-eye-result')).toHaveCount(2);
+      await expect(page.locator('.ac-metric')).toHaveCount(scope === 'standard' ? 4 : 2);
+      await expect(page.locator('.ac-metric > strong')).toHaveText(
+        Array.from({ length: scope === 'standard' ? 4 : 2 }, () => /^(?:[≤≥] )?\d+(?:[.,]\d+)? arcmin$/),
+      );
+      await expect(page.locator('.ac-metric > small')).toHaveText(
+        Array.from(
+          { length: scope === 'standard' ? 4 : 2 },
+          () => /^\d+(?:[.,]\d+)? arcmin–\d+(?:[.,]\d+)? arcmin 90% model interval/,
+        ),
+      );
+      await expectDisplayedAcuityToMatchJournal(page);
+      await expectAcutezzaPageToReflow(page, `${label} results`);
+
+      if (viewport.width === 320) await expectAcutezzaAtTwoHundredPercent(page, `${label} results`);
+    }
+  }
 });
