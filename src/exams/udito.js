@@ -209,8 +209,8 @@ function renderSetup() {
       <div class="au-setup__grid">
         <div class="au-setup__copy">
           <p class="ui-eyebrow">Audio setup / keep volume unchanged after this screen</p>
-          <h1>Quiet room.<br>Low volume.<br>Headphones.</h1>
-          <p class="au-lede">Take off hearing protection only if you normally would. If you use hearing aids or another listening device, leave your usual setup unchanged and record it below.</p>
+          <h1>${t('Quiet room.')}<br>${t('Low volume.')}<br>${t('Headphones.')}</h1>
+          <p class="au-lede">${t('Take off hearing protection only if you normally would. If you use hearing aids or another listening device, leave your usual setup unchanged and record it below.')}</p>
           <div class="ui-alert ui-alert--warning"><strong class="ui-alert__title">Sound sensitivity comes first.</strong><p class="ui-alert__body">If you have tinnitus, hyperacusis, or sounds are uncomfortable today, skip the experiment or stop immediately. Sense6 cannot measure sound pressure.</p></div>
           ${
             supported
@@ -221,12 +221,12 @@ function renderSetup() {
                 </div>`
               : `<div class="ui-alert ui-alert--danger" role="alert"><strong class="ui-alert__title">Web Audio is unavailable.</strong><p class="ui-alert__body">Udito cannot present controlled intervals in this browser. Try a current browser with audio enabled.</p></div>`
           }
-          <label class="au-device-label">Listening setup
+          <label class="au-device-label">${t('Listening setup')}
             <select data-au-device ${supported ? '' : 'disabled'}>
-              <option value="headphones">Over-ear / on-ear headphones</option>
-              <option value="earbuds">Earbuds / in-ear headphones</option>
-              <option value="assistive">Usual hearing aid / assistive setup</option>
-              <option value="other">Other / unsure</option>
+              <option value="headphones">${t('Over-ear / on-ear headphones')}</option>
+              <option value="earbuds">${t('Earbuds / in-ear headphones')}</option>
+              <option value="assistive">${t('Usual hearing aid / assistive setup')}</option>
+              <option value="other">${t('Other / unsure')}</option>
             </select>
           </label>
           <label class="au-device-label">Connection
@@ -247,15 +247,15 @@ function renderSetup() {
             ${audioScopeButton('focused', 'Focused', 'Cuffie + Portata · about 3–4 minutes')}
             ${audioScopeButton('standard', 'Standard', 'All three instruments · about 5–7 minutes')}
           </fieldset>
-          <label class="au-consent"><input type="checkbox" data-au-consent ${supported ? '' : 'disabled'}><span><strong class="experiment-boundary">I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.</strong> The reference is quiet and comfortable; the room is quiet; I will not change volume or raise it to chase a tone; I understand this is not clinical audiometry.</span></label>
+          <label class="au-consent"><input type="checkbox" data-au-consent ${supported ? '' : 'disabled'}><span><strong class="experiment-boundary">${t('I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.')}</strong> ${t('The reference is quiet and comfortable; the room is quiet; I will not change volume or raise it to chase a tone; I understand this is not clinical audiometry.')}</span></label>
           <button class="ui-button ui-button--lg" type="button" data-action="au-start" disabled>Begin selected scope <span aria-hidden="true">→</span></button>
         </div>
         <aside class="au-setup__rules" aria-label="Safe listening rules">
-          <p class="ui-eyebrow">Volume contract</p>
+          <p class="ui-eyebrow">${t('Volume contract')}</p>
           <strong>≤ 60%</strong>
-          <p>A device control, not a measured sound-pressure level. The browser cannot know dB SPL.</p>
-          <ol><li>Start low</li><li>Find quiet comfort</li><li>Lock volume</li><li>Stop for discomfort</li></ol>
-          <dl><div><dt>Upload</dt><dd>None</dd></div><div><dt>Microphone</dt><dd>Not used</dd></div><div><dt>Calibration</dt><dd>User-set only</dd></div></dl>
+          <p>${t('A device control, not a measured sound-pressure level. The browser cannot know dB SPL.')}</p>
+          <ol><li>${t('Start low')}</li><li>${t('Find quiet comfort')}</li><li>${t('Lock volume')}</li><li>${t('Stop for discomfort')}</li></ol>
+          <dl><div><dt>${t('Upload')}</dt><dd>${t('None')}</dd></div><div><dt>${t('Microphone')}</dt><dd>${t('Not used')}</dd></div><div><dt>${t('Calibration')}</dt><dd>${t('User-set only')}</dd></div></dl>
         </aside>
       </div>
     </section>
@@ -335,7 +335,7 @@ async function playAudibilityAnchors() {
 /** @param {'focused' | 'standard'} id @param {string} label @param {string} detail */
 function audioScopeButton(id, label, detail) {
   const selected = state.selectedScope === id;
-  return `<button class="au-scope-option ${selected ? 'is-selected' : ''}" type="button" data-action="au-scope" data-scope="${id}" aria-pressed="${selected}"><strong>${label}</strong><small>${detail}</small></button>`;
+  return `<button class="au-scope-option ${selected ? 'is-selected' : ''}" type="button" data-action="au-scope" data-scope="${id}" aria-pressed="${selected}"><strong>${t(label)}</strong><small>${t(detail)}</small></button>`;
 }
 
 /** @param {'focused' | 'standard'} scope */
@@ -392,6 +392,7 @@ function renderBrief(instrument) {
   stopPlayback();
   state.session.instrument = instrument;
   const info = INSTRUMENTS[instrument];
+  const instrumentTotal = state.session.scope === 'focused' ? '02' : '03';
   document.body.classList.add('lab-mode');
   document.body.classList.remove('au-running');
   document.title = `${t(info.name)} — Udito | Sense6`;
@@ -399,9 +400,9 @@ function renderBrief(instrument) {
     <section class="au-brief ui-container ui-container--wide">
       <div class="au-brief__index" aria-hidden="true">${info.number}</div>
       <div class="au-brief__copy">
-        <p class="ui-eyebrow">${t('Instrument')} ${info.number} ${t('of')} 03 / ${t(info.eyebrow)}</p><h1>${t(info.title)}</h1><p class="au-lede">${t(info.body)}</p>
+        <p class="ui-eyebrow">${t('Instrument')} ${info.number} ${t('of')} ${instrumentTotal} / ${t(info.eyebrow)}</p><h1>${t(info.title)}</h1><p class="au-lede">${t(info.body)}</p>
         <div class="au-brief__rules">${briefRules(instrument)}</div>
-        <button class="ui-button ui-button--lg" type="button" data-action="au-begin-stage">${instrument === 'headphones' ? 'Start practice' : `Start ${info.name}`} <span aria-hidden="true">→</span></button>
+        <button class="ui-button ui-button--lg" type="button" data-action="au-begin-stage">${t(instrument === 'headphones' ? 'Start practice' : `Start ${info.name}`)} <span aria-hidden="true">→</span></button>
       </div>
     </section>`;
   focusStage('h1', `${info.name} instructions ready.`);
@@ -409,10 +410,10 @@ function renderBrief(instrument) {
 
 function briefRules(instrument) {
   if (instrument === 'headphones')
-    return '<span>1</span><span>2</span><span>3</span><p>Choose the quietest tone. Two practice trials come first; the measured check is six trials.</p>';
+    return `<span>1</span><span>2</span><span>3</span><p>${t('Choose the quietest tone. Two practice trials come first; the measured check is six trials.')}</p>`;
   if (instrument === 'range')
-    return '<span>1</span><span>2</span><span>3</span><p>Choose the interval containing the tone. Silence is a valid experience—guess without changing volume.</p>';
-  return '<span>1</span><span>2</span><p>Choose which tone was higher. Loudness changes slightly on purpose, so follow pitch rather than loudness.</p>';
+    return `<span>1</span><span>2</span><span>3</span><p>${t('Choose the interval containing the tone. Silence is a valid experience—guess without changing volume.')}</p>`;
+  return `<span>1</span><span>2</span><p>${t('Choose which tone was higher. Loudness changes slightly on purpose, so follow pitch rather than loudness.')}</p>`;
 }
 
 function beginStage() {
@@ -451,14 +452,14 @@ function renderRunner() {
   state.app.innerHTML = `
     <section class="au-runner" data-au-runner data-au-instrument="${state.session.instrument}" style="--au-choices: ${choices}">
       <h1 class="sr-only" tabindex="-1" data-au-runner-heading>${t('{name} listening runner', { name: t(info.name) })}</h1>
-      <header class="au-runner__header"><div><p class="ui-eyebrow">${info.number} / ${t(info.name)}</p><strong>${t(state.session.block === 'practice' ? 'Practice' : 'Adaptive run')}</strong></div><span data-au-count>Preparing…</span><button type="button" data-action="au-stop" aria-keyshortcuts="Escape">Stop safely</button></header>
+      <header class="au-runner__header"><div><p class="ui-eyebrow">${info.number} / ${t(info.name)}</p><strong>${t(state.session.block === 'practice' ? 'Practice' : 'Adaptive run')}</strong></div><span data-au-count>${t('Preparing…')}</span><button type="button" data-action="au-stop" aria-keyshortcuts="Escape">${t('Stop safely')}</button></header>
       <div class="au-listening">
-        <p class="au-listening__status" data-au-status role="status" aria-live="polite" tabindex="-1">Preparing the sounds…</p>
+        <p class="au-listening__status" data-au-status role="status" aria-live="polite" tabindex="-1">${t('Preparing the sounds…')}</p>
         <div class="au-intervals" data-au-intervals aria-hidden="true">${Array.from({ length: choices }, (_, index) => `<div><span>${index + 1}</span><i></i></div>`).join('')}</div>
-        <div class="au-responses" aria-label="Sound interval choices">${Array.from({ length: choices }, (_, index) => `<button type="button" data-au-response="${index}" disabled><span>${index + 1}</span>${state.session.instrument === 'pitch' ? (index ? 'Second tone' : 'First tone') : `Interval ${index + 1}`}</button>`).join('')}</div>
+        <div class="au-responses" aria-label="${t('Sound interval choices')}">${Array.from({ length: choices }, (_, index) => `<button type="button" data-au-response="${index}" disabled><span>${index + 1}</span><small>${state.session.instrument === 'pitch' ? t(index ? 'Second tone' : 'First tone') : `${t('Interval')} ${index + 1}`}</small></button>`).join('')}</div>
         <div class="au-feedback" data-au-feedback role="status" aria-live="polite">${state.lastFeedback}</div>
       </div>
-      <footer class="au-runner__footer"><span>Volume reported unchanged</span><span>Keys ${choices === 2 ? '1 · 2' : '1 · 2 · 3'}</span><span>Short ramped tones</span></footer>
+      <footer class="au-runner__footer"><span>Volume reported unchanged</span><span>${t('Keys')} ${choices === 2 ? '1 · 2' : '1 · 2 · 3'}</span><span>${t('Short ramped tones')}</span></footer>
     </section>`;
   focusStage('[data-au-status]', `${info.name} sound runner ready.`);
 }
@@ -604,7 +605,7 @@ function finishHeadphoneBlock() {
   state.trialPhase = TRIAL_PHASES.idle;
   document.body.classList.remove('au-running');
   if (state.session.block === 'practice') {
-    state.app.innerHTML = `<section class="au-transition ui-container"><span class="au-transition__mark" aria-hidden="true">✓</span><p class="ui-eyebrow">Cuffie / practice complete</p><h1>Now six measured trials.</h1><p>The phase-based decoy appears only in the measured block. Keep the volume unchanged.</p><button class="ui-button ui-button--lg" type="button" data-action="au-begin-measured">Begin headphone check <span aria-hidden="true">→</span></button></section>`;
+    state.app.innerHTML = `<section class="au-transition ui-container"><span class="au-transition__mark" aria-hidden="true">✓</span><p class="ui-eyebrow">${t('Cuffie / practice complete')}</p><h1>${t('Now six measured trials.')}</h1><p>${t('The phase-based decoy appears only in the measured block. Keep the volume unchanged.')}</p><button class="ui-button ui-button--lg" type="button" data-action="au-begin-measured">${t('Begin headphone check')} <span aria-hidden="true">→</span></button></section>`;
     focusStage('h1', 'Cuffie practice complete.');
     return;
   }
@@ -626,9 +627,9 @@ function finishInstrument(completed) {
       : summarizeRange(state.session.rangeTrack);
   const line =
     completed === 'headphones'
-      ? `${summary.correct} of ${summary.trials} quiet targets located. This is evidence about presentation, not proof of hardware.`
-      : `${summary.trials} adaptive presentations recorded${summary.controlAccuracyPercent === null ? '' : `; control accuracy ${summary.controlAccuracyPercent}%`} without changing volume.`;
-  state.app.innerHTML = `<section class="au-transition ui-container"><span class="au-transition__mark" aria-hidden="true">${INSTRUMENTS[completed].number}</span><p class="ui-eyebrow">Instrument complete</p><h1>Measurement recorded: ${INSTRUMENTS[completed].name}.</h1><p>${line}</p><button class="ui-button ui-button--lg" type="button" data-action="au-next-stage" data-next="${next}">Continue to ${INSTRUMENTS[next].name} <span aria-hidden="true">→</span></button></section>`;
+      ? `${summary.correct} ${t('of')} ${summary.trials} ${t('quiet targets located. This is evidence about presentation, not proof of hardware.')}`
+      : `${summary.trials} ${t('adaptive presentations recorded')}${summary.controlAccuracyPercent === null ? '' : `; control accuracy ${summary.controlAccuracyPercent}%`} ${t('without changing volume.')}`;
+  state.app.innerHTML = `<section class="au-transition ui-container"><span class="au-transition__mark" aria-hidden="true">${INSTRUMENTS[completed].number}</span><p class="ui-eyebrow">${t('Instrument complete')}</p><h1>${t('Measurement recorded:')} ${t(INSTRUMENTS[completed].name)}.</h1><p>${line}</p><button class="ui-button ui-button--lg" type="button" data-action="au-next-stage" data-next="${next}">${t('Continue to')} ${t(INSTRUMENTS[next].name)} <span aria-hidden="true">→</span></button></section>`;
   focusStage('h1', `${INSTRUMENTS[completed].name} complete.`);
 }
 
@@ -703,7 +704,7 @@ function renderResults() {
   state.app.innerHTML = `
     <section class="au-results ui-container ui-container--wide">
       <button class="back-link" type="button" data-action="au-home"><span aria-hidden="true">←</span> ${m('nav.allTests')}</button>
-      <header class="au-results__hero"><div><p class="ui-eyebrow">Udito / this setup / this run</p><h1>${includesPitch ? 'Three listening measures.' : 'Two focused listening measures.'}<br><em>No hearing label.</em></h1><p>${usable ? 'The setup checks and adaptive tracks produced coherent run-level observations.' : 'At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.'}</p></div><div class="au-results__stamp ${usable ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>${includesPitch ? '03' : '02'} / 03</strong></div></header>
+      <header class="au-results__hero"><div><p class="ui-eyebrow">${t('Udito / this setup / this run')}</p><h1>${includesPitch ? t('Three listening measures.') : 'Two focused listening measures.'}<br><em>${t('No hearing label.')}</em></h1><p>${usable ? 'The setup checks and adaptive tracks produced coherent run-level observations.' : 'At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.'}</p></div><div class="au-results__stamp ${usable ? '' : 'is-limited'}"><span>${t(setupQuality)}</span><strong>${includesPitch ? '03 / 03' : '02 / 02'}</strong></div></header>
       <div class="ui-alert ${journalSaved ? 'ui-alert--success' : 'ui-alert--danger'}" data-au-journal-status role="${journalSaved ? 'status' : 'alert'}"><strong class="ui-alert__title">${journalSaved ? 'Saved to the private journal on this device.' : 'Journal entry not saved.'}</strong><p class="ui-alert__body">${journalSaved ? 'The structured run context is available for later same-setup comparison.' : 'The result remains available here and can still be copied, but it was not added to the private journal.'}</p></div>
       <div class="au-result-grid">
         ${resultCard('01', 'Headphone confidence', headphones.headphoneLike ? 'Headphone-like' : 'Uncertain', `${headphones.correct} / ${headphones.trials}`, 'A phase-based presentation check, not hardware detection.')}
@@ -712,11 +713,11 @@ function renderResults() {
         ${includesPitch ? resultCard('03b', 'Pitch step near 2 kHz', formatPitch(pitch, 2000), pitchDetail(pitch, 2000), 'Reported separately; no composite hearing score is calculated.') : ''}
       </div>
       <div class="au-context-grid">
-        <article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the sound.</h2><dl><div><dt>Listening setup</dt><dd>${deviceLabel(state.session.device)}</dd></div><div><dt>Connection</dt><dd>${connectionLabel(state.session.connection)}</dd></div><div><dt>Audio context</dt><dd>${formatNumber(state.session.sampleRate)} Hz</dd></div><div><dt>Audibility anchors</dt><dd>200 Hz, 500 Hz, and 2 kHz confirmed</dd></div><div><dt>Volume</dt><dd>${state.session.volumeConsistent ? 'Self-reported unchanged' : 'Changed or unsure'}</dd></div><div><dt>Portata controls</dt><dd>${formatControlAccuracy(range)}</dd></div><div><dt>Interruptions</dt><dd>${state.session.interruptions}</dd></div></dl></article>
-        <article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Device-relative, never dB HL.</h2><p>A browser knows digital amplitude, not sound pressure at your eardrum. Headphone response, fit, output, age, room noise, device processing, and the volume setting all shape these numbers.</p><p>Do not infer hearing age, “normal” hearing, safety for work, or a medical diagnosis. If hearing concerns affect daily life, use calibrated clinical audiometry.</p></article>
+        <article class="ui-card"><p class="ui-eyebrow">${t('Run context')}</p><h2>${t('What travelled with the sound.')}</h2><dl><div><dt>${t('Listening setup')}</dt><dd>${deviceLabel(state.session.device)}</dd></div><div><dt>Connection</dt><dd>${connectionLabel(state.session.connection)}</dd></div><div><dt>${t('Audio context')}</dt><dd>${formatNumber(state.session.sampleRate)} Hz</dd></div><div><dt>Audibility anchors</dt><dd>200 Hz, 500 Hz, and 2 kHz confirmed</dd></div><div><dt>Volume</dt><dd>${state.session.volumeConsistent ? 'Self-reported unchanged' : 'Changed or unsure'}</dd></div><div><dt>${t('Portata controls')}</dt><dd>${formatControlAccuracy(range)}</dd></div><div><dt>${t('Interruptions')}</dt><dd>${state.session.interruptions}</dd></div></dl></article>
+        <article class="ui-card"><p class="ui-eyebrow">${t('Interpretation boundary')}</p><h2>${t('Device-relative, never dB HL.')}</h2><p>${t('A browser knows digital amplitude, not sound pressure at your eardrum. Headphone response, fit, output, age, room noise, device processing, and the volume setting all shape these numbers.')}</p><p>${t('Do not infer hearing age, “normal” hearing, safety for work, or a medical diagnosis. If hearing concerns affect daily life, use calibrated clinical audiometry.')}</p></article>
       </div>
-      <aside class="au-results__safety"><strong>Keep the same volume only for comparison.</strong><p>Compare your own runs only with the same device, headphones, fit, room, and volume. Stop testing if any sound is uncomfortable.</p></aside>
-      <div class="ui-cluster au-results__actions"><button class="ui-button" type="button" data-action="au-restart">Repeat this scope independently</button><button class="ui-button ui-button--ghost" type="button" data-action="au-copy">Copy result summary</button>${journalSaved ? '<button class="ui-button ui-button--ghost" type="button" data-action="au-journal">Open private journal</button>' : ''}</div>
+      <aside class="au-results__safety"><strong>${t('Keep the same volume only for comparison.')}</strong><p>${t('Compare your own runs only with the same device, headphones, fit, room, and volume. Stop testing if any sound is uncomfortable.')}</p></aside>
+      <div class="ui-cluster au-results__actions"><button class="ui-button" type="button" data-action="au-restart">Repeat this scope independently</button><button class="ui-button ui-button--ghost" type="button" data-action="au-copy">${t('Copy result summary')}</button>${journalSaved ? `<button class="ui-button ui-button--ghost" type="button" data-action="au-journal">${t('Open private journal')}</button>` : ''}</div>
     </section>`;
   focusStage(
     'h1',
@@ -728,11 +729,11 @@ function renderResults() {
 
 function resultCard(index, label, value, detail, copy) {
   const headingId = `au-metric-${index}`;
-  return `<article class="au-metric" aria-labelledby="${headingId}"><div><span>${index}</span><h2 id="${headingId}">${label}</h2></div><strong>${value}</strong><small>${detail}</small><p>${copy}</p></article>`;
+  return `<article class="au-metric" aria-labelledby="${headingId}"><div><span>${index}</span><h2 id="${headingId}">${t(label)}</h2></div><strong>${t(value)}</strong><small>${detail}</small><p>${t(copy)}</p></article>`;
 }
 
 function formatHertz(result) {
-  if (result.thresholdHz === null) return 'Not settled';
+  if (result.thresholdHz === null) return t('Not settled');
   return `${result.atCeiling ? '≥ ' : ''}${formatNumber(result.thresholdHz)} Hz`;
 }
 
@@ -746,7 +747,7 @@ function rangeDetail(result) {
 
 function formatPitch(results, anchorHz) {
   const result = results.find((item) => item.anchorHz === anchorHz);
-  return !result || result.thresholdPercent === null ? 'Not settled' : `${result.thresholdPercent}%`;
+  return !result || result.thresholdPercent === null ? t('Not settled') : `${result.thresholdPercent}%`;
 }
 
 function pitchDetail(results, anchorHz) {
@@ -759,24 +760,24 @@ function pitchDetail(results, anchorHz) {
 }
 
 function completionReasonLabel(reason) {
-  return (
+  return t(
     {
       converged: 'Converged to the configured reversal target',
       'technical-ceiling': 'Bounded at the technical frequency ceiling',
       'max-trials': 'Maximum trials reached before convergence',
       incomplete: 'Incomplete',
-    }[reason] ?? 'Incomplete'
+    }[reason] ?? 'Incomplete',
   );
 }
 
 function deviceLabel(device) {
-  return (
+  return t(
     {
       headphones: 'Over-ear / on-ear',
       earbuds: 'Earbuds / in-ear',
       assistive: 'Usual assistive setup',
       other: 'Other / unsure',
-    }[device] ?? 'Other / unsure'
+    }[device] ?? 'Other / unsure',
   );
 }
 
@@ -792,7 +793,8 @@ function connectionLabel(connection) {
 }
 
 function formatControlAccuracy(range) {
-  const accuracy = range.controlAccuracyPercent === null ? 'Not sampled' : `${range.controlAccuracyPercent}%`;
+  const accuracy =
+    range.controlAccuracyPercent === null ? t('Not sampled') : `${range.controlAccuracyPercent}%`;
   return `${accuracy} (${range.controlTrials}/${range.expectedControls} controls)`;
 }
 

@@ -123,6 +123,7 @@ test('Udito focused scope ends after Portata and omits pitch placeholders', asyn
   await page.getByRole('button', { name: /Yes, unchanged/i }).click();
 
   await expect(page.getByRole('heading', { name: /Two focused listening measures/i })).toBeVisible();
+  await expect(page.locator('.au-results__stamp strong')).toHaveText('02 / 02');
   await expect(page.locator('.au-metric')).toHaveCount(2);
   await expect(page.getByText(/Pitch step near/i)).toHaveCount(0);
   await expectJournalEntry(page, 'udito');
@@ -136,11 +137,61 @@ test('Udito focused scope ends after Portata and omits pitch placeholders', asyn
     .toBe('focused');
 });
 
+test('Udito shows a settled upper boundary as a lower bound with its run evidence', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Single-browser deterministic bound journey');
+  await page.addInitScript(
+    (configuration) => {
+      window.__SENSE6_TEST_CONFIG__ = configuration;
+    },
+    {
+      udito: {
+        feedbackMs: 2,
+        audio: { toneMs: 8, gapMs: 4, rampMs: 1, referenceMs: 18 },
+        headphones: { practiceTrials: 1, scoredTrials: 1, passCorrect: 1 },
+        range: { startHz: 18000, targetReversals: 6, minTrials: 2, maxTrials: 2, controlAt: [0] },
+      },
+    },
+  );
+  await page.goto('/en/udito/');
+  await page.locator('[data-action="au-setup"]').click();
+  await page.locator('[data-action="au-scope"][data-scope="focused"]').click();
+  await completeUditoSetup(page);
+  await page.locator('[data-action="au-start"]').click();
+  await expect(page.locator('.au-brief__copy .ui-eyebrow')).toContainText('01 of 02');
+  await page.locator('[data-action="au-begin-stage"]').click();
+  await answerCurrentSoundTrial(page);
+  await page.locator('[data-action="au-begin-measured"]').click();
+  await answerCurrentSoundTrial(page);
+  await page.locator('[data-action="au-next-stage"]').click();
+  await expect(page.locator('.au-brief__copy .ui-eyebrow')).toContainText('02 of 02');
+  await page.locator('[data-action="au-begin-stage"]').click();
+  await answerCurrentSoundTrial(page);
+  await answerCurrentSoundTrial(page);
+  await answerCurrentSoundTrial(page);
+  await page.locator('[data-volume-consistent="true"]').click();
+
+  const boundary = page.getByRole('article', { name: /Upper run boundary/i });
+  await expect(boundary.locator('> strong')).toHaveText('≥ 18,000 Hz');
+  await expect(boundary.locator('> small')).toContainText(
+    'Bounded at the technical frequency ceiling · 0 reversals / 2 trials',
+  );
+  await expect(boundary).toContainText(/personal boundary may be higher/i);
+  await expect(page.locator('.au-results__stamp')).toContainText('Setup checks coherent');
+  await expect(page.locator('.au-results__stamp strong')).toHaveText('02 / 02');
+  await expect(page.getByText('100% (1/1 controls)')).toBeVisible();
+});
+
 test('German Udito stages localize generated listening labels', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'Single-browser locale journey');
+  await page.setViewportSize({ width: 360, height: 800 });
   await installQuickUdito(page);
   await page.goto('/de/udito/');
   await page.locator('[data-action="au-setup"]').click();
+  await expect(page.locator('.au-setup h1')).toContainText('Ruhiger Raum.');
+  await expect(page.locator('.experiment-boundary')).toContainText('Freizeitexperiment');
+  await expectUditoGeometry(page, '360x800 German setup');
   await page.locator('[data-action="au-reference"]').click();
   await expect(page.locator('[data-au-reference-status]')).toContainText(
     'Referenz nach Audiouhr abgeschlossen',
@@ -154,6 +205,12 @@ test('German Udito stages localize generated listening labels', async ({ page },
   await page.locator('[data-action="au-begin-stage"]').click();
   await expect(page.getByRole('heading', { name: 'Hörtest für Cuffie' })).toBeAttached();
   await expect(page.locator('.au-runner__header strong')).toHaveText('Übung');
+  await expect(page.locator('[data-au-response="0"]')).toContainText('Intervall 1');
+  await expect(page.locator('[data-action="au-stop"]')).toHaveText('Sicher stoppen');
+  await expect(page.locator('.au-runner__footer')).toContainText('Kurze ein- und ausgeblendete Töne');
+  await expectUditoGeometry(page, '360x800 German runner', { runner: true });
+  await answerCurrentSoundTrial(page);
+  await expect(page.getByRole('heading', { name: 'Jetzt folgen sechs Messversuche.' })).toBeVisible();
 });
 
 test('the mobile Udito setup and listening runner stay inside the viewport', async ({ page }, testInfo) => {
@@ -377,6 +434,97 @@ test('short landscape runner reserves non-overlapping status, controls, and feed
   expect(stopBox?.height ?? 0).toBeGreaterThanOrEqual(44);
 });
 
+test('Udito keeps every mobile scope and stage readable across the required viewport matrix', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Explicit responsive geometry matrix');
+  test.setTimeout(120_000);
+  await installQuickUdito(page);
+
+  const cases = [
+    { width: 320, height: 568, scope: 'standard', textScale: 2 },
+    { width: 320, height: 568, scope: 'focused' },
+    { width: 360, height: 800, scope: 'standard' },
+    { width: 390, height: 844, scope: 'focused' },
+    { width: 412, height: 915, scope: 'standard' },
+    { width: 844, height: 390, scope: 'standard' },
+  ];
+
+  for (const responsiveCase of cases) {
+    const label = `${responsiveCase.width}x${responsiveCase.height} ${responsiveCase.scope}${responsiveCase.textScale ? ' at 200% text' : ''}`;
+    await page.setViewportSize({ width: responsiveCase.width, height: responsiveCase.height });
+    await page.goto('/en/udito/');
+    if (responsiveCase.textScale) {
+      await page.evaluate(() => {
+        document.documentElement.style.fontSize = '200%';
+      });
+    }
+
+    await page.locator('[data-action="au-setup"]').click();
+    await page.locator('[data-au-device]').selectOption('assistive');
+    await page.locator('[data-au-connection]').selectOption('integrated');
+    await expectUditoGeometry(page, `${label} setup`);
+    await completeUditoSetup(page);
+    await page.locator(`[data-action="au-scope"][data-scope="${responsiveCase.scope}"]`).click();
+    await page.locator('[data-action="au-start"]').click();
+
+    await expectUditoGeometry(page, `${label} headphone brief`);
+    await page.locator('[data-action="au-begin-stage"]').click();
+    await expect(page.locator('[data-au-response="0"]')).toBeEnabled();
+    await expectUditoGeometry(page, `${label} headphone practice runner`, { runner: true });
+    await answerCurrentSoundTrial(page);
+    await expectUditoGeometry(page, `${label} practice transition`);
+    await page.locator('[data-action="au-begin-measured"]').click();
+    await expect(page.locator('[data-au-response="0"]')).toBeEnabled();
+    await expectUditoGeometry(page, `${label} headphone measured runner`, { runner: true });
+    await answerCurrentSoundTrial(page);
+    await answerCurrentSoundTrial(page);
+
+    await expectUditoGeometry(page, `${label} Portata transition`);
+    await page.locator('[data-action="au-next-stage"]').click();
+    await expectUditoGeometry(page, `${label} Portata brief`);
+    await page.locator('[data-action="au-begin-stage"]').click();
+    await expect(page.locator('[data-au-response="0"]')).toBeEnabled();
+    await expectUditoGeometry(page, `${label} Portata runner`, { runner: true });
+    await answerCurrentSoundTrial(page);
+    await answerCurrentSoundTrial(page);
+
+    if (responsiveCase.scope === 'standard') {
+      await expectUditoGeometry(page, `${label} Intonazione transition`);
+      await page.locator('[data-action="au-next-stage"]').click();
+      await expectUditoGeometry(page, `${label} Intonazione brief`);
+      await page.locator('[data-action="au-begin-stage"]').click();
+      await expect(page.locator('[data-au-response="0"]')).toBeEnabled();
+      await expectUditoGeometry(page, `${label} Intonazione runner`, { runner: true });
+      for (let trial = 0; trial < 4; trial += 1) await answerCurrentSoundTrial(page);
+    }
+
+    await expectUditoGeometry(page, `${label} volume transition`);
+    await page.locator('[data-volume-consistent="true"]').click();
+    await expectUditoGeometry(page, `${label} results`);
+    await expect(page.locator('.au-metric')).toHaveCount(responsiveCase.scope === 'focused' ? 2 : 4);
+    await expect(page.locator('.au-metric > strong')).toHaveCount(responsiveCase.scope === 'focused' ? 2 : 4);
+    await expect(page.locator('.au-metric > small')).toContainText(['trials']);
+    const metricEvidence = await page.locator('.au-metric').evaluateAll((cards) =>
+      cards.map((card) => ({
+        copy: card.querySelector(':scope > p')?.textContent?.trim() ?? '',
+        detail: card.querySelector(':scope > small')?.textContent?.trim() ?? '',
+        value: card.querySelector(':scope > strong')?.textContent?.trim() ?? '',
+      })),
+    );
+    expect(
+      metricEvidence.every(({ copy, detail, value }) => copy && detail && value),
+      `${label} should show a value, run evidence, and interpretation for every result metric`,
+    ).toBe(true);
+    await expect(page.locator('.au-results__stamp')).toHaveClass(/is-limited/);
+    await expect(page.locator('.au-results__stamp')).toContainText('Interpret with caution');
+    await expect(page.locator('.au-results__stamp strong')).toHaveText(
+      responsiveCase.scope === 'focused' ? '02 / 02' : '03 / 03',
+    );
+    await expect(page.getByText(/Device-relative, never dB HL/i)).toBeVisible();
+  }
+});
+
 test('caution copies retain controls, interruptions, context, and visible journal failure', async ({
   page,
 }, testInfo) => {
@@ -482,4 +630,75 @@ async function setDocumentHidden(page, hidden) {
     Object.defineProperty(document, 'hidden', { configurable: true, get: () => nextHidden });
     document.dispatchEvent(new Event('visibilitychange'));
   }, hidden);
+}
+
+async function expectUditoGeometry(page, label, { runner = false } = {}) {
+  const overflow = await page.evaluate(() => {
+    const viewportWidth = document.documentElement.clientWidth;
+    if (
+      document.documentElement.scrollWidth <= viewportWidth + 1 &&
+      document.body.scrollWidth <= viewportWidth + 1
+    )
+      return [];
+    return [...document.querySelectorAll('#app *')]
+      .filter((element) => {
+        const rect = element.getBoundingClientRect();
+        return (
+          rect.left < -1 || rect.right > viewportWidth + 1 || element.scrollWidth > element.clientWidth + 1
+        );
+      })
+      .map((element) => `${element.tagName.toLowerCase()}.${element.className || '(no-class)'}`)
+      .slice(0, 12);
+  });
+  expect(overflow, `${label} should not overflow horizontally`).toEqual([]);
+
+  const splitWords = await page.evaluate(() => {
+    const root = document.querySelector('#app');
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const offenders = [];
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      const parent = node.parentElement;
+      if (!parent || parent.closest('.sr-only') || getComputedStyle(parent).display === 'none') continue;
+      for (const match of node.data.matchAll(/[\p{L}\p{N}][\p{L}\p{N}-]{5,}/gu)) {
+        const range = document.createRange();
+        range.setStart(node, match.index);
+        range.setEnd(node, match.index + match[0].length);
+        const fragments = [...range.getClientRects()].filter((rect) => rect.width > 0 && rect.height > 0);
+        if (fragments.length > 3) offenders.push(`${match[0]} (${fragments.length} lines)`);
+      }
+    }
+    return offenders;
+  });
+  expect(splitWords, `${label} should not render words as vertical letter columns`).toEqual([]);
+
+  if (!runner) return;
+  const stop = page.locator('[data-action="au-stop"]');
+  const stopBox = await stop.boundingBox();
+  expect(stopBox?.width ?? 0, `${label} stop width`).toBeGreaterThanOrEqual(44);
+  expect(stopBox?.height ?? 0, `${label} stop height`).toBeGreaterThanOrEqual(44);
+  for (const response of await page.locator('[data-au-response]').all()) {
+    await response.scrollIntoViewIfNeeded();
+    const box = await response.boundingBox();
+    expect(box?.x ?? -1, `${label} response left edge`).toBeGreaterThanOrEqual(0);
+    expect((box?.x ?? 0) + (box?.width ?? 0), `${label} response right edge`).toBeLessThanOrEqual(
+      await page.evaluate(() => innerWidth + 1),
+    );
+    expect(box?.height ?? 0, `${label} response height`).toBeGreaterThanOrEqual(44);
+    const hit = await response.evaluate((element) => {
+      const rect = element.getBoundingClientRect();
+      const listening = document.querySelector('.au-listening').getBoundingClientRect();
+      const centreX = rect.left + rect.width / 2;
+      const centreY = rect.top + rect.height / 2;
+      return {
+        centreY,
+        hit: element.contains(document.elementFromPoint(centreX, centreY)),
+        listening: { bottom: listening.bottom, top: listening.top },
+        rect: { bottom: rect.bottom, top: rect.top },
+      };
+    });
+    expect(hit.hit, `${label} response should receive a centre-point hit test: ${JSON.stringify(hit)}`).toBe(
+      true,
+    );
+  }
 }
