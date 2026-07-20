@@ -382,7 +382,7 @@ function beginAdaptiveRun() {
     announce('Turn off forced-colours or high-contrast mode before this colour task.');
     return;
   }
-  const entropy = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}:${performance.now()}`;
+  const entropy = adaptiveRunEntropy();
   state.run = createAdaptiveRun(seededRandom(`daltonia:${entropy}`));
   const practicePlate = state.app.querySelector('.cb-plate');
   const stimulusCssPixels = Math.max(1, Math.round(practicePlate?.getBoundingClientRect().width ?? 320));
@@ -527,9 +527,7 @@ function renderResults() {
           <h1>${result.title}.</h1>
           <p>${result.detail}</p>
         </div>
-        <div class="cb-verdict cb-verdict--${result.controlStatus === 'failed' ? 'inconclusive' : 'threshold'}" aria-hidden="true">
-          <span>${result.controlStatus === 'passed' ? '≈' : result.controlStatus === 'caution' ? '!' : '?'}</span>
-        </div>
+        ${resultVerdict(result)}
       </div>
 
       <div class="cb-scorecards">
@@ -574,6 +572,23 @@ function renderResults() {
   announce(`Experiment complete. ${result.title}. ${result.detail}`);
 }
 
+function resultVerdict(result) {
+  const label =
+    result.controlStatus === 'passed'
+      ? 'Controls passed'
+      : result.controlStatus === 'caution'
+        ? 'Control caution'
+        : 'Controls not passed';
+  const symbol = result.controlStatus === 'passed' ? '✓' : result.controlStatus === 'caution' ? '!' : '×';
+  return `<div class="cb-verdict cb-verdict--${result.controlStatus}">
+    <span class="cb-verdict__symbol" aria-hidden="true">${symbol}</span>
+    <div>
+      <strong>${label}</strong>
+      <small>${result.controls.correct}/${result.controls.total} correct / scheduled</small>
+    </div>
+  </div>`;
+}
+
 function thresholdCard(axis) {
   const prefix = axis.limit === 'floor' ? '≤' : axis.limit === 'ceiling' ? '≥' : '';
   let note = `${axis.stability === 'settled' ? 'Staircase settled' : 'Limited reversals'} · ${axis.reversals} reversals`;
@@ -588,7 +603,10 @@ function thresholdCard(axis) {
   return `<article class="cb-scorecard cb-threshold-card">
     <div class="cb-scorecard__head">
       <div><h2>${axis.label}</h2><p>${axis.description}</p></div>
-      <strong>${prefix}${formatNumber(axis.threshold, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+      <div class="cb-scorecard__value">
+        <span>Ending adaptive level</span>
+        <strong>${prefix}${formatNumber(axis.threshold, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
+      </div>
     </div>
     ${spread}
     <p class="cb-scorecard__note">${note}</p>
@@ -596,17 +614,21 @@ function thresholdCard(axis) {
 }
 
 function controlCard(result) {
+  const evidence = `${result.controls.correct} of ${result.controls.total} scheduled high-contrast gap controls were answered correctly.`;
   return `<article class="cb-scorecard cb-scorecard--control">
     <div class="cb-scorecard__head">
       <div><h2>Task controls</h2><p>High-contrast gap trials</p></div>
-      <strong>${result.controls.correct}/${result.controls.total}</strong>
+      <div class="cb-scorecard__value">
+        <span>Correct / scheduled</span>
+        <strong>${result.controls.correct}/${result.controls.total}</strong>
+      </div>
     </div>
     <p class="cb-scorecard__note">${
       result.controlStatus === 'passed'
-        ? 'All controls passed; the short-run observations can be shown.'
+        ? `${evidence} The short-run adaptive levels can be shown as exploratory observations.`
         : result.controlStatus === 'caution'
-          ? 'Two of three controls passed; keep these observations only with a caution.'
-          : 'Fewer than two controls passed; do not treat these observations as usable.'
+          ? `${evidence} Keep these observations only with a control caution.`
+          : `${evidence} Do not treat these adaptive-level observations as usable.`
     }</p>
   </article>`;
 }
@@ -757,6 +779,16 @@ function saveJournalResult(result) {
 
 function forcedColorsActive() {
   return window.matchMedia?.('(forced-colors: active)').matches === true;
+}
+
+function adaptiveRunEntropy() {
+  const testSeed =
+    import.meta.env.DEV && /^(localhost|127\.0\.0\.1)$/.test(window.location.hostname)
+      ? window.__SENSE6_TEST_CONFIG__?.daltonia?.seed
+      : null;
+  return typeof testSeed === 'string' && testSeed
+    ? testSeed
+    : (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}:${performance.now()}`);
 }
 
 function currentTheme() {
