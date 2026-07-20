@@ -883,6 +883,12 @@
     font-size: clamp(4rem, 18vw, 7rem);
   }
 
+  .results-head h1 {
+    font-size: clamp(2rem, 10vw, 4rem);
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+
   .result-details {
     inline-size: 100%;
     max-inline-size: 100%;

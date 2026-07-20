@@ -1,3 +1,4 @@
+import { mobileUxRows } from './mobile-ux-copy.js';
 import { registryRows } from './registry-copy.js';
 
 // Brazilian Portuguese catalog; edit this locale directly.
@@ -1617,6 +1618,6 @@ rows.push(
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 );
 
-const catalogRows = [...rows, ...registryRows('pt-br')];
+const catalogRows = [...rows, ...registryRows('pt-br'), ...mobileUxRows('pt-br')];
 export const MESSAGE_COUNT = catalogRows.length;
 export default new Map(catalogRows);

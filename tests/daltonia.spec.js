@@ -343,17 +343,19 @@ test('real passing results explain adaptive levels and control evidence at every
   await startMeasuredRun(page, 'de');
   await finishWithCorrectAnswers(page);
 
-  await expect(page.locator('.results-head h1')).toContainText('adaptive levels from this run');
-  await expect(page.locator('.cb-verdict')).toContainText('Controls passed');
-  await expect(page.locator('.cb-verdict')).toContainText('3/3 correct / scheduled');
+  await expect(page.locator('.results-head h1')).toContainText(
+    'Bildschirmbezogene adaptive Stufen dieses Durchlaufs',
+  );
+  await expect(page.locator('.cb-verdict')).toContainText('Kontrollen bestanden');
+  await expect(page.locator('.cb-verdict')).toContainText('3/3 richtig / geplant');
   await expect(page.locator('.cb-threshold-card')).toHaveCount(3);
   await expect(page.locator('.cb-threshold-card .cb-scorecard__value > span')).toHaveText([
-    'Ending adaptive level',
-    'Ending adaptive level',
-    'Ending adaptive level',
+    'Adaptive Endstufe',
+    'Adaptive Endstufe',
+    'Adaptive Endstufe',
   ]);
   await expect(page.locator('.cb-scorecard--control')).toContainText(
-    'scheduled high-contrast gap controls were answered correctly.',
+    '3 von 3 geplanten Kontrollen mit kontrastreicher Lücke wurden richtig beantwortet.',
   );
   await expect(page.locator('.result-note')).toContainText('weder bestätigen noch ausschließen');
 

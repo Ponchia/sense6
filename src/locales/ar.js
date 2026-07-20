@@ -1,3 +1,4 @@
+import { mobileUxRows } from './mobile-ux-copy.js';
 import { registryRows } from './registry-copy.js';
 
 // Generated once from the former combined catalog; edit this locale directly.
@@ -1539,6 +1540,6 @@ const rows = [
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 ];
 
-const catalogRows = [...rows, ...registryRows('ar')];
+const catalogRows = [...rows, ...registryRows('ar'), ...mobileUxRows('ar')];
 export const MESSAGE_COUNT = catalogRows.length;
 export default new Map(catalogRows);

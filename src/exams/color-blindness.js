@@ -575,16 +575,16 @@ function renderResults() {
 function resultVerdict(result) {
   const label =
     result.controlStatus === 'passed'
-      ? 'Controls passed'
+      ? t('Controls passed')
       : result.controlStatus === 'caution'
-        ? 'Control caution'
-        : 'Controls not passed';
+        ? t('Control caution')
+        : t('Controls not passed');
   const symbol = result.controlStatus === 'passed' ? '✓' : result.controlStatus === 'caution' ? '!' : '×';
   return `<div class="cb-verdict cb-verdict--${result.controlStatus}">
     <span class="cb-verdict__symbol" aria-hidden="true">${symbol}</span>
     <div>
       <strong>${label}</strong>
-      <small>${result.controls.correct}/${result.controls.total} correct / scheduled</small>
+      <small>${result.controls.correct}/${result.controls.total} ${t('correct / scheduled')}</small>
     </div>
   </div>`;
 }
@@ -614,21 +614,24 @@ function thresholdCard(axis) {
 }
 
 function controlCard(result) {
-  const evidence = `${result.controls.correct} of ${result.controls.total} scheduled high-contrast gap controls were answered correctly.`;
+  const evidence = t('{correct} of {total} scheduled high-contrast gap controls were answered correctly.', {
+    correct: result.controls.correct,
+    total: result.controls.total,
+  });
   return `<article class="cb-scorecard cb-scorecard--control">
     <div class="cb-scorecard__head">
       <div><h2>Task controls</h2><p>High-contrast gap trials</p></div>
       <div class="cb-scorecard__value">
-        <span>Correct / scheduled</span>
+        <span>${t('Correct / scheduled')}</span>
         <strong>${result.controls.correct}/${result.controls.total}</strong>
       </div>
     </div>
     <p class="cb-scorecard__note">${
       result.controlStatus === 'passed'
-        ? `${evidence} The short-run adaptive levels can be shown as exploratory observations.`
+        ? `${evidence} ${t('Enough controls were read to report this run.')}`
         : result.controlStatus === 'caution'
-          ? `${evidence} Keep these observations only with a control caution.`
-          : `${evidence} Do not treat these adaptive-level observations as usable.`
+          ? `${evidence} ${t('Keep these observations only with a control caution.')}`
+          : `${evidence} ${t('Too many controls were missed; repeat before interpreting thresholds.')}`
     }</p>
   </article>`;
 }

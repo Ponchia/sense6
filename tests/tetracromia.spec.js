@@ -134,6 +134,17 @@ async function expectReadableMobileResults(page, label) {
   }
 }
 
+async function centerBelowStickyChrome(locator) {
+  await locator.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    const viewportHeight = window.visualViewport?.height ?? window.innerHeight;
+    const chromeBottom = document.querySelector('.site-chrome')?.getBoundingClientRect().bottom ?? 0;
+    const usableCenter = chromeBottom + (viewportHeight - chromeBottom) / 2;
+    const elementCenter = rect.top + rect.height / 2;
+    window.scrollBy({ behavior: 'instant', top: elementCenter - usableCenter });
+  });
+}
+
 test('landing page presents the method and passes an accessibility scan', async ({ page }) => {
   await page.goto('/en/tetracromia/');
 
@@ -630,7 +641,7 @@ test('Tetracromia remains operable at 320px with 200% text sizing', async ({ pag
   await expect(page.locator('.results-view')).toBeVisible();
   await expectReadableMobileResults(page, '320px Tetracromia results at 200% text');
   for (const action of await page.locator('.results-actions .ui-button').all()) {
-    await action.scrollIntoViewIfNeeded();
+    await centerBelowStickyChrome(action);
     await expectInVisualViewport(action, '200% text result action', { hitTest: true });
   }
 });

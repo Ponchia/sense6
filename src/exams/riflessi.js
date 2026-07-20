@@ -61,45 +61,8 @@ const METHOD_STEPS = [
   },
 ];
 const RESEARCH_SOURCES = sourcesFor('riflessi');
-const PRESENTATION_COPY = Object.freeze({
-  de: Object.freeze({
-    'How much do you want to run?': 'Wie umfangreich soll der Durchlauf sein?',
-    'about 2 minutes': 'etwa 2 Minuten',
-    'about 4 minutes': 'etwa 4 Minuten',
-    'about 7 minutes': 'etwa 7 Minuten',
-    'Physical setup': 'Position des Geräts',
-    'Seated · device on a stable surface': 'Sitzend · Gerät auf einer stabilen Unterlage',
-    'Handheld or standing': 'In der Hand oder im Stehen',
-    'Begin selected scope': 'Ausgewählten Umfang starten',
-    'Your response observations — Riflessi | Sense6': 'Ihre Reaktionsbeobachtungen — Riflessi | Sense6',
-    'The selected instruments captured enough clean responses for separate run-level observations.':
-      'Die ausgewählten Instrumente haben genügend saubere Reaktionen für getrennte Beobachtungen dieses Durchlaufs erfasst.',
-    'Median of {valid} clean simple responses from {scheduled} scheduled events. Within-run spread: {spread} ms; this is not estimate uncertainty.':
-      'Median aus {valid} sauberen einfachen Reaktionen von {scheduled} geplanten Ereignissen. Streuung innerhalb des Durchlaufs: {spread} ms; dies ist keine Schätzunsicherheit.',
-    '{scheduledAccuracy}% correct across all {scheduled} scheduled choices; {conditionalAccuracy}% among left/right responses.':
-      '{scheduledAccuracy} % richtige Antworten über alle {scheduled} geplanten Wahlaufgaben; {conditionalAccuracy} % unter den Links-/Rechtsantworten.',
-    'Descriptive block difference': 'Beschreibender Blockunterschied',
-    'Choice-block median minus the earlier simple-response median. Fixed order and different motor responses remain confounded.':
-      'Median des Wahlblocks minus Median der früheren einfachen Reaktionen. Feste Reihenfolge und unterschiedliche motorische Antworten bleiben vermischt.',
-    'Median of {valid} clean responses across this custom sustained block.':
-      'Median aus {valid} sauberen Reaktionen in diesem benutzerdefinierten anhaltenden Block.',
-    'A descriptive slow-tail difference for this custom block—not a PVT lapse count.':
-      'Eine beschreibende Differenz der langsamen Reaktionsflanke für diesen benutzerdefinierten Block – keine PVT-Aussetzerzahl.',
-    'No-signal checks': 'Prüfungen ohne Signal',
-    'Repeat this scope independently': 'Diesen Umfang unabhängig wiederholen',
-  }),
-});
 
 let state = null;
-
-function presentationText(source, values = {}) {
-  const template = PRESENTATION_COPY[state?.locale]?.[source];
-  if (!template) return t(source, values);
-  return Object.entries(values).reduce(
-    (output, [key, value]) => output.replaceAll(`{${key}}`, String(value)),
-    template,
-  );
-}
 
 export function mount(context) {
   const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClasses: ['lab-mode', 'rx-running'] });
@@ -264,15 +227,15 @@ function renderSetup() {
             </button>
           </fieldset>
           <fieldset class="rx-mode-picker" data-rx-scope-picker>
-            <legend>${presentationText('How much do you want to run?')}</legend>
-            ${scopeButton('signal', 'Segnale', presentationText('about 2 minutes'))}
-            ${scopeButton('signal-choice', 'Segnale + Scelta', presentationText('about 4 minutes'))}
-            ${scopeButton('complete', 'Complete set', presentationText('about 7 minutes'))}
+            <legend>${t('How much do you want to run?')}</legend>
+            ${scopeButton('signal', 'Segnale', t('about 2 minutes'))}
+            ${scopeButton('signal-choice', 'Segnale + Scelta', t('about 4 minutes'))}
+            ${scopeButton('complete', 'Complete set', t('about 7 minutes'))}
           </fieldset>
-          <label class="rx-setup-field">${presentationText('Physical setup')}
+          <label class="rx-setup-field">${t('Physical setup')}
             <select data-rx-position>
-              <option value="seated-stable">${presentationText('Seated · device on a stable surface')}</option>
-              <option value="handheld-or-standing">${presentationText('Handheld or standing')}</option>
+              <option value="seated-stable">${t('Seated · device on a stable surface')}</option>
+              <option value="handheld-or-standing">${t('Handheld or standing')}</option>
             </select>
           </label>
           <label class="rx-consent">
@@ -280,7 +243,7 @@ function renderSetup() {
             <span><strong class="experiment-boundary">I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.</strong> I understand this measures this browser, device, input, and moment—not a clinical trait.</span>
           </label>
           <button class="ui-button ui-button--lg" type="button" data-action="rx-start" disabled>
-            ${presentationText('Begin selected scope')} <span aria-hidden="true">→</span>
+            ${t('Begin selected scope')} <span aria-hidden="true">→</span>
           </button>
         </div>
         <aside class="rx-calibration" aria-label="Timing readiness">
@@ -691,7 +654,7 @@ function renderResults() {
   trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.riflessi);
   document.body.classList.add('lab-mode');
   document.body.classList.remove('rx-running');
-  document.title = presentationText('Your response observations — Riflessi | Sense6');
+  document.title = t('Your response observations — Riflessi | Sense6');
   const expectedStability = state.config.stability.durationMs < 10_000 ? 1 : 6;
   const includesChoice = state.session.scope !== 'signal';
   const includesStability = state.session.scope === 'complete';
@@ -721,17 +684,17 @@ function renderResults() {
         <div>
           <p class="ui-eyebrow">Riflessi / this run / this device</p>
           <h1 tabindex="-1" data-rx-screen-title>Your response has <em>more than one dimension.</em></h1>
-          <p>${result.usable ? presentationText('The selected instruments captured enough clean responses for separate run-level observations.') : t('Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.')}</p>
+          <p>${result.usable ? t('The selected instruments captured enough clean responses for separate run-level observations.') : t('Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.')}</p>
         </div>
         <div class="rx-results__stamp ${result.usable ? '' : 'is-limited'}"><span>${result.usable ? 'Run usable' : 'Limited run'}</span><strong>${String(scopeInstrumentCount(state.session.scope)).padStart(2, '0')} / 03</strong></div>
       </header>
 
       <div class="rx-result-grid">
-        ${metricCard('01', t('Typical signal response'), metric(result.signal.medianMs), 'ms', presentationText('Median of {valid} clean simple responses from {scheduled} scheduled events. Within-run spread: {spread} ms; this is not estimate uncertainty.', { valid: result.signal.valid, scheduled: result.signal.scheduled, spread: metric(result.signal.withinRunSpreadMs) }))}
-        ${includesChoice ? metricCard('02', t('Choice response'), metric(result.choice.medianMs), 'ms', presentationText('{scheduledAccuracy}% correct across all {scheduled} scheduled choices; {conditionalAccuracy}% among left/right responses.', { scheduledAccuracy: metric(result.choice.scheduledAccuracyPercent), scheduled: result.choice.scheduled, conditionalAccuracy: metric(result.choice.conditionalAccuracyPercent) })) : ''}
-        ${includesChoice ? metricCard('Δ', presentationText('Descriptive block difference'), signedMetric(result.choice.blockDifferenceMs), 'ms', presentationText('Choice-block median minus the earlier simple-response median. Fixed order and different motor responses remain confounded.')) : ''}
-        ${includesStability ? metricCard('03', t('Sustained response'), metric(result.stability.medianMs), 'ms', presentationText('Median of {valid} clean responses across this custom sustained block.', { valid: result.stability.valid })) : ''}
-        ${includesStability ? metricCard('20%', t('Slow-response tail'), signedMetric(result.stability.slowestGapMs), 'ms', presentationText('A descriptive slow-tail difference for this custom block—not a PVT lapse count.')) : ''}
+        ${metricCard('01', t('Typical signal response'), metric(result.signal.medianMs), 'ms', t('Median of {valid} clean simple responses from {scheduled} scheduled events. Within-run spread: {spread} ms; this is not estimate uncertainty.', { valid: result.signal.valid, scheduled: result.signal.scheduled, spread: metric(result.signal.withinRunSpreadMs) }))}
+        ${includesChoice ? metricCard('02', t('Choice response'), metric(result.choice.medianMs), 'ms', t('{scheduledAccuracy}% correct across all {scheduled} scheduled choices; {conditionalAccuracy}% among left/right responses.', { scheduledAccuracy: metric(result.choice.scheduledAccuracyPercent), scheduled: result.choice.scheduled, conditionalAccuracy: metric(result.choice.conditionalAccuracyPercent) })) : ''}
+        ${includesChoice ? metricCard('Δ', t('Descriptive block difference'), signedMetric(result.choice.blockDifferenceMs), 'ms', t('Choice-block median minus the earlier simple-response median. Fixed order and different motor responses remain confounded.')) : ''}
+        ${includesStability ? metricCard('03', t('Sustained response'), metric(result.stability.medianMs), 'ms', t('Median of {valid} clean responses across this custom sustained block.', { valid: result.stability.valid })) : ''}
+        ${includesStability ? metricCard('20%', t('Slow-response tail'), signedMetric(result.stability.slowestGapMs), 'ms', t('A descriptive slow-tail difference for this custom block—not a PVT lapse count.')) : ''}
         ${includesStability ? metricCard('↗', 'Within-run drift', signedMetric(result.stability.driftMs), 'ms', driftCopy(result.stability.driftMs)) : ''}
       </div>
 
@@ -743,14 +706,14 @@ function renderResults() {
             <div><dt>Under ${state.config.anticipationMs} ms</dt><dd>${result.events.anticipations}</dd></div>
             <div><dt>Missed signals</dt><dd>${result.events.misses}</dd></div>
             ${includesChoice ? `<div><dt>Wrong choices</dt><dd>${result.events.wrongChoices}</dd></div>` : ''}
-            <div><dt>${presentationText('No-signal checks')}</dt><dd>${result.events.catchesPassed} / ${result.events.catchesScheduled}</dd></div>
+            <div><dt>${t('No-signal checks')}</dt><dd>${result.events.catchesPassed} / ${result.events.catchesScheduled}</dd></div>
           </dl>
         </article>
         <article class="ui-card rx-timing">
           <p class="ui-eyebrow">Timing context</p><h2>${timing.label}</h2><p>${timing.copy}</p>
           <dl>
             <div><dt>Input</dt><dd>${state.session.inputMode === 'pointer' ? 'Touch / pointer' : 'Keyboard'}</dd></div>
-            <div><dt>${presentationText('Physical setup')}</dt><dd>${physicalSetupLabel(state.session.physicalSetup)}</dd></div>
+            <div><dt>${t('Physical setup')}</dt><dd>${physicalSetupLabel(state.session.physicalSetup)}</dd></div>
             <div><dt>Frame cadence</dt><dd>${state.session.diagnostics.frameMedianMs ? `≈ ${state.session.diagnostics.frameMedianMs.toFixed(1)} ms` : 'Unknown'}</dd></div>
             <div><dt>Interrupted trials</dt><dd>${state.session.diagnostics.interruptions}</dd></div>
           </dl>
@@ -764,7 +727,7 @@ function renderResults() {
       </aside>
 
       <div class="ui-cluster rx-results__actions">
-        <button class="ui-button" type="button" data-action="rx-restart">${presentationText('Repeat this scope independently')}</button>
+        <button class="ui-button" type="button" data-action="rx-restart">${t('Repeat this scope independently')}</button>
         <button class="ui-button ui-button--ghost" type="button" data-action="rx-copy">Copy result summary</button>
       </div>
     </section>
@@ -792,8 +755,8 @@ function scopeInstrumentOrdinal(instrument) {
 
 function physicalSetupLabel(value) {
   return value === 'handheld-or-standing'
-    ? presentationText('Handheld or standing')
-    : presentationText('Seated · device on a stable surface');
+    ? t('Handheld or standing')
+    : t('Seated · device on a stable surface');
 }
 
 function metric(value) {
