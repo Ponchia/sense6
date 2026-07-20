@@ -439,6 +439,16 @@ a:focus-visible {
   border-block-start: 1px solid var(--line);
 }
 
+.source-role {
+  display: block;
+  margin-block-start: 0.8rem;
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .source-list a {
   align-items: center;
   color: var(--text);
@@ -447,7 +457,7 @@ a:focus-visible {
   gap: 1rem;
   justify-content: space-between;
   min-inline-size: 0;
-  padding-block: 1rem;
+  padding-block: 0.25rem 1rem;
   text-decoration: none;
 }
 
@@ -656,8 +666,6 @@ a:focus-visible {
 .results-head > *,
 .results-head > div:first-child,
 .results-grid > *,
-.profile-card,
-.profile-card .ui-card__head > *,
 .result-details,
 .result-metric,
 .result-metric__head > * {
@@ -793,10 +801,6 @@ a:focus-visible {
   .results-head {
     padding-block-start: 2.5rem;
   }
-
-  .profile-key {
-    grid-template-columns: repeat(2, 1fr);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -895,8 +899,6 @@ html[dir="rtl"]
   .cb-directions,
   .ac-sweep,
   .ac-direction-pad,
-  .ac-meridian__fields,
-  .ac-meridian__choices,
   .rx-choice-zones,
   .au-intervals,
   .au-responses
@@ -905,14 +907,7 @@ html[dir="rtl"]
 }
 
 html[dir="rtl"]
-  :is(
-    .sequence-controls .ui-cluster,
-    .cb-directions,
-    .ac-direction-pad,
-    .ac-meridian__choices,
-    .rx-choice-zones,
-    .au-responses
-  )
+  :is(.sequence-controls .ui-cluster, .cb-directions, .ac-direction-pad, .rx-choice-zones, .au-responses)
   button {
   direction: rtl;
 }

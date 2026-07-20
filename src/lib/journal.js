@@ -1,33 +1,39 @@
 import { examContract, isExamId } from '../exams/contracts.js';
+import { legacyProtocolPassport, protocolPassport } from '../exams/protocols.js';
 import { LOCALE_CODES } from '../locale-metadata.js';
 
 const FORMAT = 'sense6-journal';
 const EXPORT_FORMAT = 'sense6-journal-export';
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 const STORAGE_KEY = 'sense6:journal';
 const MAX_ENTRIES = 100;
 const MAX_IMPORT_BYTES = 1_000_000;
+const MAX_NOTES = 12;
 
 const QUALITY = new Set(['usable', 'caution', 'limited']);
 const BOUNDS = new Set(['lower', 'upper']);
 
 /** @typedef {{ getItem: (key: string) => string | null, setItem: (key: string, value: string) => void, removeItem?: (key: string) => void }} JournalStorage */
 /** @typedef {{ id: string, value: number | null, unit: string, lower?: number, upper?: number, uncertainty?: number, bound?: 'lower' | 'upper' }} JournalMeasurement */
-/** @typedef {{ id: string, examId: string, recordedAt: string, locale: string, quality: 'usable' | 'caution' | 'limited', setup: Record<string, string | number | boolean | null>, measurements: JournalMeasurement[], notes: string[] }} JournalEntry */
+/** @typedef {import('../exams/protocols.js').ProtocolPassport} ProtocolPassport */
+/** @typedef {{ id: string, examId: string, recordedAt: string, locale: string, quality: 'usable' | 'caution' | 'limited', protocol: ProtocolPassport, setup: Record<string, string | number | boolean | null>, qualityEvidence: Record<string, string | number | boolean | null>, measurements: JournalMeasurement[], notes: string[] }} JournalEntry */
 
 /**
  * Create a portable, language-neutral journal entry.
- * @param {Omit<JournalEntry, 'id' | 'recordedAt' | 'notes'> & { id?: string, recordedAt?: string | number | Date, notes?: string[] }} value
+ * @param {Omit<JournalEntry, 'id' | 'recordedAt' | 'notes' | 'protocol' | 'qualityEvidence'> & { id?: string, recordedAt?: string | number | Date, notes?: string[], protocol?: ProtocolPassport, qualityEvidence?: Record<string, string | number | boolean | null> }} value
  * @returns {JournalEntry | null}
  */
 export function createJournalEntry(value) {
+  if (!isExamId(value.examId)) return null;
   const entry = {
     id: value.id ?? createId(),
     examId: value.examId,
     recordedAt: toIsoDate(value.recordedAt ?? new Date()),
     locale: value.locale,
     quality: value.quality,
+    protocol: value.protocol ?? protocolPassport(value.examId),
     setup: value.setup,
+    qualityEvidence: value.qualityEvidence ?? {},
     measurements: value.measurements,
     notes: value.notes ?? [],
   };
@@ -106,12 +112,8 @@ export function importJournal(raw, storage = globalThis.localStorage) {
   if (parsed?.format !== EXPORT_FORMAT || !Number.isInteger(parsed.schemaVersion))
     return { ok: false, reason: 'invalid' };
   if (parsed.schemaVersion > SCHEMA_VERSION) return { ok: false, reason: 'future' };
-  if (
-    parsed.schemaVersion !== SCHEMA_VERSION ||
-    !Array.isArray(parsed.entries) ||
-    parsed.entries.length > MAX_ENTRIES ||
-    !parsed.entries.every(isJournalEntry)
-  ) {
+  const migrated = migrateEntries(parsed.schemaVersion, parsed.entries);
+  if (!migrated) {
     return { ok: false, reason: 'invalid' };
   }
   const journal = readJournal(storage);
@@ -121,7 +123,7 @@ export function importJournal(raw, storage = globalThis.localStorage) {
   /** @type {JournalEntry[]} */
   const additions = [];
   let duplicates = 0;
-  for (const entry of /** @type {JournalEntry[]} */ (parsed.entries)) {
+  for (const entry of migrated) {
     if (known.has(entry.id)) {
       duplicates += 1;
       continue;
@@ -149,6 +151,11 @@ export function compareJournalEntries(newer, older) {
   if (!isJournalEntry(newer) || !isJournalEntry(older) || newer.examId !== older.examId) {
     return { status: 'not-comparable', reasons: ['different-instrument'] };
   }
+  if (isLegacyProtocol(newer.protocol) || isLegacyProtocol(older.protocol)) {
+    return { status: 'not-comparable', reasons: ['legacy-protocol'] };
+  }
+  const protocolReasons = protocolDifferences(newer.protocol, older.protocol);
+  if (protocolReasons.length) return { status: 'not-comparable', reasons: protocolReasons };
   const reasons = [];
   const hard = hardSetupDifferences(newer, older);
   if (hard.length) return { status: 'not-comparable', reasons: hard };
@@ -233,16 +240,13 @@ function readJournal(storage) {
     if (!raw) return { entries: [], writable: true };
     if (byteLength(raw) > MAX_IMPORT_BYTES) return { entries: [], writable: false };
     const parsed = JSON.parse(raw);
-    if (
-      parsed?.format !== FORMAT ||
-      parsed.schemaVersion !== SCHEMA_VERSION ||
-      !Array.isArray(parsed.entries) ||
-      parsed.entries.length > MAX_ENTRIES ||
-      !parsed.entries.every(isJournalEntry)
-    ) {
+    if (parsed?.format !== FORMAT || !Number.isInteger(parsed.schemaVersion)) {
       return { entries: [], writable: false };
     }
-    return { entries: sortEntries(parsed.entries), writable: true };
+    if (parsed.schemaVersion > SCHEMA_VERSION) return { entries: [], writable: false };
+    const entries = migrateEntries(parsed.schemaVersion, parsed.entries);
+    if (!entries) return { entries: [], writable: false };
+    return { entries: sortEntries(entries), writable: true };
   } catch {
     return { entries: [], writable: false };
   }
@@ -263,14 +267,38 @@ function isJournalEntry(value) {
     LOCALE_CODES.has(value.locale) &&
     typeof value.quality === 'string' &&
     QUALITY.has(value.quality) &&
+    validProtocol(value.protocol) &&
     validSetup(value.setup) &&
+    validEvidence(value.qualityEvidence) &&
     Array.isArray(value.measurements) &&
     value.measurements.length > 0 &&
     value.measurements.length <= 24 &&
     value.measurements.every(isMeasurement) &&
     Array.isArray(value.notes) &&
-    value.notes.length <= 12 &&
+    value.notes.length <= MAX_NOTES &&
     value.notes.every((note) => typeof note === 'string' && note.length <= 100)
+  );
+}
+
+/** @param {unknown} value */
+function validProtocol(value) {
+  if (!isRecord(value)) return false;
+  const fields = [
+    'methodVersion',
+    'profileId',
+    'configDigest',
+    'stimulusVersion',
+    'estimator',
+    'stoppingRule',
+    'responsePolicy',
+    'interruptionPolicy',
+    'replayPolicy',
+  ];
+  return (
+    Object.keys(value).length === fields.length &&
+    fields.every(
+      (field) => typeof value[field] === 'string' && value[field].length > 0 && value[field].length <= 160,
+    )
   );
 }
 
@@ -307,6 +335,73 @@ function validSetup(value) {
       (typeof item !== 'string' || item.length <= 160) &&
       (typeof item !== 'number' || Number.isFinite(item)),
   );
+}
+
+/** @param {unknown} value */
+function validEvidence(value) {
+  return validScalarRecord(value, 32);
+}
+
+/** @param {unknown} value @param {number} maximumFields */
+function validScalarRecord(value, maximumFields) {
+  if (!isRecord(value) || Object.keys(value).length > maximumFields) return false;
+  return Object.entries(value).every(
+    ([key, item]) =>
+      /^[a-z][a-zA-Z0-9]{0,47}$/.test(key) &&
+      (item === null || ['string', 'number', 'boolean'].includes(typeof item)) &&
+      (typeof item !== 'string' || item.length <= 160) &&
+      (typeof item !== 'number' || Number.isFinite(item)),
+  );
+}
+
+/** @param {ProtocolPassport} newer @param {ProtocolPassport} older */
+function protocolDifferences(newer, older) {
+  /** @type {readonly (keyof ProtocolPassport)[]} */
+  const fields = [
+    'methodVersion',
+    'profileId',
+    'configDigest',
+    'stimulusVersion',
+    'estimator',
+    'stoppingRule',
+    'responsePolicy',
+    'interruptionPolicy',
+    'replayPolicy',
+  ];
+  return fields.flatMap((field) => (newer[field] === older[field] ? [] : [`changed:${field}`]));
+}
+
+/** @param {ProtocolPassport} protocol */
+function isLegacyProtocol(protocol) {
+  return protocol.profileId === 'legacy-exploratory' || protocol.methodVersion.includes('-v1-legacy');
+}
+
+/** @param {number} schemaVersion @param {unknown} entries @returns {JournalEntry[] | null} */
+function migrateEntries(schemaVersion, entries) {
+  if (!Array.isArray(entries) || entries.length > MAX_ENTRIES) return null;
+  if (schemaVersion === SCHEMA_VERSION) {
+    return entries.every(isJournalEntry) ? /** @type {JournalEntry[]} */ (entries) : null;
+  }
+  if (schemaVersion !== 1 || !entries.every(isLegacyJournalEntry)) return null;
+  return entries.map((entry) => ({
+    ...entry,
+    protocol: legacyProtocolPassport(/** @type {import('../exams/contracts.js').ExamId} */ (entry.examId)),
+    qualityEvidence: {},
+    notes: entry.notes.includes('legacy-exploratory')
+      ? entry.notes
+      : [...entry.notes.slice(0, MAX_NOTES - 1), 'legacy-exploratory'],
+  }));
+}
+
+/** @param {unknown} value */
+function isLegacyJournalEntry(value) {
+  if (!isRecord(value)) return false;
+  return isJournalEntry({
+    ...value,
+    protocol:
+      typeof value.examId === 'string' && isExamId(value.examId) ? legacyProtocolPassport(value.examId) : {},
+    qualityEvidence: {},
+  });
 }
 
 /** @param {JournalEntry} newer @param {JournalEntry} older */
@@ -348,11 +443,6 @@ function combinedUncertainty(measurement, previous) {
 /** @param {JournalMeasurement} measurement */
 function measurementUncertainty(measurement) {
   if (Number.isFinite(measurement.uncertainty)) return /** @type {number} */ (measurement.uncertainty);
-  if (Number.isFinite(measurement.lower) && Number.isFinite(measurement.upper)) {
-    const upper = /** @type {number} */ (measurement.upper);
-    const lower = /** @type {number} */ (measurement.lower);
-    return (upper - lower) / 2;
-  }
   return null;
 }
 

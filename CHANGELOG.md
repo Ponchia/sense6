@@ -10,6 +10,18 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- Frozen protocol passports for every experiment and selectable scope, stored
+  with quality evidence in the local journal and used as a comparison cohort.
+- A categorized canonical evidence ledger that generates interactive, localized
+  static, and text-discovery source trails without implying validation.
+- Selectable Riflessi, Udito, and Acutezza scopes with independent-repeat
+  actions and browser journeys for every scope.
+- A complete Screen Colour Lab result journey and display-invalidation journey
+  in the focused Chromium, Firefox, and WebKit compatibility suite.
+- A source-backed evidence and product audit of all five experiments, covering
+  shipped doses and timings, reference gaps, competitor and open-source
+  precedents, interface findings, result completeness, depth choices, and a
+  prioritized integrity and validation backlog.
 - An architecture overview, an experiment extension guide, and an accepted
   decision record for continuing with incremental typed JavaScript.
 - A typed exam service contract that centralizes experiment identity, analytics
@@ -92,6 +104,15 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 
+- Tetracromia is now Screen Colour Lab: a fixed 29-block experiment with three
+  separate observations and no composite, score band, best result, profile, or
+  radar.
+- Daltonia now reports exploratory ending adaptive levels, track evidence, and
+  bounds instead of implying precise cone thresholds.
+- Riflessi, Udito, and Acutezza results now record the selected scope, expanded
+  setup provenance, and instrument-specific quality evidence.
+- Result and copied-summary language consistently describes run-level
+  observations, while keeping the recreational, nonclinical boundary visible.
 - Gallery CSS now loads only on the gallery route. Bundle checks discover every
   route stylesheet and enforce separate entry, route, and combined ceilings.
 - Metrics and journal validation now consume the exam service contract instead
@@ -125,12 +146,30 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Removed
 
+- The suspended Acutezza Meridiani scheduler, scorer, canvas renderer, styles,
+  and tests. A future orientation experiment requires a new simulated and
+  piloted protocol.
+- Tetracromia's composite score, score bands, best-result treatment, profile
+  radar, and their dead styles.
 - The unused Acutezza external-validation protocol, observation schema, and
   evidence validator, which contradicted the permanent experimental product
   boundary.
 
 ### Fixed
 
+- Daltonia rejects pre-paint, invalid, and duplicate responses and uses matched
+  linear-sRGB luminance distributions for target and field dots.
+- Riflessi requires complete schedules, clean no-signal checks, and interruption-
+  free runs for strongest quality, while retaining scheduled and valid
+  denominators and separate choice accuracy.
+- Udito presents all Portata controls before convergence, requires audibility
+  anchors and a final unchanged-volume confirmation, and treats technical
+  ceilings and reversal ranges explicitly.
+- Acutezza applies controls per eye and condition, stores measured versus
+  assumed calibration, actual contrast and distance recheck, and labels its 90%
+  interval as a model interval rather than generic uncertainty.
+- Legacy journal entries migrate into an explicit noncomparable protocol cohort
+  instead of inheriting a current method.
 - Malformed result envelopes can no longer be mistaken for valid legacy result
   records.
 - Invalid sequence swaps no longer mutate session state, and malformed adaptive

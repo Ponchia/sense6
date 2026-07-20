@@ -2,6 +2,39 @@
    Udito — device-relative listening lab
    ============================================================ */
 
+.au-scope-picker {
+  display: grid;
+  gap: 0.65rem;
+  margin: 1rem 0;
+  padding: 0;
+  border: 0;
+}
+
+.au-scope-picker legend {
+  margin-bottom: 0.55rem;
+  font-weight: 700;
+}
+
+.au-scope-option {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  text-align: start;
+}
+
+.au-scope-option.is-selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.au-scope-option small {
+  color: var(--text-muted);
+}
+
 .au-intro {
   --au-accent: #169dc7;
 

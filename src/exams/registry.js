@@ -3,39 +3,33 @@
  * loading. Non-visual service rules live in contracts.js.
  */
 import { EXAM_IDS as CONTRACT_IDS, examContract } from './contracts.js';
+import { sourcesFor } from './sources.js';
 
 /** @typedef {import('./contracts.js').ExamId} ExamId */
 /** @typedef {import('./contracts.js').ExamContract} ExamContract */
 /** @typedef {import('./module-contract.js').ExamMountContext} ExamMountContext */
-/** @typedef {readonly [string, string]} ResearchSource */
+/** @typedef {import('./sources.js').EvidenceSource} ResearchSource */
 /** @typedef {{ mount: (context: ExamMountContext) => (() => void) }} ExamModule */
-/** @typedef {{ id: ExamId, name: string, tagline: string, blurb: string, accent: string, durationMinutes: number, glyph: string, category: string, facts: string[], pageTitle: string, limit: string, load: () => Promise<ExamModule>, sources: ResearchSource[] }} ExamDefinition */
+/** @typedef {{ id: ExamId, name: string, tagline: string, blurb: string, accent: string, durationMinutes: number, glyph: string, category: string, facts: string[], pageTitle: string, limit: string, load: () => Promise<ExamModule>, sources: readonly Readonly<ResearchSource>[] }} ExamDefinition */
 /** @typedef {Readonly<Omit<ExamDefinition, 'facts' | 'sources'> & { route: ExamId, metricTest: string, contract: Readonly<ExamContract>, facts: readonly string[], sources: readonly Readonly<ResearchSource>[] }>} RegisteredExam */
 
 /** @type {readonly RegisteredExam[]} */
 export const EXAMS = Object.freeze([
   exam({
     id: 'tetracromia',
-    name: 'Tetracromia',
-    tagline: 'How finely do you see colour?',
+    name: 'Screen Colour Lab',
+    tagline: 'Three short colour observations',
     blurb:
-      'An adaptive colour-discrimination lab: three instruments measure the smallest hue steps you can resolve on this screen.',
+      'Tetracromia is a recreational screen-colour lab with three separate, short-run observations and no overall score.',
     accent: 'var(--accent)',
     durationMinutes: 4,
     glyph: 'ΔE',
     category: 'Colour discrimination',
-    facts: ['Adaptive difficulty', '3 instruments', 'Detailed profile'],
-    pageTitle: 'Tetracromia — colour discrimination | Sense6',
+    facts: ['Fixed 29-block dose', '3 separate observations', 'No composite score'],
+    pageTitle: 'Screen Colour Lab — Tetracromia | Sense6',
     limit: 'This is not a medical test and cannot confirm tetrachromacy.',
     load: () => import('./tetracromia.js'),
-    sources: [
-      ['CIEDE2000 colour-difference formula', 'https://doi.org/10.1002/col.1049'],
-      ['W3C CSS Color 4: OKLab and OKLCH', 'https://www.w3.org/TR/css-color-4/#ok-lab'],
-      [
-        'Cleveland Clinic: tetrachromacy and online-test limits',
-        'https://my.clevelandclinic.org/health/articles/tetrachromacy',
-      ],
-    ],
+    sources: sourcesFor('tetracromia'),
   }),
   exam({
     id: 'color-blindness',
@@ -47,25 +41,18 @@ export const EXAMS = Object.freeze([
     durationMinutes: 3,
     glyph: 'C',
     category: 'Colour-vision experiment',
-    facts: ['Adaptive thresholds', '3 display directions', 'Run-relative result'],
+    facts: ['Adaptive levels', '3 display directions', 'Run-relative result'],
     pageTitle: 'Experimental colour-vision check — Daltonia | Sense6',
     limit: 'Experimental and unvalidated. This is not a screening result or diagnosis.',
     load: () => import('./color-blindness.js'),
-    sources: [
-      ['CIE 2006 LMS cone fundamentals', 'https://doi.org/10.25039/CIE.DS.tijidesg'],
-      [
-        'Regan, Reffin, and Mollon: luminance noise and colour discrimination',
-        'https://doi.org/10.1016/0042-6989(94)90203-8',
-      ],
-      ['W3C CSS Color 4 conversion reference', 'https://www.w3.org/TR/css-color-4/#color-conversion-code'],
-    ],
+    sources: sourcesFor('color-blindness'),
   }),
   exam({
     id: 'riflessi',
     name: 'Riflessi',
-    tagline: 'Response speed, choice cost & consistency',
+    tagline: 'Response speed, choice task & consistency',
     blurb:
-      'Three short instruments separate a simple visual response from decision cost and within-run stability.',
+      'Three instruments keep simple response, a choice task, and within-run stability as separate observations.',
     accent: '#f4b942',
     durationMinutes: 7,
     glyph: 'R',
@@ -74,17 +61,7 @@ export const EXAMS = Object.freeze([
     pageTitle: 'Response speed and consistency — Riflessi | Sense6',
     limit: 'Compare only on the same device and input. Not a clinical or population score.',
     load: () => import('./riflessi.js'),
-    sources: [
-      [
-        'Deary, Liewald, and Nissan: browser reaction-time programme',
-        'https://doi.org/10.3758/s13428-010-0024-1',
-      ],
-      [
-        'Basner and Dinges: brief psychomotor vigilance testing',
-        'https://pmc.ncbi.nlm.nih.gov/articles/PMC3197786/',
-      ],
-      ['Bridges et al.: timing accuracy of experiment generators', 'https://doi.org/10.7717/peerj.9414'],
-    ],
+    sources: sourcesFor('riflessi'),
   }),
   exam({
     id: 'udito',
@@ -100,37 +77,23 @@ export const EXAMS = Object.freeze([
     pageTitle: 'Device-relative hearing lab — Udito | Sense6',
     limit: 'No dB HL, hearing age, diagnosis, or population score.',
     load: () => import('./udito.js'),
-    sources: [
-      ['Woods et al.: headphone screening for web experiments', 'https://doi.org/10.3758/s13414-017-1361-2'],
-      ['Levitt: transformed up-down methods in psychoacoustics', 'https://doi.org/10.1121/1.1912375'],
-      ['W3C Web Audio API', 'https://www.w3.org/TR/webaudio-1.0/'],
-    ],
+    sources: sourcesFor('udito'),
   }),
   exam({
     id: 'acutezza',
     name: 'Acutezza',
-    tagline: 'Calibrated sharpness & meridional clarity',
+    tagline: 'Calibrated sharpness & nominal contrast',
     blurb:
-      'Three per-eye instruments measure angular detail, low-contrast cost, and repeatable orientation preference without making a clinical claim.',
+      'Two per-eye conditions describe angular detail and nominal low-contrast cost without making a clinical claim.',
     accent: '#8357ff',
     durationMinutes: 8,
     glyph: 'A',
     category: 'Calibrated sharpness experiment',
-    facts: ['Physical screen calibration', '3 per-eye instruments', 'No clinical label'],
+    facts: ['Physical screen calibration', '2 per-eye conditions', 'No clinical label'],
     pageTitle: 'Calibrated sharpness experiment — Acutezza | Sense6',
     limit: 'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
     load: () => import('./acutezza.js'),
-    sources: [
-      [
-        'Li et al.: online screen and viewing-distance calibration',
-        'https://www.nature.com/articles/s41598-019-57204-1',
-      ],
-      ['ISO 8596 visual-acuity optotype principles', 'https://www.iso.org/standard/69042.html'],
-      [
-        'WHO: blindness and vision impairment',
-        'https://www.who.int/news-room/fact-sheets/detail/blindness-and-visual-impairment',
-      ],
-    ],
+    sources: sourcesFor('acutezza'),
   }),
 ]);
 
@@ -154,6 +117,6 @@ function exam(definition) {
     metricTest: contract.metricTest,
     contract,
     facts: Object.freeze(definition.facts),
-    sources: Object.freeze(definition.sources.map((source) => Object.freeze(source))),
+    sources: definition.sources,
   });
 }

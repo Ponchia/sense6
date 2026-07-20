@@ -5,18 +5,13 @@ import { shuffle } from './random.js';
 /** @typedef {{ blindSpotDegrees: number, repetitions: number, sweepMs: number, minDistanceMm: number, maxDistanceMm: number, maxSpreadPercent: number }} CalibrationConfig */
 /** @typedef {{ trials: number, controlAt: readonly number[], contrast?: number }} AcuityStageConfig */
 /** @typedef {{ minGapArcmin: number, maxGapArcmin: number, startGapArcmin: number, gridStepLog10: number, priorMedianArcmin: number, priorSigmaLog10: number, slope: number, guessRate: number, lapseRate: number, credibleMass: number }} AcuityEstimatorConfig */
-/** @typedef {{ angles: readonly number[], scales: readonly number[], stableRate: number, stableMargin: number }} MeridianConfig */
-/** @typedef {{ feedbackMs: number, practiceTrials: number, calibration: CalibrationConfig, high: AcuityStageConfig, low: AcuityStageConfig & { contrast: number }, estimator: AcuityEstimatorConfig, meridian: MeridianConfig }} AcuityConfig */
-/** @typedef {Partial<Omit<AcuityConfig, 'calibration' | 'high' | 'low' | 'estimator' | 'meridian'>> & { calibration?: Partial<CalibrationConfig>, high?: Partial<AcuityStageConfig>, low?: Partial<AcuityStageConfig & { contrast: number }>, estimator?: Partial<AcuityEstimatorConfig>, meridian?: Partial<MeridianConfig> }} AcuityConfigOverride */
+/** @typedef {{ feedbackMs: number, practiceTrials: number, calibration: CalibrationConfig, high: AcuityStageConfig, low: AcuityStageConfig & { contrast: number }, estimator: AcuityEstimatorConfig }} AcuityConfig */
+/** @typedef {Partial<Omit<AcuityConfig, 'calibration' | 'high' | 'low' | 'estimator'>> & { calibration?: Partial<CalibrationConfig>, high?: Partial<AcuityStageConfig>, low?: Partial<AcuityStageConfig & { contrast: number }>, estimator?: Partial<AcuityEstimatorConfig> }} AcuityConfigOverride */
 /** @typedef {{ gapArcmin: number, orientation: string, control: boolean }} AcuityTrial */
 /** @typedef {AcuityTrial & { selectedOrientation: string, correct: boolean }} AcuityRecord */
 /** @typedef {{ config: AcuityEstimatorConfig, trials: number, controlAt: number[], grid: number[], posterior: number[], records: AcuityRecord[], controls: AcuityRecord[], orientations: string[], complete: boolean }} AcuityTrack */
 /** @typedef {{ trials?: number, controlAt?: readonly number[], minGapArcmin?: number, maxGapArcmin?: number, estimator?: Partial<AcuityEstimatorConfig>, random?: RandomSource }} AcuityTrackOptions */
 /** @typedef {{ distanceMm: number, cssPixelsPerMm: number, devicePixelRatio?: number, maxDiameterCssPx: number, minGapDevicePixels?: number, configuredMin?: number, configuredMax?: number }} GapBoundsOptions */
-/** @typedef {'left' | 'right' | 'equal'} MeridianChoice */
-/** @typedef {{ block: number, scale: number, phase: number, leftAngle: number, rightAngle: number }} MeridianTrial */
-/** @typedef {MeridianTrial & { choice: MeridianChoice }} MeridianRecord */
-/** @typedef {Partial<MeridianConfig> & { random?: RandomSource }} MeridianOptions */
 /** @typedef {{ thresholdArcmin: number, lowerArcmin: number, upperArcmin: number, uncertaintyRatio: number, atFloor: boolean, atCeiling: boolean, trials: number, controlCorrect: number, controls: number }} AcuitySummary */
 
 export const CARD_WIDTH_MM = 85.6;
@@ -46,8 +41,8 @@ export const DEFAULT_ACUITY_CONFIG = Object.freeze({
     maxDistanceMm: 1000,
     maxSpreadPercent: 20,
   }),
-  high: Object.freeze({ trials: 18, controlAt: Object.freeze([6]) }),
-  low: Object.freeze({ trials: 18, controlAt: Object.freeze([11]), contrast: 0.1 }),
+  high: Object.freeze({ trials: 18, controlAt: Object.freeze([6, 14]) }),
+  low: Object.freeze({ trials: 18, controlAt: Object.freeze([5, 13]), contrast: 0.1 }),
   estimator: Object.freeze({
     minGapArcmin: 0.35,
     maxGapArcmin: 40,
@@ -59,12 +54,6 @@ export const DEFAULT_ACUITY_CONFIG = Object.freeze({
     guessRate: 0.125,
     lapseRate: 0.02,
     credibleMass: 0.9,
-  }),
-  meridian: Object.freeze({
-    angles: Object.freeze([0, 30, 60, 90, 120, 150]),
-    scales: Object.freeze([1.25, 1.8]),
-    stableRate: 0.65,
-    stableMargin: 0.08,
   }),
 });
 
@@ -78,7 +67,6 @@ export function mergeAcuityConfig(override = {}) {
     high: { ...DEFAULT_ACUITY_CONFIG.high, ...safe.high },
     low: { ...DEFAULT_ACUITY_CONFIG.low, ...safe.low },
     estimator: { ...DEFAULT_ACUITY_CONFIG.estimator, ...safe.estimator },
-    meridian: { ...DEFAULT_ACUITY_CONFIG.meridian, ...safe.meridian },
   };
 }
 
@@ -244,10 +232,10 @@ export function summarizeAcuity(track) {
   const upperArcmin = posteriorQuantile(track, 1 - tail);
   const rangeRatio = upperArcmin / lowerArcmin;
   return {
-    thresholdArcmin: roundTo(thresholdArcmin, 0.01),
-    lowerArcmin: roundTo(lowerArcmin, 0.01),
-    upperArcmin: roundTo(upperArcmin, 0.01),
-    uncertaintyRatio: roundTo(rangeRatio, 0.01),
+    thresholdArcmin: roundTo(thresholdArcmin, 0.1),
+    lowerArcmin: roundTo(lowerArcmin, 0.1),
+    upperArcmin: roundTo(upperArcmin, 0.1),
+    uncertaintyRatio: roundTo(rangeRatio, 0.1),
     atFloor: lowerArcmin <= track.config.minGapArcmin * 1.05,
     atCeiling: upperArcmin >= track.config.maxGapArcmin * 0.95,
     trials: track.records.length,
@@ -269,87 +257,6 @@ export function createOrientationSchedule(count, random = Math.random) {
     );
   }
   return schedule.slice(0, count);
-}
-
-/** @param {MeridianOptions} options @returns {MeridianTrial[]} */
-export function createMeridianSchedule(options = {}) {
-  const angles = [...(options.angles ?? DEFAULT_ACUITY_CONFIG.meridian.angles)];
-  const scales = [...(options.scales ?? DEFAULT_ACUITY_CONFIG.meridian.scales)];
-  const random = options.random ?? Math.random;
-  /** @type {MeridianTrial[]} */
-  const schedule = [];
-  for (const [block, scale] of scales.entries()) {
-    /** @type {MeridianTrial[]} */
-    const pairs = [];
-    for (let left = 0; left < angles.length; left += 1) {
-      for (let right = left + 1; right < angles.length; right += 1) {
-        const swap = random() >= 0.5;
-        const firstAngle = angles[left];
-        const secondAngle = angles[right];
-        if (firstAngle === undefined || secondAngle === undefined) {
-          throw new Error('Meridian angle schedule contains a missing value');
-        }
-        pairs.push({
-          block,
-          scale,
-          phase: random(),
-          leftAngle: swap ? secondAngle : firstAngle,
-          rightAngle: swap ? firstAngle : secondAngle,
-        });
-      }
-    }
-    schedule.push(...shuffle(pairs, random));
-  }
-  return schedule;
-}
-
-/** @param {MeridianRecord[]} records @param {Partial<MeridianConfig>} options */
-export function summarizeMeridians(records, options = {}) {
-  const config = { ...DEFAULT_ACUITY_CONFIG.meridian, ...options };
-  const blocks = [...new Set(records.map((record) => record.block))];
-  /** @param {MeridianRecord[]} subset */
-  const summarize = (subset) => {
-    const scores = new Map(config.angles.map((angle) => [angle, { angle, points: 0, appearances: 0 }]));
-    for (const record of subset) {
-      const left = scores.get(record.leftAngle);
-      const right = scores.get(record.rightAngle);
-      if (!left || !right) continue;
-      left.appearances += 1;
-      right.appearances += 1;
-      if (record.choice === 'left') left.points += 1;
-      if (record.choice === 'right') right.points += 1;
-      if (record.choice === 'equal') {
-        left.points += 0.5;
-        right.points += 0.5;
-      }
-    }
-    return [...scores.values()]
-      .map((entry) => ({
-        ...entry,
-        rate: entry.appearances ? entry.points / entry.appearances : 0,
-      }))
-      .sort((left, right) => right.rate - left.rate || left.angle - right.angle);
-  };
-  const overall = summarize(records);
-  const perBlock = blocks.map((block) => summarize(records.filter((record) => record.block === block)));
-  const leader = overall[0];
-  const runnerUp = overall[1];
-  const sameLeader = perBlock.length > 1 && perBlock.every((block) => block[0]?.angle === leader?.angle);
-  const margin = (leader?.rate ?? 0) - (runnerUp?.rate ?? 0);
-  const equalPercent = records.length
-    ? (records.filter((record) => record.choice === 'equal').length / records.length) * 100
-    : 0;
-  const stable =
-    leader !== undefined && sameLeader && leader.rate >= config.stableRate && margin >= config.stableMargin;
-  return {
-    stable,
-    preferredAngle: stable && leader ? leader.angle : null,
-    consistencyPercent: roundTo((leader?.rate ?? 0) * 100, 1),
-    marginPercent: roundTo(margin * 100, 1),
-    equalPercent: roundTo(equalPercent, 1),
-    comparisons: records.length,
-    angles: overall,
-  };
 }
 
 /** @param {number} michelsonContrast @param {number} backgroundLinear */

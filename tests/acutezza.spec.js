@@ -24,7 +24,6 @@ async function installControlledAcutezza(page) {
         practiceTrials: 1,
         high: { trials: 1, controlAt: [0] },
         low: { trials: 1, controlAt: [0], contrast: 0.1 },
-        meridian: { angles: [0, 60], scales: [1] },
       },
     };
   });
@@ -38,7 +37,7 @@ async function completeCalibrationFromCard(page) {
   await page.getByRole('button', { name: /Yes, clearly/i }).click();
 }
 
-test('Acutezza calibrates the display and reports three separate non-clinical observations', async ({
+test('Acutezza calibrates the display and reports separate non-clinical observations', async ({
   context,
   page,
 }) => {
@@ -50,10 +49,10 @@ test('Acutezza calibrates the display and reports three separate non-clinical ob
   await expect(page.getByRole('heading', { name: /Calibrate the screen/i })).toBeVisible();
   await expect(page.getByRole('heading', { name: /What informed Acutezza/i })).toBeVisible();
   await expect(page.locator('.ac-calibration-strip i')).toHaveCount(41);
-  await expect(page.locator('.ac-instrument-visual')).toHaveCount(3);
+  await expect(page.locator('.ac-instrument-visual')).toHaveCount(2);
   await expect(page.locator('.ac-safety.method')).toBeVisible();
   await expect(page.locator('.ac-safety-ruler i')).toHaveCount(18);
-  await expect(page.locator('.ac-research .source-list li')).toHaveCount(4);
+  await expect(page.locator('.ac-research .source-list li')).toHaveCount(7);
   await expect(page.locator('.ac-closing').getByRole('button', { name: /Open test/i })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole('button', { name: /Toggle light and dark theme/i }).click();
@@ -74,10 +73,10 @@ test('Acutezza calibrates the display and reports three separate non-clinical ob
   await page.getByRole('button', { name: /Setup unchanged/i }).click();
   await completeAcutezzaEye(page);
   await expect(page.getByRole('heading', { name: /Separate observations/i })).toBeVisible();
-  await expect(page.locator('.ac-metric')).toHaveCount(6);
+  await expect(page.locator('.ac-metric')).toHaveCount(4);
   await expect(page.locator('.ac-results__stamp')).toContainText('02 / 02');
   await expect(page.getByText(/10% nominal/i)).toBeVisible();
-  await expect(page.getByText(/uncertainty interval/i).first()).toBeVisible();
+  await expect(page.getByText(/90% model interval/i).first()).toBeVisible();
   await expect(page.getByText(/not an eye examination/i)).toBeVisible();
   await expect(page.getByText(/Do not infer normal vision, 20\/20/i)).toBeVisible();
   await expect(page.getByText(/astigmatism axis/i)).toBeVisible();
@@ -113,6 +112,31 @@ test('Acutezza calibrates the display and reports three separate non-clinical ob
       { event: 'test_completed', test: 'acutezza' },
     ]);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test('Acutezza focused scope omits the nominal-contrast condition', async ({ page }) => {
+  await installQuickAcutezza(page);
+  await page.goto('/en/acutezza/');
+  await completeAcutezzaCalibration(page, { scope: 'focused' });
+  await page.getByRole('button', { name: /Prepare Right eye/i }).click();
+  await completeAcutezzaEye(page, { includeContrast: false });
+  await page.getByRole('button', { name: /Check distance, then test Left eye/i }).click();
+  await page.getByRole('button', { name: /Setup unchanged/i }).click();
+  await completeAcutezzaEye(page, { includeContrast: false });
+
+  await expect(page.getByRole('heading', { name: /Separate observations/i })).toBeVisible();
+  await expect(page.locator('.ac-metric')).toHaveCount(2);
+  await expect(page.getByText('Nominal low-contrast angular gap estimate', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Focused Sharpness', { exact: true })).toBeVisible();
+  await expectJournalEntry(page, 'acutezza');
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const journal = JSON.parse(localStorage.getItem('sense6:journal') ?? 'null');
+        return journal.entries.find((entry) => entry.examId === 'acutezza').protocol.profileId;
+      }),
+    )
+    .toBe('focused');
 });
 
 test('Acutezza invalidates a measured run when display geometry changes', async ({ page }) => {
@@ -299,8 +323,6 @@ test('Acutezza carries the 20% fallback and unusable controls through results an
   await page.getByRole('button', { name: /Continue to Contrasto/i }).click();
   await answerAcutezzaTarget(page, false);
   await answerAcutezzaTarget(page);
-  await page.getByRole('button', { name: /Continue to Meridiani/i }).click();
-  await page.getByRole('button', { name: /No difference/i }).click();
   await page.getByRole('button', { name: /Finish with one eye/i }).click();
 
   await expect(page.locator('.ac-results__stamp')).toContainText('Run unusable');
@@ -432,93 +454,6 @@ test('Acutezza keeps calibration and runner geometry ordered at required short v
       await page.evaluate(() => {
         document.documentElement.style.fontSize = '';
       });
-    }
-    if (
-      (viewport.width === 320 && viewport.height === 568) ||
-      (viewport.width === 844 && viewport.height === 390)
-    ) {
-      await answerAcutezzaTarget(page);
-      await page.getByRole('button', { name: /Begin Nitidezza/i }).click();
-      await answerAcutezzaTarget(page);
-      await answerAcutezzaTarget(page);
-      await page.getByRole('button', { name: /Continue to Contrasto/i }).click();
-      await answerAcutezzaTarget(page);
-      await answerAcutezzaTarget(page);
-      await page.getByRole('button', { name: /Continue to Meridiani/i }).click();
-      await expect(page.locator('[data-ac-runner-heading]')).toBeFocused();
-      const meridianGeometry = await page.evaluate(() => {
-        const rect = (selector) => document.querySelector(selector).getBoundingClientRect();
-        const chamber = document.querySelector('.ac-meridian');
-        return {
-          chamberClientHeight: chamber.clientHeight,
-          chamberScrollHeight: chamber.scrollHeight,
-          choices: rect('.ac-meridian__choices'),
-          feedback: rect('.ac-feedback'),
-          fields: rect('.ac-meridian__fields'),
-          footer: rect('.ac-runner__footer'),
-          header: rect('.ac-runner__header'),
-          prompt: rect('.ac-meridian > p'),
-          squares: [...document.querySelectorAll('[data-ac-meridian]')].every((canvas) => {
-            const bounds = canvas.getBoundingClientRect();
-            return Math.abs(bounds.width - bounds.height) < 0.5 && canvas.width === canvas.height;
-          }),
-          withinInlineViewport: [...document.querySelectorAll('[data-ac-meridian-choice]')].every(
-            (button) => {
-              const bounds = button.getBoundingClientRect();
-              return bounds.left >= 0 && bounds.right <= document.documentElement.clientWidth;
-            },
-          ),
-        };
-      });
-      expect(meridianGeometry.header.bottom).toBeLessThanOrEqual(meridianGeometry.prompt.top + 1);
-      expect(meridianGeometry.prompt.bottom).toBeLessThanOrEqual(
-        Math.min(meridianGeometry.fields.top, meridianGeometry.choices.top) + 1,
-      );
-      expect(
-        Math.max(
-          meridianGeometry.fields.bottom,
-          meridianGeometry.choices.bottom,
-          meridianGeometry.feedback.bottom,
-        ),
-      ).toBeLessThanOrEqual(meridianGeometry.footer.top + 1);
-      expect(meridianGeometry.chamberScrollHeight).toBeLessThanOrEqual(
-        meridianGeometry.chamberClientHeight + 1,
-      );
-      expect(meridianGeometry.squares).toBe(true);
-      expect(meridianGeometry.withinInlineViewport).toBe(true);
-      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
-      if (viewport.width === 320) {
-        const meridianPixels = await page
-          .locator('[data-ac-meridian]')
-          .first()
-          .evaluate((canvas) => ({
-            height: canvas.getBoundingClientRect().height,
-            width: canvas.getBoundingClientRect().width,
-          }));
-        await page.evaluate(() => {
-          document.documentElement.style.fontSize = '400%';
-        });
-        const meridianReflow = await page
-          .locator('[data-ac-meridian]')
-          .first()
-          .evaluate((canvas) => ({
-            controlsInside: [...document.querySelectorAll('[data-ac-meridian-choice]')].every((button) => {
-              const rect = button.getBoundingClientRect();
-              return rect.left >= 0 && rect.right <= document.documentElement.clientWidth;
-            }),
-            documentFits: document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-            height: canvas.getBoundingClientRect().height,
-            width: canvas.getBoundingClientRect().width,
-          }));
-        expect(meridianReflow).toMatchObject({
-          ...meridianPixels,
-          controlsInside: true,
-          documentFits: true,
-        });
-        await page.evaluate(() => {
-          document.documentElement.style.fontSize = '';
-        });
-      }
     }
     await page.getByRole('button', { name: /Stop safely/i }).click();
     await expect(page.getByRole('heading', { name: /Calibrate the screen/i })).toBeVisible();

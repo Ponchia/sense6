@@ -2,27 +2,26 @@
 
 /**
  * @param {readonly Phase[]} phases
- * @param {(source: string) => string} translate
+ * @param {(source: string) => string} _translate
  * @param {(id: import('../../i18n/message-ids.js').MessageId) => string} message
  * @param {(lightness: number, chroma: number, hue: number) => string} colorCss
  */
-export function tetracromiaHomeMarkup(phases, translate, message, colorCss) {
+export function tetracromiaHomeMarkup(phases, _translate, message, colorCss) {
   const spectrumBars = Array.from({ length: 28 }, (_, index) => {
     const hue = Math.round((index / 28) * 360);
     return `<span style="--bar-color: ${colorCss(0.7, 0.13, hue)}; --bar-delay: ${index * 18}ms"></span>`;
   }).join('');
-  const headingTail = translate('colour?');
-
   return `
     <section class="hero ui-container ui-container--wide" id="top">
       <div class="hero__copy">
         <button class="back-link exam-back" type="button" data-action="gallery">
           <span aria-hidden="true">←</span> ${message('nav.allTests')}
         </button>
-        <p class="ui-eyebrow">Color perception / 03 instruments / about 4 minutes</p>
-        <h1>${translate('How finely do you')} <em>${translate('see')}</em>${headingTail === '?' ? '' : ' '}${headingTail}</h1>
+        <p class="ui-eyebrow">Screen Colour Lab / 29 blocks / about 4 minutes</p>
+        <h1>Notice colour in <em>three different ways</em>.</h1>
         <p class="hero__lede">
-          A careful, adaptive lab for the differences your display can reproduce—and your eyes can resolve.
+          Tetracromia is a short recreational experiment: 14 tile choices, 12 dot-field choices,
+          and 3 ordering arcs. Each observation stays separate.
         </p>
         <div class="ui-cluster hero__actions">
           <button class="ui-button ui-button--lg" type="button" data-action="setup">
@@ -57,7 +56,7 @@ export function tetracromiaHomeMarkup(phases, translate, message, colorCss) {
       <div class="section-heading">
         <div>
           <p class="ui-eyebrow">The lab</p>
-          <h2>Three views of discrimination.</h2>
+          <h2>Three short screen-colour observations.</h2>
         </div>
         <p>No names, no account, no result upload. Your session stays in this browser.</p>
       </div>
@@ -89,10 +88,10 @@ export function tetracromiaHomeMarkup(phases, translate, message, colorCss) {
       <div class="ui-container ui-container--wide method__layout">
         <div class="method__intro">
           <p class="ui-eyebrow">Method, not magic</p>
-          <h2>The difference gets smaller as you succeed.</h2>
+          <h2>The displayed difference adapts during two tasks.</h2>
           <p>
-            Threshold and Field use a two-correct-down, one-error-up staircase. It spends more
-            trials near your current boundary instead of asking the same easy question repeatedly.
+            Tile choices and Dot fields use a two-correct-down, one-error-up rule. With only
+            14 and 12 choices, the ending level describes this run; it is not a stable threshold.
           </p>
         </div>
         <ol class="method-steps">
@@ -106,11 +105,11 @@ export function tetracromiaHomeMarkup(phases, translate, message, colorCss) {
           </li>
           <li>
             <span>3</span>
-            <div><strong>Adaptive estimate</strong><p>Reversals around the boundary produce a session-relative threshold.</p></div>
+            <div><strong>Adaptive path</strong><p>Correct and missed choices change the next displayed difference.</p></div>
           </li>
           <li>
             <span>4</span>
-            <div><strong>Honest result</strong><p>Your profile describes this screen, light, fatigue level, and run.</p></div>
+            <div><strong>Honest result</strong><p>Three observations describe this screen, light, fatigue level, and run—with no composite.</p></div>
           </li>
         </ol>
       </div>
@@ -129,35 +128,19 @@ export function tetracromiaHomeMarkup(phases, translate, message, colorCss) {
       </div>
       <div class="science__sources ui-card">
         <p class="ui-eyebrow ui-eyebrow--muted">${message('section.researchTrail')}</p>
-        <ul class="source-list">
-          <li>
-            <a href="https://doi.org/10.1167/10.8.12" rel="noreferrer">
-              Jordan et al. (2010), functional tetrachromacy
-            </a>
-          </li>
-          <li>
-            <a href="https://www.xrite.com/visual-assessment-tools/fm-100-hue-test" rel="noreferrer">
-              Farnsworth–Munsell 100 Hue method
-            </a>
-          </li>
-          <li>
-            <a href="https://www.w3.org/TR/css-color-4/#ok-lab" rel="noreferrer">
-              W3C OKLab / OKLCH color model
-            </a>
-          </li>
-          <li>
-            <a href="https://my.clevelandclinic.org/health/articles/tetrachromacy" rel="noreferrer">
-              Clinical limits of online tetrachromacy tests
-            </a>
-          </li>
-        </ul>
+        <ul class="source-list">${sourcesFor('tetracromia')
+          .map(
+            ({ role, label, href }) =>
+              `<li><span class="source-role">${SOURCE_ROLE_LABELS[role]}</span><a href="${href}" rel="noreferrer">${label}</a></li>`,
+          )
+          .join('')}</ul>
       </div>
     </section>
 
     <section class="closing-cta ui-container ui-container--wide">
       <div>
         <p class="ui-eyebrow">Ready when your screen is</p>
-        <h2>Find your visible boundary.</h2>
+        <h2>Make three colour observations.</h2>
       </div>
       <button class="ui-button ui-button--lg" type="button" data-action="setup">
         Start the lab <span aria-hidden="true">→</span>
@@ -193,3 +176,5 @@ function testDescription(id) {
   if (id === 'field') return 'Find the shifted quadrant through controlled lightness and dot-size noise.';
   return 'Arrange three short hue arcs between fixed endpoints, with no color names as clues.';
 }
+
+import { SOURCE_ROLE_LABELS, sourcesFor } from '../sources.js';

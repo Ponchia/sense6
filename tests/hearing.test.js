@@ -11,7 +11,7 @@ import {
   nextRangeTrial,
   recordPitchResponse,
   recordRangeResponse,
-  safeFrequencyCeiling,
+  renderingFrequencyCeiling,
   summarizeHeadphones,
   summarizePitch,
   summarizeRange,
@@ -83,7 +83,7 @@ test('range summary keeps ceiling boundaries explicit', () => {
   track.completionReason = 'technical-ceiling';
   assert.deepEqual(summarizeRange(track), {
     thresholdHz: 8000,
-    spreadHz: 1000,
+    reversalRangeHz: 1000,
     atCeiling: true,
     settled: true,
     completionReason: 'technical-ceiling',
@@ -122,7 +122,7 @@ test('pitch summary reports percentages per anchor without a composite', () => {
   tracks[0].completionReason = 'converged';
   const summary = summarizePitch(tracks);
   assert.equal(summary[0].thresholdPercent, 3);
-  assert.equal(summary[0].spreadPercent, 2);
+  assert.equal(summary[0].reversalRangePercent, 2);
   assert.equal(summary[0].accuracyPercent, 50);
   assert.equal(summary[0].settled, true);
   assert.equal(summary[0].completionReason, 'converged');
@@ -172,8 +172,46 @@ test('max-trial tracks with one reversal remain explicitly non-settled', () => {
 
 test('audio helpers convert digital level and cap frequencies below Nyquist', () => {
   assert.ok(Math.abs(dbToGain(-6) - 0.5012) < 0.001);
-  assert.equal(safeFrequencyCeiling(44100), 18000);
-  assert.equal(safeFrequencyCeiling(32000), 13440);
+  assert.equal(renderingFrequencyCeiling(44100), 18000);
+  assert.equal(renderingFrequencyCeiling(32000), 13440);
+});
+
+test('range convergence waits until every scheduled control has been presented', () => {
+  const track = createRangeTrack(18000, {
+    controlAt: [0, 4],
+    minTrials: 2,
+    maxTrials: 8,
+    targetReversals: 1,
+  });
+  track.reversals = [6500];
+
+  let trial = nextRangeTrial(track, () => 0);
+  recordRangeResponse(track, trial, trial.toneInterval);
+  for (let count = 0; count < 3; count += 1) {
+    trial = nextRangeTrial(track, () => 0);
+    recordRangeResponse(track, trial, count === 1 ? 2 : trial.toneInterval);
+  }
+  assert.equal(track.complete, false);
+
+  trial = nextRangeTrial(track, () => 0);
+  assert.equal(trial.control, true);
+  recordRangeResponse(track, trial, trial.toneInterval);
+  assert.equal(track.complete, true);
+});
+
+test('technical ceiling requires two consecutive recent correct ceiling records', () => {
+  const track = createRangeTrack(8000, { controlAt: [] });
+  track.complete = true;
+  track.completionReason = 'max-trials';
+  track.records = [
+    { correct: true, frequencyHz: 8000 },
+    { correct: true, frequencyHz: 8000 },
+    { correct: false, frequencyHz: 7000 },
+  ];
+  assert.equal(summarizeRange(track).atCeiling, false);
+
+  track.records.push({ correct: true, frequencyHz: 8000 }, { correct: true, frequencyHz: 8000 });
+  assert.equal(summarizeRange(track).atCeiling, true);
 });
 
 test('the setup reference bounds every later representative digital stimulus', () => {

@@ -84,7 +84,7 @@ async function expectHitTestableGeometry(page, selector, minimum) {
 test('landing page presents the method and passes an accessibility scan', async ({ page }) => {
   await page.goto('/en/tetracromia/');
 
-  await expect(page.getByRole('heading', { name: /How finely do you see colour/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Notice colour in three different ways/i })).toBeVisible();
   await expect(page.getByRole('button', { name: /Begin the color lab/i })).toBeVisible();
   await expect(page.getByRole('heading', { name: /An RGB screen cannot test tetrachromacy/i })).toBeVisible();
 
@@ -145,7 +145,7 @@ test('screen setup exposes its warning when forced colors are active', async ({ 
   await expect(page.getByRole('button', { name: /Start instrument 01/i })).toBeDisabled();
 });
 
-test('a complete session produces an honest, accessible result profile', async ({ page }) => {
+test('a complete session produces honest, separate observations', async ({ page }) => {
   await page.goto('/en/tetracromia/');
   await page.getByRole('button', { name: /Begin the color lab/i }).click();
   await page.getByLabel(/I can distinguish the steps/i).check();
@@ -173,10 +173,13 @@ test('a complete session produces an honest, accessible result profile', async (
     await page.getByRole('button', { name: /Lock this order/i }).click();
   }
 
-  await expect(page.getByRole('heading', { name: /Your visible boundary, on this display/i })).toBeVisible();
-  await expect(page.locator('.result-note')).toContainText('not a population percentile');
-  await expect(page.getByRole('meter')).toHaveCount(3);
-  await expect(page.locator('.profile-radar__point')).toHaveCount(7);
+  await expect(
+    page.getByRole('heading', { name: /Three observations from one short screen-colour run/i }),
+  ).toBeVisible();
+  await expect(page.locator('.result-note')).toContainText('not stable thresholds');
+  await expect(page.locator('.result-metric')).toHaveCount(3);
+  await expect(page.getByRole('meter')).toHaveCount(0);
+  await expect(page.locator('.profile-radar')).toHaveCount(0);
   await expectJournalEntry(page, 'tetracromia');
 
   const results = await new AxeBuilder({ page }).analyze();
@@ -329,8 +332,10 @@ test('semantic transitions reveal the stimulus and results while keyboard focus 
   expect(resultTransition).toEqual({ scrollY: 0, headingVisible: true });
 });
 
-test('Field redraws deterministic seeded pixels whenever its bounds change', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'chromium', 'Single-browser canvas resize regression');
+test('Field invalidates the run instead of regenerating a measured stimulus after resize', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Single-browser canvas lifecycle regression');
   await page.setViewportSize({ width: 844, height: 500 });
   await reachField(page);
 
@@ -354,29 +359,10 @@ test('Field redraws deterministic seeded pixels whenever its bounds change', asy
       return current.width === current.expectedWidth && current.height === current.expectedHeight;
     })
     .toBe(true);
-  const landscape = await canvasState();
-
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect
-    .poll(async () => {
-      const current = await canvasState();
-      return (
-        current.width === current.expectedWidth &&
-        current.height === current.expectedHeight &&
-        current.width !== landscape.width
-      );
-    })
-    .toBe(true);
-
-  await page.setViewportSize({ width: 844, height: 500 });
-  await expect
-    .poll(async () => {
-      const current = await canvasState();
-      return current.width === landscape.width && current.height === landscape.height;
-    })
-    .toBe(true);
-  const restored = await canvasState();
-  expect(restored.hash).toBe(landscape.hash);
+  await expect(page.getByRole('heading', { name: /Set the room before the observations/i })).toBeVisible();
+  await expect(page.locator('canvas[data-field="0"]')).toHaveCount(0);
+  await expect(page.locator('#announcer')).toContainText(/display size changed/i);
 });
 
 test('rapid real touch activation records one response per rendered trial', async ({ page }, testInfo) => {
@@ -453,7 +439,7 @@ test('German landing and results stay contained across narrow widths', async ({ 
   test.skip(testInfo.project.name !== 'chromium', 'Single-browser narrow containment matrix');
   await page.goto('/de/tetracromia/');
   await expect(
-    page.getByRole('heading', { name: 'Wie fein können Sie Farben unterscheiden?' }),
+    page.getByRole('heading', { name: /Farbe auf drei verschiedene Arten wahrnehmen/i }),
   ).toBeVisible();
   const widths = [320, 360, 390, 412];
 
@@ -475,51 +461,42 @@ test('German landing and results stay contained across narrow widths', async ({ 
   await page.locator('#screen-ready').check();
   await page.locator('[data-action="start"]').click();
   await expect(page.getByRole('button', { name: 'Farbkachel 1', exact: true })).toBeEnabled();
-  await expect(page.locator('.trial-heading')).toContainText('Schwelle');
+  await expect(page.locator('.trial-heading')).toContainText('Kachelauswahl');
   await answerTrials(page, '[data-choice="0"]', 14);
   await expect(page.getByRole('button', { name: 'Gepunktetes Feld 1', exact: true })).toBeEnabled();
   await expect(page.locator('.trial-heading')).toContainText('Feld');
   await answerTrials(page, '[data-choice="0"]', 12);
   await expect(page.getByRole('group', { name: 'Spur zur Farbtonsortierung' })).toBeVisible();
-  await expect(page.locator('.trial-heading')).toContainText('Reihenfolge');
+  await expect(page.locator('.trial-heading')).toContainText('Farbtonreihenfolge');
   await page.locator('[data-action="submit-sequence"]').click();
   await page.locator('[data-action="submit-sequence"]').click();
   await page.locator('[data-action="submit-sequence"]').click();
   await expect(page.locator('.results-view')).toBeVisible();
   await expect(page.locator('.results-head')).toContainText('Sitzung abgeschlossen');
-  await expect(page.locator('.result-details')).toContainText('Feinster Schritt');
-  await expect(page.locator('.result-details')).toContainText('Farbtonsortierung zwischen festen Ankern');
+  await expect(page.locator('.result-details')).toContainText('Kachelauswahl');
+  await expect(page.locator('.result-details')).toContainText('Farbtonreihenfolge');
 
   for (const width of widths) {
     await page.setViewportSize({ width, height: 844 });
     const containment = await page.evaluate(() => {
       const heading = document.querySelector('.results-head h1');
       const headingBounds = heading.getBoundingClientRect();
-      const svg = document.querySelector('.profile-radar');
-      const svgBounds = svg.getBoundingClientRect();
-      const viewBox = svg.viewBox.baseVal;
-      const labelsContained = [...svg.querySelectorAll('.profile-radar__label')].every((label) => {
-        const bounds = label.getBBox();
-        return (
-          bounds.x >= viewBox.x &&
-          bounds.y >= viewBox.y &&
-          bounds.x + bounds.width <= viewBox.x + viewBox.width &&
-          bounds.y + bounds.height <= viewBox.y + viewBox.height
-        );
-      });
       return {
         noPageOverflow: document.documentElement.scrollWidth <= document.documentElement.clientWidth,
         headingContained:
           headingBounds.left >= 0 &&
           headingBounds.right <= innerWidth &&
           heading.scrollWidth <= heading.clientWidth,
-        radarContained: svgBounds.left >= 0 && svgBounds.right <= innerWidth && labelsContained,
+        resultsContained: [...document.querySelectorAll('.result-metric')].every((metric) => {
+          const bounds = metric.getBoundingClientRect();
+          return bounds.left >= 0 && bounds.right <= innerWidth;
+        }),
       };
     });
     expect(containment).toEqual({
       noPageOverflow: true,
       headingContained: true,
-      radarContained: true,
+      resultsContained: true,
     });
   }
 });

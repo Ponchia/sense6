@@ -14,6 +14,8 @@ import {
 import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 import { renderInstrumentList, renderMethodSteps, renderResearchSection } from './landing.js';
+import { protocolPassport } from './protocols.js';
+import { sourcesFor } from './sources.js';
 
 const STORAGE_KEY = 'sense6:riflessi:last';
 const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isRecord });
@@ -32,7 +34,7 @@ const INSTRUMENTS = {
     name: 'Scelta',
     eyebrow: 'Two-choice response',
     title: 'See a side. Choose it.',
-    body: 'A left or right arrow appears. Respond on the matching side. The difference from Segnale estimates the cost of choosing.',
+    body: 'A left or right arrow appears. Respond on the matching side. The block median can be described alongside Segnale, with fixed-order and motor differences left explicit.',
     note: '8 practice choices, then 32 balanced measured choices.',
   },
   stability: {
@@ -41,7 +43,7 @@ const INSTRUMENTS = {
     eyebrow: 'Sustained response',
     title: 'Keep the response steady.',
     body: 'For three minutes, respond to the same simple signal across longer, irregular waits. The pattern within this run matters more than one fastest press.',
-    note: 'A 3-minute PVT-B-inspired sequence. No fatigue or attention diagnosis is inferred.',
+    note: 'A custom 3-minute sustained-response block. It is not the validated PVT-B protocol and has no clinical lapse metric.',
   },
 };
 const METHOD_STEPS = [
@@ -50,19 +52,15 @@ const METHOD_STEPS = [
     body: 'A transparent reaction-time task with practice, randomized intervals, and separate simple and choice measures.',
   },
   {
-    title: 'Brief vigilance task',
-    body: 'The three-minute PVT-B informs the sustained-response duration and emphasis on lapses and false starts.',
+    title: 'Custom sustained block',
+    body: 'A three-minute sequence describes changes within this run. PVT-B is a comparator, not validation of this different event schedule.',
   },
   {
     title: 'Browser timing reality',
     body: 'Browser experiments can be precise enough for many effects, while input hardware and presentation still add latency.',
   },
 ];
-const RESEARCH_SOURCES = [
-  ['Deary, Liewald & Nissan, 2011', 'https://doi.org/10.3758/s13428-010-0024-1'],
-  ['Basner & Dinges, 2011', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC3197786/'],
-  ['Bridges et al., 2020', 'https://doi.org/10.7717/peerj.9414'],
-];
+const RESEARCH_SOURCES = sourcesFor('riflessi');
 
 let state = null;
 
@@ -77,6 +75,7 @@ export function mount(context) {
     session: null,
     config: runtimeConfig(),
     selectedMode: window.matchMedia?.('(pointer: coarse)').matches ? 'pointer' : 'keyboard',
+    selectedScope: 'complete',
     timeoutId: 0,
     deadlineId: 0,
     clockId: 0,
@@ -185,7 +184,7 @@ function renderIntro() {
       <section class="closing-cta rx-closing ui-container ui-container--wide">
         <div>
           <p class="ui-eyebrow">Response lab / three instruments / about 7 minutes</p>
-          <h2>Response speed, choice cost &amp; consistency</h2>
+          <h2>Response speed, choice task &amp; consistency</h2>
         </div>
         <button class="ui-button ui-button--lg" type="button" data-action="rx-setup-closing">
           ${m('action.openTest')} <span aria-hidden="true">→</span>
@@ -227,12 +226,24 @@ function renderSetup() {
               <span class="rx-mode__tap" aria-hidden="true">●</span><strong>Touch / pointer</strong><small>Tap the chamber or side</small>
             </button>
           </fieldset>
+          <fieldset class="rx-mode-picker" data-rx-scope-picker>
+            <legend>How much do you want to run?</legend>
+            ${scopeButton('signal', 'Segnale', 'about 2 minutes')}
+            ${scopeButton('signal-choice', 'Segnale + Scelta', 'about 4 minutes')}
+            ${scopeButton('complete', 'Complete set', 'about 7 minutes')}
+          </fieldset>
+          <label class="rx-setup-field">Physical setup
+            <select data-rx-position>
+              <option value="seated-stable">Seated · device on a stable surface</option>
+              <option value="handheld-or-standing">Handheld or standing</option>
+            </select>
+          </label>
           <label class="rx-consent">
             <input type="checkbox" data-rx-consent>
-            <span><strong class="experiment-boundary">I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.</strong>I understand this measures this browser, device, input, and moment—not a clinical trait.</span>
+            <span><strong class="experiment-boundary">I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.</strong> I understand this measures this browser, device, input, and moment—not a clinical trait.</span>
           </label>
           <button class="ui-button ui-button--lg" type="button" data-action="rx-start" disabled>
-            Begin instrument 01 <span aria-hidden="true">→</span>
+            Begin selected scope <span aria-hidden="true">→</span>
           </button>
         </div>
         <aside class="rx-calibration" aria-label="Timing readiness">
@@ -263,6 +274,22 @@ function selectMode(mode) {
   }
 }
 
+/** @param {'signal' | 'signal-choice' | 'complete'} id @param {string} label @param {string} duration */
+function scopeButton(id, label, duration) {
+  const selected = state.selectedScope === id;
+  return `<button class="rx-mode ${selected ? 'is-selected' : ''}" type="button" data-action="rx-scope" data-scope="${id}" aria-pressed="${selected}"><strong>${label}</strong><small>${duration}</small></button>`;
+}
+
+/** @param {'signal' | 'signal-choice' | 'complete'} scope */
+function selectScope(scope) {
+  state.selectedScope = scope;
+  for (const button of state.app.querySelectorAll('[data-action="rx-scope"]')) {
+    const selected = button.dataset.scope === scope;
+    button.classList.toggle('is-selected', selected);
+    button.setAttribute('aria-pressed', String(selected));
+  }
+}
+
 function startSession() {
   const consent = state.app.querySelector('[data-rx-consent]');
   if (!consent?.checked) {
@@ -274,6 +301,8 @@ function startSession() {
   const seed = `${Date.now()}-${Math.random()}`;
   state.session = {
     inputMode: state.selectedMode,
+    physicalSetup: state.app.querySelector('[data-rx-position]')?.value ?? 'unrecorded',
+    scope: state.selectedScope,
     instrument: 'signal',
     block: null,
     queue: [],
@@ -392,7 +421,7 @@ function renderRunner() {
     <section class="rx-runner" data-rx-instrument="${state.session.instrument}">
       <h1 class="sr-only" tabindex="-1" data-rx-screen-title>${t('{name} response runner', { name: t(info.name) })}</h1>
       <header class="rx-runner__header">
-        <div><p class="ui-eyebrow">${info.number} / ${t(info.name)}</p><strong data-rx-block>${t(stability ? 'Measured run' : state.session.block === 'practice' ? 'Practice' : 'Measured run')}</strong></div>
+        <div><p class="ui-eyebrow">${t(info.name)} · instrument ${scopeInstrumentOrdinal(state.session.instrument)} of ${scopeInstrumentCount(state.session.scope)}</p><strong data-rx-block>${t(stability ? 'Measured run' : state.session.block === 'practice' ? 'Practice' : 'Measured run')}</strong></div>
         <div class="rx-progress" role="progressbar" aria-label="Instrument progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="0% complete" data-rx-progressbar><i data-rx-progress></i></div>
         <span class="rx-runner__count" data-rx-count>${stability ? formatClock(state.config.stability.durationMs) : `0 / ${state.session.queue.length}`}</span>
         <button class="rx-runner__stop" type="button" data-action="rx-stop">Stop safely</button>
@@ -524,13 +553,14 @@ function recordOutcome(outcome, rt = null) {
   clearTrialClocks();
   state.trialState = 'feedback';
   const isScored = state.session.block === 'scored';
-  if (isScored && outcome !== 'catch-correct') {
+  if (isScored) {
     state.session.records[state.session.instrument].push({ outcome, rt });
   }
   const chamber = state.app.querySelector('[data-rx-chamber]');
   chamber?.setAttribute('data-rx-state', outcomeClass(outcome));
   const feedback = state.app.querySelector('[data-rx-feedback]');
-  if (feedback) feedback.textContent = t(feedbackText(outcome, rt));
+  if (feedback)
+    feedback.textContent = t(isScored ? measuredFeedbackText(outcome) : feedbackText(outcome, rt));
 
   if (state.session.instrument !== 'stability') state.session.index += 1;
   state.timeoutId = window.setTimeout(() => {
@@ -541,6 +571,13 @@ function recordOutcome(outcome, rt = null) {
       prepareQueuedTrial();
     }
   }, state.config.feedbackMs);
+}
+
+function measuredFeedbackText(outcome) {
+  if (outcome === 'catch-correct') return 'No-signal check recorded';
+  if (outcome === 'correct') return 'Response recorded';
+  if (outcome === 'wrong' || outcome === 'miss') return 'Response event recorded';
+  return 'Early response recorded';
 }
 
 function outcomeClass(outcome) {
@@ -586,7 +623,11 @@ function finishCurrentInstrument() {
   stopClocks();
   document.body.classList.remove('rx-running');
   const completed = state.session.instrument;
-  if (completed === 'stability') {
+  if (
+    completed === 'stability' ||
+    (completed === 'signal' && state.session.scope === 'signal') ||
+    (completed === 'choice' && state.session.scope === 'signal-choice')
+  ) {
     renderResults();
     return;
   }
@@ -598,7 +639,7 @@ function finishCurrentInstrument() {
       <span class="rx-transition__mark" aria-hidden="true">${INSTRUMENTS[completed].number}</span>
       <p class="ui-eyebrow">Instrument complete</p>
       <h1 tabindex="-1" data-rx-screen-title>Measurement recorded: ${INSTRUMENTS[completed].name}.</h1>
-      <p>${valid} clean response${valid === 1 ? '' : 's'} captured across ${total} measured event${total === 1 ? '' : 's'}. Interpretation waits until all three instruments are complete.</p>
+      <p>${valid} clean response${valid === 1 ? '' : 's'} captured across ${total} measured event${total === 1 ? '' : 's'}. Interpretation waits until the selected scope is complete. Take a short break now if needed, without changing device or input.</p>
       <button class="ui-button ui-button--lg" type="button" data-action="rx-next-stage" data-next="${next}">
         Continue to ${INSTRUMENTS[next].name} <span aria-hidden="true">→</span>
       </button>
@@ -613,12 +654,17 @@ function renderResults() {
   trackMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.riflessi);
   document.body.classList.add('lab-mode');
   document.body.classList.remove('rx-running');
-  document.title = t('Your response profile — Riflessi | Sense6');
+  document.title = t('Your response observations — Riflessi | Sense6');
   const expectedStability = state.config.stability.durationMs < 10_000 ? 1 : 6;
+  const includesChoice = state.session.scope !== 'signal';
+  const includesStability = state.session.scope === 'complete';
   const result = summarizeRiflessi(state.session.records, {
     signal: state.config.signal.scoredTrials,
-    choice: state.config.choice.scoredTrials,
-    stability: expectedStability,
+    signalScheduled: state.config.signal.scoredTrials + state.config.signal.catchTrials,
+    catches: state.config.signal.catchTrials,
+    choice: includesChoice ? state.config.choice.scoredTrials : 0,
+    stability: includesStability ? expectedStability : 0,
+    interruptions: state.session.diagnostics.interruptions,
   });
   const timing = timingHealth(state.session.diagnostics);
   const stored = {
@@ -638,18 +684,18 @@ function renderResults() {
         <div>
           <p class="ui-eyebrow">Riflessi / this run / this device</p>
           <h1 tabindex="-1" data-rx-screen-title>Your response has <em>more than one dimension.</em></h1>
-          <p>${result.usable ? 'The three instruments captured enough clean responses for a run-level profile.' : 'Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.'}</p>
+          <p>${result.usable ? 'The selected instruments captured enough clean responses for separate run-level observations.' : 'Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.'}</p>
         </div>
-        <div class="rx-results__stamp ${result.usable ? '' : 'is-limited'}"><span>${result.usable ? 'Run usable' : 'Limited run'}</span><strong>03 / 03</strong></div>
+        <div class="rx-results__stamp ${result.usable ? '' : 'is-limited'}"><span>${result.usable ? 'Run usable' : 'Limited run'}</span><strong>${String(scopeInstrumentCount(state.session.scope)).padStart(2, '0')} / 03</strong></div>
       </header>
 
       <div class="rx-result-grid">
-        ${metricCard('01', 'Typical signal response', metric(result.signal.medianMs), 'ms', `Median of ${result.signal.valid} clean simple responses. Typical is more robust than your single fastest response.`)}
-        ${metricCard('02', 'Choice response', metric(result.choice.medianMs), 'ms', `${metric(result.choice.accuracyPercent)}% correct across ${result.choice.attempts} valid choices.`)}
-        ${metricCard('Δ', 'Choice cost', signedMetric(result.choice.costMs), 'ms', 'Difference between the choice and simple-response medians in this run.')}
-        ${metricCard('03', 'Sustained response', metric(result.stability.medianMs), 'ms', `Median of ${result.stability.valid} clean responses across the sustained block.`)}
-        ${metricCard('20%', 'Slow-response tail', signedMetric(result.stability.slowestGapMs), 'ms', 'How much slower the slowest fifth was than the sustained median.')}
-        ${metricCard('↗', 'Within-run drift', signedMetric(result.stability.driftMs), 'ms', driftCopy(result.stability.driftMs))}
+        ${metricCard('01', 'Typical signal response', metric(result.signal.medianMs), 'ms', `Median of ${result.signal.valid} clean simple responses from ${result.signal.scheduled} scheduled events. Within-run spread: ${metric(result.signal.withinRunSpreadMs)} ms; this is not estimate uncertainty.`)}
+        ${includesChoice ? metricCard('02', 'Choice response', metric(result.choice.medianMs), 'ms', `${metric(result.choice.scheduledAccuracyPercent)}% correct across all ${result.choice.scheduled} scheduled choices; ${metric(result.choice.conditionalAccuracyPercent)}% among left/right responses.`) : ''}
+        ${includesChoice ? metricCard('Δ', 'Descriptive block difference', signedMetric(result.choice.blockDifferenceMs), 'ms', 'Choice-block median minus the earlier simple-response median. Fixed order and different motor responses remain confounded.') : ''}
+        ${includesStability ? metricCard('03', 'Sustained response', metric(result.stability.medianMs), 'ms', `Median of ${result.stability.valid} clean responses across this custom sustained block.`) : ''}
+        ${includesStability ? metricCard('20%', 'Slow-response tail', signedMetric(result.stability.slowestGapMs), 'ms', 'A descriptive slow-tail difference for this custom block—not a PVT lapse count.') : ''}
+        ${includesStability ? metricCard('↗', 'Within-run drift', signedMetric(result.stability.driftMs), 'ms', driftCopy(result.stability.driftMs)) : ''}
       </div>
 
       <div class="rx-result-notes">
@@ -660,12 +706,14 @@ function renderResults() {
             <div><dt>Under ${state.config.anticipationMs} ms</dt><dd>${result.events.anticipations}</dd></div>
             <div><dt>Missed signals</dt><dd>${result.events.misses}</dd></div>
             <div><dt>Wrong choices</dt><dd>${result.events.wrongChoices}</dd></div>
+            <div><dt>No-signal checks</dt><dd>${result.events.catchesPassed} / ${result.events.catchesScheduled}</dd></div>
           </dl>
         </article>
         <article class="ui-card rx-timing">
           <p class="ui-eyebrow">Timing context</p><h2>${timing.label}</h2><p>${timing.copy}</p>
           <dl>
             <div><dt>Input</dt><dd>${state.session.inputMode === 'pointer' ? 'Touch / pointer' : 'Keyboard'}</dd></div>
+            <div><dt>Physical setup</dt><dd>${state.session.physicalSetup}</dd></div>
             <div><dt>Frame cadence</dt><dd>${state.session.diagnostics.frameMedianMs ? `≈ ${state.session.diagnostics.frameMedianMs.toFixed(1)} ms` : 'Unknown'}</dd></div>
             <div><dt>Interrupted trials</dt><dd>${state.session.diagnostics.interruptions}</dd></div>
           </dl>
@@ -679,7 +727,7 @@ function renderResults() {
       </aside>
 
       <div class="ui-cluster rx-results__actions">
-        <button class="ui-button" type="button" data-action="rx-restart">Run again</button>
+        <button class="ui-button" type="button" data-action="rx-restart">Repeat this scope independently</button>
         <button class="ui-button ui-button--ghost" type="button" data-action="rx-copy">Copy result summary</button>
       </div>
     </section>
@@ -691,6 +739,18 @@ function metricCard(index, label, value, unit, copy) {
   return `<article class="rx-metric">
     <div><span>${index}</span><p>${label}</p></div><strong>${value}<small>${unit}</small></strong><p>${copy}</p>
   </article>`;
+}
+
+/** @param {'signal' | 'signal-choice' | 'complete'} scope */
+function scopeInstrumentCount(scope) {
+  if (scope === 'signal') return 1;
+  if (scope === 'signal-choice') return 2;
+  return 3;
+}
+
+/** @param {'signal' | 'choice' | 'stability'} instrument */
+function scopeInstrumentOrdinal(instrument) {
+  return { signal: 1, choice: 2, stability: 3 }[instrument];
 }
 
 function metric(value) {
@@ -720,10 +780,12 @@ function updateRunnerProgress() {
     const remaining = Math.max(0, state.session.stabilityEndsAt - performance.now());
     const complete = 1 - remaining / state.config.stability.durationMs;
     const percent = Math.min(100, Math.max(0, complete * 100));
-    progress.style.inlineSize = `${percent}%`;
+    const coarsePercent = percent >= 67 ? 67 : percent >= 33 ? 33 : 0;
+    progress.style.inlineSize = `${coarsePercent}%`;
     progressbar.setAttribute('aria-valuenow', String(Math.round(percent)));
     progressbar.setAttribute('aria-valuetext', `${formatClock(remaining)} remaining`);
-    count.textContent = formatClock(remaining);
+    count.textContent =
+      percent >= 67 ? 'Final section' : percent >= 33 ? 'Middle section' : 'Opening section';
   } else {
     const percent = (state.session.index / state.session.queue.length) * 100;
     progress.style.inlineSize = `${percent}%`;
@@ -752,6 +814,20 @@ function pauseRun() {
   state.trialState = 'paused';
   state.session.pauseStartedAt = performance.now();
   state.session.diagnostics.interruptions += 1;
+  if (state.session.instrument === 'choice' && state.session.block === 'scored') {
+    state.session.queue[state.session.index] = createChoiceSchedule({
+      trials: 1,
+      minWaitMs: state.config.choice.minWaitMs,
+      maxWaitMs: state.config.choice.maxWaitMs,
+      random: state.session.random,
+    })[0];
+  } else if (state.session.instrument === 'signal' && state.session.block === 'scored') {
+    const active = state.session.queue[state.session.index];
+    state.session.queue[state.session.index] = {
+      kind: active?.kind ?? 'signal',
+      waitMs: randomWait(state.config.signal.minWaitMs, state.config.signal.maxWaitMs, state.session.random),
+    };
+  }
   document.body.classList.remove('rx-running');
   state.app.innerHTML = `
     <section class="rx-transition ui-container" data-rx-paused>
@@ -826,7 +902,7 @@ function copyResults() {
   const result = state.session.result;
   const timing = timingHealth(state.session.diagnostics);
   const text = [
-    t('Riflessi — device-relative response profile'),
+    t('Riflessi — device-relative response observations'),
     t('Input: {input}', { input: t(state.session.inputMode === 'pointer' ? 'touch / pointer' : 'keyboard') }),
     t('Run quality: {quality}', { quality: t(result.usable ? 'Usable run' : 'Limited run') }),
     t('Timing: {timing}; interruptions: {interruptions}', {
@@ -836,8 +912,8 @@ function copyResults() {
     t('Signal median: {value} ms', { value: metric(result.signal.medianMs) }),
     t('Choice median: {median} ms; accuracy: {accuracy}%; cost: {cost} ms', {
       median: metric(result.choice.medianMs),
-      accuracy: metric(result.choice.accuracyPercent),
-      cost: signedMetric(result.choice.costMs),
+      accuracy: metric(result.choice.scheduledAccuracyPercent),
+      cost: signedMetric(result.choice.blockDifferenceMs),
     }),
     t('Sustained median: {median} ms; slow tail: {tail} ms; drift: {drift} ms', {
       median: metric(result.stability.medianMs),
@@ -884,6 +960,11 @@ function wireEvents(signal) {
           break;
         case 'rx-mode':
           selectMode(action.dataset.mode);
+          break;
+        case 'rx-scope':
+          if (['signal', 'signal-choice', 'complete'].includes(action.dataset.scope)) {
+            selectScope(action.dataset.scope);
+          }
           break;
         case 'rx-start':
           startSession();
@@ -937,6 +1018,12 @@ function wireEvents(signal) {
     'keydown',
     (event) => {
       if (event.repeat || !state.session || state.session.inputMode !== 'keyboard') return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (
+        !target?.closest('.rx-runner') ||
+        target.closest('button, input, select, textarea, [contenteditable]')
+      )
+        return;
       let response = null;
       if (state.session.instrument === 'choice' && event.key === 'ArrowLeft') response = 'left';
       if (state.session.instrument === 'choice' && event.key === 'ArrowRight') response = 'right';
@@ -1006,31 +1093,54 @@ function saveLast(result) {
 }
 
 function saveJournalResult(result, timing) {
+  const profileId =
+    state.session.scope === 'signal'
+      ? 'signal'
+      : state.session.scope === 'signal-choice'
+        ? 'signal-choice'
+        : 'complete';
   const entry = createJournalEntry({
     examId: 'riflessi',
     locale: state.locale,
     quality: result.usable ? 'usable' : 'limited',
+    protocol: protocolPassport('riflessi', profileId),
     setup: {
       ...captureDisplayPassport(),
       inputMode: state.session.inputMode,
+      physicalSetup: state.session.physicalSetup,
       frameCadence: state.session.diagnostics.frameMedianMs ?? null,
       timingHealth: timing.label,
       interruptions: state.session.diagnostics.interruptions,
+    },
+    qualityEvidence: {
+      signalScheduled: result.signal.scheduled,
+      signalValid: result.signal.valid,
+      choiceScheduled: result.choice.scheduled,
+      choiceValid: result.choice.valid,
+      sustainedValid: result.stability.valid,
+      catchesPassed: result.events.catchesPassed,
+      catchesScheduled: result.events.catchesScheduled,
+      falseStarts: result.events.falseStarts,
+      anticipations: result.events.anticipations,
+      misses: result.events.misses,
+      wrongChoices: result.events.wrongChoices,
+      interruptions: state.session.diagnostics.interruptions,
+      qualityReasons: result.qualityReasons.join(','),
     },
     measurements: [
       {
         id: 'signal-median',
         value: result.signal.medianMs,
         unit: 'ms',
-        ...(result.signal.spreadMs === null ? {} : { uncertainty: result.signal.spreadMs }),
       },
       { id: 'choice-median', value: result.choice.medianMs, unit: 'ms' },
-      { id: 'choice-cost', value: result.choice.costMs, unit: 'ms' },
+      { id: 'choice-block-difference', value: result.choice.blockDifferenceMs, unit: 'ms' },
+      { id: 'choice-scheduled-accuracy', value: result.choice.scheduledAccuracyPercent, unit: '%' },
       { id: 'stability-median', value: result.stability.medianMs, unit: 'ms' },
       { id: 'slowest-gap', value: result.stability.slowestGapMs, unit: 'ms' },
       { id: 'drift', value: result.stability.driftMs, unit: 'ms' },
     ],
-    notes: result.usable ? [] : ['partial-run'],
+    notes: result.usable ? ['device-relative-custom-tasks'] : ['limited-run', ...result.qualityReasons],
   });
   if (entry) appendJournalEntry(entry);
 }

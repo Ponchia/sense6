@@ -128,6 +128,7 @@ export function recordRangeResponse(track, trial, selectedInterval) {
   const correct = selectedInterval === trial.toneInterval;
   if (trial.control) {
     track.controls.push({ ...trial, selectedInterval, correct });
+    updateRangeCompletion(track);
     return track;
   }
 
@@ -161,8 +162,16 @@ export function recordRangeResponse(track, trial, selectedInterval) {
     direction,
     nextFrequencyHz: track.frequencyHz,
   });
+  updateRangeCompletion(track);
+  return track;
+}
+
+/** @param {RangeTrack} track */
+function updateRangeCompletion(track) {
   const converged =
-    track.records.length >= track.config.minTrials && track.reversals.length >= track.config.targetReversals;
+    track.records.length >= track.config.minTrials &&
+    track.reversals.length >= track.config.targetReversals &&
+    track.controls.length === track.config.controlAt.length;
   if (converged) {
     track.complete = true;
     track.completionReason = hasTechnicalCeilingEvidence(track) ? 'technical-ceiling' : 'converged';
@@ -170,7 +179,6 @@ export function recordRangeResponse(track, trial, selectedInterval) {
     track.complete = true;
     track.completionReason = hasTechnicalCeilingEvidence(track) ? 'technical-ceiling' : 'max-trials';
   }
-  return track;
 }
 
 /** @param {RangeTrack} track */
@@ -190,7 +198,7 @@ export function summarizeRange(track) {
       : null;
   return {
     thresholdHz,
-    spreadHz: reversalWindow.length >= 2 ? roundTo(range(reversalWindow), 100) : null,
+    reversalRangeHz: reversalWindow.length >= 2 ? roundTo(range(reversalWindow), 100) : null,
     atCeiling,
     settled,
     completionReason,
@@ -294,7 +302,7 @@ export function summarizePitch(tracks) {
     return {
       anchorHz: track.anchorHz,
       thresholdPercent: settled && reversalMedian !== null ? roundTo(reversalMedian, 0.1) : null,
-      spreadPercent: reversalWindow.length >= 2 ? roundTo(range(reversalWindow), 0.1) : null,
+      reversalRangePercent: reversalWindow.length >= 2 ? roundTo(range(reversalWindow), 0.1) : null,
       settled,
       completionReason,
       reversals: track.reversals.length,
@@ -321,7 +329,7 @@ export function dbToGain(db) {
 }
 
 /** @param {number} sampleRate @param {number} configuredMax */
-export function safeFrequencyCeiling(sampleRate, configuredMax = 18000) {
+export function renderingFrequencyCeiling(sampleRate, configuredMax = 18000) {
   return Math.round(Math.min(configuredMax, sampleRate * 0.42));
 }
 
@@ -350,11 +358,13 @@ function requiredElement(value, label) {
 
 /** @param {RangeTrack} track */
 function hasTechnicalCeilingEvidence(track) {
+  const recent = track.records.slice(-2);
   return (
-    track.records.filter(
+    recent.length === 2 &&
+    recent.every(
       (record) =>
         record.correct && Math.abs(record.frequencyHz - track.config.maxHz) < track.config.maxHz * 0.001,
-    ).length >= 2
+    )
   );
 }
 

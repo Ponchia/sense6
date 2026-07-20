@@ -117,6 +117,11 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
     /Experimental perception tests for curiosity and fun—not medical tests or diagnoses\./,
   );
 
+  const italianTetracromia = await readFile(new URL('it/tetracromia/index.html', DIST), 'utf8');
+  assert.match(italianTetracromia, /Fonte del metodo/);
+  assert.match(italianTetracromia, /Limite di interpretazione/);
+  assert.doesNotMatch(italianTetracromia, />Method source</);
+
   const about = await readFile(new URL('en/about/index.html', DIST), 'utf8');
   const aboutJson = JSON.parse(
     about.match(/<script type="application\/ld\+json">(.+)<\/script>/)?.[1] ?? '{}',

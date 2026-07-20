@@ -44,6 +44,8 @@ and uncertainty, but it can't turn a browser task into a clinical instrument.
 | Shell and router | `src/main.js`, `src/router.js` | Resolve locale-aware routes, mount one view, and dispose the previous view |
 | Service contracts | `src/exams/contracts.js` | Define experiment identity, metric names, and journal-comparison policy |
 | Presentation registry | `src/exams/registry.js` | Define gallery and static-page metadata plus lazy experiment loaders |
+| Protocol passports | `src/exams/protocols.js` | Freeze method versions, selectable profiles, schedule digests, stopping rules, and interpretation boundaries |
+| Evidence ledger | `src/exams/sources.js` | Classify canonical sources as method, boundary, comparator, or exact Sense6 validation evidence |
 | Experiment controllers | `src/exams/*.js`, `src/exams/*.d.ts` | Coordinate setup, response handling, phase changes, and results for one experiment; declarations define their checked public mount boundary |
 | Experiment views | `src/exams/views/*.js` | Produce pure markup for large landing or phase views without owning runtime state |
 | Domain models | `src/lib/*.js` | Implement strictly checked adaptive tracks, schedules, summaries, persistence, lifecycle behavior, and guarded state transitions |
@@ -66,8 +68,10 @@ and uncertainty, but it can't turn a browser task into a clinical instrument.
    function.
 5. Pure domain modules generate trials and summarize answers. The controller
    presents those values but doesn't duplicate the numerical model.
-6. A completed run writes a validated journal entry locally. On the canonical
-   production origin only, it also sends an allowlisted completion counter.
+6. A completed run writes its protocol passport, setup passport, quality
+   evidence, and separate measurements to a validated local journal entry.
+7. On the canonical production origin only, completion sends one allowlisted
+   aggregate counter with no result or setup data.
 
 Render tokens prevent a slower dynamic import from overwriting a newer route.
 Gallery, Tetracromia, the other experiments, About, privacy, and journal styles
@@ -88,13 +92,15 @@ only when the person explicitly saves them.
 ## Extension seams
 
 Add cross-cutting policy to a shared boundary only when at least two consumers
-need it. Current examples are experiment contracts, lifecycle cleanup,
-persistence envelopes, stable message IDs, and landing-section renderers.
+need it. Current examples are experiment contracts, protocol passports, the
+evidence ledger, lifecycle cleanup, persistence envelopes, stable message IDs,
+and landing-section renderers.
 
-Keep stimulus generation, task schedules, interpretation, and result wording
-inside the owning experiment and its domain module. A generic experiment engine
-would hide meaningful differences among color, timing, audio, and acuity
-tasks.
+Keep stimulus generation, task schedules, quality decisions, interpretation,
+and result wording inside the owning experiment and its domain module. Shared
+quality evidence is an envelope and vocabulary, not one cross-test scoring
+formula. A generic experiment engine would hide meaningful differences among
+color, timing, audio, and acuity tasks.
 
 Follow `adding-an-experiment.md` for the complete extension contract.
 Tests compare the service-contract IDs with the presentation registry, so a
@@ -105,8 +111,9 @@ partially registered experiment fails early.
 `npm run check` is the release gate. It covers formatting, strict typed
 JavaScript, locale-catalog integrity, unit coverage, production build, static
 output, browser journeys, responsive layouts, and accessibility. Chromium and
-the mobile Chromium profile run the complete journey suite. Focused critical
-journeys also run in Firefox and WebKit.
+the mobile Chromium profile run the complete journey suite. A full Screen
+Colour Lab result journey and active-run invalidation also run in Firefox and
+WebKit as the selected compatibility paths.
 
 The type gate automatically includes every module under `src/lib/`,
 `src/exams/views/`, `src/i18n/`, and `src/locales/`, plus named shared runtime
@@ -149,6 +156,11 @@ catalog progress, missing or duplicate keys, missing stable IDs, source-equal
 strings, and placeholder drift. Migrate older prose when it changes. A
 wholesale key conversion would create translation risk without a user-visible
 benefit.
+
+`src/locales/registry-copy.js` keeps coordinated experiment, result, scope, and
+evidence-role changes atomic across all catalogs. This is a migration seam, not
+a second presentation registry: keys still originate in product code, and the
+catalog audit rejects duplicates or placeholder drift.
 
 Shared shell, method, setup, and result primitives remain in the entry style
 sheet because several experiments use them. Tetracromia-owned visuals and

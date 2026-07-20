@@ -56,13 +56,28 @@ test('summary reports independent response dimensions without a composite score'
 
   assert.equal(summary.signal.medianMs, 215);
   assert.equal(summary.choice.medianMs, 310);
-  assert.equal(summary.choice.costMs, 95);
-  assert.equal(summary.choice.accuracyPercent, 75);
+  assert.equal(summary.choice.blockDifferenceMs, 95);
+  assert.equal(summary.choice.conditionalAccuracyPercent, 75);
+  assert.equal(summary.choice.scheduledAccuracyPercent, 75);
   assert.equal(summary.stability.slowestGapMs, 55);
   assert.equal(summary.stability.driftMs, 50);
   assert.equal(summary.events.wrongChoices, 1);
-  assert.equal(summary.usable, true);
+  assert.equal(summary.usable, false);
+  assert.deepEqual(summary.qualityReasons, ['choice-valid-responses-low']);
   assert.equal('score' in summary, false);
+});
+
+test('quality requires complete schedules, all catches, and no interruption', () => {
+  const records = {
+    signal: [...[200, 210, 220, 230].map((rt) => ({ outcome: 'correct', rt })), { outcome: 'catch-correct' }],
+    choice: [300, 310, 320, 330].map((rt) => ({ outcome: 'correct', rt })),
+    stability: [230, 240, 250, 260].map((rt) => ({ outcome: 'correct', rt })),
+  };
+  const expected = { signal: 4, signalScheduled: 5, choice: 4, stability: 4, catches: 1 };
+  assert.equal(summarizeRiflessi(records, expected).usable, true);
+  assert.deepEqual(summarizeRiflessi(records, { ...expected, interruptions: 1 }).qualityReasons, [
+    'timing-interrupted',
+  ]);
 });
 
 test('config overrides stay isolated to their instrument', () => {

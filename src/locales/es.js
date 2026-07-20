@@ -1,3 +1,5 @@
+import { registryRows } from './registry-copy.js';
+
 // Generated once from the former combined catalog; edit this locale directly.
 /** @type {Array<[string, string]>} */
 const rows = [
@@ -1624,5 +1626,6 @@ rows.push(
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 );
 
-export const MESSAGE_COUNT = rows.length;
-export default new Map(rows);
+const catalogRows = [...rows, ...registryRows('es')];
+export const MESSAGE_COUNT = catalogRows.length;
+export default new Map(catalogRows);

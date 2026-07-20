@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import {
   answerCurrentSoundTrial,
   captureMetrics,
+  completeUditoSetup,
   expectJournalEntry,
   installQuickUdito,
 } from './helpers/browser.js';
@@ -19,7 +20,7 @@ test('Udito completes three safe-listening instruments and keeps results separat
   await expect(page.locator('.au-instrument-visual')).toHaveCount(3);
   await expect(page.locator('.au-safety.method')).toBeVisible();
   await expect(page.locator('.au-safety-meter i')).toHaveCount(12);
-  await expect(page.locator('.au-research .source-list li')).toHaveCount(4);
+  await expect(page.locator('.au-research .source-list li')).toHaveCount(6);
   await expect(page.locator('.au-closing').getByRole('button', { name: /Open test/i })).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole('button', { name: /Toggle light and dark theme/i }).click();
@@ -33,16 +34,16 @@ test('Udito completes three safe-listening instruments and keeps results separat
   await expect(page.locator('.experiment-boundary')).toHaveText(
     /recreational experiment for curiosity and fun—not a medical test or diagnosis/i,
   );
-  const start = page.getByRole('button', { name: /Begin instrument 01/i });
+  const start = page.getByRole('button', { name: /Begin selected scope/i });
   await expect(start).toBeDisabled();
-  await page.getByRole('button', { name: /Play maximum-level reference/i }).click();
-  await expect(page.getByText(/Reference completed on the audio clock/i)).toBeVisible();
-  await page.getByLabel(/The reference is quiet and comfortable/i).check();
+  await completeUditoSetup(page);
   await expect(start).toBeEnabled();
   await page.getByLabel('Connection').selectOption('wireless');
   await expect(start).toBeDisabled();
   await page.getByRole('button', { name: /Play reference again/i }).click();
   await expect(page.getByText(/Reference completed on the audio clock/i)).toBeVisible();
+  await page.getByRole('button', { name: /audibility anchors/i }).click();
+  await page.getByLabel(/I heard all three anchors comfortably/i).check();
   await expect(start).toBeEnabled();
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await start.click();
@@ -68,6 +69,7 @@ test('Udito completes three safe-listening instruments and keeps results separat
   await page.getByRole('button', { name: /Continue to Intonazione/i }).click();
   await page.getByRole('button', { name: /Start Intonazione/i }).click();
   for (let trial = 0; trial < 4; trial += 1) await answerCurrentSoundTrial(page);
+  await page.getByRole('button', { name: /Yes, unchanged/i }).click();
 
   await expect(page.getByRole('heading', { name: /Three listening measures/i })).toBeVisible();
   await expect(page.locator('.au-metric')).toHaveCount(4);
@@ -101,6 +103,39 @@ test('Udito completes three safe-listening instruments and keeps results separat
   await expect(page.getByRole('heading', { name: /Your private measurement journal/i })).toBeVisible();
 });
 
+test('Udito focused scope ends after Portata and omits pitch placeholders', async ({ page }) => {
+  await installQuickUdito(page);
+  await page.goto('/en/udito/');
+  await page.getByRole('button', { name: /Prepare the sound lab/i }).click();
+  await page.locator('[data-action="au-scope"][data-scope="focused"]').click();
+  await completeUditoSetup(page);
+  await page.getByRole('button', { name: /Begin selected scope/i }).click();
+
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  await answerCurrentSoundTrial(page);
+  await page.getByRole('button', { name: /Begin headphone check/i }).click();
+  await answerCurrentSoundTrial(page);
+  await answerCurrentSoundTrial(page);
+  await page.getByRole('button', { name: /Continue to Portata/i }).click();
+  await page.getByRole('button', { name: /Start Portata/i }).click();
+  await answerCurrentSoundTrial(page);
+  await answerCurrentSoundTrial(page);
+  await page.getByRole('button', { name: /Yes, unchanged/i }).click();
+
+  await expect(page.getByRole('heading', { name: /Two focused listening measures/i })).toBeVisible();
+  await expect(page.locator('.au-metric')).toHaveCount(2);
+  await expect(page.getByText(/Pitch step near/i)).toHaveCount(0);
+  await expectJournalEntry(page, 'udito');
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const journal = JSON.parse(localStorage.getItem('sense6:journal') ?? 'null');
+        return journal.entries.find((entry) => entry.examId === 'udito').protocol.profileId;
+      }),
+    )
+    .toBe('focused');
+});
+
 test('German Udito stages localize generated listening labels', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'Single-browser locale journey');
   await installQuickUdito(page);
@@ -110,6 +145,8 @@ test('German Udito stages localize generated listening labels', async ({ page },
   await expect(page.locator('[data-au-reference-status]')).toContainText(
     'Referenz nach Audiouhr abgeschlossen',
   );
+  await page.locator('[data-action="au-anchors"]').click();
+  await page.locator('[data-au-anchors-confirmed]').check();
   await page.locator('[data-au-consent]').check();
   await page.locator('[data-action="au-start"]').click();
   await expect(page.locator('.au-brief__copy')).toContainText('Kopfhörer-Konfidenz');
@@ -124,10 +161,8 @@ test('the mobile Udito setup and listening runner stay inside the viewport', asy
   await installQuickUdito(page);
   await page.goto('/en/udito/');
   await page.getByRole('button', { name: /Prepare the sound lab/i }).click();
-  await page.getByRole('button', { name: /Play maximum-level reference/i }).click();
-  await expect(page.getByText(/Reference completed on the audio clock/i)).toBeVisible();
-  await page.getByLabel(/The reference is quiet and comfortable/i).check();
-  await page.getByRole('button', { name: /Begin instrument 01/i }).click();
+  await completeUditoSetup(page);
+  await page.getByRole('button', { name: /Begin selected scope/i }).click();
   await page.getByRole('button', { name: /Start practice/i }).click();
   await expect(page.locator('[data-au-response="0"]')).toBeEnabled();
 
@@ -193,7 +228,7 @@ test('audio-clock interruption keeps the gate closed and persistent playback fai
   await page.goto('/en/udito/');
   await page.getByRole('button', { name: /Prepare the sound lab/i }).click();
   await page.getByLabel(/The reference is quiet and comfortable/i).check();
-  const start = page.getByRole('button', { name: /Begin instrument 01/i });
+  const start = page.getByRole('button', { name: /Begin selected scope/i });
   await page.getByRole('button', { name: /Play maximum-level reference/i }).click();
   await page.waitForTimeout(90);
   await page.evaluate(() => window.__trackedUditoAudioContext.suspend());
@@ -202,6 +237,8 @@ test('audio-clock interruption keeps the gate closed and persistent playback fai
 
   await page.getByRole('button', { name: /Play reference again/i }).click();
   await expect(page.getByText(/Reference completed on the audio clock/i)).toBeVisible();
+  await page.getByRole('button', { name: /audibility anchors/i }).click();
+  await page.getByLabel(/I heard all three anchors comfortably/i).check();
   await expect(start).toBeEnabled();
   await start.click();
   await page.getByRole('button', { name: /Start practice/i }).click();
@@ -242,10 +279,8 @@ test('visibility changes replay only uncommitted trials and advance after commit
   );
   await page.goto('/en/udito/');
   await page.getByRole('button', { name: /Prepare the sound lab/i }).click();
-  await page.getByRole('button', { name: /Play maximum-level reference/i }).click();
-  await expect(page.getByText(/Reference completed on the audio clock/i)).toBeVisible();
-  await page.getByLabel(/The reference is quiet and comfortable/i).check();
-  await page.getByRole('button', { name: /Begin instrument 01/i }).click();
+  await completeUditoSetup(page);
+  await page.getByRole('button', { name: /Begin selected scope/i }).click();
   await page.getByRole('button', { name: /Start practice/i }).click();
 
   const playingId = await page.locator('[data-au-runner]').getAttribute('data-trial-id');
@@ -310,10 +345,8 @@ test('short landscape runner reserves non-overlapping status, controls, and feed
   );
   await page.goto('/en/udito/');
   await page.getByRole('button', { name: /Prepare the sound lab/i }).click();
-  await page.getByRole('button', { name: /Play maximum-level reference/i }).click();
-  await expect(page.getByText(/Reference completed on the audio clock/i)).toBeVisible();
-  await page.getByLabel(/The reference is quiet and comfortable/i).check();
-  await page.getByRole('button', { name: /Begin instrument 01/i }).click();
+  await completeUditoSetup(page);
+  await page.getByRole('button', { name: /Begin selected scope/i }).click();
   await page.getByRole('button', { name: /Start practice/i }).click();
   await expect(page.locator('[data-au-response="0"]')).toBeEnabled();
   await answerCurrentSoundTrial(page);
@@ -374,10 +407,8 @@ test('caution copies retain controls, interruptions, context, and visible journa
   await page.goto('/en/udito/');
   await page.evaluate(() => localStorage.setItem('sense6:journal', '{malformed'));
   await page.getByRole('button', { name: /Prepare the sound lab/i }).click();
-  await page.getByRole('button', { name: /Play maximum-level reference/i }).click();
-  await expect(page.getByText(/Reference completed on the audio clock/i)).toBeVisible();
-  await page.getByLabel(/The reference is quiet and comfortable/i).check();
-  await page.getByRole('button', { name: /Begin instrument 01/i }).click();
+  await completeUditoSetup(page);
+  await page.getByRole('button', { name: /Begin selected scope/i }).click();
   await page.getByRole('button', { name: /Start practice/i }).click();
   await answerCurrentSoundTrial(page);
   await page.getByRole('button', { name: /Begin headphone check/i }).click();
@@ -392,6 +423,7 @@ test('caution copies retain controls, interruptions, context, and visible journa
   await page.getByRole('button', { name: /Start Intonazione/i }).click();
   await answerCurrentSoundTrial(page);
   await answerCurrentSoundTrial(page);
+  await page.getByRole('button', { name: /Yes, unchanged/i }).click();
 
   await expect(page.getByRole('alert')).toContainText(/Journal entry not saved/i);
   await expect(page.getByRole('alert')).toContainText(/can still be copied/i);

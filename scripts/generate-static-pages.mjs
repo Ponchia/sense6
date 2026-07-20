@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { ABOUT_DATE_MODIFIED, aboutCopy, aboutMarkup } from '../src/about.js';
 import { CRAWLER_POLICY, renderRobots } from '../src/crawler-policy.js';
 import { EXAMS } from '../src/exams/registry.js';
+import { SOURCE_ROLE_LABELS } from '../src/exams/sources.js';
 import { journalCopy } from '../src/journal-copy.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
 import { privacyCopy, privacyHtml } from '../src/privacy.js';
@@ -236,8 +237,8 @@ function examMarkup(definition, locale, tr) {
       <h2>${escapeHtml(tr('Research trail'))}</h2>
       <ul>${definition.sources
         .map(
-          ([label, href]) =>
-            `<li><a href="${escapeAttribute(href)}" rel="noreferrer">${escapeHtml(label)}</a></li>`,
+          ({ label, href, role }) =>
+            `<li><strong>${escapeHtml(tr(sourceRoleLabel(role)))}:</strong> <a href="${escapeAttribute(href)}" rel="noreferrer">${escapeHtml(label)}</a></li>`,
         )
         .join('')}</ul>
     </section>
@@ -347,7 +348,7 @@ function examData(definition, locale, path, tr) {
     applicationCategory: 'EducationalApplication',
     isAccessibleForFree: true,
     inLanguage: locale,
-    citation: definition.sources.map(([, href]) => href),
+    citation: definition.sources.map(({ href }) => href),
   };
 }
 
@@ -386,7 +387,7 @@ async function writeDiscoveryFiles() {
       `- [${definition.name}](${ORIGIN}/en/${definition.route}/): ${definition.blurb} ${definition.limit}`,
   ).join(
     '\n',
-  )}\n\n## Research sources\n\n${EXAMS.flatMap((definition) => definition.sources.map(([label, href]) => `- ${definition.name}: [${label}](${href})`)).join('\n')}\n`;
+  )}\n\n## Research sources\n\n${EXAMS.flatMap((definition) => definition.sources.map(({ label, href, role }) => `- ${definition.name} (${sourceRoleLabel(role)}): [${label}](${href})`)).join('\n')}\n`;
   await writeFile(join(DIST, 'llms.txt'), llms);
 }
 
@@ -410,6 +411,10 @@ function escapeHtml(value) {
 
 function escapeAttribute(value) {
   return escapeHtml(value).replaceAll('\n', ' ');
+}
+
+function sourceRoleLabel(role) {
+  return SOURCE_ROLE_LABELS[role];
 }
 
 function escapeRegExp(value) {

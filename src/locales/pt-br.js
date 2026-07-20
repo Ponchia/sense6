@@ -1,3 +1,5 @@
+import { registryRows } from './registry-copy.js';
+
 // Brazilian Portuguese catalog; edit this locale directly.
 /** @type {Array<[string, string]>} */
 const rows = [
@@ -1615,5 +1617,6 @@ rows.push(
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 );
 
-export const MESSAGE_COUNT = rows.length;
-export default new Map(rows);
+const catalogRows = [...rows, ...registryRows('pt-br')];
+export const MESSAGE_COUNT = catalogRows.length;
+export default new Map(catalogRows);

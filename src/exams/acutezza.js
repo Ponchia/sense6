@@ -7,7 +7,6 @@ import {
   CARD_WIDTH_MM,
   contrastGrays,
   createAcuityTrack,
-  createMeridianSchedule,
   createOrientationSchedule,
   estimateViewingDistance,
   landoltDiameterCssPixels,
@@ -19,14 +18,14 @@ import {
   summarizeAcuity,
   summarizeBlindSpot,
   summarizeContrastCost,
-  summarizeMeridians,
 } from '../lib/acuity.js';
 import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
 import { createExamLifecycle } from '../lib/lifecycle.js';
-import { drawLandoltRing, drawMeridianField } from '../lib/optotypes.js';
+import { drawLandoltRing } from '../lib/optotypes.js';
 import { seededRandom } from '../lib/random.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
+import { protocolPassport } from './protocols.js';
 import { ACUTEZZA_INSTRUMENTS, acutezzaIntroMarkup } from './views/acutezza-intro.js';
 
 const STORAGE_KEY = 'sense6:acutezza:last';
@@ -45,6 +44,7 @@ export function mount(context) {
     lifecycle,
     locale: context.locale,
     config: runtimeConfig(),
+    selectedScope: 'standard',
     session: null,
     activeTrial: null,
     responseOpen: false,
@@ -91,10 +91,27 @@ function renderPreparation() {
       <div class="ac-setup__grid"><div class="ac-setup__copy"><p class="ui-eyebrow">Setup / adult near-vision experiment</p><h1>Stable screen.<br>Steady distance.<br>One eye.</h1><p class="ac-lede">Use a laptop, tablet, or monitor without glare. Reset browser zoom, keep brightness comfortable, and leave the display still after calibration.</p>
         <label class="ac-field">Correction during this run<select data-ac-correction><option value="none">No correction</option><option value="glasses">Glasses</option><option value="contacts">Contact lenses</option></select></label>
         <label class="ac-field">First eye<select data-ac-eye-order><option value="right">Right eye first</option><option value="left">Left eye first</option></select></label>
-        <label class="ac-consent"><input type="checkbox" data-ac-consent><span><strong class="experiment-boundary">I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.</strong>I am 18 or older; I will use my usual correction for this distance; I can cover either eye without pressing it; I understand this is not an eye examination.</span></label>
+        <fieldset class="ac-scope-picker"><legend>Choose this run's scope</legend>${acuityScopeButton('focused', 'Focused Sharpness', '24 interactions per eye')}${acuityScopeButton('standard', 'Sharpness + nominal contrast', '44 interactions per eye')}</fieldset>
+        <label class="ac-consent"><input type="checkbox" data-ac-consent><span><strong class="experiment-boundary">I understand this is a recreational experiment for curiosity and fun—not a medical test or diagnosis.</strong> I am 18 or older; I will use my usual correction for this distance; I can cover either eye without pressing it; I understand this is not an eye examination.</span></label>
         <button class="ui-button ui-button--lg" type="button" data-action="ac-card" disabled>Calibrate the screen <span aria-hidden="true">→</span></button></div>
         <aside class="ac-setup__rules" aria-label="Acutezza setup rules"><p class="ui-eyebrow">Setup contract</p><strong>01 / 03</strong><ol><li>Match a physical card</li><li>Estimate viewing distance</li><li>Lock display geometry</li></ol><dl><div><dt>Camera</dt><dd>Not used</dd></div><div><dt>Upload</dt><dd>None</dd></div><div><dt>Result</dt><dd>Run relative</dd></div></dl></aside>
       </div></section>`);
+}
+
+/** @param {'focused' | 'standard'} id @param {string} label @param {string} detail */
+function acuityScopeButton(id, label, detail) {
+  const selected = state.selectedScope === id;
+  return `<button class="ac-scope-option ${selected ? 'is-selected' : ''}" type="button" data-action="ac-scope" data-scope="${id}" aria-pressed="${selected}"><strong>${label}</strong><small>${detail}</small></button>`;
+}
+
+/** @param {'focused' | 'standard'} scope */
+function selectAcuityScope(scope) {
+  state.selectedScope = scope;
+  for (const button of state.app.querySelectorAll('[data-action="ac-scope"]')) {
+    const selected = button.dataset.scope === scope;
+    button.classList.toggle('is-selected', selected);
+    button.setAttribute('aria-pressed', String(selected));
+  }
 }
 
 function beginCalibration() {
@@ -103,12 +120,14 @@ function beginCalibration() {
   state.session = {
     random: seededRandom(`${Date.now()}-${Math.random()}`),
     correction: state.app.querySelector('[data-ac-correction]')?.value ?? 'none',
+    scope: state.selectedScope,
     eyes: firstEye === 'right' ? ['right', 'left'] : ['left', 'right'],
     eyeIndex: 0,
     eyeResults: [],
     calibration: { state: 'invalid', valid: false, readings: [] },
     contrast: state.config.low.contrast,
     interruptions: 0,
+    distanceRecheckPassed: null,
   };
   renderCardCalibration();
 }
@@ -262,7 +281,7 @@ function acceptDistance() {
     spreadPercent: state.session.pendingDistance.spreadPercent,
     state: 'measured',
   });
-  renderContrastCheck();
+  continueAfterDistance();
 }
 
 function renderManualDistance() {
@@ -280,7 +299,16 @@ function confirmManualDistance() {
     spreadPercent: null,
     state: 'assumed',
   });
-  renderContrastCheck();
+  continueAfterDistance();
+}
+
+function continueAfterDistance() {
+  if (state.session.scope === 'focused') {
+    state.session.contrast = null;
+    lockCalibration();
+  } else {
+    renderContrastCheck();
+  }
 }
 
 function renderContrastCheck({ stronger = false } = {}) {
@@ -371,9 +399,6 @@ function beginEye() {
           random: state.session.random,
         })
       : null,
-    meridianSchedule: createMeridianSchedule({ ...state.config.meridian, random: state.session.random }),
-    meridianRecords: [],
-    meridianIndex: 0,
   };
   if (renderAcuityRunner()) prepareAcuityTrial();
 }
@@ -510,12 +535,7 @@ function renderStageTransition(completed) {
       'ac-next-acuity',
     );
   }
-  eye.stage = 'meridian';
-  const note =
-    completed === 'high'
-      ? 'Contrasto is unavailable on this setup, so no low-contrast value will be inferred.'
-      : 'High- and low-contrast estimates remain separate in the result.';
-  renderTransition('Threshold tasks complete', note, 'Continue to Meridiani', 'ac-next-meridian');
+  finishEye();
 }
 
 function renderTransition(eyebrow, title, button, action) {
@@ -537,46 +557,6 @@ function continueAcuity() {
   if (renderAcuityRunner()) prepareAcuityTrial();
 }
 
-function renderMeridianRunner() {
-  if (!ensureGeometry()) return;
-  document.body.classList.add('lab-mode', 'ac-running');
-  const eye = state.session.currentEye;
-  if (eye.meridianIndex >= eye.meridianSchedule.length) return finishEye();
-  state.activeTrial = withTrialIdentity(eye.meridianSchedule[eye.meridianIndex]);
-  state.responseOpen = true;
-  state.app.innerHTML = `<section class="ac-runner ac-meridian-runner" data-ac-meridian-runner data-ac-trial-id="${state.activeTrial.id}"><header class="ac-runner__header"><div><p class="ui-eyebrow">03 / Meridiani</p><h1 tabindex="-1" data-ac-runner-heading>${t('{eye} — {instrument}', { eye: t(eyeLabel(eye.eye)), instrument: 'Meridiani' })}</h1></div><span>${eye.meridianIndex + 1} / ${eye.meridianSchedule.length}</span><button type="button" data-action="ac-stop">Stop safely</button></header><div class="ac-meridian"><p>Without moving closer, which line field looks clearer?</p><div class="ac-meridian__fields"><canvas data-ac-meridian="left" aria-label="Left line field"></canvas><canvas data-ac-meridian="right" aria-label="Right line field"></canvas></div><div class="ac-meridian__choices"><button type="button" data-ac-meridian-choice="left"><span aria-hidden="true">←</span> Left clearer <small>1</small></button><button type="button" data-ac-meridian-choice="equal">No difference <small>2</small></button><button type="button" data-ac-meridian-choice="right">Right clearer <span aria-hidden="true">→</span><small>3</small></button></div><div class="ac-feedback" data-ac-feedback aria-live="polite"></div></div><footer class="ac-runner__footer"><span>Two repeated scales</span><span>Changing pixel phase</span><span>No astigmatism claim</span></footer></section>`;
-  drawCurrentMeridians();
-  state.lifecycle.present(state.app, { focus: '[data-ac-runner-heading]' });
-}
-
-function drawCurrentMeridians() {
-  const size = Math.max(120, Math.min(210, (window.innerWidth - 64) / 2, window.innerHeight - 420));
-  for (const side of ['left', 'right']) {
-    const canvas = state.app.querySelector(`[data-ac-meridian="${side}"]`);
-    const angleDegrees = state.activeTrial[`${side}Angle`];
-    drawMeridianField(canvas, {
-      angleDegrees,
-      scale: state.activeTrial.scale,
-      phase: state.activeTrial.phase,
-      boxCssPx: size,
-    });
-    canvas.dataset.angle = String(angleDegrees);
-  }
-}
-
-function chooseMeridian(choice) {
-  if (!state.responseOpen || !state.activeTrial || !state.session?.currentEye) return;
-  state.responseOpen = false;
-  const trial = state.activeTrial;
-  state.session.currentEye.meridianRecords.push({ ...trial, choice });
-  state.session.currentEye.meridianIndex += 1;
-  for (const button of state.app.querySelectorAll('[data-ac-meridian-choice]')) button.disabled = true;
-  state.app.querySelector('[data-ac-feedback]').textContent = t('Comparison recorded.');
-  trial.responseCommitted = true;
-  state.pendingAdvance = true;
-  state.feedbackTimer = window.setTimeout(advanceCommittedTrial, state.config.feedbackMs);
-}
-
 function finishEye() {
   if (!ensureGeometry()) return;
   clearRuntime();
@@ -585,14 +565,12 @@ function finishEye() {
   const high = summarizeAcuity(eye.high);
   const low = eye.low ? summarizeAcuity(eye.low) : null;
   const contrastCost = summarizeContrastCost(high, low);
-  const meridian = summarizeMeridians(eye.meridianRecords, state.config.meridian);
   state.session.eyeResults.push({
     eye: eye.eye,
     high,
     low,
     contrastCostPercent: contrastCost.value,
     contrastCostBounded: contrastCost.bounded,
-    meridian,
   });
   state.session.currentEye = null;
   if (state.session.eyeIndex === 0) renderBetweenEyes();
@@ -604,7 +582,7 @@ function renderBetweenEyes() {
   const result = state.session.eyeResults[0];
   const nextEye = state.session.eyes[1];
   renderScreen(
-    `<section class="ac-between ui-container ui-container--wide"><div><p class="ui-eyebrow">First eye complete</p><h1>${eyeLabel(result.eye)} recorded.<br>Rest before switching.</h1><p>Uncover both eyes and blink normally. The completed eye is retained in this session.</p></div><aside><p class="ui-eyebrow">Provisional observations</p><strong>${formatBoundedAcuity(result.high)}</strong><span>high-contrast angular gap</span><p>${result.meridian.stable ? `Stable ${result.meridian.preferredAngle}° preference appeared.` : 'No stable meridional preference appeared.'}</p></aside><div class="ui-cluster"><button class="ui-button ui-button--lg" type="button" data-action="ac-next-eye">Check distance, then test ${eyeLabel(nextEye)} <span aria-hidden="true">→</span></button><button class="ui-button ui-button--ghost" type="button" data-action="ac-finish-one-eye">Finish with one eye</button></div></section>`,
+    `<section class="ac-between ui-container ui-container--wide"><div><p class="ui-eyebrow">First eye complete</p><h1>${eyeLabel(result.eye)} recorded.<br>Rest before switching.</h1><p>Uncover both eyes and blink normally. The completed eye is retained in this session.</p></div><aside><p class="ui-eyebrow">Provisional observation</p><strong>${formatBoundedAcuity(result.high)}</strong><span>high-contrast angular gap estimate</span><p>Any nominal low-contrast condition remains separate.</p></aside><div class="ui-cluster"><button class="ui-button ui-button--lg" type="button" data-action="ac-next-eye">Check distance, then test ${eyeLabel(nextEye)} <span aria-hidden="true">→</span></button><button class="ui-button ui-button--ghost" type="button" data-action="ac-finish-one-eye">Finish with one eye</button></div></section>`,
   );
 }
 
@@ -629,6 +607,7 @@ function finishDistanceRecheck(distanceMm) {
     return renderCalibrationInvalid(
       'The between-eye distance check differed by more than 20%. Recalibrate before continuing.',
     );
+  state.session.distanceRecheckPassed = true;
   renderScreen(
     `<section class="ac-distance-result ui-container"><span class="ac-distance-result__mark" aria-hidden="true">✓</span><p class="ui-eyebrow">Distance coherent</p><h1>The setup remains close to the original distance.</h1><p>The quick check differed by ${formatNumber(difference * 100, { maximumFractionDigits: 1 })}%.</p><button class="ui-button ui-button--lg" type="button" data-action="ac-confirm-next-eye">${t('Prepare {eye}', { eye: t(eyeLabel(state.session.eyes[1])) })} <span aria-hidden="true">→</span></button></section>`,
   );
@@ -637,6 +616,7 @@ function finishDistanceRecheck(distanceMm) {
 function confirmNextEye() {
   if (!geometryMatches(state.session.calibration.geometry, captureGeometry()))
     return renderCalibrationInvalid('The viewport changed between eyes. Recalibrate before continuing.');
+  state.session.distanceRecheckPassed = true;
   renderEyeBrief();
 }
 
@@ -650,25 +630,35 @@ function renderResults() {
   const controlCorrect = summaries.reduce((sum, result) => sum + result.controlCorrect, 0);
   const controlCount = summaries.reduce((sum, result) => sum + result.controls, 0);
   const bounded = summaries.some((result) => result.atFloor || result.atCeiling);
-  const usable =
-    state.session.calibration.valid && (controlCount === 0 || controlCorrect >= controlCount - 1);
-  const setupQuality =
-    usable && !bounded ? 'Setup checks coherent' : usable ? 'Interpret with caution' : 'Run unusable';
-  state.session.result = { setupQuality, usable, bounded, controlCorrect, controlCount };
+  const controlsUsable = summaries.every((result) => result.controls >= 2 && result.controlCorrect >= 1);
+  const controlsCoherent = summaries.every(
+    (result) => result.controls >= 2 && result.controlCorrect === result.controls,
+  );
+  const usable = state.session.calibration.valid && controlsUsable;
+  const strongest =
+    usable &&
+    controlsCoherent &&
+    !bounded &&
+    state.session.calibration.state === 'measured' &&
+    state.session.interruptions === 0 &&
+    state.session.distanceRecheckPassed !== false;
+  const setupQuality = strongest
+    ? 'Setup checks coherent'
+    : usable
+      ? 'Interpret with caution'
+      : 'Run unusable';
+  state.session.result = { setupQuality, usable, strongest, bounded, controlCorrect, controlCount };
   saveLast({ setupQuality, eyes: state.session.eyeResults.length, recordedAt: Date.now() });
-  saveJournalResult({ setupQuality, usable, bounded, controlCorrect, controlCount });
-  document.title = t('Your calibrated sharpness profile — Acutezza | Sense6');
+  saveJournalResult({ setupQuality, usable, strongest, bounded, controlCorrect, controlCount });
+  document.title = t('Your calibrated sharpness observations — Acutezza | Sense6');
   renderScreen(
-    `<section class="ac-results ui-container ui-container--wide"><button class="back-link" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button><header class="ac-results__hero"><div><p class="ui-eyebrow">Acutezza / this display / this distance</p><h1>Separate observations.<br><em>No vision label.</em></h1><p>${usable ? 'The calibration and task controls support interpretation of this run at the stated distance.' : 'A calibration or task-control check was limited. Repeat before comparing runs.'}</p></div><div class="ac-results__stamp ${usable && !bounded ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>${String(state.session.eyeResults.length).padStart(2, '0')} / 02</strong></div></header><div class="ac-eye-results">${state.session.eyeResults.map(eyeResultMarkup).join('')}</div><div class="ac-context-grid"><article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the target.</h2><dl><div><dt>Correction</dt><dd>${correctionLabel(state.session.correction)}</dd></div><div><dt>Distance</dt><dd>${Math.round(state.session.calibration.distanceMm / 10)} cm · ${t(state.session.calibration.state)}</dd></div><div><dt>Card scale</dt><dd>${Math.round(state.session.calibration.cardWidthCssPx)} CSS px</dd></div><div><dt>Low contrast</dt><dd>${contrastLabel()}</dd></div><div><dt>Surround theme</dt><dd>${state.session.theme}</dd></div><div><dt>Task controls</dt><dd>${controlCorrect} / ${controlCount}</dd></div><div><dt>Interruptions</dt><dd>${state.session.interruptions}</dd></div></dl></article><article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Calibrated experiment, not an eye examination.</h2><p>Acutezza describes one self-administered run on this display at this estimated distance. It is not vision screening, diagnosis, or a prescription.</p><p>Do not infer normal vision, 20/20, refractive error, cylinder power, or an astigmatism axis.</p></article></div><aside class="ac-results__safety"><strong>Sudden changes need care, not another run.</strong><p>Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.</p></aside><div class="ui-cluster ac-results__actions"><button class="ui-button" type="button" data-action="ac-restart">Run again</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-copy">Copy result summary</button></div></section>`,
+    `<section class="ac-results ui-container ui-container--wide"><button class="back-link" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button><header class="ac-results__hero"><div><p class="ui-eyebrow">Acutezza / this display / this distance</p><h1>Separate observations.<br><em>No vision label.</em></h1><p>${strongest ? 'Measured calibration and every per-condition task-control pair support this run at the stated distance.' : usable ? 'At least one calibration, bound, interruption, or control condition requires caution before comparison.' : 'A per-condition task-control check failed. Repeat before interpreting this run.'}</p></div><div class="ac-results__stamp ${strongest ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>${String(state.session.eyeResults.length).padStart(2, '0')} / 02</strong></div></header><div class="ac-eye-results">${state.session.eyeResults.map(eyeResultMarkup).join('')}</div><div class="ac-context-grid"><article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the target.</h2><dl><div><dt>Scope</dt><dd>${state.session.scope === 'focused' ? 'Focused Sharpness' : 'Sharpness + nominal contrast'}</dd></div><div><dt>Correction</dt><dd>${correctionLabel(state.session.correction)}</dd></div><div><dt>Distance</dt><dd>${Math.round(state.session.calibration.distanceMm / 10)} cm · ${t(state.session.calibration.state)}</dd></div><div><dt>Second-eye distance recheck</dt><dd>${state.session.distanceRecheckPassed === null ? 'Not applicable' : state.session.distanceRecheckPassed ? 'Passed' : 'Not passed'}</dd></div><div><dt>Card scale</dt><dd>${Math.round(state.session.calibration.cardWidthCssPx)} CSS px</dd></div><div><dt>Low contrast</dt><dd>${contrastLabel()}</dd></div><div><dt>Surround theme</dt><dd>${state.session.theme}</dd></div><div><dt>Task controls</dt><dd>${controlCorrect} / ${controlCount}, assessed per condition</dd></div><div><dt>Interruptions</dt><dd>${state.session.interruptions}</dd></div></dl></article><article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Calibrated experiment, not an eye examination.</h2><p>Acutezza describes one self-administered run on this display at this estimated distance. It is not vision screening, diagnosis, or a prescription.</p><p>Do not infer normal vision, 20/20, refractive error, cylinder power, or an astigmatism axis. Meridiani scoring is suspended.</p></article></div><aside class="ac-results__safety"><strong>Sudden changes need care, not another run.</strong><p>Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.</p></aside><div class="ui-cluster ac-results__actions"><button class="ui-button" type="button" data-action="ac-restart">Repeat this scope independently</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-copy">Copy result summary</button></div></section>`,
   );
 }
 
 function eyeResultMarkup(result) {
   const lowValue = result.low ? formatBoundedAcuity(result.low) : 'Unavailable';
   const cost = result.contrastCostPercent;
-  const meridianValue = result.meridian.stable
-    ? `${result.meridian.preferredAngle}° preference`
-    : 'No stable preference';
   const costDetail = result.contrastCostBounded
     ? 'Contrast cost is indeterminate because an estimate meets the display range.'
     : cost === null
@@ -676,10 +666,7 @@ function eyeResultMarkup(result) {
       : t('{cost}% gap size versus high contrast', {
           cost: `${cost >= 0 ? '+' : ''}${formatNumber(cost)}`,
         });
-  const consistency = t('{consistency}% leading-choice consistency', {
-    consistency: formatNumber(result.meridian.consistencyPercent),
-  });
-  return `<section class="ac-eye-result" aria-label="${eyeLabel(result.eye)}"><header><p class="ui-eyebrow">${eyeLabel(result.eye)}</p><h2>Three measures for this eye.</h2></header><div class="ac-metric-grid">${resultCard('01', 'High-contrast angular gap', formatBoundedAcuity(result.high), acuityInterval(result.high), acuityInterpretation(result.high, 'A calibrated angular threshold from forced-choice trials.'))}${resultCard('02', 'Low-contrast angular gap', lowValue, result.low ? acuityInterval(result.low) : 'not measured', result.low ? `${costDetail} A within-run difference, not clinical contrast sensitivity.` : 'The display could not preserve a dependable low-contrast condition.')}${resultCard('03', 'Meridional consistency', meridianValue, consistency, result.meridian.stable ? 'The preference repeated at both scales. It does not identify astigmatism.' : 'No preference met the replication rule across scale and pixel phase.')}</div></section>`;
+  return `<section class="ac-eye-result" aria-label="${eyeLabel(result.eye)}"><header><p class="ui-eyebrow">${eyeLabel(result.eye)}</p><h2>${result.low ? 'Two separate conditions' : 'Focused sharpness'} for this eye.</h2></header><div class="ac-metric-grid">${resultCard('01', 'High-contrast angular gap estimate', formatBoundedAcuity(result.high), acuityInterval(result.high), acuityInterpretation(result.high, 'A model-based angular-gap estimate from forced-choice trials.'))}${result.low ? resultCard('02', 'Nominal low-contrast angular gap estimate', lowValue, acuityInterval(result.low), `${costDetail} A within-run difference, not clinical contrast sensitivity.`) : ''}</div></section>`;
 }
 
 function resultCard(index, label, value, detail, copy) {
@@ -690,7 +677,7 @@ function copyResults() {
   if (!state.session?.result) return;
   const resultState = state.session.result;
   const lines = [
-    t('Acutezza — calibrated sharpness profile'),
+    t('Acutezza — calibrated sharpness observations'),
     t('Setup: {distance} cm ({distanceState}); correction: {correction}', {
       distance: Math.round(state.session.calibration.distanceMm / 10),
       distanceState: t(state.session.calibration.state),
@@ -701,22 +688,16 @@ function copyResults() {
   ];
   for (const result of state.session.eyeResults)
     lines.push(
-      t(
-        '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
-        {
-          eye: t(eyeLabel(result.eye)),
-          gap: clipboardAcuity(result.high),
-          low: result.low ? clipboardAcuity(result.low) : t('Unavailable'),
-          cost: result.contrastCostBounded
-            ? t('indeterminate (display-range bound)')
-            : result.contrastCostPercent === null
-              ? t('not measured')
-              : `${result.contrastCostPercent >= 0 ? '+' : ''}${formatNumber(result.contrastCostPercent)}%`,
-          meridians: result.meridian.stable
-            ? `${result.meridian.preferredAngle}° ${t('preference')}`
-            : t('no stable preference'),
-        },
-      ),
+      t('{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}', {
+        eye: t(eyeLabel(result.eye)),
+        gap: clipboardAcuity(result.high),
+        low: result.low ? clipboardAcuity(result.low) : t('Unavailable'),
+        cost: result.contrastCostBounded
+          ? t('indeterminate (display-range bound)')
+          : result.contrastCostPercent === null
+            ? t('not measured')
+            : `${result.contrastCostPercent >= 0 ? '+' : ''}${formatNumber(result.contrastCostPercent)}%`,
+      }),
     );
   if (!resultState.usable || resultState.bounded)
     lines.push(t('Interpret with caution; repeat before comparing runs.'));
@@ -742,11 +723,9 @@ function pauseRun() {
 
 function resumeRun() {
   if (!ensureGeometry()) return;
-  const stage = state.session.currentEye.stage;
   const shouldAdvance = state.pendingAdvance || state.activeTrial?.responseCommitted;
   state.pendingAdvance = false;
   state.activeTrial = null;
-  if (stage === 'meridian') return renderMeridianRunner();
   if (renderAcuityRunner()) prepareAcuityTrial();
   if (!shouldAdvance)
     state.app.querySelector('[data-ac-status]').textContent = t('The unanswered target is presented again.');
@@ -818,9 +797,7 @@ function wireEvents(signal) {
     'click',
     (event) => {
       const direction = event.target.closest('[data-ac-direction]');
-      const meridian = event.target.closest('[data-ac-meridian-choice]');
       if (direction) chooseDirection(direction.dataset.acDirection);
-      if (meridian) chooseMeridian(meridian.dataset.acMeridianChoice);
       const action = event.target.closest('[data-action]');
       if (!action) return;
       const actions = {
@@ -829,6 +806,9 @@ function wireEvents(signal) {
         'ac-prepare': renderPreparation,
         'ac-prepare-closing': renderPreparation,
         'ac-method': () => state.app.querySelector('#ac-method')?.scrollIntoView({ behavior: 'smooth' }),
+        'ac-scope': () => {
+          if (['focused', 'standard'].includes(action.dataset.scope)) selectAcuityScope(action.dataset.scope);
+        },
         'ac-card': beginCalibration,
         'ac-card-smaller': () => adjustCard(-4),
         'ac-card-larger': () => adjustCard(4),
@@ -846,7 +826,6 @@ function wireEvents(signal) {
         'ac-first-eye': renderEyeBrief,
         'ac-begin-eye': beginEye,
         'ac-next-acuity': continueAcuity,
-        'ac-next-meridian': renderMeridianRunner,
         'ac-next-eye': startNextEye,
         'ac-confirm-next-eye': confirmNextEye,
         'ac-finish-one-eye': renderResults,
@@ -885,21 +864,6 @@ function wireEvents(signal) {
         return recordSweep();
       }
       if (!state.responseOpen) return;
-      if (state.session?.currentEye?.stage === 'meridian') {
-        const choices = {
-          1: 'left',
-          ArrowLeft: 'left',
-          2: 'equal',
-          ArrowDown: 'equal',
-          3: 'right',
-          ArrowRight: 'right',
-        };
-        if (choices[event.key]) {
-          event.preventDefault();
-          chooseMeridian(choices[event.key]);
-        }
-        return;
-      }
       const direction = ACUITY_DIRECTIONS.find(
         (entry) =>
           entry.key === event.key ||
@@ -947,8 +911,7 @@ function advanceCommittedTrial() {
   state.feedbackTimer = 0;
   state.pendingAdvance = false;
   state.activeTrial = null;
-  if (state.session.currentEye.stage === 'meridian') renderMeridianRunner();
-  else prepareAcuityTrial();
+  prepareAcuityTrial();
 }
 
 function withTrialIdentity(trial) {
@@ -1019,7 +982,7 @@ function contrastLabel() {
 }
 
 function formatArcmin(value) {
-  return `${formatNumber(value, { maximumFractionDigits: 2 })} arcmin`;
+  return `${formatNumber(value, { maximumFractionDigits: 1 })} arcmin`;
 }
 
 function formatBoundedAcuity(result) {
@@ -1028,7 +991,7 @@ function formatBoundedAcuity(result) {
 }
 
 function acuityInterval(result) {
-  const interval = t('{lower}–{upper} uncertainty interval', {
+  const interval = t('{lower}–{upper} 90% model interval', {
     lower: formatArcmin(result.lowerArcmin),
     upper: formatArcmin(result.upperArcmin),
   });
@@ -1051,7 +1014,7 @@ function acuityInterpretation(result, fallback) {
 function clipboardAcuity(result) {
   const bound = acuityBoundLabel(result);
   const details = [
-    `${formatArcmin(result.lowerArcmin)}–${formatArcmin(result.upperArcmin)} interval`,
+    `${formatArcmin(result.lowerArcmin)}–${formatArcmin(result.upperArcmin)} 90% model interval`,
     `controls ${result.controlCorrect} / ${result.controls}`,
   ];
   if (bound) details.push(bound);
@@ -1073,24 +1036,20 @@ function saveLast(result) {
   }
 }
 
-function saveJournalResult({ setupQuality, usable, bounded, controlCorrect, controlCount }) {
+function saveJournalResult({ setupQuality, usable, strongest, bounded, controlCorrect, controlCount }) {
   const measurements = state.session.eyeResults.flatMap((eye) => {
     const prefix = eye.eye;
     return [
       acuityMeasurement(`${prefix}-high`, eye.high),
       ...(eye.low ? [acuityMeasurement(`${prefix}-low`, eye.low)] : []),
-      { id: `${prefix}-contrast-cost`, value: eye.contrastCostPercent, unit: '%' },
-      {
-        id: `${prefix}-meridian`,
-        value: eye.meridian.consistencyPercent,
-        unit: '%',
-      },
+      ...(eye.low ? [{ id: `${prefix}-contrast-cost`, value: eye.contrastCostPercent, unit: '%' }] : []),
     ];
   });
   const entry = createJournalEntry({
     examId: 'acutezza',
     locale: state.locale,
-    quality: usable && !bounded ? 'usable' : usable ? 'caution' : 'limited',
+    quality: strongest ? 'usable' : usable ? 'caution' : 'limited',
+    protocol: protocolPassport('acutezza', state.session.scope),
     setup: {
       ...captureDisplayPassport(),
       correction: state.session.correction,
@@ -1098,17 +1057,30 @@ function saveJournalResult({ setupQuality, usable, bounded, controlCorrect, cont
       calibrationState: state.session.calibration.state,
       cardWidthCssPx: Math.round(state.session.calibration.cardWidthCssPx),
       contrastPercent: state.session.contrast === null ? null : state.session.contrast * 100,
+      contrastLinear: state.session.contrast,
       theme: state.session.theme,
       setupQuality,
       controlsCorrect: controlCorrect,
       controlsPresented: controlCount,
       interruptions: state.session.interruptions,
+      distanceRecheckPassed: state.session.distanceRecheckPassed,
     },
+    qualityEvidence: Object.fromEntries(
+      state.session.eyeResults.flatMap((eye) => [
+        [`${eye.eye}HighControls`, `${eye.high.controlCorrect}/${eye.high.controls}`],
+        ...(eye.low ? [[`${eye.eye}LowControls`, `${eye.low.controlCorrect}/${eye.low.controls}`]] : []),
+      ]),
+    ),
     measurements,
     notes: [
       ...(bounded ? ['display-range-bound'] : []),
       ...(!usable ? ['setup-check-limited'] : []),
       ...(state.session.contrast === null ? ['low-contrast-unavailable'] : []),
+      'posterior-90-percent-model-interval',
+      ...(state.session.calibration.state === 'assumed'
+        ? ['manual-distance-cannot-receive-strongest-quality']
+        : []),
+      ...(state.session.distanceRecheckPassed === true ? ['second-eye-distance-recheck-passed'] : []),
     ],
   });
   if (entry) appendJournalEntry(entry);

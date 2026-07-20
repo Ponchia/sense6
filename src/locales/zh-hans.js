@@ -1,3 +1,5 @@
+import { registryRows } from './registry-copy.js';
+
 // Simplified Chinese locale catalog. English source keys are the stable message identifiers.
 /** @type {Array<[string, string]>} */
 const rows = [
@@ -1438,5 +1440,6 @@ rows.push(
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 );
 
-export const MESSAGE_COUNT = rows.length;
-export default new Map(rows);
+const catalogRows = [...rows, ...registryRows('zh-hans')];
+export const MESSAGE_COUNT = catalogRows.length;
+export default new Map(catalogRows);

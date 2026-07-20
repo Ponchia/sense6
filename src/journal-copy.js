@@ -41,6 +41,7 @@ const COPY = Object.freeze({
     confirmOne: 'Delete this saved run?',
     entries: 'saved runs',
     reasonInstrument: 'The runs use different instruments.',
+    reasonProtocol: 'The runs use different or legacy experiment protocols.',
     reasonSetup: 'A required setup condition changed or is missing.',
     reasonVolume: 'Browser volume cannot be verified between runs.',
     reasonLimited: 'At least one run has limited setup or measurement quality.',
@@ -85,6 +86,7 @@ const COPY = Object.freeze({
     confirmOne: 'Eliminare questa sessione salvata?',
     entries: 'sessioni salvate',
     reasonInstrument: 'Le sessioni usano strumenti diversi.',
+    reasonProtocol: 'Le sessioni usano protocolli sperimentali diversi o precedenti.',
     reasonSetup: 'Una condizione necessaria della configurazione è cambiata o manca.',
     reasonVolume: 'Il volume del browser non può essere verificato tra sessioni.',
     reasonLimited: 'Almeno una sessione ha qualità di configurazione o misura limitata.',
@@ -129,6 +131,7 @@ const COPY = Object.freeze({
     confirmOne: 'Diesen gespeicherten Durchlauf löschen?',
     entries: 'gespeicherte Durchläufe',
     reasonInstrument: 'Die Durchläufe verwenden unterschiedliche Instrumente.',
+    reasonProtocol: 'Die Durchläufe verwenden unterschiedliche oder ältere Versuchsprotokolle.',
     reasonSetup: 'Eine erforderliche Einrichtungsbedingung hat sich geändert oder fehlt.',
     reasonVolume: 'Die Browserlautstärke kann zwischen Durchläufen nicht geprüft werden.',
     reasonLimited: 'Mindestens ein Durchlauf hat eingeschränkte Einrichtungs- oder Messqualität.',
@@ -173,6 +176,7 @@ const COPY = Object.freeze({
     confirmOne: 'Supprimer cette session enregistrée ?',
     entries: 'sessions enregistrées',
     reasonInstrument: 'Les sessions utilisent des instruments différents.',
+    reasonProtocol: 'Les sessions utilisent des protocoles expérimentaux différents ou anciens.',
     reasonSetup: 'Une condition de configuration requise a changé ou manque.',
     reasonVolume: 'Le volume du navigateur ne peut pas être vérifié entre les sessions.',
     reasonLimited: 'Au moins une session a une qualité de configuration ou de mesure limitée.',
@@ -217,6 +221,7 @@ const COPY = Object.freeze({
     confirmOne: '¿Eliminar esta sesión guardada?',
     entries: 'sesiones guardadas',
     reasonInstrument: 'Las sesiones usan instrumentos distintos.',
+    reasonProtocol: 'Las sesiones usan protocolos experimentales distintos o anteriores.',
     reasonSetup: 'Una condición necesaria de la configuración cambió o falta.',
     reasonVolume: 'El volumen del navegador no puede verificarse entre sesiones.',
     reasonLimited: 'Al menos una sesión tiene calidad limitada de configuración o medición.',
@@ -261,6 +266,7 @@ const COPY = Object.freeze({
     confirmOne: 'Eliminar esta sessão guardada?',
     entries: 'sessões guardadas',
     reasonInstrument: 'As sessões usam instrumentos diferentes.',
+    reasonProtocol: 'As sessões usam protocolos experimentais diferentes ou anteriores.',
     reasonSetup: 'Uma condição necessária da configuração mudou ou está em falta.',
     reasonVolume: 'O volume do navegador não pode ser verificado entre sessões.',
     reasonLimited: 'Pelo menos uma sessão tem qualidade limitada de configuração ou medição.',
@@ -321,12 +327,13 @@ const SETUP_KEYS = Object.freeze([
   'setupQuality',
   'controlsCorrect',
   'controlsPresented',
+  'physicalSetup',
+  'contrastLinear',
+  'distanceRecheckPassed',
+  'audibilityAnchorsConfirmed',
 ]);
 
-// Supplemental locale modules predate the extended setup passport. They own
-// the original translated labels; newer fields intentionally fall back to the
-// complete English table until those translations are added.
-const SUPPLEMENTAL_SETUP_KEYS = Object.freeze(SETUP_KEYS.slice(0, 14));
+const SUPPLEMENTAL_SETUP_KEYS = SETUP_KEYS;
 
 /** @type {Readonly<Record<string, Readonly<Record<string, string>>>>} */
 const SETUP_LABELS = Object.freeze({
@@ -362,6 +369,10 @@ const SETUP_LABELS = Object.freeze({
     'Setup quality',
     'Controls correct',
     'Controls presented',
+    'Physical setup',
+    'Nominal contrast (linear)',
+    'Second-eye distance recheck',
+    'Audibility anchors confirmed',
   ]),
   it: setupLabels([
     'Schermo',
@@ -395,6 +406,10 @@ const SETUP_LABELS = Object.freeze({
     'Qualità della configurazione',
     'Controlli corretti',
     'Controlli presentati',
+    'Configurazione fisica',
+    'Contrasto nominale (lineare)',
+    'Ricontrollo della distanza per il secondo occhio',
+    'Riferimenti di udibilità confermati',
   ]),
   de: setupLabels([
     'Bildschirm',
@@ -428,6 +443,10 @@ const SETUP_LABELS = Object.freeze({
     'Einrichtungsqualität',
     'Richtige Kontrollen',
     'Dargebotene Kontrollen',
+    'Physische Einrichtung',
+    'Nennkontrast (linear)',
+    'Abstandsprüfung für das zweite Auge',
+    'Hörbarkeitsanker bestätigt',
   ]),
   fr: setupLabels([
     'Écran',
@@ -461,6 +480,10 @@ const SETUP_LABELS = Object.freeze({
     'Qualité de la configuration',
     'Contrôles corrects',
     'Contrôles présentés',
+    'Installation physique',
+    'Contraste nominal (linéaire)',
+    'Nouvelle vérification de distance pour le second œil',
+    'Repères d’audibilité confirmés',
   ]),
   es: setupLabels([
     'Pantalla',
@@ -494,6 +517,10 @@ const SETUP_LABELS = Object.freeze({
     'Calidad de la configuración',
     'Controles correctos',
     'Controles presentados',
+    'Configuración física',
+    'Contraste nominal (lineal)',
+    'Nueva comprobación de distancia para el segundo ojo',
+    'Referencias de audibilidad confirmadas',
   ]),
   pt: setupLabels([
     'Ecrã',
@@ -527,6 +554,10 @@ const SETUP_LABELS = Object.freeze({
     'Qualidade da configuração',
     'Controlos corretos',
     'Controlos apresentados',
+    'Configuração física',
+    'Contraste nominal (linear)',
+    'Nova verificação da distância para o segundo olho',
+    'Referências de audibilidade confirmadas',
   ]),
 });
 

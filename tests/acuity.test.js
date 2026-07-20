@@ -5,7 +5,6 @@ import {
   CARD_WIDTH_MM,
   contrastGrays,
   createAcuityTrack,
-  createMeridianSchedule,
   createOrientationSchedule,
   cssPixelsToArcmin,
   estimateViewingDistance,
@@ -18,9 +17,8 @@ import {
   summarizeAcuity,
   summarizeBlindSpot,
   summarizeContrastCost,
-  summarizeMeridians,
 } from '../src/lib/acuity.js';
-import { drawLandoltRing, drawMeridianField, setSquareCanvasSize } from '../src/lib/optotypes.js';
+import { drawLandoltRing, setSquareCanvasSize } from '../src/lib/optotypes.js';
 import { seededRandom } from '../src/lib/random.js';
 
 test('card and blind-spot calibration recover physical scale and distance', () => {
@@ -93,51 +91,6 @@ test('orientation schedules are balanced and deterministic', () => {
   assert.ok(Math.max(...counts) - Math.min(...counts) <= 1);
 });
 
-test('meridian schedules cover every pair at both scales and require replication', () => {
-  const schedule = createMeridianSchedule({ random: seededRandom('meridians') });
-  assert.equal(schedule.length, 30);
-  assert.equal(schedule.filter((trial) => trial.block === 0).length, 15);
-  assert.equal(schedule.filter((trial) => trial.block === 1).length, 15);
-  const records = schedule.map((trial) => {
-    const leftPreferred = trial.leftAngle === 60;
-    const rightPreferred = trial.rightAngle === 60;
-    return {
-      ...trial,
-      choice: leftPreferred ? 'left' : rightPreferred ? 'right' : 'equal',
-    };
-  });
-  const summary = summarizeMeridians(records);
-  assert.equal(summary.stable, true);
-  assert.equal(summary.preferredAngle, 60);
-  assert.equal(summary.comparisons, 30);
-  const inconsistent = summarizeMeridians(
-    schedule.map((trial) => ({
-      ...trial,
-      choice:
-        trial.block === 0
-          ? trial.leftAngle === 30
-            ? 'left'
-            : trial.rightAngle === 30
-              ? 'right'
-              : 'equal'
-          : trial.leftAngle === 120
-            ? 'left'
-            : trial.rightAngle === 120
-              ? 'right'
-              : 'equal',
-    })),
-  );
-  assert.equal(inconsistent.stable, false);
-  assert.equal(inconsistent.preferredAngle, null);
-});
-
-test('meridian schedules reject sparse angle inputs', () => {
-  assert.throws(
-    () => createMeridianSchedule({ angles: [0, undefined, 60] }),
-    /angle schedule contains a missing value/i,
-  );
-});
-
 test('low-contrast colors and within-run cost remain explicit', () => {
   const colors = contrastGrays(0.1);
   assert.equal(colors.contrast, 0.1);
@@ -196,22 +149,6 @@ test('optotype renderers keep square backing stores and execute complete drawing
   assert.equal(landolt.canvas.height, 400);
   assert.equal(landolt.calls.filter(([name]) => name === 'arc').length, 2);
   assert.ok(landolt.calls.some(([name]) => name === 'fillRect'));
-
-  const meridian = fakeCanvas();
-  const field = drawMeridianField(meridian.canvas, {
-    angleDegrees: 60,
-    boxCssPx: 90,
-    devicePixelRatio: 1,
-    phase: 0.75,
-    scale: 1.5,
-    supersample: 2,
-  });
-  assert.equal(field.backing, 180);
-  assert.equal(field.spacing, 21);
-  assert.equal(meridian.canvas.width, 180);
-  assert.equal(meridian.canvas.height, 180);
-  assert.ok(meridian.calls.some(([name]) => name === 'clip'));
-  assert.ok(meridian.calls.filter(([name]) => name === 'stroke').length > 2);
 });
 
 test('optotype renderers reject canvases without a two-dimensional context', () => {

@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { protocolPassport } from '../src/exams/protocols.js';
 import { journalSetupLabel } from '../src/journal-copy.js';
 import {
   appendJournalEntry,
@@ -101,7 +102,7 @@ test('exports merge idempotently and reject unsafe imports', () => {
   });
   assert.deepEqual(importJournal(JSON.stringify({}), target), { ok: false, reason: 'invalid' });
   assert.deepEqual(
-    importJournal(JSON.stringify({ format: 'sense6-journal-export', schemaVersion: 2, entries: [] }), target),
+    importJournal(JSON.stringify({ format: 'sense6-journal-export', schemaVersion: 3, entries: [] }), target),
     { ok: false, reason: 'future' },
   );
   assert.deepEqual(
@@ -117,7 +118,7 @@ test('exports merge idempotently and reject unsafe imports', () => {
     importJournal(
       JSON.stringify({
         format: 'sense6-journal-export',
-        schemaVersion: 1,
+        schemaVersion: 2,
         entries: [duplicateEntry, duplicateEntry],
       }),
       target,
@@ -162,6 +163,55 @@ test('setup passports classify comparisons without inventing comparability', () 
   assert.deepEqual(compareJournalEntries(changedViewport, older), {
     status: 'caution',
     reasons: ['changed:viewport'],
+  });
+});
+
+test('protocol identity prevents incompatible runs from appearing comparable', () => {
+  const older = entry({ id: 'protocol-before' });
+  for (const field of [
+    'methodVersion',
+    'profileId',
+    'configDigest',
+    'stimulusVersion',
+    'estimator',
+    'stoppingRule',
+    'responsePolicy',
+    'interruptionPolicy',
+    'replayPolicy',
+  ]) {
+    const newer = entry({
+      id: `protocol-${field}`,
+      protocol: { ...older.protocol, [field]: `${older.protocol[field]}-changed` },
+    });
+    assert.deepEqual(compareJournalEntries(newer, older), {
+      status: 'not-comparable',
+      reasons: [`changed:${field}`],
+    });
+  }
+});
+
+test('schema-one entries remain readable but migrate into an explicit legacy cohort', () => {
+  const legacy = entry({
+    id: 'legacy-run',
+    notes: Array.from({ length: 12 }, (_, index) => `legacy-note-${index}`),
+  });
+  const { protocol: _protocol, qualityEvidence: _qualityEvidence, ...schemaOneEntry } = legacy;
+  const storage = memoryStorage({
+    'sense6:journal': JSON.stringify({
+      format: 'sense6-journal',
+      schemaVersion: 1,
+      entries: [schemaOneEntry],
+    }),
+  });
+  const [migrated] = loadJournal(storage);
+  assert.equal(migrated.protocol.profileId, 'legacy-exploratory');
+  assert.equal(migrated.protocol.methodVersion, 'tetracromia-v1-legacy');
+  assert.deepEqual(migrated.qualityEvidence, {});
+  assert.ok(migrated.notes.includes('legacy-exploratory'));
+  assert.equal(migrated.notes.length, 12);
+  assert.deepEqual(compareJournalEntries(entry({ id: 'current-run' }), migrated), {
+    status: 'not-comparable',
+    reasons: ['legacy-protocol'],
   });
 });
 
@@ -283,9 +333,31 @@ test('the journal labels enriched setup evidence in every supported language', (
     assert.notEqual(journalSetupLabel('measurementDpr', locale), 'Measurement Dpr');
   }
   assert.equal(journalSetupLabel('contrastPercent', 'de'), 'Nennkontrast');
+  const physicalSetup = {
+    en: 'Physical setup',
+    it: 'Configurazione fisica',
+    de: 'Physische Einrichtung',
+    fr: 'Installation physique',
+    es: 'Configuración física',
+    pt: 'Configuração física',
+    'pt-br': 'Configuração física',
+    ar: 'الإعداد المادي',
+    ja: '物理的な設定',
+    ko: '물리적 설정',
+    hi: 'भौतिक सेटअप',
+    'zh-hans': '物理设置',
+  };
+  for (const [locale, label] of Object.entries(physicalSetup)) {
+    assert.equal(journalSetupLabel('physicalSetup', locale), label);
+    if (locale !== 'en')
+      assert.notEqual(
+        journalSetupLabel('audibilityAnchorsConfirmed', locale),
+        'Audibility anchors confirmed',
+      );
+  }
 });
 
-test('measurement changes combine intervals and retain bound warnings', () => {
+test('measurement changes combine explicit uncertainty and do not relabel model intervals', () => {
   const older = entry({
     id: 'before',
     measurements: [
@@ -315,7 +387,7 @@ test('measurement changes combine intervals and retain bound warnings', () => {
     id: 'interval',
     delta: 2,
     unit: 'x',
-    uncertainty: Math.sqrt(5),
+    uncertainty: null,
     bounded: false,
   });
   assert.match(captureDisplayPassport().display, /^\d+x\d+@/);
@@ -328,7 +400,9 @@ function entry(overrides = {}) {
     recordedAt: '2026-01-01T00:00:00.000Z',
     locale: 'en',
     quality: 'usable',
+    protocol: protocolPassport(overrides.examId ?? 'tetracromia'),
     setup: { display: '100x100@1', viewport: '800x600', gamut: 'srgb' },
+    qualityEvidence: {},
     measurements: [{ id: 'score', value: 10, unit: '/100' }],
     notes: [],
     ...overrides,

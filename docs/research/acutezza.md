@@ -3,8 +3,18 @@
 <!-- vale on -->
 <!-- vale Vale.Spelling = NO -->
 
-Status: implemented as a permanently experimental, nonclinical browser task;
-no certification or formal validation planned, 2026-07-19
+Status: historical design rationale; the cross-test audit is the current
+protocol decision, 2026-07-20
+
+Update, 2026-07-20: this brief records the design that preceded implementation.
+The later cross-test [evidence and product
+audit](five-test-evidence-and-product-audit.md) is the current decision source
+for the shipped protocol. Its null simulations found that the former Meridiani
+schedule could report a stable preference about 15–16% of the time without a
+stable signal, and its control audit found permissive one-control paths. The
+production UI, scheduler, scorer, canvas renderer, and styles are now removed.
+The calibration and Landolt-gap rationale below remain applicable within the
+boundaries stated here and in the audit.
 
 Acutezza is a calibrated browser sharpness experiment, not an online eye exam.
 It describes what a person resolved on one screen, at one estimated
@@ -15,9 +25,15 @@ This brief records the design rationale, software contract, and evidence
 boundary. Published methods inform the task, but do not validate Sense6's
 implementation. Scientific or clinical validation is not planned.
 
-## Recommendation
+Production Acutezza now offers two scopes: Focused Sharpness and Standard
+Sharpness + nominal contrast. It records calibration provenance, controls for
+every eye and condition, display bounds, actual contrast, and a second-eye
+distance recheck. It labels 90% estimator output as a model interval, not generic
+uncertainty.
 
-Build Acutezza around a mandatory calibration gate and three monocular
+## Original recommendation
+
+The original design proposed a mandatory calibration gate and three monocular
 instruments:
 
 1. **Nitidezza** measures a high-contrast Landolt-ring gap threshold.
@@ -31,8 +47,9 @@ current roadmap phrase, **Visual acuity and astigmatism**, implies more clinical
 authority than an unvalidated browser experiment has. Increase the expected
 duration from about 2 minutes to about 7–9 minutes for a complete two-eye run.
 
-The result should report angular gap thresholds, uncertainty, a contrast cost,
-and meridional response consistency. Do not show Snellen fractions, clinical
+The current result reports angular-gap estimates, model intervals, and an
+optional nominal low-contrast cost. It doesn't report meridional consistency.
+Do not show Snellen fractions, clinical
 logMAR labels, cylinder power, a prescription axis, pass or fail, population
 percentiles, or reassurance that vision is normal.
 

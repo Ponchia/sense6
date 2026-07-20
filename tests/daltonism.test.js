@@ -18,6 +18,7 @@ import {
 } from '../src/lib/daltonism.js';
 
 const fixedRandom = () => 0.25;
+const incorrectOrientation = (orientation) => ORIENTATIONS.find((candidate) => candidate !== orientation);
 
 const displayEnvironment = Object.freeze({
   theme: 'light',
@@ -79,6 +80,11 @@ test('the full adaptive range stays in gamut and produces visible easy targets',
       `${type} clipped`,
     );
     assert.ok(srgbDistance(pair.field, pair.target) > 40, `${type} easy target is too subtle`);
+    const luminance = ([red, green, blue]) => 0.2126 * red + 0.7152 * green + 0.0722 * blue;
+    assert.ok(
+      Math.abs(luminance(pair.fieldLinear) - luminance(pair.targetLinear)) < 1e-9,
+      `${type} target and field have different linear-sRGB luminance`,
+    );
   }
 });
 
@@ -116,9 +122,18 @@ test('two correct answers lower an axis strength and one error raises it', () =>
     recordAdaptiveAnswer(run, trial.orientation);
   }
   const strengthBeforeError = run.axes[type].strength;
-  recordAdaptiveAnswer(run, 'not-an-orientation');
+  recordAdaptiveAnswer(run, 'unseen');
   assert.ok(run.axes[type].strength > strengthBeforeError);
   assert.equal(run.axes[type].reversals.length, 1);
+});
+
+test('invalid response strings neither score nor advance the adaptive run', () => {
+  const run = createAdaptiveRun(fixedRandom);
+  const index = run.index;
+  const responses = run.responses.length;
+  assert.equal(recordAdaptiveAnswer(run, 'not-an-orientation'), null);
+  assert.equal(run.index, index);
+  assert.equal(run.responses.length, responses);
 });
 
 test('a no-gap response is a miss and makes that direction easier', () => {
@@ -178,7 +193,7 @@ test('all-correct runs return lower display-relative thresholds than all-error r
   const errorRun = createAdaptiveRun(fixedRandom);
   while (currentAdaptiveTrial(errorRun)) {
     const trial = currentAdaptiveTrial(errorRun);
-    recordAdaptiveAnswer(errorRun, trial.type === 'control' ? trial.orientation : 'wrong');
+    recordAdaptiveAnswer(errorRun, trial.type === 'control' ? trial.orientation : 'unseen');
   }
 
   const correct = summarizeAdaptiveRun(correctRun);
@@ -194,7 +209,10 @@ test('missing two task controls makes a run inconclusive without a diagnostic la
   const run = createAdaptiveRun(fixedRandom);
   while (currentAdaptiveTrial(run)) {
     const trial = currentAdaptiveTrial(run);
-    recordAdaptiveAnswer(run, trial.type === 'control' ? 'wrong' : trial.orientation);
+    recordAdaptiveAnswer(
+      run,
+      trial.type === 'control' ? incorrectOrientation(trial.orientation) : trial.orientation,
+    );
   }
   const result = summarizeAdaptiveRun(run);
   assert.equal(result.controlOk, false);
