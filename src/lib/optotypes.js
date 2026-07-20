@@ -1,3 +1,18 @@
+/**
+ * @typedef {object} LandoltRingOptions
+ * @property {number} diameterCssPx
+ * @property {number} orientationDegrees
+ * @property {string} [target]
+ * @property {string} [background]
+ * @property {number} [boxCssPx]
+ * @property {number} [devicePixelRatio]
+ * @property {number} [supersample]
+ */
+
+/**
+ * @param {HTMLCanvasElement} canvas
+ * @param {LandoltRingOptions} options
+ */
 export function drawLandoltRing(
   canvas,
   {
@@ -15,7 +30,7 @@ export function drawLandoltRing(
   canvas.width = backing;
   canvas.height = backing;
   setSquareCanvasSize(canvas, boxCssPx);
-  const context = canvas.getContext('2d', { alpha: false });
+  const context = requireCanvasContext(canvas);
   context.setTransform(1, 0, 0, 1, 0, 0);
   context.fillStyle = background;
   context.fillRect(0, 0, backing, backing);
@@ -40,6 +55,22 @@ export function drawLandoltRing(
   return { backing, diameter, unit };
 }
 
+/**
+ * @typedef {object} MeridianFieldOptions
+ * @property {number} angleDegrees
+ * @property {number} [scale]
+ * @property {number} [phase]
+ * @property {string} [target]
+ * @property {string} [background]
+ * @property {number} [boxCssPx]
+ * @property {number} [devicePixelRatio]
+ * @property {number} [supersample]
+ */
+
+/**
+ * @param {HTMLCanvasElement} canvas
+ * @param {MeridianFieldOptions} options
+ */
 export function drawMeridianField(
   canvas,
   {
@@ -58,7 +89,7 @@ export function drawMeridianField(
   canvas.width = backing;
   canvas.height = backing;
   setSquareCanvasSize(canvas, boxCssPx);
-  const context = canvas.getContext('2d', { alpha: false });
+  const context = requireCanvasContext(canvas);
   context.fillStyle = background;
   context.fillRect(0, 0, backing, backing);
   context.save();
@@ -86,6 +117,7 @@ export function drawMeridianField(
   return { backing, spacing };
 }
 
+/** @param {HTMLCanvasElement} canvas @param {number} boxCssPx */
 export function setSquareCanvasSize(canvas, boxCssPx) {
   if (!(boxCssPx > 0)) throw new RangeError('Canvas size must be positive');
   const size = `${boxCssPx}px`;
@@ -94,4 +126,11 @@ export function setSquareCanvasSize(canvas, boxCssPx) {
   canvas.style.maxInlineSize = 'none';
   canvas.style.maxBlockSize = 'none';
   canvas.style.aspectRatio = '1 / 1';
+}
+
+/** @param {HTMLCanvasElement} canvas */
+function requireCanvasContext(canvas) {
+  const context = canvas.getContext('2d', { alpha: false });
+  if (!context) throw new Error('A two-dimensional canvas context is required');
+  return context;
 }

@@ -1,4 +1,4 @@
-/** @typedef {{ locale: string | null, route: string }} RouteTarget */
+/** @typedef {{ locale: string | null, route: string, legacy?: boolean, canonical?: boolean }} RouteTarget */
 
 /** @type {null | ((next: RouteTarget) => boolean)} */
 let navigationGuard = null;

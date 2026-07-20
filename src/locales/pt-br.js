@@ -1,4 +1,5 @@
 // Brazilian Portuguese catalog; edit this locale directly.
+/** @type {Array<[string, string]>} */
 const rows = [
   ['Skip to content', 'Ir para o conteúdo'],
   ['Sense6 — all tests', 'Sense6 — todos os testes'],

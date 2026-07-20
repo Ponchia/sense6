@@ -44,9 +44,9 @@ and uncertainty, but it can't turn a browser task into a clinical instrument.
 | Shell and router | `src/main.js`, `src/router.js` | Resolve locale-aware routes, mount one view, and dispose the previous view |
 | Service contracts | `src/exams/contracts.js` | Define experiment identity, metric names, and journal-comparison policy |
 | Presentation registry | `src/exams/registry.js` | Define gallery and static-page metadata plus lazy experiment loaders |
-| Experiment controllers | `src/exams/*.js` | Coordinate setup, response handling, phase changes, and results for one experiment |
+| Experiment controllers | `src/exams/*.js`, `src/exams/*.d.ts` | Coordinate setup, response handling, phase changes, and results for one experiment; declarations define their checked public mount boundary |
 | Experiment views | `src/exams/views/*.js` | Produce pure markup for large landing or phase views without owning runtime state |
-| Domain models | `src/lib/*.js` | Implement adaptive tracks, schedules, summaries, persistence, and lifecycle behavior |
+| Domain models | `src/lib/*.js` | Implement strictly checked adaptive tracks, schedules, summaries, persistence, lifecycle behavior, and guarded state transitions |
 | Shared landing views | `src/exams/landing.js` | Render repeated instrument, method, and research structures |
 | Localization | `src/i18n.js`, `src/i18n/message-ids.js`, `src/i18n/catalog-audit.js`, `src/locales/` | Load one catalog, translate stable shared IDs and legacy source-keyed prose, apply locale metadata, and report catalog drift |
 | Static generator | `scripts/generate-static-pages.mjs` | Produce localized discovery HTML, metadata, sitemap, crawler files, and the 404 page |
@@ -108,6 +108,13 @@ output, browser journeys, responsive layouts, and accessibility. Chromium and
 the mobile Chromium profile run the complete journey suite. Focused critical
 journeys also run in Firefox and WebKit.
 
+The type gate automatically includes every module under `src/lib/`,
+`src/exams/views/`, `src/i18n/`, and `src/locales/`, plus named shared runtime
+boundaries and controller declarations. The ratchet fails if the configuration
+omits a strict file. It also rejects type-suppression comments and explicit
+JSDoc `any`. Values crossing browser and storage boundaries still require
+runtime validation.
+
 CI gives the release gate ten minutes. Crossing that ceiling is a signal to
 shard the Playwright workload rather than silently accepting a slower feedback
 loop. Dependency installation and Pages publication sit outside that measured
@@ -125,11 +132,14 @@ a filename allowlist.
 
 ## Known pressure points
 
-Experiment controllers still contain substantial phase-specific event
-orchestration. Acutezza's intro and Tetracromia's home view establish the
-incremental pattern: don't add a suite-wide base controller. When you change
-one phase, extract its pure markup or state transition behind a small typed
-interface and keep the measurement behavior covered.
+Experiment controllers still contain substantial unchecked phase-specific
+event orchestration. The type gate checks their public `mount(context)`
+contract, and the Tetracromia domain session now models discrimination and
+sequence trials as separate guarded states. Acutezza's intro and Tetracromia's
+home view establish the incremental pattern: don't add a suite-wide base
+controller. When you change one phase, extract its pure markup or state
+transition behind a small typed interface and keep the measurement behavior
+covered.
 
 Legacy localization uses English source prose as catalog keys. Stable IDs now
 cover reusable controls and safety boundaries. `npm run locales:check` reports

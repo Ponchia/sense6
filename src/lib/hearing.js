@@ -1,3 +1,23 @@
+/** @typedef {() => number} RandomSource */
+/** @typedef {{ toneMs: number, gapMs: number, rampMs: number, referenceMs: number, masterGain: number }} HearingAudioConfig */
+/** @typedef {{ practiceTrials: number, scoredTrials: number, passCorrect: number }} HeadphoneConfig */
+/** @typedef {{ startHz: number, minHz: number, maxHz: number, targetReversals: number, minTrials: number, maxTrials: number, controlAt: readonly number[], initialStepOctaves: number, fineStepOctaves: number }} RangeConfig */
+/** @typedef {{ anchorsHz: readonly number[], startPercent: number, minPercent: number, maxPercent: number, targetReversals: number, minTrials: number, maxTrials: number, initialFactor: number, fineFactor: number }} PitchConfig */
+/** @typedef {{ feedbackMs: number, audio: HearingAudioConfig, headphones: HeadphoneConfig, range: RangeConfig, pitch: PitchConfig }} HearingConfig */
+/** @typedef {Partial<Omit<HearingConfig, 'audio' | 'headphones' | 'range' | 'pitch'>> & { audio?: Partial<HearingAudioConfig>, headphones?: Partial<HeadphoneConfig>, range?: Partial<RangeConfig>, pitch?: Partial<PitchConfig> }} HearingConfigOverride */
+/** @typedef {'up' | 'down'} StaircaseDirection */
+/** @typedef {'converged' | 'max-trials' | 'technical-ceiling'} CompletionReason */
+/** @typedef {{ kind: 'headphones', quietInterval: number, antiPhaseInterval: number | null, practice: boolean }} HeadphoneTrial */
+/** @typedef {HeadphoneTrial & { selectedInterval: number, correct: boolean }} HeadphoneRecord */
+/** @typedef {{ kind: 'range', control: boolean, frequencyHz: number, toneInterval: number }} RangeTrial */
+/** @typedef {RangeTrial & { selectedInterval: number, correct: boolean }} RangeControlRecord */
+/** @typedef {RangeControlRecord & { direction: StaircaseDirection | null, nextFrequencyHz: number }} RangeRecord */
+/** @typedef {{ config: RangeConfig, frequencyHz: number, correctStreak: number, lastDirection: StaircaseDirection | null, reversals: number[], records: RangeRecord[], controls: RangeControlRecord[], complete: boolean, completionReason: CompletionReason | null }} RangeTrack */
+/** @typedef {{ kind: 'pitch', anchorHz: number, deltaPercent: number, higherInterval: number, roveDb: [number, number] }} PitchTrial */
+/** @typedef {PitchTrial & { selectedInterval: number, correct: boolean, direction: StaircaseDirection | null, nextDeltaPercent: number }} PitchRecord */
+/** @typedef {{ anchorHz: number, config: PitchConfig, deltaPercent: number, correctStreak: number, lastDirection: StaircaseDirection | null, reversals: number[], records: PitchRecord[], complete: boolean, completionReason: CompletionReason | null }} PitchTrack */
+/** @typedef {{ correct: boolean }} CorrectnessRecord */
+
 export const DEFAULT_HEARING_CONFIG = Object.freeze({
   feedbackMs: 420,
   audio: Object.freeze({
@@ -44,6 +64,7 @@ export const HEARING_DIGITAL_LEVELS = Object.freeze({
   pitchRoveMaxDb: 3,
 });
 
+/** @param {HearingConfigOverride | null} override @returns {HearingConfig} */
 export function mergeHearingConfig(override = {}) {
   const safeOverride = override ?? {};
   return {
@@ -56,6 +77,7 @@ export function mergeHearingConfig(override = {}) {
   };
 }
 
+/** @param {{ count: number, practice?: boolean, random?: RandomSource }} options @returns {HeadphoneTrial[]} */
 export function createHeadphoneTrials({ count, practice = false, random = Math.random }) {
   return Array.from({ length: count }, () => {
     const quietInterval = randomIndex(3, random);
@@ -70,6 +92,7 @@ export function createHeadphoneTrials({ count, practice = false, random = Math.r
   });
 }
 
+/** @param {number} maxHz @param {Partial<RangeConfig>} options @returns {RangeTrack} */
 export function createRangeTrack(maxHz, options = {}) {
   const config = { ...DEFAULT_HEARING_CONFIG.range, ...options };
   const ceilingHz = clamp(maxHz, config.minHz, config.maxHz);
@@ -86,6 +109,7 @@ export function createRangeTrack(maxHz, options = {}) {
   };
 }
 
+/** @param {RangeTrack} track @param {RandomSource} random @returns {RangeTrial} */
 export function nextRangeTrial(track, random = Math.random) {
   const presentation = track.records.length + track.controls.length;
   const control = track.config.controlAt.includes(presentation);
@@ -97,6 +121,7 @@ export function nextRangeTrial(track, random = Math.random) {
   };
 }
 
+/** @param {RangeTrack} track @param {RangeTrial} trial @param {number} selectedInterval */
 export function recordRangeResponse(track, trial, selectedInterval) {
   const correct = selectedInterval === trial.toneInterval;
   if (trial.control) {
@@ -104,6 +129,7 @@ export function recordRangeResponse(track, trial, selectedInterval) {
     return track;
   }
 
+  /** @type {StaircaseDirection | null} */
   let direction = null;
   if (correct) {
     track.correctStreak += 1;
@@ -145,18 +171,20 @@ export function recordRangeResponse(track, trial, selectedInterval) {
   return track;
 }
 
+/** @param {RangeTrack} track */
 export function summarizeRange(track) {
   const reversalWindow = track.reversals.slice(-6);
+  const reversalMedian = median(reversalWindow);
   const atCeiling = hasTechnicalCeilingEvidence(track);
   const completionReason = track.completionReason ?? 'incomplete';
   const settled =
     completionReason === 'technical-ceiling' ||
     (completionReason === 'converged' && reversalWindow.length > 0);
   const thresholdHz =
-    settled && (atCeiling || reversalWindow.length)
+    settled && (atCeiling || reversalMedian !== null)
       ? atCeiling
         ? track.config.maxHz
-        : roundTo(median(reversalWindow), 100)
+        : roundTo(/** @type {number} */ (reversalMedian), 100)
       : null;
   return {
     thresholdHz,
@@ -172,6 +200,7 @@ export function summarizeRange(track) {
   };
 }
 
+/** @param {Partial<PitchConfig>} options @returns {PitchTrack[]} */
 export function createPitchTracks(options = {}) {
   const config = { ...DEFAULT_HEARING_CONFIG.pitch, ...options };
   return config.anchorsHz.map((anchorHz) => ({
@@ -187,6 +216,7 @@ export function createPitchTracks(options = {}) {
   }));
 }
 
+/** @param {PitchTrack[]} tracks @param {RandomSource} random @returns {PitchTrial | null} */
 export function nextPitchTrial(tracks, random = Math.random) {
   const open = tracks.filter((track) => !track.complete);
   if (!open.length) return null;
@@ -202,10 +232,12 @@ export function nextPitchTrial(tracks, random = Math.random) {
   };
 }
 
+/** @param {PitchTrack[]} tracks @param {PitchTrial} trial @param {number} selectedInterval */
 export function recordPitchResponse(tracks, trial, selectedInterval) {
   const track = tracks.find((entry) => entry.anchorHz === trial.anchorHz);
   if (!track) throw new Error(`Unknown pitch anchor: ${trial.anchorHz}`);
   const correct = selectedInterval === trial.higherInterval;
+  /** @type {StaircaseDirection | null} */
   let direction = null;
   if (correct) {
     track.correctStreak += 1;
@@ -250,14 +282,16 @@ export function recordPitchResponse(tracks, trial, selectedInterval) {
   return tracks;
 }
 
+/** @param {PitchTrack[]} tracks */
 export function summarizePitch(tracks) {
   return tracks.map((track) => {
     const reversalWindow = track.reversals.slice(-4);
+    const reversalMedian = median(reversalWindow);
     const completionReason = track.completionReason ?? 'incomplete';
     const settled = completionReason === 'converged' && reversalWindow.length > 0;
     return {
       anchorHz: track.anchorHz,
-      thresholdPercent: settled && reversalWindow.length ? roundTo(median(reversalWindow), 0.1) : null,
+      thresholdPercent: settled && reversalMedian !== null ? roundTo(reversalMedian, 0.1) : null,
       spreadPercent: reversalWindow.length >= 2 ? roundTo(range(reversalWindow), 0.1) : null,
       settled,
       completionReason,
@@ -268,6 +302,7 @@ export function summarizePitch(tracks) {
   });
 }
 
+/** @param {HeadphoneRecord[]} records @param {number} passCorrect */
 export function summarizeHeadphones(records, passCorrect) {
   const correct = records.filter((record) => record.correct).length;
   return {
@@ -278,14 +313,17 @@ export function summarizeHeadphones(records, passCorrect) {
   };
 }
 
+/** @param {number} db */
 export function dbToGain(db) {
   return 10 ** (db / 20);
 }
 
+/** @param {number} sampleRate @param {number} configuredMax */
 export function safeFrequencyCeiling(sampleRate, configuredMax = 18000) {
   return Math.round(Math.min(configuredMax, sampleRate * 0.42));
 }
 
+/** @param {readonly number[]} values */
 export function median(values) {
   if (!values.length) return null;
   const sorted = [...values].sort((left, right) => left - right);
@@ -293,6 +331,7 @@ export function median(values) {
   return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
 }
 
+/** @param {RangeTrack} track */
 function hasTechnicalCeilingEvidence(track) {
   return (
     track.records.filter(
@@ -302,28 +341,34 @@ function hasTechnicalCeilingEvidence(track) {
   );
 }
 
+/** @param {CorrectnessRecord[]} records */
 function percentCorrect(records) {
   return records.length
     ? Math.round((records.filter((record) => record.correct).length / records.length) * 100)
     : null;
 }
 
+/** @param {readonly number[]} values */
 function range(values) {
   return Math.max(...values) - Math.min(...values);
 }
 
+/** @param {number} value @param {number} increment */
 function roundTo(value, increment) {
   return Math.round(value / increment) * increment;
 }
 
+/** @param {number} length @param {RandomSource} random */
 function randomIndex(length, random) {
   return Math.min(length - 1, Math.floor(random() * length));
 }
 
+/** @param {number} minimum @param {number} maximum @param {RandomSource} random */
 function randomBetween(minimum, maximum, random) {
   return minimum + random() * (maximum - minimum);
 }
 
+/** @param {number} value @param {number} minimum @param {number} maximum */
 function clamp(value, minimum, maximum) {
   return Math.max(minimum, Math.min(maximum, value));
 }

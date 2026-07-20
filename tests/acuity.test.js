@@ -195,6 +195,26 @@ test('optotype renderers keep square backing stores and execute complete drawing
   assert.ok(meridian.calls.filter(([name]) => name === 'stroke').length > 2);
 });
 
+test('optotype renderers reject canvases without a two-dimensional context', () => {
+  const canvas = {
+    getContext: () => null,
+    height: 0,
+    style: {},
+    width: 0,
+  };
+
+  assert.throws(
+    () =>
+      drawLandoltRing(canvas, {
+        boxCssPx: 100,
+        devicePixelRatio: 1,
+        diameterCssPx: 25,
+        orientationDegrees: 90,
+      }),
+    /two-dimensional canvas context/i,
+  );
+});
+
 function fakeCanvas() {
   const calls = [];
   const context = {};

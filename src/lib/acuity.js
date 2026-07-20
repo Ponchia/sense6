@@ -1,9 +1,29 @@
 import { shuffle } from './random.js';
 
+/** @typedef {() => number} RandomSource */
+/** @typedef {{ id: string, degrees: number, symbol: string, key: string }} AcuityDirection */
+/** @typedef {{ blindSpotDegrees: number, repetitions: number, sweepMs: number, minDistanceMm: number, maxDistanceMm: number, maxSpreadPercent: number }} CalibrationConfig */
+/** @typedef {{ trials: number, controlAt: readonly number[], contrast?: number }} AcuityStageConfig */
+/** @typedef {{ minGapArcmin: number, maxGapArcmin: number, startGapArcmin: number, gridStepLog10: number, priorMedianArcmin: number, priorSigmaLog10: number, slope: number, guessRate: number, lapseRate: number, credibleMass: number }} AcuityEstimatorConfig */
+/** @typedef {{ angles: readonly number[], scales: readonly number[], stableRate: number, stableMargin: number }} MeridianConfig */
+/** @typedef {{ feedbackMs: number, practiceTrials: number, calibration: CalibrationConfig, high: AcuityStageConfig, low: AcuityStageConfig & { contrast: number }, estimator: AcuityEstimatorConfig, meridian: MeridianConfig }} AcuityConfig */
+/** @typedef {Partial<Omit<AcuityConfig, 'calibration' | 'high' | 'low' | 'estimator' | 'meridian'>> & { calibration?: Partial<CalibrationConfig>, high?: Partial<AcuityStageConfig>, low?: Partial<AcuityStageConfig & { contrast: number }>, estimator?: Partial<AcuityEstimatorConfig>, meridian?: Partial<MeridianConfig> }} AcuityConfigOverride */
+/** @typedef {{ gapArcmin: number, orientation: string, control: boolean }} AcuityTrial */
+/** @typedef {AcuityTrial & { selectedOrientation: string, correct: boolean }} AcuityRecord */
+/** @typedef {{ config: AcuityEstimatorConfig, trials: number, controlAt: number[], grid: number[], posterior: number[], records: AcuityRecord[], controls: AcuityRecord[], orientations: string[], complete: boolean }} AcuityTrack */
+/** @typedef {{ trials?: number, controlAt?: readonly number[], minGapArcmin?: number, maxGapArcmin?: number, estimator?: Partial<AcuityEstimatorConfig>, random?: RandomSource }} AcuityTrackOptions */
+/** @typedef {{ distanceMm: number, cssPixelsPerMm: number, devicePixelRatio?: number, maxDiameterCssPx: number, minGapDevicePixels?: number, configuredMin?: number, configuredMax?: number }} GapBoundsOptions */
+/** @typedef {'left' | 'right' | 'equal'} MeridianChoice */
+/** @typedef {{ block: number, scale: number, phase: number, leftAngle: number, rightAngle: number }} MeridianTrial */
+/** @typedef {MeridianTrial & { choice: MeridianChoice }} MeridianRecord */
+/** @typedef {Partial<MeridianConfig> & { random?: RandomSource }} MeridianOptions */
+/** @typedef {{ thresholdArcmin: number, lowerArcmin: number, upperArcmin: number, uncertaintyRatio: number, atFloor: boolean, atCeiling: boolean, trials: number, controlCorrect: number, controls: number }} AcuitySummary */
+
 export const CARD_WIDTH_MM = 85.6;
 export const CARD_HEIGHT_MM = 53.98;
 export const BLIND_SPOT_DEGREES = 13.5;
 
+/** @type {readonly Readonly<AcuityDirection>[]} */
 export const ACUITY_DIRECTIONS = Object.freeze([
   Object.freeze({ id: 'up', degrees: 0, symbol: '↑', key: '8' }),
   Object.freeze({ id: 'up-right', degrees: 45, symbol: '↗', key: '9' }),
@@ -48,6 +68,7 @@ export const DEFAULT_ACUITY_CONFIG = Object.freeze({
   }),
 });
 
+/** @param {AcuityConfigOverride | null} override @returns {AcuityConfig} */
 export function mergeAcuityConfig(override = {}) {
   const safe = override ?? {};
   return {
@@ -61,17 +82,20 @@ export function mergeAcuityConfig(override = {}) {
   };
 }
 
+/** @param {number} cardWidthCssPx @param {number} cardWidthMm */
 export function pixelsPerMillimetre(cardWidthCssPx, cardWidthMm = CARD_WIDTH_MM) {
   if (!(cardWidthCssPx > 0) || !(cardWidthMm > 0)) throw new RangeError('Card dimensions must be positive');
   return cardWidthCssPx / cardWidthMm;
 }
 
+/** @param {number} offsetCssPx @param {number} cssPixelsPerMm @param {number} blindSpotDegrees */
 export function estimateViewingDistance(offsetCssPx, cssPixelsPerMm, blindSpotDegrees = BLIND_SPOT_DEGREES) {
   if (!(offsetCssPx > 0) || !(cssPixelsPerMm > 0)) return null;
   const offsetMm = offsetCssPx / cssPixelsPerMm;
   return offsetMm / Math.tan(degreesToRadians(blindSpotDegrees));
 }
 
+/** @param {readonly number[]} readingsMm @param {Partial<CalibrationConfig>} options */
 export function summarizeBlindSpot(readingsMm, options = {}) {
   const config = { ...DEFAULT_ACUITY_CONFIG.calibration, ...options };
   const readings = readingsMm.filter((value) => Number.isFinite(value) && value > 0);
@@ -92,6 +116,7 @@ export function summarizeBlindSpot(readingsMm, options = {}) {
   };
 }
 
+/** @param {number} gapArcmin @param {number} distanceMm @param {number} cssPixelsPerMm */
 export function arcminToCssPixels(gapArcmin, distanceMm, cssPixelsPerMm) {
   if (!(gapArcmin > 0) || !(distanceMm > 0) || !(cssPixelsPerMm > 0)) return null;
   const gapRadians = degreesToRadians(gapArcmin / 60);
@@ -99,17 +124,20 @@ export function arcminToCssPixels(gapArcmin, distanceMm, cssPixelsPerMm) {
   return gapMm * cssPixelsPerMm;
 }
 
+/** @param {number} gapArcmin @param {number} distanceMm @param {number} cssPixelsPerMm */
 export function landoltDiameterCssPixels(gapArcmin, distanceMm, cssPixelsPerMm) {
   const gapCssPx = arcminToCssPixels(gapArcmin, distanceMm, cssPixelsPerMm);
   return gapCssPx === null ? null : gapCssPx * 5;
 }
 
+/** @param {number} gapCssPx @param {number} distanceMm @param {number} cssPixelsPerMm */
 export function cssPixelsToArcmin(gapCssPx, distanceMm, cssPixelsPerMm) {
   if (!(gapCssPx > 0) || !(distanceMm > 0) || !(cssPixelsPerMm > 0)) return null;
   const gapMm = gapCssPx / cssPixelsPerMm;
   return radiansToDegrees(2 * Math.atan(gapMm / (2 * distanceMm))) * 60;
 }
 
+/** @param {GapBoundsOptions} options */
 export function measurableGapBounds({
   distanceMm,
   cssPixelsPerMm,
@@ -131,6 +159,7 @@ export function measurableGapBounds({
   };
 }
 
+/** @param {AcuityTrackOptions} options @returns {AcuityTrack} */
 export function createAcuityTrack({
   trials = DEFAULT_ACUITY_CONFIG.high.trials,
   controlAt = DEFAULT_ACUITY_CONFIG.high.controlAt,
@@ -159,6 +188,7 @@ export function createAcuityTrack({
   };
 }
 
+/** @param {AcuityTrack} track @returns {AcuityTrial | null} */
 export function nextAcuityTrial(track) {
   if (track.complete) return null;
   const presentation = track.records.length + track.controls.length;
@@ -170,11 +200,9 @@ export function nextAcuityTrial(track) {
   } else if (track.records.length === 0) {
     gapArcmin = clamp(track.config.startGapArcmin, track.config.minGapArcmin, track.config.maxGapArcmin);
   } else if (track.records.length < 3 && track.records.every((record) => record.correct)) {
-    gapArcmin = clamp(
-      track.records.at(-1).gapArcmin / 2,
-      track.config.minGapArcmin,
-      track.config.maxGapArcmin,
-    );
+    const previous = track.records.at(-1);
+    if (!previous) throw new Error('Acuity track is missing its previous response');
+    gapArcmin = clamp(previous.gapArcmin / 2, track.config.minGapArcmin, track.config.maxGapArcmin);
   } else {
     gapArcmin = mostInformativeStimulus(track);
   }
@@ -185,6 +213,7 @@ export function nextAcuityTrial(track) {
   };
 }
 
+/** @param {AcuityTrack} track @param {AcuityTrial} trial @param {string} selectedOrientation */
 export function recordAcuityResponse(track, trial, selectedOrientation) {
   const correct = selectedOrientation === trial.orientation;
   const record = { ...trial, selectedOrientation, correct };
@@ -201,6 +230,7 @@ export function recordAcuityResponse(track, trial, selectedOrientation) {
   return record;
 }
 
+/** @param {AcuityTrack} track @returns {AcuitySummary} */
 export function summarizeAcuity(track) {
   const tail = (1 - track.config.credibleMass) / 2;
   const thresholdArcmin = posteriorQuantile(track, 0.5);
@@ -220,7 +250,9 @@ export function summarizeAcuity(track) {
   };
 }
 
+/** @param {number} count @param {RandomSource} random @returns {string[]} */
 export function createOrientationSchedule(count, random = Math.random) {
+  /** @type {string[]} */
   const schedule = [];
   while (schedule.length < count) {
     schedule.push(
@@ -233,12 +265,15 @@ export function createOrientationSchedule(count, random = Math.random) {
   return schedule.slice(0, count);
 }
 
+/** @param {MeridianOptions} options @returns {MeridianTrial[]} */
 export function createMeridianSchedule(options = {}) {
   const angles = [...(options.angles ?? DEFAULT_ACUITY_CONFIG.meridian.angles)];
   const scales = [...(options.scales ?? DEFAULT_ACUITY_CONFIG.meridian.scales)];
   const random = options.random ?? Math.random;
+  /** @type {MeridianTrial[]} */
   const schedule = [];
   for (const [block, scale] of scales.entries()) {
+    /** @type {MeridianTrial[]} */
     const pairs = [];
     for (let left = 0; left < angles.length; left += 1) {
       for (let right = left + 1; right < angles.length; right += 1) {
@@ -257,9 +292,11 @@ export function createMeridianSchedule(options = {}) {
   return schedule;
 }
 
+/** @param {MeridianRecord[]} records @param {Partial<MeridianConfig>} options */
 export function summarizeMeridians(records, options = {}) {
   const config = { ...DEFAULT_ACUITY_CONFIG.meridian, ...options };
   const blocks = [...new Set(records.map((record) => record.block))];
+  /** @param {MeridianRecord[]} subset */
   const summarize = (subset) => {
     const scores = new Map(config.angles.map((angle) => [angle, { angle, points: 0, appearances: 0 }]));
     for (const record of subset) {
@@ -295,7 +332,7 @@ export function summarizeMeridians(records, options = {}) {
     Boolean(leader) && sameLeader && leader.rate >= config.stableRate && margin >= config.stableMargin;
   return {
     stable,
-    preferredAngle: stable ? leader.angle : null,
+    preferredAngle: stable && leader ? leader.angle : null,
     consistencyPercent: roundTo((leader?.rate ?? 0) * 100, 1),
     marginPercent: roundTo(margin * 100, 1),
     equalPercent: roundTo(equalPercent, 1),
@@ -304,6 +341,7 @@ export function summarizeMeridians(records, options = {}) {
   };
 }
 
+/** @param {number} michelsonContrast @param {number} backgroundLinear */
 export function contrastGrays(michelsonContrast, backgroundLinear = 0.5) {
   const contrast = clamp(michelsonContrast, 0, 0.95);
   const targetLinear = (backgroundLinear * (1 - contrast)) / (1 + contrast);
@@ -316,11 +354,13 @@ export function contrastGrays(michelsonContrast, backgroundLinear = 0.5) {
   };
 }
 
+/** @param {number} highThresholdArcmin @param {number} lowThresholdArcmin */
 export function percentContrastCost(highThresholdArcmin, lowThresholdArcmin) {
   if (!(highThresholdArcmin > 0) || !(lowThresholdArcmin > 0)) return null;
   return roundTo((lowThresholdArcmin / highThresholdArcmin - 1) * 100, 1);
 }
 
+/** @param {AcuitySummary | null} high @param {AcuitySummary | null} low */
 export function summarizeContrastCost(high, low) {
   if (!high || !low) return { value: null, bounded: false };
   const bounded = high.atFloor || high.atCeiling || low.atFloor || low.atCeiling;
@@ -330,6 +370,7 @@ export function summarizeContrastCost(high, low) {
   };
 }
 
+/** @param {AcuityTrack} track @param {number} stimulusArcmin @param {boolean} correct */
 function updatePosterior(track, stimulusArcmin, correct) {
   const stimulusLog = Math.log10(stimulusArcmin);
   track.posterior = normalize(
@@ -340,6 +381,7 @@ function updatePosterior(track, stimulusArcmin, correct) {
   );
 }
 
+/** @param {AcuityTrack} track */
 function mostInformativeStimulus(track) {
   let best = posteriorQuantile(track, 0.5);
   let bestEntropy = Number.POSITIVE_INFINITY;
@@ -368,20 +410,23 @@ function mostInformativeStimulus(track) {
   return best;
 }
 
+/** @param {AcuityTrack} track @param {number} probability */
 function posteriorQuantile(track, probability) {
   let cumulative = 0;
   for (let index = 0; index < track.grid.length; index += 1) {
     cumulative += track.posterior[index];
     if (cumulative >= probability) return track.grid[index];
   }
-  return track.grid.at(-1);
+  return track.grid.at(-1) ?? track.config.maxGapArcmin;
 }
 
+/** @param {number} stimulusLog @param {number} thresholdLog @param {AcuityEstimatorConfig} config */
 function probabilityCorrect(stimulusLog, thresholdLog, config) {
   const logistic = 1 / (1 + Math.exp(-config.slope * (stimulusLog - thresholdLog)));
   return config.guessRate + (1 - config.guessRate - config.lapseRate) * logistic;
 }
 
+/** @param {number} minimum @param {number} maximum @param {number} step */
 function logarithmicGrid(minimum, maximum, step) {
   const lower = Math.log10(minimum);
   const upper = Math.log10(maximum);
@@ -389,48 +434,58 @@ function logarithmicGrid(minimum, maximum, step) {
   return Array.from({ length: count + 1 }, (_, index) => 10 ** (lower + ((upper - lower) * index) / count));
 }
 
+/** @param {number} value @param {number} center @param {number} sigma */
 function gaussian(value, center, sigma) {
   return Math.exp(-0.5 * ((value - center) / sigma) ** 2);
 }
 
+/** @param {readonly number[]} values */
 function normalize(values) {
   const total = values.reduce((sum, value) => sum + value, 0);
   if (!(total > 0)) return values.map(() => 1 / values.length);
   return values.map((value) => value / total);
 }
 
+/** @param {readonly number[]} values */
 function entropy(values) {
   return -values.reduce((sum, value) => sum + (value > 0 ? value * Math.log(value) : 0), 0);
 }
 
+/** @param {number} value */
 function linearToSrgb(value) {
   const channel = value <= 0.0031308 ? 12.92 * value : 1.055 * value ** (1 / 2.4) - 0.055;
   return clamp(channel, 0, 1);
 }
 
+/** @param {number} value */
 function grayscaleCss(value) {
   const byte = Math.round(value * 255);
   return `rgb(${byte} ${byte} ${byte})`;
 }
 
+/** @param {number} degrees */
 function degreesToRadians(degrees) {
   return (degrees * Math.PI) / 180;
 }
 
+/** @param {number} radians */
 function radiansToDegrees(radians) {
   return (radians * 180) / Math.PI;
 }
 
+/** @param {readonly number[]} values */
 function median(values) {
   const sorted = [...values].sort((left, right) => left - right);
   const middle = Math.floor(sorted.length / 2);
   return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
 }
 
+/** @param {number} value @param {number} minimum @param {number} maximum */
 function clamp(value, minimum, maximum) {
   return Math.min(maximum, Math.max(minimum, value));
 }
 
+/** @param {number} value @param {number} step */
 function roundTo(value, step) {
   return Math.round(value / step) * step;
 }

@@ -15,6 +15,21 @@
  * - Anomalous-trichromacy model: https://doi.org/10.1109/TVCG.2009.113
  */
 
+/** @typedef {() => number} RandomSource */
+/** @typedef {'protan' | 'deutan' | 'tritan'} AxisType */
+/** @typedef {AxisType | 'control'} TrialType */
+/** @typedef {'up' | 'right' | 'down' | 'left'} Orientation */
+/** @typedef {'up' | 'down'} StaircaseDirection */
+/** @typedef {'floor' | 'ceiling'} AxisLimit */
+/** @typedef {{ label: string, description: string, background: readonly number[] }} AxisConfig */
+/** @typedef {{ forcedColors: boolean, theme: string, dpr: number, orientation: string, viewportWidth: number, viewportHeight: number }} DisplayEnvironment */
+/** @typedef {{ strength: number, correct: boolean }} AxisPresentation */
+/** @typedef {{ strength: number, step: number, correctStreak: number, lastDirection: StaircaseDirection | null, reversals: number[], presentations: AxisPresentation[], boundaryMisses: number, finished: boolean, limit: AxisLimit | null }} AxisState */
+/** @typedef {{ id: string, type: TrialType, orientation: Orientation }} AdaptiveSlot */
+/** @typedef {AdaptiveSlot & { label: string, description: string, background: readonly number[], strength: number }} AdaptiveTrial */
+/** @typedef {{ trialId: string, type: TrialType, orientation: Orientation, answer: string, strength: number, correct: boolean }} AdaptiveResponse */
+/** @typedef {{ index: number, schedule: AdaptiveSlot[], axes: Record<AxisType, AxisState>, controls: { correct: number, total: number }, responses: AdaptiveResponse[] }} AdaptiveRun */
+
 const RGB_TO_LMS = [
   [0.31399022, 0.63951294, 0.04649755],
   [0.15537241, 0.75789446, 0.08670142],
@@ -27,27 +42,38 @@ const LMS_TO_RGB = [
   [0.02980165, -0.19318073, 1.16364789],
 ];
 
+/** @param {number} value @param {number} minimum @param {number} maximum */
 function clamp(value, minimum, maximum) {
   return Math.min(maximum, Math.max(minimum, value));
 }
 
+/** @param {number} value */
 function clamp01(value) {
   return clamp(value, 0, 1);
 }
 
+/** @param {readonly number[]} vector */
 function normalize(vector) {
   const length = Math.hypot(...vector) || 1;
   return vector.map((component) => component / length);
 }
 
+/** @param {number} value */
 function rounded(value) {
   return Math.round(value * 1000) / 1000;
 }
 
+/** @param {readonly number[]} values */
 function mean(values) {
   return values.reduce((total, value) => total + value, 0) / values.length;
 }
 
+/**
+ * @template T
+ * @param {readonly T[]} values
+ * @param {RandomSource} random
+ * @returns {T[]}
+ */
 function shuffled(values, random) {
   const copy = [...values];
   for (let index = copy.length - 1; index > 0; index -= 1) {
@@ -57,16 +83,19 @@ function shuffled(values, random) {
   return copy;
 }
 
+/** @param {number} channel */
 export function srgbToLinear(channel) {
   const value = channel / 255;
   return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
 }
 
+/** @param {number} value */
 export function linearToSrgb(value) {
   const encoded = value <= 0.0031308 ? value * 12.92 : 1.055 * clamp01(value) ** (1 / 2.4) - 0.055;
   return Math.round(clamp01(encoded) * 255);
 }
 
+/** @type {Record<TrialType, number[]>} */
 export const CONFUSION_DIRECTIONS = {
   protan: normalize(LMS_TO_RGB.map((row) => row[0])),
   deutan: normalize(LMS_TO_RGB.map((row) => row[1])),
@@ -76,6 +105,7 @@ export const CONFUSION_DIRECTIONS = {
   control: normalize([0.65, -0.2, 0.73]),
 };
 
+/** @type {Record<AxisType, AxisConfig>} */
 export const AXIS_CONFIGS = {
   protan: {
     label: 'L direction',
@@ -94,7 +124,9 @@ export const AXIS_CONFIGS = {
   },
 };
 
-export const AXIS_TYPES = Object.freeze(Object.keys(AXIS_CONFIGS));
+/** @type {readonly AxisType[]} */
+export const AXIS_TYPES = Object.freeze(/** @type {AxisType[]} */ (Object.keys(AXIS_CONFIGS)));
+/** @type {readonly Orientation[]} */
 export const ORIENTATIONS = Object.freeze(['up', 'right', 'down', 'left']);
 
 export const ADAPTIVE_CONFIG = Object.freeze({
@@ -111,6 +143,9 @@ export const ADAPTIVE_CONFIG = Object.freeze({
 /**
  * Identify display changes that make a browser-relative measurement run
  * incomparable with the conditions captured at its start.
+ *
+ * @param {DisplayEnvironment | null} baseline
+ * @param {DisplayEnvironment | null} current
  */
 export function displayEnvironmentChange(baseline, current) {
   if (!baseline || !current) return 'missing';
@@ -134,6 +169,7 @@ export const DEMO_TARGET = Object.freeze({
   background: AXIS_CONFIGS.deutan.background,
 });
 
+/** @param {readonly number[]} linearRgb */
 export function lmsOf(linearRgb) {
   return RGB_TO_LMS.map((row) => row[0] * linearRgb[0] + row[1] * linearRgb[1] + row[2] * linearRgb[2]);
 }
@@ -142,6 +178,10 @@ export function lmsOf(linearRgb) {
  * Return a field/target pair separated along one fixed display-model direction.
  * Both values are retained in linear sRGB so luminance noise can be applied
  * before encoding for canvas.
+ *
+ * @param {readonly number[]} backgroundLinear
+ * @param {TrialType} type
+ * @param {number} strength
  */
 export function makeTargetPair(backgroundLinear, type, strength) {
   const direction = CONFUSION_DIRECTIONS[type] ?? CONFUSION_DIRECTIONS.deutan;
@@ -156,16 +196,24 @@ export function makeTargetPair(backgroundLinear, type, strength) {
   };
 }
 
-/** Apply the same luminance-noise distribution to target and field dots. */
+/**
+ * Apply the same luminance-noise distribution to target and field dots.
+ *
+ * @param {readonly number[]} baseLinear
+ * @param {RandomSource} random
+ * @param {number} luminanceJitter
+ */
 export function jitterDotColor(baseLinear, random, luminanceJitter = 0.18) {
   const scale = 1 + (random() - 0.5) * 2 * luminanceJitter;
   return baseLinear.map((channel) => linearToSrgb(channel * scale));
 }
 
+/** @param {readonly number[]} channels */
 export function rgbCss(channels) {
   return `rgb(${channels[0]} ${channels[1]} ${channels[2]})`;
 }
 
+/** @param {readonly number[]} a @param {readonly number[]} b */
 export function srgbDistance(a, b) {
   const rMean = (a[0] + b[0]) / 2;
   const dr = a[0] - b[0];
@@ -174,6 +222,7 @@ export function srgbDistance(a, b) {
   return Math.sqrt((2 + rMean / 256) * dr * dr + 4 * dg * dg + (2 + (255 - rMean) / 256) * db * db);
 }
 
+/** @returns {AxisState} */
 function createAxisState() {
   return {
     strength: ADAPTIVE_CONFIG.initialStrength,
@@ -188,7 +237,9 @@ function createAxisState() {
   };
 }
 
+/** @param {RandomSource} random @returns {AdaptiveSlot[]} */
 function buildSchedule(random) {
+  /** @type {TrialType[]} */
   const schedule = [];
   const controlRounds = new Set(
     Array.from({ length: ADAPTIVE_CONFIG.controlTrials }, (_, index) =>
@@ -206,17 +257,27 @@ function buildSchedule(random) {
   }));
 }
 
-/** Create one randomized, interleaved adaptive run. */
+/**
+ * Create one randomized, interleaved adaptive run.
+ *
+ * @param {RandomSource} random
+ * @returns {AdaptiveRun}
+ */
 export function createAdaptiveRun(random = Math.random) {
+  /** @type {Record<AxisType, AxisState>} */
+  const axes = /** @type {Record<AxisType, AxisState>} */ (
+    Object.fromEntries(AXIS_TYPES.map((type) => [type, createAxisState()]))
+  );
   return {
     index: 0,
     schedule: buildSchedule(random),
-    axes: Object.fromEntries(AXIS_TYPES.map((type) => [type, createAxisState()])),
+    axes,
     controls: { correct: 0, total: 0 },
     responses: [],
   };
 }
 
+/** @param {AdaptiveRun} run @returns {AdaptiveTrial | null} */
 export function currentAdaptiveTrial(run) {
   const slot = run.schedule[run.index];
   if (!slot) return null;
@@ -237,6 +298,7 @@ export function currentAdaptiveTrial(run) {
   };
 }
 
+/** @param {AxisState} state @param {boolean} correct */
 function updateStaircase(state, correct) {
   state.presentations.push({ strength: state.strength, correct });
 
@@ -253,6 +315,7 @@ function updateStaircase(state, correct) {
     state.boundaryMisses = 0;
   }
 
+  /** @type {StaircaseDirection | null} */
   let direction = null;
   if (correct) {
     state.correctStreak += 1;
@@ -287,6 +350,7 @@ function updateStaircase(state, correct) {
   );
 }
 
+/** @param {AdaptiveRun} run */
 function skipFinishedAxisSlots(run) {
   while (run.index < run.schedule.length) {
     const nextType = run.schedule[run.index].type;
@@ -295,7 +359,12 @@ function skipFinishedAxisSlots(run) {
   }
 }
 
-/** Record a forced-choice answer and advance the run by one presentation. */
+/**
+ * Record a forced-choice answer and advance the run by one presentation.
+ *
+ * @param {AdaptiveRun} run
+ * @param {string} answer
+ */
 export function recordAdaptiveAnswer(run, answer) {
   const trial = currentAdaptiveTrial(run);
   if (!trial) return null;
@@ -322,6 +391,7 @@ export function recordAdaptiveAnswer(run, answer) {
   return response;
 }
 
+/** @param {AxisType} type @param {AxisState} state */
 function summarizeAxis(type, state) {
   if (state.limit) {
     const threshold =
@@ -360,6 +430,8 @@ function summarizeAxis(type, state) {
 /**
  * Summarize only this run. No population norm or diagnostic classification is
  * applied because Daltonia has not been clinically validated.
+ *
+ * @param {AdaptiveRun} run
  */
 export function summarizeAdaptiveRun(run) {
   const controlOk = run.controls.total === ADAPTIVE_CONFIG.controlTrials && run.controls.correct >= 2;

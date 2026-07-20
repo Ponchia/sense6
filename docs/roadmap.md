@@ -42,7 +42,12 @@ The completed foundation includes:
 - route-scoped gallery CSS with independent entry, route, and combined budgets;
 - substantive localized static entry pages and crawler discovery artifacts;
 - stable message IDs for shared controls and safety boundaries;
-- strict typed-JavaScript checks for shared contracts and new modules; and
+- an automatic strict typed-JavaScript ratchet covering every domain model,
+  experiment view, locale catalog, and localization helper, plus shared routing
+  boundaries;
+- checked public declarations for every lazy-loaded experiment controller;
+- guarded phase variants for the Tetracromia session and fail-closed browser and
+  persistence boundaries; and
 - enforced JavaScript and CSS production bundle budgets.
 
 The journal is now a separate versioned store. Existing concise latest-or-best
@@ -75,11 +80,15 @@ validated, certified, diagnostic, or suitable for medical or occupational use.
   Tetracromia CSS when the global entry approaches its 125 kB ceiling.
 - Put reusable controls and safety boundaries in
   `src/i18n/message-ids.js`. Migrate older source-keyed prose when it changes;
-  do not create a high-risk catalog rewrite only to change key shape.
-- Extend strict typed-JavaScript coverage through shared contracts and new
-  modules first. Convert individual experiment modules incrementally when they
-  are changed, rather than through an unreviewable suite-wide rewrite. Revisit
-  TypeScript only under the conditions in ADR 0005.
+  don't create a high-risk catalog rewrite only to change key shape.
+- Keep the strict typed-JavaScript roots and public controller declarations
+  green. Convert one controller's internal state transitions when that
+  controller changes, rather than through an unreviewable suite-wide rewrite.
+  Revisit `.ts` modules only under the evidence-based conditions in architecture
+  decision record 0005.
+- Add runtime guards and malformed-input tests whenever code crosses storage,
+  browser API, dynamic import, or phase-transition boundaries. Types alone do
+  not validate those values.
 
 Keep every value labelled as a run-specific, device-relative observation. Make
 no clinical acuity, screening, diagnosis, prescription, certification, or

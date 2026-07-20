@@ -56,6 +56,25 @@ test('insertSequence removes the tile and re-inserts it, shifting the rest', () 
   assert.equal(lab.insertSequence(0, 7), false);
 });
 
+test('phase-specific operations reject invalid state transitions', () => {
+  const lab = new ColorLabSession('state-guards');
+
+  assert.equal(lab.phase.id, 'threshold');
+  assert.throws(() => lab.submitSequence(), /sequence trial is required/i);
+  assert.throws(() => lab.insertSequence(0, 1), /sequence trial is required/i);
+
+  while (lab.phase.id !== 'sequence') lab.answerChoice(lab.currentTrial.answer, 100);
+
+  assert.throws(() => lab.answerChoice(0), /use submitSequence/i);
+});
+
+test('unknown phase indexes fail explicitly instead of producing partial state', () => {
+  const lab = new ColorLabSession('invalid-phase');
+  lab.phaseIndex = Number.MAX_SAFE_INTEGER;
+
+  assert.throws(() => lab.phase, /unknown session phase index/i);
+});
+
 test('a complete deterministic session produces bounded results', () => {
   const lab = new ColorLabSession('unit-session');
   let done = false;

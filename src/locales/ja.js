@@ -1,4 +1,5 @@
 // Japanese locale catalog. English source keys are the stable message identifiers.
+/** @type {Array<[string, string]>} */
 const rows = [
   ['Skip to content', '本文へ移動'],
   ['Sense6 — all tests', 'Sense6 — すべてのテスト'],

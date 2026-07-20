@@ -1,13 +1,21 @@
 import { messageSource } from './i18n/message-ids.js';
 import { DEFAULT_LOCALE, LOCALES, loadMessages, localeMetadata, resolveLocale } from './locales.js';
 
+/** @typedef {import('./locale-metadata.js').LocaleCode} LocaleCode */
+
 const STORAGE_KEY = 'sense6:locale';
+/** @type {WeakMap<Text, string>} */
 const textSources = new WeakMap();
+/** @type {WeakMap<Element, Map<string, string>>} */
 const attributeSources = new WeakMap();
+/** @type {LocaleCode} */
 let locale = DEFAULT_LOCALE;
+/** @type {Map<string, string>} */
 let messages = new Map();
+/** @type {((locale: LocaleCode) => void | Promise<void>) | null} */
 let localeChangeHandler = null;
 
+/** @param {{ initialLocale?: unknown, onLocaleChange?: (locale: LocaleCode) => void | Promise<void> }} options */
 export async function initializeI18n({ initialLocale, onLocaleChange } = {}) {
   localeChangeHandler = onLocaleChange ?? null;
   locale = normalizeLocale(initialLocale) ?? storedLocale() ?? browserLocale() ?? DEFAULT_LOCALE;
@@ -23,6 +31,7 @@ export function getLocale() {
   return locale;
 }
 
+/** @param {unknown} nextLocale @param {{ notify?: boolean }} options */
 export async function setLocale(nextLocale, { notify = true } = {}) {
   const normalized = normalizeLocale(nextLocale);
   if (!normalized || normalized === locale) return false;
@@ -36,13 +45,14 @@ export async function setLocale(nextLocale, { notify = true } = {}) {
     // Language still applies for this page when storage is unavailable.
   }
   const selector = document.querySelector('[data-locale-select]');
-  if (selector) selector.value = locale;
+  if (selector instanceof HTMLSelectElement) selector.value = locale;
   translateTree(document.documentElement);
   localizeInternalLinks(document);
   if (notify) await localeChangeHandler?.(locale);
   return true;
 }
 
+/** @param {string} source @param {Record<string, string | number>} values */
 export function t(source, values = {}) {
   const translated = messages.get(source) ?? (Object.keys(values).length ? source : translateExact(source));
   return Object.entries(values).reduce(
@@ -60,15 +70,18 @@ export function m(id, values = {}) {
   return t(messageSource(id), values);
 }
 
+/** @param {string | number} value */
 function interpolationValue(value) {
   const rendered = String(value);
   return localeMetadata(locale).direction === 'rtl' ? `\u2068${rendered}\u2069` : rendered;
 }
 
+/** @param {number} value @param {Intl.NumberFormatOptions} [options] */
 export function formatNumber(value, options) {
   return new Intl.NumberFormat(localeMetadata(locale).languageTag, options).format(value);
 }
 
+/** @param {string} route @param {string} targetLocale */
 export function localeHref(route = '', targetLocale = locale) {
   const normalizedRoute = String(route).replace(/^\/+|\/+$/g, '');
   return `/${targetLocale}/${normalizedRoute ? `${normalizedRoute}/` : ''}`;
@@ -78,6 +91,7 @@ export function localeHref(route = '', targetLocale = locale) {
  * Return a mount root that localizes every explicit HTML render. This keeps
  * translation at the view boundary and avoids observing arbitrary DOM changes.
  */
+/** @param {HTMLElement} root */
 export function localizedRoot(root) {
   return new Proxy(root, {
     get(target, property) {
@@ -92,18 +106,19 @@ export function localizedRoot(root) {
   });
 }
 
+/** @param {Node | null} root */
 export function translateTree(root) {
   if (!root) return;
-  if (root.nodeType === Node.TEXT_NODE) {
+  if (root instanceof Text) {
     translateTextNode(root);
     return;
   }
-  if (root.nodeType !== Node.ELEMENT_NODE && root.nodeType !== Node.DOCUMENT_NODE) return;
-  if (root.nodeType === Node.ELEMENT_NODE) translateAttributes(root);
+  if (!(root instanceof Element || root instanceof Document)) return;
+  if (root instanceof Element) translateAttributes(root);
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   let node = walker.nextNode();
   while (node) {
-    translateTextNode(node);
+    if (node instanceof Text) translateTextNode(node);
     node = walker.nextNode();
   }
   for (const element of root.querySelectorAll?.('[aria-label], [placeholder], [title]') ?? []) {
@@ -111,6 +126,7 @@ export function translateTree(root) {
   }
 }
 
+/** @param {Text} node */
 function translateTextNode(node) {
   if (node.parentElement?.matches('script, style')) return;
   const current = node.data;
@@ -125,6 +141,7 @@ function translateTextNode(node) {
   node.data = `${leading}${translated}${trailing}`;
 }
 
+/** @param {Element} element */
 function translateAttributes(element) {
   const translatable = ['aria-label', 'placeholder', 'title'];
   let sources = attributeSources.get(element);
@@ -134,13 +151,14 @@ function translateAttributes(element) {
   }
   for (const attribute of translatable) {
     if (!element.hasAttribute(attribute)) continue;
-    const source = sources.get(attribute) ?? element.getAttribute(attribute);
+    const source = sources.get(attribute) ?? element.getAttribute(attribute) ?? '';
     sources.set(attribute, source);
     const translated = translateExact(source);
     if (element.getAttribute(attribute) !== translated) element.setAttribute(attribute, translated);
   }
 }
 
+/** @param {string} source */
 function translateExact(source) {
   if (locale === DEFAULT_LOCALE) return source;
   const normalized = source.replace(/\s+/g, ' ').trim();
@@ -158,6 +176,7 @@ function translateExact(source) {
  * DOM. Catalog extraction intentionally records its stable phrases separately;
  * selecting non-overlapping longest matches keeps those phrases localizable.
  */
+/** @param {string} source */
 function translateDynamicText(source) {
   const candidates = [...messages]
     .filter(([key, value]) => key !== value && !key.includes('{') && key.length > 1 && source.includes(key))
@@ -193,18 +212,20 @@ function translateDynamicText(source) {
   return output + dynamicFragment(source.slice(cursor));
 }
 
+/** @param {string} fragment */
 function dynamicFragment(fragment) {
   if (localeMetadata(locale).direction !== 'rtl' || !/[\p{L}\p{N}]/u.test(fragment)) return fragment;
   return interpolationValue(fragment);
 }
 
+/** @param {string | undefined} value */
 function isWord(value) {
   return Boolean(value && /[\p{L}\p{N}]/u.test(value));
 }
 
 function renderLocaleSelector() {
   const selector = document.querySelector('[data-locale-select]');
-  if (!selector) return;
+  if (!(selector instanceof HTMLSelectElement)) return;
   selector.innerHTML = LOCALES.map(
     (entry) =>
       `<option value="${entry.code}" lang="${entry.languageTag}" dir="${entry.direction}">${entry.label}</option>`,
@@ -213,12 +234,14 @@ function renderLocaleSelector() {
   selector.addEventListener('change', () => void setLocale(selector.value));
 }
 
+/** @param {ParentNode} root */
 function localizeInternalLinks(root) {
   for (const link of root.querySelectorAll?.('a[data-sense6-route]') ?? []) {
-    link.setAttribute('href', localeHref(link.dataset.sense6Route));
+    if (link instanceof HTMLAnchorElement) link.setAttribute('href', localeHref(link.dataset.sense6Route));
   }
 }
 
+/** @param {unknown} value */
 export function normalizeLocale(value) {
   return resolveLocale(value);
 }

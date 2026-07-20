@@ -1,5 +1,15 @@
 import { shuffle } from './random.js';
 
+/** @typedef {() => number} RandomSource */
+/** @typedef {{ practiceTrials: number, scoredTrials: number, catchTrials: number, minWaitMs: number, maxWaitMs: number, responseTimeoutMs: number }} SignalConfig */
+/** @typedef {{ practiceTrials: number, scoredTrials: number, minWaitMs: number, maxWaitMs: number, responseTimeoutMs: number }} ChoiceConfig */
+/** @typedef {{ durationMs: number, minWaitMs: number, maxWaitMs: number, responseTimeoutMs: number }} StabilityConfig */
+/** @typedef {{ anticipationMs: number, feedbackMs: number, signal: SignalConfig, choice: ChoiceConfig, stability: StabilityConfig }} ReflexConfig */
+/** @typedef {Partial<Omit<ReflexConfig, 'signal' | 'choice' | 'stability'>> & { signal?: Partial<SignalConfig>, choice?: Partial<ChoiceConfig>, stability?: Partial<StabilityConfig> }} ReflexConfigOverride */
+/** @typedef {'correct' | 'wrong' | 'miss' | 'false-start' | 'anticipation'} ReflexOutcome */
+/** @typedef {{ outcome: ReflexOutcome, rt?: number | null }} ReflexRecord */
+/** @typedef {{ signal: ReflexRecord[], choice: ReflexRecord[], stability: ReflexRecord[] }} ReflexRecords */
+
 export const DEFAULT_REFLEX_CONFIG = Object.freeze({
   anticipationMs: 100,
   feedbackMs: 520,
@@ -26,6 +36,7 @@ export const DEFAULT_REFLEX_CONFIG = Object.freeze({
   }),
 });
 
+/** @param {ReflexConfigOverride} override @returns {ReflexConfig} */
 export function mergeReflexConfig(override = {}) {
   return {
     ...DEFAULT_REFLEX_CONFIG,
@@ -36,6 +47,9 @@ export function mergeReflexConfig(override = {}) {
   };
 }
 
+/**
+ * @param {{ trials: number, catches?: number, minWaitMs: number, maxWaitMs: number, random: RandomSource }} options
+ */
 export function createSignalSchedule({ trials, catches = 0, minWaitMs, maxWaitMs, random }) {
   const signalTrials = balancedWaits(trials, minWaitMs, maxWaitMs, random).map((waitMs) => ({
     kind: 'signal',
@@ -49,6 +63,7 @@ export function createSignalSchedule({ trials, catches = 0, minWaitMs, maxWaitMs
   return shuffle([...signalTrials, ...catchTrials], random);
 }
 
+/** @param {{ trials: number, minWaitMs: number, maxWaitMs: number, random: RandomSource }} options */
 export function createChoiceSchedule({ trials, minWaitMs, maxWaitMs, random }) {
   const sides = Array.from({ length: trials }, (_, index) => (index % 2 === 0 ? 'left' : 'right'));
   const waits = balancedWaits(trials, minWaitMs, maxWaitMs, random);
@@ -57,10 +72,12 @@ export function createChoiceSchedule({ trials, minWaitMs, maxWaitMs, random }) {
   return waits.map((waitMs, index) => ({ kind: 'choice', side: shuffledSides[index], waitMs }));
 }
 
+/** @param {number} minWaitMs @param {number} maxWaitMs @param {RandomSource} random */
 export function randomWait(minWaitMs, maxWaitMs, random) {
   return Math.round(minWaitMs + random() * (maxWaitMs - minWaitMs));
 }
 
+/** @param {readonly number[]} values */
 export function median(values) {
   if (!values.length) return null;
   const sorted = [...values].sort((left, right) => left - right);
@@ -68,6 +85,7 @@ export function median(values) {
   return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
 }
 
+/** @param {readonly number[]} values @param {number} proportion */
 export function percentile(values, proportion) {
   if (!values.length) return null;
   const sorted = [...values].sort((left, right) => left - right);
@@ -75,15 +93,18 @@ export function percentile(values, proportion) {
   return sorted[index];
 }
 
+/** @param {readonly number[]} values */
 export function medianAbsoluteDeviation(values) {
   const center = median(values);
   return center === null ? null : median(values.map((value) => Math.abs(value - center)));
 }
 
+/** @param {number | null} value */
 export function roundToFive(value) {
-  return Number.isFinite(value) ? Math.round(value / 5) * 5 : null;
+  return typeof value === 'number' && Number.isFinite(value) ? Math.round(value / 5) * 5 : null;
 }
 
+/** @param {ReflexRecords} records @param {Partial<Record<'signal' | 'choice' | 'stability', number>>} expected */
 export function summarizeRiflessi(records, expected = {}) {
   const signalTimes = correctTimes(records.signal);
   const choiceTimes = correctTimes(records.choice);
@@ -93,9 +114,12 @@ export function summarizeRiflessi(records, expected = {}) {
   const stabilityMedian = median(stabilityTimes);
   const slowestCutoff = percentile(stabilityTimes, 0.8);
   const slowestTimes = slowestCutoff === null ? [] : stabilityTimes.filter((value) => value >= slowestCutoff);
+  const slowestMedian = median(slowestTimes);
   const middle = Math.floor(stabilityTimes.length / 2);
   const firstHalf = stabilityTimes.slice(0, middle);
   const secondHalf = stabilityTimes.slice(middle);
+  const firstHalfMedian = median(firstHalf);
+  const secondHalfMedian = median(secondHalf);
   const choiceAttempts = records.choice.filter((record) =>
     ['correct', 'wrong', 'miss'].includes(record.outcome),
   ).length;
@@ -121,11 +145,13 @@ export function summarizeRiflessi(records, expected = {}) {
     stability: {
       medianMs: roundToFive(stabilityMedian),
       slowestGapMs:
-        stabilityMedian === null || !slowestTimes.length
+        stabilityMedian === null || slowestMedian === null
           ? null
-          : roundToFive(median(slowestTimes) - stabilityMedian),
+          : roundToFive(slowestMedian - stabilityMedian),
       driftMs:
-        !firstHalf.length || !secondHalf.length ? null : roundToFive(median(secondHalf) - median(firstHalf)),
+        firstHalfMedian === null || secondHalfMedian === null
+          ? null
+          : roundToFive(secondHalfMedian - firstHalfMedian),
       valid: stabilityTimes.length,
     },
     events: {
@@ -141,6 +167,7 @@ export function summarizeRiflessi(records, expected = {}) {
   };
 }
 
+/** @param {number} count @param {number} minWaitMs @param {number} maxWaitMs @param {RandomSource} random */
 function balancedWaits(count, minWaitMs, maxWaitMs, random) {
   if (count <= 0) return [];
   const span = maxWaitMs - minWaitMs;
@@ -154,8 +181,11 @@ function balancedWaits(count, minWaitMs, maxWaitMs, random) {
   return shuffle(values, random);
 }
 
+/** @param {ReflexRecord[]} records */
 function correctTimes(records = []) {
-  return records
-    .filter((record) => record.outcome === 'correct' && Number.isFinite(record.rt))
-    .map((record) => record.rt);
+  return records.flatMap((record) =>
+    record.outcome === 'correct' && typeof record.rt === 'number' && Number.isFinite(record.rt)
+      ? [record.rt]
+      : [],
+  );
 }

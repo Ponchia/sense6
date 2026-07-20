@@ -1,6 +1,24 @@
 import { circularHueDistance, deltaEok } from './color.js';
 import { randomInt, seededRandom, shuffle } from './random.js';
 
+/** @typedef {() => number} RandomSource */
+/** @typedef {'threshold' | 'field'} DiscriminationKind */
+/** @typedef {DiscriminationKind | 'sequence'} PhaseId */
+/** @typedef {{ id: PhaseId, number: string, name: string, short: string, trials: number }} Phase */
+/** @typedef {{ hue: number, label: string }} HueFamily */
+/** @typedef {'up' | 'down'} StaircaseDirection */
+/** @typedef {{ level: number, correct: boolean }} StaircaseHistory */
+/** @typedef {{ level: number, minimum: number, maximum: number, correctStreak: number, previousDirection: StaircaseDirection | null, reversals: number[], history: StaircaseHistory[] }} Staircase */
+/** @typedef {{ l: number, c: number, h: number }} LabColor */
+/** @typedef {{ kind: DiscriminationKind, answer: number, reference: LabColor, target: LabColor, delta: number, nonce: number }} DiscriminationTrial */
+/** @typedef {{ id: number, l: number, c: number, h: number }} SequenceColor */
+/** @typedef {{ kind: 'sequence', colors: SequenceColor[], order: number[], selected: number | null, nonce: number }} SequenceTrial */
+/** @typedef {DiscriminationTrial | SequenceTrial} ColorLabTrial */
+/** @typedef {{ correct: boolean, choice: number, answer: number, delta: number, level: number, hue: number, elapsedMs: number }} DiscriminationResponse */
+/** @typedef {{ score: number, order: number[], elapsedMs: number }} SequenceResponse */
+/** @typedef {{ threshold: DiscriminationResponse[], field: DiscriminationResponse[], sequence: SequenceResponse[] }} SessionResponses */
+
+/** @type {readonly Phase[]} */
 export const PHASES = [
   {
     id: 'threshold',
@@ -25,6 +43,7 @@ export const PHASES = [
   },
 ];
 
+/** @type {readonly HueFamily[]} */
 export const HUE_FAMILIES = [
   { hue: 18, label: 'Rose' },
   { hue: 62, label: 'Amber' },
@@ -35,6 +54,7 @@ export const HUE_FAMILIES = [
   { hue: 326, label: 'Magenta' },
 ];
 
+/** @param {{ initial?: number, minimum?: number, maximum?: number }} options @returns {Staircase} */
 export function createStaircase({ initial = 18, minimum = 1.2, maximum = 26 } = {}) {
   return {
     level: initial,
@@ -47,9 +67,11 @@ export function createStaircase({ initial = 18, minimum = 1.2, maximum = 26 } = 
   };
 }
 
+/** @param {Staircase} staircase @param {boolean} correct @returns {Staircase} */
 export function updateStaircase(staircase, correct) {
   const next = { ...staircase, reversals: [...staircase.reversals], history: [...staircase.history] };
   next.history.push({ level: next.level, correct });
+  /** @type {StaircaseDirection | null} */
   let direction = null;
 
   if (correct) {
@@ -73,6 +95,7 @@ export function updateStaircase(staircase, correct) {
   return next;
 }
 
+/** @param {Staircase} staircase */
 export function staircaseThreshold(staircase) {
   const samples =
     staircase.reversals.length >= 4
@@ -85,6 +108,7 @@ export function staircaseThreshold(staircase) {
   return ordered.length % 2 === 0 ? (ordered[middle - 1] + ordered[middle]) / 2 : ordered[middle];
 }
 
+/** @param {readonly number[]} order */
 export function sequenceScore(order) {
   const count = order.length;
   let inversions = 0;
@@ -99,6 +123,7 @@ export function sequenceScore(order) {
   return maximum === 0 ? 100 : Math.round((1 - inversions / maximum) * 100);
 }
 
+/** @param {RandomSource} random @param {Staircase} staircase @param {DiscriminationKind} kind @param {number} baseFamilyHue @returns {DiscriminationTrial} */
 function createDiscriminationTrial(random, staircase, kind, baseFamilyHue) {
   const baseHue = baseFamilyHue + (random() - 0.5) * 14;
   const direction = random() > 0.5 ? 1 : -1;
@@ -120,6 +145,7 @@ function createDiscriminationTrial(random, staircase, kind, baseFamilyHue) {
   };
 }
 
+/** @param {RandomSource} random @param {number} round @returns {SequenceTrial} */
 function createSequenceTrial(random, round) {
   const count = 9;
   const starts = [8, 126, 238];
@@ -145,17 +171,22 @@ function createSequenceTrial(random, round) {
 }
 
 export class ColorLabSession {
+  /** @param {string | number} seed */
   constructor(seed = Date.now()) {
     this.seed = String(seed);
     this.random = seededRandom(this.seed);
     this.phaseIndex = 0;
     this.trialIndex = 0;
+    /** @type {Record<DiscriminationKind, Staircase>} */
     this.staircases = {
       threshold: createStaircase({ initial: 21 }),
       field: createStaircase({ initial: 24 }),
     };
+    /** @type {SessionResponses} */
     this.responses = { threshold: [], field: [], sequence: [] };
+    /** @type {Record<DiscriminationKind, number[]>} */
     this.hueDecks = { threshold: [], field: [] };
+    /** @type {ColorLabTrial} */
     this.currentTrial = this.createTrial();
   }
 
@@ -164,6 +195,7 @@ export class ColorLabSession {
    * family is sampled evenly across a phase and the hue profile has data in
    * every direction.
    */
+  /** @param {DiscriminationKind} kind */
   nextBaseHue(kind) {
     const deck = this.hueDecks[kind];
     if (deck.length === 0) {
@@ -174,11 +206,15 @@ export class ColorLabSession {
         ),
       );
     }
-    return deck.pop();
+    const hue = deck.pop();
+    if (hue === undefined) throw new Error(`Hue deck for ${kind} could not be refilled`);
+    return hue;
   }
 
   get phase() {
-    return PHASES[this.phaseIndex];
+    const phase = PHASES[this.phaseIndex];
+    if (!phase) throw new Error(`Unknown session phase index: ${this.phaseIndex}`);
+    return phase;
   }
 
   get completedTrials() {
@@ -193,61 +229,74 @@ export class ColorLabSession {
     return Math.round((this.completedTrials / this.totalTrials) * 100);
   }
 
+  /** @returns {ColorLabTrial} */
   createTrial() {
-    if (this.phase.id === 'sequence') return createSequenceTrial(this.random, this.trialIndex);
+    const phase = this.phase;
+    if (phase.id === 'sequence') return createSequenceTrial(this.random, this.trialIndex);
     return createDiscriminationTrial(
       this.random,
-      this.staircases[this.phase.id],
-      this.phase.id,
-      this.nextBaseHue(this.phase.id),
+      this.staircases[phase.id],
+      phase.id,
+      this.nextBaseHue(phase.id),
     );
   }
 
+  /** @param {number} choice @param {number} elapsedMs */
   answerChoice(choice, elapsedMs = 0) {
-    if (this.phase.id === 'sequence') throw new Error('Use submitSequence for sequence trials.');
-    const correct = choice === this.currentTrial.answer;
+    const phase = this.phase;
+    if (phase.id === 'sequence') throw new Error('Use submitSequence for sequence trials.');
+    const trial = this.requireDiscriminationTrial();
+    const correct = choice === trial.answer;
     const response = {
       correct,
       choice,
-      answer: this.currentTrial.answer,
-      delta: this.currentTrial.delta,
-      level: this.staircases[this.phase.id].level,
-      hue: this.currentTrial.reference.h,
+      answer: trial.answer,
+      delta: trial.delta,
+      level: this.staircases[phase.id].level,
+      hue: trial.reference.h,
       elapsedMs,
     };
-    this.responses[this.phase.id].push(response);
-    this.staircases[this.phase.id] = updateStaircase(this.staircases[this.phase.id], correct);
+    this.responses[phase.id].push(response);
+    this.staircases[phase.id] = updateStaircase(this.staircases[phase.id], correct);
     return { correct, response, done: this.advance() };
   }
 
+  /** @param {number} firstIndex @param {number} secondIndex */
   swapSequence(firstIndex, secondIndex) {
-    const order = [...this.currentTrial.order];
+    const trial = this.requireSequenceTrial();
+    const order = [...trial.order];
     [order[firstIndex], order[secondIndex]] = [order[secondIndex], order[firstIndex]];
-    this.currentTrial = { ...this.currentTrial, order };
+    this.currentTrial = { ...trial, order };
   }
 
+  /** @param {number} index @param {number} direction */
   moveSequence(index, direction) {
+    const trial = this.requireSequenceTrial();
     const target = index + direction;
-    if (target < 0 || target >= this.currentTrial.order.length) return false;
+    if (target < 0 || target >= trial.order.length) return false;
     this.swapSequence(index, target);
     return true;
   }
 
-  /** Remove the tile at fromIndex and re-insert it at toIndex, shifting the rest. */
+  /** @param {number} fromIndex @param {number} toIndex */
   insertSequence(fromIndex, toIndex) {
-    const length = this.currentTrial.order.length;
+    const trial = this.requireSequenceTrial();
+    const length = trial.order.length;
     if (fromIndex === toIndex) return false;
     if (fromIndex < 0 || toIndex < 0 || fromIndex >= length || toIndex >= length) return false;
-    const order = [...this.currentTrial.order];
+    const order = [...trial.order];
     const [moved] = order.splice(fromIndex, 1);
+    if (moved === undefined) return false;
     order.splice(toIndex, 0, moved);
-    this.currentTrial = { ...this.currentTrial, order };
+    this.currentTrial = { ...trial, order };
     return true;
   }
 
+  /** @param {number} elapsedMs */
   submitSequence(elapsedMs = 0) {
-    const score = sequenceScore(this.currentTrial.order);
-    this.responses.sequence.push({ score, order: [...this.currentTrial.order], elapsedMs });
+    const trial = this.requireSequenceTrial();
+    const score = sequenceScore(trial.order);
+    this.responses.sequence.push({ score, order: [...trial.order], elapsedMs });
     return { score, done: this.advance() };
   }
 
@@ -299,21 +348,41 @@ export class ColorLabSession {
     };
   }
 
+  /** @param {DiscriminationKind} kind @param {number} level */
   levelToDelta(kind, level) {
     const reference = { l: kind === 'field' ? 0.7 : 0.67, c: kind === 'field' ? 0.095 : 0.105, h: 0 };
     return deltaEok(reference, { ...reference, h: level });
   }
+
+  /** @returns {DiscriminationTrial} */
+  requireDiscriminationTrial() {
+    if (this.currentTrial.kind === 'sequence') {
+      throw new Error('A discrimination trial is required for this operation.');
+    }
+    return this.currentTrial;
+  }
+
+  /** @returns {SequenceTrial} */
+  requireSequenceTrial() {
+    if (this.currentTrial.kind !== 'sequence') {
+      throw new Error('A sequence trial is required for this operation.');
+    }
+    return this.currentTrial;
+  }
 }
 
+/** @param {DiscriminationResponse[]} responses */
 function accuracy(responses) {
   if (responses.length === 0) return 0;
   return Math.round((responses.filter(({ correct }) => correct).length / responses.length) * 100);
 }
 
+/** @param {number} delta */
 function discriminationScore(delta) {
   return Math.round(Math.max(0, Math.min(100, 112 - delta * 22)));
 }
 
+/** @param {number} hue */
 function nearestFamilyIndex(hue) {
   let nearest = 0;
   let nearestDistance = Number.POSITIVE_INFINITY;
@@ -331,6 +400,8 @@ function nearestFamilyIndex(hue) {
  * Share of correct choices per hue family. The staircase keeps overall
  * difficulty near the observer's boundary, so differences between families
  * show relative strengths rather than absolute ability.
+ *
+ * @param {DiscriminationResponse[]} responses
  */
 function hueProfile(responses) {
   return HUE_FAMILIES.map((family, index) => {

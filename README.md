@@ -329,11 +329,18 @@ Check the JavaScript and CSS source with Biome:
 npm run lint
 ```
 
-Check the typed JavaScript contracts:
+Check the strict typed-JavaScript contracts and coverage ratchet:
 
 ```sh
 npm run typecheck
 ```
+
+The ratchet automatically includes domain models, experiment views,
+localization helpers, and locale catalogs; it also rejects unchecked additions
+and type-suppression escapes in those boundaries. Experiment controllers expose
+checked public declarations and are converted internally one stable transition
+at a time. See ADR 0005 for the evidence that would justify moving individual
+modules to TypeScript.
 
 Run unit tests with enforced coverage for shared storage and lifecycle code:
 
