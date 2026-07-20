@@ -103,6 +103,9 @@ export function summarizeBlindSpot(readingsMm, options = {}) {
     return { coherent: false, distanceMm: null, spreadPercent: null, readings };
   }
   const distanceMm = median(readings);
+  if (distanceMm === null) {
+    return { coherent: false, distanceMm: null, spreadPercent: null, readings };
+  }
   const spreadPercent = ((Math.max(...readings) - Math.min(...readings)) / distanceMm) * 100;
   const coherent =
     distanceMm >= config.minDistanceMm &&
@@ -169,6 +172,7 @@ export function createAcuityTrack({
   random = Math.random,
 } = {}) {
   const config = { ...DEFAULT_ACUITY_CONFIG.estimator, ...estimator, minGapArcmin, maxGapArcmin };
+  if (!Number.isInteger(trials) || trials < 1) throw new RangeError('Acuity trials must be positive');
   if (!(config.maxGapArcmin > config.minGapArcmin)) throw new RangeError('Acuity range is not measurable');
   const grid = logarithmicGrid(config.minGapArcmin, config.maxGapArcmin, config.gridStepLog10);
   const priorCenter = Math.log10(config.priorMedianArcmin);
@@ -206,9 +210,11 @@ export function nextAcuityTrial(track) {
   } else {
     gapArcmin = mostInformativeStimulus(track);
   }
+  const orientation = track.orientations[presentation % track.orientations.length];
+  if (!orientation) throw new Error('Acuity orientation schedule is empty');
   return {
     gapArcmin,
-    orientation: track.orientations[presentation % track.orientations.length],
+    orientation,
     control,
   };
 }
@@ -278,12 +284,17 @@ export function createMeridianSchedule(options = {}) {
     for (let left = 0; left < angles.length; left += 1) {
       for (let right = left + 1; right < angles.length; right += 1) {
         const swap = random() >= 0.5;
+        const firstAngle = angles[left];
+        const secondAngle = angles[right];
+        if (firstAngle === undefined || secondAngle === undefined) {
+          throw new Error('Meridian angle schedule contains a missing value');
+        }
         pairs.push({
           block,
           scale,
           phase: random(),
-          leftAngle: swap ? angles[right] : angles[left],
-          rightAngle: swap ? angles[left] : angles[right],
+          leftAngle: swap ? secondAngle : firstAngle,
+          rightAngle: swap ? firstAngle : secondAngle,
         });
       }
     }
@@ -329,7 +340,7 @@ export function summarizeMeridians(records, options = {}) {
     ? (records.filter((record) => record.choice === 'equal').length / records.length) * 100
     : 0;
   const stable =
-    Boolean(leader) && sameLeader && leader.rate >= config.stableRate && margin >= config.stableMargin;
+    leader !== undefined && sameLeader && leader.rate >= config.stableRate && margin >= config.stableMargin;
   return {
     stable,
     preferredAngle: stable && leader ? leader.angle : null,
@@ -375,7 +386,8 @@ function updatePosterior(track, stimulusArcmin, correct) {
   const stimulusLog = Math.log10(stimulusArcmin);
   track.posterior = normalize(
     track.posterior.map((prior, index) => {
-      const probability = probabilityCorrect(stimulusLog, Math.log10(track.grid[index]), track.config);
+      const threshold = requiredNumber(track.grid[index], 'acuity threshold grid');
+      const probability = probabilityCorrect(stimulusLog, Math.log10(threshold), track.config);
       return prior * (correct ? probability : 1 - probability);
     }),
   );
@@ -389,16 +401,19 @@ function mostInformativeStimulus(track) {
     let correctProbability = 0;
     const likelihoods = track.grid.map((threshold, index) => {
       const probability = probabilityCorrect(Math.log10(stimulus), Math.log10(threshold), track.config);
-      correctProbability += track.posterior[index] * probability;
+      correctProbability += requiredNumber(track.posterior[index], 'acuity posterior') * probability;
       return probability;
     });
     const incorrectProbability = 1 - correctProbability;
     const correctPosterior = likelihoods.map(
-      (likelihood, index) => (track.posterior[index] * likelihood) / Math.max(correctProbability, 1e-12),
+      (likelihood, index) =>
+        (requiredNumber(track.posterior[index], 'acuity posterior') * likelihood) /
+        Math.max(correctProbability, 1e-12),
     );
     const incorrectPosterior = likelihoods.map(
       (likelihood, index) =>
-        (track.posterior[index] * (1 - likelihood)) / Math.max(incorrectProbability, 1e-12),
+        (requiredNumber(track.posterior[index], 'acuity posterior') * (1 - likelihood)) /
+        Math.max(incorrectProbability, 1e-12),
     );
     const expectedEntropy =
       correctProbability * entropy(correctPosterior) + incorrectProbability * entropy(incorrectPosterior);
@@ -414,8 +429,9 @@ function mostInformativeStimulus(track) {
 function posteriorQuantile(track, probability) {
   let cumulative = 0;
   for (let index = 0; index < track.grid.length; index += 1) {
-    cumulative += track.posterior[index];
-    if (cumulative >= probability) return track.grid[index];
+    cumulative += requiredNumber(track.posterior[index], 'acuity posterior');
+    const threshold = requiredNumber(track.grid[index], 'acuity threshold grid');
+    if (cumulative >= probability) return threshold;
   }
   return track.grid.at(-1) ?? track.config.maxGapArcmin;
 }
@@ -473,11 +489,22 @@ function radiansToDegrees(radians) {
   return (radians * 180) / Math.PI;
 }
 
-/** @param {readonly number[]} values */
+/** @param {readonly number[]} values @returns {number | null} */
 function median(values) {
+  if (values.length === 0) return null;
   const sorted = [...values].sort((left, right) => left - right);
   const middle = Math.floor(sorted.length / 2);
-  return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+  const upper = sorted[middle];
+  if (upper === undefined) return null;
+  if (sorted.length % 2) return upper;
+  const lower = sorted[middle - 1];
+  return lower === undefined ? null : (lower + upper) / 2;
+}
+
+/** @param {number | undefined} value @param {string} label */
+function requiredNumber(value, label) {
+  if (value === undefined) throw new Error(`Missing ${label} value`);
+  return value;
 }
 
 /** @param {number} value @param {number} minimum @param {number} maximum */

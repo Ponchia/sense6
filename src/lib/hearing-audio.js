@@ -110,9 +110,9 @@ export class HearingAudio {
   /** @param {PitchTrial} trial @param {(index: number) => void} [onInterval] */
   async playPitchTrial(trial, onInterval) {
     const upperHz = trial.anchorHz * (1 + trial.deltaPercent / 100);
-    const intervals = [0, 1].map((index) => ({
+    const intervals = trial.roveDb.map((roveDb, index) => ({
       frequencyHz: index === trial.higherInterval ? upperHz : trial.anchorHz,
-      gain: HEARING_DIGITAL_LEVELS.pitchBase * dbToGain(trial.roveDb[index]),
+      gain: HEARING_DIGITAL_LEVELS.pitchBase * dbToGain(roveDb),
     }));
     return this.playIntervals(intervals, onInterval);
   }

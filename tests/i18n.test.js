@@ -53,9 +53,11 @@ test('regional browser locales resolve without collapsing distinct language vari
   assert.equal(resolveLocale('zh-Hant-TW'), null);
   assert.equal(resolveLocale('ar-EG'), 'ar');
   assert.equal(resolveLocale('ja-JP'), 'ja');
+  assert.equal(resolveLocale('   '), null);
   assert.equal(localeMetadata('ar').direction, 'rtl');
   assert.equal(localeMetadata('pt-br').languageTag, 'pt-BR');
   assert.equal(localeMetadata('zh-hans').languageTag, 'zh-Hans');
+  assert.equal(localeMetadata('unknown').code, DEFAULT_LOCALE);
 });
 
 test('privacy and journal routes have dedicated copy in every supported language', () => {

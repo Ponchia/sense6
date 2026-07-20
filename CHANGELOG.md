@@ -87,6 +87,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   experiment-controller module declarations.
 - Runtime state guards and failure-mode tests for phase-specific color-session
   operations, unavailable canvas contexts, and malformed result envelopes.
+- Failure-mode tests for invalid random sources, missing adaptive-test state,
+  sparse schedules, empty statistics, and out-of-range sequence operations.
 
 ### Changed
 
@@ -97,6 +99,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Domain, routing, registry, and localization boundaries now narrow browser,
   storage, dynamic-import, and catalog values without JSDoc `any` or type
   suppressions.
+- The strict typed-JavaScript program now rejects unchecked indexed access.
+  Fixed numerical structures use tuple contracts, while variable lookups define
+  explicit fallback, rejection, or corrupt-state behavior.
 - Sense6 now explicitly positions every task as a recreational experiment for
   curiosity and fun. Formal validation, certification, regulatory approval, and
   professional review are not planned; software tests prove implementation
@@ -128,6 +133,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 - Malformed result envelopes can no longer be mistaken for valid legacy result
   records.
+- Invalid sequence swaps no longer mutate session state, and malformed adaptive
+  schedules and posterior grids now fail with explicit integrity errors.
 - Playwright runs can select a strict, isolated server port so concurrent
   worktrees do not reuse and later lose one another's development server.
 - `Daltonia` no longer forces a directional guess when no gap is visible or

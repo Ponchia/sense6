@@ -337,9 +337,11 @@ npm run typecheck
 
 The ratchet automatically includes domain models, experiment views,
 localization helpers, and locale catalogs; it also rejects unchecked additions
-and type-suppression escapes in those boundaries. Experiment controllers expose
-checked public declarations and are converted internally one stable transition
-at a time. See ADR 0005 for the evidence that would justify moving individual
+and type-suppression escapes in those boundaries. Unchecked indexed access is a
+compiler error, so fixed-size data uses tuples and variable lookups declare
+their fallback or failure behavior. Experiment controllers expose checked
+public declarations and are converted internally one stable transition at a
+time. See ADR 0005 for the evidence that would justify moving individual
 modules to TypeScript.
 
 Run unit tests with enforced coverage for shared storage and lifecycle code:

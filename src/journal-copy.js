@@ -323,6 +323,11 @@ const SETUP_KEYS = Object.freeze([
   'controlsPresented',
 ]);
 
+// Supplemental locale modules predate the extended setup passport. They own
+// the original translated labels; newer fields intentionally fall back to the
+// complete English table until those translations are added.
+const SUPPLEMENTAL_SETUP_KEYS = Object.freeze(SETUP_KEYS.slice(0, 14));
+
 /** @type {Readonly<Record<string, Readonly<Record<string, string>>>>} */
 const SETUP_LABELS = Object.freeze({
   en: setupLabels([
@@ -534,13 +539,17 @@ export function journalCopy(locale) {
 export function journalMetricLabel(id, translate = (source) => source) {
   const eye = id.match(/^(right|left)-(high|low|contrast-cost|meridian)$/);
   if (eye) {
-    const eyeLabel = translate(eye[1] === 'right' ? 'Right eye' : 'Left eye');
-    const measurement = {
+    const side = eye[1];
+    const measurementId = eye[2];
+    const eyeLabel = translate(side === 'right' ? 'Right eye' : 'Left eye');
+    /** @type {Readonly<Record<string, string>>} */
+    const measurements = {
       high: 'High-contrast angular gap',
       low: 'Low-contrast angular gap',
       'contrast-cost': 'Low-contrast cost',
       meridian: 'Meridional consistency',
-    }[eye[2]];
+    };
+    const measurement = measurementId ? measurements[measurementId] : undefined;
     return `${eyeLabel} — ${translate(measurement ?? id)}`;
   }
   return translate(METRICS[id] ?? id.replaceAll('-', ' '));
@@ -549,8 +558,10 @@ export function journalMetricLabel(id, translate = (source) => source) {
 /** @param {string} key @param {string} locale */
 export function journalSetupLabel(key, locale) {
   const supplemental = supplementalSetupLabels(locale);
-  const labels = supplemental ? setupLabels(supplemental) : SETUP_LABELS[locale];
-  return (labels ?? SETUP_LABELS.en)[key] ?? humanize(key);
+  const labels = supplemental ? setupLabels(supplemental, SUPPLEMENTAL_SETUP_KEYS) : SETUP_LABELS[locale];
+  const fallback = SETUP_LABELS.en;
+  if (!fallback) throw new Error('English setup labels are unavailable');
+  return labels?.[key] ?? fallback[key] ?? humanize(key);
 }
 
 /** @param {Record<string, string>} value */
@@ -558,9 +569,24 @@ function copy(value) {
   return Object.freeze(value);
 }
 
-/** @param {readonly string[]} labels */
-function setupLabels(labels) {
-  return Object.freeze(Object.fromEntries(SETUP_KEYS.map((key, index) => [key, labels[index]])));
+/**
+ * @param {readonly string[]} labels
+ * @param {readonly string[]} [keys]
+ * @returns {Readonly<Record<string, string>>}
+ */
+function setupLabels(labels, keys = SETUP_KEYS) {
+  if (labels.length !== keys.length) {
+    throw new RangeError(`Expected ${keys.length} setup labels, received ${labels.length}`);
+  }
+  return Object.freeze(
+    Object.fromEntries(
+      keys.map((key, index) => {
+        const label = labels[index];
+        if (!label) throw new Error(`Missing setup label for ${key}`);
+        return [key, label];
+      }),
+    ),
+  );
 }
 
 /** @param {string} value */

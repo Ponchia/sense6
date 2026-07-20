@@ -37,7 +37,9 @@ test('choice schedule balances sides and randomizes their order', () => {
 
 test('statistics use robust centers and display-safe rounding', () => {
   assert.equal(median([100, 500, 200, 300]), 250);
+  assert.equal(median([]), null);
   assert.equal(percentile([1, 2, 3, 4, 5], 0.8), 4);
+  assert.equal(percentile([], 0.8), null);
   assert.equal(roundToFive(247), 245);
   assert.equal(roundToFive(Number.NaN), null);
 });

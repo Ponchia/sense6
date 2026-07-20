@@ -166,7 +166,9 @@ function translateExact(source) {
   if (direct) return direct;
   const countMatch = normalized.match(/^(\d+) (tests|trials|runs)$/);
   if (countMatch) {
-    return `${interpolationValue(countMatch[1])} ${messages.get(countMatch[2]) ?? countMatch[2]}`;
+    const count = countMatch[1];
+    const noun = countMatch[2];
+    if (count && noun) return `${interpolationValue(count)} ${messages.get(noun) ?? noun}`;
   }
   return translateDynamicText(normalized) ?? source;
 }
