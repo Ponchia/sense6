@@ -1,3 +1,4 @@
+import { messageSource } from './i18n/message-ids.js';
 import { DEFAULT_LOCALE, LOCALES, loadMessages, localeMetadata, resolveLocale } from './locales.js';
 
 const STORAGE_KEY = 'sense6:locale';
@@ -48,6 +49,15 @@ export function t(source, values = {}) {
     (output, [key, value]) => output.replaceAll(`{${key}}`, interpolationValue(value)),
     translated,
   );
+}
+
+/**
+ * Translate shared interface copy through a stable message ID.
+ * @param {import('./i18n/message-ids.js').MessageId} id
+ * @param {Record<string, string | number>} [values]
+ */
+export function m(id, values = {}) {
+  return t(messageSource(id), values);
 }
 
 function interpolationValue(value) {

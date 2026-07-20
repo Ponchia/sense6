@@ -1,4 +1,4 @@
-import { EXAMS } from './exams/registry.js';
+import { METRIC_TEST_IDS } from './exams/contracts.js';
 
 export const METRIC_EVENTS = Object.freeze({
   siteLoaded: 'site_loaded',
@@ -9,7 +9,7 @@ export const METRIC_EVENTS = Object.freeze({
 
 export const METRIC_TESTS = Object.freeze({
   site: 'site',
-  ...Object.fromEntries(EXAMS.map(({ metricTest }) => [metricTest, metricTest])),
+  ...Object.fromEntries(METRIC_TEST_IDS.map((metricTest) => [metricTest, metricTest])),
 });
 
 const ALLOWED_PAIRS = new Set([
@@ -23,10 +23,16 @@ const ALLOWED_PAIRS = new Set([
     ]),
 ]);
 
+/** @param {string} event @param {string} test */
 export function isAllowedMetric(event, test) {
   return ALLOWED_PAIRS.has(`${event}:${test}`);
 }
 
+/**
+ * @param {string} event
+ * @param {string} test
+ * @param {typeof fetch} [fetchImpl]
+ */
 export async function sendMetric(event, test, fetchImpl = globalThis.fetch) {
   if (!isAllowedMetric(event, test) || typeof fetchImpl !== 'function') return false;
 
@@ -46,6 +52,7 @@ export async function sendMetric(event, test, fetchImpl = globalThis.fetch) {
   }
 }
 
+/** @param {string} event @param {string} test */
 export function trackMetric(event, test) {
   void sendMetric(event, test);
 }

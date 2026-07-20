@@ -1,5 +1,5 @@
 import { toast } from '@ponchia/ui/behaviors';
-import { formatNumber, t } from '../i18n.js';
+import { formatNumber, m, t } from '../i18n.js';
 import { toRgbCss } from '../lib/color.js';
 import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
 import { createExamLifecycle } from '../lib/lifecycle.js';
@@ -86,7 +86,7 @@ function renderHome() {
     <section class="hero ui-container ui-container--wide" id="top">
       <div class="hero__copy">
         <button class="back-link exam-back" type="button" data-action="gallery">
-          <span aria-hidden="true">←</span> All tests
+          <span aria-hidden="true">←</span> ${m('nav.allTests')}
         </button>
         <p class="ui-eyebrow">Color perception / 03 instruments / about 4 minutes</p>
         <h1>${t('How finely do you')} <em>${t('see')}</em>${headingTail === '?' ? '' : ' '}${headingTail}</h1>
@@ -97,7 +97,7 @@ function renderHome() {
           <button class="ui-button ui-button--lg" type="button" data-action="setup">
             Begin the color lab <span aria-hidden="true">→</span>
           </button>
-          <a class="ui-link ui-link--cta" href="#method">See the method</a>
+          <a class="ui-link ui-link--cta" href="#method">${m('action.seeMethod')}</a>
         </div>
         <p class="hero__limit">
           <span aria-hidden="true">◇</span>
@@ -195,7 +195,7 @@ function renderHome() {
         </p>
       </div>
       <div class="science__sources ui-card">
-        <p class="ui-eyebrow ui-eyebrow--muted">Research trail</p>
+        <p class="ui-eyebrow ui-eyebrow--muted">${m('section.researchTrail')}</p>
         <ul class="source-list">
           <li>
             <a href="https://doi.org/10.1167/10.8.12" rel="noreferrer">

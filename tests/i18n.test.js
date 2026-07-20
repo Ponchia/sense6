@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { aboutCopy, aboutMarkup } from '../src/about.js';
 import { EXAMS } from '../src/exams/registry.js';
+import { MESSAGE_SOURCES, messageSource } from '../src/i18n/message-ids.js';
 import { journalCopy, journalSetupLabel } from '../src/journal-copy.js';
 import { DEFAULT_LOCALE, LOCALES, loadMessages, localeMetadata, resolveLocale } from '../src/locales.js';
 import { privacyCopy } from '../src/privacy.js';
@@ -129,6 +130,24 @@ test('critical navigation and safety copy exists in every language', async () =>
     if (code === DEFAULT_LOCALE) continue;
     for (const key of boundaryKeys) {
       assert.notEqual(messages.get(key), key, `${code} experimental boundary fell back to English`);
+    }
+  }
+});
+
+test('stable message IDs resolve in every catalog', async () => {
+  for (const [id, source] of Object.entries(MESSAGE_SOURCES)) {
+    assert.equal(messageSource(id), source);
+  }
+  assert.throws(() => messageSource('missing.message'), /Unknown message ID/);
+
+  for (const { code } of LOCALES) {
+    const messages = await loadMessages(code);
+    for (const [id, source] of Object.entries(MESSAGE_SOURCES)) {
+      assert.ok(messages.has(source), `${code} is missing ${id}`);
+    }
+    if (code !== DEFAULT_LOCALE) {
+      const boundary = MESSAGE_SOURCES['boundary.recreational'];
+      assert.notEqual(messages.get(boundary), boundary, `${code} safety boundary fell back to English`);
     }
   }
 });

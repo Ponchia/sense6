@@ -1,7 +1,7 @@
 # Sense6 roadmap
 <!-- vale Vale.Spelling = NO -->
 
-Status: current, 2026-07-19
+Status: current, 2026-07-20
 
 This document records the current product and engineering priorities for
 Sense6. It does not promise release dates.
@@ -35,10 +35,14 @@ The completed foundation includes:
 
 - an idempotent mount lifecycle with abort-driven listener cleanup;
 - versioned, validated local persistence with legacy-result migration;
-- one registry for routes, gallery copy, metadata, metrics, and lazy loading;
+- a typed exam contract for identity, metrics, and journal-comparison policy;
+- a presentation registry for routes, gallery copy, metadata, and lazy loading;
+- shared renderers for repeated instrument, method, and research sections;
 - route-level experiment modules and language-level locale chunks;
+- route-scoped gallery CSS with independent entry, route, and combined budgets;
 - substantive localized static entry pages and crawler discovery artifacts;
-- strict typed-JavaScript checks for shared contracts; and
+- stable message IDs for shared controls and safety boundaries;
+- strict typed-JavaScript checks for shared contracts and new modules; and
 - enforced JavaScript and CSS production bundle budgets.
 
 The journal is now a separate versioned store. Existing concise latest-or-best
@@ -67,14 +71,15 @@ validated, certified, diagnostic, or suitable for medical or occupational use.
   guidance changes.
 - Keep the About page, `llms.txt`, structured data, README, and experiment limits
   aligned with the permanent experimental boundary.
-- Keep the entry and route bundle budgets green. Split more common or
-  Tetracromia CSS only when a measured regression justifies the extra boundary.
-- Keep new structured feature copy separate from the legacy phrase catalogs.
-  Migrate older copy to message IDs only when translation authoring or tooling
-  demonstrates a concrete need.
+- Keep the entry, per-route, and combined bundle budgets green. Split
+  Tetracromia CSS when the global entry approaches its 125 kB ceiling.
+- Put reusable controls and safety boundaries in
+  `src/i18n/message-ids.js`. Migrate older source-keyed prose when it changes;
+  do not create a high-risk catalog rewrite only to change key shape.
 - Extend strict typed-JavaScript coverage through shared contracts and new
   modules first. Convert individual experiment modules incrementally when they
-  are changed, rather than through an unreviewable suite-wide rewrite.
+  are changed, rather than through an unreviewable suite-wide rewrite. Revisit
+  TypeScript only under the conditions in ADR 0005.
 
 Keep every value labelled as a run-specific, device-relative observation. Make
 no clinical acuity, screening, diagnosis, prescription, certification, or

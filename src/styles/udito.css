@@ -930,7 +930,7 @@
   padding: clamp(1.5rem, 4vw, 2.5rem);
 }
 
-.au-context-grid h2 {
+.au-context-grid > article h2 {
   font-family: var(--display);
   font-size: clamp(1.8rem, 3vw, 2.7rem);
   margin: 0.7rem 0 1.5rem;

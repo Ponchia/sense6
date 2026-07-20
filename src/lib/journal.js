@@ -1,3 +1,4 @@
+import { examContract, isExamId } from '../exams/contracts.js';
 import { LOCALE_CODES } from '../locale-metadata.js';
 
 const FORMAT = 'sense6-journal';
@@ -7,7 +8,6 @@ const STORAGE_KEY = 'sense6:journal';
 const MAX_ENTRIES = 100;
 const MAX_IMPORT_BYTES = 1_000_000;
 
-const EXAM_IDS = new Set(['tetracromia', 'color-blindness', 'riflessi', 'udito', 'acutezza']);
 const QUALITY = new Set(['usable', 'caution', 'limited']);
 const BOUNDS = new Set(['lower', 'upper']);
 
@@ -153,21 +153,18 @@ export function compareJournalEntries(newer, older) {
   const hard = hardSetupDifferences(newer, older);
   if (hard.length) return { status: 'not-comparable', reasons: hard };
 
-  for (const field of cautionFields(newer.examId)) {
+  const policy = examContract(newer.examId)?.journal;
+  if (!policy) return { status: 'not-comparable', reasons: ['unknown-instrument'] };
+  for (const field of policy.caution) {
     if (!hasValue(newer.setup[field]) || !hasValue(older.setup[field])) reasons.push(`missing:${field}`);
     else if (newer.setup[field] !== older.setup[field]) reasons.push(`changed:${field}`);
   }
-  if (newer.examId === 'udito') reasons.push('volume-not-verifiable');
-  if (newer.examId === 'acutezza') {
-    const newerDistance = Number(newer.setup.distanceMm);
-    const olderDistance = Number(older.setup.distanceMm);
-    if (
-      newerDistance > 0 &&
-      olderDistance > 0 &&
-      Math.abs(newerDistance - olderDistance) / olderDistance > 0.05
-    ) {
-      reasons.push('changed:distanceMm');
-    }
+  reasons.push(...policy.alwaysCaution);
+  if (
+    policy.distanceTolerance &&
+    setupDifferenceRatio(newer, older, policy.distanceTolerance.field) > policy.distanceTolerance.cautionRatio
+  ) {
+    reasons.push(`changed:${policy.distanceTolerance.field}`);
   }
   if (newer.quality !== 'usable' || older.quality !== 'usable') reasons.push('limited-run');
   return { status: reasons.length ? 'caution' : 'comparable', reasons };
@@ -258,7 +255,7 @@ function isJournalEntry(value) {
     typeof value.id === 'string' &&
     value.id.length > 0 &&
     value.id.length <= 128 &&
-    EXAM_IDS.has(value.examId) &&
+    isExamId(value.examId) &&
     isIsoDate(value.recordedAt) &&
     typeof value.locale === 'string' &&
     LOCALE_CODES.has(value.locale) &&
@@ -306,37 +303,30 @@ function validSetup(value) {
 /** @param {JournalEntry} newer @param {JournalEntry} older */
 function hardSetupDifferences(newer, older) {
   const reasons = [];
-  for (const field of hardFields(newer.examId)) {
+  const policy = examContract(newer.examId)?.journal;
+  if (!policy) return ['unknown-instrument'];
+  for (const field of policy.hard) {
     if (!hasValue(newer.setup[field]) || !hasValue(older.setup[field])) reasons.push(`missing:${field}`);
     else if (newer.setup[field] !== older.setup[field]) reasons.push(`changed:${field}`);
   }
-  if (newer.examId === 'acutezza') {
-    const newerDistance = Number(newer.setup.distanceMm);
-    const olderDistance = Number(older.setup.distanceMm);
+  if (policy.distanceTolerance) {
+    const field = policy.distanceTolerance.field;
+    const newerDistance = Number(newer.setup[field]);
+    const olderDistance = Number(older.setup[field]);
     if (!(newerDistance > 0 && olderDistance > 0)) reasons.push('missing:distanceMm');
-    else if (Math.abs(newerDistance - olderDistance) / olderDistance > 0.1)
-      reasons.push('changed:distanceMm');
+    else if (setupDifferenceRatio(newer, older, field) > policy.distanceTolerance.hardRatio)
+      reasons.push(`changed:${field}`);
   }
   return reasons;
 }
 
-/** @param {string} examId */
-function hardFields(examId) {
-  if (examId === 'riflessi') return ['display', 'inputMode'];
-  if (examId === 'udito') return ['device', 'connection', 'sampleRate'];
-  if (examId === 'acutezza') return ['display', 'correction', 'contrastPercent', 'theme'];
-  if (examId === 'color-blindness')
-    return ['display', 'gamut', 'theme', 'stimulusCssPixels', 'measurementDpr'];
-  return ['display', 'gamut'];
-}
-
-/** @param {string} examId */
-function cautionFields(examId) {
-  if (examId === 'riflessi') return ['frameCadence'];
-  if (examId === 'udito') return ['interruptions'];
-  if (examId === 'acutezza') return ['calibrationState', 'cardWidthCssPx'];
-  if (examId === 'color-blindness') return ['measurementViewport', 'orientation'];
-  return ['viewport'];
+/** @param {JournalEntry} newer @param {JournalEntry} older @param {string} field */
+function setupDifferenceRatio(newer, older, field) {
+  const newerValue = Number(newer.setup[field]);
+  const olderValue = Number(older.setup[field]);
+  return newerValue > 0 && olderValue > 0
+    ? Math.abs(newerValue - olderValue) / olderValue
+    : Number.POSITIVE_INFINITY;
 }
 
 /** @param {JournalMeasurement} measurement @param {JournalMeasurement} previous */

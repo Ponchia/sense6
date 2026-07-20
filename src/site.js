@@ -19,7 +19,7 @@ const PLATE_EIGHT = [
 ];
 
 export function renderGallery(context) {
-  const { app, exams, localeHref, t } = context;
+  const { app, exams, localeHref, m, t } = context;
   document.title = t('Sense6 — measure what your senses notice');
 
   app.innerHTML = `
@@ -32,7 +32,7 @@ export function renderGallery(context) {
           No account, no answers or results uploaded.
         </p>
         <p class="gallery-hero__boundary">
-          Experimental perception tests for curiosity and fun—not medical tests or diagnoses.
+          ${m('boundary.recreational')}
         </p>
         <a class="ui-link gallery-hero__about" data-sense6-route="about" href="${localeHref('about')}">
           How Sense6 works <span aria-hidden="true">→</span>
@@ -64,7 +64,7 @@ export function renderGallery(context) {
         </p>
       </header>
       <div class="exam-grid">
-        ${exams.map((meta) => liveCard(meta, localeHref, t)).join('')}
+        ${exams.map((meta) => liveCard(meta, localeHref, m, t)).join('')}
       </div>
     </section>
 
@@ -82,7 +82,7 @@ export function renderGallery(context) {
   return () => {};
 }
 
-function liveCard(meta, localeHref, t) {
+function liveCard(meta, localeHref, m, t) {
   return `
     <article class="exam-card ui-card ui-card--interactive" style="--card-accent:${meta.accent}">
       <a class="exam-card__link" data-sense6-route="${meta.route}" href="${localeHref(meta.route)}">
@@ -98,10 +98,10 @@ function liveCard(meta, localeHref, t) {
           <h3>${meta.name}</h3>
           <p class="exam-card__tagline">${meta.tagline}</p>
           <p class="exam-card__blurb">${meta.blurb}</p>
-          <ul class="exam-card__facts" aria-label="What this test includes">
+          <ul class="exam-card__facts" aria-label="${m('gallery.testIncludes')}">
             ${meta.facts.map((fact) => `<li>${fact}</li>`).join('')}
           </ul>
-          <span class="exam-card__cta">Open test <span aria-hidden="true">→</span></span>
+          <span class="exam-card__cta">${m('action.openTest')} <span aria-hidden="true">→</span></span>
         </div>
       </a>
     </article>

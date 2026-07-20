@@ -10,6 +10,14 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- An architecture overview, an experiment extension guide, and an accepted
+  decision record for continuing with incremental typed JavaScript.
+- A typed exam service contract that centralizes experiment identity, analytics
+  names, journal-comparison fields, and distance tolerances.
+- Stable localization IDs for reusable controls and safety boundaries, with
+  catalog-completeness tests.
+- Shared, escaped renderers for repeated instrument, method, and research
+  sections on experiment landing pages.
 - A twelve-language About and methodology page with visible authorship, permanent
   experimental boundaries, per-experiment interpretation limits, privacy and
   quality explanations, research links, static HTML, and structured data.
@@ -77,6 +85,10 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 
+- Gallery CSS now loads only on the gallery route. Bundle checks discover every
+  route stylesheet and enforce separate entry, route, and combined ceilings.
+- Metrics and journal validation now consume the exam service contract instead
+  of maintaining separate hardcoded experiment lists.
 - Sense6 now explicitly positions every task as a recreational experiment for
   curiosity and fun. Formal validation, certification, regulatory approval, and
   professional review are not planned; software tests prove implementation

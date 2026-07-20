@@ -1,7 +1,9 @@
 /**
- * The suite's single source of truth. Routing, gallery cards, static output,
- * metrics, metadata, and completeness tests all consume this registry.
+ * Presentation metadata for routing, gallery cards, static output, and module
+ * loading. Non-visual service rules live in contracts.js.
  */
+import { EXAM_IDS as CONTRACT_IDS, examContract } from './contracts.js';
+
 export const EXAMS = Object.freeze([
   exam({
     id: 'tetracromia',
@@ -16,7 +18,6 @@ export const EXAMS = Object.freeze([
     facts: ['Adaptive difficulty', '3 instruments', 'Detailed profile'],
     pageTitle: 'Tetracromia — colour discrimination | Sense6',
     limit: 'This is not a medical test and cannot confirm tetrachromacy.',
-    metricTest: 'tetracromia',
     load: () => import('./tetracromia.js'),
     sources: [
       ['CIEDE2000 colour-difference formula', 'https://doi.org/10.1002/col.1049'],
@@ -40,7 +41,6 @@ export const EXAMS = Object.freeze([
     facts: ['Adaptive thresholds', '3 display directions', 'Run-relative result'],
     pageTitle: 'Experimental colour-vision check — Daltonia | Sense6',
     limit: 'Experimental and unvalidated. This is not a screening result or diagnosis.',
-    metricTest: 'daltonia',
     load: () => import('./color-blindness.js'),
     sources: [
       ['CIE 2006 LMS cone fundamentals', 'https://doi.org/10.25039/CIE.DS.tijidesg'],
@@ -64,7 +64,6 @@ export const EXAMS = Object.freeze([
     facts: ['3 instruments', 'Device-relative timing', 'No composite score'],
     pageTitle: 'Response speed and consistency — Riflessi | Sense6',
     limit: 'Compare only on the same device and input. Not a clinical or population score.',
-    metricTest: 'riflessi',
     load: () => import('./riflessi.js'),
     sources: [
       [
@@ -91,7 +90,6 @@ export const EXAMS = Object.freeze([
     facts: ['3 instruments', 'Volume safety contract', 'No hearing label'],
     pageTitle: 'Device-relative hearing lab — Udito | Sense6',
     limit: 'No dB HL, hearing age, diagnosis, or population score.',
-    metricTest: 'udito',
     load: () => import('./udito.js'),
     sources: [
       ['Woods et al.: headphone screening for web experiments', 'https://doi.org/10.3758/s13414-017-1361-2'],
@@ -112,7 +110,6 @@ export const EXAMS = Object.freeze([
     facts: ['Physical screen calibration', '3 per-eye instruments', 'No clinical label'],
     pageTitle: 'Calibrated sharpness experiment — Acutezza | Sense6',
     limit: 'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
-    metricTest: 'acutezza',
     load: () => import('./acutezza.js'),
     sources: [
       [
@@ -129,7 +126,7 @@ export const EXAMS = Object.freeze([
 ]);
 
 export const EXAM_BY_ID = new Map(EXAMS.map((entry) => [entry.id, entry]));
-export const EXAM_IDS = Object.freeze(EXAMS.map((entry) => entry.id));
+export const EXAM_IDS = CONTRACT_IDS;
 
 export async function loadExam(id) {
   const definition = EXAM_BY_ID.get(id);
@@ -137,9 +134,13 @@ export async function loadExam(id) {
 }
 
 function exam(definition) {
+  const contract = examContract(definition.id);
+  if (!contract) throw new Error(`Missing exam contract: ${definition.id}`);
   return Object.freeze({
     ...definition,
     route: definition.id,
+    metricTest: contract.metricTest,
+    contract,
     facts: Object.freeze(definition.facts),
     sources: Object.freeze(definition.sources.map((source) => Object.freeze(source))),
   });

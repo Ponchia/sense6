@@ -3,7 +3,16 @@ import { initThemeToggle } from '@ponchia/ui/behaviors';
 import './styles.css';
 
 import { EXAM_BY_ID, EXAMS, loadExam } from './exams/registry.js';
-import { getLocale, initializeI18n, localeHref, localizedRoot, setLocale, t, translateTree } from './i18n.js';
+import {
+  getLocale,
+  initializeI18n,
+  localeHref,
+  localizedRoot,
+  m,
+  setLocale,
+  t,
+  translateTree,
+} from './i18n.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from './metrics.js';
 import { currentLocation, currentRoute, navigate, startRouter } from './router.js';
 import { renderGallery } from './site.js';
@@ -39,6 +48,7 @@ function context() {
     gamutChip,
     locale: getLocale(),
     localeHref,
+    m,
     t,
     navigate: (name) => navigate(name, getLocale()),
     navigateHome: () => navigate('', getLocale()),
@@ -80,6 +90,8 @@ startRouter(async ({ route, locale }) => {
   } else if (route) {
     navigate('', getLocale(), { replace: true });
   } else {
+    await import('./styles/gallery.css');
+    if (token !== renderToken) return;
     app.innerHTML = '';
     cleanup = renderGallery({ ...context(), exams: EXAMS });
   }

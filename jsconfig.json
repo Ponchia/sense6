@@ -12,9 +12,13 @@
   },
   "include": [
     "src/crawler-policy.js",
+    "src/exams/contracts.js",
+    "src/exams/landing.js",
+    "src/i18n/message-ids.js",
     "src/journal-copy.js",
     "src/lib/journal.js",
     "src/lib/lifecycle.js",
-    "src/lib/storage.js"
+    "src/lib/storage.js",
+    "src/metrics.js"
   ]
 }
