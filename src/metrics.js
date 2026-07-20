@@ -12,6 +12,8 @@ export const METRIC_TESTS = Object.freeze({
   ...Object.fromEntries(METRIC_TEST_IDS.map((metricTest) => [metricTest, metricTest])),
 });
 
+export const PRODUCTION_METRIC_ORIGIN = 'https://sense6.net';
+
 const ALLOWED_PAIRS = new Set([
   `${METRIC_EVENTS.siteLoaded}:${METRIC_TESTS.site}`,
   ...Object.values(METRIC_TESTS)
@@ -28,13 +30,29 @@ export function isAllowedMetric(event, test) {
   return ALLOWED_PAIRS.has(`${event}:${test}`);
 }
 
+/** @param {{ origin?: string } | undefined} location */
+export function isProductionMetricOrigin(location = globalThis.location) {
+  return location?.origin === PRODUCTION_METRIC_ORIGIN;
+}
+
+/** @param {{ origin?: string } | undefined} location */
+function isMetricTransportEnabled(location) {
+  if (isProductionMetricOrigin(location)) return true;
+  return (
+    import.meta.env?.DEV === true &&
+    (location?.origin === 'http://127.0.0.1:4173' || location?.origin === 'http://localhost:4173')
+  );
+}
+
 /**
  * @param {string} event
  * @param {string} test
  * @param {typeof fetch} [fetchImpl]
+ * @param {{ origin?: string }} [location]
  */
-export async function sendMetric(event, test, fetchImpl = globalThis.fetch) {
-  if (!isAllowedMetric(event, test) || typeof fetchImpl !== 'function') return false;
+export async function sendMetric(event, test, fetchImpl = globalThis.fetch, location = globalThis.location) {
+  if (!isMetricTransportEnabled(location) || !isAllowedMetric(event, test) || typeof fetchImpl !== 'function')
+    return false;
 
   try {
     const response = await fetchImpl('/api/metric', {

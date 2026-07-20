@@ -16,8 +16,31 @@ export default defineConfig({
     trace: 'retain-on-failure',
   },
   projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'mobile', use: { ...devices['iPhone 13'], browserName: 'chromium' } },
+    {
+      name: 'chromium',
+      testIgnore: '**/cross-browser.spec.js',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'mobile',
+      testIgnore: '**/cross-browser.spec.js',
+      use: { ...devices['iPhone 13'], browserName: 'chromium' },
+    },
+    {
+      name: 'chromium-smoke',
+      testMatch: '**/cross-browser.spec.js',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'firefox',
+      testMatch: '**/cross-browser.spec.js',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      testMatch: '**/cross-browser.spec.js',
+      use: { ...devices['Desktop Safari'] },
+    },
   ],
   webServer: {
     command: `npm run dev -- --port ${port} --strictPort`,

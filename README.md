@@ -241,10 +241,12 @@ increase the count. `test_started` begins at the first measured block after any
 practice. Sense6 records `test_completed` only when the result view appears.
 Sense6 reserves `report_downloaded` for a future report action.
 
-The write endpoint has no read, update, or delete operation. It requires a
-same-origin JSON request, rejects unknown fields and event combinations, limits
-the body to 128 bytes, and fails closed when D1 is unavailable. The app ignores
-metric failures, so analytics availability can't block a test.
+The write endpoint has no read, update, or delete operation. It requires a JSON
+request whose request URL and `Origin` are both exactly `https://sense6.net`,
+rejects unknown fields and event combinations, limits the body to 128 bytes,
+and fails closed when D1 is unavailable. Production builds also disable metric
+sends away from that canonical origin. Analytics availability can't block a
+test.
 
 The interface uses [`@ponchia/ui`](https://github.com/Ponchia/bronto-ui) for its
 tokens, typography, layout primitives, controls, feedback, theme behavior, and
@@ -281,6 +283,11 @@ the added locales lives in `src/locales/supplemental/`.
 English source phrases, placeholder drift, and accidental safety-copy fallback.
 Browser tests cover locale routing, regional detection, right-to-left behavior,
 persistence, accessibility, and mobile overflow.
+
+Run `npm run locales:check` for a compact completion report across all catalogs,
+or `npm run locales:check -- --details` to list every source-equal string. The
+same audit runs inside the release gate and also catches missing or duplicate
+keys, empty values, missing stable IDs, and placeholder drift.
 
 ## Static discovery and crawler policy
 
@@ -353,6 +360,9 @@ Run the browser, accessibility, and responsive checks:
 npm run test:e2e
 ```
 
+The complete suite runs in desktop and mobile Chromium. Focused gallery,
+route-CSS, setup, and first-interaction journeys also run in Firefox and WebKit.
+
 Run every gate:
 
 ```sh
@@ -361,14 +371,23 @@ npm run check
 
 ## Deploy
 
-Every push to `main` runs the complete lint, unit, build, browser, responsive,
-accessibility, static-output, and bundle-budget gate. The deploy job builds and
-verifies one `dist/` directory, then uploads that same directory directly to
-Cloudflare Pages. Pull requests run the same checks without deploying.
+Every push to `main` runs the complete lint, locale, unit, build, browser,
+responsive, accessibility, static-output, and bundle-budget gate. The deploy
+job builds and verifies one `dist/` directory, then uploads that same directory
+directly to Cloudflare Pages. The verification step has a ten-minute ceiling;
+if the suite reaches it, shard Playwright instead of raising the ceiling.
+
+Same-repository pull requests run that gate and publish the already verified
+`dist/` directory to a stable `pr-<number>.sense6.pages.dev` branch preview. CI
+then smoke-tests the real deployment. Cloudflare and `_headers` mark previews
+`noindex`, and both the client and Pages Function accept metrics only on
+`https://sense6.net`. Fork pull requests verify without deployment credentials
+or a preview.
 
 The initial route budget is at most 110 kB of raw JavaScript. Entry CSS is
 limited to 125 kB raw, every route stylesheet to 40 kB raw, and entry plus the
-largest route stylesheet to 150 kB raw. The gallery has its own route chunk.
+largest route stylesheet to 150 kB raw. The gallery and Tetracromia have their
+own route chunks.
 `tests/static-output.build.js` discovers all generated route stylesheets and
 fails when a bundle crosses those ceilings. The budgets intentionally use
 uncompressed sizes so regressions stay visible independently of transfer

@@ -83,6 +83,17 @@ Add reusable controls or safety boundaries to
 to every catalog in `src/locales/` with identical placeholders. Extend the
 structured About copy in `src/about.js` for all supported locales.
 
+Run the catalog report while authoring:
+
+```sh
+npm run locales:check -- --details
+```
+
+The report shows completion per locale and names source-equal strings, missing
+catalog entries, missing stable IDs, duplicate rows, empty values, and
+placeholder drift. `npm run check` fails on structural catalog errors or when a
+locale exceeds the current source-equal-string ceiling.
+
 Translate accessibility names, announcements, page titles, copied summaries,
 setup labels, and error states—not only visible landing copy. Verify
 right-to-left flow and narrow layouts when controls have spatial meaning.
@@ -108,6 +119,7 @@ Run:
 ```sh
 npm run lint
 npm run typecheck
+npm run locales:check
 npm run test:coverage
 npm run build
 npm run test:static
@@ -116,8 +128,14 @@ npm run test:e2e
 
 Add browser coverage for the complete happy path, interruption, retry behavior,
 keyboard use, pointer use, result recording, accessibility, and
-responsive layouts. A new shared module belongs in `jsconfig.json` and the
+responsive layouts. Keep the full behavioral matrix in Chromium and mobile
+Chromium. Add the smallest critical setup-and-interaction journey to the focused
+Firefox and WebKit suite when a new experiment depends on a browser API or
+route stylesheet. A new shared module belongs in `jsconfig.json` and the
 coverage set.
 
 Before merging, confirm that `npm run check` passes from a clean checkout and
 that the built route stays inside the documented JavaScript and CSS ceilings.
+Same-repository pull requests publish the already verified `dist/` directory to
+a `noindex` Pages preview and smoke-test that real URL. Production metrics must
+remain disabled there.

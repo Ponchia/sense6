@@ -1,4 +1,4 @@
-import { isAllowedMetric } from '../../src/metrics.js';
+import { isAllowedMetric, PRODUCTION_METRIC_ORIGIN } from '../../src/metrics.js';
 
 const MAX_BODY_BYTES = 128;
 const RESPONSE_HEADERS = {
@@ -14,9 +14,10 @@ function response(status, message = '', extraHeaders = {}) {
   return new Response(message || null, { status, headers });
 }
 
-function isSameOrigin(request) {
+function isProductionOrigin(request) {
+  if (new URL(request.url).origin !== PRODUCTION_METRIC_ORIGIN) return false;
   const origin = request.headers.get('origin');
-  if (!origin || origin !== new URL(request.url).origin) return false;
+  if (origin !== PRODUCTION_METRIC_ORIGIN) return false;
 
   const fetchSite = request.headers.get('sec-fetch-site');
   return !fetchSite || fetchSite === 'same-origin';
@@ -65,7 +66,7 @@ function validPayload(payload) {
 }
 
 async function handleMetricPost({ request, env }) {
-  if (!isSameOrigin(request)) return response(403, 'Forbidden');
+  if (!isProductionOrigin(request)) return response(403, 'Forbidden');
   if (request.headers.get('content-type')?.split(';', 1)[0].trim() !== 'application/json') {
     return response(415, 'Unsupported media type');
   }

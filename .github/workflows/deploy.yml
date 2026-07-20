@@ -12,7 +12,7 @@ concurrency:
 jobs:
   verify-and-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     permissions:
       contents: read
       deployments: write
@@ -30,11 +30,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Install browser engines
+        run: npx playwright install --with-deps chromium firefox webkit
 
       - name: Verify the production bundle
-        run: npm run check
+        run: timeout --verbose --signal=TERM --kill-after=30s 10m npm run check
 
       - name: Publish the verified bundle
         uses: cloudflare/wrangler-action@v4
