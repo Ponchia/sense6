@@ -442,7 +442,7 @@ a:focus-visible {
 .source-role {
   display: block;
   margin-block-start: 0.8rem;
-  color: var(--text-muted);
+  color: var(--text-dim);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -845,7 +845,7 @@ a:focus-visible {
 
 .static-page-grid {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-md);
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
 }
 

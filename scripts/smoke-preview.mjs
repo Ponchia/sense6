@@ -39,7 +39,8 @@ async function fetchReady(url) {
 /** @param {URL} preview */
 async function expectPreviewMetricsClosed(preview) {
   let status = 0;
-  for (let attempt = 1; attempt <= 5; attempt += 1) {
+  const propagationAttempts = 12;
+  for (let attempt = 1; attempt <= propagationAttempts; attempt += 1) {
     const metric = await fetch(new URL('/api/metric', preview), {
       method: 'POST',
       headers: {
@@ -51,7 +52,12 @@ async function expectPreviewMetricsClosed(preview) {
     });
     status = metric.status;
     if (status === 403) return;
-    await new Promise((resolve) => setTimeout(resolve, attempt * 1_000));
+    if (status !== 404) {
+      throw new Error(`Preview metrics must fail closed with 403; received ${status}`);
+    }
+    if (attempt < propagationAttempts) {
+      await new Promise((resolve) => setTimeout(resolve, 5_000));
+    }
   }
   throw new Error(`Preview metrics must fail closed with 403; received ${status}`);
 }
