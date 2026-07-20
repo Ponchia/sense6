@@ -36,12 +36,12 @@ Live exams:
   clarity observations for each eye. It reports angular task thresholds and
   uncertainty, never 20/20, a diagnosis, astigmatism, or a prescription.
 
-Adding an exam: create `src/exams/<id>.js` exporting `mount(context)` (return a
-cleanup function), add its metadata and lazy loader to `src/exams/registry.js`,
-and add localized source phrases to every file in `src/locales/`. Keep
-experiment-specific styles beside the other route styles and extend the unit,
-static-output, and browser tests. The registry is the single source for routes,
-gallery facts, metadata, metrics, static pages, and runtime module loading.
+Read the [architecture overview](docs/architecture.md) before changing a
+cross-cutting boundary. To add an experiment, follow the
+[experiment extension guide](docs/adding-an-experiment.md). It covers the
+service contract, presentation registry, domain model, mount lifecycle,
+journal passport, localization, route stylesheet, static content, and required
+tests.
 
 Acutezza's source-backed [research and implementation
 brief](docs/research/acutezza.md) records the method, product boundary, completed
@@ -270,14 +270,17 @@ controls retain physical left/right placement and numbered keyboard order in
 every writing direction.
 
 English source phrases and their eleven translations live in
-`src/locales/<language>.js`. Only the active language catalog is loaded. Add
-each new user-facing phrase with the same placeholders in every language and
-translate dynamic text explicitly where it is rendered. Route-specific privacy
-and journal copy for the added locales lives in `src/locales/supplemental/`.
-`tests/i18n.test.js` rejects missing values, duplicate English source phrases,
-placeholder drift, and accidental English fallback. Browser tests cover locale
-routing, regional detection, right-to-left behavior, persistence,
-accessibility, and mobile overflow.
+`src/locales/<language>.js`. Only the active language catalog is loaded.
+Reusable controls and safety boundaries use stable IDs from
+`src/i18n/message-ids.js`; call `m(id)` for that copy. Existing experiment
+prose remains source-keyed and migrates when it is changed. Add every new source
+phrase with the same placeholders in every language and translate dynamic text
+explicitly where it is rendered. Route-specific privacy and journal copy for
+the added locales lives in `src/locales/supplemental/`.
+`tests/i18n.test.js` rejects missing stable IDs, missing values, duplicate
+English source phrases, placeholder drift, and accidental safety-copy fallback.
+Browser tests cover locale routing, regional detection, right-to-left behavior,
+persistence, accessibility, and mobile overflow.
 
 ## Static discovery and crawler policy
 
@@ -363,11 +366,13 @@ accessibility, static-output, and bundle-budget gate. The deploy job builds and
 verifies one `dist/` directory, then uploads that same directory directly to
 Cloudflare Pages. Pull requests run the same checks without deploying.
 
-The initial route budget is at most 110 kB of raw JavaScript. The entry CSS is
-limited to 130 kB raw, and entry plus the largest route stylesheet is limited to
-150 kB raw. `tests/static-output.build.js` fails when a bundle crosses those
-ceilings. The budgets intentionally use uncompressed sizes so regressions stay
-visible independently of transfer compression.
+The initial route budget is at most 110 kB of raw JavaScript. Entry CSS is
+limited to 125 kB raw, every route stylesheet to 40 kB raw, and entry plus the
+largest route stylesheet to 150 kB raw. The gallery has its own route chunk.
+`tests/static-output.build.js` discovers all generated route stylesheets and
+fails when a bundle crosses those ceilings. The budgets intentionally use
+uncompressed sizes so regressions stay visible independently of transfer
+compression.
 
 The production site is available at
 [`sense6.net`](https://sense6.net). Cloudflare Pages terminates TLS and serves

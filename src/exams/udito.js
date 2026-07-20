@@ -1,6 +1,6 @@
 import { toast } from '@ponchia/ui/behaviors';
 import '../styles/udito.css';
-import { formatNumber, t } from '../i18n.js';
+import { formatNumber, m, t } from '../i18n.js';
 import {
   createHeadphoneTrials,
   createPitchTracks,
@@ -21,6 +21,7 @@ import { createExamLifecycle } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
+import { renderInstrumentList, renderResearchSection } from './landing.js';
 
 const STORAGE_KEY = 'sense6:udito:last';
 const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isRecord });
@@ -55,6 +56,12 @@ const INSTRUMENTS = {
     body: 'Two tones play in sequence. Separate adaptive tracks estimate the smallest pitch step resolved around 500 Hz and 2 kHz.',
   },
 };
+const RESEARCH_SOURCES = [
+  ['Woods et al., 2017', 'https://doi.org/10.3758/s13414-017-1361-2'],
+  ['Levitt, 1971', 'https://doi.org/10.1121/1.1912375'],
+  ['Grassi et al., 2024', 'https://pubmed.ncbi.nlm.nih.gov/38709452/'],
+  ['WHO–ITU standard', 'https://www.who.int/publications-detail-redirect/9789241515276'],
+];
 
 let state = null;
 
@@ -113,7 +120,7 @@ function renderIntro() {
   state.app.innerHTML = `
     <div class="au-intro">
       <section class="au-intro__hero ui-container ui-container--wide">
-        <button class="back-link exam-back" type="button" data-action="au-home"><span aria-hidden="true">←</span> All tests</button>
+        <button class="back-link exam-back" type="button" data-action="au-home"><span aria-hidden="true">←</span> ${m('nav.allTests')}</button>
         <div class="au-hero">
         <div class="au-hero__copy">
           <p class="ui-eyebrow">Listening lab / three instruments / about 6 minutes</p>
@@ -121,7 +128,7 @@ function renderIntro() {
           <p class="au-lede">Udito checks headphone-like presentation, maps an upper audibility boundary, and estimates pitch discrimination at two frequencies. Every result belongs to this device, volume, room, and run.</p>
           <div class="ui-cluster au-hero__actions">
             <button class="ui-button ui-button--lg" type="button" data-action="au-setup">Prepare the sound lab <span aria-hidden="true">→</span></button>
-            <button class="ui-link ui-link--cta" type="button" data-action="au-method">See the method</button>
+            <button class="ui-link ui-link--cta" type="button" data-action="au-method">${m('action.seeMethod')}</button>
           </div>
           <p class="hero__limit"><span aria-hidden="true">◇</span> No dB HL, hearing age, diagnosis, or population score.</p>
           ${previous ? `<p class="previous-score">Last run on this browser: <strong>${previous.setupQuality}</strong></p>` : ''}
@@ -141,17 +148,10 @@ function renderIntro() {
       <section class="au-method section" id="au-method" aria-labelledby="au-method-title">
         <div class="ui-container ui-container--wide">
           <div class="section-heading">
-            <div><p class="ui-eyebrow">Method and limits</p><h2 id="au-method-title">Three questions. No synthetic score.</h2></div>
+            <div><p class="ui-eyebrow">${m('section.methodLimits')}</p><h2 id="au-method-title">Three questions. No synthetic score.</h2></div>
             <p>The instruments stay separate because confidence in the setup is not the same thing as audibility or pitch discrimination.</p>
           </div>
-          <ol class="au-instrument-list">
-            ${Object.entries(INSTRUMENTS)
-              .map(
-                ([id, item]) =>
-                  `<li><div class="au-instrument-visual au-instrument-visual--${id}" aria-hidden="true">${instrumentVisual(id)}</div><div class="au-instrument-copy"><span>${item.number}</span><div><p class="ui-eyebrow ui-eyebrow--muted">${item.eyebrow}</p><h3>${item.name}</h3><p>${item.body}</p></div></div></li>`,
-              )
-              .join('')}
-          </ol>
+          ${renderInstrumentList(INSTRUMENTS, { classPrefix: 'au', visual: instrumentVisual })}
         </div>
       </section>
 
@@ -165,23 +165,19 @@ function renderIntro() {
         </div>
       </section>
 
-      <section class="science au-research section ui-container ui-container--wide" aria-labelledby="au-research-title">
-        <div class="science__statement">
-          <p class="ui-eyebrow">Research trail</p>
-          <h2 id="au-research-title">What informed Udito.</h2>
-          <p>Established task structures inform the experiment. Consumer audio hardware remains uncalibrated.</p>
-        </div>
-        <aside class="ui-card science__sources"><p class="ui-eyebrow ui-eyebrow--muted">Research trail</p><ul class="source-list">
-          <li><a href="https://doi.org/10.3758/s13414-017-1361-2" target="_blank" rel="noreferrer">Woods et al., 2017</a></li>
-          <li><a href="https://doi.org/10.1121/1.1912375" target="_blank" rel="noreferrer">Levitt, 1971</a></li>
-          <li><a href="https://pubmed.ncbi.nlm.nih.gov/38709452/" target="_blank" rel="noreferrer">Grassi et al., 2024</a></li>
-          <li><a href="https://www.who.int/publications-detail-redirect/9789241515276" target="_blank" rel="noreferrer">WHO–ITU standard</a></li>
-        </ul></aside>
-      </section>
+      ${renderResearchSection({
+        className: 'au-research',
+        titleId: 'au-research-title',
+        title: 'What informed Udito.',
+        description:
+          'Established task structures inform the experiment. Consumer audio hardware remains uncalibrated.',
+        label: m('section.researchTrail'),
+        sources: RESEARCH_SOURCES,
+      })}
 
       <section class="closing-cta au-closing ui-container ui-container--wide">
         <div><p class="ui-eyebrow">Listening lab / three instruments / about 6 minutes</p><h2>Headphone confidence, audibility &amp; pitch</h2></div>
-        <button class="ui-button ui-button--lg" type="button" data-action="au-setup-closing">Open test <span aria-hidden="true">→</span></button>
+        <button class="ui-button ui-button--lg" type="button" data-action="au-setup-closing">${m('action.openTest')} <span aria-hidden="true">→</span></button>
       </section>
     </div>
   `;
@@ -616,7 +612,7 @@ function renderResults() {
 
   state.app.innerHTML = `
     <section class="au-results ui-container ui-container--wide">
-      <button class="back-link" type="button" data-action="au-home"><span aria-hidden="true">←</span> All tests</button>
+      <button class="back-link" type="button" data-action="au-home"><span aria-hidden="true">←</span> ${m('nav.allTests')}</button>
       <header class="au-results__hero"><div><p class="ui-eyebrow">Udito / this setup / this run</p><h1>Three listening measures.<br><em>No hearing label.</em></h1><p>${usable ? 'The setup checks and adaptive tracks produced a coherent run-level profile.' : 'At least one setup check, interruption check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.'}</p></div><div class="au-results__stamp ${usable ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>03 / 03</strong></div></header>
       <div class="ui-notice ${journalSaved ? '' : 'ui-notice--danger'}" data-au-journal-status role="${journalSaved ? 'status' : 'alert'}"><strong>${journalSaved ? 'Saved to the private journal on this device.' : 'Journal entry not saved.'}</strong><p>${journalSaved ? 'The structured run context is available for later same-setup comparison.' : 'The result remains available here and can still be copied, but it was not added to the private journal.'}</p></div>
       <div class="au-result-grid">

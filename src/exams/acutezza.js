@@ -1,6 +1,6 @@
 import { toast } from '@ponchia/ui/behaviors';
 import '../styles/acutezza.css';
-import { formatNumber, t } from '../i18n.js';
+import { formatNumber, m, t } from '../i18n.js';
 import {
   ACUITY_DIRECTIONS,
   CARD_HEIGHT_MM,
@@ -27,6 +27,7 @@ import { drawLandoltRing, drawMeridianField } from '../lib/optotypes.js';
 import { seededRandom } from '../lib/random.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
+import { renderInstrumentList, renderResearchSection } from './landing.js';
 
 const STORAGE_KEY = 'sense6:acutezza:last';
 const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isRecord });
@@ -54,6 +55,15 @@ const INSTRUMENTS = {
     body: 'Line fields repeat at two scales and changing pixel phases. A preference appears only when it replicates.',
   },
 };
+const RESEARCH_SOURCES = [
+  ['Li et al., 2020', 'https://www.nature.com/articles/s41598-019-57204-1'],
+  ['ISO 8596:2017', 'https://www.iso.org/standard/69042.html'],
+  ['Bach, 2024', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC11868300/'],
+  [
+    'National Eye Institute',
+    'https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/floaters',
+  ],
+];
 
 let state = null;
 
@@ -104,13 +114,13 @@ function renderIntro() {
   renderScreen(`
     <div class="ac-intro">
       <section class="ac-intro__hero ui-container ui-container--wide">
-        <button class="back-link exam-back" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button>
+        <button class="back-link exam-back" type="button" data-action="ac-home"><span aria-hidden="true">←</span> ${m('nav.allTests')}</button>
         <div class="ac-hero">
         <div class="ac-hero__copy">
           <p class="ui-eyebrow">Vision lab / three instruments / about 8 minutes</p>
           <h1>Calibrate the screen.<br><em>Resolve the opening.</em></h1>
           <p class="ac-lede">Acutezza measures the angular detail resolved by each eye, the cost of lower contrast, and whether a directional clarity preference repeats. It is a perception experiment, not an eye examination.</p>
-          <div class="ui-cluster ac-hero__actions"><button class="ui-button ui-button--lg" type="button" data-action="ac-prepare">Prepare the vision lab <span aria-hidden="true">→</span></button><button class="ui-link ui-link--cta" type="button" data-action="ac-method">See the method</button></div>
+          <div class="ui-cluster ac-hero__actions"><button class="ui-button ui-button--lg" type="button" data-action="ac-prepare">Prepare the vision lab <span aria-hidden="true">→</span></button><button class="ui-link ui-link--cta" type="button" data-action="ac-method">${m('action.seeMethod')}</button></div>
           <p class="hero__limit"><span aria-hidden="true">◇</span> No 20/20 label, diagnosis, astigmatism detection, or prescription.</p>
           ${previous ? `<p class="previous-score">Last run on this browser: <strong>${previous.setupQuality}</strong></p>` : ''}
         </div>
@@ -124,13 +134,8 @@ function renderIntro() {
 
       <section class="ac-method section" id="ac-method" aria-labelledby="ac-method-title">
         <div class="ui-container ui-container--wide">
-          <div class="section-heading"><div><p class="ui-eyebrow">Method and limits</p><h2 id="ac-method-title">Three observations. No composite score.</h2></div><p>High-contrast detail, low-contrast cost, and directional preference remain separate.</p></div>
-          <ol class="ac-instrument-list">${Object.entries(INSTRUMENTS)
-            .map(
-              ([id, item]) =>
-                `<li><div class="ac-instrument-visual ac-instrument-visual--${id}" aria-hidden="true">${instrumentVisual(id)}</div><div class="ac-instrument-copy"><span>${item.number}</span><div><p class="ui-eyebrow ui-eyebrow--muted">${item.eyebrow}</p><h3>${item.name}</h3><p>${item.body}</p></div></div></li>`,
-            )
-            .join('')}</ol>
+          <div class="section-heading"><div><p class="ui-eyebrow">${m('section.methodLimits')}</p><h2 id="ac-method-title">Three observations. No composite score.</h2></div><p>High-contrast detail, low-contrast cost, and directional preference remain separate.</p></div>
+          ${renderInstrumentList(INSTRUMENTS, { classPrefix: 'ac', visual: instrumentVisual })}
         </div>
       </section>
       <section class="method section ac-safety" aria-labelledby="ac-safety-title">
@@ -139,19 +144,19 @@ function renderIntro() {
           <div class="ac-safety__copy"><div class="ac-safety-ruler" aria-hidden="true">${Array.from({ length: 18 }, (_, index) => `<i style="--mark:${index}"></i>`).join('')}<span>Keep distance fixed</span></div><p><strong>Sudden vision loss, severe eye pain, new flashes or floaters, or a curtain-like shadow needs prompt professional assessment.</strong> Do not delay care to take this test.</p></div>
         </div>
       </section>
-      <section class="science ac-research section ui-container ui-container--wide" aria-labelledby="ac-research-title">
-        <div class="science__statement"><p class="ui-eyebrow">Research trail</p><h2 id="ac-research-title">What informed Acutezza.</h2><p>Published methods shape the task. They do not make this implementation clinically validated.</p></div>
-        <aside class="ui-card science__sources"><p class="ui-eyebrow ui-eyebrow--muted">Research trail</p><ul class="source-list">
-          <li><a href="https://www.nature.com/articles/s41598-019-57204-1" target="_blank" rel="noreferrer">Li et al., 2020</a></li>
-          <li><a href="https://www.iso.org/standard/69042.html" target="_blank" rel="noreferrer">ISO 8596:2017</a></li>
-          <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC11868300/" target="_blank" rel="noreferrer">Bach, 2024</a></li>
-          <li><a href="https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/floaters" target="_blank" rel="noreferrer">National Eye Institute</a></li>
-        </ul></aside>
-      </section>
+      ${renderResearchSection({
+        className: 'ac-research',
+        titleId: 'ac-research-title',
+        title: 'What informed Acutezza.',
+        description:
+          'Published methods shape the task. They do not make this implementation clinically validated.',
+        label: m('section.researchTrail'),
+        sources: RESEARCH_SOURCES,
+      })}
 
       <section class="closing-cta ac-closing ui-container ui-container--wide">
         <div><p class="ui-eyebrow">Vision lab / three instruments / about 8 minutes</p><h2>Calibrated sharpness &amp; meridional clarity</h2></div>
-        <button class="ui-button ui-button--lg" type="button" data-action="ac-prepare-closing">Open test <span aria-hidden="true">→</span></button>
+        <button class="ui-button ui-button--lg" type="button" data-action="ac-prepare-closing">${m('action.openTest')} <span aria-hidden="true">→</span></button>
       </section>
     </div>`);
 }

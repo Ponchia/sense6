@@ -1,6 +1,6 @@
 import { toast } from '@ponchia/ui/behaviors';
 import '../styles/color-blindness.css';
-import { formatNumber, t } from '../i18n.js';
+import { formatNumber, m, t } from '../i18n.js';
 import {
   createAdaptiveRun,
   currentAdaptiveTrial,
@@ -17,6 +17,7 @@ import { createExamLifecycle } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
+import { renderMethodSteps, renderResearchSection } from './landing.js';
 
 const RESULT_STORE = createResultStore({
   key: 'sense6:daltonia:last',
@@ -55,6 +56,25 @@ const PRACTICE_TARGETS = [
     strength: 0.26,
     background: [0.27, 0.32, 0.18],
   },
+];
+const METHOD_STEPS = [
+  {
+    title: 'Practice first',
+    body: 'Two clear targets teach the C-gap interaction with immediate feedback before any threshold is measured.',
+  },
+  {
+    title: 'Luminance noise',
+    body: 'Target and field dots share the same brightness variation, reducing a consistent lightness cue.',
+  },
+  {
+    title: 'Three staircases',
+    body: 'Directions become harder after correct responses. “No gap visible” counts as a miss and makes that direction easier.',
+  },
+];
+const RESEARCH_SOURCES = [
+  ['Regan, Reffin & Mollon, 1994', 'https://doi.org/10.1016/0042-6989(94)90203-8'],
+  ['Rabin, Gooch & Ivan, 2011', 'https://doi.org/10.1167/iovs.10-6283'],
+  ['Evans et al., 2025', 'https://doi.org/10.1364/JOSAA.544985'],
 ];
 
 let state = null;
@@ -103,7 +123,7 @@ function renderIntro() {
     <div class="cb-intro">
       <section class="cb-intro__hero ui-container ui-container--wide">
         <button class="back-link exam-back" type="button" data-action="gallery">
-          <span aria-hidden="true">←</span> All tests
+          <span aria-hidden="true">←</span> ${m('nav.allTests')}
         </button>
         <div class="cb-hero">
         <div class="cb-hero__copy">
@@ -162,30 +182,23 @@ function renderIntro() {
       <section class="method section cb-boundary">
         <div class="ui-container ui-container--wide method__layout">
           <div class="method__intro">
-            <p class="ui-eyebrow">Method and limits</p>
+            <p class="ui-eyebrow">${m('section.methodLimits')}</p>
             <h2>Run-relative output</h2>
             <p>You receive thresholds and run spread, not a normal/deficient label or a clinical score.</p>
           </div>
-          <ol class="method-steps">
-            <li><span>1</span><div><strong>Practice first</strong><p>Two clear targets teach the C-gap interaction with immediate feedback before any threshold is measured.</p></div></li>
-            <li><span>2</span><div><strong>Luminance noise</strong><p>Target and field dots share the same brightness variation, reducing a consistent lightness cue.</p></div></li>
-            <li><span>3</span><div><strong>Three staircases</strong><p>Directions become harder after correct responses. “No gap visible” counts as a miss and makes that direction easier.</p></div></li>
-          </ol>
+          ${renderMethodSteps(METHOD_STEPS)}
         </div>
       </section>
 
-      <section class="science cb-research section ui-container ui-container--wide" aria-labelledby="cb-research-title">
-        <div class="science__statement">
-          <p class="ui-eyebrow">Research trail</p>
-          <h2 id="cb-research-title">What informed Daltonia.</h2>
-          <p>These sources inform the stimulus model and task design. They do not validate this implementation.</p>
-        </div>
-        <aside class="ui-card science__sources"><p class="ui-eyebrow ui-eyebrow--muted">Research trail</p><ul class="source-list">
-          <li><a href="https://doi.org/10.1016/0042-6989(94)90203-8" target="_blank" rel="noreferrer">Regan, Reffin &amp; Mollon, 1994</a></li>
-          <li><a href="https://doi.org/10.1167/iovs.10-6283" target="_blank" rel="noreferrer">Rabin, Gooch &amp; Ivan, 2011</a></li>
-          <li><a href="https://doi.org/10.1364/JOSAA.544985" target="_blank" rel="noreferrer">Evans et al., 2025</a></li>
-        </ul></aside>
-      </section>
+      ${renderResearchSection({
+        className: 'cb-research',
+        titleId: 'cb-research-title',
+        title: 'What informed Daltonia.',
+        description:
+          'These sources inform the stimulus model and task design. They do not validate this implementation.',
+        label: m('section.researchTrail'),
+        sources: RESEARCH_SOURCES,
+      })}
 
       <section class="closing-cta cb-closing ui-container ui-container--wide">
         <div>
@@ -193,7 +206,7 @@ function renderIntro() {
           <h2>Adaptive browser colour-vision experiment</h2>
         </div>
         <button class="ui-button ui-button--lg" type="button" data-action="cb-setup-closing">
-          Open test <span aria-hidden="true">→</span>
+          ${m('action.openTest')} <span aria-hidden="true">→</span>
         </button>
       </section>
     </div>
@@ -536,7 +549,7 @@ function renderResults() {
             ? '<button class="ui-button ui-button--lg" type="button" data-action="cb-setup">Run again</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-copy">Copy run summary</button>'
             : '<button class="ui-button ui-button--lg" type="button" data-action="cb-copy">Copy run summary</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-setup">Run again</button>'
         }
-        <button class="ui-button ui-button--subtle" type="button" data-action="gallery">All tests</button>
+        <button class="ui-button ui-button--subtle" type="button" data-action="gallery">${m('nav.allTests')}</button>
       </div>
     </section>
   `;

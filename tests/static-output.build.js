@@ -132,6 +132,9 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
 });
 
 test('the entry bundle stays route-split and within its documented budget', async () => {
+  const ENTRY_CSS_BUDGET = 125_000;
+  const ROUTE_CSS_BUDGET = 40_000;
+  const COMBINED_CSS_BUDGET = 150_000;
   const files = await readdir(new URL('assets/', DIST));
   const entry = files.find((file) => /^index-.+\.js$/.test(file));
   const english = files.find((file) => /^en-.+\.js$/.test(file));
@@ -157,20 +160,24 @@ test('the entry bundle stays route-split and within its documented budget', asyn
   const entryCss = files.find((file) => /^index-.+\.css$/.test(file));
   assert.ok(entryCss);
   const entryCssBytes = await sumSizes([entryCss]);
-  assert.ok(entryCssBytes <= 130_000, `entry CSS is ${entryCssBytes} bytes; budget is 130000`);
-  const routeCss = files.filter((file) =>
-    /^(about|acutezza|color-blindness|riflessi|udito|journal|privacy)-.+\.css$/.test(file),
-  );
-  assert.equal(routeCss.length, 7);
   assert.ok(
-    entryCssBytes +
-      Math.max(
-        ...(await Promise.all(
-          routeCss.map(async (file) => (await stat(new URL(`assets/${file}`, DIST))).size),
-        )),
-      ) <=
-      150_000,
-    'entry CSS plus the largest route stylesheet exceeds 150000 bytes',
+    entryCssBytes <= ENTRY_CSS_BUDGET,
+    `entry CSS is ${entryCssBytes} bytes; budget is ${ENTRY_CSS_BUDGET}`,
+  );
+  const routeCss = files.filter((file) => file.endsWith('.css') && file !== entryCss);
+  assert.ok(
+    routeCss.some((file) => /^gallery-.+\.css$/.test(file)),
+    'gallery CSS must remain route-scoped',
+  );
+  const routeCssSizes = await Promise.all(
+    routeCss.map(async (file) => [file, (await stat(new URL(`assets/${file}`, DIST))).size]),
+  );
+  for (const [file, bytes] of routeCssSizes) {
+    assert.ok(bytes <= ROUTE_CSS_BUDGET, `${file} is ${bytes} bytes; budget is ${ROUTE_CSS_BUDGET}`);
+  }
+  assert.ok(
+    entryCssBytes + Math.max(...routeCssSizes.map(([, bytes]) => bytes)) <= COMBINED_CSS_BUDGET,
+    `entry CSS plus the largest route stylesheet exceeds ${COMBINED_CSS_BUDGET} bytes`,
   );
 
   const headers = await readFile(new URL('_headers', DIST), 'utf8');
