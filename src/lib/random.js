@@ -1,4 +1,11 @@
-/** Create a deterministic 32-bit seed from a string. */
+/** @typedef {() => number} RandomSource */
+
+/**
+ * Create a deterministic 32-bit seed from a string.
+ *
+ * @param {string} value
+ * @returns {() => number}
+ */
 export function hashSeed(value) {
   let hash = 1779033703 ^ value.length;
 
@@ -15,7 +22,12 @@ export function hashSeed(value) {
   };
 }
 
-/** Return a deterministic PRNG whose values are in [0, 1). */
+/**
+ * Return a deterministic PRNG whose values are in [0, 1).
+ *
+ * @param {string | number} seed
+ * @returns {RandomSource}
+ */
 export function seededRandom(seed) {
   let state = hashSeed(String(seed))();
 
@@ -28,10 +40,17 @@ export function seededRandom(seed) {
   };
 }
 
+/** @param {RandomSource} random @param {number} max */
 export function randomInt(random, max) {
   return Math.floor(random() * max);
 }
 
+/**
+ * @template T
+ * @param {readonly T[]} values
+ * @param {RandomSource} random
+ * @returns {T[]}
+ */
 export function shuffle(values, random) {
   const result = [...values];
 

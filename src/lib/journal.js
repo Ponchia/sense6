@@ -255,10 +255,13 @@ function isJournalEntry(value) {
     typeof value.id === 'string' &&
     value.id.length > 0 &&
     value.id.length <= 128 &&
+    typeof value.examId === 'string' &&
     isExamId(value.examId) &&
+    typeof value.recordedAt === 'string' &&
     isIsoDate(value.recordedAt) &&
     typeof value.locale === 'string' &&
     LOCALE_CODES.has(value.locale) &&
+    typeof value.quality === 'string' &&
     QUALITY.has(value.quality) &&
     validSetup(value.setup) &&
     Array.isArray(value.measurements) &&
@@ -283,8 +286,14 @@ function isMeasurement(value) {
     optionalFinite(value.lower) &&
     optionalFinite(value.upper) &&
     optionalFinite(value.uncertainty) &&
-    (value.bound === undefined || BOUNDS.has(value.bound)) &&
-    !(Number.isFinite(value.lower) && Number.isFinite(value.upper) && value.lower > value.upper)
+    (value.bound === undefined || (typeof value.bound === 'string' && BOUNDS.has(value.bound))) &&
+    !(
+      typeof value.lower === 'number' &&
+      Number.isFinite(value.lower) &&
+      typeof value.upper === 'number' &&
+      Number.isFinite(value.upper) &&
+      value.lower > value.upper
+    )
   );
 }
 
@@ -380,7 +389,7 @@ function hasValue(value) {
   return value !== undefined && value !== null && value !== '';
 }
 
-/** @param {unknown} value @returns {value is Record<string, any>} */
+/** @param {unknown} value @returns {value is Record<string, unknown>} */
 function isRecord(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }

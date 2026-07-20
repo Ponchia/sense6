@@ -1,6 +1,7 @@
 const FORMAT = 'sense6-result';
 
 /** @typedef {{ getItem: (key: string) => string | null, setItem: (key: string, value: string) => void }} StorageLike */
+/** @typedef {{ format: string, schemaVersion: number, payload: unknown }} ResultEnvelope */
 
 /**
  * @template T
@@ -32,20 +33,16 @@ export function createResultStore({
         for (const candidate of [key, ...legacyKeys]) {
           const parsed = parse(storage.getItem(candidate));
           if (!parsed) continue;
-          if (
-            candidate === key &&
-            parsed.format === FORMAT &&
-            Number.isInteger(parsed.schemaVersion) &&
-            parsed.schemaVersion > version
-          ) {
+          if (candidate === key && isResultEnvelope(parsed) && parsed.schemaVersion > version) {
             return null;
           }
           const value = readPayload(parsed, version, migrations);
           if (!validate(value)) continue;
-          if (candidate !== key || parsed.format !== FORMAT || parsed.schemaVersion !== version) {
-            write(storage, key, version, value);
+          const validated = /** @type {T} */ (value);
+          if (candidate !== key || !isResultEnvelope(parsed) || parsed.schemaVersion !== version) {
+            write(storage, key, version, validated);
           }
-          return value;
+          return validated;
         }
       } catch {
         return null;
@@ -59,19 +56,20 @@ export function createResultStore({
   });
 }
 
-/** @param {unknown} value */
+/** @param {unknown} value @returns {value is Record<string, unknown>} */
 export function isRecord(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
 /**
- * @param {any} parsed
+ * @param {unknown} parsed
  * @param {number} targetVersion
  * @param {Record<number, (value: unknown) => unknown>} migrations
  */
 function readPayload(parsed, targetVersion, migrations) {
-  if (parsed.format !== FORMAT) return parsed;
-  if (!Number.isInteger(parsed.schemaVersion) || parsed.schemaVersion < 1) return null;
+  if (hasResultFormat(parsed) && !isResultEnvelope(parsed)) return null;
+  if (!isResultEnvelope(parsed)) return parsed;
+  if (parsed.schemaVersion < 1) return null;
   if (parsed.schemaVersion > targetVersion) return null;
   let value = parsed.payload;
   for (let version = parsed.schemaVersion + 1; version <= targetVersion; version += 1) {
@@ -80,6 +78,11 @@ function readPayload(parsed, targetVersion, migrations) {
     value = migrate(value);
   }
   return value;
+}
+
+/** @param {unknown} value @returns {value is Record<string, unknown> & { format: typeof FORMAT }} */
+function hasResultFormat(value) {
+  return isRecord(value) && value.format === FORMAT;
 }
 
 /** @param {StorageLike} storage @param {string} key @param {number} version @param {unknown} payload */
@@ -100,12 +103,22 @@ function write(storage, key, version, payload) {
   }
 }
 
-/** @param {string | null} raw @returns {any} */
+/** @param {string | null} raw @returns {unknown} */
 function parse(raw) {
   if (!raw) return null;
   try {
-    return JSON.parse(raw);
+    return /** @type {unknown} */ (JSON.parse(raw));
   } catch {
     return null;
   }
+}
+
+/** @param {unknown} value @returns {value is ResultEnvelope} */
+function isResultEnvelope(value) {
+  return (
+    hasResultFormat(value) &&
+    typeof value.schemaVersion === 'number' &&
+    Number.isInteger(value.schemaVersion) &&
+    Object.hasOwn(value, 'payload')
+  );
 }

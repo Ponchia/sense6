@@ -1,4 +1,5 @@
 // Generated once from the former combined catalog; edit this locale directly.
+/** @type {Array<[string, string]>} */
 const rows = [
   ['Skip to content', 'Zum Inhalt springen'],
   ['Sense6 — all tests', 'Sense6 — alle Tests'],

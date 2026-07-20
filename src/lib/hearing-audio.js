@@ -1,14 +1,31 @@
 import { dbToGain, HEARING_DIGITAL_LEVELS } from './hearing.js';
 
+/** @typedef {{ toneMs: number, gapMs: number, rampMs: number, referenceMs: number, masterGain: number }} HearingAudioConfig */
+/** @typedef {{ quietInterval: number, antiPhaseInterval: number | null }} HeadphoneTrial */
+/** @typedef {{ toneInterval: number, frequencyHz: number }} RangeTrial */
+/** @typedef {{ anchorHz: number, deltaPercent: number, higherInterval: number, roveDb: [number, number] }} PitchTrial */
+/** @typedef {{ frequencyHz: number, gain: number, antiPhase?: boolean }} ToneInterval */
+/** @typedef {ToneInterval & { startAt: number, toneSeconds: number, rampSeconds: number }} ScheduledTone */
+/** @typedef {{ resolve: (completed: boolean) => void }} PendingWait */
+/** @typedef {AudioNode & { stop?: () => void }} TrackedAudioNode */
+/** @typedef {typeof globalThis & { webkitAudioContext?: typeof AudioContext }} AudioGlobal */
+
 export class HearingAudio {
+  /** @param {HearingAudioConfig} config */
   constructor(config) {
     this.config = config;
+    /** @type {AudioContext | null} */
     this.context = null;
+    /** @type {GainNode | null} */
     this.master = null;
+    /** @type {Set<TrackedAudioNode>} */
     this.nodes = new Set();
+    /** @type {Set<PendingWait>} */
     this.pendingWaits = new Set();
     this.playToken = 0;
+    /** @type {((state: AudioContextState) => void) | null} */
     this.onStateChange = null;
+    /** @type {(() => void) | null} */
     this.onOutputChange = null;
     this.handleContextStateChange = () => {
       const contextState = this.context?.state ?? 'closed';
@@ -19,7 +36,8 @@ export class HearingAudio {
   }
 
   get supported() {
-    return Boolean(globalThis.AudioContext || globalThis.webkitAudioContext);
+    const audioGlobal = /** @type {AudioGlobal} */ (globalThis);
+    return Boolean(audioGlobal.AudioContext || audioGlobal.webkitAudioContext);
   }
 
   get sampleRate() {
@@ -37,7 +55,9 @@ export class HearingAudio {
       this.master = null;
     }
     if (!this.context) {
-      const AudioContextClass = globalThis.AudioContext || globalThis.webkitAudioContext;
+      const audioGlobal = /** @type {AudioGlobal} */ (globalThis);
+      const AudioContextClass = audioGlobal.AudioContext || audioGlobal.webkitAudioContext;
+      if (!AudioContextClass) throw new Error('Web Audio is unavailable');
       this.context = new AudioContextClass({ latencyHint: 'interactive' });
       this.context.addEventListener?.('statechange', this.handleContextStateChange);
       this.context.addEventListener?.('sinkchange', this.handleSinkChange);
@@ -53,8 +73,9 @@ export class HearingAudio {
   async playReference() {
     await this.init();
     this.stop();
+    const context = this.requireContext();
     const token = this.playToken;
-    const startAt = this.context.currentTime + 0.05;
+    const startAt = context.currentTime + 0.05;
     const durationSeconds = this.config.referenceMs / 1000;
     this.scheduleTone({
       frequencyHz: 1000,
@@ -66,6 +87,7 @@ export class HearingAudio {
     return this.waitForAudioTime(startAt + durationSeconds + 0.03, token);
   }
 
+  /** @param {HeadphoneTrial} trial @param {(index: number) => void} [onInterval] */
   async playHeadphoneTrial(trial, onInterval) {
     const intervals = [0, 1, 2].map((index) => ({
       frequencyHz: 200,
@@ -75,6 +97,7 @@ export class HearingAudio {
     return this.playIntervals(intervals, onInterval);
   }
 
+  /** @param {RangeTrial} trial @param {(index: number) => void} [onInterval] */
   async playRangeTrial(trial, onInterval) {
     const intervals = [0, 1, 2].map((index) =>
       index === trial.toneInterval
@@ -84,6 +107,7 @@ export class HearingAudio {
     return this.playIntervals(intervals, onInterval);
   }
 
+  /** @param {PitchTrial} trial @param {(index: number) => void} [onInterval] */
   async playPitchTrial(trial, onInterval) {
     const upperHz = trial.anchorHz * (1 + trial.deltaPercent / 100);
     const intervals = [0, 1].map((index) => ({
@@ -93,14 +117,16 @@ export class HearingAudio {
     return this.playIntervals(intervals, onInterval);
   }
 
+  /** @param {(ToneInterval | null)[]} intervals @param {(index: number) => void} [onInterval] */
   async playIntervals(intervals, onInterval) {
     await this.init();
     this.stop();
+    const context = this.requireContext();
     const token = this.playToken;
     const toneSeconds = this.config.toneMs / 1000;
     const gapSeconds = this.config.gapMs / 1000;
     const rampSeconds = Math.min(this.config.rampMs / 1000, toneSeconds / 3);
-    const startAt = this.context.currentTime + 0.08;
+    const startAt = context.currentTime + 0.08;
 
     intervals.forEach((interval, index) => {
       const intervalStart = startAt + index * (toneSeconds + gapSeconds);
@@ -113,12 +139,15 @@ export class HearingAudio {
     return this.waitForAudioTime(endAt, token);
   }
 
+  /** @param {ScheduledTone} tone */
   scheduleTone({ frequencyHz, gain, antiPhase = false, startAt, toneSeconds, rampSeconds }) {
-    const oscillator = this.context.createOscillator();
-    const envelope = this.context.createGain();
-    const left = this.context.createGain();
-    const right = this.context.createGain();
-    const merger = this.context.createChannelMerger(2);
+    const context = this.requireContext();
+    const master = this.requireMaster();
+    const oscillator = context.createOscillator();
+    const envelope = context.createGain();
+    const left = context.createGain();
+    const right = context.createGain();
+    const merger = context.createChannelMerger(2);
     oscillator.type = 'sine';
     oscillator.frequency.setValueAtTime(frequencyHz, startAt);
     scheduleEnvelope(envelope.gain, startAt, toneSeconds, rampSeconds, gain);
@@ -127,7 +156,7 @@ export class HearingAudio {
     oscillator.connect(envelope);
     envelope.connect(left).connect(merger, 0, 0);
     envelope.connect(right).connect(merger, 0, 1);
-    merger.connect(this.master);
+    merger.connect(master);
     this.track(oscillator, envelope, left, right, merger);
     oscillator.start(startAt);
     oscillator.stop(startAt + toneSeconds + 0.02);
@@ -168,14 +197,17 @@ export class HearingAudio {
     this.master = null;
   }
 
+  /** @param {...TrackedAudioNode} nodes */
   track(...nodes) {
     for (const node of nodes) this.nodes.add(node);
   }
 
+  /** @param {number} at @param {number} token @param {() => void} callback */
   scheduleAudioMarker(at, token, callback) {
-    const marker = this.context.createBufferSource();
-    marker.buffer = this.context.createBuffer(1, 1, this.context.sampleRate);
-    marker.connect(this.master);
+    const context = this.requireContext();
+    const marker = context.createBufferSource();
+    marker.buffer = context.createBuffer(1, 1, context.sampleRate);
+    marker.connect(this.requireMaster());
     marker.onended = () => {
       this.nodes.delete(marker);
       marker.disconnect?.();
@@ -185,12 +217,15 @@ export class HearingAudio {
     marker.start(at);
   }
 
+  /** @param {number} endAt @param {number} token @returns {Promise<boolean>} */
   waitForAudioTime(endAt, token) {
     return new Promise((resolve) => {
+      const context = this.requireContext();
       let settled = false;
-      const marker = this.context.createBufferSource();
-      marker.buffer = this.context.createBuffer(1, 1, this.context.sampleRate);
-      marker.connect(this.master);
+      const marker = context.createBufferSource();
+      marker.buffer = context.createBuffer(1, 1, context.sampleRate);
+      marker.connect(this.requireMaster());
+      /** @param {boolean} completed */
       const settle = (completed) => {
         if (settled) return;
         settled = true;
@@ -199,20 +234,30 @@ export class HearingAudio {
         marker.disconnect?.();
         resolve(completed);
       };
+      /** @type {PendingWait} */
       const pending = { resolve: () => settle(false) };
       this.pendingWaits.add(pending);
       this.track(marker);
       marker.onended = () =>
         settle(
-          token === this.playToken &&
-            this.context?.state === 'running' &&
-            this.context.currentTime >= endAt - 0.005,
+          token === this.playToken && context.state === 'running' && context.currentTime >= endAt - 0.005,
         );
       marker.start(endAt);
     });
   }
+
+  requireContext() {
+    if (!this.context) throw new Error('Audio context has not been initialized');
+    return this.context;
+  }
+
+  requireMaster() {
+    if (!this.master) throw new Error('Audio output has not been initialized');
+    return this.master;
+  }
 }
 
+/** @param {AudioParam} audioParam @param {number} startAt @param {number} durationSeconds @param {number} rampSeconds @param {number} gain */
 function scheduleEnvelope(audioParam, startAt, durationSeconds, rampSeconds, gain) {
   const endAt = startAt + durationSeconds;
   audioParam.cancelScheduledValues(startAt);

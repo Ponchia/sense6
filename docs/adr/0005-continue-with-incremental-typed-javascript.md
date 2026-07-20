@@ -11,34 +11,50 @@ measurement phases. The numerical models, persistence, lifecycle, and journal
 logic already live in smaller modules with deterministic tests.
 
 The repository uses JavaScript modules, JSDoc contracts, and TypeScript's
-`checkJs` mode. Shared modules pass strict checks, while older controllers are
-not yet in that program. A complete TypeScript conversion would change nearly
-every experiment and locale at once without changing the runtime. A framework
-migration would also replace working routing, static generation, and lifecycle
-code without solving measurement-specific complexity.
+`checkJs` mode. Domain models, pure experiment views, localization catalogs,
+and shared routing boundaries pass strict checks. Older controller
+implementations aren't yet in that program, but colocated declaration files
+define and check their lazy-loaded public `mount(context)` boundary.
+
+A complete TypeScript conversion would change nearly every experiment at once
+without changing the runtime. A framework migration would also replace working
+routing, static generation, and lifecycle code without solving
+measurement-specific complexity.
 
 ## Decision
 
 - Keep vanilla ECMAScript modules, Vite, and JSDoc-based strict checking.
-- Require new shared contracts, domain modules, and reusable view helpers to
-  pass `npm run typecheck`.
-- Expand `jsconfig.json` when a module has a stable interface or changes
-  substantially. Convert one dependency boundary at a time.
+- Require every domain module, locale catalog, localization helper, and reusable
+  experiment view to pass `npm run typecheck`. A ratchet discovers files under
+  those roots automatically so new files can't silently remain unchecked.
+- Reject type-suppression comments and explicit JSDoc `any` declarations in the
+  strict program. Narrow values at storage, DOM, locale, audio, and dynamic
+  import boundaries.
+- Give every experiment controller a checked public module declaration. Convert
+  controller internals one stable state transition at a time when that
+  controller changes.
 - Keep experiment controllers as orchestration modules. Move reusable markup,
   domain algorithms, persistence, and cross-experiment policy out of them.
+- Represent phase-specific domain state with explicit variants and runtime
+  guards. Static types don't replace validation of persisted data, browser APIs,
+  or transitions triggered by events.
 - Don't introduce a framework solely to reduce file length.
-- Reconsider TypeScript when multiple contributors regularly change shared
-  interfaces, JSDoc can no longer express required invariants, or type defects
-  repeatedly escape the current checks.
+- Reconsider `.ts` modules when multiple contributors regularly change shared
+  interfaces, controller declarations drift from implementations, JSDoc
+  obscures state models, or type defects repeatedly escape the current checks.
+  Migrate dependency boundaries independently; don't create a suite-wide
+  conversion branch.
 
 ## Consequences
 
 Changes remain reviewable and don't create a long-lived mixed-language
 migration branch. Runtime output and deployment stay unchanged.
 
-The project still has two typing levels during the transition. Reviewers must
-keep `jsconfig.json` honest and must not treat unchecked controllers as typed.
-Some JSDoc declarations are more verbose than TypeScript syntax.
+The project still has two typing levels during the transition. The ratchet keeps
+the strict roots honest, but a controller declaration proves only its public
+module boundary—not the controller's internal state. Some JSDoc declarations
+are more verbose than TypeScript syntax.
 
-This decision doesn't forbid TypeScript. It defines evidence that would make a
-conversion worthwhile and keeps that future migration incremental.
+Runtime behavior and deployment remain unchanged. The stricter program makes a
+future file-by-file TypeScript migration smaller because its domain contracts
+and module seams already exist.

@@ -36,6 +36,21 @@ test('invalid, corrupt, and future payloads fail closed', () => {
   assert.equal(store.load(future), null);
 });
 
+test('canonical storage rejects non-records and malformed envelopes', () => {
+  const key = 'sense6:test:last';
+  const store = createResultStore({ key });
+  const cases = [
+    42,
+    null,
+    { format: 'sense6-result', schemaVersion: 1 },
+    { format: 'sense6-result', schemaVersion: '1', payload: { score: 1 } },
+  ];
+
+  for (const value of cases) {
+    assert.equal(store.load(memoryStorage({ [key]: JSON.stringify(value) })), null);
+  }
+});
+
 test('a future canonical payload is never replaced by older legacy data', () => {
   const key = 'sense6:test:last';
   const futureValue = JSON.stringify({

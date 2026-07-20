@@ -1,6 +1,8 @@
+/** @typedef {'en' | 'it' | 'de' | 'fr' | 'es' | 'pt' | 'pt-br' | 'ar' | 'ja' | 'ko' | 'hi' | 'zh-hans'} LocaleCode */
+
 /**
  * @typedef {object} LocaleMetadata
- * @property {string} code
+ * @property {LocaleCode} code
  * @property {string} languageTag
  * @property {string} label
  * @property {string} short
@@ -43,24 +45,28 @@ export const LOCALES = Object.freeze([
   },
 ]);
 
+/** @type {LocaleCode} */
 export const DEFAULT_LOCALE = 'en';
+/** @type {ReadonlySet<string>} */
 export const LOCALE_CODES = new Set(LOCALES.map((locale) => locale.code));
 
+/** @type {ReadonlyMap<string, LocaleMetadata>} */
 const LOCALE_BY_CODE = new Map(LOCALES.map((locale) => [locale.code, locale]));
+/** @type {ReadonlyMap<string, LocaleCode>} */
 const LOCALE_ALIASES = new Map(
   LOCALES.flatMap((locale) => (locale.aliases ?? []).map((alias) => [alias, locale.code])),
 );
 
-/** @param {string} locale */
+/** @param {string} locale @returns {LocaleMetadata} */
 export function localeMetadata(locale) {
   return LOCALE_BY_CODE.get(locale) ?? LOCALES[0];
 }
 
-/** @param {unknown} value */
+/** @param {unknown} value @returns {LocaleCode | null} */
 export function resolveLocale(value) {
   if (!value) return null;
   const normalized = String(value).trim().replaceAll('_', '-').toLowerCase();
-  if (LOCALE_CODES.has(normalized)) return normalized;
+  if (LOCALE_CODES.has(normalized)) return /** @type {LocaleCode} */ (normalized);
   const alias = LOCALE_ALIASES.get(normalized);
   if (alias) return alias;
   const subtags = normalized.split('-');
@@ -69,5 +75,5 @@ export function resolveLocale(value) {
   if (base === 'zh') {
     return subtags.some((subtag) => ['hans', 'cn', 'sg'].includes(subtag)) ? 'zh-hans' : null;
   }
-  return LOCALE_CODES.has(base) ? base : null;
+  return LOCALE_CODES.has(base) ? /** @type {LocaleCode} */ (base) : null;
 }

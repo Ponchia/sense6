@@ -35,6 +35,11 @@ name, localized source phrases, duration, limit, sources, and lazy loader.
 Static generation, gallery cards, route lookup, and metadata consume this
 registry.
 
+Add `src/exams/<id>.d.ts` beside the controller and expose its `mount` through
+the shared `ExamModule` contract in `src/exams/module-contract.d.ts`. The
+registry's dynamic loader must satisfy that public boundary even while
+maintainers convert the controller implementation incrementally.
+
 Don't put journal or analytics policy in the registry. Those consumers use the
 service contract.
 
@@ -44,6 +49,11 @@ Put adaptive logic, schedules, randomization, calculations, and summaries in a
 small module under `src/lib/`. Accept dependencies such as randomness or time
 as arguments when practical. Add deterministic unit tests before connecting the
 model to the browser.
+
+Every module under `src/lib/` enters the strict typed-JavaScript program
+automatically. Use JSDoc variants for phase-specific state, narrow unknown
+inputs, and add runtime guards at transitions that events or stored data can
+reach. Don't bypass the gate with suppression comments or explicit `any`.
 
 Use explicit bounds and quality states. Don't invent precision, population
 norms, clinical labels, or a suite-wide score.
@@ -109,8 +119,7 @@ identifying at least two real consumers.
 
 Update the README, changelog, About boundaries, research links, privacy wording
 when the data boundary changes, and roadmap only when commitments change. The
-static generator creates every localized route from the registry and
-catalogs.
+static generator creates every localized route from the registry and catalogs.
 
 ## 9. Verify the extension
 
@@ -131,11 +140,12 @@ keyboard use, pointer use, result recording, accessibility, and
 responsive layouts. Keep the full behavioral matrix in Chromium and mobile
 Chromium. Add the smallest critical setup-and-interaction journey to the focused
 Firefox and WebKit suite when a new experiment depends on a browser API or
-route stylesheet. A new shared module belongs in `jsconfig.json` and the
-coverage set.
+route style sheet. The ratchet discovers modules in the strict roots
+automatically. Add a named runtime boundary to `jsconfig.json` and the
+type-ratchet script together when it lives elsewhere.
 
 Before merging, confirm that `npm run check` passes from a clean checkout and
 that the built route stays inside the documented JavaScript and CSS ceilings.
 Same-repository pull requests publish the already verified `dist/` directory to
 a `noindex` Pages preview and smoke-test that real URL. Production metrics must
-remain disabled there.
+remain off there.

@@ -1,5 +1,8 @@
 import { DEFAULT_LOCALE, LOCALE_CODES } from './locale-metadata.js';
 
+/** @typedef {import('./locale-metadata.js').LocaleCode} LocaleCode */
+/** @typedef {() => Promise<{ default: Map<string, string> }>} LocaleLoader */
+
 export {
   DEFAULT_LOCALE,
   LOCALE_CODES,
@@ -8,6 +11,7 @@ export {
   resolveLocale,
 } from './locale-metadata.js';
 
+/** @type {Readonly<Record<LocaleCode, LocaleLoader>>} */
 const LOADERS = Object.freeze({
   en: () => import('./locales/en.js'),
   it: () => import('./locales/it.js'),
@@ -23,7 +27,9 @@ const LOADERS = Object.freeze({
   'zh-hans': () => import('./locales/zh-hans.js'),
 });
 
+/** @param {string} locale */
 export async function loadMessages(locale) {
-  const loader = LOADERS[LOCALE_CODES.has(locale) ? locale : DEFAULT_LOCALE];
+  const code = LOCALE_CODES.has(locale) ? /** @type {LocaleCode} */ (locale) : DEFAULT_LOCALE;
+  const loader = LOADERS[code];
   return (await loader()).default;
 }

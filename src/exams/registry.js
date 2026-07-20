@@ -4,6 +4,15 @@
  */
 import { EXAM_IDS as CONTRACT_IDS, examContract } from './contracts.js';
 
+/** @typedef {import('./contracts.js').ExamId} ExamId */
+/** @typedef {import('./contracts.js').ExamContract} ExamContract */
+/** @typedef {import('./module-contract.js').ExamMountContext} ExamMountContext */
+/** @typedef {readonly [string, string]} ResearchSource */
+/** @typedef {{ mount: (context: ExamMountContext) => (() => void) }} ExamModule */
+/** @typedef {{ id: ExamId, name: string, tagline: string, blurb: string, accent: string, durationMinutes: number, glyph: string, category: string, facts: string[], pageTitle: string, limit: string, load: () => Promise<ExamModule>, sources: ResearchSource[] }} ExamDefinition */
+/** @typedef {Readonly<Omit<ExamDefinition, 'facts' | 'sources'> & { route: ExamId, metricTest: string, contract: Readonly<ExamContract>, facts: readonly string[], sources: readonly Readonly<ResearchSource>[] }>} RegisteredExam */
+
+/** @type {readonly RegisteredExam[]} */
 export const EXAMS = Object.freeze([
   exam({
     id: 'tetracromia',
@@ -125,14 +134,17 @@ export const EXAMS = Object.freeze([
   }),
 ]);
 
+/** @type {ReadonlyMap<string, RegisteredExam>} */
 export const EXAM_BY_ID = new Map(EXAMS.map((entry) => [entry.id, entry]));
 export const EXAM_IDS = CONTRACT_IDS;
 
+/** @param {string} id @returns {Promise<ExamModule | null>} */
 export async function loadExam(id) {
   const definition = EXAM_BY_ID.get(id);
   return definition ? definition.load() : null;
 }
 
+/** @param {ExamDefinition} definition @returns {RegisteredExam} */
 function exam(definition) {
   const contract = examContract(definition.id);
   if (!contract) throw new Error(`Missing exam contract: ${definition.id}`);

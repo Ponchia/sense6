@@ -1,4 +1,5 @@
 // Generated once from the former combined catalog; edit this locale directly.
+/** @type {Array<[string, string]>} */
 const rows = [
   ['Skip to content', '본문으로 건너뛰기'],
   ['Sense6 — all tests', 'Sense6 — 모든 테스트'],

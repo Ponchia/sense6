@@ -1,4 +1,5 @@
 // Simplified Chinese locale catalog. English source keys are the stable message identifiers.
+/** @type {Array<[string, string]>} */
 const rows = [
   ['Skip to content', '跳到正文'],
   ['Sense6 — all tests', 'Sense6 — 所有测试'],

@@ -15,14 +15,17 @@
     "src/crawler-policy.js",
     "src/exams/contracts.js",
     "src/exams/landing.js",
-    "src/exams/views/acutezza-intro.js",
-    "src/exams/views/tetracromia-home.js",
-    "src/i18n/catalog-audit.js",
-    "src/i18n/message-ids.js",
+    "src/exams/registry.js",
+    "src/exams/views/**/*.js",
+    "src/i18n.js",
+    "src/i18n/**/*.js",
     "src/journal-copy.js",
-    "src/lib/journal.js",
-    "src/lib/lifecycle.js",
-    "src/lib/storage.js",
-    "src/metrics.js"
+    "src/lib/**/*.js",
+    "src/locale-metadata.js",
+    "src/locales.js",
+    "src/locales/**/*.js",
+    "src/metrics.js",
+    "src/router.js",
+    "src/**/*.d.ts"
   ]
 }

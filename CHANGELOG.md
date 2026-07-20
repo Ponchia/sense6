@@ -82,6 +82,11 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - Typed-JavaScript contract checks, coverage thresholds for shared lifecycle
   and persistence code, generated-static-output tests, and production bundle
   budgets.
+- An automatic strict typed-JavaScript ratchet for domain models, experiment
+  views, localization, locale catalogs, shared routing boundaries, and public
+  experiment-controller module declarations.
+- Runtime state guards and failure-mode tests for phase-specific color-session
+  operations, unavailable canvas contexts, and malformed result envelopes.
 
 ### Changed
 
@@ -89,6 +94,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   route stylesheet and enforce separate entry, route, and combined ceilings.
 - Metrics and journal validation now consume the exam service contract instead
   of maintaining separate hardcoded experiment lists.
+- Domain, routing, registry, and localization boundaries now narrow browser,
+  storage, dynamic-import, and catalog values without JSDoc `any` or type
+  suppressions.
 - Sense6 now explicitly positions every task as a recreational experiment for
   curiosity and fun. Formal validation, certification, regulatory approval, and
   professional review are not planned; software tests prove implementation
@@ -118,6 +126,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Fixed
 
+- Malformed result envelopes can no longer be mistaken for valid legacy result
+  records.
 - Playwright runs can select a strict, isolated server port so concurrent
   worktrees do not reuse and later lose one another's development server.
 - `Daltonia` no longer forces a directional guess when no gap is visible or

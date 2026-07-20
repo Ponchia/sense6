@@ -1,4 +1,5 @@
 // Hindi catalog; edit this locale directly.
+/** @type {Array<[string, string]>} */
 const rows = [
   ['Skip to content', 'सामग्री पर जाएं'],
   ['Sense6 — all tests', 'Sense6 - सभी परीक्षण'],
