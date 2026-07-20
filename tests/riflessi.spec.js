@@ -1,11 +1,35 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import {
+  expectInVisualViewport,
   expectJournalEntry,
+  expectNoHorizontalOverflow,
   installQuickRiflessi,
   respondToChoice,
   respondWithKey,
 } from './helpers/browser.js';
+
+const AUDITED_LAYOUTS = [
+  { label: '320x568 signal', viewport: { width: 320, height: 568 }, scope: 'signal' },
+  {
+    label: '360x800 signal-choice',
+    viewport: { width: 360, height: 800 },
+    scope: 'signal-choice',
+  },
+  { label: '390x844 complete', viewport: { width: 390, height: 844 }, scope: 'complete' },
+  { label: '412x915 complete', viewport: { width: 412, height: 915 }, scope: 'complete' },
+  {
+    label: '844x390 complete landscape',
+    viewport: { width: 844, height: 390 },
+    scope: 'complete',
+  },
+  {
+    label: '320x568 at 200% text',
+    viewport: { width: 320, height: 568 },
+    scope: 'complete',
+    textScale: 2,
+  },
+];
 
 async function prepareRiflessi(page, mode = 'keyboard', scope = 'complete') {
   await page.getByRole('button', { name: /Prepare the lab/i }).click();
@@ -17,6 +41,16 @@ async function prepareRiflessi(page, mode = 'keyboard', scope = 'complete') {
 
 test('Riflessi signal scope ends independently without placeholder instruments', async ({ page }) => {
   await installQuickRiflessi(page);
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: async (text) => {
+          window.__copiedRiflessi = text;
+        },
+      },
+    });
+  });
   await page.goto('/en/riflessi/');
   await prepareRiflessi(page, 'keyboard', 'signal');
   await page.getByRole('button', { name: /Start practice/i }).click();
@@ -31,6 +65,7 @@ test('Riflessi signal scope ends independently without placeholder instruments',
   await expect(page.locator('.rx-metric')).toHaveCount(1);
   await expect(page.locator('.rx-results__stamp')).toContainText('01 / 03');
   await expect(page.getByText('Choice response', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('Wrong choices', { exact: true })).toHaveCount(0);
   await expectJournalEntry(page, 'riflessi');
   await expect
     .poll(() =>
@@ -40,6 +75,12 @@ test('Riflessi signal scope ends independently without placeholder instruments',
       }),
     )
     .toBe('signal');
+  await page.getByRole('button', { name: /Copy result summary/i }).click();
+  await expect.poll(() => page.evaluate(() => window.__copiedRiflessi)).toContain('Signal median:');
+  const copied = await page.evaluate(() => window.__copiedRiflessi);
+  expect(copied).not.toContain('Choice median:');
+  expect(copied).not.toContain('Sustained median:');
+  expect(copied).not.toContain('wrong choices');
 });
 
 async function finishSignalAndOpenChoice(page) {
@@ -107,6 +148,134 @@ async function expectRunnerToFit(page) {
     });
 }
 
+async function expectScreenToReflow(page, label) {
+  const overflow = await page.evaluate(() => {
+    const clientWidth = document.documentElement.clientWidth;
+    const offenders = [...document.querySelectorAll('#app *')]
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          name: element.className || element.tagName,
+          left: Math.round(rect.left),
+          right: Math.round(rect.right),
+        };
+      })
+      .filter(({ left, right }) => left < -1 || right > clientWidth + 1)
+      .slice(0, 8);
+    return { clientWidth, offenders, scrollWidth: document.documentElement.scrollWidth };
+  });
+  expect(overflow.scrollWidth, `${label}: ${JSON.stringify(overflow.offenders)}`).toBeLessThanOrEqual(
+    overflow.clientWidth,
+  );
+  await expectNoHorizontalOverflow(page, label);
+  const failures = await page.locator('#app').evaluate((app) => {
+    const viewportLeft = window.visualViewport?.offsetLeft ?? 0;
+    const viewportRight =
+      viewportLeft + (window.visualViewport?.width ?? document.documentElement.clientWidth);
+    const visible = (element) => {
+      const style = getComputedStyle(element);
+      const rect = element.getBoundingClientRect();
+      return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+    };
+    const inspected = [
+      ...app.querySelectorAll(
+        '.rx-mode strong, .rx-mode small, .rx-setup-field, .rx-transition h1, .rx-transition > p:not(.ui-eyebrow), .rx-results h1, .rx-metric p, .rx-events dt, .rx-timing dt, .rx-timing dd, .rx-results__actions button',
+      ),
+    ].filter(visible);
+
+    return inspected.flatMap((element) => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      const fontSize = Number.parseFloat(style.fontSize);
+      const text = element.textContent.trim();
+      const problems = [];
+      if (rect.left < viewportLeft - 1 || rect.right > viewportRight + 1) {
+        problems.push(
+          `${element.className || element.tagName}: outside viewport (${rect.left}-${rect.right})`,
+        );
+      }
+      if (text.length >= 4 && rect.width < fontSize * 2) {
+        problems.push(`${element.className || element.tagName}: one-character text column (${rect.width}px)`);
+      }
+      if (element.scrollWidth > element.clientWidth + 1) {
+        problems.push(`${element.className || element.tagName}: clipped inline content`);
+      }
+      return problems;
+    });
+  });
+  expect(failures, `${label}: ${failures.join('; ')}`).toEqual([]);
+}
+
+async function expectRunnerStageToFit(page, label) {
+  await expectRunnerToFit(page);
+  const geometry = await page.evaluate(() => {
+    const rect = (selector) => {
+      const bounds = document.querySelector(selector)?.getBoundingClientRect();
+      return bounds
+        ? { bottom: bounds.bottom, left: bounds.left, right: bounds.right, top: bounds.top }
+        : null;
+    };
+    return {
+      chamber: rect('[data-rx-chamber]'),
+      count: rect('[data-rx-count]'),
+      hint: rect('.rx-response-pad span, .rx-choice-zones small'),
+      status: rect('[data-rx-status]'),
+      stop: rect('[data-action="rx-stop"]'),
+      target: rect('[data-rx-target]'),
+    };
+  });
+  expect(geometry.count.right, `${label}: progress label should not overlap Stop`).toBeLessThanOrEqual(
+    geometry.stop.left + 1,
+  );
+  expect(geometry.status.left, `${label}: status should stay inside the chamber`).toBeGreaterThanOrEqual(
+    geometry.chamber.left - 1,
+  );
+  expect(geometry.status.right, `${label}: status should stay inside the chamber`).toBeLessThanOrEqual(
+    geometry.chamber.right + 1,
+  );
+  expect(geometry.status.bottom, `${label}: status should not overlap the target`).toBeLessThanOrEqual(
+    geometry.target.top + 1,
+  );
+  expect(geometry.target.bottom, `${label}: target should not overlap the response hint`).toBeLessThanOrEqual(
+    geometry.hint.top + 1,
+  );
+}
+
+async function completeScopeWithGeometry(page, scope, label) {
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  await expectRunnerStageToFit(page, `${label} signal practice`);
+  await respondWithKey(page, 'Space');
+  await expectScreenToReflow(page, `${label} signal practice transition`);
+  await page.getByRole('button', { name: /Begin measured block/i }).click();
+  const signalTrials = Number(
+    await page.locator('[data-rx-count]').evaluate((element) => element.textContent.split('/')[1]),
+  );
+  for (let trial = 0; trial < signalTrials; trial += 1) await respondWithKey(page, 'Space');
+  if (scope === 'signal') return;
+
+  await expectScreenToReflow(page, `${label} signal-choice transition`);
+  await page.getByRole('button', { name: /Continue to Scelta/i }).click();
+  await expectScreenToReflow(page, `${label} choice brief`);
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  await expectRunnerStageToFit(page, `${label} choice practice`);
+  await respondToChoice(page);
+  await respondToChoice(page);
+  await expectScreenToReflow(page, `${label} choice practice transition`);
+  await page.getByRole('button', { name: /Begin measured block/i }).click();
+  const choiceTrials = Number(
+    await page.locator('[data-rx-count]').evaluate((element) => element.textContent.split('/')[1]),
+  );
+  for (let trial = 0; trial < choiceTrials; trial += 1) await respondToChoice(page);
+  if (scope === 'signal-choice') return;
+
+  await expectScreenToReflow(page, `${label} choice-sustained transition`);
+  await page.getByRole('button', { name: /Continue to Tenuta/i }).click();
+  await expectScreenToReflow(page, `${label} sustained brief`);
+  await page.getByRole('button', { name: /Start the 3-minute run/i }).click();
+  await expectRunnerStageToFit(page, `${label} sustained runner`);
+  await respondWithKey(page, 'Space');
+}
+
 test('Riflessi completes all three instruments and reports separate device-relative measures', async ({
   page,
 }) => {
@@ -163,12 +332,39 @@ test('Riflessi completes all three instruments and reports separate device-relat
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
+test('production-length denominators remain readable on a 320px result screen', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Single-browser long-copy geometry regression');
+  await installQuickRiflessi(page);
+  await page.addInitScript(() => {
+    window.__SENSE6_TEST_CONFIG__.riflessi.signal.scoredTrials = 20;
+    window.__SENSE6_TEST_CONFIG__.riflessi.choice.scoredTrials = 32;
+  });
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('/en/riflessi/');
+  await prepareRiflessi(page);
+  await completeScopeWithGeometry(page, 'complete', '320x568 production denominators');
+
+  await expect(page.locator('.rx-results')).toBeVisible();
+  await expect(page.locator('.rx-metric').first()).toContainText('from 20 scheduled events');
+  await expect(page.locator('.rx-metric').nth(1)).toContainText('across all 32 scheduled choices');
+  await expectScreenToReflow(page, '320x568 production-denominator results');
+});
+
 test('German Riflessi stages localize generated runner labels', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'Single-browser locale journey');
   await installQuickRiflessi(page);
+  await page.setViewportSize({ width: 320, height: 568 });
   await page.goto('/de/riflessi/');
   await page.locator('[data-action="rx-setup"]').click();
+  await expect(page.getByRole('heading', { name: 'Wählen Sie einen Reaktionsweg.' })).toBeVisible();
+  await expect(page.locator('[data-rx-scope-picker] legend')).toHaveText(
+    'Wie umfangreich soll der Durchlauf sein?',
+  );
+  await expect(page.locator('[data-rx-scope-picker] [data-scope="signal"]')).toContainText('etwa 2 Minuten');
   await page.locator('[data-action="rx-mode"][data-mode="keyboard"]').click();
+  await page.locator('[data-action="rx-scope"][data-scope="signal"]').click();
   await page.locator('[data-rx-consent]').check();
   await page.locator('[data-action="rx-start"]').click();
   await expect(page.locator('.rx-brief__copy')).toContainText('Einfache visuelle Reaktion');
@@ -176,6 +372,21 @@ test('German Riflessi stages localize generated runner labels', async ({ page },
   await page.locator('[data-action="rx-begin-stage"]').click();
   await expect(page.getByRole('heading', { name: 'Reaktionstest für Segnale' })).toBeAttached();
   await expect(page.locator('[data-rx-block]')).toHaveText('Übung');
+  await respondWithKey(page, 'Space');
+  await page.locator('[data-action="rx-begin-scored"]').click();
+  await respondWithKey(page, 'Space');
+  await respondWithKey(page, 'Space');
+
+  await expect(page.locator('.rx-results')).toBeVisible();
+  await expect(page.locator('.rx-results__hero h1')).toContainText('Ihre Reaktion hat');
+  await expect(page.locator('.rx-results__stamp')).toContainText('Durchlauf nutzbar');
+  await expect(page.locator('.rx-metric')).toContainText('Typische Signalreaktion');
+  await expect(page.locator('.rx-metric > p')).toContainText(
+    /Median aus 2 sauberen einfachen Reaktionen von 2 geplanten Ereignissen/,
+  );
+  await expect(page.locator('.rx-events')).toContainText('Prüfungen ohne Signal');
+  await expect(page.locator('.rx-limit')).toContainText(/Riflessi beurteilt weder Gehirnerschütterung/);
+  await expectScreenToReflow(page, '320x568 German signal result');
 });
 
 test('the mobile Riflessi setup and response chamber stay inside the viewport', async ({
@@ -498,4 +709,56 @@ test('copied limited summaries retain quality, interruptions, and wrong-choice c
   const copied = await page.evaluate(() => window.__copiedRiflessi);
   expect(copied).toContain('Timing: Timing interruptions observed; interruptions: 1');
   expect(copied).toContain('4 wrong choices');
+});
+
+test('all Riflessi scopes reflow through real results at the audited mobile layouts', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Runs the explicit mobile and text-scale matrix');
+  await installQuickRiflessi(page);
+
+  for (const layout of AUDITED_LAYOUTS) {
+    await page.setViewportSize(layout.viewport);
+    await page.goto('/en/riflessi/');
+    if (layout.textScale) {
+      await page.evaluate((scale) => {
+        document.documentElement.style.fontSize = `${16 * scale}px`;
+      }, layout.textScale);
+    }
+    await page.getByRole('button', { name: /Prepare the lab/i }).click();
+    await expectScreenToReflow(page, `${layout.label} setup`);
+
+    for (const scope of ['signal', 'signal-choice', 'complete']) {
+      const scopeButton = page.locator(`[data-rx-scope-picker] [data-scope="${scope}"]`);
+      await scopeButton.evaluate((element) => element.scrollIntoView({ behavior: 'instant', block: 'end' }));
+      await expectInVisualViewport(scopeButton, `${layout.label} ${scope} scope`, { hitTest: true });
+    }
+    const start = page.getByRole('button', { name: /Begin selected scope/i });
+    await page.getByRole('button', { name: /^Keyboard/i }).click();
+    await page.locator(`[data-rx-scope-picker] [data-scope="${layout.scope}"]`).click();
+    await page.getByLabel(/I understand this measures this browser/i).check();
+    await start.evaluate((element) => element.scrollIntoView({ behavior: 'instant', block: 'end' }));
+    await expectInVisualViewport(start, `${layout.label} start`, { hitTest: true });
+    await start.click();
+
+    await expectScreenToReflow(page, `${layout.label} signal brief`);
+    await completeScopeWithGeometry(page, layout.scope, layout.label);
+    await expect(page.locator('.rx-results')).toBeVisible();
+    await expectScreenToReflow(page, `${layout.label} results`);
+    await expect(page.locator('.rx-metric')).toHaveCount(
+      layout.scope === 'signal' ? 1 : layout.scope === 'signal-choice' ? 3 : 6,
+    );
+    await expect(page.locator('.rx-results__stamp')).toContainText(
+      `${layout.scope === 'signal' ? '01' : layout.scope === 'signal-choice' ? '02' : '03'} / 03`,
+    );
+    await expect(page.locator('.rx-limit')).toContainText(/does not assess/i);
+    const resultActions = page.locator('.rx-results__actions button');
+    for (let index = 0; index < (await resultActions.count()); index += 1) {
+      const action = resultActions.nth(index);
+      await action.evaluate((element) => element.scrollIntoView({ behavior: 'instant', block: 'end' }));
+      await expectInVisualViewport(action, `${layout.label} result action ${index + 1}`, {
+        hitTest: true,
+      });
+    }
+  }
 });
