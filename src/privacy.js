@@ -327,7 +327,7 @@ export const PRIVACY_COPY = Object.freeze({
 });
 
 const LINKS = Object.freeze({
-  email: `<a href="mailto:${PRIVACY_EMAIL}">${PRIVACY_EMAIL}</a>`,
+  email: `<!--email_off--><a href="mailto:${PRIVACY_EMAIL}">${PRIVACY_EMAIL}</a><!--/email_off-->`,
   cloudflarePrivacy:
     '<a href="https://www.cloudflare.com/privacypolicy/" rel="noreferrer">Cloudflare Privacy Policy</a>',
   cloudflareDpa:

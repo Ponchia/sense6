@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { ABOUT_DATE_MODIFIED, aboutCopy, aboutMarkup } from '../src/about.js';
@@ -13,6 +13,7 @@ const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DIST = join(ROOT, 'dist');
 const ORIGIN = 'https://sense6.net';
 const template = await readFile(join(DIST, 'index.html'), 'utf8');
+const routeStyles = await indexRouteStyles();
 const canonicalPaths = ['/'];
 const catalogs = new Map(
   await Promise.all(LOCALES.map(async ({ code }) => [code, await loadMessages(code)])),
@@ -27,6 +28,7 @@ await writePage('index.html', {
   description:
     'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
   main: rootMarkup(),
+  stylesheet: routeStyles.get('gallery'),
   alternates: galleryAlternates(),
   structuredData: websiteData('en'),
 });
@@ -50,6 +52,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
       'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
     ),
     main: galleryMarkup(locale, translate),
+    stylesheet: routeStyles.get('gallery'),
     alternates: galleryAlternates(),
     structuredData: websiteData(
       languageTag,
@@ -70,6 +73,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
       title: translate(definition.pageTitle),
       description: translate(definition.blurb),
       main: examMarkup(definition, locale, translate),
+      stylesheet: routeStyles.get(definition.id),
       alternates: pageAlternates(definition.route),
       structuredData: examData(definition, languageTag, path, translate),
     });
@@ -86,6 +90,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     title: about.pageTitle,
     description: about.description,
     main: aboutMarkup(locale),
+    stylesheet: routeStyles.get('about'),
     alternates: pageAlternates('about'),
     structuredData: aboutData(about, languageTag, aboutPath),
   });
@@ -101,6 +106,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     title: `${journal.title} | Sense6`,
     description: journal.intro,
     main: journalMarkup(journal, locale),
+    stylesheet: routeStyles.get('journal'),
     alternates: pageAlternates('journal'),
     structuredData: webpageData(`${journal.title} | Sense6`, journal.intro, languageTag, journalPath),
   });
@@ -116,6 +122,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     title: `${copy.title} | Sense6`,
     description: copy.intro,
     main: privacyMarkup(copy, locale),
+    stylesheet: routeStyles.get('privacy'),
     alternates: pageAlternates('privacy'),
     structuredData: webpageData(`${copy.title} | Sense6`, copy.intro, languageTag, privacyPath),
   });
@@ -142,12 +149,27 @@ async function writePage(relativePath, page) {
   );
   html = html.replace(
     '</head>',
-    `${page.alternates}\n    <script type="application/ld+json">${json}</script>\n  </head>`,
+    `    <link rel="stylesheet" crossorigin href="/assets/${page.stylesheet}">\n    ${page.alternates}\n    <script type="application/ld+json">${json}</script>\n  </head>`,
   );
   html = html.replace('<div id="app"></div>', `<div id="app">${page.main}</div>`);
   const output = join(DIST, relativePath);
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, html);
+}
+
+async function indexRouteStyles() {
+  const assets = await readdir(join(DIST, 'assets'));
+  const routeNames = ['gallery', ...EXAMS.map(({ id }) => id), 'about', 'journal', 'privacy'];
+  return new Map(
+    routeNames.map((name) => {
+      const pattern = new RegExp(`^${escapeRegExp(name)}-.+\\.css$`);
+      const matches = assets.filter((asset) => pattern.test(asset));
+      if (matches.length !== 1) {
+        throw new Error(`Expected one generated stylesheet for ${name}, found ${matches.length}`);
+      }
+      return [name, matches[0]];
+    }),
+  );
 }
 
 function localizeShell(html, locale) {

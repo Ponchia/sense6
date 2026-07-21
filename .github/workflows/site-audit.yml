@@ -1,0 +1,119 @@
+name: Site audit
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '23 3 * * 1'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: site-audit-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  route-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Build the static site
+        run: npm run build
+      - name: Validate all generated HTML
+        run: npm run test:html
+      - name: Validate internal links and fragments
+        run: npm run test:links
+      - name: Crawl every route and compare visual baselines
+        run: npm run test:site-audit
+      - name: Upload the browser report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-audit-playwright-report
+          path: playwright-report/site-audit
+          if-no-files-found: ignore
+
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      FULL_SITE_AUDIT: ${{ github.event_name != 'pull_request' && '1' || '0' }}
+      UNLIGHTHOUSE_OUTPUT_PATH: .unlighthouse
+      UNLIGHTHOUSE_SITE: http://127.0.0.1:4174
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Build and serve the static site
+        run: |
+          npm run build
+          npm run preview -- --port 4174 --strictPort > /tmp/sense6-preview.log 2>&1 &
+          node scripts/wait-for-url.mjs http://127.0.0.1:4174/sitemap.xml
+      - name: Enforce Lighthouse budgets
+        run: npm run audit:lighthouse
+      - name: Upload Lighthouse results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unlighthouse-report
+          path: .unlighthouse
+          if-no-files-found: ignore
+
+  external-links:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install and build
+        run: npm ci && npm run build
+      - name: Check external links
+        uses: lycheeverse/lychee-action@v2.9.0
+        with:
+          args: >-
+            --root-dir dist --exclude '^https://sense6\\.net' --max-concurrency 8
+            --timeout 30 --max-retries 2 --no-progress 'dist/**/*.html'
+          fail: true
+          failIfEmpty: true
+          jobSummary: true
+          lycheeVersion: v0.24.2
+
+  passive-security:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Run the passive ZAP baseline against production
+        uses: zaproxy/action-baseline@v0.15.0
+        with:
+          target: https://sense6.net
+          allow_issue_writing: false
+          fail_action: false

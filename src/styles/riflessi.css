@@ -137,6 +137,10 @@ body.rx-running > .ui-sitefooter {
   transform-origin: left;
 }
 
+[dir="rtl"] .rx-scope__sweep {
+  transform-origin: right;
+}
+
 @keyframes rx-scope-sweep {
   to {
     transform: rotate(1turn);
