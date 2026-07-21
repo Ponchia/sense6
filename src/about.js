@@ -1004,7 +1004,9 @@ export function renderAbout(context) {
   const { app, locale, localeHref } = context;
   const copy = aboutCopy(locale);
   document.title = copy.pageTitle;
-  app.innerHTML = aboutMarkup(locale, localeHref);
+  if (!app.querySelector(`:scope > [data-sense6-view="about"][data-sense6-locale="${locale}"]`)) {
+    app.innerHTML = aboutMarkup(locale, localeHref);
+  }
   return () => {};
 }
 
@@ -1016,7 +1018,7 @@ export function aboutCopy(locale) {
 /** @param {string} locale @param {(route: string) => string} [hrefFor] */
 export function aboutMarkup(locale, hrefFor = (route) => `/${locale}/${route ? `${route}/` : ''}`) {
   const page = aboutCopy(locale);
-  return `<article class="about-view ui-container ui-container--wide">
+  return `<article class="about-view ui-container ui-container--wide" data-sense6-view="about" data-sense6-locale="${locale}">
     <a class="back-link about-view__back" data-sense6-route="" href="${escapeAttribute(hrefFor(''))}"><span aria-hidden="true">←</span> ${escapeHtml(page.back)}</a>
     <header class="about-hero">
       <div><p class="ui-eyebrow">${escapeHtml(page.eyebrow)}</p><h1>${escapeHtml(page.title)}</h1><p class="about-hero__lede">${escapeHtml(page.intro)}</p><p class="about-hero__updated">${escapeHtml(page.updated)}</p></div>

@@ -49,10 +49,10 @@
 .au-hero {
   align-items: center;
   display: grid;
-  gap: clamp(3rem, 8vw, 8rem);
+  gap: var(--s6-space-layout);
   grid-template-columns: minmax(0, 1.05fr) minmax(20rem, 0.95fr);
-  min-block-size: min(48rem, calc(100svh - 8rem));
-  padding-block: clamp(3rem, 8vh, 7rem);
+  min-block-size: min(44rem, calc(100svh - 8rem));
+  padding-block: var(--s6-space-hero);
 }
 
 .au-hero h1,
@@ -124,6 +124,7 @@
   border: 1px solid var(--line-strong);
   border-radius: 50%;
   display: flex;
+  direction: ltr;
   inline-size: 56%;
   justify-content: center;
   position: relative;
@@ -133,7 +134,8 @@
   border-block-start: 1px solid color-mix(in srgb, #169dc7 70%, var(--line));
   inline-size: 50%;
   inset-block-start: 50%;
-  inset-inline-start: 50%;
+  left: 50%;
+  right: auto;
   position: absolute;
   transform: rotate(calc(var(--i, 1) * 42deg));
   transform-origin: left;
@@ -170,7 +172,7 @@
 }
 
 .au-wave i {
-  animation: au-wave 2.4s ease-in-out infinite alternate;
+  animation: none;
   animation-delay: calc(var(--bar) * -50ms);
   background: color-mix(in srgb, #169dc7 70%, var(--text));
   block-size: calc(0.3rem + sin(var(--bar) * 31deg) * sin(var(--bar) * 31deg) * 3.8rem);
@@ -182,6 +184,12 @@
   to {
     opacity: 0.95;
     transform: scaleY(0.55);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .au-wave i {
+    animation: au-wave 2.4s ease-in-out 2 alternate both;
   }
 }
 
@@ -424,8 +432,8 @@
 .au-brief,
 .au-transition,
 .au-results {
-  padding-inline-start: calc(var(--space-md) + env(safe-area-inset-left));
-  padding-inline-end: calc(var(--space-md) + env(safe-area-inset-right));
+  padding-left: calc(var(--space-md) + env(safe-area-inset-left));
+  padding-right: calc(var(--space-md) + env(safe-area-inset-right));
 }
 
 .au-setup__grid {
@@ -708,8 +716,8 @@
   border-block-end: 1px solid var(--line);
   grid-template-columns: minmax(0, 1fr) auto auto;
   padding-block-start: calc(var(--au-runner-block-pad) + env(safe-area-inset-top));
-  padding-inline-end: calc(var(--au-runner-inline-pad) + env(safe-area-inset-right));
-  padding-inline-start: calc(var(--au-runner-inline-pad) + env(safe-area-inset-left));
+  padding-left: calc(var(--au-runner-inline-pad) + env(safe-area-inset-left));
+  padding-right: calc(var(--au-runner-inline-pad) + env(safe-area-inset-right));
 }
 
 .au-runner__header > div {
@@ -739,8 +747,8 @@
   border-block-start: 1px solid var(--line);
   grid-template-columns: repeat(3, 1fr);
   padding-block-end: calc(var(--au-runner-block-pad) + env(safe-area-inset-bottom));
-  padding-inline-end: calc(var(--au-runner-inline-pad) + env(safe-area-inset-right));
-  padding-inline-start: calc(var(--au-runner-inline-pad) + env(safe-area-inset-left));
+  padding-left: calc(var(--au-runner-inline-pad) + env(safe-area-inset-left));
+  padding-right: calc(var(--au-runner-inline-pad) + env(safe-area-inset-right));
 }
 
 .au-runner__footer span:nth-child(2) {
@@ -760,8 +768,8 @@
   min-block-size: 0;
   overflow-y: auto;
   padding-block: clamp(1rem, 3vw, 2rem);
-  padding-inline-end: calc(clamp(1rem, 3vw, 2rem) + env(safe-area-inset-right));
-  padding-inline-start: calc(clamp(1rem, 3vw, 2rem) + env(safe-area-inset-left));
+  padding-left: calc(clamp(1rem, 3vw, 2rem) + env(safe-area-inset-left));
+  padding-right: calc(clamp(1rem, 3vw, 2rem) + env(safe-area-inset-right));
 }
 
 .au-listening__status {
@@ -1288,8 +1296,8 @@
     grid-template-rows: auto auto auto minmax(24px, auto);
     overflow-y: auto;
     padding-block: 4px;
-    padding-inline-end: calc(12px + env(safe-area-inset-right));
-    padding-inline-start: calc(12px + env(safe-area-inset-left));
+    padding-left: calc(12px + env(safe-area-inset-left));
+    padding-right: calc(12px + env(safe-area-inset-right));
   }
 
   .au-listening__status {
@@ -1332,6 +1340,14 @@
   .au-intervals > div {
     transition: none;
   }
+}
+
+.measurement-active .au-intervals > div {
+  transition: none;
+}
+
+.measurement-active .au-intervals > div.is-live {
+  transform: none;
 }
 
 @media (forced-colors: active) {

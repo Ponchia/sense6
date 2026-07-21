@@ -5,16 +5,21 @@ import { ABOUT_DATE_MODIFIED, aboutCopy, aboutMarkup } from '../src/about.js';
 import { CRAWLER_POLICY, renderRobots } from '../src/crawler-policy.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { SOURCE_ROLE_LABELS } from '../src/exams/sources.js';
+import { galleryMarkup } from '../src/gallery-markup.js';
+import { messageSource } from '../src/i18n/message-ids.js';
+import { interpolateMessage } from '../src/i18n.js';
 import { journalCopy } from '../src/journal-copy.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
-import { privacyCopy, privacyHtml } from '../src/privacy.js';
+import { privacyCopy, privacyMarkup } from '../src/privacy.js';
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DIST = join(ROOT, 'dist');
 const ORIGIN = 'https://sense6.net';
 const SITE_DATE_MODIFIED = '2026-07-21';
 const template = await readFile(join(DIST, 'index.html'), 'utf8');
-const routeStyles = await indexRouteStyles();
+const builtAssets = await readdir(join(DIST, 'assets'));
+const routeStyles = indexRouteStyles(builtAssets);
+const criticalDisplayFont = findCriticalDisplayFont(builtAssets);
 const canonicalPaths = [{ path: '/', lastModified: SITE_DATE_MODIFIED }];
 const examById = new Map(EXAMS.map((definition) => [definition.id, definition]));
 const catalogs = new Map(
@@ -40,10 +45,7 @@ await writePage('index.html', {
 for (const { code: locale, languageTag, direction } of LOCALES) {
   const messages = await loadMessages(locale);
   const translate = (source, values = {}) =>
-    Object.entries(values).reduce(
-      (output, [key, value]) => output.replaceAll(`{${key}}`, String(value)),
-      messages.get(source) ?? source,
-    );
+    interpolateMessage(messages.get(source) ?? source, values, locale);
   const galleryPath = `/${locale}/`;
   canonicalPaths.push({ path: galleryPath, lastModified: SITE_DATE_MODIFIED });
   await writePage(`${locale}/index.html`, {
@@ -59,7 +61,13 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     socialImageAlt: translate(
       'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',
     ),
-    main: galleryMarkup(locale, translate),
+    main: galleryMarkup({
+      exams: EXAMS,
+      locale,
+      localeHref: (route) => `/${locale}/${route ? `${route}/` : ''}`,
+      m: (id) => translate(messageSource(id)),
+      t: translate,
+    }),
     stylesheet: routeStyles.get('gallery'),
     alternates: galleryAlternates(),
     structuredData: websiteData(
@@ -137,7 +145,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     description: copy.intro,
     socialImage: '/social/sense6.png',
     socialImageAlt: copy.intro,
-    main: privacyMarkup(copy, locale),
+    main: privacyMarkup(copy, (route) => `/${locale}/${route ? `${route}/` : ''}`, locale),
     stylesheet: routeStyles.get('privacy'),
     alternates: pageAlternates('privacy'),
     structuredData: webpageData(`${copy.title} | Sense6`, copy.intro, languageTag, privacyPath),
@@ -171,7 +179,7 @@ async function writePage(relativePath, page) {
   );
   html = html.replace(
     '</head>',
-    `    <link rel="stylesheet" crossorigin href="/assets/${page.stylesheet}">\n    ${page.alternates}\n    <script type="application/ld+json">${json}</script>\n  </head>`,
+    `    ${displayFontPreload(page.locale)}<link rel="stylesheet" crossorigin href="/assets/${page.stylesheet}">\n    ${page.alternates}\n    <script type="application/ld+json">${json}</script>\n  </head>`,
   );
   html = html.replace('<div id="app"></div>', `<div id="app">${page.main}</div>`);
   const output = join(DIST, relativePath);
@@ -179,8 +187,12 @@ async function writePage(relativePath, page) {
   await writeFile(output, html);
 }
 
-async function indexRouteStyles() {
-  const assets = await readdir(join(DIST, 'assets'));
+function displayFontPreload(locale) {
+  if (['ar', 'hi', 'ja', 'ko', 'zh-hans'].includes(locale)) return '';
+  return `<link rel="preload" href="/assets/${criticalDisplayFont}" as="font" type="font/woff2" crossorigin media="not (prefers-reduced-data: reduce)">\n    `;
+}
+
+function indexRouteStyles(assets) {
   const routeNames = ['gallery', ...EXAMS.map(({ id }) => id), 'about', 'journal', 'privacy'];
   return new Map(
     routeNames.map((name) => {
@@ -192,6 +204,14 @@ async function indexRouteStyles() {
       return [name, matches[0]];
     }),
   );
+}
+
+function findCriticalDisplayFont(assets) {
+  const matches = assets.filter((asset) => /^doto-800-.+\.woff2$/.test(asset));
+  if (matches.length !== 1) {
+    throw new Error(`Expected one generated Doto 800 font, found ${matches.length}`);
+  }
+  return matches[0];
 }
 
 function localizeShell(html, locale) {
@@ -237,26 +257,6 @@ function rootMarkup() {
       ({ code, languageTag, direction, label }) =>
         `<a href="/${code}/" hreflang="${languageTag}" lang="${languageTag}" dir="${direction}">${label}</a>`,
     ).join('')}</nav>
-  </section>`;
-}
-
-function galleryMarkup(locale, tr) {
-  return `<section class="static-entry ui-container ui-container--wide">
-    <p class="ui-eyebrow">Sense6</p>
-    <h1>${escapeHtml(tr('Sense6 — measure what your senses notice'))}</h1>
-    <p>${escapeHtml(tr('Short, careful tests that turn what you notice into honest, device-relative results.'))}</p>
-    <p>${escapeHtml(tr('No account, no answers or results uploaded.'))}</p>
-    <p><strong>${escapeHtml(tr('Experimental perception tests for curiosity and fun—not medical tests or diagnoses.'))}</strong></p>
-    <p><a data-sense6-route="about" href="/${locale}/about/">${escapeHtml(tr('How Sense6 works'))}</a></p>
-    <h2>${escapeHtml(tr('Start with what you want to learn.'))}</h2>
-    <div class="static-page-grid">${EXAMS.map(
-      (definition) => `<article class="ui-card">
-        <p class="ui-eyebrow">${escapeHtml(tr(definition.category))} · ${escapeHtml(tr('≈ {minutes} min', { minutes: definition.durationMinutes }))}</p>
-        <h3><a data-sense6-route="${definition.route}" href="/${locale}/${definition.route}/">${escapeHtml(definition.name)}</a></h3>
-        <p>${escapeHtml(tr(definition.tagline))}</p>
-        <p>${escapeHtml(tr(definition.blurb))}</p>
-      </article>`,
-    ).join('')}</div>
   </section>`;
 }
 
@@ -306,22 +306,6 @@ function examMarkup(definition, locale, tr) {
         )
         .join('')}</div>
     </section>
-  </article>`;
-}
-
-function privacyMarkup(copy, locale) {
-  return `<article class="static-entry ui-container">
-    <a class="back-link" data-sense6-route="" href="/${locale}/"><span aria-hidden="true">←</span> ${escapeHtml(copy.back)}</a>
-    <header><p class="ui-eyebrow">${escapeHtml(copy.eyebrow)}</p><h1>${escapeHtml(copy.title)}</h1><p>${escapeHtml(copy.intro)}</p><p>${escapeHtml(copy.updated)}</p></header>
-    <aside><h2>${escapeHtml(copy.summaryTitle)}</h2><p>${escapeHtml(copy.summary)}</p></aside>
-    ${copy.sections
-      .map(
-        (section) =>
-          `<section><h2>${escapeHtml(section.title)}</h2>${section.paragraphs
-            .map((paragraph) => `<p>${privacyHtml(paragraph)}</p>`)
-            .join('')}</section>`,
-      )
-      .join('')}
   </article>`;
 }
 
