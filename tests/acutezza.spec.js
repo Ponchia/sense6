@@ -98,9 +98,22 @@ async function expectAcutezzaPageToReflow(page, label) {
 }
 
 async function expectAcutezzaActionsToBeReachable(page, label) {
-  const geometries = await page.locator('main button:visible').evaluateAll((actions) =>
-    actions.map((element) => {
+  const geometries = await page.locator('main button:visible').evaluateAll((initialActions) => {
+    const visibleActions = () =>
+      [...document.querySelectorAll('main button')].filter((element) => {
+        const rect = element.getBoundingClientRect();
+        const style = window.getComputedStyle(element);
+        return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+      });
+
+    return initialActions.map((_, index) => {
+      let element = visibleActions()[index];
+      if (!element) return null;
       element.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' });
+      // A scroll can synchronously re-render the current card. Re-query so the
+      // geometry audit never measures a detached button from the old render.
+      element = visibleActions()[index];
+      if (!element) return null;
       const rect = element.getBoundingClientRect();
       const viewport = window.visualViewport;
       const viewportLeft = viewport?.offsetLeft ?? 0;
@@ -124,9 +137,11 @@ async function expectAcutezzaActionsToBeReachable(page, label) {
         viewportTop,
         width: rect.width,
       };
-    }),
-  );
+    });
+  });
   for (const [index, geometry] of geometries.entries()) {
+    expect(geometry, `${label} action ${index} remains rendered after scroll`).not.toBeNull();
+    if (!geometry) continue;
     expect(geometry.left, `${label} action ${index} left`).toBeGreaterThanOrEqual(geometry.viewportLeft - 1);
     expect(geometry.right, `${label} action ${index} right`).toBeLessThanOrEqual(geometry.viewportRight + 1);
     expect(geometry.top, `${label} action ${index} top`).toBeGreaterThanOrEqual(geometry.viewportTop - 1);
