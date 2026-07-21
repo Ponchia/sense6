@@ -35,6 +35,7 @@ const SOURCES = Object.freeze([
   'Method source',
   'Related instrument',
   'Sense6 validation',
+  'Share result',
 ]);
 
 /** @type {Readonly<Record<LocaleCode, readonly string[]>>} */
@@ -67,6 +68,7 @@ const TRANSLATIONS = Object.freeze({
     'Fonte del metodo',
     'Strumento correlato',
     'Validazione Sense6',
+    'Condividi il risultato',
   ]),
   de: Object.freeze([
     'Bildschirm-Farblabor',
@@ -95,6 +97,7 @@ const TRANSLATIONS = Object.freeze({
     'Methodenquelle',
     'Verwandtes Instrument',
     'Sense6-Validierung',
+    'Ergebnis teilen',
   ]),
   fr: Object.freeze([
     'Laboratoire couleur sur écran',
@@ -123,6 +126,7 @@ const TRANSLATIONS = Object.freeze({
     'Source de la méthode',
     'Instrument associé',
     'Validation de Sense6',
+    'Partager le résultat',
   ]),
   es: Object.freeze([
     'Laboratorio de color en pantalla',
@@ -151,6 +155,7 @@ const TRANSLATIONS = Object.freeze({
     'Fuente del método',
     'Instrumento relacionado',
     'Validación de Sense6',
+    'Compartir el resultado',
   ]),
   pt: Object.freeze([
     'Laboratório de cor no ecrã',
@@ -179,6 +184,7 @@ const TRANSLATIONS = Object.freeze({
     'Fonte do método',
     'Instrumento relacionado',
     'Validação do Sense6',
+    'Partilhar o resultado',
   ]),
   'pt-br': Object.freeze([
     'Laboratório de cor na tela',
@@ -207,6 +213,7 @@ const TRANSLATIONS = Object.freeze({
     'Fonte do método',
     'Instrumento relacionado',
     'Validação do Sense6',
+    'Compartilhar o resultado',
   ]),
   ar: Object.freeze([
     'مختبر ألوان الشاشة',
@@ -235,6 +242,7 @@ const TRANSLATIONS = Object.freeze({
     'مصدر المنهج',
     'أداة ذات صلة',
     'تحقق Sense6',
+    'مشاركة النتيجة',
   ]),
   ja: Object.freeze([
     '画面カラーラボ',
@@ -263,6 +271,7 @@ const TRANSLATIONS = Object.freeze({
     '手法の出典',
     '関連する測定機器',
     'Sense6 の検証',
+    '結果を共有',
   ]),
   ko: Object.freeze([
     '화면 색상 실험실',
@@ -291,6 +300,7 @@ const TRANSLATIONS = Object.freeze({
     '방법 출처',
     '관련 도구',
     'Sense6 검증',
+    '결과 공유',
   ]),
   hi: Object.freeze([
     'स्क्रीन रंग प्रयोगशाला',
@@ -319,6 +329,7 @@ const TRANSLATIONS = Object.freeze({
     'विधि स्रोत',
     'संबंधित उपकरण',
     'Sense6 सत्यापन',
+    'परिणाम साझा करें',
   ]),
   'zh-hans': Object.freeze([
     '屏幕色彩实验室',
@@ -347,6 +358,7 @@ const TRANSLATIONS = Object.freeze({
     '方法来源',
     '相关工具',
     'Sense6 验证',
+    '分享结果',
   ]),
 });
 

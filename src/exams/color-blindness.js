@@ -15,6 +15,7 @@ import {
 import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
 import { createExamLifecycle } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
+import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 import { renderMethodSteps, renderResearchSection } from './landing.js';
@@ -560,8 +561,8 @@ function renderResults() {
       <div class="results-actions">
         ${
           storageOk
-            ? '<button class="ui-button ui-button--lg" type="button" data-action="cb-setup">Repeat independently</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-copy">Copy run summary</button>'
-            : '<button class="ui-button ui-button--lg" type="button" data-action="cb-copy">Copy run summary</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-setup">Repeat independently</button>'
+            ? `<button class="ui-button ui-button--lg" type="button" data-action="cb-setup">Repeat independently</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-copy">${resultActionLabel(t, 'Copy run summary')}</button>`
+            : `<button class="ui-button ui-button--lg" type="button" data-action="cb-copy">${resultActionLabel(t, 'Copy run summary')}</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-setup">Repeat independently</button>`
         }
         <button class="ui-button ui-button--subtle" type="button" data-action="gallery">${m('nav.allTests')}</button>
       </div>
@@ -714,8 +715,13 @@ async function copyResults() {
     .join(', ');
   const summary = `Daltonia exploratory browser run — ending adaptive levels: ${levels}; task controls ${result.controls.correct}/${result.controls.total}. Display-relative HPE/sRGB coordinates, unvalidated, not cone thresholds, and not diagnostic.`;
   try {
-    await navigator.clipboard.writeText(summary);
-    toast(t('Run summary copied'), { tone: 'success' });
+    const outcome = await shareOrCopyResult({
+      title: t('Experimental colour-vision check — Daltonia | Sense6'),
+      summary,
+      route: 'color-blindness',
+      locale: state.locale,
+    });
+    if (outcome === 'copied') toast(t('Run summary copied'), { tone: 'success' });
   } catch {
     toast(t('Could not access the clipboard'), { tone: 'danger' });
   }

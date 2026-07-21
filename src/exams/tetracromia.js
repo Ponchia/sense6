@@ -5,6 +5,7 @@ import { toRgbCss } from '../lib/color.js';
 import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
 import { createExamLifecycle } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
+import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
 import { ColorLabSession, PHASES } from '../lib/session.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 import { protocolPassport } from './protocols.js';
@@ -606,7 +607,7 @@ function renderResults() {
 
       <div class="results-actions">
         <button class="ui-button ui-button--lg" type="button" data-action="setup">Repeat independently</button>
-        <button class="ui-button ui-button--ghost" type="button" data-action="copy-results">Copy summary</button>
+        <button class="ui-button ui-button--ghost" type="button" data-action="copy-results">${resultActionLabel(t, 'Copy summary')}</button>
         <button class="ui-button ui-button--subtle" type="button" data-action="home">Return to method</button>
       </div>
     </section>
@@ -666,8 +667,13 @@ async function copyResults() {
   const summary = `Screen Colour Lab (Tetracromia) — tile ${result.tile.correct}/${result.tile.presentations} at an ending adaptive level near ${result.tile.adaptiveLevelDegrees}°; field ${result.field.correct}/${result.field.presentations} near ${result.field.adaptiveLevelDegrees}°; ordering ${result.ordering.orderedPairsPercent}% of pairs. Short-run, display-relative observations—not thresholds, a clinical test, or a diagnosis.`;
 
   try {
-    await navigator.clipboard.writeText(summary);
-    toast(t('Result summary copied'), { tone: 'success' });
+    const outcome = await shareOrCopyResult({
+      title: t('Tetracromia — colour discrimination | Sense6'),
+      summary,
+      route: 'tetracromia',
+      locale: state.locale,
+    });
+    if (outcome === 'copied') toast(t('Result summary copied'), { tone: 'success' });
   } catch {
     toast(t('Could not access the clipboard'), { tone: 'danger' });
   }
