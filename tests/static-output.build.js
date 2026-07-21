@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import test from 'node:test';
+import { measureInitialLocaleGraph } from '../scripts/vite-manifest.mjs';
 import { CRAWLER_POLICY } from '../src/crawler-policy.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { LOCALES } from '../src/locales.js';
@@ -193,23 +194,16 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
 });
 
 test('the entry bundle stays route-split and within its documented budget', async () => {
+  const INITIAL_JS_BUDGET = 110_000;
   const ENTRY_CSS_BUDGET = 125_000;
   const ROUTE_CSS_BUDGET = 40_000;
   const COMBINED_CSS_BUDGET = 150_000;
   const files = await readdir(new URL('assets/', DIST));
-  const entry = files.find((file) => /^index-.+\.js$/.test(file));
-  const english = files.find((file) => /^en-.+\.js$/.test(file));
-  let sharedRuntime;
-  for (const file of files.filter((candidate) => candidate.endsWith('.js'))) {
-    const source = await readFile(new URL(`assets/${file}`, DIST), 'utf8');
-    if (source.includes('site_loaded') && source.includes('test_started')) {
-      sharedRuntime = file;
-      break;
-    }
-  }
-  assert.ok(entry && english && sharedRuntime);
-  const initialBytes = await sumSizes([entry, english, sharedRuntime]);
-  assert.ok(initialBytes <= 110_000, `initial English JS is ${initialBytes} bytes; budget is 110000`);
+  const initialGraph = await measureInitialLocaleGraph('en', DIST);
+  assert.ok(
+    initialGraph.bytes <= INITIAL_JS_BUDGET,
+    `initial English JS is ${initialGraph.bytes} bytes; budget is ${INITIAL_JS_BUDGET}; graph: ${initialGraph.files.map(({ file, bytes }) => `${file} (${bytes})`).join(', ')}`,
+  );
   for (const { id } of EXAMS)
     assert.ok(
       files.some(

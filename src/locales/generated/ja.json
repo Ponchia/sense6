@@ -1,0 +1,261 @@
+[
+  ["Screen Colour Lab", "画面カラーラボ"],
+  ["Three short colour observations", "3つの短い色の観察"],
+  [
+    "Tetracromia is a recreational screen-colour lab with three separate, short-run observations and no overall score.",
+    "Tetracromia は、3つの独立した短時間の観察を行う娯楽目的の画面カラーラボです。総合スコアはありません。"
+  ],
+  ["Fixed 29-block dose", "29ブロック固定"],
+  ["3 separate observations", "3つの独立した観察"],
+  ["Screen Colour Lab — Tetracromia | Sense6", "画面カラーラボ — Tetracromia | Sense6"],
+  ["Calibrated sharpness & nominal contrast", "較正した視認精度と公称コントラスト"],
+  [
+    "Two per-eye conditions describe angular detail and nominal low-contrast cost without making a clinical claim.",
+    "各眼2条件で角度視認精度と公称低コントラストの影響を記述します。臨床的な主張は行いません。"
+  ],
+  ["2 per-eye conditions", "各眼2条件"],
+  ["Adaptive levels", "適応レベル"],
+  ["Response speed, choice task & consistency", "反応速度、選択課題、一貫性"],
+  [
+    "Three instruments keep simple response, a choice task, and within-run stability as separate observations.",
+    "3つの機器は、単純反応、選択課題、実行中の安定性を別々の観察として扱います。"
+  ],
+  ["Notice colour in", "色を"],
+  ["three different ways", "3つの異なる方法で観察"],
+  ["Three observations from one short screen-colour run.", "1回の短い画面カラー実行から得た3つの観察。"],
+  ["Tile choices", "タイル選択"],
+  ["Dot-field choices", "ドットフィールド選択"],
+  ["Hue ordering", "色相の並べ替え"],
+  ["Complete set", "完全セット"],
+  ["Riflessi — device-relative response observations", "Riflessi — デバイスに依存する反応の観察"],
+  ["Udito — device-relative listening observations", "Udito — デバイスに依存する聴取の観察"],
+  ["Acutezza — calibrated sharpness observations", "Acutezza — 較正した視認精度の観察"],
+  [
+    "The setup checks and adaptive tracks produced coherent run-level observations.",
+    "設定確認と適応トラックから、この実行について一貫した観察が得られました。"
+  ],
+  ["Method source", "手法の出典"],
+  ["Related instrument", "関連する測定機器"],
+  ["Sense6 validation", "Sense6 の検証"],
+  ["Share result", "結果を共有"],
+  ["How much do you want to run?", "どの程度詳しく実施しますか？"],
+  ["about 2 minutes", "約2分"],
+  ["about 4 minutes", "約4分"],
+  ["about 7 minutes", "約7分"],
+  ["Physical setup", "身体と端末の配置"],
+  ["Seated · device on a stable surface", "着席 · 端末を安定した面に置く"],
+  ["Handheld or standing", "端末を手に持つ、または立って実施"],
+  ["Begin selected scope", "選択した範囲を開始"],
+  ["Your response observations — Riflessi | Sense6", "あなたの反応観察 — Riflessi | Sense6"],
+  [
+    "The selected instruments captured enough clean responses for separate run-level observations.",
+    "選択した測定項目では、今回の実行について個別の観察を示すのに十分な有効反応が得られました。"
+  ],
+  [
+    "Median of {valid} clean simple responses from {scheduled} scheduled events. Within-run spread: {spread} ms; this is not estimate uncertainty.",
+    "予定された{scheduled}イベントのうち、有効な単純反応{valid}件の中央値です。実行内のばらつき：{spread}ミリ秒。これは推定の不確実性ではありません。"
+  ],
+  [
+    "{scheduledAccuracy}% correct across all {scheduled} scheduled choices; {conditionalAccuracy}% among left/right responses.",
+    "予定された{scheduled}件の選択全体で{scheduledAccuracy}%正解、左右いずれかを選んだ反応では{conditionalAccuracy}%正解でした。"
+  ],
+  ["Descriptive block difference", "ブロック間の記述的な差"],
+  [
+    "Choice-block median minus the earlier simple-response median. Fixed order and different motor responses remain confounded.",
+    "選択ブロックの中央値から先に行った単純反応の中央値を引いた値です。固定された順序と異なる運動反応の影響は分離できません。"
+  ],
+  [
+    "Median of {valid} clean responses across this custom sustained block.",
+    "この独自の持続ブロックにおける有効反応{valid}件の中央値です。"
+  ],
+  [
+    "A descriptive slow-tail difference for this custom block—not a PVT lapse count.",
+    "この独自ブロックにおける遅い反応側の記述的な差であり、PVTのラプス数ではありません。"
+  ],
+  ["No-signal checks", "無信号チェック"],
+  ["Repeat this scope independently", "この範囲を独立して再実施"],
+  ["Controls passed", "コントロール通過"],
+  ["Control caution", "コントロールに注意"],
+  ["Controls not passed", "コントロール不通過"],
+  ["correct / scheduled", "正解 / 予定"],
+  ["Ending adaptive level", "最終適応レベル"],
+  ["Correct / scheduled", "正解 / 予定"],
+  [
+    "{correct} of {total} scheduled high-contrast gap controls were answered correctly.",
+    "予定された高コントラストの切れ目コントロール{total}件中{correct}件に正しく回答しました。"
+  ],
+  ["Keep these observations only with a control caution.", "これらの観察は、コントロールへの注意を付けた場合にのみ保存してください。"],
+  ["Display-relative adaptive levels from this run", "この実行で得られた画面相対の最終適応レベル"],
+  ["Display-relative observations with a control caution", "コントロールに注意が必要な画面相対の観察"],
+  [
+    "Lower values mean the short adaptive track ended at a smaller colour shift in that direction on this display. These are not precise thresholds, cone measurements, clinical scores, or diagnoses.",
+    "値が低いほど、この画面のその方向では短い適応トラックがより小さな色差で終了したことを意味します。これは精密なしきい値、錐体測定、臨床スコア、診断ではありません。"
+  ],
+  [
+    "Two of three high-contrast task controls passed. The observations are retained with a caution, but should not be treated as a strong run.",
+    "3件中2件の高コントラスト課題コントロールを通過しました。観察は注意付きで保持されますが、強い実行結果として扱わないでください。"
+  ],
+  [
+    "Fewer than two high-contrast task controls passed, so the adaptive levels are not treated as usable. Check the instructions and viewing setup, then try again.",
+    "高コントラスト課題コントロールの通過が2件未満だったため、適応レベルは利用可能とはみなしません。手順と観察環境を確認して、もう一度試してください。"
+  ],
+  ["Focused", "重点"],
+  ["Standard", "標準"],
+  ["Cuffie + Portata · about 3–4 minutes", "Cuffie + Portata · 約3～4分"],
+  ["All three instruments · about 5–7 minutes", "3つの測定項目すべて · 約5～7分"],
+  ["Two focused listening measures.", "2つの重点的な聴覚測定。"],
+  [
+    "Keep the tasks separate. This fixed 29-block experiment is too short to establish a stable threshold, stable hue characteristic, or overall ability score.",
+    "各課題は分けて扱ってください。この固定29ブロックの実験は、安定したしきい値、安定した色相特性、または総合的な能力スコアを確立するには短すぎます。"
+  ],
+  ["blocks", "ブロック"],
+  ["{correct} of {presentations} correct", "{presentations}件中{correct}件正解"],
+  [
+    "The adaptive level ended near {level}° of OKLCH hue (ΔEOK {delta}).",
+    "適応レベルはOKLCH色相の約{level}°（ΔEOK {delta}）で終了しました。"
+  ],
+  [
+    "Presented range {minimum}°–{maximum}° · {reversals} direction changes",
+    "提示範囲 {minimum}°～{maximum}° · 方向変更 {reversals}回"
+  ],
+  ["{percent}% of pairs ordered", "ペアの{percent}%を正しく並べ替え"],
+  ["Mean pair ordering across {runs} fixed-anchor arcs.", "{runs}本の固定アンカー円弧におけるペア順序の平均。"],
+  ["Run values: {values}%", "各実行の値：{values}%"],
+  [
+    "The ending adaptive levels summarize where this brief run happened to finish; they are not stable thresholds or uncertainty estimates. Ordering is a separate task. None of these observations is a population score, diagnosis, clinical screen, or evidence for tetrachromacy. A repeat is stored independently—Sense6 never pools runs or keeps a best.",
+    "最終適応レベルは、この短い実行が終了した位置を要約したものです。安定したしきい値や不確実性の推定値ではありません。並べ替えは別の課題です。これらの観察はいずれも、集団スコア、診断、臨床スクリーニング、または四色型色覚の証拠ではありません。再実行は個別に保存され、Sense6が実行を統合したり最高値を残したりすることはありません。"
+  ],
+  ["Repeat independently", "独立して再実施"],
+  ["29 completed blocks", "29ブロック完了"],
+  ["Completed", "完了"],
+  ["Screen Colour Lab / 29 blocks / about 4 minutes", "画面色ラボ / 29ブロック / 約4分"],
+  [
+    "Tetracromia is a short recreational experiment: 14 tile choices, 12 dot-field choices, and 3 ordering arcs. Each observation stays separate.",
+    "Tetracromiaは短い娯楽目的の実験です。色タイルの選択14回、ドットフィールドの選択12回、並べ替えの弧3本を行い、それぞれの観察結果は分けて扱います。"
+  ],
+  ["Three short screen-colour observations.", "画面上の色についての短い観察を3つ行います。"],
+  ["14 trials", "14試行"],
+  ["12 trials", "12試行"],
+  ["Dot fields", "ドットフィールド"],
+  ["3 runs", "3回"],
+  ["The displayed difference adapts during two tasks.", "表示される差は、2つの課題中に適応します。"],
+  [
+    "Tile choices and Dot fields use a two-correct-down, one-error-up rule. With only 14 and 12 choices, the ending level describes this run; it is not a stable threshold.",
+    "色タイル選択とドットフィールドは、2回正解で差を小さくし、1回不正解で大きくする規則を使います。選択回数は14回と12回だけなので、終了時の水準は今回の結果を表すもので、安定したしきい値ではありません。"
+  ],
+  ["Adaptive path", "適応の経過"],
+  ["Correct and missed choices change the next displayed difference.", "正答と誤答に応じて、次に表示される差が変わります。"],
+  [
+    "Three observations describe this screen, light, fatigue level, and run—with no composite.",
+    "3つの観察結果は、この画面、照明、疲労の程度、今回の実行を表します。総合得点は算出しません。"
+  ],
+  ["Make three colour observations.", "色について3つの観察を行います。"],
+  [
+    "A C-shaped target becomes harder to separate from its field. Three independent staircases record where each short display-relative track ends during this run.",
+    "C字形の視標は、背景から次第に見分けにくくなります。3つの独立した階段法で、今回の実行における各画面相対トラックの終了位置を記録します。"
+  ],
+  ["Three display directions", "画面上の3つの色方向"],
+  [
+    "You receive ending adaptive levels and track evidence, not cone thresholds, a normal/deficient label, or a clinical score.",
+    "得られるのは最終適応水準とトラックの記録です。錐体のしきい値、正常／異常という分類、臨床スコアではありません。"
+  ],
+  [
+    "Two clear targets teach the C-gap interaction with immediate feedback before the exploratory track.",
+    "探索トラックの前に、見やすい2つの視標と即時フィードバックでC字の切れ目の選び方を練習します。"
+  ],
+  [
+    "Target and field are luminance-matched in linear sRGB and share the same dot-level brightness variation.",
+    "視標と背景は線形sRGBで輝度を一致させ、各ドットの明るさのばらつきも同じにしています。"
+  ],
+  [
+    "Directions become harder after correct responses. “No gap visible” counts as a miss and makes that display direction easier.",
+    "正答すると方向の判別が難しくなります。「切れ目が見えない」は誤答として扱われ、その画面方向が易しくなります。"
+  ],
+  ["Signal", "合図"],
+  ["ready", "準備完了"],
+  [
+    "A left or right arrow appears. Respond on the matching side. The block median can be described alongside Segnale, with fixed-order and motor differences left explicit.",
+    "左または右の矢印が表示されたら、同じ側で反応します。このブロックの中央値はSegnaleと並べて説明できますが、固定順序と動作の違いは明示したままにします。"
+  ],
+  ["Custom sustained block", "独自の持続反応ブロック"],
+  [
+    "A three-minute sequence describes changes within this run. PVT-B is a comparator, not validation of this different event schedule.",
+    "3分間の系列で、今回の実行中の変化を記述します。PVT-Bは比較対象であり、この異なるイベント構成を検証するものではありません。"
+  ],
+  [
+    "One of three intervals contains a tone. Its frequency adapts to find the upper boundary available in this run, on this device, while you report keeping volume unchanged.",
+    "3区間のうち1つに音が含まれます。音量を変えていないと申告した状態で、周波数を適応させ、今回の実行とこの端末で得られる上限を探します。"
+  ],
+  ["Udito listening lab ready.", "Uditoの聴覚ラボを開始できます。"],
+  ["Vision lab / selectable scope / about 4–8 minutes", "視覚ラボ / 範囲を選択 / 約4～8分"],
+  [
+    "Acutezza describes angular detail for each eye and, in Standard scope, the within-run cost of a nominal low-contrast condition. Meridiani scoring is suspended. This is a perception experiment, not an eye examination.",
+    "Acutezzaは、各眼の角度視認細度と、標準範囲では公称低コントラスト条件による今回の実行内の影響を記述します。Meridianiの採点は停止中です。これは知覚実験であり、眼科検査ではありません。"
+  ],
+  ["Two conditions. No composite score.", "2つの条件。総合得点なし。"],
+  [
+    "High-contrast detail and nominal low-contrast cost remain separate. The former Meridiani score is suspended pending redesign and pilot evidence.",
+    "高コントラストの細部と、公称低コントラストによる影響は分けて扱います。旧Meridianiスコアは、再設計と予備データが得られるまで停止しています。"
+  ],
+  [
+    "Audio setup ready. Play the maximum-level reference before beginning.",
+    "オーディオ設定の準備ができました。開始前に最大レベルの基準音を再生してください。"
+  ],
+  ["{name} instructions ready.", "{name}の説明を開始できます。"],
+  ["{name} sound runner ready.", "{name}の音響テストを開始できます。"],
+  ["Cuffie practice complete.", "Cuffieの練習が完了しました。"],
+  ["{name} complete.", "{name}が完了しました。"],
+  ["Confirm whether device volume stayed unchanged during the run.", "今回の実行中に端末の音量が変わらなかったか確認してください。"],
+  [
+    "Udito results ready. {quality}. Saved to the private journal.",
+    "Uditoの結果が準備できました。{quality}。非公開ジャーナルに保存しました。"
+  ],
+  [
+    "Udito results ready. {quality}. The journal entry was not saved.",
+    "Uditoの結果が準備できました。{quality}。ジャーナル項目は保存されませんでした。"
+  ],
+  ["Listening paused. {explanation}", "聴覚テストを一時停止しました。{explanation}"],
+  ["Set the room before the observations.", "観察の前に室内環境を整えてください。"],
+  [
+    "Display settings and ambient light can change what appears visible. This one-minute check makes the 29-block run easier to repeat under similar conditions.",
+    "画面設定や周囲の明るさによって見え方は変わります。この1分間の確認により、29ブロックを同じような条件で繰り返しやすくなります。"
+  ],
+  ["Color override detected", "カラー表示の上書きを検出しました"],
+  [
+    "Turn off forced-colors or high-contrast mode before a visual color task.",
+    "色を使う視覚課題の前に、強制カラーまたはハイコントラストモードをオフにしてください。"
+  ],
+  ["Eleven brightness steps from black to white", "黒から白までの11段階の明るさ"],
+  ["Continuous grayscale gradient", "連続したグレースケールのグラデーション"],
+  [
+    "The adaptive track only describes this browser, display, lighting, and viewing position. Colour-shifting features can move them substantially.",
+    "適応トラックが表すのは、このブラウザ、画面、照明、観察位置での結果だけです。色を変える機能によって結果が大きく変わることがあります。"
+  ],
+  ["Colour override detected", "カラー表示の上書きを検出しました"],
+  ["Audio setup / keep volume unchanged after this screen", "オーディオ設定 / この画面の後は音量を変更しないでください"],
+  ["Sound sensitivity comes first.", "音への過敏さを最優先してください。"],
+  [
+    "If you have tinnitus, hyperacusis, or sounds are uncomfortable today, skip the experiment or stop immediately. Sense6 cannot measure sound pressure.",
+    "耳鳴りや聴覚過敏がある場合、または今日は音が不快に感じられる場合は、実験を行わないか直ちに中止してください。Sense6は音圧を測定できません。"
+  ],
+  ["Play maximum-level reference", "最大レベルの基準音を再生"],
+  [
+    "Start device volume low before playing. This 1 kHz preview represents the loudest digital level used later; it does not measure acoustic output.",
+    "端末の音量を低くしてから再生してください。この1 kHzの試聴音は、後で使う最大デジタルレベルを示すもので、音響出力は測定しません。"
+  ],
+  ["Connection", "接続"],
+  ["Wired", "有線"],
+  ["Wireless / Bluetooth", "ワイヤレス / Bluetooth"],
+  ["Built-in / assistive route", "内蔵 / 補助機器経由"],
+  ["Play 200 Hz, 500 Hz, and 2 kHz audibility anchors", "200 Hz、500 Hz、2 kHzの可聴確認音を再生"],
+  [
+    "Confirm that all three are audible at the same comfortable volume. This is a self-report gate, not calibration.",
+    "3つすべてが同じ快適な音量で聞こえることを確認してください。自己申告による確認であり、較正ではありません。"
+  ],
+  ["I heard all three anchors comfortably without changing volume.", "音量を変えずに、3つの確認音をすべて快適に聞けました。"],
+  ["Choose this run's scope", "今回の実行範囲を選択"],
+  ["Focused Sharpness", "視認細度のみ"],
+  ["24 interactions per eye", "片眼につき24操作"],
+  ["Sharpness + nominal contrast", "視認細度 + 公称コントラスト"],
+  ["44 interactions per eye", "片眼につき44操作"]
+]

@@ -12,6 +12,13 @@
       "semicolons": "always",
       "trailingCommas": "all"
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["src/locales/generated/*.json"],
+      "formatter": {
+        "enabled": false
+      }
+    }
+  ]
 }
-

@@ -1,8 +1,6 @@
-import { landingRows } from './landing-copy.js';
-import { mobileUxRows } from './mobile-ux-copy.js';
-import { registryRows } from './registry-copy.js';
+import copyRows from './generated/ja.json' with { type: 'json' };
 
-// Japanese locale catalog. English source keys are the stable message identifiers.
+// Manual locale catalog; edit this locale directly.
 /** @type {Array<[string, string]>} */
 const rows = [
   ['Skip to content', '本文へ移動'],
@@ -18,7 +16,6 @@ const rows = [
   ['All tests', 'すべてのテスト'],
   ['About', 'Sense6について'],
   ['How Sense6 works', 'Sense6の仕組み'],
-  ['Anonymous daily counts · no cookies', '匿名の日別件数のみ · Cookie 不使用'],
   ['Source', 'ソース'],
   ['Sense6 — measure what your senses notice', 'Sense6 — 感覚が捉えるものを測る'],
   ['Measure what your', '感覚が捉える'],
@@ -26,10 +23,6 @@ const rows = [
   [
     'Short, careful tests that turn what you notice into honest, device-relative results.',
     '短く丁寧なテストで、あなたが感じ取ったものを、このデバイス上での率直な結果にします。',
-  ],
-  [
-    'No account, no answers or results uploaded, no diagnosis theatre.',
-    'アカウント不要。回答や結果は送信しません。診断を装うこともありません。',
   ],
   ['No account, no answers or results uploaded.', 'アカウント不要。回答や結果は送信しません。'],
   [
@@ -44,7 +37,6 @@ const rows = [
   ['Colour', '色'],
   ['Hearing', '聴覚'],
   ['Threshold', '閾値'],
-  ['Pattern', 'パターン'],
   ['Profile', 'プロフィール'],
   ['Ready now / choose a test', '今すぐ試せます / テストを選ぶ'],
   ['Start with what you want to learn.', '学びたいことから始めましょう。'],
@@ -58,31 +50,17 @@ const rows = [
     'In development — visible here as direction, not as something you can start yet.',
     '開発中 — 今後の方向性を示すもので、まだ開始はできません。',
   ],
-  ['Calibrated sharpness & meridional clarity', '較正した視認精度と方向別の明瞭さ'],
   ['Open test', 'テストを開く'],
   ['What this test includes', 'このテストの内容'],
-  ['How finely do you see colour?', '色の違いをどこまで細かく見分けられますか？'],
-  [
-    'An adaptive colour-discrimination lab: three instruments measure the smallest hue steps you can resolve on this screen.',
-    '適応型の色弁別ラボ。3つの測定で、この画面上で見分けられる最小の色相差を調べます。',
-  ],
   ['Colour discrimination', '色弁別'],
-  ['Adaptive difficulty', '適応難易度'],
-  ['Detailed profile', '詳しいプロフィール'],
   ['Adaptive browser colour-vision experiment', 'ブラウザで行う適応型色覚実験'],
   [
     'Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.',
     'ディスプレイ相対の3つの色方向を個別に調整しながら、輝度ノイズの点に隠れた切れ目を探します。',
   ],
   ['Colour-vision experiment', '色覚実験'],
-  ['Adaptive thresholds', '適応型閾値'],
   ['3 display directions', 'ディスプレイ上の3方向'],
   ['Run-relative result', 'この測定内の相対結果'],
-  ['Response speed, choice cost & consistency', '反応速度、選択コスト、一貫性'],
-  [
-    'Three short instruments separate a simple visual response from decision cost and within-run stability.',
-    '3つの短い測定で、単純な視覚反応、選択に伴う時間、測定中の安定性を分けて捉えます。',
-  ],
   ['Response timing', '反応時間'],
   ['Device-relative timing', 'デバイス相対の時間'],
   ['No composite score', '複合スコアなし'],
@@ -95,21 +73,11 @@ const rows = [
   ['Volume safety contract', '安全な音量の確認事項'],
   ['No hearing label', '聴力の判定なし'],
   ['3 instruments', '3つの測定項目'],
-  [
-    'Three per-eye instruments measure angular detail, low-contrast cost, and repeatable orientation preference without making a clinical claim.',
-    '左右の眼で3つずつ測定し、臨床的な判断はせずに、角度分解能、低コントラストによる低下、方向による見え方の偏りの再現性を調べます。',
-  ],
   ['Calibrated sharpness experiment', '較正した視認精度の実験'],
   ['Physical screen calibration', '画面の物理サイズを較正'],
-  ['3 per-eye instruments', '片眼ごとに3つの測定'],
   ['No clinical label', '臨床的判定なし'],
-  ['Vision lab / three instruments / about 8 minutes', '視覚ラボ / 3つの測定 / 約8分'],
   ['Calibrate the screen.', '画面を較正する。'],
   ['Resolve the opening.', '切れ目を見分ける。'],
-  [
-    'Acutezza measures the angular detail resolved by each eye, the cost of lower contrast, and whether a directional clarity preference repeats. It is a perception experiment, not an eye examination.',
-    'Acutezza は、左右それぞれの眼で見分けられる角度の細かさ、低コントラストによる低下、特定方向の見えやすさが繰り返し現れるかを測ります。これは知覚実験であり、眼科検査ではありません。',
-  ],
   ['Prepare the vision lab', '視覚ラボの準備'],
   [
     'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
@@ -117,17 +85,10 @@ const rows = [
   ],
   ['Gap angle', '切れ目の角度'],
   ['calibrated', '較正済み'],
-  ['Three observations. No composite score.', '3つの観察結果。総合スコアはありません。'],
-  [
-    'High-contrast detail, low-contrast cost, and directional preference remain separate.',
-    '高コントラストでの細部、低コントラストによる低下、方向の偏りは、別々に示します。',
-  ],
   ['High-contrast sharpness', '高コントラストでの視認精度'],
   ['Find the opening.', '切れ目を見つけてください。'],
   ['Low-contrast cost', '低コントラストによる低下'],
   ['Find the quieter opening.', '薄い環の切れ目を見つけてください。'],
-  ['Orientation consistency', '方向による見え方の一貫性'],
-  ['Which line field looks clearer?', 'どちらの縞模様がより鮮明に見えますか？'],
   ['Comfort and context come first.', '快適さと状況を最優先に。'],
   [
     'Use your usual correction for this distance. Cover one eye without pressing it, keep your head upright, and stop for discomfort.',
@@ -214,17 +175,6 @@ const rows = [
   ],
   ['Begin Nitidezza', 'Nitidezza を開始'],
   ['Continue to Contrasto', 'Contrasto へ進む'],
-  ['Continue to Meridiani', 'Meridiani へ進む'],
-  [
-    'Without moving closer, which line field looks clearer?',
-    '近づかずに見たとき、どちらの縞模様がより鮮明ですか？',
-  ],
-  ['Left line field', '左の縞模様'],
-  ['Right line field', '右の縞模様'],
-  ['Left clearer', '左が鮮明'],
-  ['No difference', '差はない'],
-  ['Right clearer', '右が鮮明'],
-  ['No astigmatism claim', '乱視に関する判定なし'],
   ['First eye complete', '最初の眼が完了'],
   ['Finish with one eye', 'もう一方の眼を測る'],
   ['Separate observations.', '結果は個別に表示。'],
@@ -232,31 +182,16 @@ const rows = [
   ['High-contrast angular gap', '高コントラストでの切れ目角度'],
   ['Low-contrast angular gap', '低コントラストでの切れ目角度'],
   ['Meridional consistency', '方向別の一貫性'],
-  ['No stable preference', '安定した偏りなし'],
   ['Calibrated experiment, not an eye examination.', '較正済みの実験であり、眼科検査ではありません。'],
   ['Sudden changes need care, not another run.', '急な変化に必要なのは受診であり、再測定ではありません。'],
   [
     'This is not vision screening, diagnosis, or a prescription.',
     'これは視力スクリーニング、診断、処方ではありません。',
   ],
-  ['Acutezza — calibrated sharpness profile', 'Acutezza — 較正済み視認精度プロファイル'],
   ['preference', '偏り'],
-  ['no stable preference', '安定した偏りなし'],
   ['Calibrated sharpness experiment — Acutezza | Sense6', '較正した視認精度の実験 — Acutezza | Sense6'],
   ['Calibrate screen size — Acutezza | Sense6', '画面サイズを較正 — Acutezza | Sense6'],
   ['Estimate viewing distance — Acutezza | Sense6', '視距離を推定 — Acutezza | Sense6'],
-  [
-    'Your calibrated sharpness profile — Acutezza | Sense6',
-    '較正済み視認精度プロファイル — Acutezza | Sense6',
-  ],
-  ['Gap at top', '切れ目は上'],
-  ['Gap at upper right', '切れ目は右上'],
-  ['Gap at right', '切れ目は右'],
-  ['Gap at lower right', '切れ目は右下'],
-  ['Gap at bottom', '切れ目は下'],
-  ['Gap at lower left', '切れ目は左下'],
-  ['Gap at left', '切れ目は左'],
-  ['Gap at upper left', '切れ目は左上'],
   [
     'A Landolt ring changes size while you identify its opening. The estimate belongs to this calibrated distance and display.',
     'ランドルト環の大きさが変化する中で、切れ目の位置を答えます。推定値は、較正したこの距離とディスプレイにのみ対応します。',
@@ -265,15 +200,8 @@ const rows = [
     'The same task repeats with a pale target. Sense6 compares conditions within this run, not across devices.',
     '同じ課題を淡い視標で繰り返します。Sense6 が比較するのは今回の測定内の条件であり、デバイス間ではありません。',
   ],
-  [
-    'Line fields repeat at two scales and changing pixel phases. A preference appears only when it replicates.',
-    '2つの大きさと変化するピクセル位相で縞模様を繰り返します。同じ偏りが再現された場合だけ結果に示します。',
-  ],
   ['Before testing', 'テスト前'],
   ['Acutezza setup rules', 'Acutezza の準備条件'],
-  ['Adaptive burden', '適応型の試行量'],
-  ['Standard optotype', '標準視標'],
-  ['Urgent symptoms', '緊急の症状'],
   ['Camera', 'カメラ'],
   ['Result', '結果'],
   ['None', 'なし'],
@@ -282,25 +210,6 @@ const rows = [
   ['Calibration 02 / estimated viewing distance', '較正 02 / 推定視距離'],
   ['Calibration 03 / contrast availability', '較正 03 / コントラスト表示の可否'],
   ['Between-eye setup check', '両眼間の設定確認'],
-  ['Changing pixel phase', '変化するピクセル位相'],
-  ['Two repeated scales', '2つの大きさで反復'],
-  ['Comparison recorded.', '比較結果を記録しました。'],
-  [
-    'A physical card and blind-spot sweeps establish screen scale and estimated viewing distance.',
-    '実物のカードと盲点スイープから、画面尺度と推定視距離を求めます。',
-  ],
-  [
-    'The Landolt ring provides language-independent, eight-direction geometry.',
-    'ランドルト環は、言語に依存しない8方向の図形です。',
-  ],
-  [
-    'Eighteen eight-choice trials balance precision and effort in FrACT research.',
-    'FrACT の研究では、18回の8択試行によって精度と負担の均衡を図っています。',
-  ],
-  [
-    'Safety copy reflects guidance for sudden floaters, flashes, or curtain-like shadows.',
-    '安全上の案内は、急に現れた飛蚊症、光のちらつき、カーテン状の影に関する指針を反映しています。',
-  ],
   [
     'Use a laptop, tablet, or monitor without glare. Reset browser zoom, keep brightness comfortable, and leave the display still after calibration.',
     '映り込みのないノートPC、タブレット、モニターを使ってください。ブラウザのズームをリセットし、見やすい明るさにして、較正後は画面を動かさないでください。',
@@ -324,10 +233,6 @@ const rows = [
   [
     'Rotate to landscape or continue on a larger tablet, laptop, or monitor. Acutezza will not guess physical screen size.',
     '横向きにするか、より大きなタブレット、ノートPC、モニターで続けてください。Acutezza は画面の物理サイズを推測で補いません。',
-  ],
-  [
-    'Keep this viewport, browser zoom, orientation, and viewing distance unchanged.',
-    'この表示領域、ブラウザのズーム、画面の向き、視距離を変えないでください。',
   ],
   [
     'Screen scale is measured, but distance came from manual entry. Results retain this caution.',
@@ -375,14 +280,6 @@ const rows = [
   ],
   ['Keep the right eye covered and look only at the square.', '右眼を覆ったまま、四角だけを見てください。'],
   ['Acutezza / this display / this distance', 'Acutezza / このディスプレイ / この距離'],
-  [
-    'The calibration and task controls support interpretation of this run at the stated distance.',
-    '較正と課題の確認結果に基づき、記載された距離での今回の測定を解釈できます。',
-  ],
-  [
-    'A calibration or task-control check was limited. Repeat before comparing runs.',
-    '較正または課題確認の一部が不十分でした。測定同士を比較する前に、もう一度行ってください。',
-  ],
   ['What travelled with the target.', '視標とともに記録された条件。'],
   ['Correction', '視力矯正'],
   ['Distance', '距離'],
@@ -399,37 +296,13 @@ const rows = [
     'Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.',
     '急な視力低下、強い眼痛、新たに現れた光のちらつきや飛蚊症、視野のカーテン状の影がある場合は、速やかに専門家の診察を受けてください。',
   ],
-  ['Three measures for this eye.', 'この眼についての3つの測定値。'],
-  ['{lower}–{upper} uncertainty interval', '{lower}–{upper} の不確実性区間'],
   ['{cost}% gap size versus high contrast', '高コントラスト時より切れ目が{cost}%大きい'],
-  ['{consistency}% leading-choice consistency', '最多選択の一貫性 {consistency}%'],
   ['not measured', '未測定'],
-  [
-    'The estimate touches the display range; treat it as a bound.',
-    '推定値がディスプレイの測定範囲に達しています。境界値として扱ってください。',
-  ],
-  [
-    'A calibrated angular threshold from forced-choice trials.',
-    '強制選択試行から求めた、較正済みの角度閾値。',
-  ],
   [
     'A within-run difference, not clinical contrast sensitivity.',
     '今回の測定内での差であり、臨床的なコントラスト感度ではありません。',
   ],
-  [
-    'The display could not preserve a dependable low-contrast condition.',
-    'このディスプレイでは、信頼できる低コントラスト条件を維持できませんでした。',
-  ],
-  [
-    'The preference repeated at both scales. It does not identify astigmatism.',
-    '両方の大きさで同じ偏りが再現されましたが、乱視を特定するものではありません。',
-  ],
-  [
-    'No preference met the replication rule across scale and pixel phase.',
-    '大きさとピクセル位相をまたいで、再現基準を満たす偏りはありませんでした。',
-  ],
   ['Instrument 01 complete', '測定 01 完了'],
-  ['Threshold tasks complete', '閾値測定が完了'],
   [
     'A calibrated estimate was recorded with {trials} measured targets.',
     '{trials}個の測定視標から、較正済みの推定値を記録しました。',
@@ -437,14 +310,6 @@ const rows = [
   [
     'Rest your eye for a moment. Keep the same correction, distance, screen, and covered eye.',
     '眼を少し休めてください。視力矯正、距離、画面、覆う眼は変えないでください。',
-  ],
-  [
-    'High- and low-contrast estimates remain separate in the result.',
-    '高コントラストと低コントラストの推定値は、結果でも別々に示します。',
-  ],
-  [
-    'Contrasto is unavailable on this setup, so no low-contrast value will be inferred.',
-    'この設定では Contrasto を利用できないため、低コントラスト値は推定しません。',
   ],
   ['Listening lab / three instruments / about 6 minutes', '聴取ラボ / 3つの測定 / 約6分'],
   ['Listen for the boundary.', '聞こえの境界を探る。'],
@@ -478,25 +343,17 @@ const rows = [
     'Start with device volume low. Raise it only until the reference is quiet and comfortable, never beyond about 60%. Then lock it for the whole run.',
     '端末の音量を低くして始めます。基準音が小さく快適に聞こえるところまでだけ上げ、約60%を超えないでください。その後は測定が終わるまで音量を固定します。',
   ],
-  [
-    'Never raise volume to chase a missing high tone. Stop immediately for discomfort, pain, pressure, or ringing.',
-    '聞こえない高音を探すために音量を上げないでください。不快感、痛み、圧迫感、耳鳴りがあれば直ちに中止してください。',
-  ],
   ['Research trail', '研究上の根拠'],
   ['What informed Udito.', 'Udito の設計根拠。'],
-  ['Read the primary source', '一次資料を読む'],
   ['Safe listening', '安全な聴取'],
-  ['Audio setup / volume locks after this screen', '音声設定 / この画面の後は音量を固定'],
   ['Quiet room.', '静かな部屋。'],
   ['Low volume.', '小さい音量。'],
   ['Headphones.', 'ヘッドフォン。'],
-  ['Play quiet reference', '小さい基準音を再生'],
   ['Start device volume low before playing.', '再生前に端末の音量を下げてください。'],
   ['Listening setup', '聴取環境'],
   ['Over-ear / on-ear headphones', 'オーバーイヤー／オンイヤーヘッドホン'],
   ['Earbuds / in-ear headphones', 'イヤホン／インイヤーヘッドホン'],
   ['Other / unsure', 'その他 / 分からない'],
-  ['Begin instrument 01', '測定 01 を開始'],
   ['Volume contract', '音量の確認事項'],
   ['Start low', '低い音量から'],
   ['Find quiet comfort', '小さく快適な音量に'],
@@ -509,10 +366,8 @@ const rows = [
   ['Start practice', '練習を開始'],
   ['Listen…', '聴いてください…'],
   ['Stop safely', '安全に中止'],
-  ['Volume locked', '音量を固定しました'],
   ['Short ramped tones', '短く、緩やかに立ち上がる音'],
   ['Response recorded.', '反応を記録しました。'],
-  ['Run again', 'もう一度測る'],
   ['Not settled', '収束せず'],
   ['Device-relative, never dB HL.', 'デバイス相対値であり、dB HLではありません。'],
   [
@@ -535,20 +390,10 @@ const rows = [
     '測定した音圧レベルではなく、端末上の設定値です。ブラウザには dB SPL は分かりません。',
   ],
   ['Upload', 'アップロード'],
-  ['Playing quiet reference…', '小さい基準音を再生中…'],
   ['Keep this quiet and comfortable.', '小さく快適に聞こえる音量にしてください。'],
   ['Play reference again', '基準音をもう一度再生'],
   ['audio context', 'オーディオコンテキスト'],
   ['now leave volume unchanged.', 'ここからは音量を変えないでください。'],
-  [
-    'Audio could not start. Check browser audio permissions and try again.',
-    '音声を開始できませんでした。ブラウザの音声権限を確認して、もう一度試してください。',
-  ],
-  ['The reference sound could not start.', '基準音を開始できませんでした。'],
-  [
-    'Play the quiet reference and confirm the volume contract first.',
-    'まず小さい基準音を再生し、音量についての確認事項に同意してください。',
-  ],
   [
     'Never raise volume to chase a missing high tone.',
     '聞こえない高音を探すために音量を上げないでください。',
@@ -558,7 +403,6 @@ const rows = [
     '不快感、痛み、圧迫感、耳鳴りがあれば直ちに中止してください。',
   ],
   ['Instrument', '測定'],
-  ['of 03', '/ 03'],
   [
     'Choose the quietest tone. Two practice trials come first; the measured check is six trials.',
     '最も小さい音を選んでください。最初に2回練習し、その後6回の測定試行を行います。',
@@ -571,9 +415,6 @@ const rows = [
     'Choose which tone was higher. Loudness changes slightly on purpose, so follow pitch rather than loudness.',
     'どちらの音が高かったか選んでください。音量は意図的に少し変わるため、音の大きさではなく高さを比べます。',
   ],
-  ['Start Cuffie', 'Cuffie を開始'],
-  ['Start Portata', 'Portata を開始'],
-  ['Start Intonazione', 'Intonazione を開始'],
   ['Practice', '練習'],
   ['Adaptive run', '適応型測定'],
   ['Preparing…', '準備中…'],
@@ -611,18 +452,9 @@ const rows = [
   ['without changing volume.', '音量を変えずに。'],
   ['Adaptive', '適応型'],
   ['Interleaved', '交互提示'],
-  ['Your listening profile — Udito | Sense6', 'あなたの聴取プロファイル — Udito | Sense6'],
   ['Udito / this setup / this run', 'Udito / この設定 / 今回の測定'],
   ['Three listening measures.', '3つの聴取測定。'],
   ['No hearing label.', '聴力の判定なし。'],
-  [
-    'The setup checks and adaptive tracks produced a coherent run-level profile.',
-    '設定確認と適応型トラックから、測定内で一貫したプロファイルが得られました。',
-  ],
-  [
-    'At least one setup check or adaptive track did not settle. The observations remain visible, but comparison should wait for a steadier repeat.',
-    '設定確認または適応型トラックの少なくとも1つが収束しませんでした。観察結果は表示しますが、比較はより安定した条件で再測定してからにしてください。',
-  ],
   ['Setup checks coherent', '設定確認に一貫性あり'],
   ['Interpret with caution', '慎重に解釈'],
   ['Headphone-like', 'ヘッドホン提示らしい'],
@@ -632,20 +464,9 @@ const rows = [
     '機器の検出ではなく、位相を使った提示チェックです。',
   ],
   ['Upper run boundary', '今回の可聴上限'],
-  ['boundary estimate', '境界の推定値'],
-  ['adaptive estimate', '適応型の推定値'],
   ['Over-ear / on-ear', 'オーバーイヤー／オンイヤー'],
-  [
-    'Reached the device-safe test ceiling; your personal boundary may be higher.',
-    '端末上の安全なテスト上限に達しました。あなた自身の境界はさらに高い可能性があります。',
-  ],
-  [
-    'Relative to this device, fixed volume, room, and audio sample rate.',
-    'このデバイス、固定音量、部屋、音声サンプルレートに対する相対値です。',
-  ],
   ['Pitch step near 500 Hz', '500 Hz付近の音高差'],
   ['Pitch step near 2 kHz', '2 kHz付近の音高差'],
-  ['Reversal-based just-noticeable difference for this run.', '今回の測定で反転点から求めた弁別閾。'],
   [
     'Reported separately; no composite hearing score is calculated.',
     '個別に報告し、総合的な聴力スコアは算出しません。',
@@ -671,11 +492,6 @@ const rows = [
     '自分の測定同士を比べる場合も、同じデバイス、ヘッドホン、装着状態、部屋、音量に限ってください。不快に感じる音があればテストを中止してください。',
   ],
   ['Screen check / 01 of 01', '画面確認 / 01 / 01'],
-  ['Prepare the environment before the score.', '測定前に環境を整えます。'],
-  [
-    'Display settings and ambient light can move a color threshold. This one-minute check makes your run more repeatable.',
-    'ディスプレイ設定や周囲の光で色の閾値は変わります。この1分間の確認で、測定を再現しやすくします。',
-  ],
   [
     'Use one screen. Disable Night Shift, True Tone, blue-light filters, and vivid modes.',
     '1台の画面だけを使い、Night Shift、True Tone、ブルーライト軽減、鮮やか表示などの機能をオフにしてください。',
@@ -701,10 +517,6 @@ const rows = [
   ['Start instrument 01', '測定 01 を開始'],
   ['Viewing setup / 01 of 01', '観察環境 / 01 / 01'],
   ['Colour filters off, please.', '色を変えるフィルターをオフにしてください。'],
-  [
-    'The thresholds only describe this browser, display, lighting, and viewing position. Colour-shifting features can move them substantially.',
-    '閾値が表すのは、このブラウザ、ディスプレイ、照明、観察位置での結果だけです。色を変える機能により大きく変動することがあります。',
-  ],
   [
     'Turn off Night Shift, True Tone, blue-light filters, and vivid display modes.',
     'Night Shift、True Tone、ブルーライト軽減、鮮やか表示などの機能をオフにしてください。',
@@ -770,23 +582,17 @@ const rows = [
     'Results are calculated locally and are not uploaded.',
     '結果はこの端末内で計算され、アップロードされません。',
   ],
-  ['Color perception / 03 instruments / about 4 minutes', '色知覚 / 3つの測定 / 約4分'],
-  ['How finely do you', '色を'],
   ['see', 'どこまで細かく'],
-  ['colour?', '見分けられる？'],
   ['Begin the color lab', '色覚ラボを開始'],
-  ['Set the room before the score.', '測定前に室内環境を整えます。'],
   ['Which tile is different?', '色が異なるタイルはどれですか？'],
   ['Which field shifts in color?', '色が変化している領域はどれですか？'],
   ['Build the smoothest color path.', '最も滑らかな色の並びを作ってください。'],
   ['Lock this order', 'この順序で確定'],
-  ['Your visible boundary, on this display.', 'このディスプレイで見分けられる境界。'],
   [
     'This is not a medical test and cannot confirm tetrachromacy.',
     'これは医学的検査ではなく、四色型色覚を確認することはできません。',
   ],
   ['Lab progress', 'ラボ全体の進捗'],
-  ['Current instrument progress', '現在の測定の進捗'],
   [
     'Choose once. Trust the first stable difference you see.',
     '一度だけ選んでください。最初にはっきり安定して見えた違いを信じます。',
@@ -818,18 +624,10 @@ const rows = [
   ],
   ['tile', 'タイル'],
   ['Tap its new place to swap, or use the arrows.', '移動先をタップして入れ替えるか、矢印を使ってください。'],
-  ['Your colour profile — Tetracromia | Sense6', 'あなたの色覚プロファイル — Tetracromia | Sense6'],
   ['Session complete', 'セッション完了'],
   ['Session index', 'セッション指標'],
-  ['Hue profile', '色相プロファイル'],
   ['Display-relative', 'ディスプレイ相対'],
-  [
-    'Each spoke is one hue region, drawn in its real color. The dot shows the share of discrimination trials you answered correctly there — the test keeps overall difficulty near your limit, so shorter spokes mark your relatively weaker directions.',
-    '各軸は1つの色相領域を実際の色で表します。点は、その領域の弁別試行で正解した割合です。全体の難易度はあなたの限界付近に保たれるため、軸が短い方向ほど、この測定では相対的に弱かったことを示します。',
-  ],
   ['Sequence', '配列'],
-  ['Finest step', '最小の差'],
-  ['Finest shift', '最小の変化'],
   ['Rose', 'ローズ'],
   ['Amber', 'アンバー'],
   ['Lime', 'ライム'],
@@ -837,36 +635,7 @@ const rows = [
   ['Cyan', 'シアン'],
   ['Blue', 'ブルー'],
   ['Magenta', 'マゼンタ'],
-  ['of hue', 'の色相'],
-  ['through noise', 'ノイズ下'],
-  ['correct · smaller angle = finer vision', '正解 · 角度が小さいほど細かく弁別'],
-  ['Hue ordering between fixed anchors', '固定した両端の間で色相を並べる'],
-  ['perfect order · each out-of-place pair costs points', '完全な順序 · 順序が逆の組ごとに減点'],
   ['How to read this', '結果の読み方'],
-  [
-    'Threshold and Field report the smallest hue difference you kept answering correctly, found adaptively (the app floor is 1.2°, near what an sRGB screen can render). The session index weighs them 35% + 35%, plus 30% for Sequence. Scores describe this run on this browser and screen — useful for comparing your own sessions under similar conditions, not a population percentile, diagnosis, or evidence for tetrachromacy.',
-    'Threshold と Field は、適応的に求めた、継続して正答できた最小の色相差を示します（アプリの下限は1.2°で、sRGB画面が表現できる範囲に近い値です）。セッション指標は Threshold 35% + Field 35% + Sequence 30%で算出します。スコアが表すのは、このブラウザと画面での今回の結果です。同じような条件で自分のセッション同士を比べる参考にはなりますが、集団内の順位、診断、四色型色覚の証拠ではありません。',
-  ],
-  ['Very fine screen-level discrimination', '画面上で非常に細かな差を弁別'],
-  ['Fine screen-level discrimination', '画面上で細かな差を弁別'],
-  ['Moderate screen-level discrimination', '画面上で中程度の差を弁別'],
-  ['Broad screen-level discrimination', '画面上で大きめの差を弁別'],
-  [
-    'You resolved small display differences consistently across the three instruments.',
-    '3つの測定を通じて、画面上の小さな違いを一貫して見分けました。',
-  ],
-  [
-    'You resolved subtle display differences with a stable overall profile.',
-    '全体として安定したプロファイルで、画面上の微妙な違いを見分けました。',
-  ],
-  [
-    'You found clear differences; the finest steps were less consistent in this run.',
-    '明確な違いは見分けられましたが、今回の測定では最も細かな段階への反応がやや不安定でした。',
-  ],
-  [
-    'The smallest display steps were difficult in this run. Screen setup and fatigue can matter.',
-    '今回の測定では、画面上の最小の差を見分けるのが難しい結果でした。画面設定や疲労も影響します。',
-  ],
   ['Colour vision / adaptive experiment / about 3 minutes', '色覚 / 適応型実験 / 約3分'],
   ['Find the gap', '切れ目を探す'],
   ['in the dots', '点の中から'],
@@ -895,7 +664,6 @@ const rows = [
   ['left', '左'],
   ['top', '上'],
   ['bottom', '下'],
-  ['Adaptive colour threshold', '適応型色覚閾値'],
   ['Experiment progress', '実験の進捗'],
   ['Dotted colour target with a C-shaped gap', 'C字形の切れ目がある、点で構成された色視標'],
   ['Adaptive response', '適応型の回答'],
@@ -907,15 +675,10 @@ const rows = [
   ['Gap at', '切れ目：'],
   ['Keyboard: arrow keys · N for no gap', 'キーボード：矢印キー · 切れ目なしは N'],
   ['Experimental run complete', '実験が完了しました'],
-  ['Display-relative thresholds from this run', '今回のディスプレイ相対閾値'],
   ['Run inconclusive — repeat the controls', '結果を確定できません — 確認試行をやり直してください'],
   [
     'Lower values mean you followed a smaller colour shift in that direction on this display. The three directions are not clinical scores and should not be compared as diagnoses.',
     '値が小さいほど、このディスプレイ上で、その方向のより小さな色変化を見分けられたことを示します。3方向の値は臨床スコアではなく、診断のように相互比較することはできません。',
-  ],
-  [
-    'Too many high-contrast task controls were missed to interpret the adaptive thresholds. Check the instructions and viewing setup, then try again.',
-    '適応型閾値を解釈するには、高コントラストの確認試行で見落としが多すぎました。説明と観察環境を確認して、もう一度試してください。',
   ],
   ['L direction', 'L方向'],
   ['M direction', 'M方向'],
@@ -926,11 +689,7 @@ const rows = [
   ['Staircase settled', '階段法が収束'],
   ['Limited reversals', '反転回数が少ない'],
   ['reversals', '反転'],
-  ['Experiment floor confirmed', '実験下限を確認'],
-  ['Experiment maximum reached', '実験上限に到達'],
   ['presentations', '提示'],
-  ['lower measurement bound', '測定下限'],
-  ['upper measurement bound', '測定上限'],
   ['run spread', '測定内のばらつき'],
   ['High-contrast gap trials', '高コントラストの切れ目確認試行'],
   ['Enough controls were read to report this run.', '今回の結果を表示できる数の確認試行に正答しました。'],
@@ -943,20 +702,11 @@ const rows = [
     'Daltonia には臨床基準がなく、アノマロスコープ、CAD、Cambridge Colour Test、診断済み集団との比較検証も行われていません。この値から色覚特性の異常を確認したり除外したりすることはできません。反復測定は、同じディスプレイと設定で行ったものだけを比較してください。',
   ],
   ['Copy run summary', '測定の要約をコピー'],
-  [
-    'A careful, adaptive lab for the differences your display can reproduce—and your eyes can resolve.',
-    'ディスプレイが再現でき、あなたの眼が見分けられる差を、丁寧な適応型手法で調べます。',
-  ],
   ['display relative', 'ディスプレイ相対'],
   ['Hue', '色相'],
   ['Field', 'フィールド'],
   ['Order', '順序'],
   ['The lab', 'ラボ'],
-  ['Three views of discrimination.', '弁別を3つの観点から。'],
-  [
-    'No names, no account, no upload. Your session stays in this browser.',
-    '氏名もアカウントもアップロードも不要。セッションはこのブラウザ内に留まります。',
-  ],
   [
     'No names, no account, no result upload. Your session stays in this browser.',
     '氏名もアカウントも結果のアップロードも不要。セッションはこのブラウザ内に留まります。',
@@ -976,11 +726,6 @@ const rows = [
     '色名を手がかりにせず、固定された両端の間で、3つの短い色相系列を並べます。',
   ],
   ['Method, not magic', '魔法ではなく、測定手法'],
-  ['The difference gets smaller as you succeed.', '正解するほど違いが小さくなります。'],
-  [
-    'Threshold and Field use a two-correct-down, one-error-up staircase. It spends more trials near your current boundary instead of asking the same easy question repeatedly.',
-    'Threshold と Field は、2回正解で難しく、1回不正解で易しくなる階段法を使います。同じ簡単な問いを繰り返さず、現在の弁別境界付近に多くの試行を割り当てます。',
-  ],
   ['Neutral surround', '中立な背景'],
   [
     'Stimuli sit on the same middle-gray chamber in either theme.',
@@ -991,16 +736,7 @@ const rows = [
     'Colors are generated in OKLCH and mapped safely into sRGB.',
     '色は OKLCH で生成し、安全に sRGB 色域へ変換します。',
   ],
-  ['Adaptive estimate', '適応型推定'],
-  [
-    'Reversals around the boundary produce a session-relative threshold.',
-    '境界付近の反転点から、そのセッション内での相対閾値を求めます。',
-  ],
   ['Honest result', '率直な結果'],
-  [
-    'Your profile describes this screen, light, fatigue level, and run.',
-    'プロファイルが表すのは、この画面、照明、疲労の程度、今回の測定です。',
-  ],
   ['The fourth-cone question', '4種類目の錐体をめぐる問い'],
   ['An RGB screen cannot test tetrachromacy.', 'RGB画面では四色型色覚を検査できません。'],
   [
@@ -1008,7 +744,6 @@ const rows = [
     '一般的なディスプレイは3つの原色を混ぜて色を表します。機能的な四色型色覚の確認には、4つ目の反応を分離できる分光刺激、専用機器、遺伝情報、統制された条件が必要です。Tetracromia が測るのは通常の画面上での色弁別であり、その限界を明記しています。',
   ],
   ['Ready when your screen is', '画面の準備ができたら'],
-  ['Find your visible boundary.', '見分けられる境界を探してください。'],
   ['Start the lab', 'ラボを開始'],
   [
     'A C-shaped target becomes harder to separate from its field. Three independent staircases estimate the smallest colour shift you follow in each display-relative direction during this run.',
@@ -1019,50 +754,18 @@ const rows = [
     '実験段階で未検証です。スクリーニング結果でも診断でもありません。',
   ],
   ['Last run on this browser:', 'このブラウザでの前回の測定：'],
-  ['display-relative thresholds recorded', 'ディスプレイ相対閾値を記録済み'],
   ['An adaptive task, not a plate score.', 'プレート式スコアではなく、適応型課題です。'],
   [
     'The design borrows established psychophysical techniques without claiming their clinical validation.',
     '確立された心理物理学的手法を取り入れていますが、臨床的な妥当性を主張するものではありません。',
   ],
-  [
-    'Two clear targets teach the C-gap interaction with immediate feedback before any threshold is measured.',
-    '閾値を測り始める前に、はっきり見える2つの視標と即時フィードバックで、C字の切れ目の答え方を練習します。',
-  ],
   ['Luminance noise', '輝度ノイズ'],
-  [
-    'Target and field dots share the same brightness variation, reducing a consistent lightness cue.',
-    '視標と背景の点には同じ明るさのばらつきを与え、明度が一貫した手がかりにならないようにします。',
-  ],
   ['Three staircases', '3本の階段法'],
-  [
-    'Directions become harder after correct responses. “No gap visible” counts as a miss and makes that direction easier.',
-    '正解すると、その方向は難しくなります。「切れ目が見えない」は不正解として扱われ、その方向は易しくなります。',
-  ],
   ['Run-relative output', '測定内相対の出力'],
-  [
-    'You receive thresholds and run spread, not a normal/deficient label or a clinical score.',
-    '正常／異常という判定や臨床スコアではなく、閾値と測定内のばらつきを示します。',
-  ],
   ['What informed Daltonia.', 'Daltonia の設計根拠。'],
   [
     'These sources inform the stimulus model and task design. They do not validate this implementation.',
     'これらの資料を刺激モデルと課題設計の参考にしていますが、この実装を検証するものではありません。',
-  ],
-  ['Adaptive colour thresholds', '適応型色覚閾値'],
-  [
-    'Random Landolt-C orientation, spatial and luminance noise, and interleaved confusion-line staircases.',
-    'ランドルトCの方向を無作為化し、空間・輝度ノイズを加え、混同色線ごとの階段法を交互に提示します。',
-  ],
-  ['Cone-contrast testing', '錐体コントラスト検査'],
-  [
-    'Randomized cone-specific optotypes and validation against anomaloscope and plate results.',
-    '錐体ごとに無作為化した視標を用い、アノマロスコープやプレート検査の結果と比較検証しています。',
-  ],
-  ['Modern screener validation', '現代的スクリーナーの検証'],
-  [
-    'A multicentre comparison on calibrated displays demonstrates the evidence required for screening claims.',
-    '較正済みディスプレイを使った多施設比較は、スクリーニングをうたうために必要な根拠の水準を示しています。',
   ],
   ['Response lab / three instruments / about 7 minutes', '反応ラボ / 3つの測定 / 約7分'],
   ['Notice the signal.', '合図に気づく。'],
@@ -1109,10 +812,6 @@ const rows = [
     'テスト領域が静かな間は待ち、中央の印が現れたらすぐに反応します。待ち時間を無作為にすることで、先走った反応を見分けます。',
   ],
   [
-    'A left or right arrow appears. Respond on the matching side. The difference from Segnale estimates the cost of choosing.',
-    '左または右の矢印が現れたら、同じ側で反応します。Segnale との差から、選択に伴う追加時間を推定します。',
-  ],
-  [
     'For three minutes, respond to the same simple signal across longer, irregular waits. The pattern within this run matters more than one fastest press.',
     '3分間、長さが不規則に変わる待ち時間の後に、同じ単純な合図へ反応します。最速の1回より、今回の測定中の反応パターンを重視します。',
   ],
@@ -1126,11 +825,6 @@ const rows = [
     'A transparent reaction-time task with practice, randomized intervals, and separate simple and choice measures.',
     '練習、無作為な提示間隔、単純反応と選択反応の個別測定を備えた、手順の明確な反応時間課題です。',
   ],
-  ['Brief vigilance task', '短時間の持続的注意課題'],
-  [
-    'The three-minute PVT-B informs the sustained-response duration and emphasis on lapses and false starts.',
-    '3分間の PVT-B を、持続反応の測定時間と、反応の抜けや先走りを重視する設計の参考にしています。',
-  ],
   ['Browser timing reality', 'ブラウザ計時の現実'],
   [
     'Browser experiments can be precise enough for many effects, while input hardware and presentation still add latency.',
@@ -1141,10 +835,6 @@ const rows = [
     '3つの低い音が順に鳴ります。最も小さい音を選んでください。位相を使ったおとり音により、機器を特定したと主張せずに、ヘッドホンらしい提示かを確認します。',
   ],
   [
-    'One of three intervals contains a tone. Its frequency adapts to find the upper boundary available in this run, on this device, at the locked volume.',
-    '3つの区間の1つに音が入ります。周波数を適応的に変化させ、固定した音量とこのデバイスで、今回利用できる可聴上限を探ります。',
-  ],
-  [
     'Two tones play in sequence. Separate adaptive tracks estimate the smallest pitch step resolved around 500 Hz and 2 kHz.',
     '2つの音が順に鳴ります。別々の適応型トラックで、500 Hzと2 kHz付近で見分けられる最小の音高差を推定します。',
   ],
@@ -1152,41 +842,13 @@ const rows = [
     'Established task structures inform the experiment. Consumer audio hardware remains uncalibrated.',
     '確立された課題構成を実験に生かしていますが、一般向けの音声機器は未較正のままです。',
   ],
-  [
-    'A six-trial, three-alternative phase-cancellation task informs Cuffie and its cautious setup language.',
-    '6試行・3択の位相相殺課題を、Cuffie とその慎重な設定案内の参考にしています。',
-  ],
-  [
-    'Transformed up-down staircases inform the reversal-based Portata and Intonazione estimates.',
-    '変形上下法の階段法を、反転点に基づく Portata と Intonazione の推定に用いています。',
-  ],
-  ['Browser psychoacoustics', 'ブラウザ心理音響学'],
-  [
-    'Web and mobile adaptive frequency-discrimination work supports the browser task structure—not clinical interpretation.',
-    'ウェブとモバイルで行われた適応型周波数弁別研究は、ブラウザ課題の構成を支持しますが、臨床的な解釈を支持するものではありません。',
-  ],
-  [
-    'Safe-listening guidance informs the low reference, volume lock, short tones, and stop warnings.',
-    '安全な聴取の指針を、小さい基準音、音量固定、短い提示音、中止の警告に反映しています。',
-  ],
   ['Copy result summary', '結果の要約をコピー'],
   ['practice', '練習'],
   ['practice complete', '練習完了'],
   ['Measurement recorded:', '記録した測定値：'],
-  ['Keyboard timing', 'キーボードでの計時'],
-  ['Touch / pointer timing', 'タッチ／ポインターでの計時'],
   ['Median of', '中央値（'],
   ['clean responses', '件の有効な反応）'],
-  ['measured events', '件の測定イベント'],
   ['Under', '早すぎの基準：'],
-  [
-    'Keep the same hand position. Early responses, misses, and no-signal responses will be recorded.',
-    '手の位置を変えないでください。早すぎた反応、見逃し、合図がないときの反応も記録します。',
-  ],
-  [
-    'Keep the same hand position. Early responses, misses, and wrong sides will be recorded.',
-    '手の位置を変えないでください。早すぎた反応、見逃し、左右の間違いも記録します。',
-  ],
   [
     'Please acknowledge the device-relative limit before starting.',
     '開始前に、結果がデバイス相対であるという限界を確認してください。',
@@ -1198,10 +860,6 @@ const rows = [
   [
     '8 practice choices, then 32 balanced measured choices.',
     '8回の選択練習後、左右を均等にした32回の選択を測定します。',
-  ],
-  [
-    'A 3-minute PVT-B-inspired sequence. No fatigue or attention diagnosis is inferred.',
-    'PVT-Bを参考にした3分間の課題です。疲労や注意力の診断は行いません。',
   ],
   [
     'Rest one hand near the arrow keys. Use the matching key.',
@@ -1246,16 +904,7 @@ const rows = [
   ['clean response', '件の有効な反応を'],
   ['captured across', '、全'],
   ['measured event', '件の測定イベントで記録しました。'],
-  [
-    'Interpretation waits until all three instruments are complete.',
-    '3つの測定がすべて完了するまで解釈は表示されません。',
-  ],
-  ['Your response profile — Riflessi | Sense6', 'あなたの反応プロファイル — Riflessi | Sense6'],
   ['Riflessi / this run / this device', 'Riflessi / 今回の測定 / このデバイス'],
-  [
-    'The three instruments captured enough clean responses for a run-level profile.',
-    '3つの測定で、測定内プロファイルを作成するのに十分な有効反応が得られました。',
-  ],
   [
     'Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.',
     '複数の反応が中断されたか無効でした。数値は部分的な測定結果として扱い、より安定した条件でやり直してください。',
@@ -1263,24 +912,10 @@ const rows = [
   ['Run usable', '利用可能な測定'],
   ['Limited run', '限定的な測定'],
   ['Typical signal response', '代表的な合図反応'],
-  [
-    'clean simple responses. Typical is more robust than your single fastest response.',
-    '件の有効な単純反応。代表値は、最速の1回だけを見るより頑健です。',
-  ],
   ['Choice response', '選択反応'],
   ['correct across', '正解（全'],
-  ['valid choices.', '件の有効な選択）'],
   ['Choice cost', '選択コスト'],
-  [
-    'Difference between the choice and simple-response medians in this run.',
-    '今回の測定における、選択反応と単純反応の中央値の差。',
-  ],
-  ['clean responses across the sustained block.', '件の有効な反応（持続ブロック）。'],
   ['Slow-response tail', '遅い反応の裾'],
-  [
-    'How much slower the slowest fifth was than the sustained median.',
-    '最も遅い5分の1が、持続反応の中央値よりどれだけ遅かったか。',
-  ],
   ['Within-run drift', '測定内の変化'],
   [
     'Not enough clean responses to estimate a first-to-second-half change.',
@@ -1327,24 +962,13 @@ const rows = [
   ['Leave the experiment? Your progress will be lost.', '実験を退出しますか？進捗は失われます。'],
   ['Prepare your screen — Tetracromia | Sense6', '画面の準備 — Tetracromia | Sense6'],
   ['Prepare your display — Daltonia | Sense6', 'ディスプレイの準備 — Daltonia | Sense6'],
-  ['Your display-relative thresholds — Daltonia | Sense6', 'ディスプレイ相対閾値 — Daltonia | Sense6'],
   ['Prepare your response setup — Riflessi | Sense6', '反応環境の準備 — Riflessi | Sense6'],
   ['Prepare your audio setup — Udito | Sense6', '音声環境の準備 — Udito | Sense6'],
-  ['Reference played', '基準音を再生しました'],
   ['Result summary copied.', '結果の要約をコピーしました。'],
   ['Copy was unavailable in this browser.', 'このブラウザではコピーできませんでした。'],
   ['Result summary copied', '結果の要約をコピーしました'],
   ['Run summary copied', '測定の要約をコピーしました'],
   ['Could not access the clipboard', 'クリップボードにアクセスできませんでした'],
-  [
-    'Tetracromia — {overall}/100 screen-level color discrimination. Threshold {threshold}, Field {field}, Sequence {sequence}. Device-relative, not diagnostic.',
-    'Tetracromia — 画面上の色弁別 {overall}/100。Threshold {threshold}、Field {field}、Sequence {sequence}。デバイス相対値で、診断ではありません。',
-  ],
-  [
-    'Daltonia experimental browser run — {thresholds}; task controls {correct}/{total}. Display-relative, unvalidated, and not diagnostic.',
-    'Daltonia のブラウザ実験 — {thresholds}; 課題確認 {correct}/{total}。ディスプレイ相対・未検証で、診断ではありません。',
-  ],
-  ['Riflessi — device-relative response profile', 'Riflessi — デバイス相対の反応プロファイル'],
   ['Input: {input}', '入力：{input}'],
   ['Signal median: {value} ms', '合図反応の中央値：{value} ms'],
   [
@@ -1365,18 +989,11 @@ const rows = [
   ],
   ['touch / pointer', 'タッチ／ポインター'],
   ['keyboard', 'キーボード'],
-  ['Udito — device-relative listening profile', 'Udito — デバイス相対の聴取プロファイル'],
-  [
-    'Setup: {device}; {sampleRate} Hz audio context',
-    '設定：{device}; {sampleRate} Hz オーディオコンテキスト',
-  ],
   [
     'Headphone confidence: {correct}/{trials} ({confidence})',
     'ヘッドホン提示の確度：{correct}/{trials}（{confidence}）',
   ],
   ['Upper run boundary: {boundary}', '今回の可聴上限：{boundary}'],
-  ['Pitch step near 500 Hz: {step}', '500 Hz付近の音高差：{step}'],
-  ['Pitch step near 2 kHz: {step}', '2 kHz付近の音高差：{step}'],
   ['headphone-like', 'ヘッドホン提示らしい'],
   ['uncertain', '不確か'],
   [
@@ -1409,10 +1026,6 @@ const rows = [
     'サンプル内で長いフレーム間隔を{count}回検出しました。',
   ],
   ['{count} sweeps remaining', '残り{count}回のスイープ'],
-  [
-    'Reference played · {sampleRate} Hz audio context · now leave volume unchanged.',
-    '基準音を再生しました · {sampleRate} Hz オーディオコンテキスト · ここからは音量を変えないでください。',
-  ],
   ['Sound {number}', '音 {number}'],
   ['Adaptive · {count}', '適応型 · {count}'],
   ['Interleaved · {count}', '交互提示 · {count}'],
@@ -1444,10 +1057,6 @@ const rows = [
     'Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials',
     '{anchor} Hz付近の音高ステップ: {step}、{completion}、反転 {reversals}回 / 試行 {trials}回',
   ],
-  [
-    'Play the maximum-level reference and confirm the volume contract first.',
-    '先に最大レベルの基準音を再生し、音量に関する確認事項に同意してください。',
-  ],
   ['Playback interruptions: {count}', '再生の中断: {count}回'],
   ['Playing maximum-level reference…', '最大レベルの基準音を再生中…'],
   ['Portata control accuracy: {accuracy}', 'Portata の操作精度: {accuracy}'],
@@ -1455,8 +1064,6 @@ const rows = [
     'Recorded. Look at the square and start the next sweep.',
     '記録しました。四角を見つめ、次のスイープを開始してください。',
   ],
-  ['Recorded. Next trial.', '記録しました。次の試行です。'],
-  ['Recorded. The difference will increase.', '記録しました。差を大きくします。'],
   [
     'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
     'オーディオクロック上で基準音の再生が完了 · {sampleRate} Hzコンテキスト · ここからは音量を変えないでください。',
@@ -1490,17 +1097,9 @@ const rows = [
     'Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials',
     '上限付近の測定: {boundary}、{completion}、反転 {reversals}回 / 試行 {trials}回',
   ],
-  [
-    'Volume: self-reported unchanged during the run; the browser could not verify it.',
-    '音量: 測定中に変えていないとの自己申告です。ブラウザでは確認できませんでした。',
-  ],
   ['indeterminate (display-range bound)', '判定不能（表示範囲の限界）'],
   ['lower bound at the display ceiling', 'ディスプレイ上限での下限値'],
   ['upper bound at the display floor', 'ディスプレイ下限での上限値'],
-  [
-    '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
-    '{eye}: 高コントラストの切れ目 {gap}、低コントラストの切れ目 {low}、コントラストによる低下 {cost}、方向別 {meridians}',
-  ],
   ['Usable run', '有効な測定'],
   ['{name} response runner', '{name} 反応テスト'],
   ['Open private journal', '非公開ジャーナルを開く'],
@@ -1512,7 +1111,6 @@ const rows = [
     'Display conditions changed. This measured run stopped and was not saved.',
     '表示条件が変わりました。この測定は停止し、保存されませんでした。',
   ],
-  ['Instrument one. Threshold. Find the different tile.', '測定1、閾値。異なるタイルを見つけてください。'],
   [
     'Practice one of two. Find the clear gap in the C.',
     '練習 1/2。Cのはっきりした切れ目を見つけてください。',
@@ -1553,6 +1151,6 @@ const rows = [
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 ];
 
-const catalogRows = [...rows, ...registryRows('ja'), ...mobileUxRows('ja'), ...landingRows('ja')];
+const catalogRows = [...rows, .../** @type {Array<[string, string]>} */ (copyRows)];
 export const MESSAGE_COUNT = catalogRows.length;
 export default new Map(catalogRows);

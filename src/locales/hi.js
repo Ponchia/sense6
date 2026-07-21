@@ -1,8 +1,6 @@
-import { landingRows } from './landing-copy.js';
-import { mobileUxRows } from './mobile-ux-copy.js';
-import { registryRows } from './registry-copy.js';
+import copyRows from './generated/hi.json' with { type: 'json' };
 
-// Hindi catalog; edit this locale directly.
+// Manual locale catalog; edit this locale directly.
 /** @type {Array<[string, string]>} */
 const rows = [
   ['Skip to content', 'सामग्री पर जाएं'],
@@ -18,7 +16,6 @@ const rows = [
   ['All tests', 'सभी परीक्षण'],
   ['About', 'Sense6 के बारे में'],
   ['How Sense6 works', 'Sense6 कैसे काम करता है'],
-  ['Anonymous daily counts · no cookies', 'अनाम दैनिक गणना · कोई कुकीज़ नहीं'],
   ['Source', 'सोर्स कोड'],
   ['Sense6 — measure what your senses notice', 'Sense6 — मापें कि आपकी इंद्रियाँ क्या महसूस करती हैं'],
   ['Measure what your', 'मापें कि आपकी'],
@@ -26,10 +23,6 @@ const rows = [
   [
     'Short, careful tests that turn what you notice into honest, device-relative results.',
     'छोटे और सावधानी से बनाए गए परीक्षण, जो आपकी अनुभूति को ईमानदार और डिवाइस-सापेक्ष परिणामों में बदलते हैं।',
-  ],
-  [
-    'No account, no answers or results uploaded, no diagnosis theatre.',
-    'न खाता, न उत्तर या परिणाम अपलोड होते हैं, और न निदान का दिखावा।',
   ],
   ['No account, no answers or results uploaded.', 'न खाता, न उत्तर या परिणाम अपलोड होते हैं।'],
   [
@@ -44,7 +37,6 @@ const rows = [
   ['Colour', 'रंग'],
   ['Hearing', 'श्रवण'],
   ['Threshold', 'सीमा'],
-  ['Pattern', 'पैटर्न'],
   ['Profile', 'प्रोफ़ाइल'],
   ['Ready now / choose a test', 'अभी तैयार हैं / एक परीक्षण चुनें'],
   ['Start with what you want to learn.', 'आप जो सीखना चाहते हैं उससे शुरुआत करें।'],
@@ -58,31 +50,17 @@ const rows = [
     'In development — visible here as direction, not as something you can start yet.',
     'विकासाधीन — यहाँ केवल आगे की दिशा के रूप में दिखाया गया है; इसे अभी शुरू नहीं किया जा सकता।',
   ],
-  ['Calibrated sharpness & meridional clarity', 'कैलिब्रेट की गई तीक्ष्णता और दिशागत स्पष्टता'],
   ['Open test', 'परीक्षण खोलें'],
   ['What this test includes', 'इस परीक्षण में क्या शामिल है'],
-  ['How finely do you see colour?', 'आप रंग को कितनी बारीकी से देखते हैं?'],
-  [
-    'An adaptive colour-discrimination lab: three instruments measure the smallest hue steps you can resolve on this screen.',
-    'एक अनुकूली रंग-भेद परीक्षण: तीन उपकरण इस स्क्रीन पर आपके द्वारा पहचाने जा सकने वाले सबसे छोटे रंग-अंतर को मापते हैं।',
-  ],
   ['Colour discrimination', 'रंग भेदभाव'],
-  ['Adaptive difficulty', 'अनुकूली कठिनाई'],
-  ['Detailed profile', 'विस्तृत प्रोफ़ाइल'],
   ['Adaptive browser colour-vision experiment', 'अनुकूली ब्राउज़र रंग-दृष्टि प्रयोग'],
   [
     'Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.',
     'चमक के शोर वाले बिंदुओं में छिपा खुला भाग खोजें; इस दौरान डिस्प्ले-सापेक्ष रंग की तीन दिशाएँ अलग-अलग अनुकूलित होती हैं।',
   ],
   ['Colour-vision experiment', 'रंग-दृष्टि प्रयोग'],
-  ['Adaptive thresholds', 'अनुकूली थ्रेसहोल्ड'],
   ['3 display directions', '3 प्रदर्शन दिशाएँ'],
   ['Run-relative result', 'इस सत्र के सापेक्ष परिणाम'],
-  ['Response speed, choice cost & consistency', 'प्रतिक्रिया की गति, चयन की अतिरिक्त लागत और स्थिरता'],
-  [
-    'Three short instruments separate a simple visual response from decision cost and within-run stability.',
-    'तीन छोटे उपकरण सरल दृश्य प्रतिक्रिया, निर्णय लेने की अतिरिक्त लागत और सत्र के भीतर की स्थिरता को अलग-अलग मापते हैं।',
-  ],
   ['Response timing', 'प्रतिक्रिया समय'],
   ['Device-relative timing', 'डिवाइस-सापेक्ष समय'],
   ['No composite score', 'कोई समग्र स्कोर नहीं'],
@@ -95,21 +73,11 @@ const rows = [
   ['Volume safety contract', 'वॉल्यूम सुरक्षा अनुबंध'],
   ['No hearing label', 'श्रवण का कोई नैदानिक लेबल नहीं'],
   ['3 instruments', '3 उपकरण'],
-  [
-    'Three per-eye instruments measure angular detail, low-contrast cost, and repeatable orientation preference without making a clinical claim.',
-    'हर आँख के लिए तीन उपकरण कोणीय बारीकी, कम कंट्रास्ट की अतिरिक्त कठिनाई और बार-बार दिखने वाली दिशागत पसंद को मापते हैं—बिना कोई नैदानिक दावा किए।',
-  ],
   ['Calibrated sharpness experiment', 'कैलिब्रेटेड तीक्ष्णता प्रयोग'],
   ['Physical screen calibration', 'भौतिक स्क्रीन अंशांकन'],
-  ['3 per-eye instruments', '3 प्रति-आंख उपकरण'],
   ['No clinical label', 'कोई नैदानिक लेबल नहीं'],
-  ['Vision lab / three instruments / about 8 minutes', 'विजन लैब/तीन उपकरण/लगभग 8 मिनट'],
   ['Calibrate the screen.', 'स्क्रीन को कैलिब्रेट करें।'],
   ['Resolve the opening.', 'खुले भाग की दिशा पहचानें।'],
-  [
-    'Acutezza measures the angular detail resolved by each eye, the cost of lower contrast, and whether a directional clarity preference repeats. It is a perception experiment, not an eye examination.',
-    'Acutezza मापता है कि हर आँख कितनी सूक्ष्म कोणीय बारीकी पहचानती है, कम कंट्रास्ट से कितनी अतिरिक्त कठिनाई होती है और कोई दिशागत स्पष्टता-पसंद दोहराती है या नहीं। यह अनुभूति का प्रयोग है, आँखों की जाँच नहीं।',
-  ],
   ['Prepare the vision lab', 'दृष्टि प्रयोगशाला तैयार करें'],
   [
     'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
@@ -117,17 +85,10 @@ const rows = [
   ],
   ['Gap angle', 'गैप कोण'],
   ['calibrated', 'कैलिब्रेटेड'],
-  ['Three observations. No composite score.', 'तीन अवलोकन। कोई समग्र स्कोर नहीं।'],
-  [
-    'High-contrast detail, low-contrast cost, and directional preference remain separate.',
-    'उच्च-विपरीत विवरण, कम-विपरीत लागत और दिशात्मक वरीयता अलग-अलग रहती है।',
-  ],
   ['High-contrast sharpness', 'उच्च-विपरीत तीक्ष्णता'],
   ['Find the opening.', 'खुला भाग खोजें।'],
   ['Low-contrast cost', 'कम विपरीत लागत'],
   ['Find the quieter opening.', 'हल्के कंट्रास्ट वाला खुला भाग खोजें।'],
-  ['Orientation consistency', 'अभिविन्यास स्थिरता'],
-  ['Which line field looks clearer?', 'कौन सा लाइन क्षेत्र स्पष्ट दिखता है?'],
   ['Comfort and context come first.', 'आराम और संदर्भ पहले आते हैं।'],
   [
     'Use your usual correction for this distance. Cover one eye without pressing it, keep your head upright, and stop for discomfort.',
@@ -214,14 +175,6 @@ const rows = [
   ],
   ['Begin Nitidezza', 'शुरू करें Nitidezza'],
   ['Continue to Contrasto', 'जारी रखें Contrasto तक'],
-  ['Continue to Meridiani', 'जारी रखें Meridiani तक'],
-  ['Without moving closer, which line field looks clearer?', 'बिना पास आए, कौन सा रेखा क्षेत्र स्पष्ट दिखता है?'],
-  ['Left line field', 'बायाँ रेखा क्षेत्र'],
-  ['Right line field', 'दायाँ रेखा क्षेत्र'],
-  ['Left clearer', 'बायाँ स्पष्ट'],
-  ['No difference', 'कोई अंतर नहीं'],
-  ['Right clearer', 'दायाँ स्पष्ट'],
-  ['No astigmatism claim', 'कोई अस्टिग्मैटिज्म दावा नहीं'],
   ['First eye complete', 'पहली आँख पूरी'],
   ['Finish with one eye', 'एक आँख के साथ समाप्त करें'],
   ['Separate observations.', 'अलग अवलोकन।'],
@@ -229,28 +182,16 @@ const rows = [
   ['High-contrast angular gap', 'उच्च-विपरीतता कोणीय अंतर'],
   ['Low-contrast angular gap', 'निम्न-विपरीतता कोणीय अंतर'],
   ['Meridional consistency', 'मेरिडियनल स्थिरता'],
-  ['No stable preference', 'कोई स्थिर पसंद नहीं'],
   ['Calibrated experiment, not an eye examination.', 'मापित प्रयोग, आंख की जाँच नहीं।'],
   ['Sudden changes need care, not another run.', 'अचानक बदलाव होने पर चिकित्सा सहायता लें, परीक्षण दोबारा न करें।'],
   [
     'This is not vision screening, diagnosis, or a prescription.',
     'यह दृष्टि-स्क्रीनिंग, निदान या चश्मे का नुस्खा नहीं है।',
   ],
-  ['Acutezza — calibrated sharpness profile', 'Acutezza — मापा गया तीक्ष्णता प्रोफ़ाइल'],
   ['preference', 'पसंद'],
-  ['no stable preference', 'कोई स्थिर पसंद नहीं'],
   ['Calibrated sharpness experiment — Acutezza | Sense6', 'मापित तीक्ष्णता प्रयोग — Acutezza | Sense6'],
   ['Calibrate screen size — Acutezza | Sense6', 'स्क्रीन का आकार कैलिब्रेट करें — Acutezza | Sense6'],
   ['Estimate viewing distance — Acutezza | Sense6', 'दृश्य दूरी का अनुमान लगाएँ — Acutezza | Sense6'],
-  ['Your calibrated sharpness profile — Acutezza | Sense6', 'आपकी मापित तीक्ष्णता प्रोफ़ाइल — Acutezza | Sense6'],
-  ['Gap at top', 'ऊपर अंतर'],
-  ['Gap at upper right', 'ऊपरी दायाँ में अंतर'],
-  ['Gap at right', 'दायाँ में अंतर'],
-  ['Gap at lower right', 'नीचे दायाँ में अंतर'],
-  ['Gap at bottom', 'नीचे में अंतर'],
-  ['Gap at lower left', 'नीचे बायाँ में अंतर'],
-  ['Gap at left', 'बायाँ में अंतर'],
-  ['Gap at upper left', 'ऊपरी बायाँ में अंतर'],
   [
     'A Landolt ring changes size while you identify its opening. The estimate belongs to this calibrated distance and display.',
     'जब आप इसका उद्घाटन पहचानते हैं, एक लैंडोल्ट रिंग का आकार बदलता रहता है। अनुमान इस मापित दूरी और डिस्प्ले का है।',
@@ -259,15 +200,8 @@ const rows = [
     'The same task repeats with a pale target. Sense6 compares conditions within this run, not across devices.',
     'इसी कार्य को एक फीके लक्ष्य के साथ दोहराया जाता है। Sense6 इस रन के भीतर स्थितियों की तुलना करता है, उपकरणों के बीच नहीं।',
   ],
-  [
-    'Line fields repeat at two scales and changing pixel phases. A preference appears only when it replicates.',
-    'लाइन फ़ील्ड दो पैमानों पर दोहराते हैं और पिक्सेल चरणों को बदलते हैं। एक वरीयता केवल तभी प्रकट होती है जब वह प्रतिकृति बनाती है।',
-  ],
   ['Before testing', 'परीक्षण से पहले'],
   ['Acutezza setup rules', 'Acutezza सेटअप नियम'],
-  ['Adaptive burden', 'अनुकूली बोझ'],
-  ['Standard optotype', 'मानक ऑप्टोटाइप'],
-  ['Urgent symptoms', 'तत्काल लक्षण'],
   ['Camera', 'कैमरा'],
   ['Result', 'परिणाम'],
   ['None', 'कोई नहीं'],
@@ -276,25 +210,6 @@ const rows = [
   ['Calibration 02 / estimated viewing distance', 'अंशांकन 02/अनुमानित देखने की दूरी'],
   ['Calibration 03 / contrast availability', 'अंशांकन 03/कंट्रास्ट उपलब्धता'],
   ['Between-eye setup check', 'आंखों के बीच की सेटअप जांच'],
-  ['Changing pixel phase', 'पिक्सेल चरण बदलना'],
-  ['Two repeated scales', 'दो दोहराए गए तराजू'],
-  ['Comparison recorded.', 'तुलना दर्ज की गई।'],
-  [
-    'A physical card and blind-spot sweeps establish screen scale and estimated viewing distance.',
-    'एक भौतिक कार्ड और ब्लाइंड-स्पॉट स्वीप स्क्रीन स्केल और अनुमानित देखने की दूरी स्थापित करते हैं।',
-  ],
-  [
-    'The Landolt ring provides language-independent, eight-direction geometry.',
-    'लैंडोल्ट रिंग भाषा-स्वतंत्र, आठ-दिशा ज्यामिति प्रदान करती है।',
-  ],
-  [
-    'Eighteen eight-choice trials balance precision and effort in FrACT research.',
-    'अठारह आठ-विकल्प परीक्षण FrACT अनुसंधान में सटीकता और प्रयास को संतुलित करते हैं।',
-  ],
-  [
-    'Safety copy reflects guidance for sudden floaters, flashes, or curtain-like shadows.',
-    'सुरक्षा-संबंधी भाषा अचानक तैरते धब्बों, चमकती रोशनियों या पर्दे जैसी छाया के चिकित्सा मार्गदर्शन पर आधारित है।',
-  ],
   [
     'Use a laptop, tablet, or monitor without glare. Reset browser zoom, keep brightness comfortable, and leave the display still after calibration.',
     'बिना चकाचौंध के लैपटॉप, टैबलेट या मॉनिटर का उपयोग करें। ब्राउज़र ज़ूम रीसेट करें, चमक को आरामदायक रखें, और अंशांकन के बाद डिस्प्ले को स्थिर छोड़ दें।',
@@ -318,10 +233,6 @@ const rows = [
   [
     'Rotate to landscape or continue on a larger tablet, laptop, or monitor. Acutezza will not guess physical screen size.',
     'लैंडस्केप पर घुमाएँ या किसी बड़े टैबलेट, लैपटॉप या मॉनिटर पर जारी रखें। Acutezza भौतिक स्क्रीन आकार का अनुमान नहीं लगाएंगे।',
-  ],
-  [
-    'Keep this viewport, browser zoom, orientation, and viewing distance unchanged.',
-    'इस व्यूपोर्ट, ब्राउज़र ज़ूम, ओरिएंटेशन और देखने की दूरी को अपरिवर्तित रखें।',
   ],
   [
     'Screen scale is measured, but distance came from manual entry. Results retain this caution.',
@@ -366,14 +277,6 @@ const rows = [
   ],
   ['Keep the right eye covered and look only at the square.', 'दाहिनी आंख को ढक कर रखें और केवल वर्ग को ही देखें।'],
   ['Acutezza / this display / this distance', 'Acutezza / यह डिस्प्ले / यह दूरी'],
-  [
-    'The calibration and task controls support interpretation of this run at the stated distance.',
-    'अंशांकन और कार्य नियंत्रण बताई गई दूरी पर इस रन की व्याख्या का समर्थन करते हैं।',
-  ],
-  [
-    'A calibration or task-control check was limited. Repeat before comparing runs.',
-    'एक अंशांकन या कार्य-नियंत्रण जांच सीमित थी। रनों की तुलना करने से पहले दोहराएं।',
-  ],
   ['What travelled with the target.', 'लक्ष्य के साथ क्या यात्रा की।'],
   ['Correction', 'चश्मा या कॉन्टैक्ट लेंस'],
   ['Distance', 'दूरी'],
@@ -390,37 +293,13 @@ const rows = [
     'Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.',
     'अचानक दृष्टि घटना, आँख में तेज दर्द, नई चमकती रोशनियाँ या तैरते धब्बे, अथवा दृश्य क्षेत्र में पर्दा या छाया दिखे तो तुरंत पेशेवर चिकित्सा मूल्यांकन कराएँ।',
   ],
-  ['Three measures for this eye.', 'इस आंख के लिए तीन उपाय।'],
-  ['{lower}–{upper} uncertainty interval', '{lower}–{upper} अनिश्चितता अंतराल'],
   ['{cost}% gap size versus high contrast', 'उच्च कंट्रास्ट की तुलना में {cost}% गैप आकार'],
-  ['{consistency}% leading-choice consistency', '{consistency}% अग्रणी-चयन स्थिरता'],
   ['not measured', 'मापा नहीं गया'],
-  [
-    'The estimate touches the display range; treat it as a bound.',
-    'अनुमान प्रदर्शन सीमा को छूता है; इसे एक बाउंड के रूप में मानें।',
-  ],
-  [
-    'A calibrated angular threshold from forced-choice trials.',
-    'फोर्स्ड-चॉइस ट्रायल से एक कैलिब्रेटेड कोणीय थ्रेशोल्ड।',
-  ],
   [
     'A within-run difference, not clinical contrast sensitivity.',
     'एक रन के भीतर का अंतर, नैदानिक कंट्रास्ट संवेदनशीलता नहीं।',
   ],
-  [
-    'The display could not preserve a dependable low-contrast condition.',
-    'डिस्प्ले कम कंट्रास्ट की भरोसेमंद स्थिति बनाए नहीं रख सका।',
-  ],
-  [
-    'The preference repeated at both scales. It does not identify astigmatism.',
-    'पसंद दोनों स्केल पर दोहराई गई। यह एस्टिग्मेटिज़्म की पहचान नहीं करती।',
-  ],
-  [
-    'No preference met the replication rule across scale and pixel phase.',
-    'किसी भी पसंद ने स्केल और पिक्सेल फ़ेज़ में प्रतिकृति नियम को पूरा नहीं किया।',
-  ],
   ['Instrument 01 complete', 'उपकरण 01 पूरा'],
-  ['Threshold tasks complete', 'थ्रेशोल्ड कार्य पूरे हुए'],
   [
     'A calibrated estimate was recorded with {trials} measured targets.',
     'एक कैलिब्रेटेड अनुमान {trials} मापे गए लक्ष्यों के साथ रिकॉर्ड किया गया।',
@@ -428,14 +307,6 @@ const rows = [
   [
     'Rest your eye for a moment. Keep the same correction, distance, screen, and covered eye.',
     'अपनी आँख को कुछ समय के लिए विश्राम दें। समान सुधार, दूरी, स्क्रीन, और ढकी हुई आंख बनाए रखें।',
-  ],
-  [
-    'High- and low-contrast estimates remain separate in the result.',
-    'उच्च और निम्न कंट्रास्ट अनुमान परिणाम में अलग रहते हैं।',
-  ],
-  [
-    'Contrasto is unavailable on this setup, so no low-contrast value will be inferred.',
-    'Contrasto इस सेटअप पर उपलब्ध नहीं है, इसलिए कोई निम्न-कंट्रास्ट मान अनुमानित नहीं किया जाएगा।',
   ],
   ['Listening lab / three instruments / about 6 minutes', 'सुनने की प्रयोगशाला / तीन उपकरण / लगभग 6 मिनट'],
   ['Listen for the boundary.', 'सुनाई देने की सीमा पहचानें।'],
@@ -469,25 +340,17 @@ const rows = [
     'Start with device volume low. Raise it only until the reference is quiet and comfortable, never beyond about 60%. Then lock it for the whole run.',
     'डिवाइस का वॉल्यूम कम से शुरू करें। उसे केवल तब तक बढ़ाएँ जब तक संदर्भ ध्वनि धीमी और आरामदायक सुनाई दे—लगभग 60% से अधिक कभी नहीं। फिर पूरे सत्र में वॉल्यूम न बदलें।',
   ],
-  [
-    'Never raise volume to chase a missing high tone. Stop immediately for discomfort, pain, pressure, or ringing.',
-    'न सुनाई देने वाली ऊँची पिच खोजने के लिए वॉल्यूम कभी न बढ़ाएँ। असुविधा, दर्द, दबाव या कान बजने पर तुरंत रुक जाएँ।',
-  ],
   ['Research trail', 'अनुसंधान पथ'],
   ['What informed Udito.', 'Udito क्या सूचित किया।'],
-  ['Read the primary source', 'प्राथमिक स्रोत पढ़ें'],
   ['Safe listening', 'सुरक्षित सुनना'],
-  ['Audio setup / volume locks after this screen', 'इस स्क्रीन के बाद ऑडियो सेटअप/वॉल्यूम लॉक हो जाता है'],
   ['Quiet room.', 'शांत कमरा।'],
   ['Low volume.', 'कम वॉल्यूम।'],
   ['Headphones.', 'हेडफ़ोन।'],
-  ['Play quiet reference', 'शांत संदर्भ चलाएं'],
   ['Start device volume low before playing.', 'ध्वनि चलाने से पहले डिवाइस का वॉल्यूम कम रखें।'],
   ['Listening setup', 'सुनने की व्यवस्था'],
   ['Over-ear / on-ear headphones', 'ओवर-ईयर/ऑन-ईयर हेडफ़ोन'],
   ['Earbuds / in-ear headphones', 'ईयरबड्स/इन-ईयर हेडफ़ोन'],
   ['Other / unsure', 'अन्य/अनिश्चित'],
-  ['Begin instrument 01', 'उपकरण शुरू करें 01'],
   ['Volume contract', 'वॉल्यूम अनुबंध'],
   ['Start low', 'कम शुरू करें'],
   ['Find quiet comfort', 'शांत आराम पाएं'],
@@ -500,10 +363,8 @@ const rows = [
   ['Start practice', 'अभ्यास शुरू करें'],
   ['Listen…', 'सुनो...'],
   ['Stop safely', 'सुरक्षित रूप से रोकें'],
-  ['Volume locked', 'वॉल्यूम लॉक किया गया'],
   ['Short ramped tones', 'लघु रैंप टोन'],
   ['Response recorded.', 'प्रतिक्रिया दर्ज की गई।'],
-  ['Run again', 'फिर से चलाएं'],
   ['Not settled', 'सुलझा नहीं'],
   ['Device-relative, never dB HL.', 'डिवाइस-सापेक्ष; यह dB HL नहीं है।'],
   [
@@ -526,20 +387,10 @@ const rows = [
     'यह केवल डिवाइस का नियंत्रण है, मापा हुआ ध्वनि-दाब स्तर नहीं। ब्राउज़र dB SPL नहीं जान सकता।',
   ],
   ['Upload', 'अपलोड करें'],
-  ['Playing quiet reference…', 'शांत संदर्भ खेलना ...'],
   ['Keep this quiet and comfortable.', 'इसे शांत और आरामदायक रखें।'],
   ['Play reference again', 'संदर्भ फिर से चलाएं'],
   ['audio context', 'ऑडियो संदर्भ'],
   ['now leave volume unchanged.', 'अब वॉल्यूम को अपरिवर्तित छोड़ दें।'],
-  [
-    'Audio could not start. Check browser audio permissions and try again.',
-    'ऑडियो प्रारंभ नहीं हो सका. ब्राउज़र ऑडियो अनुमतियाँ जाँचें और पुन: प्रयास करें.',
-  ],
-  ['The reference sound could not start.', 'संदर्भ ध्वनि प्रारंभ नहीं हो सका.'],
-  [
-    'Play the quiet reference and confirm the volume contract first.',
-    'शांत संदर्भ चलाएं और पहले वॉल्यूम अनुबंध की पुष्टि करें।',
-  ],
   [
     'Never raise volume to chase a missing high tone.',
     'लापता उच्च स्वर का पीछा करने के लिए कभी भी वॉल्यूम न बढ़ाएं।',
@@ -549,7 +400,6 @@ const rows = [
     'असुविधा, दर्द, दबाव या कान बजने पर तुरंत रुक जाएँ।',
   ],
   ['Instrument', 'साधन'],
-  ['of 03', '03 का'],
   [
     'Choose the quietest tone. Two practice trials come first; the measured check is six trials.',
     'सबसे शांत स्वर चुनें। दो अभ्यास परीक्षण पहले आते हैं; मापा गया चेक छह परीक्षण है।',
@@ -562,9 +412,6 @@ const rows = [
     'Choose which tone was higher. Loudness changes slightly on purpose, so follow pitch rather than loudness.',
     'चुनें कि किस स्वर की पिच अधिक ऊँची थी। आवाज़ की तीव्रता जानबूझकर थोड़ी बदलती है, इसलिए तीव्रता के बजाय पिच पर ध्यान दें।',
   ],
-  ['Start Cuffie', 'Cuffie शुरू करें'],
-  ['Start Portata', 'Portata शुरू करें'],
-  ['Start Intonazione', 'Intonazione शुरू करें'],
   ['Practice', 'अभ्यास'],
   ['Adaptive run', 'अनुकूली रन'],
   ['Preparing…', 'तैयारी...'],
@@ -599,18 +446,9 @@ const rows = [
   ['without changing volume.', 'वॉल्यूम बदलने बिना।'],
   ['Adaptive', 'अनुकूली'],
   ['Interleaved', 'इंटरलीव्ड'],
-  ['Your listening profile — Udito | Sense6', 'आपकी सुनने की प्रोफ़ाइल — Udito | Sense6'],
   ['Udito / this setup / this run', 'Udito / यह सेटअप / यह रन'],
   ['Three listening measures.', 'तीन सुनने के माप।'],
   ['No hearing label.', 'कोई सुनने का लेबल नहीं।'],
-  [
-    'The setup checks and adaptive tracks produced a coherent run-level profile.',
-    'सेटअप जांच और अनुकूली ट्रैक्स ने एक संगत रन-स्तरीय प्रोफ़ाइल तैयार की।',
-  ],
-  [
-    'At least one setup check or adaptive track did not settle. The observations remain visible, but comparison should wait for a steadier repeat.',
-    'कम से कम एक सेटअप जांच या अनुकूली ट्रैक स्थिर नहीं हुआ। निरीक्षण दिखाई देते रहेंगे, लेकिन तुलना स्थिर पुनरावृत्ति के लिए प्रतीक्षा करनी चाहिए।',
-  ],
   ['Setup checks coherent', 'सेटअप जांच संगत'],
   ['Interpret with caution', 'सावधानी के साथ व्याख्या करें'],
   ['Headphone-like', 'हेडफोन जैसा'],
@@ -620,20 +458,9 @@ const rows = [
     'यह फेज़-आधारित प्रस्तुति-जाँच है, हार्डवेयर की पहचान नहीं।',
   ],
   ['Upper run boundary', 'ऊपरी रन सीमा'],
-  ['boundary estimate', 'सीमा अनुमान'],
-  ['adaptive estimate', 'अनुकूली अनुमान'],
   ['Over-ear / on-ear', 'ओवर-ईयर / ऑन-ईयर'],
-  [
-    'Reached the device-safe test ceiling; your personal boundary may be higher.',
-    'उपकरण-सुरक्षित परीक्षण सीमा तक पहुँचा; आपकी व्यक्तिगत सीमा अधिक हो सकती है।',
-  ],
-  [
-    'Relative to this device, fixed volume, room, and audio sample rate.',
-    'इस उपकरण के सापेक्ष, स्थिर वॉल्यूम, कमरे और ऑडियो सैंपल दर।',
-  ],
   ['Pitch step near 500 Hz', '500 हर्ट्ज के पास पिच स्टेप'],
   ['Pitch step near 2 kHz', '2 kHz के पास पिच स्टेप'],
-  ['Reversal-based just-noticeable difference for this run.', 'इस रन के लिए रिवर्सल-आधारित न्यूनतम अंतर।'],
   [
     'Reported separately; no composite hearing score is calculated.',
     'अलग से रिपोर्ट किया गया; कोई सम्मिलित सुनने का स्कोर नहीं निकाला जाता।',
@@ -659,11 +486,6 @@ const rows = [
     'अपने सत्रों की तुलना केवल उसी डिवाइस, हेडफ़ोन, फिट, कमरे और वॉल्यूम पर करें। कोई ध्वनि असुविधाजनक लगे तो परीक्षण रोक दें।',
   ],
   ['Screen check / 01 of 01', 'स्क्रीन जांच / 01 में से 01'],
-  ['Prepare the environment before the score.', 'स्कोर से पहले वातावरण तैयार करें।'],
-  [
-    'Display settings and ambient light can move a color threshold. This one-minute check makes your run more repeatable.',
-    'डिस्प्ले सेटिंग्स और परिवेशी प्रकाश रंग सीमा को बदल सकते हैं। यह एक मिनट की जांच आपके रन को अधिक दोहरनीय बनाती है।',
-  ],
   [
     'Use one screen. Disable Night Shift, True Tone, blue-light filters, and vivid modes.',
     'एक स्क्रीन का उपयोग करें। Night Shift, True Tone, नीली-रोशनी फ़िल्टर और जीवंत मोड अक्षम करें।',
@@ -689,10 +511,6 @@ const rows = [
   ['Start instrument 01', 'इंस्ट्रूमेंट 01 शुरू करें'],
   ['Viewing setup / 01 of 01', 'व्यूइंग सेटअप / 01 में से 01'],
   ['Colour filters off, please.', 'कृपया रंग फ़िल्टर बंद करें।'],
-  [
-    'The thresholds only describe this browser, display, lighting, and viewing position. Colour-shifting features can move them substantially.',
-    'ये थ्रेशोल्ड केवल इस ब्राउज़र, डिस्प्ले, लाइटिंग और देखने की स्थिति का वर्णन करते हैं। रंग-स्थानांतरण विशेषताएं उन्हें काफी हद तक बदल सकती हैं।',
-  ],
   [
     'Turn off Night Shift, True Tone, blue-light filters, and vivid display modes.',
     'Night Shift, True Tone, नीली-रोशनी फ़िल्टर और जीवंत डिस्प्ले मोड बंद करें।',
@@ -758,23 +576,17 @@ const rows = [
     'Results are calculated locally and are not uploaded.',
     'परिणाम इसी डिवाइस पर निकाले जाते हैं और अपलोड नहीं होते।',
   ],
-  ['Color perception / 03 instruments / about 4 minutes', 'रंग धारणा/03 उपकरण/लगभग 4 मिनट'],
-  ['How finely do you', 'आप कितने बारीकी से काम करते हैं'],
   ['see', 'देखना'],
-  ['colour?', 'रंग?'],
   ['Begin the color lab', 'रंग प्रयोगशाला शुरू करें'],
-  ['Set the room before the score.', 'स्कोर से पहले कमरा सेट करें।'],
   ['Which tile is different?', 'कौन सी टाइल अलग है?'],
   ['Which field shifts in color?', 'कौन सा क्षेत्र रंग में बदलता है?'],
   ['Build the smoothest color path.', 'सबसे चिकना रंग पथ बनाएं।'],
   ['Lock this order', 'इस आदेश को लॉक करें'],
-  ['Your visible boundary, on this display.', 'इस प्रदर्शन पर आपकी दृश्यमान सीमा।'],
   [
     'This is not a medical test and cannot confirm tetrachromacy.',
     'यह चिकित्सीय परीक्षण नहीं है और टेट्राक्रोमैसी की पुष्टि नहीं कर सकता।',
   ],
   ['Lab progress', 'प्रयोगशाला प्रगति'],
-  ['Current instrument progress', 'वर्तमान उपकरण प्रगति'],
   [
     'Choose once. Trust the first stable difference you see.',
     'एक बार चुनें। आपके द्वारा देखे जाने वाले पहले स्थिर अंतर पर भरोसा करें।',
@@ -809,18 +621,10 @@ const rows = [
     'Tap its new place to swap, or use the arrows.',
     'स्वैप करने के लिए इसके नए स्थान पर टैप करें, या तीरों का उपयोग करें।',
   ],
-  ['Your colour profile — Tetracromia | Sense6', 'आपकी रंग प्रोफ़ाइल — Tetracromia | Sense6'],
   ['Session complete', 'सत्र पूर्ण'],
   ['Session index', 'सत्र सूची'],
-  ['Hue profile', 'ह्यू प्रोफ़ाइल'],
   ['Display-relative', 'डिस्प्ले-सापेक्ष'],
-  [
-    'Each spoke is one hue region, drawn in its real color. The dot shows the share of discrimination trials you answered correctly there — the test keeps overall difficulty near your limit, so shorter spokes mark your relatively weaker directions.',
-    'हर स्पोक एक ह्यू क्षेत्र है, जिसे उसके असली रंग में प्रदर्शित किया गया है। बिंदु दिखाता है कि आपने वहां कितनी भिन्नता परीक्षण सही उत्तर दी — परीक्षण कुल कठिनाई को आपकी सीमा के पास रखता है, इसलिए छोटे स्पोक आपकी अपेक्षाकृत कमजोर दिशाओं को मार्क करते हैं।',
-  ],
   ['Sequence', 'क्रम'],
-  ['Finest step', 'सर्वोत्तम चरण'],
-  ['Finest shift', 'सर्वोत्तम बदलाव'],
   ['Rose', 'गुलाब'],
   ['Amber', 'एम्बर'],
   ['Lime', 'चूना'],
@@ -828,36 +632,7 @@ const rows = [
   ['Cyan', 'सियान'],
   ['Blue', 'नीला'],
   ['Magenta', 'मैजेंटा'],
-  ['of hue', 'ह्यू का'],
-  ['through noise', 'शोर के माध्यम से'],
-  ['correct · smaller angle = finer vision', 'सही · छोटा कोण = सूक्ष्म दृष्टि'],
-  ['Hue ordering between fixed anchors', 'निर्धारित एंकर के बीच ह्यू क्रम'],
-  ['perfect order · each out-of-place pair costs points', 'संपूर्ण क्रम · प्रत्येक गलत जगह जोड़ी अंक घटाती है'],
   ['How to read this', 'इसे कैसे पढ़ें'],
-  [
-    'Threshold and Field report the smallest hue difference you kept answering correctly, found adaptively (the app floor is 1.2°, near what an sRGB screen can render). The session index weighs them 35% + 35%, plus 30% for Sequence. Scores describe this run on this browser and screen — useful for comparing your own sessions under similar conditions, not a population percentile, diagnosis, or evidence for tetrachromacy.',
-    'थ्रेशोल्ड और फ़ील्ड उस सबसे छोटे रंग-अंतर को बताते हैं जिसे आपने लगातार सही पहचाना; इसे अनुकूली तरीके से मापा जाता है (ऐप की न्यूनतम सीमा 1.2° है, जो sRGB स्क्रीन की प्रदर्शन-क्षमता के करीब है)। सत्र सूचकांक में थ्रेशोल्ड और फ़ील्ड का भार 35%–35% तथा सीक्वेंस का 30% है। ये स्कोर इसी ब्राउज़र और स्क्रीन पर किए गए इस सत्र का वर्णन करते हैं। इनका उपयोग केवल समान परिस्थितियों में अपने सत्रों की तुलना के लिए करें; ये जनसंख्या प्रतिशतक, निदान या टेट्राक्रोमैसी का प्रमाण नहीं हैं।',
-  ],
-  ['Very fine screen-level discrimination', 'बहुत सूक्ष्म स्क्रीन-स्तर भिन्नता'],
-  ['Fine screen-level discrimination', 'सूक्ष्म स्क्रीन-स्तर भिन्नता'],
-  ['Moderate screen-level discrimination', 'मध्यम स्क्रीन-स्तर भिन्नता'],
-  ['Broad screen-level discrimination', 'विस्तृत स्क्रीन-स्तर भिन्नता'],
-  [
-    'You resolved small display differences consistently across the three instruments.',
-    'आपने तीन उपकरणों में लगातार छोटे डिस्प्ले मतभेदों को हल किया।',
-  ],
-  [
-    'You resolved subtle display differences with a stable overall profile.',
-    'आपने स्थिर कुल प्रोफ़ाइल के साथ सूक्ष्म डिस्प्ले अंतर हल किए।',
-  ],
-  [
-    'You found clear differences; the finest steps were less consistent in this run.',
-    'आपने स्पष्ट अंतर पाए; इस रन में सबसे छोटे चरण कम स्थिर थे।',
-  ],
-  [
-    'The smallest display steps were difficult in this run. Screen setup and fatigue can matter.',
-    'सबसे छोटे डिस्प्ले चरण इस रन में कठिन थे। स्क्रीन सेटअप और थकान मायने रख सकते हैं।',
-  ],
   ['Colour vision / adaptive experiment / about 3 minutes', 'रंग दृष्टि / अनुकूली प्रयोग / लगभग 3 मिनट'],
   ['Find the gap', 'अंतर खोजें'],
   ['in the dots', 'बिंदुओं में'],
@@ -883,7 +658,6 @@ const rows = [
   ['left', 'बायाँ'],
   ['top', 'ऊपर'],
   ['bottom', 'नीचे'],
-  ['Adaptive colour threshold', 'अनुकूल रंग सीमा'],
   ['Experiment progress', 'प्रयोग प्रगति'],
   ['Dotted colour target with a C-shaped gap', 'C-आकार वाले डॉटेड रंग लक्ष्य'],
   ['Adaptive response', 'अनुकूल प्रतिक्रिया'],
@@ -895,15 +669,10 @@ const rows = [
   ['Gap at', 'गैप पर'],
   ['Keyboard: arrow keys · N for no gap', 'कीबोर्ड: एरो कीज़ · N का अर्थ कोई गैप नहीं'],
   ['Experimental run complete', 'प्रयोगात्मक रन पूरा हुआ'],
-  ['Display-relative thresholds from this run', 'इस रन से प्रदर्शन-सापेक्ष सीमाएँ दिखाएँ'],
   ['Run inconclusive — repeat the controls', 'रन अनिर्णायक — नियंत्रण दोहराएँ'],
   [
     'Lower values mean you followed a smaller colour shift in that direction on this display. The three directions are not clinical scores and should not be compared as diagnoses.',
     'छोटे रंग बदलाव का पालन करने का मतलब यह है कि इस प्रदर्शन पर छोटे मान थे। तीन दिशाएँ नैदानिक स्कोर नहीं हैं और उन्हें डायग्नोसिस के रूप में तुलना नहीं करनी चाहिए।',
-  ],
-  [
-    'Too many high-contrast task controls were missed to interpret the adaptive thresholds. Check the instructions and viewing setup, then try again.',
-    'बहुत अधिक उच्च कंट्रास्ट कार्य नियंत्रण को अनदेखा किया गया ताकि अनुकूल सीमाओं की व्याख्या हो सके। निर्देश और देखने की सेटिंग जांचें, फिर फिर से प्रयास करें।',
   ],
   ['L direction', 'L दिशा'],
   ['M direction', 'M दिशा'],
@@ -914,11 +683,7 @@ const rows = [
   ['Staircase settled', 'सीढ़ी तय हो गई'],
   ['Limited reversals', 'सीमित पलटाव'],
   ['reversals', 'पलटाव'],
-  ['Experiment floor confirmed', 'प्रयोग फर्श की पुष्टि हुई'],
-  ['Experiment maximum reached', 'प्रयोग अधिकतम पहुँच गया'],
   ['presentations', 'प्रस्तुतियाँ'],
-  ['lower measurement bound', 'निम्न माप सीमा'],
-  ['upper measurement bound', 'उच्च माप सीमा'],
   ['run spread', 'रन प्रसार'],
   ['High-contrast gap trials', 'उच्च-कांट्रास्ट गैप परीक्षण'],
   ['Enough controls were read to report this run.', 'इस रन की रिपोर्ट करने के लिए पर्याप्त नियंत्रण पढ़े गए थे।'],
@@ -931,20 +696,11 @@ const rows = [
     'Daltonia के कोई नैदानिक मानक नहीं हैं और इसे एनॉमैलोस्कोप, CAD, Cambridge Colour Test या निदान किए गए समूह के विरुद्ध सत्यापित नहीं किया गया है। ये मान रंग-दृष्टि की कमी की पुष्टि या उसे खारिज नहीं कर सकते। दोहराए गए सत्रों की तुलना केवल उसी डिस्प्ले और सेटअप पर करें।',
   ],
   ['Copy run summary', 'रन सारांश कॉपी करें'],
-  [
-    'A careful, adaptive lab for the differences your display can reproduce—and your eyes can resolve.',
-    'एक सावधानीपूर्वक, अनुकूलनीय प्रयोगशाला आपके डिस्प्ले द्वारा पुन: उत्पन्न किए जा सकने वाले अंतर और आपकी आंखों द्वारा पहचाने जा सकने वाले अंतर के लिए।',
-  ],
   ['display relative', 'प्रदर्शन सापेक्ष'],
   ['Hue', 'रंग छींट (Hue)'],
   ['Field', 'क्षेत्र (Field)'],
   ['Order', 'आदेश (Order)'],
   ['The lab', 'प्रयोगशाला'],
-  ['Three views of discrimination.', 'भेदभाव के तीन दृष्टिकोण।'],
-  [
-    'No names, no account, no upload. Your session stays in this browser.',
-    'कोई नाम नहीं, कोई खाता नहीं, कोई अपलोड नहीं। आपका सत्र इस ब्राउज़र में रहता है।',
-  ],
   [
     'No names, no account, no result upload. Your session stays in this browser.',
     'कोई नाम नहीं, कोई खाता नहीं, कोई परिणाम अपलोड नहीं। आपका सत्र इस ब्राउज़र में रहता है।',
@@ -964,11 +720,6 @@ const rows = [
     'स्थिर बिंदुओं के बीच तीन छोटे रंगीन चाप व्यवस्थित करें, बिना किसी रंग नाम के संकेत के।',
   ],
   ['Method, not magic', 'विधि, जादू नहीं'],
-  ['The difference gets smaller as you succeed.', 'जैसे-जैसे आप सफल होते हैं, अंतर छोटा हो जाता है।'],
-  [
-    'Threshold and Field use a two-correct-down, one-error-up staircase. It spends more trials near your current boundary instead of asking the same easy question repeatedly.',
-    'थ्रेशोल्ड और फील्ड दो-सही-डाउन, एक-त्रुटि-अप सीढ़ी का उपयोग करते हैं। यह बार-बार आसान प्रश्न पूछने के बजाय आपके वर्तमान सीमा के पास अधिक परीक्षण करता है।',
-  ],
   ['Neutral surround', 'सतत परिवेश'],
   [
     'Stimuli sit on the same middle-gray chamber in either theme.',
@@ -979,16 +730,7 @@ const rows = [
     'Colors are generated in OKLCH and mapped safely into sRGB.',
     'रंग OKLCH में उत्पन्न होते हैं और सुरक्षित रूप से sRGB में मानचित्रित होते हैं।',
   ],
-  ['Adaptive estimate', 'अनुकूलनशील अनुमान'],
-  [
-    'Reversals around the boundary produce a session-relative threshold.',
-    'सीमा के आसपास उलटफेर सत्र-सापेक्ष थ्रेशोल्ड उत्पन्न करता है।',
-  ],
   ['Honest result', 'ईमानदार परिणाम'],
-  [
-    'Your profile describes this screen, light, fatigue level, and run.',
-    'आपकी प्रोफ़ाइल इस स्क्रीन, रोशनी, थकान स्तर और रन का वर्णन करती है।',
-  ],
   ['The fourth-cone question', 'चौथी-कोन सवाल'],
   ['An RGB screen cannot test tetrachromacy.', 'एक RGB स्क्रीन टेट्राक्रोमैसी का परीक्षण नहीं कर सकती।'],
   [
@@ -996,7 +738,6 @@ const rows = [
     'उपभोक्ता प्रदर्शित करता है तीन प्राथमिक मिश्रण. कार्यात्मक टेट्राक्रोमेसी की पुष्टि करने के लिए वर्णक्रमीय उत्तेजनाओं की आवश्यकता होती है जो चौथी प्रतिक्रिया, विशेष हार्डवेयर, आनुवंशिकी और नियंत्रित स्थितियों को अलग कर सकती है। Tetracromia इसके बजाय साधारण ऑन-स्क्रीन रंग भेदभाव को मापता है - और ठीक यही कहता है।',
   ],
   ['Ready when your screen is', 'जब आपकी स्क्रीन हो तो तैयार'],
-  ['Find your visible boundary.', 'अपनी दृश्यमान सीमा का पता लगाएं।'],
   ['Start the lab', 'लैब शुरू करें'],
   [
     'A C-shaped target becomes harder to separate from its field. Three independent staircases estimate the smallest colour shift you follow in each display-relative direction during this run.',
@@ -1007,50 +748,18 @@ const rows = [
     'यह प्रायोगिक और अप्रमाणित है। यह स्क्रीनिंग का परिणाम या निदान नहीं है।',
   ],
   ['Last run on this browser:', 'इस ब्राउज़र पर अंतिम रन:'],
-  ['display-relative thresholds recorded', 'प्रदर्शन-सापेक्ष थ्रेसहोल्ड रिकॉर्ड किया गया'],
   ['An adaptive task, not a plate score.', 'एक अनुकूली कार्य, प्लेट स्कोर नहीं।'],
   [
     'The design borrows established psychophysical techniques without claiming their clinical validation.',
     'डिजाइन उनके नैदानिक सत्यापन का दावा किए बिना स्थापित मनोभौतिकीय तकनीकों को उधार लेता है।',
   ],
-  [
-    'Two clear targets teach the C-gap interaction with immediate feedback before any threshold is measured.',
-    'दो स्पष्ट लक्ष्य किसी भी सीमा को मापने से पहले तत्काल प्रतिक्रिया के साथ सी-गैप इंटरैक्शन सिखाते हैं।',
-  ],
   ['Luminance noise', 'चमक शोर'],
-  [
-    'Target and field dots share the same brightness variation, reducing a consistent lightness cue.',
-    'लक्ष्य और फ़ील्ड डॉट्स समान चमक भिन्नता साझा करते हैं, जिससे एक सुसंगत हल्कापन संकेत कम हो जाता है।',
-  ],
   ['Three staircases', 'तीन सीढ़ियाँ'],
-  [
-    'Directions become harder after correct responses. “No gap visible” counts as a miss and makes that direction easier.',
-    'सही प्रतिक्रियाओं के बाद दिशा-निर्देश कठिन हो जाते हैं। "कोई गैप दिखाई नहीं दे रहा है" एक मिस के रूप में गिना जाता है और उस दिशा को आसान बनाता है।',
-  ],
   ['Run-relative output', 'रन-सापेक्ष आउटपुट'],
-  [
-    'You receive thresholds and run spread, not a normal/deficient label or a clinical score.',
-    'आप थ्रेसहोल्ड प्राप्त करते हैं और स्प्रेड चलाते हैं, न कि सामान्य/कमी वाला लेबल या क्लिनिकल स्कोर।',
-  ],
   ['What informed Daltonia.', 'Daltonia क्या सूचित किया।'],
   [
     'These sources inform the stimulus model and task design. They do not validate this implementation.',
     'ये स्रोत प्रोत्साहन मॉडल और कार्य डिजाइन को सूचित करते हैं। वे इस कार्यान्वयन को मान्य नहीं करते हैं।',
-  ],
-  ['Adaptive colour thresholds', 'अनुकूली रंग थ्रेसहोल्ड'],
-  [
-    'Random Landolt-C orientation, spatial and luminance noise, and interleaved confusion-line staircases.',
-    'रैंडम लैंडोल्ट-सी ओरिएंटेशन, स्थानिक और ल्यूमिनेंस शोर, और इंटरलीव्ड कन्फ्यूजन-लाइन सीढ़ियाँ।',
-  ],
-  ['Cone-contrast testing', 'शंकु-विपरीत परीक्षण'],
-  [
-    'Randomized cone-specific optotypes and validation against anomaloscope and plate results.',
-    'यादृच्छिक शंकु-विशिष्ट ऑप्टोटाइप और एनोमैलोस्कोप और प्लेट परिणामों के खिलाफ सत्यापन।',
-  ],
-  ['Modern screener validation', 'आधुनिक स्क्रीनर सत्यापन'],
-  [
-    'A multicentre comparison on calibrated displays demonstrates the evidence required for screening claims.',
-    'कैलिब्रेटेड डिस्प्ले पर एक बहुकेंद्रीय तुलना दावों की स्क्रीनिंग के लिए आवश्यक साक्ष्य प्रदर्शित करती है।',
   ],
   ['Response lab / three instruments / about 7 minutes', 'प्रतिक्रिया प्रयोगशाला/तीन उपकरण/लगभग 7 मिनट'],
   ['Notice the signal.', 'संकेत पर ध्यान दें।'],
@@ -1094,10 +803,6 @@ const rows = [
     'कक्ष शांत होने तक प्रतीक्षा करें, फिर केंद्रीय चिह्न दिखाई देते ही प्रतिक्रिया दें। यादृच्छिक प्रतीक्षा प्रत्याशा को दृश्यमान बनाती है।',
   ],
   [
-    'A left or right arrow appears. Respond on the matching side. The difference from Segnale estimates the cost of choosing.',
-    'एक बाएँ या दाएँ तीर दिखाई देता है। मिलान पक्ष पर जवाब दें। Segnale से अंतर चुनने की लागत का अनुमान लगाता है।',
-  ],
-  [
     'For three minutes, respond to the same simple signal across longer, irregular waits. The pattern within this run matters more than one fastest press.',
     'तीन मिनट के लिए, लंबे, अनियमित प्रतीक्षा में एक ही सरल संकेत का जवाब दें। इस रन के भीतर पैटर्न एक से अधिक सबसे तेज़ प्रेस मायने रखता है।',
   ],
@@ -1111,11 +816,6 @@ const rows = [
     'A transparent reaction-time task with practice, randomized intervals, and separate simple and choice measures.',
     'एक पारदर्शी प्रतिक्रिया-समय कार्य जिसमें अभ्यास, यादृच्छिक अंतराल, और अलग सरल और चयनात्मक माप शामिल हैं।',
   ],
-  ['Brief vigilance task', 'संक्षिप्त सतर्कता कार्य'],
-  [
-    'The three-minute PVT-B informs the sustained-response duration and emphasis on lapses and false starts.',
-    'तीन मिनट का PVT-B सतत-प्रतिक्रिया अवधि और चूकों और फॉल्स स्टार्ट पर ध्यान देता है।',
-  ],
   ['Browser timing reality', 'ब्राउज़र समय वास्तविकता'],
   [
     'Browser experiments can be precise enough for many effects, while input hardware and presentation still add latency.',
@@ -1126,10 +826,6 @@ const rows = [
     'तीन निम्न स्वर क्रम में बजते हैं। सबसे शांत का चयन करें। एक चरण-आधारित छल कपट यह जांचने में मदद करता है कि ध्वनि हेडफ़ोन की तरह पहुँच रही है, बिना आपके हार्डवेयर की पहचान करने का दावा किए।',
   ],
   [
-    'One of three intervals contains a tone. Its frequency adapts to find the upper boundary available in this run, on this device, at the locked volume.',
-    'तीन अंतरालों में से एक में एक सुर होता है। इसकी आवृत्ति इस रन में, इस डिवाइस पर, लॉक किए गए वॉल्यूम पर उपलब्ध उच्च सीमा खोजने के लिए अनुकूलित होती है।',
-  ],
-  [
     'Two tones play in sequence. Separate adaptive tracks estimate the smallest pitch step resolved around 500 Hz and 2 kHz.',
     'दो स्वर क्रम में बजते हैं। अलग-अलग अनुकूलन ट्रैक 500 Hz और 2 kHz के आसपास हल किए गए सबसे छोटे पिच चरण का अनुमान लगाते हैं।',
   ],
@@ -1137,41 +833,13 @@ const rows = [
     'Established task structures inform the experiment. Consumer audio hardware remains uncalibrated.',
     'स्थापित कार्य संरचनाएँ प्रयोग को सूचित करती हैं। उपभोक्ता ऑडियो हार्डवेयर अक्रियान्वित रहता है।',
   ],
-  [
-    'A six-trial, three-alternative phase-cancellation task informs Cuffie and its cautious setup language.',
-    'एक छह-परीक्षण, तीन-विकल्प चरण-रद्दीकरण कार्य Cuffie और इसकी सतर्क सेटअप भाषा को सूचित करता है।',
-  ],
-  [
-    'Transformed up-down staircases inform the reversal-based Portata and Intonazione estimates.',
-    'परिवर्तित ऊपर-नीचे सीढ़ियाँ विपरीत-आधारित Portata और Intonazione अनुमान को सूचित करती हैं।',
-  ],
-  ['Browser psychoacoustics', 'ब्राउज़र मनोश्रव्य विज्ञान'],
-  [
-    'Web and mobile adaptive frequency-discrimination work supports the browser task structure—not clinical interpretation.',
-    'वेब और मोबाइल अनुकूलन आवृत्ति-भेद्यता कार्य ब्राउज़र कार्य संरचना का समर्थन करते हैं—न कि नैदानिक व्याख्या।',
-  ],
-  [
-    'Safe-listening guidance informs the low reference, volume lock, short tones, and stop warnings.',
-    'सुरक्षित-सुनने का मार्गदर्शन निम्न संदर्भ, वॉल्यूम लॉक, छोटे स्वर और रोक चेतावनियों को सूचित करता है।',
-  ],
   ['Copy result summary', 'परिणाम सारांश कॉपी करें'],
   ['practice', 'अभ्यास'],
   ['practice complete', 'अभ्यास पूरा'],
   ['Measurement recorded:', 'मापन रिकॉर्ड किया गया:'],
-  ['Keyboard timing', 'कीबोर्ड समय'],
-  ['Touch / pointer timing', 'टच / पॉइंटर समय'],
   ['Median of', 'मध्य'],
   ['clean responses', 'साफ प्रतिक्रियाएँ'],
-  ['measured events', 'मापित घटनाएँ'],
   ['Under', 'के तहत'],
-  [
-    'Keep the same hand position. Early responses, misses, and no-signal responses will be recorded.',
-    'समान हाथ की स्थिति बनाए रखें। प्रारंभिक प्रतिक्रियाएँ, चूक, और बिना-संकेत प्रतिक्रियाएँ रिकॉर्ड की जाएँगी।',
-  ],
-  [
-    'Keep the same hand position. Early responses, misses, and wrong sides will be recorded.',
-    'समान हाथ की स्थिति बनाए रखें। प्रारंभिक प्रतिक्रियाएँ, चूकें, और गलत पक्ष रिकॉर्ड किए जाएंगे।',
-  ],
   [
     'Please acknowledge the device-relative limit before starting.',
     'कृपया शुरू करने से पहले उपकरण-सापेक्ष सीमा की पुष्टि करें।',
@@ -1181,10 +849,6 @@ const rows = [
     '8 अभ्यास प्रतिक्रियाएं, फिर 20 मापा संकेत और 2 नो-सिग्नल जांच।',
   ],
   ['8 practice choices, then 32 balanced measured choices.', '8 अभ्यास विकल्प, फिर 32 संतुलित मापा विकल्प।'],
-  [
-    'A 3-minute PVT-B-inspired sequence. No fatigue or attention diagnosis is inferred.',
-    'PVT-B से प्रेरित 3 मिनट का क्रम। इससे थकान या ध्यान-संबंधी कोई निदान नहीं निकाला जाता।',
-  ],
   [
     'Rest one hand near the arrow keys. Use the matching key.',
     'तीर कुंजियों के पास एक हाथ आराम करें। मिलान कुंजी का उपयोग करें।',
@@ -1225,16 +889,7 @@ const rows = [
   ['clean response', 'स्वच्छ प्रतिक्रिया'],
   ['captured across', 'भर में कब्जा कर लिया'],
   ['measured event', 'मापी गई घटना'],
-  [
-    'Interpretation waits until all three instruments are complete.',
-    'व्याख्या तब तक प्रतीक्षा करती है जब तक कि तीनों उपकरण पूरे न हो जाएं।',
-  ],
-  ['Your response profile — Riflessi | Sense6', 'आपकी प्रतिक्रिया प्रोफ़ाइल — Riflessi | Sense6'],
   ['Riflessi / this run / this device', 'Riflessi / यह रन / यह डिवाइस'],
-  [
-    'The three instruments captured enough clean responses for a run-level profile.',
-    'तीन उपकरणों ने रन-लेवल प्रोफाइल के लिए पर्याप्त स्वच्छ प्रतिक्रियाएं कैप्चर कीं।',
-  ],
   [
     'Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.',
     'कई प्रतिक्रियाएँ बाधित या अमान्य थीं। संख्याओं को आंशिक रन के रूप में मानें और स्थिर परिस्थितियों में दोहराएं।',
@@ -1242,24 +897,10 @@ const rows = [
   ['Run usable', 'प्रयोग करने योग्य चलाएं'],
   ['Limited run', 'सीमित रन'],
   ['Typical signal response', 'विशिष्ट संकेत प्रतिक्रिया'],
-  [
-    'clean simple responses. Typical is more robust than your single fastest response.',
-    'सरल प्रतिक्रियाओं को साफ करें। विशिष्ट आपकी एकल सबसे तेज़ प्रतिक्रिया से अधिक मजबूत है।',
-  ],
   ['Choice response', 'पसंद की प्रतिक्रिया'],
   ['correct across', 'सही पार'],
-  ['valid choices.', 'वैध विकल्प।'],
   ['Choice cost', 'पसंद की लागत'],
-  [
-    'Difference between the choice and simple-response medians in this run.',
-    'इस रन में पसंद और सरल-प्रतिक्रिया माध्यिका के बीच अंतर।',
-  ],
-  ['clean responses across the sustained block.', 'निरंतर ब्लॉक में स्वच्छ प्रतिक्रियाएं।'],
   ['Slow-response tail', 'धीमा-प्रतिक्रिया पूंछ'],
-  [
-    'How much slower the slowest fifth was than the sustained median.',
-    'सबसे धीमे पाँचवाँ कितना धीमा था निष्चित मध्य से।',
-  ],
   ['Within-run drift', 'दौड़ के भीतर परिवर्तन'],
   [
     'Not enough clean responses to estimate a first-to-second-half change.',
@@ -1306,24 +947,13 @@ const rows = [
   ['Leave the experiment? Your progress will be lost.', 'क्या आप प्रयोग छोड़ना चाहते हैं? आपकी प्रगति खो जाएगी।'],
   ['Prepare your screen — Tetracromia | Sense6', 'अपनी स्क्रीन तैयार करें — Tetracromia | Sense6'],
   ['Prepare your display — Daltonia | Sense6', 'अपना डिस्प्ले तैयार करें — Daltonia | Sense6'],
-  ['Your display-relative thresholds — Daltonia | Sense6', 'आपकी डिस्प्ले-सापेक्ष थ्रेशोल्ड — Daltonia | Sense6'],
   ['Prepare your response setup — Riflessi | Sense6', 'अपना प्रतिक्रिया सेटअप तैयार करें — Riflessi | Sense6'],
   ['Prepare your audio setup — Udito | Sense6', 'अपना ऑडियो सेटअप तैयार करें — Udito | Sense6'],
-  ['Reference played', 'संदर्भ चलाया गया'],
   ['Result summary copied.', 'परिणाम सारांश कॉपी किया गया।'],
   ['Copy was unavailable in this browser.', 'इस ब्राउज़र में कॉपी उपलब्ध नहीं थी।'],
   ['Result summary copied', 'परिणाम सारांश कॉपी किया गया'],
   ['Run summary copied', 'कॉपी किया गया सारांश चलाएं'],
   ['Could not access the clipboard', 'क्लिपबोर्ड तक नहीं पहुँच सका'],
-  [
-    'Tetracromia — {overall}/100 screen-level color discrimination. Threshold {threshold}, Field {field}, Sequence {sequence}. Device-relative, not diagnostic.',
-    'Tetracromia - {overall}/100 स्क्रीन-स्तरीय रंग भेदभाव। थ्रेसहोल्ड {threshold}, फील्ड {field}, अनुक्रम {sequence}। डिवाइस-सापेक्ष, निदान नहीं।',
-  ],
-  [
-    'Daltonia experimental browser run — {thresholds}; task controls {correct}/{total}. Display-relative, unvalidated, and not diagnostic.',
-    'Daltonia प्रायोगिक ब्राउज़र रन - {thresholds}; कार्य नियंत्रण {correct}/{total}। प्रदर्शन-सापेक्ष, अमान्य, और निदानात्मक नहीं।',
-  ],
-  ['Riflessi — device-relative response profile', 'Riflessi — डिवाइस-सापेक्ष प्रतिक्रिया प्रोफ़ाइल'],
   ['Input: {input}', 'इनपुट: {input}'],
   ['Signal median: {value} ms', 'सिग्नल माध्यिका: {value} एमएस'],
   [
@@ -1344,15 +974,11 @@ const rows = [
   ],
   ['touch / pointer', 'टच/पॉइंटर'],
   ['keyboard', 'कीबोर्ड'],
-  ['Udito — device-relative listening profile', 'Udito - डिवाइस-सापेक्ष श्रवण प्रोफ़ाइल'],
-  ['Setup: {device}; {sampleRate} Hz audio context', 'सेटअप: {device}; {sampleRate} हर्ट्ज ऑडियो संदर्भ'],
   [
     'Headphone confidence: {correct}/{trials} ({confidence})',
     'हेडफोन आत्मविश्वास: {correct}/{trials} ({confidence})',
   ],
   ['Upper run boundary: {boundary}', 'ऊपरी रन सीमा: {boundary}'],
-  ['Pitch step near 500 Hz: {step}', '500 हर्ट्ज के पास पिच कदम: {step}'],
-  ['Pitch step near 2 kHz: {step}', '2 kHz के पास पिच कदम: {step}'],
   ['headphone-like', 'हेडफोन जैसा'],
   ['uncertain', 'डाँवाँडोल'],
   [
@@ -1382,10 +1008,6 @@ const rows = [
   [', selected', ', चयनित'],
   ['{count} long frame intervals observed in the sample.', '{count} लंबी फ्रेम अंतराल नमूने में देखे गए।'],
   ['{count} sweeps remaining', '{count} शेष स्वीप'],
-  [
-    'Reference played · {sampleRate} Hz audio context · now leave volume unchanged.',
-    'संदर्भ प्ले किया गया · {sampleRate} Hz ऑडियो संदर्भ · अब वॉल्यूम अपरिवर्तित छोड़ें।',
-  ],
   ['Sound {number}', 'ध्वनि {number}'],
   ['Adaptive · {count}', 'एडेप्टिव · {count}'],
   ['Interleaved · {count}', 'इंटरलीव्ड · {count}'],
@@ -1420,16 +1042,10 @@ const rows = [
     'Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials',
     '{anchor} Hz के पास पिच अंतर: {step}; {completion}; {reversals} पलटाव / {trials} प्रयास',
   ],
-  [
-    'Play the maximum-level reference and confirm the volume contract first.',
-    'अधिकतम स्तर का संदर्भ चलाएँ और पहले वॉल्यूम सुरक्षा की शर्तों की पुष्टि करें।',
-  ],
   ['Playback interruptions: {count}', 'प्लेबैक में रुकावटें: {count}'],
   ['Playing maximum-level reference…', 'अधिकतम स्तर का संदर्भ चल रहा है…'],
   ['Portata control accuracy: {accuracy}', 'Portata नियंत्रण की सटीकता: {accuracy}'],
   ['Recorded. Look at the square and start the next sweep.', 'दर्ज हो गया। वर्ग को देखें और अगला स्वीप शुरू करें।'],
-  ['Recorded. Next trial.', 'दर्ज हो गया। अगला प्रयास।'],
-  ['Recorded. The difference will increase.', 'दर्ज हो गया। अंतर बढ़ेगा।'],
   [
     'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
     'ऑडियो घड़ी के अनुसार संदर्भ पूरा हुआ · {sampleRate} Hz ऑडियो संदर्भ · अब वॉल्यूम न बदलें।',
@@ -1460,17 +1076,9 @@ const rows = [
     'Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials',
     'सत्र की ऊपरी सीमा: {boundary}; {completion}; {reversals} पलटाव / {trials} प्रयास',
   ],
-  [
-    'Volume: self-reported unchanged during the run; the browser could not verify it.',
-    'वॉल्यूम: आपके अनुसार सत्र के दौरान यह नहीं बदला; ब्राउज़र इसकी पुष्टि नहीं कर सका।',
-  ],
   ['indeterminate (display-range bound)', 'अनिर्धारित (डिस्प्ले-परास की सीमा पर)'],
   ['lower bound at the display ceiling', 'डिस्प्ले की अधिकतम सीमा पर निचली सीमा'],
   ['upper bound at the display floor', 'डिस्प्ले की न्यूनतम सीमा पर ऊपरी सीमा'],
-  [
-    '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
-    '{eye}: उच्च-कंट्रास्ट गैप {gap}; कम-कंट्रास्ट गैप {low}; कंट्रास्ट की अतिरिक्त कठिनाई {cost}; दिशाएँ {meridians}',
-  ],
   ['Usable run', 'उपयोग योग्य सत्र'],
   ['{name} response runner', '{name} प्रतिक्रिया संचालक'],
   ['Open private journal', 'निजी जर्नल खोलें'],
@@ -1482,7 +1090,6 @@ const rows = [
     'Display conditions changed. This measured run stopped and was not saved.',
     'डिस्प्ले की स्थितियाँ बदल गईं। यह मापन सत्र रोक दिया गया और सहेजा नहीं गया।',
   ],
-  ['Instrument one. Threshold. Find the different tile.', 'उपकरण एक। थ्रेशोल्ड। अलग टाइल खोजें।'],
   ['Practice one of two. Find the clear gap in the C.', 'दो अभ्यासों में पहला। C में स्पष्ट गैप खोजें।'],
   ['That tile is already at the edge.', 'वह टाइल पहले से किनारे पर है।'],
   [
@@ -1520,6 +1127,6 @@ const rows = [
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 ];
 
-const catalogRows = [...rows, ...registryRows('hi'), ...mobileUxRows('hi'), ...landingRows('hi')];
+const catalogRows = [...rows, .../** @type {Array<[string, string]>} */ (copyRows)];
 export const MESSAGE_COUNT = catalogRows.length;
 export default new Map(catalogRows);

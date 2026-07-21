@@ -1,5 +1,11 @@
+import { readdir, readFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { auditCatalog } from '../src/i18n/catalog-audit.js';
 import { MESSAGE_SOURCES } from '../src/i18n/message-ids.js';
+import { landingRows } from '../src/locales/landing-copy.js';
+import { mobileUxRows } from '../src/locales/mobile-ux-copy.js';
+import { registryRows } from '../src/locales/registry-copy.js';
 import { DEFAULT_LOCALE, LOCALES } from '../src/locales.js';
 
 const detailed = process.argv.includes('--details');
@@ -13,6 +19,7 @@ const catalogs = await Promise.all(
 const english = catalogs.find(({ code }) => code === DEFAULT_LOCALE);
 if (!english) throw new Error(`Default locale ${DEFAULT_LOCALE} has no catalog`);
 const englishKeys = [...english.messages.keys()];
+const deadSources = await findDeadSources(englishKeys);
 const audits = catalogs.map(({ code, messages, rowCount }) =>
   auditCatalog({
     locale: code,
@@ -41,9 +48,41 @@ if (json) {
     if (audit.duplicateRows) console.log(`  duplicate rows: ${audit.duplicateRows}`);
     if (audit.untranslated.length) reportList('source-equal', audit.untranslated, detailed);
   }
+  reportList('dead source keys', deadSources, detailed);
 }
 
-if (audits.some((audit) => !audit.valid || audit.untranslated.length > 25)) process.exitCode = 1;
+if (audits.some((audit) => !audit.valid || audit.untranslated.length > 25) || deadSources.length) {
+  process.exitCode = 1;
+}
+
+/** @param {string[]} catalogSources */
+async function findDeadSources(catalogSources) {
+  const root = dirname(dirname(fileURLToPath(import.meta.url)));
+  const files = [];
+  await collectProductionFiles(join(root, 'src'), files);
+  files.push(join(root, 'index.html'), join(root, 'scripts/generate-static-pages.mjs'));
+  const searchable = (await Promise.all(files.map((file) => readFile(file, 'utf8'))))
+    .join('\n')
+    .replace(/\s+/g, ' ');
+  const dynamicSources = new Set(
+    [...registryRows('en'), ...mobileUxRows('en'), ...landingRows('en')].map(([source]) => source),
+  );
+  return catalogSources.filter(
+    (source) => !dynamicSources.has(source) && !searchable.includes(source.replace(/\s+/g, ' ')),
+  );
+}
+
+/** @param {string} directory @param {string[]} files */
+async function collectProductionFiles(directory, files) {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name !== 'locales') await collectProductionFiles(path, files);
+    } else if (path.endsWith('.js')) {
+      files.push(path);
+    }
+  }
+}
 
 /** @param {string} label @param {string[]} values @param {boolean} showAll */
 function reportList(label, values, showAll) {

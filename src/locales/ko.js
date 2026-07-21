@@ -1,8 +1,6 @@
-import { landingRows } from './landing-copy.js';
-import { mobileUxRows } from './mobile-ux-copy.js';
-import { registryRows } from './registry-copy.js';
+import copyRows from './generated/ko.json' with { type: 'json' };
 
-// Generated once from the former combined catalog; edit this locale directly.
+// Manual locale catalog; edit this locale directly.
 /** @type {Array<[string, string]>} */
 const rows = [
   ['Skip to content', '본문으로 건너뛰기'],
@@ -18,7 +16,6 @@ const rows = [
   ['All tests', '모든 테스트'],
   ['About', 'Sense6 소개'],
   ['How Sense6 works', 'Sense6 작동 방식'],
-  ['Anonymous daily counts · no cookies', '익명 일일 집계 · 쿠키 없음'],
   ['Source', '소스 코드'],
   ['Sense6 — measure what your senses notice', 'Sense6 — 감각이 알아차리는 차이를 측정하세요'],
   ['Measure what your', '감각이 알아차리는'],
@@ -26,10 +23,6 @@ const rows = [
   [
     'Short, careful tests that turn what you notice into honest, device-relative results.',
     '눈에 띄는 내용을 정직하고 기기 관련 결과로 바꾸는 짧고 신중한 테스트입니다.',
-  ],
-  [
-    'No account, no answers or results uploaded, no diagnosis theatre.',
-    '계정이 필요 없고 답변이나 결과가 업로드되지 않으며, 진단인 것처럼 꾸미지 않습니다.',
   ],
   ['No account, no answers or results uploaded.', '계정이 필요 없고 답변이나 결과가 업로드되지 않습니다.'],
   [
@@ -44,7 +37,6 @@ const rows = [
   ['Colour', '색상'],
   ['Hearing', '청각'],
   ['Threshold', '역치'],
-  ['Pattern', '패턴'],
   ['Profile', '프로필'],
   ['Ready now / choose a test', '지금 이용 가능 / 테스트 선택'],
   ['Start with what you want to learn.', '배우고 싶은 것부터 시작하세요.'],
@@ -58,31 +50,17 @@ const rows = [
     'In development — visible here as direction, not as something you can start yet.',
     '개발 중 — 여기에서는 아직 시작할 수 있는 것이 아니라 방향으로 표시됩니다.',
   ],
-  ['Calibrated sharpness & meridional clarity', '보정된 선명도 및 자오선 선명도'],
   ['Open test', '테스트 열기'],
   ['What this test includes', '이 테스트에 포함되는 내용'],
-  ['How finely do you see colour?', '색깔이 얼마나 세밀하게 보이시나요?'],
-  [
-    'An adaptive colour-discrimination lab: three instruments measure the smallest hue steps you can resolve on this screen.',
-    '적응형 색 구별 실험입니다. 세 가지 도구가 이 화면에서 구별할 수 있는 가장 작은 색조 차이를 측정합니다.',
-  ],
   ['Colour discrimination', '색 구별'],
-  ['Adaptive difficulty', '적응 난이도'],
-  ['Detailed profile', '상세 프로필'],
   ['Adaptive browser colour-vision experiment', '적응형 브라우저 색각 실험'],
   [
     'Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.',
     '휘도 노이즈가 섞인 점들 사이의 틈을 찾으세요. 화면 기준의 세 색 방향이 각각 독립적으로 조정됩니다.',
   ],
   ['Colour-vision experiment', '색각 실험'],
-  ['Adaptive thresholds', '적응형 임계값'],
   ['3 display directions', '화면 기준 방향 3개'],
   ['Run-relative result', '이번 회차 기준 결과'],
-  ['Response speed, choice cost & consistency', '반응 속도, 선택 소요 시간 및 일관성'],
-  [
-    'Three short instruments separate a simple visual response from decision cost and within-run stability.',
-    '세 가지 짧은 도구가 단순 시각 반응, 선택에 더 걸리는 시간, 회차 내 안정성을 각각 측정합니다.',
-  ],
   ['Response timing', '반응 시간'],
   ['Device-relative timing', '기기 기준 반응 시간'],
   ['No composite score', '종합 점수 없음'],
@@ -95,21 +73,11 @@ const rows = [
   ['Volume safety contract', '음량 안전 지침'],
   ['No hearing label', '청력 판정 없음'],
   ['3 instruments', '도구 3개'],
-  [
-    'Three per-eye instruments measure angular detail, low-contrast cost, and repeatable orientation preference without making a clinical claim.',
-    '각 눈에 대한 세 가지 도구가 각도 세부 해상도, 낮은 대비의 영향, 반복되는 방향 선호를 측정하며 임상적 판단은 하지 않습니다.',
-  ],
   ['Calibrated sharpness experiment', '보정된 시각 선명도 실험'],
   ['Physical screen calibration', '화면 실제 크기 보정'],
-  ['3 per-eye instruments', '눈당 기구 3개'],
   ['No clinical label', '임상 판정 없음'],
-  ['Vision lab / three instruments / about 8 minutes', '시각 실험실 / 도구 3개 / 약 8분'],
   ['Calibrate the screen.', '화면을 보정하세요.'],
   ['Resolve the opening.', '고리의 틈 방향을 구별하세요.'],
-  [
-    'Acutezza measures the angular detail resolved by each eye, the cost of lower contrast, and whether a directional clarity preference repeats. It is a perception experiment, not an eye examination.',
-    'Acutezza는 각 눈이 구별하는 각도 세부 수준, 낮은 대비의 영향, 특정 방향이 더 선명하다는 선호가 반복되는지를 측정합니다. 지각 실험이며 안과 검사가 아닙니다.',
-  ],
   ['Prepare the vision lab', '비전랩 준비'],
   [
     'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
@@ -117,17 +85,10 @@ const rows = [
   ],
   ['Gap angle', '간격 각도'],
   ['calibrated', '보정된'],
-  ['Three observations. No composite score.', '세 가지 관찰. 종합 점수가 없습니다.'],
-  [
-    'High-contrast detail, low-contrast cost, and directional preference remain separate.',
-    '고대비 세부 수준, 낮은 대비의 영향, 방향 선호는 각각 별도로 표시됩니다.',
-  ],
   ['High-contrast sharpness', '고대비 선명도'],
   ['Find the opening.', '고리의 틈을 찾으세요.'],
   ['Low-contrast cost', '낮은 대비의 영향'],
   ['Find the quieter opening.', '더 흐린 고리의 틈을 찾으세요.'],
-  ['Orientation consistency', '방향 선호 일관성'],
-  ['Which line field looks clearer?', '어느 선 무늬가 더 선명해 보이나요?'],
   ['Comfort and context come first.', '편안함과 측정 환경이 가장 중요합니다.'],
   [
     'Use your usual correction for this distance. Cover one eye without pressing it, keep your head upright, and stop for discomfort.',
@@ -214,17 +175,6 @@ const rows = [
   ],
   ['Begin Nitidezza', 'Nitidezza 시작'],
   ['Continue to Contrasto', 'Contrasto로 계속'],
-  ['Continue to Meridiani', 'Meridiani로 계속'],
-  [
-    'Without moving closer, which line field looks clearer?',
-    '더 가까이 가지 말고, 어느 선 무늬가 더 선명한지 고르세요.',
-  ],
-  ['Left line field', '왼쪽 선 무늬'],
-  ['Right line field', '오른쪽 선 무늬'],
-  ['Left clearer', '왼쪽이 더 선명함'],
-  ['No difference', '차이 없음'],
-  ['Right clearer', '오른쪽이 더 선명함'],
-  ['No astigmatism claim', '난시 판정 없음'],
   ['First eye complete', '첫 번째 눈 완료'],
   ['Finish with one eye', '한쪽 눈으로 마무리'],
   ['Separate observations.', '별도의 관찰.'],
@@ -232,7 +182,6 @@ const rows = [
   ['High-contrast angular gap', '고대비 각도 간격'],
   ['Low-contrast angular gap', '낮은 대비 각도 간격'],
   ['Meridional consistency', '자오선 일관성'],
-  ['No stable preference', '안정적인 선호 없음'],
   ['Calibrated experiment, not an eye examination.', '보정된 실험이며 안과 검사가 아닙니다.'],
   [
     'Sudden changes need care, not another run.',
@@ -242,21 +191,10 @@ const rows = [
     'This is not vision screening, diagnosis, or a prescription.',
     '이것은 시력 선별검사나 진단, 처방이 아닙니다.',
   ],
-  ['Acutezza — calibrated sharpness profile', 'Acutezza — 보정된 선명도 프로필'],
   ['preference', '선호'],
-  ['no stable preference', '안정적인 선호가 없음'],
   ['Calibrated sharpness experiment — Acutezza | Sense6', '보정된 선명도 실험 — Acutezza | Sense6'],
   ['Calibrate screen size — Acutezza | Sense6', '화면 크기 보정 — Acutezza | Sense6'],
   ['Estimate viewing distance — Acutezza | Sense6', '예상 시청 거리 — Acutezza | Sense6'],
-  ['Your calibrated sharpness profile — Acutezza | Sense6', '보정된 선명도 프로필 — Acutezza | Sense6'],
-  ['Gap at top', '상단의 간격'],
-  ['Gap at upper right', '오른쪽 상단의 간격'],
-  ['Gap at right', '오른쪽 간격'],
-  ['Gap at lower right', '오른쪽 아래 간격'],
-  ['Gap at bottom', '하단의 간격'],
-  ['Gap at lower left', '왼쪽 아래 간격'],
-  ['Gap at left', '왼쪽 간격'],
-  ['Gap at upper left', '왼쪽 상단의 간격'],
   [
     'A Landolt ring changes size while you identify its opening. The estimate belongs to this calibrated distance and display.',
     '란돌트 고리의 크기가 바뀌는 동안 틈의 방향을 고릅니다. 추정값은 보정된 이 거리와 이 화면에만 해당합니다.',
@@ -265,15 +203,8 @@ const rows = [
     'The same task repeats with a pale target. Sense6 compares conditions within this run, not across devices.',
     '같은 과제를 흐린 표적으로 반복합니다. Sense6는 기기 간이 아니라 이번 회차 안에서 조건을 비교합니다.',
   ],
-  [
-    'Line fields repeat at two scales and changing pixel phases. A preference appears only when it replicates.',
-    '선 무늬를 두 가지 크기와 여러 픽셀 위상으로 반복합니다. 같은 선호가 반복될 때만 결과에 표시됩니다.',
-  ],
   ['Before testing', '테스트하기 전에'],
   ['Acutezza setup rules', 'Acutezza 설정 규칙'],
-  ['Adaptive burden', '적응 부담'],
-  ['Standard optotype', '표준 시표'],
-  ['Urgent symptoms', '긴급 증상'],
   ['Camera', '카메라'],
   ['Result', '결과'],
   ['None', '없음'],
@@ -282,25 +213,6 @@ const rows = [
   ['Calibration 02 / estimated viewing distance', '보정 02 / 예상 시청 거리'],
   ['Calibration 03 / contrast availability', '교정 03 / 대비 가용성'],
   ['Between-eye setup check', '눈 사이 설정 확인'],
-  ['Changing pixel phase', '픽셀 위상 변경'],
-  ['Two repeated scales', '두 개의 반복되는 스케일'],
-  ['Comparison recorded.', '비교가 기록되었습니다.'],
-  [
-    'A physical card and blind-spot sweeps establish screen scale and estimated viewing distance.',
-    '실제 카드와 사각지대 스윕을 통해 화면 규모와 예상 시청 거리를 설정합니다.',
-  ],
-  [
-    'The Landolt ring provides language-independent, eight-direction geometry.',
-    '란돌트 고리는 언어에 의존하지 않는 8방향 도형입니다.',
-  ],
-  [
-    'Eighteen eight-choice trials balance precision and effort in FrACT research.',
-    'FrACT 연구의 8지선다 18회 시행은 정밀도와 부담의 균형을 맞춥니다.',
-  ],
-  [
-    'Safety copy reflects guidance for sudden floaters, flashes, or curtain-like shadows.',
-    '안전 문구에는 갑작스러운 부유물, 섬광 또는 커튼 같은 그림자에 대한 지침이 반영되어 있습니다.',
-  ],
   [
     'Use a laptop, tablet, or monitor without glare. Reset browser zoom, keep brightness comfortable, and leave the display still after calibration.',
     '눈부심이 없는 노트북, 태블릿, 모니터를 사용하세요. 브라우저 확대/축소를 재설정하고, 밝기를 편안하게 유지하고, 보정 후에는 디스플레이를 그대로 두세요.',
@@ -324,10 +236,6 @@ const rows = [
   [
     'Rotate to landscape or continue on a larger tablet, laptop, or monitor. Acutezza will not guess physical screen size.',
     '가로 방향으로 회전하거나 더 큰 태블릿, 노트북 또는 모니터에서 계속하세요. Acutezza는 실제 화면 크기를 추측하지 않습니다.',
-  ],
-  [
-    'Keep this viewport, browser zoom, orientation, and viewing distance unchanged.',
-    '이 뷰포트, 브라우저 확대/축소, 방향 및 보기 거리를 변경하지 않고 유지하세요.',
   ],
   [
     'Screen scale is measured, but distance came from manual entry. Results retain this caution.',
@@ -375,14 +283,6 @@ const rows = [
   ],
   ['Keep the right eye covered and look only at the square.', '오른쪽 눈을 가리고 사각형만 보세요.'],
   ['Acutezza / this display / this distance', 'Acutezza / 이 표시 / 이 거리'],
-  [
-    'The calibration and task controls support interpretation of this run at the stated distance.',
-    '보정 및 작업 제어는 명시된 거리에서의 이번 회차에 대한 해석을 지원합니다.',
-  ],
-  [
-    'A calibration or task-control check was limited. Repeat before comparing runs.',
-    '교정 또는 작업 제어 확인이 제한되었습니다. 회차를 비교하기 전에 반복하십시오.',
-  ],
   ['What travelled with the target.', '표적과 함께 기록된 환경'],
   ['Correction', '수정'],
   ['Distance', '거리'],
@@ -399,37 +299,13 @@ const rows = [
     'Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.',
     '갑작스러운 시력 상실, 심한 눈 통증, 새로운 섬광이나 부유물, 시야에 커튼이나 그림자가 나타나는 경우 즉시 전문적인 평가를 받으십시오.',
   ],
-  ['Three measures for this eye.', '이 눈에 대한 세 가지 조치.'],
-  ['{lower}–{upper} uncertainty interval', '{lower}–{upper} 불확실성 구간'],
   ['{cost}% gap size versus high contrast', '{cost}% 간격 크기 대 고대비'],
-  ['{consistency}% leading-choice consistency', '{consistency}% 선도적 선택 일관성'],
   ['not measured', '측정되지 않음'],
-  [
-    'The estimate touches the display range; treat it as a bound.',
-    '추정값이 화면의 표시 범위 끝에 닿았습니다. 경곗값으로 해석하세요.',
-  ],
-  [
-    'A calibrated angular threshold from forced-choice trials.',
-    '강제 선택 시험에서 보정된 각도 임계값입니다.',
-  ],
   [
     'A within-run difference, not clinical contrast sensitivity.',
     '이번 회차 안의 차이이며 임상적 대비 감도 값이 아닙니다.',
   ],
-  [
-    'The display could not preserve a dependable low-contrast condition.',
-    '디스플레이가 신뢰할 수 있는 저대비 상태를 유지할 수 없습니다.',
-  ],
-  [
-    'The preference repeated at both scales. It does not identify astigmatism.',
-    '두 척도 모두에서 선호가 반복되었습니다. 난시를 식별하지는 않습니다.',
-  ],
-  [
-    'No preference met the replication rule across scale and pixel phase.',
-    '규모 및 픽셀 단계 전반에 걸쳐 복제 규칙을 충족하는 기본 설정이 없습니다.',
-  ],
   ['Instrument 01 complete', '도구 01 완료'],
-  ['Threshold tasks complete', '임계값 작업 완료'],
   [
     'A calibrated estimate was recorded with {trials} measured targets.',
     '{trials} 측정 대상을 사용하여 보정된 추정치가 기록되었습니다.',
@@ -437,14 +313,6 @@ const rows = [
   [
     'Rest your eye for a moment. Keep the same correction, distance, screen, and covered eye.',
     '잠시 눈을 쉬어 보세요. 동일한 교정, 거리, 화면 및 눈을 감고 유지하십시오.',
-  ],
-  [
-    'High- and low-contrast estimates remain separate in the result.',
-    '고대비 추정치와 저대비 추정치는 결과에서 별도로 유지됩니다.',
-  ],
-  [
-    'Contrasto is unavailable on this setup, so no low-contrast value will be inferred.',
-    '이 설정에서는 Contrasto를 사용할 수 없으므로 낮은 대비 값이 유추되지 않습니다.',
   ],
   ['Listening lab / three instruments / about 6 minutes', '청각 실험실 / 도구 3개 / 약 6분'],
   ['Listen for the boundary.', '경계를 들어보세요.'],
@@ -478,25 +346,17 @@ const rows = [
     'Start with device volume low. Raise it only until the reference is quiet and comfortable, never beyond about 60%. Then lock it for the whole run.',
     '기기 음량을 낮게 시작하세요. 기준음이 작지만 편안하게 들릴 때까지만 높이고 약 60%를 넘지 마세요. 그런 다음 회차가 끝날 때까지 음량을 바꾸지 마세요.',
   ],
-  [
-    'Never raise volume to chase a missing high tone. Stop immediately for discomfort, pain, pressure, or ringing.',
-    '들리지 않는 높은 음을 찾으려고 음량을 높이지 마세요. 불편함, 통증, 압박감 또는 이명이 있으면 즉시 중단하세요.',
-  ],
   ['Research trail', '연구 흔적'],
   ['What informed Udito.', 'Udito가 참고한 근거'],
-  ['Read the primary source', '기본 소스 읽기'],
   ['Safe listening', '안전한 청취'],
-  ['Audio setup / volume locks after this screen', '이 화면 이후 오디오 설정 / 음량이 잠깁니다.'],
   ['Quiet room.', '조용한 방.'],
   ['Low volume.', '낮은 음량.'],
   ['Headphones.', '헤드폰.'],
-  ['Play quiet reference', '작은 기준음 재생'],
   ['Start device volume low before playing.', '재생하기 전에 기기 음량을 낮추세요.'],
   ['Listening setup', '청취 설정'],
   ['Over-ear / on-ear headphones', '오버이어 / 온이어 헤드폰'],
   ['Earbuds / in-ear headphones', '이어버드 / 인이어 헤드폰'],
   ['Other / unsure', '기타 / 확실하지 않음'],
-  ['Begin instrument 01', '도구 01 시작'],
   ['Volume contract', '음량 안전 지침'],
   ['Start low', '낮게 시작하세요'],
   ['Find quiet comfort', '조용한 편안함을 찾아보세요'],
@@ -509,10 +369,8 @@ const rows = [
   ['Start practice', '연습 시작'],
   ['Listen…', '들어봐…'],
   ['Stop safely', '안전하게 정지하세요'],
-  ['Volume locked', '음량 고정됨'],
   ['Short ramped tones', '짧은 경사 톤'],
   ['Response recorded.', '반응이 기록되었습니다.'],
-  ['Run again', '다시 회차'],
   ['Not settled', '미정산'],
   ['Device-relative, never dB HL.', '장치 기준이며 절대 dB HL가 아닙니다.'],
   [
@@ -535,20 +393,10 @@ const rows = [
     '측정된 음압 레벨이 아닌 장치 제어입니다. 브라우저는 dB SPL를 알 수 없습니다.',
   ],
   ['Upload', '업로드'],
-  ['Playing quiet reference…', '조용한 참조 재생 중…'],
   ['Keep this quiet and comfortable.', '조용하고 편안하게 유지하세요.'],
   ['Play reference again', '참조 다시 재생'],
   ['audio context', '오디오 컨텍스트'],
   ['now leave volume unchanged.', '이제 음량을 바꾸지 마세요.'],
-  [
-    'Audio could not start. Check browser audio permissions and try again.',
-    '오디오를 시작할 수 없습니다. 브라우저 오디오 권한을 확인하고 다시 시도하세요.',
-  ],
-  ['The reference sound could not start.', '참조 사운드를 시작할 수 없습니다.'],
-  [
-    'Play the quiet reference and confirm the volume contract first.',
-    '먼저 작은 기준음을 재생하고 음량 안전 지침을 확인하세요.',
-  ],
   [
     'Never raise volume to chase a missing high tone.',
     '들리지 않는 높은 음을 찾으려고 음량을 높이지 마세요.',
@@ -558,7 +406,6 @@ const rows = [
     '불편함, 통증, 압박감 또는 이명이 있으면 즉시 중단하세요.',
   ],
   ['Instrument', '도구'],
-  ['of 03', '03 중'],
   [
     'Choose the quietest tone. Two practice trials come first; the measured check is six trials.',
     '가장 조용한 톤을 선택하세요. 두 번의 연습 시험이 먼저 옵니다. 측정된 수표는 6번의 시도입니다.',
@@ -571,9 +418,6 @@ const rows = [
     'Choose which tone was higher. Loudness changes slightly on purpose, so follow pitch rather than loudness.',
     '어떤 톤이 더 높은지 선택하세요. 음량은 의도적으로 조금씩 바뀌므로 음량보다는 음높이를 따르세요.',
   ],
-  ['Start Cuffie', 'Cuffie 시작'],
-  ['Start Portata', 'Portata 시작'],
-  ['Start Intonazione', 'Intonazione 시작'],
   ['Practice', '연습'],
   ['Adaptive run', '적응형 회차'],
   ['Preparing…', '준비 중…'],
@@ -611,18 +455,9 @@ const rows = [
   ['without changing volume.', '음량을 바꾸지 않고.'],
   ['Adaptive', '적응형'],
   ['Interleaved', '교차 진행'],
-  ['Your listening profile — Udito | Sense6', '귀하의 청취 프로필 — Udito | Sense6'],
   ['Udito / this setup / this run', 'Udito / 이 설정 / 이번 회차'],
   ['Three listening measures.', '세 가지 청취 측정값.'],
   ['No hearing label.', '청력 판정 없음.'],
-  [
-    'The setup checks and adaptive tracks produced a coherent run-level profile.',
-    '설정 확인과 적응형 트랙에서 일관된 회차별 프로필을 얻었습니다.',
-  ],
-  [
-    'At least one setup check or adaptive track did not settle. The observations remain visible, but comparison should wait for a steadier repeat.',
-    '하나 이상의 설정 확인 또는 적응형 트랙이 정착되지 않았습니다. 관찰 내용은 계속 표시되지만 비교는 보다 안정적인 반복을 기다려야 합니다.',
-  ],
   ['Setup checks coherent', '설정 확인 결과 일관됨'],
   ['Interpret with caution', '주의해서 해석하세요'],
   ['Headphone-like', '헤드폰 같은'],
@@ -632,23 +467,9 @@ const rows = [
     '위상 기반 소리 제시 확인이며 하드웨어를 식별하는 기능이 아닙니다.',
   ],
   ['Upper run boundary', '이번 회차의 가청 상한'],
-  ['boundary estimate', '경계 추정'],
-  ['adaptive estimate', '적응 추정'],
   ['Over-ear / on-ear', '오버이어 / 온이어'],
-  [
-    'Reached the device-safe test ceiling; your personal boundary may be higher.',
-    '장치 안전 테스트 한도에 도달했습니다. 귀하의 개인 경계가 더 높을 수 있습니다.',
-  ],
-  [
-    'Relative to this device, fixed volume, room, and audio sample rate.',
-    '이 기기, 고정된 음량, 공간 및 오디오 샘플링 속도를 기준으로 합니다.',
-  ],
   ['Pitch step near 500 Hz', '500 Hz 부근의 음높이 차이'],
   ['Pitch step near 2 kHz', '2 kHz 부근의 음높이 차이'],
-  [
-    'Reversal-based just-noticeable difference for this run.',
-    '이번 회차에서 반전점을 바탕으로 추정한 최소 식별 차이입니다.',
-  ],
   [
     'Reported separately; no composite hearing score is calculated.',
     '각 결과는 별도로 표시되며 종합 청력 점수는 계산하지 않습니다.',
@@ -674,11 +495,6 @@ const rows = [
     '같은 기기, 헤드폰, 착용 상태, 공간 및 음량에서 진행한 본인의 회차끼리만 비교하세요. 어떤 소리든 불편하면 테스트를 중단하세요.',
   ],
   ['Screen check / 01 of 01', '화면 점검 / 01 중 01'],
-  ['Prepare the environment before the score.', '점수를 매기기 전에 환경을 준비하십시오.'],
-  [
-    'Display settings and ambient light can move a color threshold. This one-minute check makes your run more repeatable.',
-    '화면 설정과 주변광에 따라 색 역치가 달라질 수 있습니다. 이 1분 점검으로 회차의 반복 가능성을 높입니다.',
-  ],
   [
     'Use one screen. Disable Night Shift, True Tone, blue-light filters, and vivid modes.',
     '하나의 화면을 사용하세요. Night Shift, True Tone, 블루라이트 필터 및 생생한 모드를 비활성화합니다.',
@@ -704,10 +520,6 @@ const rows = [
   ['Start instrument 01', '기기 01 시작'],
   ['Viewing setup / 01 of 01', '설정 / 보기 01/01'],
   ['Colour filters off, please.', '컬러 필터를 꺼주세요.'],
-  [
-    'The thresholds only describe this browser, display, lighting, and viewing position. Colour-shifting features can move them substantially.',
-    '임계값은 이 브라우저, 디스플레이, 조명 및 보기 위치만 설명합니다. 색상 변경 기능을 사용하면 크게 이동할 수 있습니다.',
-  ],
   [
     'Turn off Night Shift, True Tone, blue-light filters, and vivid display modes.',
     'Night Shift, True Tone, 블루라이트 필터 및 생생한 디스플레이 모드를 끕니다.',
@@ -770,23 +582,17 @@ const rows = [
     '모든 것이 로컬에서 회차됩니다. 응답이 브라우저를 떠나지 않습니다.',
   ],
   ['Results are calculated locally and are not uploaded.', '결과는 로컬에서 계산되며 업로드되지 않습니다.'],
-  ['Color perception / 03 instruments / about 4 minutes', '색상 인식 / 03 기기 / 약 4분'],
-  ['How finely do you', '얼마나 미세한'],
   ['see', '색 차이를'],
-  ['colour?', '구별하나요?'],
   ['Begin the color lab', '색상 연구실 시작'],
-  ['Set the room before the score.', '점수 전에 방을 설정하십시오.'],
   ['Which tile is different?', '어느 색상 타일이 다른가요?'],
   ['Which field shifts in color?', '어떤 필드의 색상이 바뀌나요?'],
   ['Build the smoothest color path.', '가장 매끄러운 색상 순서를 만드세요.'],
   ['Lock this order', '이 순서 확정'],
-  ['Your visible boundary, on this display.', '이 디스플레이에 보이는 경계.'],
   [
     'This is not a medical test and cannot confirm tetrachromacy.',
     '이것은 의학적인 검사가 아니며 사색성을 확인할 수 없습니다.',
   ],
   ['Lab progress', '연구실 진행'],
-  ['Current instrument progress', '현재 도구 진행률'],
   [
     'Choose once. Trust the first stable difference you see.',
     '한 번 선택해 보세요. 처음으로 보이는 안정적인 차이를 신뢰하세요.',
@@ -818,18 +624,10 @@ const rows = [
   ],
   ['tile', '타일'],
   ['Tap its new place to swap, or use the arrows.', '새로운 위치를 탭하여 바꾸거나 화살표를 사용하세요.'],
-  ['Your colour profile — Tetracromia | Sense6', '귀하의 색상 프로필 — Tetracromia | Sense6'],
   ['Session complete', '세션 완료'],
   ['Session index', '세션 인덱스'],
-  ['Hue profile', '색조 프로필'],
   ['Display-relative', '화면 기준'],
-  [
-    'Each spoke is one hue region, drawn in its real color. The dot shows the share of discrimination trials you answered correctly there — the test keeps overall difficulty near your limit, so shorter spokes mark your relatively weaker directions.',
-    '각 스포크는 실제 색상으로 그려진 하나의 색상 영역입니다. 점은 당신이 올바르게 답한 차별 시험의 비율을 보여줍니다. 테스트는 전반적인 난이도를 한계에 가깝게 유지하므로 짧은 바퀴살은 상대적으로 약한 방향을 표시합니다.',
-  ],
   ['Sequence', '순서'],
-  ['Finest step', '가장 미세한 차이'],
-  ['Finest shift', '가장 미세한 변화'],
   ['Rose', '장미'],
   ['Amber', '호박색'],
   ['Lime', '라임'],
@@ -837,39 +635,7 @@ const rows = [
   ['Cyan', '청록색'],
   ['Blue', '블루'],
   ['Magenta', '마젠타'],
-  ['of hue', '색조의'],
-  ['through noise', '소음을 통해'],
-  ['correct · smaller angle = finer vision', '정확함 · 작은 각도 = 더 미세한 시력'],
-  ['Hue ordering between fixed anchors', '고정된 기준 타일 사이의 색조 배열'],
-  [
-    'perfect order · each out-of-place pair costs points',
-    '완벽한 주문 · 각각의 잘못된 쌍에는 포인트가 필요합니다.',
-  ],
   ['How to read this', '이것을 읽는 방법'],
-  [
-    'Threshold and Field report the smallest hue difference you kept answering correctly, found adaptively (the app floor is 1.2°, near what an sRGB screen can render). The session index weighs them 35% + 35%, plus 30% for Sequence. Scores describe this run on this browser and screen — useful for comparing your own sessions under similar conditions, not a population percentile, diagnosis, or evidence for tetrachromacy.',
-    '‘역치’와 ‘필드’는 계속 정확히 구별한 가장 작은 색조 차이를 적응형 방식으로 추정합니다. 앱의 하한은 1.2°로 sRGB 화면이 표현할 수 있는 수준에 가깝습니다. 세션 지수는 두 결과에 각각 35%, ‘순서’에 30%를 반영합니다. 점수는 이 브라우저와 화면에서 진행한 이번 회차를 설명하며, 비슷한 조건의 본인 회차를 비교하는 데만 유용합니다. 인구 백분위수나 진단, 사색형 색각의 근거가 아닙니다.',
-  ],
-  ['Very fine screen-level discrimination', '매우 미세한 화면 수준 식별'],
-  ['Fine screen-level discrimination', '미세한 화면 수준 식별'],
-  ['Moderate screen-level discrimination', '보통 수준의 화면 수준 차별'],
-  ['Broad screen-level discrimination', '광범위한 화면 수준 차별'],
-  [
-    'You resolved small display differences consistently across the three instruments.',
-    '세 가지 기기에서 작은 디스플레이 차이를 일관되게 해결했습니다.',
-  ],
-  [
-    'You resolved subtle display differences with a stable overall profile.',
-    '안정적인 전체 프로필로 미묘한 디스플레이 차이를 해결했습니다.',
-  ],
-  [
-    'You found clear differences; the finest steps were less consistent in this run.',
-    '뚜렷한 차이는 찾았지만 이번 회차에서는 가장 미세한 차이에 대한 반응이 덜 일관됐습니다.',
-  ],
-  [
-    'The smallest display steps were difficult in this run. Screen setup and fatigue can matter.',
-    '이번 회차에서는 화면의 가장 작은 차이를 구별하기 어려웠습니다. 화면 설정과 피로가 영향을 줄 수 있습니다.',
-  ],
   ['Colour vision / adaptive experiment / about 3 minutes', '컬러 비전 / 적응 실험 / 약 3분'],
   ['Find the gap', '격차를 찾아라'],
   ['in the dots', '점들 속에'],
@@ -895,7 +661,6 @@ const rows = [
   ['left', '왼쪽'],
   ['top', '위'],
   ['bottom', '아래'],
-  ['Adaptive colour threshold', '적응형 색상 임계값'],
   ['Experiment progress', '실험 진행률'],
   ['Dotted colour target with a C-shaped gap', 'C자 모양의 간격이 있는 점선 컬러 타겟'],
   ['Adaptive response', '적응적 반응'],
@@ -907,15 +672,10 @@ const rows = [
   ['Gap at', '간격'],
   ['Keyboard: arrow keys · N for no gap', '키보드: 화살표 키 · N(간격 없음)'],
   ['Experimental run complete', '실험 회차 완료'],
-  ['Display-relative thresholds from this run', '이번 회차의 디스플레이 기준 임계값'],
   ['Run inconclusive — repeat the controls', '결론이 나지 않은 회차 - 제어 반복'],
   [
     'Lower values mean you followed a smaller colour shift in that direction on this display. The three directions are not clinical scores and should not be compared as diagnoses.',
     '값이 낮을수록 이 디스플레이에서 해당 방향으로 더 작은 색상 변화를 따랐다는 의미입니다. 세 가지 방향은 임상 점수가 아니므로 진단으로 비교해서는 안 됩니다.',
-  ],
-  [
-    'Too many high-contrast task controls were missed to interpret the adaptive thresholds. Check the instructions and viewing setup, then try again.',
-    '적응형 임계값을 해석하기에는 너무 많은 고대비 작업 제어가 누락되었습니다. 지침과 보기 설정을 확인한 후 다시 시도하세요.',
   ],
   ['L direction', 'L 방향'],
   ['M direction', 'M 방향'],
@@ -926,11 +686,7 @@ const rows = [
   ['Staircase settled', '적응형 계단 절차 안정됨'],
   ['Limited reversals', '제한된 반전'],
   ['reversals', '반전점'],
-  ['Experiment floor confirmed', '실험층 확정'],
-  ['Experiment maximum reached', '실험 최대값에 도달함'],
   ['presentations', '프레젠테이션'],
-  ['lower measurement bound', '측정 하한'],
-  ['upper measurement bound', '측정 상한'],
   ['run spread', '회차 내 변동 폭'],
   ['High-contrast gap trials', '고대비 갭 시험'],
   ['Enough controls were read to report this run.', '이번 회차을 보고하기에 충분한 컨트롤을 읽었습니다.'],
@@ -943,20 +699,11 @@ const rows = [
     'Daltonia에는 임상적 기준이 없으며 색각경, CAD, Cambridge Colour Test 또는 진단된 코호트에 대해 검증되지 않았습니다. 이 값은 색각 이상을 확인하거나 배제할 수 없습니다. 동일한 디스플레이 및 설정에서만 반복 회차를 비교하세요.',
   ],
   ['Copy run summary', '회차 요약 복사'],
-  [
-    'A careful, adaptive lab for the differences your display can reproduce—and your eyes can resolve.',
-    '디스플레이가 재현할 수 있고 눈이 해결할 수 있는 차이점에 대한 신중하고 적응력이 뛰어난 실험실입니다.',
-  ],
   ['display relative', '화면 기준'],
   ['Hue', '색조'],
   ['Field', '필드'],
   ['Order', '주문'],
   ['The lab', '연구실'],
-  ['Three views of discrimination.', '차별에 대한 세 가지 견해.'],
-  [
-    'No names, no account, no upload. Your session stays in this browser.',
-    '이름도 없고, 계정도 없고, 업로드도 없습니다. 세션은 이 브라우저에 유지됩니다.',
-  ],
   [
     'No names, no account, no result upload. Your session stays in this browser.',
     '이름도 없고, 계정도 없고, 결과도 업로드되지 않습니다. 세션은 이 브라우저에 유지됩니다.',
@@ -976,11 +723,6 @@ const rows = [
     '단서가 되는 색상 이름 없이 고정된 끝점 사이에 세 개의 짧은 색조 호를 배열합니다.',
   ],
   ['Method, not magic', '마술이 아닌 방법'],
-  ['The difference gets smaller as you succeed.', '성공할수록 그 차이는 작아집니다.'],
-  [
-    'Threshold and Field use a two-correct-down, one-error-up staircase. It spends more trials near your current boundary instead of asking the same easy question repeatedly.',
-    '임계값 및 필드는 2개의 올바른 아래쪽, 1개의 오류 위쪽 계단을 사용합니다. 동일한 쉬운 질문을 반복적으로 묻는 대신 현재 경계 근처에서 더 많은 시도를 수행합니다.',
-  ],
   ['Neutral surround', '중립 서라운드'],
   [
     'Stimuli sit on the same middle-gray chamber in either theme.',
@@ -991,16 +733,7 @@ const rows = [
     'Colors are generated in OKLCH and mapped safely into sRGB.',
     '색상은 OKLCH에서 생성되고 sRGB에 안전하게 매핑됩니다.',
   ],
-  ['Adaptive estimate', '적응 추정'],
-  [
-    'Reversals around the boundary produce a session-relative threshold.',
-    '경계 주변의 반전은 세션 기준 임계값을 생성합니다.',
-  ],
   ['Honest result', '정직한 결과'],
-  [
-    'Your profile describes this screen, light, fatigue level, and run.',
-    '귀하의 프로필은 이 화면, 조명, 피로 수준 및 회차를 설명합니다.',
-  ],
   ['The fourth-cone question', '네 번째 원뿔 질문'],
   ['An RGB screen cannot test tetrachromacy.', 'RGB 화면은 사색성을 테스트할 수 없습니다.'],
   [
@@ -1008,7 +741,6 @@ const rows = [
     '일반 디스플레이는 세 원색을 혼합합니다. 기능적 사색형 색각을 확인하려면 네 번째 반응을 분리할 수 있는 분광 자극, 전문 장비, 유전 정보, 통제된 환경이 필요합니다. 따라서 Tetracromia는 화면상의 일반적인 색 구별 능력만 측정하며 그 한계를 명확히 밝힙니다.',
   ],
   ['Ready when your screen is', '화면이 준비되면 준비됨'],
-  ['Find your visible boundary.', '눈에 보이는 경계를 찾으세요.'],
   ['Start the lab', '실습 시작'],
   [
     'A C-shaped target becomes harder to separate from its field. Three independent staircases estimate the smallest colour shift you follow in each display-relative direction during this run.',
@@ -1019,50 +751,18 @@ const rows = [
     '실험적이며 검증되지 않았습니다. 선별검사 결과나 진단이 아닙니다.',
   ],
   ['Last run on this browser:', '이 브라우저에서 마지막 회차:'],
-  ['display-relative thresholds recorded', '기록된 디스플레이 기준 임계값'],
   ['An adaptive task, not a plate score.', '플레이트 점수가 아닌 적응형 작업입니다.'],
   [
     'The design borrows established psychophysical techniques without claiming their clinical validation.',
     '이 디자인은 임상적 검증을 주장하지 않고 확립된 정신물리학적 기술을 차용합니다.',
   ],
-  [
-    'Two clear targets teach the C-gap interaction with immediate feedback before any threshold is measured.',
-    '명확한 표적 두 개로 C자 틈 선택 방법을 익히고 즉시 피드백을 받은 뒤 역치 측정을 시작합니다.',
-  ],
   ['Luminance noise', '휘도 노이즈'],
-  [
-    'Target and field dots share the same brightness variation, reducing a consistent lightness cue.',
-    '대상 및 필드 도트는 동일한 밝기 변화를 공유하므로 일관된 밝기 신호가 줄어듭니다.',
-  ],
   ['Three staircases', '세 개의 계단'],
-  [
-    'Directions become harder after correct responses. “No gap visible” counts as a miss and makes that direction easier.',
-    '올바른 반응 후에는 방향이 더 어려워집니다. "간격이 보이지 않음"은 실수로 간주되어 해당 방향을 더 쉽게 만듭니다.',
-  ],
   ['Run-relative output', '회차 기준 출력'],
-  [
-    'You receive thresholds and run spread, not a normal/deficient label or a clinical score.',
-    '역치와 회차 내 변동 폭을 제공하며, 정상/결함 판정이나 임상 점수는 제공하지 않습니다.',
-  ],
   ['What informed Daltonia.', 'Daltonia에 대한 정보는 무엇입니까?'],
   [
     'These sources inform the stimulus model and task design. They do not validate this implementation.',
     '이러한 소스는 자극 모델과 작업 설계에 대한 정보를 제공합니다. 그들은 이 구현을 검증하지 않습니다.',
-  ],
-  ['Adaptive colour thresholds', '적응형 색상 임계값'],
-  [
-    'Random Landolt-C orientation, spatial and luminance noise, and interleaved confusion-line staircases.',
-    '무작위 Landolt-C 방향, 공간 및 휘도 노이즈, 인터리브 혼동선 계단.',
-  ],
-  ['Cone-contrast testing', '원뿔 대비 테스트'],
-  [
-    'Randomized cone-specific optotypes and validation against anomaloscope and plate results.',
-    '변칙경 및 플레이트 결과에 대한 무작위 원뿔별 검안 및 검증.',
-  ],
-  ['Modern screener validation', '최신 스크리너 검증'],
-  [
-    'A multicentre comparison on calibrated displays demonstrates the evidence required for screening claims.',
-    '보정된 디스플레이를 사용한 다기관 비교 연구는 선별검사라고 주장하는 데 필요한 근거 수준을 보여 줍니다.',
   ],
   ['Response lab / three instruments / about 7 minutes', '대응 연구실 / 3개 기기 / 약 7분'],
   ['Notice the signal.', '신호를 주목하세요.'],
@@ -1109,10 +809,6 @@ const rows = [
     '챔버가 조용해질 때까지 기다렸다가 중앙 표시가 나타나면 즉시 응답하십시오. 무작위 대기는 기대감을 가시화합니다.',
   ],
   [
-    'A left or right arrow appears. Respond on the matching side. The difference from Segnale estimates the cost of choosing.',
-    '왼쪽 또는 오른쪽 화살표가 나타납니다. 일치하는 측에서 응답하십시오. Segnale와의 차이는 선택 비용을 추정합니다.',
-  ],
-  [
     'For three minutes, respond to the same simple signal across longer, irregular waits. The pattern within this run matters more than one fastest press.',
     '3분 동안 길고 불규칙한 대기 시간 동안 동일한 단순 신호에 응답하십시오. 이번 회차의 패턴은 가장 빠른 프레스를 한 번 누르는 것보다 더 중요합니다.',
   ],
@@ -1126,11 +822,6 @@ const rows = [
     'A transparent reaction-time task with practice, randomized intervals, and separate simple and choice measures.',
     '연습, 무작위 간격, 별도의 단순 측정 및 선택 측정이 포함된 투명한 반응 시간 작업입니다.',
   ],
-  ['Brief vigilance task', '간략한 감시 작업'],
-  [
-    'The three-minute PVT-B informs the sustained-response duration and emphasis on lapses and false starts.',
-    '3분 PVT-B를 참고해 지속 반응 과제의 길이와 지연 반응 및 성급한 시작에 대한 분석을 정했습니다.',
-  ],
   ['Browser timing reality', '브라우저 타이밍 현실'],
   [
     'Browser experiments can be precise enough for many effects, while input hardware and presentation still add latency.',
@@ -1141,10 +832,6 @@ const rows = [
     '세 가지 낮은 톤이 순서대로 재생됩니다. 가장 조용한 것을 선택하십시오. 위상 기반 디코이는 하드웨어를 식별하지 않고도 사운드가 헤드폰처럼 도착하는지 확인하는 데 도움이 됩니다.',
   ],
   [
-    'One of three intervals contains a tone. Its frequency adapts to find the upper boundary available in this run, on this device, at the locked volume.',
-    '세 구간 중 하나에 음이 들어 있습니다. 주파수가 적응형으로 바뀌며, 이 기기와 고정된 음량에서 이번 회차에 들을 수 있는 상한을 찾습니다.',
-  ],
-  [
     'Two tones play in sequence. Separate adaptive tracks estimate the smallest pitch step resolved around 500 Hz and 2 kHz.',
     '두 음이 차례로 재생됩니다. 별도의 적응형 트랙이 500 Hz와 2 kHz 부근에서 구별할 수 있는 가장 작은 음높이 차이를 추정합니다.',
   ],
@@ -1152,41 +839,13 @@ const rows = [
     'Established task structures inform the experiment. Consumer audio hardware remains uncalibrated.',
     '확립된 작업 구조는 실험에 정보를 제공합니다. 소비자 오디오 하드웨어는 보정되지 않은 상태로 유지됩니다.',
   ],
-  [
-    'A six-trial, three-alternative phase-cancellation task informs Cuffie and its cautious setup language.',
-    '6회 시도, 3회 대체 위상 취소 작업은 Cuffie와 신중한 설정 언어를 알려줍니다.',
-  ],
-  [
-    'Transformed up-down staircases inform the reversal-based Portata and Intonazione estimates.',
-    '변환된 상향 계단은 반전 기반 Portata 및 Intonazione 추정치를 알려줍니다.',
-  ],
-  ['Browser psychoacoustics', '브라우저 심리음향학'],
-  [
-    'Web and mobile adaptive frequency-discrimination work supports the browser task structure—not clinical interpretation.',
-    '웹 및 모바일 적응형 주파수 판별 작업은 임상 해석이 아닌 브라우저 작업 구조를 지원합니다.',
-  ],
-  [
-    'Safe-listening guidance informs the low reference, volume lock, short tones, and stop warnings.',
-    '작은 기준음, 음량 고정, 짧은 신호음, 중단 경고는 안전한 청취 지침을 반영합니다.',
-  ],
   ['Copy result summary', '결과 요약 복사'],
   ['practice', '연습'],
   ['practice complete', '연습 완료'],
   ['Measurement recorded:', '기록된 측정값:'],
-  ['Keyboard timing', '키보드 타이밍'],
-  ['Touch / pointer timing', '터치 / 포인터 타이밍'],
   ['Median of', '중앙값'],
   ['clean responses', '깨끗한 반응'],
-  ['measured events', '측정된 이벤트'],
   ['Under', '아래'],
-  [
-    'Keep the same hand position. Early responses, misses, and no-signal responses will be recorded.',
-    '같은 손 위치를 유지하십시오. 조기 반응, 누락 및 신호 없음 반응이 기록됩니다.',
-  ],
-  [
-    'Keep the same hand position. Early responses, misses, and wrong sides will be recorded.',
-    '같은 손 위치를 유지하십시오. 초기 반응, 미스, 잘못된 부분이 기록됩니다.',
-  ],
   [
     'Please acknowledge the device-relative limit before starting.',
     '시작하기 전에 결과가 기기에 따라 달라진다는 한계를 확인해 주세요.',
@@ -1198,10 +857,6 @@ const rows = [
   [
     '8 practice choices, then 32 balanced measured choices.',
     '8개의 연습 선택과 32개의 균형 잡힌 측정 선택이 있습니다.',
-  ],
-  [
-    'A 3-minute PVT-B-inspired sequence. No fatigue or attention diagnosis is inferred.',
-    'PVT-B를 참고한 3분 과제입니다. 피로나 주의력에 관한 진단을 추론하지 않습니다.',
   ],
   [
     'Rest one hand near the arrow keys. Use the matching key.',
@@ -1246,16 +901,7 @@ const rows = [
   ['clean response', '깨끗한 반응'],
   ['captured across', '걸쳐 캡처'],
   ['measured event', '측정된 이벤트'],
-  [
-    'Interpretation waits until all three instruments are complete.',
-    '통역은 세 가지 도구가 모두 완료될 때까지 기다립니다.',
-  ],
-  ['Your response profile — Riflessi | Sense6', '귀하의 반응 프로필 — Riflessi | Sense6'],
   ['Riflessi / this run / this device', 'Riflessi / 이 장치를 회차합니다. / 이 장치를 회차합니다.'],
-  [
-    'The three instruments captured enough clean responses for a run-level profile.',
-    '세 가지 계측기는 회차 수준 프로필에 대해 충분히 명확한 반응을 캡처했습니다.',
-  ],
   [
     'Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.',
     '여러 반응이 중단되었거나 유효하지 않습니다. 숫자를 부분 회차로 처리하고 안정적인 조건에서 반복합니다.',
@@ -1263,24 +909,10 @@ const rows = [
   ['Run usable', '사용 가능한 회차'],
   ['Limited run', '한정 회차'],
   ['Typical signal response', '일반적인 신호 반응'],
-  [
-    'clean simple responses. Typical is more robust than your single fastest response.',
-    '간단한 답변을 정리하세요. 일반은 가장 빠른 단일 반응보다 더 강력합니다.',
-  ],
   ['Choice response', '선택 반응'],
   ['correct across', '맞은편에 정정하다'],
-  ['valid choices.', '유효한 선택.'],
   ['Choice cost', '선택 비용'],
-  [
-    'Difference between the choice and simple-response medians in this run.',
-    '이번 회차에서 선택 중앙값과 단순 반응 중앙값의 차이입니다.',
-  ],
-  ['clean responses across the sustained block.', '지속 블록 전반에 걸쳐 깨끗한 반응을 제공합니다.'],
   ['Slow-response tail', '반응이 느린 꼬리'],
-  [
-    'How much slower the slowest fifth was than the sustained median.',
-    '가장 느린 5분의 1이 지속된 중앙값보다 얼마나 느렸습니까?',
-  ],
   ['Within-run drift', '회차 내 변화'],
   [
     'Not enough clean responses to estimate a first-to-second-half change.',
@@ -1327,24 +959,13 @@ const rows = [
   ['Leave the experiment? Your progress will be lost.', '실험을 나갈까요? 진행 내용이 사라집니다.'],
   ['Prepare your screen — Tetracromia | Sense6', '화면 준비 — Tetracromia | Sense6'],
   ['Prepare your display — Daltonia | Sense6', '디스플레이 준비 — Daltonia | Sense6'],
-  ['Your display-relative thresholds — Daltonia | Sense6', '디스플레이 기준 임계값 — Daltonia | Sense6'],
   ['Prepare your response setup — Riflessi | Sense6', '반응 설정 준비 — Riflessi | Sense6'],
   ['Prepare your audio setup — Udito | Sense6', '오디오 설정 준비 — Udito | Sense6'],
-  ['Reference played', '기준음 재생됨'],
   ['Result summary copied.', '결과 요약을 복사했습니다.'],
   ['Copy was unavailable in this browser.', '이 브라우저에서는 복사할 수 없습니다.'],
   ['Result summary copied', '결과 요약 복사됨'],
   ['Run summary copied', '회차 요약 복사됨'],
   ['Could not access the clipboard', '클립보드에 접근할 수 없습니다'],
-  [
-    'Tetracromia — {overall}/100 screen-level color discrimination. Threshold {threshold}, Field {field}, Sequence {sequence}. Device-relative, not diagnostic.',
-    'Tetracromia — {overall}/100 화면 수준 색상 구별. 임계값 {threshold}, 필드 {field}, 시퀀스 {sequence}. 진단이 아닌 장치 기준입니다.',
-  ],
-  [
-    'Daltonia experimental browser run — {thresholds}; task controls {correct}/{total}. Display-relative, unvalidated, and not diagnostic.',
-    'Daltonia 실험적 브라우저 회차 — {thresholds}; 과제 확인 {correct}/{total}. 화면 기준이며 검증되지 않았고 진단용이 아닙니다.',
-  ],
-  ['Riflessi — device-relative response profile', 'Riflessi — 기기 기준 반응 프로필'],
   ['Input: {input}', '입력: {input}'],
   ['Signal median: {value} ms', '신호 반응 중앙값: {value} ms'],
   [
@@ -1365,15 +986,11 @@ const rows = [
   ],
   ['touch / pointer', '/ 포인터 터치'],
   ['keyboard', '키보드'],
-  ['Udito — device-relative listening profile', 'Udito — 기기 기준 청각 프로필'],
-  ['Setup: {device}; {sampleRate} Hz audio context', '설정: {device}; {sampleRate} Hz 오디오 컨텍스트'],
   [
     'Headphone confidence: {correct}/{trials} ({confidence})',
     '헤드폰형 재생 신뢰도: {correct}/{trials} ({confidence})',
   ],
   ['Upper run boundary: {boundary}', '이번 회차의 가청 상한: {boundary}'],
-  ['Pitch step near 500 Hz: {step}', '500 Hz 부근 음높이 차이: {step}'],
-  ['Pitch step near 2 kHz: {step}', '2 kHz 부근 음높이 차이: {step}'],
   ['headphone-like', '헤드폰 같은'],
   ['uncertain', '불확실한'],
   [
@@ -1406,10 +1023,6 @@ const rows = [
     '샘플에서 긴 프레임 간격이 {count}회 관찰되었습니다.',
   ],
   ['{count} sweeps remaining', '남은 스윕: {count}회'],
-  [
-    'Reference played · {sampleRate} Hz audio context · now leave volume unchanged.',
-    '기준음 재생됨 · {sampleRate} Hz 오디오 컨텍스트 · 이제 음량을 바꾸지 마세요.',
-  ],
   ['Sound {number}', '사운드 {number}'],
   ['Adaptive · {count}', '적응형 · {count}'],
   ['Interleaved · {count}', '교차 진행 · {count}'],
@@ -1441,10 +1054,6 @@ const rows = [
     'Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials',
     '{anchor} Hz 부근의 음높이 간격: {step}; {completion}; 반전 {reversals}회 / 시도 {trials}회',
   ],
-  [
-    'Play the maximum-level reference and confirm the volume contract first.',
-    '최대 레벨 기준음을 재생하고 먼저 음량 지침을 확인하세요.',
-  ],
   ['Playback interruptions: {count}', '재생 중단: {count}회'],
   ['Playing maximum-level reference…', '최대 레벨 기준음 재생 중…'],
   ['Portata control accuracy: {accuracy}', 'Portata 조작 정확도: {accuracy}'],
@@ -1452,8 +1061,6 @@ const rows = [
     'Recorded. Look at the square and start the next sweep.',
     '기록했습니다. 사각형을 바라보고 다음 스윕을 시작하세요.',
   ],
-  ['Recorded. Next trial.', '기록했습니다. 다음 시도입니다.'],
-  ['Recorded. The difference will increase.', '기록했습니다. 차이가 커집니다.'],
   [
     'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
     '오디오 시계 기준으로 기준음 재생 완료 · {sampleRate} Hz 컨텍스트 · 이제 음량을 바꾸지 마세요.',
@@ -1487,17 +1094,9 @@ const rows = [
     'Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials',
     '상한 측정값: {boundary}; {completion}; 반전 {reversals}회 / 시도 {trials}회',
   ],
-  [
-    'Volume: self-reported unchanged during the run; the browser could not verify it.',
-    '음량: 측정 중 바꾸지 않았다고 직접 확인함; 브라우저에서는 검증할 수 없었습니다.',
-  ],
   ['indeterminate (display-range bound)', '판정 불가(화면 표시 범위 한계)'],
   ['lower bound at the display ceiling', '화면 상한에서의 하한값'],
   ['upper bound at the display floor', '화면 하한에서의 상한값'],
-  [
-    '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
-    '{eye}: 고대비 틈 {gap}; 저대비 틈 {low}; 대비 비용 {cost}; 경선 {meridians}',
-  ],
   ['Usable run', '유효한 측정'],
   ['{name} response runner', '{name} 반응 테스트'],
   ['Open private journal', '비공개 기록 열기'],
@@ -1509,7 +1108,6 @@ const rows = [
     'Display conditions changed. This measured run stopped and was not saved.',
     '화면 조건이 변경되었습니다. 이 측정은 중단되었고 저장되지 않았습니다.',
   ],
-  ['Instrument one. Threshold. Find the different tile.', '도구 1. 역치. 다른 타일을 찾으세요.'],
   ['Practice one of two. Find the clear gap in the C.', '연습 1/2. C의 선명한 틈을 찾으세요.'],
   ['That tile is already at the edge.', '해당 타일은 이미 가장자리에 있습니다.'],
   [
@@ -1547,6 +1145,6 @@ const rows = [
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 ];
 
-const catalogRows = [...rows, ...registryRows('ko'), ...mobileUxRows('ko'), ...landingRows('ko')];
+const catalogRows = [...rows, .../** @type {Array<[string, string]>} */ (copyRows)];
 export const MESSAGE_COUNT = catalogRows.length;
 export default new Map(catalogRows);

@@ -109,6 +109,86 @@ test('language routes translate, persist, and remain accessible', async ({ page 
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
+test('persistent shell copy keeps stable sources across de to it', async ({ page }) => {
+  const italian = await loadMessages('it');
+  await page.goto('/de/');
+  await page.locator('[data-locale-select]').selectOption('it');
+
+  await expect(page).toHaveURL(/\/it\/$/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'it');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+  await expect(page.locator('[data-locale-select]')).toHaveValue('it');
+  await expect(page.locator('.ui-skiplink')).toHaveText(italian.get('Skip to content'));
+  await expect(page.locator('.theme-button__label')).toHaveText(italian.get('Theme'));
+  await expect(page.locator('[data-bronto-theme-toggle]')).toHaveAttribute(
+    'aria-label',
+    italian.get('Toggle light and dark theme'),
+  );
+  await expect(page.locator('.ui-sitefooter__links [data-sense6-route="about"]')).toHaveText(
+    italian.get('About'),
+  );
+  await expect(
+    page.getByRole('heading', { name: italian.get('Start with what you want to learn.') }),
+  ).toBeVisible();
+  await expect.poll(() => page.evaluate(() => localStorage.getItem('sense6:locale'))).toBe('it');
+
+  const gamutSource = await page.locator('#gamut-chip').getAttribute('data-i18n-source');
+  await expect(page.locator('#gamut-chip')).toHaveText(italian.get(gamutSource));
+});
+
+test('a delayed it locale chunk cannot overwrite a later de selection', async ({ page }) => {
+  const german = await loadMessages('de');
+  let releaseItalian;
+  let markItalianRequested;
+  let markItalianSettled;
+  const italianGate = new Promise((resolve) => {
+    releaseItalian = resolve;
+  });
+  const italianRequested = new Promise((resolve) => {
+    markItalianRequested = resolve;
+  });
+  const italianSettled = new Promise((resolve) => {
+    markItalianSettled = resolve;
+  });
+  await page.route(/\/(?:assets\/it-[^/]+|src\/locales\/it)\.js(?:\?.*)?$/, async (route) => {
+    markItalianRequested();
+    await italianGate;
+    const response = await route.fetch();
+    await route.fulfill({ response });
+    markItalianSettled();
+  });
+
+  await page.goto('/en/');
+  await page.locator('[data-locale-select]').selectOption('it');
+  await italianRequested;
+  await page.locator('[data-locale-select]').selectOption('de');
+  await expect(page).toHaveURL(/\/de\/$/);
+  releaseItalian();
+  await italianSettled;
+
+  await expect
+    .poll(() =>
+      page.evaluate(() => ({
+        direction: document.documentElement.dir,
+        heading: document.querySelector('.gallery-heading h2')?.textContent?.trim(),
+        language: document.documentElement.lang,
+        pathname: window.location.pathname,
+        selected: document.querySelector('[data-locale-select]')?.value,
+        shell: document.querySelector('.theme-button__label')?.textContent?.trim(),
+        stored: localStorage.getItem('sense6:locale'),
+      })),
+    )
+    .toEqual({
+      direction: 'ltr',
+      heading: german.get('Start with what you want to learn.'),
+      language: 'de',
+      pathname: '/de/',
+      selected: 'de',
+      shell: german.get('Theme'),
+      stored: 'de',
+    });
+});
+
 test('the privacy notice describes the deployed data boundary in every locale', async ({ page }) => {
   await page.goto('/en/');
   await page.getByRole('link', { name: 'Privacy', exact: true }).click();

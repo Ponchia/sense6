@@ -1,0 +1,303 @@
+[
+  ["Screen Colour Lab", "Laboratório de cor no ecrã"],
+  ["Three short colour observations", "Três observações breves de cor"],
+  [
+    "Tetracromia is a recreational screen-colour lab with three separate, short-run observations and no overall score.",
+    "Tetracromia é um laboratório recreativo de cor no ecrã com três observações breves e separadas, sem pontuação global."
+  ],
+  ["Fixed 29-block dose", "Dose fixa de 29 blocos"],
+  ["3 separate observations", "3 observações separadas"],
+  ["Screen Colour Lab — Tetracromia | Sense6", "Laboratório de cor no ecrã — Tetracromia | Sense6"],
+  ["Calibrated sharpness & nominal contrast", "Nitidez calibrada e contraste nominal"],
+  [
+    "Two per-eye conditions describe angular detail and nominal low-contrast cost without making a clinical claim.",
+    "Duas condições por olho descrevem o detalhe angular e o custo nominal do baixo contraste, sem alegações clínicas."
+  ],
+  ["2 per-eye conditions", "2 condições por olho"],
+  ["Adaptive levels", "Níveis adaptativos"],
+  ["Response speed, choice task & consistency", "Velocidade de resposta, tarefa de escolha e consistência"],
+  [
+    "Three instruments keep simple response, a choice task, and within-run stability as separate observations.",
+    "Três instrumentos mantêm a resposta simples, a tarefa de escolha e a estabilidade durante a sessão como observações separadas."
+  ],
+  ["Notice colour in", "Observe a cor de"],
+  ["three different ways", "três formas diferentes"],
+  [
+    "Three observations from one short screen-colour run.",
+    "Três observações de uma breve sessão de cor no ecrã."
+  ],
+  ["Tile choices", "Escolhas de mosaicos"],
+  ["Dot-field choices", "Escolhas de campos de pontos"],
+  ["Hue ordering", "Ordenação de tonalidades"],
+  ["Complete set", "Conjunto completo"],
+  [
+    "Riflessi — device-relative response observations",
+    "Riflessi — observações de resposta relativas ao dispositivo"
+  ],
+  [
+    "Udito — device-relative listening observations",
+    "Udito — observações de audição relativas ao dispositivo"
+  ],
+  ["Acutezza — calibrated sharpness observations", "Acutezza — observações de nitidez calibrada"],
+  [
+    "The setup checks and adaptive tracks produced coherent run-level observations.",
+    "As verificações de configuração e os percursos adaptativos produziram observações coerentes nesta sessão."
+  ],
+  ["Method source", "Fonte do método"],
+  ["Related instrument", "Instrumento relacionado"],
+  ["Sense6 validation", "Validação do Sense6"],
+  ["Share result", "Partilhar o resultado"],
+  ["How much do you want to run?", "Qual deve ser a profundidade do teste?"],
+  ["about 2 minutes", "cerca de 2 minutos"],
+  ["about 4 minutes", "cerca de 4 minutos"],
+  ["about 7 minutes", "cerca de 7 minutos"],
+  ["Physical setup", "Configuração física"],
+  ["Seated · device on a stable surface", "Sentado · dispositivo numa superfície estável"],
+  ["Handheld or standing", "Dispositivo na mão ou em pé"],
+  ["Begin selected scope", "Iniciar o âmbito selecionado"],
+  ["Your response observations — Riflessi | Sense6", "As suas observações de resposta — Riflessi | Sense6"],
+  [
+    "The selected instruments captured enough clean responses for separate run-level observations.",
+    "Os instrumentos selecionados recolheram respostas válidas suficientes para apresentar observações separadas desta execução."
+  ],
+  [
+    "Median of {valid} clean simple responses from {scheduled} scheduled events. Within-run spread: {spread} ms; this is not estimate uncertainty.",
+    "Mediana de {valid} respostas simples válidas em {scheduled} eventos programados. Dispersão durante a execução: {spread} ms; não é a incerteza da estimativa."
+  ],
+  [
+    "{scheduledAccuracy}% correct across all {scheduled} scheduled choices; {conditionalAccuracy}% among left/right responses.",
+    "{scheduledAccuracy}% de respostas corretas nas {scheduled} escolhas programadas; {conditionalAccuracy}% entre as respostas esquerda/direita."
+  ],
+  ["Descriptive block difference", "Diferença descritiva entre blocos"],
+  [
+    "Choice-block median minus the earlier simple-response median. Fixed order and different motor responses remain confounded.",
+    "Mediana do bloco de escolha menos a mediana anterior de resposta simples. A ordem fixa e as diferentes respostas motoras continuam confundidas."
+  ],
+  [
+    "Median of {valid} clean responses across this custom sustained block.",
+    "Mediana de {valid} respostas válidas neste bloco sustentado personalizado."
+  ],
+  [
+    "A descriptive slow-tail difference for this custom block—not a PVT lapse count.",
+    "Uma diferença descritiva da cauda lenta para este bloco personalizado, não uma contagem de lapsos PVT."
+  ],
+  ["No-signal checks", "Controlos sem sinal"],
+  ["Repeat this scope independently", "Repetir este âmbito de forma independente"],
+  ["Controls passed", "Controlos aprovados"],
+  ["Control caution", "Cautela nos controlos"],
+  ["Controls not passed", "Controlos não aprovados"],
+  ["correct / scheduled", "corretos / programados"],
+  ["Ending adaptive level", "Nível adaptativo final"],
+  ["Correct / scheduled", "Corretos / programados"],
+  [
+    "{correct} of {total} scheduled high-contrast gap controls were answered correctly.",
+    "{correct} dos {total} controlos programados com abertura de alto contraste foram respondidos corretamente."
+  ],
+  [
+    "Keep these observations only with a control caution.",
+    "Conserve estas observações apenas com uma ressalva sobre os controlos."
+  ],
+  ["Display-relative adaptive levels from this run", "Níveis adaptativos relativos ao ecrã desta execução"],
+  [
+    "Display-relative observations with a control caution",
+    "Observações relativas ao ecrã com uma ressalva sobre os controlos"
+  ],
+  [
+    "Lower values mean the short adaptive track ended at a smaller colour shift in that direction on this display. These are not precise thresholds, cone measurements, clinical scores, or diagnoses.",
+    "Valores mais baixos significam que a breve trajetória adaptativa terminou numa diferença de cor menor nessa direção neste ecrã. Não são limiares precisos, medições dos cones, pontuações clínicas nem diagnósticos."
+  ],
+  [
+    "Two of three high-contrast task controls passed. The observations are retained with a caution, but should not be treated as a strong run.",
+    "Dois dos três controlos de tarefa de alto contraste foram aprovados. As observações são mantidas com uma ressalva, mas não devem ser tratadas como uma execução sólida."
+  ],
+  [
+    "Fewer than two high-contrast task controls passed, so the adaptive levels are not treated as usable. Check the instructions and viewing setup, then try again.",
+    "Menos de dois controlos de tarefa de alto contraste foram aprovados, pelo que os níveis adaptativos não são considerados utilizáveis. Verifique as instruções e as condições de visualização e tente novamente."
+  ],
+  ["Focused", "Focado"],
+  ["Standard", "Padrão"],
+  ["Cuffie + Portata · about 3–4 minutes", "Cuffie + Portata · cerca de 3–4 minutos"],
+  ["All three instruments · about 5–7 minutes", "Os três instrumentos · cerca de 5–7 minutos"],
+  ["Two focused listening measures.", "Duas medições de escuta focadas."],
+  [
+    "Keep the tasks separate. This fixed 29-block experiment is too short to establish a stable threshold, stable hue characteristic, or overall ability score.",
+    "Mantenha as tarefas separadas. Esta experiência fixa de 29 blocos é demasiado curta para estabelecer um limiar estável, uma característica cromática estável ou uma pontuação geral de capacidade."
+  ],
+  ["blocks", "blocos"],
+  ["{correct} of {presentations} correct", "{correct} de {presentations} corretas"],
+  [
+    "The adaptive level ended near {level}° of OKLCH hue (ΔEOK {delta}).",
+    "O nível adaptativo terminou perto de {level}° de matiz OKLCH (ΔEOK {delta})."
+  ],
+  [
+    "Presented range {minimum}°–{maximum}° · {reversals} direction changes",
+    "Intervalo apresentado {minimum}°–{maximum}° · {reversals} mudanças de direção"
+  ],
+  ["{percent}% of pairs ordered", "{percent}% dos pares ordenados"],
+  [
+    "Mean pair ordering across {runs} fixed-anchor arcs.",
+    "Ordenação média dos pares em {runs} arcos com âncoras fixas."
+  ],
+  ["Run values: {values}%", "Valores das execuções: {values}%"],
+  [
+    "The ending adaptive levels summarize where this brief run happened to finish; they are not stable thresholds or uncertainty estimates. Ordering is a separate task. None of these observations is a population score, diagnosis, clinical screen, or evidence for tetrachromacy. A repeat is stored independently—Sense6 never pools runs or keeps a best.",
+    "Os níveis adaptativos finais resumem onde esta breve execução terminou; não são limiares estáveis nem estimativas de incerteza. A ordenação é uma tarefa separada. Nenhuma destas observações é uma pontuação populacional, um diagnóstico, um rastreio clínico ou prova de tetracromacia. Cada repetição é guardada de forma independente: o Sense6 nunca combina execuções nem conserva a melhor."
+  ],
+  ["Repeat independently", "Repetir de forma independente"],
+  ["29 completed blocks", "29 blocos concluídos"],
+  ["Completed", "Concluídos"],
+  [
+    "Screen Colour Lab / 29 blocks / about 4 minutes",
+    "Laboratório de cor no ecrã / 29 blocos / cerca de 4 minutos"
+  ],
+  [
+    "Tetracromia is a short recreational experiment: 14 tile choices, 12 dot-field choices, and 3 ordering arcs. Each observation stays separate.",
+    "Tetracromia é uma experiência recreativa curta: 14 escolhas de peças, 12 escolhas em campos de pontos e 3 arcos para ordenar. Cada observação permanece separada."
+  ],
+  ["Three short screen-colour observations.", "Três observações curtas da cor no ecrã."],
+  ["14 trials", "14 ensaios"],
+  ["12 trials", "12 ensaios"],
+  ["Dot fields", "Campos de pontos"],
+  ["3 runs", "3 passagens"],
+  [
+    "The displayed difference adapts during two tasks.",
+    "A diferença apresentada adapta-se durante duas tarefas."
+  ],
+  [
+    "Tile choices and Dot fields use a two-correct-down, one-error-up rule. With only 14 and 12 choices, the ending level describes this run; it is not a stable threshold.",
+    "As escolhas de peças e os campos de pontos seguem uma regra: duas respostas certas reduzem a diferença e um erro aumenta-a. Com apenas 14 e 12 escolhas, o nível final descreve esta sessão; não é um limiar estável."
+  ],
+  ["Adaptive path", "Percurso adaptativo"],
+  [
+    "Correct and missed choices change the next displayed difference.",
+    "As escolhas certas e falhadas alteram a diferença apresentada a seguir."
+  ],
+  [
+    "Three observations describe this screen, light, fatigue level, and run—with no composite.",
+    "Três observações descrevem este ecrã, a luz, o nível de cansaço e a sessão, sem uma pontuação global."
+  ],
+  ["Make three colour observations.", "Faça três observações da cor."],
+  [
+    "A C-shaped target becomes harder to separate from its field. Three independent staircases record where each short display-relative track ends during this run.",
+    "Um alvo em forma de C torna-se mais difícil de distinguir do campo. Três escadas independentes registam onde termina cada percurso curto relativo ao ecrã durante esta sessão."
+  ],
+  ["Three display directions", "Três direções cromáticas no ecrã"],
+  [
+    "You receive ending adaptive levels and track evidence, not cone thresholds, a normal/deficient label, or a clinical score.",
+    "Recebe os níveis adaptativos finais e os dados dos percursos, não limiares dos cones, um rótulo normal/deficiente nem uma pontuação clínica."
+  ],
+  [
+    "Two clear targets teach the C-gap interaction with immediate feedback before the exploratory track.",
+    "Dois alvos nítidos ensinam a interação com a abertura do C, com resposta imediata antes do percurso exploratório."
+  ],
+  [
+    "Target and field are luminance-matched in linear sRGB and share the same dot-level brightness variation.",
+    "O alvo e o campo têm luminância igualada em sRGB linear e partilham a mesma variação de brilho ao nível dos pontos."
+  ],
+  [
+    "Directions become harder after correct responses. “No gap visible” counts as a miss and makes that display direction easier.",
+    "As direções tornam-se mais difíceis após respostas certas. «Nenhuma abertura visível» conta como falha e facilita essa direção no ecrã."
+  ],
+  ["Signal", "Sinal"],
+  ["ready", "pronto"],
+  [
+    "A left or right arrow appears. Respond on the matching side. The block median can be described alongside Segnale, with fixed-order and motor differences left explicit.",
+    "Surge uma seta para a esquerda ou para a direita. Responda no lado correspondente. A mediana do bloco pode ser descrita ao lado de Segnale, mantendo explícitas as diferenças de ordem fixa e de movimento."
+  ],
+  ["Custom sustained block", "Bloco sustentado personalizado"],
+  [
+    "A three-minute sequence describes changes within this run. PVT-B is a comparator, not validation of this different event schedule.",
+    "Uma sequência de três minutos descreve as alterações durante esta sessão. O PVT-B serve de comparação, não de validação deste calendário de eventos diferente."
+  ],
+  [
+    "One of three intervals contains a tone. Its frequency adapts to find the upper boundary available in this run, on this device, while you report keeping volume unchanged.",
+    "Um dos três intervalos contém um som. A frequência adapta-se para encontrar o limite superior disponível nesta sessão e neste dispositivo, enquanto declara manter o volume inalterado."
+  ],
+  ["Udito listening lab ready.", "O laboratório de audição Udito está pronto."],
+  [
+    "Vision lab / selectable scope / about 4–8 minutes",
+    "Laboratório visual / duração selecionável / cerca de 4–8 minutos"
+  ],
+  [
+    "Acutezza describes angular detail for each eye and, in Standard scope, the within-run cost of a nominal low-contrast condition. Meridiani scoring is suspended. This is a perception experiment, not an eye examination.",
+    "Acutezza descreve o detalhe angular de cada olho e, no modo Padrão, o custo dentro da sessão de uma condição nominal de baixo contraste. A pontuação Meridiani está suspensa. É uma experiência de perceção, não um exame oftalmológico."
+  ],
+  ["Two conditions. No composite score.", "Duas condições. Sem pontuação global."],
+  [
+    "High-contrast detail and nominal low-contrast cost remain separate. The former Meridiani score is suspended pending redesign and pilot evidence.",
+    "O detalhe de alto contraste e o custo nominal do baixo contraste permanecem separados. A antiga pontuação Meridiani está suspensa enquanto se aguarda uma reformulação e dados-piloto."
+  ],
+  [
+    "Audio setup ready. Play the maximum-level reference before beginning.",
+    "Configuração de áudio pronta. Reproduza a referência no nível máximo antes de começar."
+  ],
+  ["{name} instructions ready.", "As instruções de {name} estão prontas."],
+  ["{name} sound runner ready.", "O teste de som de {name} está pronto."],
+  ["Cuffie practice complete.", "Prática de Cuffie concluída."],
+  ["{name} complete.", "Medição {name} concluída."],
+  [
+    "Confirm whether device volume stayed unchanged during the run.",
+    "Confirme se o volume do dispositivo permaneceu inalterado durante a sessão."
+  ],
+  [
+    "Udito results ready. {quality}. Saved to the private journal.",
+    "Resultados do Udito prontos. {quality}. Guardados no diário privado."
+  ],
+  [
+    "Udito results ready. {quality}. The journal entry was not saved.",
+    "Resultados do Udito prontos. {quality}. A entrada do diário não foi guardada."
+  ],
+  ["Listening paused. {explanation}", "Audição em pausa. {explanation}"],
+  ["Set the room before the observations.", "Prepare a sala antes das observações."],
+  [
+    "Display settings and ambient light can change what appears visible. This one-minute check makes the 29-block run easier to repeat under similar conditions.",
+    "As definições do ecrã e a luz ambiente podem alterar o que parece visível. Esta verificação de um minuto facilita a repetição dos 29 blocos em condições semelhantes."
+  ],
+  ["Color override detected", "Foi detetada uma substituição de cores"],
+  [
+    "Turn off forced-colors or high-contrast mode before a visual color task.",
+    "Desative as cores forçadas ou o modo de alto contraste antes de uma tarefa visual de cor."
+  ],
+  ["Eleven brightness steps from black to white", "Onze níveis de brilho do preto ao branco"],
+  ["Continuous grayscale gradient", "Gradiente contínuo em tons de cinzento"],
+  [
+    "The adaptive track only describes this browser, display, lighting, and viewing position. Colour-shifting features can move them substantially.",
+    "O percurso adaptativo descreve apenas este navegador, ecrã, iluminação e posição de visualização. As funções que alteram as cores podem mudar substancialmente os resultados."
+  ],
+  ["Colour override detected", "Foi detetada uma substituição de cores"],
+  [
+    "Audio setup / keep volume unchanged after this screen",
+    "Configuração de áudio / não altere o volume depois deste ecrã"
+  ],
+  ["Sound sensitivity comes first.", "A sensibilidade ao som vem primeiro."],
+  [
+    "If you have tinnitus, hyperacusis, or sounds are uncomfortable today, skip the experiment or stop immediately. Sense6 cannot measure sound pressure.",
+    "Se tem zumbido ou hiperacusia, ou se os sons estão desconfortáveis hoje, ignore a experiência ou pare imediatamente. O Sense6 não consegue medir a pressão sonora."
+  ],
+  ["Play maximum-level reference", "Reproduzir a referência no nível máximo"],
+  [
+    "Start device volume low before playing. This 1 kHz preview represents the loudest digital level used later; it does not measure acoustic output.",
+    "Comece com o volume do dispositivo baixo. Esta amostra de 1 kHz representa o nível digital mais alto usado depois; não mede a saída acústica."
+  ],
+  ["Connection", "Ligação"],
+  ["Wired", "Com fios"],
+  ["Wireless / Bluetooth", "Sem fios / Bluetooth"],
+  ["Built-in / assistive route", "Integrada / dispositivo de assistência"],
+  [
+    "Play 200 Hz, 500 Hz, and 2 kHz audibility anchors",
+    "Reproduzir referências de audibilidade a 200 Hz, 500 Hz e 2 kHz"
+  ],
+  [
+    "Confirm that all three are audible at the same comfortable volume. This is a self-report gate, not calibration.",
+    "Confirme que as três são audíveis ao mesmo volume confortável. É uma declaração pessoal, não uma calibração."
+  ],
+  [
+    "I heard all three anchors comfortably without changing volume.",
+    "Ouvi confortavelmente as três referências sem alterar o volume."
+  ],
+  ["Choose this run's scope", "Escolha o âmbito desta sessão"],
+  ["Focused Sharpness", "Apenas nitidez"],
+  ["24 interactions per eye", "24 interações por olho"],
+  ["Sharpness + nominal contrast", "Nitidez + contraste nominal"],
+  ["44 interactions per eye", "44 interações por olho"]
+]

@@ -229,7 +229,10 @@ function localizeShell(html, locale) {
       `aria-label="${escapeAttribute(tr('Toggle light and dark theme'))}"`,
     )
     .replace('>Theme<', `>${escapeHtml(tr('Theme'))}<`)
-    .replace('Measure carefully. Keep it private.', escapeHtml(tr('Measure carefully. Keep it private.')))
+    .replace(
+      '>Measure carefully. Keep it private.<',
+      `>${escapeHtml(tr('Measure carefully. Keep it private.'))}<`,
+    )
     .replace('>About<', `>${escapeHtml(tr('About'))}<`)
     .replace('>Journal<', `>${escapeHtml(tr('Journal'))}<`)
     .replace('>Privacy<', `>${escapeHtml(tr('Privacy'))}<`)
