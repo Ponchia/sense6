@@ -27,7 +27,8 @@
     "locales:check": "node scripts/check-locales.mjs",
     "typecheck": "node scripts/check-type-ratchet.mjs && tsc -p jsconfig.json",
     "check:ui": "bronto-ui-check src functions scripts",
-    "check": "npm run lint && npm run typecheck && npm run locales:check && npm run check:ui && npm run test:coverage && npm run build && npm run test:static && npm run test:e2e"
+    "check:core": "npm run lint && npm run typecheck && npm run locales:check && npm run check:ui && npm run test:coverage && npm run build && npm run test:static",
+    "check": "npm run check:core && npm run test:e2e"
   },
   "dependencies": {
     "@ponchia/ui": "~0.7.0"
