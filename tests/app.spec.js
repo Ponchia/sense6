@@ -2,6 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { aboutCopy } from '../src/about.js';
 import { EXAMS } from '../src/exams/registry.js';
+import { LANDING_COPY_SOURCES, SETUP_COPY_SOURCES } from '../src/locales/landing-copy.js';
 import { LOCALES, loadMessages, localeMetadata } from '../src/locales.js';
 import { privacyCopy } from '../src/privacy.js';
 import { expectInVisualViewport, expectNoHorizontalOverflow } from './helpers/browser.js';
@@ -230,6 +231,16 @@ test('every live exam has a localized entry point in every language', async ({ p
     udito: ['Listen for the boundary.', 'Keep the limits audible.'],
     acutezza: ['Calibrate the screen.', 'Resolve the opening.'],
   };
+  const setupActions = {
+    tetracromia: '[data-action="setup"]',
+    'color-blindness': '[data-action="cb-setup"]',
+    riflessi: '[data-action="rx-setup"]',
+    udito: '[data-action="au-setup"]',
+    acutezza: '[data-action="ac-prepare"]',
+  };
+  const setupAttributeSources = {
+    tetracromia: ['Eleven brightness steps from black to white', 'Continuous grayscale gradient'],
+  };
   for (const { code, languageTag } of LOCALES) {
     const messages = await loadMessages(code);
     for (const { route } of EXAMS) {
@@ -239,6 +250,56 @@ test('every live exam has a localized entry point in every language', async ({ p
       const suffix = ['tetracromia', 'color-blindness'].includes(route) ? '\\.' : '';
       await expect(page.locator('main h1')).toHaveText(new RegExp(`^${expected}${suffix}$`, 'u'));
       await expect(page.locator('[data-locale-select]')).toHaveValue(code);
+
+      const rendered = await renderedTextNodes(page);
+      const landingSources = LANDING_COPY_SOURCES[route];
+      const expectedLanding = landingSources.map((source) => messages.get(source));
+      expect(rendered, `${code}/${route} should render every localized landing phrase`).toEqual(
+        expect.arrayContaining(expectedLanding),
+      );
+      if (code !== 'en') {
+        const leaked = landingSources.filter(
+          (source) => messages.get(source) !== source && rendered.includes(source),
+        );
+        expect(leaked, `${code}/${route} should not retain English landing phrases`).toEqual([]);
+      }
+
+      const setupSources = SETUP_COPY_SOURCES[route];
+      if (setupSources.length) {
+        await page.locator(setupActions[route]).first().click();
+        const renderedSetup = await renderedTextNodes(page);
+        const attributeSources = setupAttributeSources[route] ?? [];
+        const visibleSources = setupSources.filter((source) => !attributeSources.includes(source));
+        const expectedSetup = visibleSources.map((source) => messages.get(source));
+        expect(renderedSetup, `${code}/${route} should render every localized setup phrase`).toEqual(
+          expect.arrayContaining(expectedSetup),
+        );
+        const renderedAttributes = await page
+          .locator('[aria-label], [placeholder], [title]')
+          .evaluateAll((elements) =>
+            elements.flatMap((element) =>
+              ['aria-label', 'placeholder', 'title']
+                .map((attribute) => element.getAttribute(attribute))
+                .filter(Boolean),
+            ),
+          );
+        expect(renderedAttributes, `${code}/${route} should localize setup attributes`).toEqual(
+          expect.arrayContaining(attributeSources.map((source) => messages.get(source))),
+        );
+        if (code !== 'en') {
+          const leaked = visibleSources.filter(
+            (source) => messages.get(source) !== source && renderedSetup.includes(source),
+          );
+          expect(leaked, `${code}/${route} setup should not retain English phrases`).toEqual([]);
+          const leakedAttributes = attributeSources.filter(
+            (source) => messages.get(source) !== source && renderedAttributes.includes(source),
+          );
+          expect(
+            leakedAttributes,
+            `${code}/${route} setup attributes should not retain English phrases`,
+          ).toEqual([]);
+        }
+      }
     }
   }
 
@@ -349,4 +410,18 @@ test('the shared shell reflows at 200% text size without hidden controls', async
 
 function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+async function renderedTextNodes(page) {
+  return page.locator('body').evaluate((body) => {
+    const values = [];
+    const walker = document.createTreeWalker(body, NodeFilter.SHOW_TEXT);
+    let node = walker.nextNode();
+    while (node) {
+      const value = node.data.replace(/\s+/g, ' ').trim();
+      if (value) values.push(value);
+      node = walker.nextNode();
+    }
+    return [...new Set(values)];
+  });
 }

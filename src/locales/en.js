@@ -1,3 +1,4 @@
+import { landingRows } from './landing-copy.js';
 import { mobileUxRows } from './mobile-ux-copy.js';
 import { registryRows } from './registry-copy.js';
 
@@ -1579,6 +1580,6 @@ rows.push(
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 );
 
-const catalogRows = [...rows, ...registryRows('en'), ...mobileUxRows('en')];
+const catalogRows = [...rows, ...registryRows('en'), ...mobileUxRows('en'), ...landingRows('en')];
 export const MESSAGE_COUNT = catalogRows.length;
 export default new Map(catalogRows);

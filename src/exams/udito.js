@@ -406,7 +406,7 @@ function renderBrief(instrument) {
         <button class="ui-button ui-button--lg" type="button" data-action="au-begin-stage">${t(instrument === 'headphones' ? 'Start practice' : `Start ${info.name}`)} <span aria-hidden="true">→</span></button>
       </div>
     </section>`;
-  focusStage('h1', `${info.name} instructions ready.`);
+  focusStage('h1', '{name} instructions ready.', { name: t(info.name) });
 }
 
 function briefRules(instrument) {
@@ -462,7 +462,7 @@ function renderRunner() {
       </div>
       <footer class="au-runner__footer"><span>Volume reported unchanged</span><span>${t('Keys')} ${choices === 2 ? '1 · 2' : '1 · 2 · 3'}</span><span>${t('Short ramped tones')}</span></footer>
     </section>`;
-  focusStage('[data-au-status]', `${info.name} sound runner ready.`);
+  focusStage('[data-au-status]', '{name} sound runner ready.', { name: t(info.name) });
 }
 
 function prepareNextTrial() {
@@ -631,7 +631,7 @@ function finishInstrument(completed) {
       ? `${summary.correct} ${t('of')} ${summary.trials} ${t('quiet targets located. This is evidence about presentation, not proof of hardware.')}`
       : `${summary.trials} ${t('adaptive presentations recorded')}${summary.controlAccuracyPercent === null ? '' : `; control accuracy ${summary.controlAccuracyPercent}%`} ${t('without changing volume.')}`;
   state.app.innerHTML = `<section class="au-transition ui-container"><span class="au-transition__mark" aria-hidden="true">${INSTRUMENTS[completed].number}</span><p class="ui-eyebrow">${t('Instrument complete')}</p><h1>${t('Measurement recorded:')} ${t(INSTRUMENTS[completed].name)}.</h1><p>${line}</p><button class="ui-button ui-button--lg" type="button" data-action="au-next-stage" data-next="${next}">${t('Continue to')} ${t(INSTRUMENTS[next].name)} <span aria-hidden="true">→</span></button></section>`;
-  focusStage('h1', `${INSTRUMENTS[completed].name} complete.`);
+  focusStage('h1', '{name} complete.', { name: t(INSTRUMENTS[completed].name) });
 }
 
 function renderVolumeCheck() {
@@ -723,8 +723,9 @@ function renderResults() {
   focusStage(
     'h1',
     journalSaved
-      ? `Udito results ready. ${setupQuality}. Saved to the private journal.`
-      : `Udito results ready. ${setupQuality}. The journal entry was not saved.`,
+      ? 'Udito results ready. {quality}. Saved to the private journal.'
+      : 'Udito results ready. {quality}. The journal entry was not saved.',
+    { quality: t(setupQuality) },
   );
 }
 
@@ -846,7 +847,7 @@ function pauseRun(message = 'This playback was interrupted.', { setupRequired = 
       ? 'Continue after recorded response'
       : 'Replay this trial';
   state.app.innerHTML = `<section class="au-transition ui-container" data-au-paused data-resume-mode="${setupRequired ? 'setup' : committed ? 'advance' : 'replay'}"><span class="au-transition__mark" aria-hidden="true">Ⅱ</span><p class="ui-eyebrow">Listening paused</p><h1>${message}</h1><p>${explanation}</p><div class="ui-cluster au-pause__actions"><button class="ui-button ui-button--lg" type="button" data-action="${primaryAction}">${primaryLabel} <span aria-hidden="true">→</span></button><button class="ui-button ui-button--ghost" type="button" data-action="au-stop">End run and return to Udito</button></div></section>`;
-  focusStage('h1', `Listening paused. ${explanation}`);
+  focusStage('h1', 'Listening paused. {explanation}', { explanation: t(explanation) });
 }
 
 async function resumeRun() {
@@ -1082,11 +1083,16 @@ function wireEvents(signal) {
   navigator.mediaDevices?.addEventListener?.('devicechange', handleOutputDeviceChange, { signal });
 }
 
-function focusStage(selector, announcement) {
+/**
+ * @param {string} selector
+ * @param {string} announcement
+ * @param {Record<string, string | number>} [values]
+ */
+function focusStage(selector, announcement, values = {}) {
   state.lifecycle.present(state.app, { focus: selector });
   const target = state.app.querySelector(selector);
   if (target && !target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
-  if (state.announcer && announcement) state.announcer.textContent = t(announcement);
+  if (state.announcer && announcement) state.announcer.textContent = t(announcement, values);
 }
 
 function runtimeConfig() {

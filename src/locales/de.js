@@ -1,3 +1,4 @@
+import { landingRows } from './landing-copy.js';
 import { mobileUxRows } from './mobile-ux-copy.js';
 import { registryRows } from './registry-copy.js';
 
@@ -545,7 +546,7 @@ const rows = [
     'A device control, not a measured sound-pressure level. The browser cannot know dB SPL.',
     'Eine Geräteeinstellung, kein gemessener Schalldruckpegel. Der Browser kennt keine dB SPL.',
   ],
-  ['Upload', 'Upload'],
+  ['Upload', 'Hochladen'],
   ['Playing quiet reference…', 'Leise Referenz wird abgespielt…'],
   ['Keep this quiet and comfortable.', 'Halten Sie dies leise und angenehm.'],
   ['Play reference again', 'Referenz erneut abspielen'],
@@ -763,7 +764,7 @@ const rows = [
   ['Timing clock', 'Zeitmessuhr'],
   ['Monotonic', 'Monoton'],
   ['Privacy', 'Datenschutz'],
-  ['Journal', 'Journal'],
+  ['Journal', 'Messprotokoll'],
   ['Answers stay local', 'Antworten bleiben lokal'],
   ['Back', 'Zurück'],
   ['Leave lab', 'Labor verlassen'],
@@ -1621,6 +1622,6 @@ rows.push(
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 );
 
-const catalogRows = [...rows, ...registryRows('de'), ...mobileUxRows('de')];
+const catalogRows = [...rows, ...registryRows('de'), ...mobileUxRows('de'), ...landingRows('de')];
 export const MESSAGE_COUNT = catalogRows.length;
 export default new Map(catalogRows);
