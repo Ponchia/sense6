@@ -71,6 +71,7 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           BASE_WORKTREE: ${{ runner.temp }}/sense6-visual-base
         run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git worktree add --detach "$BASE_WORKTREE" "$BASE_SHA"
           npm ci --prefix "$BASE_WORKTREE"
           npm run build --prefix "$BASE_WORKTREE"
