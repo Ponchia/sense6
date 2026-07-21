@@ -16,6 +16,10 @@ for (const route of REPRESENTATIVE_ROUTES) {
 
 async function settlePage(page) {
   await page.locator('main h1').waitFor({ state: 'visible' });
+  if (process.env.VISUAL_BASELINE_CAPTURE !== '1') {
+    await page.locator('#app[data-sense6-hydrated]').waitFor();
+  }
+  await page.waitForFunction(() => !document.querySelector('#app > .static-entry'));
   await page.evaluate(async () => document.fonts?.ready);
 }
 

@@ -788,14 +788,14 @@ function updateRunnerProgress() {
     const complete = 1 - remaining / state.config.stability.durationMs;
     const percent = Math.min(100, Math.max(0, complete * 100));
     const coarsePercent = percent >= 67 ? 67 : percent >= 33 ? 33 : 0;
-    progress.style.inlineSize = `${coarsePercent}%`;
+    progress.style.transform = `scaleX(${coarsePercent / 100})`;
     progressbar.setAttribute('aria-valuenow', String(Math.round(percent)));
     progressbar.setAttribute('aria-valuetext', `${formatClock(remaining)} remaining`);
     count.textContent =
       percent >= 67 ? 'Final section' : percent >= 33 ? 'Middle section' : 'Opening section';
   } else {
     const percent = (state.session.index / state.session.queue.length) * 100;
-    progress.style.inlineSize = `${percent}%`;
+    progress.style.transform = `scaleX(${percent / 100})`;
     progressbar.setAttribute('aria-valuenow', String(Math.round(percent)));
     progressbar.setAttribute(
       'aria-valuetext',

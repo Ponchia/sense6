@@ -2,10 +2,10 @@
 .hero {
   align-items: center;
   display: grid;
-  gap: clamp(2rem, 5vw, 7rem);
+  gap: var(--s6-space-layout);
   grid-template-columns: minmax(0, 1.12fr) minmax(20rem, 0.88fr);
-  min-block-size: min(49rem, calc(100svh - 4.5rem));
-  padding-block: clamp(4rem, 10vw, 8rem);
+  min-block-size: min(44rem, calc(100svh - 4.5rem));
+  padding-block: var(--s6-space-hero);
 }
 
 .hero__copy {
@@ -78,7 +78,7 @@
   mask: radial-gradient(circle closest-side, transparent calc(100% - 8px), #000 calc(100% - 7px));
   position: absolute;
   transform: rotate(0deg);
-  animation: orbit 38s linear infinite;
+  animation: none;
 }
 
 .color-orbit--middle {
@@ -88,7 +88,7 @@
 
 .color-orbit--middle::before {
   animation-direction: reverse;
-  animation-duration: 27s;
+  animation-duration: 4.2s;
   opacity: 0.64;
 }
 
@@ -98,7 +98,7 @@
 }
 
 .color-orbit--inner::before {
-  animation-duration: 19s;
+  animation-duration: 3.6s;
   opacity: 0.36;
 }
 
@@ -179,13 +179,33 @@
 .spectrum span {
   background: var(--bar-color);
   transform-origin: bottom;
-  animation: bar-in 500ms var(--ease-standard) both;
+  animation: none;
   animation-delay: var(--bar-delay);
 }
 
 @keyframes bar-in {
   from {
     transform: scaleY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .color-orbit::before {
+    animation: orbit 4.8s var(--ease-standard) 1 both;
+  }
+
+  .color-orbit--middle::before {
+    animation-direction: reverse;
+    animation-duration: 4.2s;
+  }
+
+  .color-orbit--inner::before {
+    animation-duration: 3.6s;
+  }
+
+  .spectrum span {
+    animation: bar-in 500ms var(--ease-standard) both;
+    animation-delay: var(--bar-delay);
   }
 }
 
@@ -932,4 +952,13 @@
   .sequence-run.is-reordering .sequence-tile {
     transition: none;
   }
+}
+
+.measurement-active .sequence-tile,
+.measurement-active .sequence-tile.is-swapped {
+  animation: none;
+}
+
+.measurement-active .sequence-run.is-reordering .sequence-tile {
+  transition: none;
 }

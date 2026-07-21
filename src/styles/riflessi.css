@@ -28,10 +28,10 @@ body.rx-running > .ui-sitefooter {
 .rx-hero {
   align-items: center;
   display: grid;
-  gap: clamp(3rem, 8vw, 9rem);
+  gap: var(--s6-space-layout);
   grid-template-columns: minmax(0, 1.1fr) minmax(20rem, 0.9fr);
-  min-block-size: min(48rem, calc(100svh - 8rem));
-  padding-block: clamp(3rem, 8vh, 7rem);
+  min-block-size: min(44rem, calc(100svh - 8rem));
+  padding-block: var(--s6-space-hero);
 }
 
 .rx-hero h1,
@@ -92,6 +92,7 @@ body.rx-running > .ui-sitefooter {
   inline-size: 68%;
   justify-content: center;
   position: relative;
+  direction: ltr;
 }
 
 .rx-scope::before,
@@ -128,17 +129,14 @@ body.rx-running > .ui-sitefooter {
 }
 
 .rx-scope__sweep {
-  animation: rx-scope-sweep 4s linear infinite;
+  animation: none;
   background: linear-gradient(90deg, color-mix(in srgb, #f4b942 45%, transparent), transparent);
   block-size: 1px;
   inline-size: 50%;
-  inset-inline-start: 50%;
+  left: 50%;
+  right: auto;
   position: absolute;
   transform-origin: left;
-}
-
-[dir="rtl"] .rx-scope__sweep {
-  transform-origin: right;
 }
 
 @keyframes rx-scope-sweep {
@@ -509,10 +507,12 @@ body.rx-running > .ui-sitefooter {
 }
 
 .rx-calibration__pulse i {
-  animation: rx-pulse 1.2s ease-in-out infinite alternate;
+  animation: none;
   background: #f4b942;
-  block-size: 42%;
+  block-size: 88%;
   flex: 1;
+  transform: scaleY(0.48);
+  transform-origin: bottom;
 }
 
 .rx-calibration__pulse i:nth-child(2) {
@@ -525,8 +525,18 @@ body.rx-running > .ui-sitefooter {
 
 @keyframes rx-pulse {
   to {
-    block-size: 88%;
     opacity: 0.42;
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .rx-scope__sweep {
+    animation: rx-scope-sweep 4s linear 1 both;
+  }
+
+  .rx-calibration__pulse i {
+    animation: rx-pulse 1.2s ease-in-out 3 alternate both;
   }
 }
 
@@ -635,14 +645,15 @@ body.rx-running > .ui-sitefooter {
 }
 
 .rx-runner {
-  block-size: 100svh;
+  block-size: 100dvh;
   box-sizing: border-box;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   inline-size: 100%;
   min-block-size: 100svh;
   overflow: hidden;
-  padding-inline: env(safe-area-inset-left) env(safe-area-inset-right);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 .rx-runner__header,
@@ -681,8 +692,14 @@ body.rx-running > .ui-sitefooter {
   background: #f4b942;
   block-size: 100%;
   display: block;
-  inline-size: 0;
-  transition: inline-size 180ms linear;
+  inline-size: 100%;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms linear;
+}
+
+html[dir="rtl"] .rx-progress i {
+  transform-origin: right;
 }
 
 .rx-runner__stop {
@@ -1289,7 +1306,8 @@ body.rx-running > .ui-sitefooter {
   .rx-runner__header {
     gap: 0.4rem;
     grid-template-columns: minmax(4ch, 1fr) minmax(0, auto);
-    padding-inline: max(0.5rem, env(safe-area-inset-left)) max(0.5rem, env(safe-area-inset-right));
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+    padding-right: max(0.5rem, env(safe-area-inset-right));
   }
 
   .rx-runner__header > div:first-child,
@@ -1356,6 +1374,10 @@ body.rx-running > .ui-sitefooter {
   .rx-calibration__pulse i {
     animation: none;
   }
+}
+
+.measurement-active .rx-progress i {
+  transition: none;
 }
 
 @layer bronto {

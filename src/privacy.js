@@ -339,8 +339,17 @@ export function renderPrivacy(context) {
   const copy = privacyCopy(locale);
   document.title = `${copy.title} | Sense6`;
 
-  app.innerHTML = `
-    <article class="privacy-view ui-container">
+  if (!app.querySelector(`:scope > [data-sense6-view="privacy"][data-sense6-locale="${locale}"]`)) {
+    app.innerHTML = privacyMarkup(copy, localeHref, locale);
+  }
+
+  return () => {};
+}
+
+/** @param {ReturnType<typeof privacyCopy>} copy @param {(route: string) => string} localeHref @param {string} locale */
+export function privacyMarkup(copy, localeHref, locale) {
+  return `
+    <article class="privacy-view ui-container" data-sense6-view="privacy" data-sense6-locale="${locale}">
       <a class="back-link privacy-view__back" data-sense6-route="" href="${localeHref('')}">
         <span aria-hidden="true">←</span> ${copy.back}
       </a>
@@ -387,8 +396,6 @@ export function renderPrivacy(context) {
       </div>
     </article>
   `;
-
-  return () => {};
 }
 
 export function privacyCopy(locale) {

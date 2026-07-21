@@ -52,6 +52,8 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble
     steps:
@@ -66,7 +68,19 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Detect intentional visual baseline updates
+        id: visual-baselines
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          if git diff --quiet "$BASE_SHA" HEAD -- audits/visual-regression.spec.js-snapshots; then
+            echo "updated=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "updated=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Check out and build the base revision
+        if: steps.visual-baselines.outputs.updated == 'false'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           BASE_WORKTREE: ${{ runner.temp }}/sense6-visual-base
@@ -76,12 +90,32 @@ jobs:
           npm ci --prefix "$BASE_WORKTREE"
           npm run build --prefix "$BASE_WORKTREE"
       - name: Capture base revision on this runner
+        if: steps.visual-baselines.outputs.updated == 'false'
         env:
           HOME: /root
           PLAYWRIGHT_SITE_DIR: ${{ runner.temp }}/sense6-visual-base
+          VISUAL_BASELINE_CAPTURE: '1'
         run: npm run test:visual:container -- --update-snapshots
       - name: Build the candidate revision
         run: npm run build
+      - name: Refresh candidate baselines on the CI runner
+        if: steps.visual-baselines.outputs.updated == 'true'
+        env:
+          HOME: /root
+        run: npm run test:visual:container -- --update-snapshots
+      - name: Commit CI-native visual baselines
+        if: steps.visual-baselines.outputs.updated == 'true'
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add audits/visual-regression.spec.js-snapshots
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'test: refresh visual baselines on CI runner'
+          git push origin "HEAD:$HEAD_REF"
       - name: Compare the candidate with the base revision
         env:
           HOME: /root

@@ -41,6 +41,13 @@ test('every canonical route has substantive, localized raw HTML', async () => {
     );
     assert.equal((html.match(/rel="alternate" hreflang=/g) ?? []).length, LOCALES.length + 1, path);
     assert.match(html, /<script type="application\/ld\+json">.+<\/script>/, path);
+    const displayFontPreload =
+      /<link rel="preload" href="\/assets\/doto-800-[^"]+\.woff2" as="font" type="font\/woff2" crossorigin media="not \(prefers-reduced-data: reduce\)">/;
+    if (['ar', 'hi', 'ja', 'ko', 'zh-hans'].includes(locale)) {
+      assert.doesNotMatch(html, displayFontPreload, `${path} uses native script metrics instead of Doto`);
+    } else {
+      assert.match(html, displayFontPreload, `${path} must preload the above-fold display face`);
+    }
     const stylesheet = path.split('/').filter(Boolean)[1] ?? 'gallery';
     assert.match(
       html,
@@ -70,6 +77,11 @@ test('every canonical route has substantive, localized raw HTML', async () => {
     if (path !== '/') assert.ok(!titles.has(localizedTitle), `duplicate title within ${locale}: ${title}`);
     titles.add(localizedTitle);
   }
+});
+
+test('RTL static interpolation matches the runtime directional-isolate contract', async () => {
+  const html = await readFile(new URL('ar/index.html', DIST), 'utf8');
+  assert.match(html, /\u2068\d+\u2069/);
 });
 
 test('experiment discovery pages expose useful copy, related routes, images, and provenance', async () => {
