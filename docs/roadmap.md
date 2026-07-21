@@ -53,8 +53,8 @@ The completed foundation includes:
 - guarded phase variants for the Tetracromia session and fail-closed browser and
   persistence boundaries; and
 - enforced JavaScript and CSS production bundle budgets;
-- checksummed, commit-stamped release artifacts that are built once and reused
-  by audit, preview, and production jobs;
+- checksummed, commit-stamped release output that is built, audited, and
+  deployed without a rebuild in one job after the browser matrix passes;
 - generated per-locale copy with a stale-output check and a true transitive
   startup-graph budget; and
 - source complexity and large-file ceilings that require extraction instead of

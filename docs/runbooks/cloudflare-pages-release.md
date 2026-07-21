@@ -19,8 +19,8 @@ write metrics and don't require a production migration.
 ## Preconditions
 
 - The pull request is current with `main` and `npm run check:release` passes.
-- CI has produced `verified-dist-<commit>` with `dist/`, `dist.sha256`, and
-  `dist/build-meta.json` from one build.
+- CI's release job produces `dist/`, `dist.sha256`, and
+  `dist/build-meta.json` from one build after the browser matrix passes.
 - Repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` exist;
   never print their values.
 - The Pages project is `sense6`, the production branch is `main`, and the D1
@@ -53,15 +53,15 @@ write metrics and don't require a production migration.
    intended production database. Confirm the zone rate-limit rule still matches
    only `POST /api/metric` with the documented 10 requests per 10 seconds and a
    10-second block.
-5. Push the pull-request branch. Wait for the reusable verification workflow,
-   browser matrix, production-artifact audit, preview deployment, and preview
-   smoke test. The deploy job must download and verify the existing checksum;
-   it must not run `npm run build`.
+5. Push the pull-request branch. Wait for the reusable browser matrix and
+   release job. The release job runs the core and production-site audits,
+   verifies its checksum, deploys that same working tree, and smoke-tests the
+   preview. It must not rebuild between audit and deployment.
 6. Inspect the preview. Confirm substantive localized HTML, `noindex`, and a
    closed metric endpoint. Preview traffic must not increment production
    metrics.
-7. After approval, merge to `main`. The production workflow publishes the same
-   verified artifact shape and runs:
+7. After approval, merge to `main`. The production workflow repeats the
+   browser-first release contract and runs:
 
    ```sh
    node scripts/smoke-production.mjs https://sense6.net <40-character-commit>
@@ -78,8 +78,8 @@ write metrics and don't require a production migration.
 - Production returns the checked security-header contract, including HSTS,
   frame denial, no-referrer, and cross-origin isolation headers.
 - `GET https://sense6.net/api/metric` with same-origin headers returns `405`.
-- The Pages deployment identifies the expected commit and the workflow's
-  checksum verification passed before upload.
+- The Pages deployment identifies the expected commit and the release job's
+  checksum verification passed before deployment.
 - D1 contains the pre-existing aggregate rows after migration. Inspect counts
   privately; don't add or use a public read endpoint.
 

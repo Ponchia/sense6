@@ -14,34 +14,7 @@ concurrency:
 jobs:
   verify:
     uses: ./.github/workflows/verify.yml
-
-  preview:
-    if: github.event.pull_request.head.repo.full_name == github.repository
-    needs: verify
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    steps:
-      - name: Check out deployment scripts
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-
-      - name: Download the verified artifact
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
-        with:
-          name: verified-dist-${{ github.sha }}
-
-      - name: Verify the artifact checksum
-        run: sha256sum --check dist.sha256
-
-      - name: Publish the verified preview
-        id: preview
-        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: 4.112.0
-          command: pages deploy dist --project-name=sense6 --branch=pr-${{ github.event.pull_request.number }} --commit-hash=${{ github.sha }}
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Smoke-test the real preview
-        run: node scripts/smoke-preview.mjs "${{ steps.preview.outputs.deployment-url }}"
+    with:
+      deploy_target: ${{ github.event.pull_request.head.repo.full_name == github.repository && 'preview' || 'none' }}
+      deploy_branch: pr-${{ github.event.pull_request.number }}
+    secrets: inherit

@@ -23,7 +23,7 @@
     "test:site-integrity": "playwright test --config playwright.site.config.js audits/site-integrity.spec.js",
     "test:site-audit": "playwright test --config playwright.site.config.js audits/site-integrity.spec.js audits/experience-stability.spec.js",
     "test:visual:container": "playwright test --config playwright.site.config.js audits/visual-regression.spec.js --workers=1",
-    "audit:lighthouse": "unlighthouse --config-file unlighthouse.config.mjs && node scripts/check-lighthouse-metrics.mjs",
+    "audit:lighthouse": "unlighthouse-ci --config-file unlighthouse.config.mjs && node scripts/check-lighthouse-metrics.mjs",
     "audit:site": "npm run build && npm run test:html && npm run test:links && npm run test:site-audit",
     "locales:generate": "node scripts/generate-locale-copy.mjs",
     "locales:check": "node scripts/generate-locale-copy.mjs --check && node scripts/check-locales.mjs",

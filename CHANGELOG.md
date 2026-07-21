@@ -11,8 +11,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
-- A checksummed, commit-stamped release artifact reused unchanged by site
-  audits, pull-request previews, and production deployment.
+- A checksummed, commit-stamped release working tree audited and deployed
+  unchanged in one job after the browser matrix passes.
 - Forward D1 migration coverage for every runtime metric pair, exact Cloudflare
   header and function-route tests, and a read-only production smoke contract.
 - Complexity, large-file, locale-generation, audit-discovery, coverage-report,

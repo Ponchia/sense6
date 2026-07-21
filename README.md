@@ -317,9 +317,9 @@ they aren't silently treated as part of the per-commit release gate.
 Every push to `main` runs the complete lint, locale, unit, build, browser,
 responsive, accessibility, static-output, and bundle-budget gate. Verification
 builds `dist/` once, stamps `build-meta.json` with the workflow commit, writes a
-file-by-file SHA-256 manifest, and retains the verified artifact for seven days.
-The audit and deploy jobs download and verify that same artifact; they never
-rebuild production output.
+file-by-file SHA-256 manifest, verifies it, and runs the production site audit.
+After the browser matrix passes, the same release job deploys that working tree
+without rebuilding production output or depending on external artifact storage.
 
 Same-repository pull requests run that gate and publish the already verified
 `dist/` directory to a stable `pr-<number>.sense6.pages.dev` branch preview. CI

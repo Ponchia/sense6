@@ -11,39 +11,12 @@ concurrency:
 
 permissions:
   contents: read
+  deployments: write
 
 jobs:
   verify:
     uses: ./.github/workflows/verify.yml
-
-  publish:
-    needs: verify
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-      deployments: write
-
-    steps:
-      - name: Check out deployment scripts
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-
-      - name: Download the verified artifact
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
-        with:
-          name: verified-dist-${{ github.sha }}
-
-      - name: Verify the artifact checksum
-        run: sha256sum --check dist.sha256
-
-      - name: Publish the verified bundle
-        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          wranglerVersion: 4.112.0
-          command: pages deploy dist --project-name=sense6 --branch=main --commit-hash=${{ github.sha }}
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Verify the live production commit and contract
-        run: node scripts/smoke-production.mjs https://sense6.net "${{ github.sha }}"
+    with:
+      deploy_target: production
+      deploy_branch: main
+    secrets: inherit

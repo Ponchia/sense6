@@ -130,11 +130,11 @@ indexed lookups.
 Values crossing browser and storage boundaries still require runtime
 validation.
 
-CI separates the core build, browser projects, and production-artifact audit.
-The build job creates `dist/` once, stamps the commit in `build-meta.json`,
-writes a SHA-256 manifest, and uploads both with seven-day retention. Audit,
-preview, and production jobs verify and consume that exact artifact. They never
-rebuild deployable output.
+CI runs browser projects first, then one release job creates `dist/`, stamps the
+commit in `build-meta.json`, writes and verifies a SHA-256 manifest, and audits
+the production site. When deployment is enabled, that same job publishes its
+verified working tree without rebuilding it. This keeps artifact identity exact
+without depending on account-wide artifact storage.
 
 Raw bundle ceilings are:
 
@@ -179,9 +179,9 @@ when expanding the color lab.
 
 ## Delivery environments
 
-Every same-repository pull request first passes the complete release gate and
-then publishes the checksummed verified artifact to a stable Cloudflare Pages
-branch preview. CI smoke-tests the real preview URL, including substantive
+Every same-repository pull request first passes the browser matrix and complete
+release gate, then publishes the checksummed working tree to a stable Cloudflare
+Pages branch preview. CI smoke-tests the real preview URL, including substantive
 localized HTML, `X-Robots-Tag: noindex`, and a closed metrics endpoint. Fork
 pull requests run verification without receiving deployment credentials or a
 preview.

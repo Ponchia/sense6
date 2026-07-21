@@ -28,10 +28,10 @@ security headers.
 - Use `https://sense6.net` as the canonical production origin.
 - Deploy the static site to the Cloudflare Pages project `sense6` by direct
   upload from GitHub Actions.
-- Build `dist/` once in the reusable verification workflow, validate it, stamp
-  its source commit, and record a file-by-file SHA-256 manifest. Retain the
-  verified artifact for seven days. Audit, preview, and production jobs must
-  verify and consume that exact artifact without rebuilding it.
+- After the reusable browser matrix passes, build `dist/` once in a release
+  job, validate it, stamp its source commit, and verify a file-by-file SHA-256
+  manifest. Audit and deploy that exact working tree in the same job without
+  rebuilding it or depending on account-wide artifact storage.
 - Keep security and cache policy in `public/_headers` so Vite copies it into the
   deployed bundle.
 - Redirect `www.sense6.net` and the former hostname to the canonical origin.
@@ -42,8 +42,8 @@ security headers.
 
 - The public site no longer depends on the personal Kubernetes cluster.
 - Rollback selects a previous verified Pages deployment.
-- The retained checksum and `build-meta.json` make artifact identity observable
-  before deployment and on the live site.
+- The checksum and `build-meta.json` make artifact identity observable before
+  deployment and on the live site.
 - Browser storage is origin-bound. Existing summaries under the former origin
   are not deleted, but they are not visible from `sense6.net`. Returning to the
   former origin before its retirement restores access to them.
