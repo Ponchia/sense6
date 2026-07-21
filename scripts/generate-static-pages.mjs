@@ -275,7 +275,7 @@ function examMarkup(definition, locale, tr) {
       <a class="ui-button" href="#interactive-test">${escapeHtml(tr('Open test'))}</a>
     </header>
     <figure class="static-preview">
-      <img src="/social/${definition.id}.png" width="1200" height="630" alt="${escapeAttribute(`${definition.name} — ${tr(definition.tagline)}`)}" loading="lazy">
+      <img src="/social/${definition.id}.svg" width="1200" height="630" alt="${escapeAttribute(`${definition.name} — ${tr(definition.tagline)}`)}" loading="lazy">
     </figure>
     <section>
       <h2>${escapeHtml(tr('What this test includes'))}</h2>

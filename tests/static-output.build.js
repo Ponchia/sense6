@@ -80,7 +80,7 @@ test('experiment discovery pages expose useful copy, related routes, images, and
     assert.ok(words.length >= 200, `${definition.route} raw entry has only ${words.length} words`);
     assert.match(
       html,
-      new RegExp(`<img src="/social/${escapeRegex(definition.id)}\\.png" width="1200" height="630"`),
+      new RegExp(`<img src="/social/${escapeRegex(definition.id)}\\.svg" width="1200" height="630"`),
     );
     for (const related of definition.discovery.related) {
       assert.match(html, new RegExp(`href="/en/${escapeRegex(related)}/"`));

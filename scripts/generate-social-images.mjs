@@ -1,4 +1,4 @@
-import { mkdir } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
@@ -61,7 +61,9 @@ const browser = await chromium.launch({ headless: true });
 try {
   const page = await browser.newPage({ viewport: { width: 1200, height: 630 } });
   for (const card of CARDS) {
-    await page.setContent(cardSvg(card));
+    const svg = cardSvg(card);
+    await writeFile(join(OUTPUT, `${card.id}.svg`), svg);
+    await page.setContent(`<!doctype html><html><body style="margin:0">${svg}</body></html>`);
     await page.locator('svg').screenshot({ path: join(OUTPUT, `${card.id}.png`) });
   }
 } finally {
@@ -74,7 +76,8 @@ function cardSvg({ accent, eyebrow, title, copy, glyph }) {
     (_, index) =>
       `<circle cx="${760 + (index % 7) * 62}" cy="${84 + Math.floor(index / 7) * 82}" r="${8 + (index % 4) * 3}" fill="${accent}" opacity="${0.15 + (index % 5) * 0.08}"/>`,
   ).join('');
-  return `<!doctype html><html><body style="margin:0"><svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img">
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img">
+    <title>${escapeXml(`${eyebrow} — ${title}`)}</title>
     <defs>
       <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#11131a"/><stop offset="1" stop-color="#202433"/></linearGradient>
       <radialGradient id="glow"><stop stop-color="${accent}" stop-opacity=".38"/><stop offset="1" stop-color="${accent}" stop-opacity="0"/></radialGradient>
@@ -91,7 +94,7 @@ function cardSvg({ accent, eyebrow, title, copy, glyph }) {
     <text x="74" y="365" fill="#c9cedd" font-family="Arial, sans-serif" font-size="22" font-weight="600" letter-spacing="2">${escapeXml(copy)}</text>
     <text x="74" y="548" fill="#f6f7fb" font-family="Arial, sans-serif" font-size="28" font-weight="700">Sense<tspan fill="${accent}">6</tspan></text>
     <text x="176" y="548" fill="#8f96aa" font-family="Arial, sans-serif" font-size="18">sense6.net</text>
-  </svg></body></html>`;
+  </svg>`;
 }
 
 function escapeXml(value) {
