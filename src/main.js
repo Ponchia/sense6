@@ -4,7 +4,7 @@ import './styles.css';
 
 import { EXAM_BY_ID, EXAMS, loadExam } from './exams/registry.js';
 import { getLocale, initializeI18n, localeHref, localizedRoot, m, setLocale, t } from './i18n.js';
-import { disposeActiveExamLifecycles } from './lib/lifecycle.js';
+import { disposeActiveMounts } from './lib/mount-registry.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from './metrics.js';
 import { currentLocation, currentRoute, navigate, startRouter } from './router.js';
 import { renderGallery } from './site.js';
@@ -121,10 +121,7 @@ function retireOutgoingRoute() {
  * @param {{ animate: boolean, initial: boolean, routeName: string, token: number, updateLinks?: boolean }} options
  * @returns {Promise<boolean>}
  */
-async function commitRoute(
-  mountRoute,
-  { animate, initial, routeName, token, updateLinks = true },
-) {
+async function commitRoute(mountRoute, { animate, initial, routeName, token, updateLinks = true }) {
   const generation = ++routeCommitGeneration;
   const previousHeight = appElement.getBoundingClientRect().height;
   const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -150,7 +147,7 @@ async function commitRoute(
     } catch (error) {
       if (cleanup === mountedCleanup) cleanup = null;
       disposeRoute(mountedCleanup);
-      disposeActiveExamLifecycles();
+      disposeActiveMounts();
       throw error;
     }
   };
@@ -193,7 +190,7 @@ function releaseRouteHeight(generation) {
 
 async function renderRouteLoadFailure(error, route, token) {
   console.error('Sense6 route failed to load.', error);
-  disposeActiveExamLifecycles();
+  disposeActiveMounts();
   const initial = !committedRoute;
   try {
     const committed = await commitRoute(
@@ -229,7 +226,7 @@ async function renderRouteLoadFailure(error, route, token) {
 function forceRouteLoadFailure(route) {
   disposeRoute(cleanup);
   cleanup = null;
-  disposeActiveExamLifecycles();
+  disposeActiveMounts();
   document.body.classList.remove('lab-mode', 'measurement-active');
   appElement.inert = false;
   appElement.style.minBlockSize = '';

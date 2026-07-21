@@ -356,8 +356,7 @@ test('Acutezza surfaces journal persistence failure while keeping the result usa
 
   const status = page.locator('[data-ac-journal-status]');
   await expect(status).toHaveAttribute('role', 'alert');
-  await expect(status).toContainText('Journal entry not saved.');
-  await expect(status).toContainText('The result remains available here and can still be copied');
+  await expect(status).toContainText('The result is ready, but this browser did not allow local storage.');
   await expect(page.getByRole('button', { name: /Open private journal/i })).toHaveCount(0);
   const latest = await page.evaluate(() => JSON.parse(localStorage.getItem('sense6:acutezza:last')));
   expect(latest).toMatchObject({

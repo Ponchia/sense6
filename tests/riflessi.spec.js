@@ -102,8 +102,9 @@ test('Riflessi keeps storage failure visible and prioritizes copying the unsaved
   );
   for (let trial = 0; trial < total; trial += 1) await respondWithKey(page, 'Space');
 
-  await expect(page.getByRole('alert')).toContainText(/This result was not saved/i);
-  await expect(page.getByRole('alert')).toContainText(/copy it before leaving/i);
+  await expect(page.getByRole('alert')).toContainText(
+    /The result is ready, but this browser did not allow local storage/i,
+  );
   await expect(page.locator('.rx-results__actions .ui-button').first()).toContainText(/Copy result summary/i);
 });
 

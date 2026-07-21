@@ -290,8 +290,9 @@ test('storage failure leaves a persistent recovery alert instead of claiming the
   await submit.click();
   await submit.click();
 
-  await expect(page.getByRole('alert')).toContainText(/Journal entry not saved/i);
-  await expect(page.getByRole('alert')).toContainText(/can still be copied/i);
+  await expect(page.getByRole('alert')).toContainText(
+    /The result is ready, but this browser did not allow local storage/i,
+  );
   await expect(page.locator('.results-actions .ui-button').first()).toContainText(/Copy summary/i);
 });
 

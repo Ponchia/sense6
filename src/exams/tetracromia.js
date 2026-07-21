@@ -597,10 +597,7 @@ function renderResults() {
         </div>
       </div>
 
-      <div class="ui-alert ${journalSaved ? 'ui-alert--success' : 'ui-alert--danger'} tetracromia-journal-status" data-tetracromia-journal-status role="${journalSaved ? 'status' : 'alert'}">
-        <strong class="ui-alert__title">${journalSaved ? 'Saved to the private journal on this device.' : 'Journal entry not saved.'}</strong>
-        <p class="ui-alert__body">${journalSaved ? 'The structured run context is available for later same-setup comparison.' : 'The result remains available here and can still be copied, but it was not added to the private journal.'}</p>
-      </div>
+      ${journalSaved ? '' : `<div class="ui-alert ui-alert--danger tetracromia-journal-status" data-tetracromia-journal-status role="alert"><strong class="ui-alert__title">${t('The result is ready, but this browser did not allow local storage.')}</strong></div>`}
 
       <div class="result-details">
         ${observationMetric('01', 'Tile choices', t('{correct} of {presentations} correct', { correct: result.tile.correct, presentations: result.tile.presentations }), t('The adaptive level ended near {level}° of OKLCH hue (ΔEOK {delta}).', { level: formatNumber(result.tile.adaptiveLevelDegrees, { maximumFractionDigits: 1 }), delta: formatNumber(result.tile.deltaEok, { maximumFractionDigits: 3 }) }), t('Presented range {minimum}°–{maximum}° · {reversals} direction changes', { minimum: result.tile.presentedMinimum, maximum: result.tile.presentedMaximum, reversals: result.tile.reversals }))}

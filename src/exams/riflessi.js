@@ -748,16 +748,8 @@ function metricCard(index, label, value, unit, copy) {
 }
 
 function persistenceStatus(lastResultSaved, journalSaved) {
-  if (lastResultSaved && journalSaved) {
-    return `<div class="ui-alert ui-alert--success rx-persistence-status" data-rx-persistence-status role="status"><strong class="ui-alert__title">Saved on this device.</strong><p class="ui-alert__body">The latest-run reminder and structured private-journal entry are available in this browser.</p></div>`;
-  }
-  if (journalSaved) {
-    return `<div class="ui-alert ui-alert--danger rx-persistence-status" data-rx-persistence-status role="alert"><strong class="ui-alert__title">Latest-result reminder not saved.</strong><p class="ui-alert__body">The private-journal entry was saved, but this browser could not update the latest-run reminder. Copy the result before leaving if you need it outside the journal.</p></div>`;
-  }
-  if (lastResultSaved) {
-    return `<div class="ui-alert ui-alert--danger rx-persistence-status" data-rx-persistence-status role="alert"><strong class="ui-alert__title">Journal entry not saved.</strong><p class="ui-alert__body">The latest-run reminder remains on this device, but this run was not added to the private journal. Copy the result before leaving.</p></div>`;
-  }
-  return `<div class="ui-alert ui-alert--danger rx-persistence-status" data-rx-persistence-status role="alert"><strong class="ui-alert__title">This result was not saved.</strong><p class="ui-alert__body">Browser storage is unavailable. The result remains visible here, so copy it before leaving this page.</p></div>`;
+  if (lastResultSaved && journalSaved) return '';
+  return `<div class="ui-alert ui-alert--danger rx-persistence-status" data-rx-persistence-status role="alert"><strong class="ui-alert__title">${t('The result is ready, but this browser did not allow local storage.')}</strong></div>`;
 }
 
 /** @param {'signal' | 'signal-choice' | 'complete'} scope */

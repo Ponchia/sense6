@@ -1,16 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {
-  EXAM_CONTRACTS,
-  EXAM_IDS,
-  examContract,
-  isAcutezzaLatestResult,
-  isLegacyAcutezzaLatestResult,
-  METRIC_TEST_IDS,
-  migrateLegacyAcutezzaLatestResult,
-} from '../src/exams/contracts.js';
+import { EXAM_CONTRACTS, EXAM_IDS, examContract, METRIC_TEST_IDS } from '../src/exams/contracts.js';
 import { EXAM_PROTOCOLS, protocolPassport } from '../src/exams/protocols.js';
 import { EXAMS } from '../src/exams/registry.js';
+import {
+  isAcutezzaLatestResult,
+  isLegacyAcutezzaLatestResult,
+  migrateLegacyAcutezzaLatestResult,
+} from '../src/exams/results/acutezza.js';
 import { EXAM_SOURCES, sourcesByRole, sourcesFor } from '../src/exams/sources.js';
 import { DEFAULT_ACUITY_CONFIG } from '../src/lib/acuity.js';
 import { ADAPTIVE_CONFIG, createAdaptiveRun } from '../src/lib/daltonism.js';
@@ -85,10 +82,10 @@ test('Acutezza latest-result validation is strict and migrates the legacy count-
 test('every exam uses one categorized source ledger with no implied validation', () => {
   const sourceIds = new Set();
   for (const exam of EXAMS) {
-    assert.equal(exam.sources, sourcesFor(exam.id));
-    assert.equal(exam.sources, EXAM_SOURCES[exam.id]);
+    const sources = sourcesFor(exam.id);
+    assert.equal(sources, EXAM_SOURCES[exam.id]);
     assert.equal(sourcesByRole(exam.id, 'validation').length, 0);
-    for (const source of exam.sources) {
+    for (const source of sources) {
       assert.ok(['method', 'boundary', 'comparator', 'validation'].includes(source.role));
       assert.match(source.href, /^https:\/\//);
       assert.ok(!sourceIds.has(`${exam.id}:${source.id}`));

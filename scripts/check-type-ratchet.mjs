@@ -4,7 +4,7 @@ import path from 'node:path';
 
 const PROJECT_ROOT = process.cwd();
 const CONFIG_PATH = path.join(PROJECT_ROOT, 'jsconfig.json');
-const STRICT_ROOTS = ['src/lib', 'src/exams/views', 'src/i18n', 'src/locales'];
+const STRICT_ROOTS = ['src/lib', 'src/exams/results', 'src/exams/views', 'src/i18n', 'src/locales'];
 const STRICT_FILES = [
   'src/crawler-policy.js',
   'src/exams/contracts.js',
