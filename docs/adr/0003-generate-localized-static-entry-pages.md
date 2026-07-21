@@ -3,6 +3,8 @@
 
 Status: Accepted
 
+Lifecycle: current
+
 ## Context
 
 Sense6 was a client-rendered single-page application with hash routes. A person

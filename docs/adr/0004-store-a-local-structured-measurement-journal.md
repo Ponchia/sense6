@@ -3,6 +3,8 @@
 
 Status: accepted
 
+Lifecycle: current
+
 ## Context
 
 Sense6 previously retained one concise latest or best result per experiment.

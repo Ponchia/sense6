@@ -8,6 +8,8 @@ Status: accepted and implemented; evidence audit performed against `main` at
 `04b24134a56b080bac6461b01762409b7c5970ce`; implementation tracked in PR 37,
 2026-07-20
 
+Lifecycle: archive
+
 This report reviews the scientific basis, shipped protocol, public duration,
 result completeness, interface, competitors, reusable open-source work, and
 automated verification for all five Sense6 experiments. It is a product

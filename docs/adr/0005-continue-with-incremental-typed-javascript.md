@@ -3,6 +3,8 @@
 
 Status: accepted
 
+Lifecycle: current
+
 ## Context
 
 Sense6 is a static, dependency-light browser app. Its experiment

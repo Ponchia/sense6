@@ -4,6 +4,8 @@
 
 Status: Accepted
 
+Lifecycle: current
+
 ## Context
 
 Sense6 needs basic product signals: document loads, measured-test starts,

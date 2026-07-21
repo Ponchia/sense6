@@ -27,9 +27,10 @@
     "audit:site": "npm run build && npm run test:html && npm run test:links && npm run test:site-audit",
     "locales:generate": "node scripts/generate-locale-copy.mjs",
     "locales:check": "node scripts/generate-locale-copy.mjs --check && node scripts/check-locales.mjs",
+    "docs:check": "node scripts/check-docs-lifecycle.mjs",
     "typecheck": "node scripts/check-type-ratchet.mjs && tsc -p jsconfig.json",
     "check:ui": "bronto-ui-check src functions scripts",
-    "check:core": "npm run lint && npm run typecheck && npm run locales:check && npm run check:ui && npm run test:coverage && npm run build && npm run test:static",
+    "check:core": "npm run lint && npm run typecheck && npm run locales:check && npm run docs:check && npm run check:ui && npm run test:coverage && npm run build && npm run test:static",
     "check": "npm run check:core && npm run test:e2e",
     "check:release": "npm run check && npm run test:html && npm run test:links && npm run test:site-audit"
   },

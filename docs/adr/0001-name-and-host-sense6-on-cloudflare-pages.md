@@ -3,6 +3,8 @@
 
 Status: Accepted
 
+Lifecycle: current
+
 ## Context
 
 The perception suite started as the Tetracromia experiment and later used
@@ -26,8 +28,10 @@ security headers.
 - Use `https://sense6.net` as the canonical production origin.
 - Deploy the static site to the Cloudflare Pages project `sense6` by direct
   upload from GitHub Actions.
-- Build and run `npm run check` in one deployment job, then upload that exact
-  verified `dist/` directory without rebuilding it or retaining an artifact.
+- Build `dist/` once in the reusable verification workflow, validate it, stamp
+  its source commit, and record a file-by-file SHA-256 manifest. Retain the
+  verified artifact for seven days. Audit, preview, and production jobs must
+  verify and consume that exact artifact without rebuilding it.
 - Keep security and cache policy in `public/_headers` so Vite copies it into the
   deployed bundle.
 - Redirect `www.sense6.net` and the former hostname to the canonical origin.
@@ -38,6 +42,8 @@ security headers.
 
 - The public site no longer depends on the personal Kubernetes cluster.
 - Rollback selects a previous verified Pages deployment.
+- The retained checksum and `build-meta.json` make artifact identity observable
+  before deployment and on the live site.
 - Browser storage is origin-bound. Existing summaries under the former origin
   are not deleted, but they are not visible from `sense6.net`. Returning to the
   former origin before its retirement restores access to them.
