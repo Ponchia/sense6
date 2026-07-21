@@ -97,7 +97,7 @@ export function exportJournal(storage = globalThis.localStorage) {
  * repeated imports idempotent.
  * @param {string} raw
  * @param {JournalStorage} [storage]
- * @returns {{ ok: true, imported: number, duplicates: number, total: number } | { ok: false, reason: 'too-large' | 'malformed' | 'future' | 'invalid' | 'storage' }}
+ * @returns {{ ok: true, imported: number, duplicates: number, discarded: number, evicted: number, skipped: number, total: number } | { ok: false, reason: 'too-large' | 'malformed' | 'future' | 'invalid' | 'storage' }}
  */
 export function importJournal(raw, storage = globalThis.localStorage) {
   if (!storage) return { ok: false, reason: 'storage' };
@@ -133,10 +133,17 @@ export function importJournal(raw, storage = globalThis.localStorage) {
   }
   const entries = sortEntries([...current, ...additions]).slice(0, MAX_ENTRIES);
   if (!writeJournal(entries, storage)) return { ok: false, reason: 'storage' };
+  const retained = new Set(entries.map((entry) => entry.id));
+  const imported = additions.filter((entry) => retained.has(entry.id)).length;
+  const discarded = additions.length - imported;
+  const evicted = current.filter((entry) => !retained.has(entry.id)).length;
   return {
     ok: true,
-    imported: additions.length,
+    imported,
     duplicates,
+    discarded,
+    evicted,
+    skipped: duplicates + discarded,
     total: entries.length,
   };
 }
@@ -156,7 +163,9 @@ export function compareJournalEntries(newer, older) {
   }
   const protocolReasons = protocolDifferences(newer.protocol, older.protocol);
   if (protocolReasons.length) return { status: 'not-comparable', reasons: protocolReasons };
-  const reasons = [];
+  const coverage = acutezzaCoverageDifferences(newer, older);
+  if (coverage.hard.length) return { status: 'not-comparable', reasons: coverage.hard };
+  const reasons = [...coverage.caution];
   const hard = hardSetupDifferences(newer, older);
   if (hard.length) return { status: 'not-comparable', reasons: hard };
 
@@ -276,8 +285,25 @@ function isJournalEntry(value) {
     value.measurements.every(isMeasurement) &&
     Array.isArray(value.notes) &&
     value.notes.length <= MAX_NOTES &&
-    value.notes.every((note) => typeof note === 'string' && note.length <= 100)
+    value.notes.every((note) => typeof note === 'string' && note.length <= 100) &&
+    validInstrumentEntry(value)
   );
+}
+
+/** @param {Record<string, unknown>} value */
+function validInstrumentEntry(value) {
+  if (value.examId !== 'acutezza') return true;
+  const setup = /** @type {Record<string, unknown>} */ (value.setup);
+  const hasCompletedEyes = Object.hasOwn(setup, 'completedEyes');
+  const hasCompletionVariant = Object.hasOwn(setup, 'completionVariant');
+  if (!hasCompletedEyes && !hasCompletionVariant) return true;
+  if (!hasCompletedEyes || !hasCompletionVariant) return false;
+  const completedEyes = parseCompletedEyes(setup.completedEyes);
+  if (!completedEyes) return false;
+  const expectedVariant = completedEyes.length === 2 ? 'both-eyes' : 'single-eye';
+  if (setup.completionVariant !== expectedVariant) return false;
+  const measuredEyes = measurementEyes(/** @type {JournalMeasurement[]} */ (value.measurements));
+  return measuredEyes.length > 0 && sameValues(completedEyes, measuredEyes);
 }
 
 /** @param {unknown} value */
@@ -374,6 +400,49 @@ function protocolDifferences(newer, older) {
 /** @param {ProtocolPassport} protocol */
 function isLegacyProtocol(protocol) {
   return protocol.profileId === 'legacy-exploratory' || protocol.methodVersion.includes('-v1-legacy');
+}
+
+/** @param {JournalEntry} newer @param {JournalEntry} older */
+function acutezzaCoverageDifferences(newer, older) {
+  if (newer.examId !== 'acutezza') return { hard: [], caution: [] };
+  const newerEyes = completedEyesForComparison(newer);
+  const olderEyes = completedEyesForComparison(older);
+  if (newerEyes.length === 0 || olderEyes.length === 0) {
+    return { hard: ['missing:completedEyes'], caution: [] };
+  }
+  if (!newerEyes.some((eye) => olderEyes.includes(eye))) {
+    return { hard: ['no-common-eye'], caution: [] };
+  }
+  return sameValues(newerEyes, olderEyes)
+    ? { hard: [], caution: [] }
+    : { hard: [], caution: ['changed:completedEyes'] };
+}
+
+/** @param {JournalEntry} entry */
+function completedEyesForComparison(entry) {
+  const measuredEyes = measurementEyes(entry.measurements);
+  if (measuredEyes.length) return measuredEyes;
+  return parseCompletedEyes(entry.setup.completedEyes) ?? [];
+}
+
+/** @param {JournalMeasurement[]} measurements @returns {string[]} */
+function measurementEyes(measurements) {
+  const eyes = measurements.flatMap(({ id }) => {
+    const match = /^(left|right)-/.exec(id);
+    return match ? [match[1] ?? ''] : [];
+  });
+  return [...new Set(eyes)].filter(Boolean).sort();
+}
+
+/** @param {unknown} value @returns {string[] | null} */
+function parseCompletedEyes(value) {
+  if (typeof value !== 'string' || !['left', 'right', 'left,right'].includes(value)) return null;
+  return value.split(',');
+}
+
+/** @param {string[]} left @param {string[]} right */
+function sameValues(left, right) {
+  return left.length === right.length && left.every((value, index) => value === right[index]);
 }
 
 /** @param {number} schemaVersion @param {unknown} entries @returns {JournalEntry[] | null} */

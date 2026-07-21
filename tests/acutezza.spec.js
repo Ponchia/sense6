@@ -254,6 +254,8 @@ test('Acutezza calibrates the display and reports separate non-clinical observat
     return { quality: entry.quality, setup: entry.setup, measurements: entry.measurements };
   });
   expect(journalSetup.setup).toMatchObject({
+    completedEyes: 'left,right',
+    completionVariant: 'both-eyes',
     contrastPercent: 10,
     controlsCorrect: 0,
     controlsPresented: 0,
@@ -304,6 +306,99 @@ test('Acutezza focused scope omits the nominal-contrast condition', async ({ pag
       }),
     )
     .toBe('focused');
+});
+
+test('Acutezza migrates its legacy latest result into the strict versioned shape', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'Storage migration is viewport-independent');
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'sense6:acutezza:last',
+      JSON.stringify({
+        setupQuality: 'Interpret with caution',
+        eyes: 1,
+        recordedAt: 1_753_084_800_000,
+      }),
+    );
+  });
+  await page.goto('/en/acutezza/');
+
+  await expect(page.locator('.previous-score')).toContainText('Interpret with caution');
+  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('sense6:acutezza:last')));
+  expect(stored).toMatchObject({
+    format: 'sense6-result',
+    schemaVersion: 2,
+    payload: {
+      setupQuality: 'Interpret with caution',
+      recordedAt: 1_753_084_800_000,
+      completion: { variant: 'legacy-count', eyes: [], count: 1 },
+    },
+  });
+});
+
+test('Acutezza surfaces journal persistence failure while keeping the result usable', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'Persistence behavior is viewport-independent');
+  await installQuickAcutezza(page);
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'sense6:journal',
+      JSON.stringify({ format: 'sense6-journal', schemaVersion: 999, entries: [] }),
+    );
+  });
+  await page.goto('/en/acutezza/');
+  await completeAcutezzaCalibration(page, { scope: 'focused' });
+  await page.getByRole('button', { name: /Prepare Right eye/i }).click();
+  await completeAcutezzaEye(page, { includeContrast: false });
+  await page.getByRole('button', { name: /Finish with one eye/i }).click();
+
+  const status = page.locator('[data-ac-journal-status]');
+  await expect(status).toHaveAttribute('role', 'alert');
+  await expect(status).toContainText('Journal entry not saved.');
+  await expect(status).toContainText('The result remains available here and can still be copied');
+  await expect(page.getByRole('button', { name: /Open private journal/i })).toHaveCount(0);
+  const latest = await page.evaluate(() => JSON.parse(localStorage.getItem('sense6:acutezza:last')));
+  expect(latest).toMatchObject({
+    schemaVersion: 2,
+    payload: { completion: { variant: 'single-eye', eyes: ['right'] } },
+  });
+});
+
+test('Acutezza ignores queued calibration and sweep frames after route disposal', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'Lifecycle behavior is viewport-independent');
+  await installQuickAcutezza(page);
+  await page.goto('/en/acutezza/');
+  await page.getByRole('button', { name: /Prepare the vision lab/i }).click();
+  await page.getByLabel(/I am 18 or older/i).check();
+  await page.getByRole('button', { name: /Calibrate the screen/i }).click();
+  await page.evaluate(() => {
+    window.__acutezzaRafCallbacks = [];
+    window.__acutezzaOriginalRaf = window.requestAnimationFrame;
+    window.__acutezzaOriginalCancelRaf = window.cancelAnimationFrame;
+    window.requestAnimationFrame = (callback) => {
+      window.__acutezzaRafCallbacks.push(callback);
+      return window.__acutezzaRafCallbacks.length;
+    };
+    window.cancelAnimationFrame = () => {};
+  });
+
+  await page.getByRole('button', { name: /The edges match/i }).click();
+  await page.getByRole('button', { name: /Start sweep/i }).click();
+  await page.locator('.brand').click();
+  await expect(page).toHaveURL(/\/en\/$/);
+  await expect(page.locator('[data-sense6-view="gallery"]')).toBeVisible();
+
+  await page.evaluate(() => {
+    const callbacks = window.__acutezzaRafCallbacks.splice(0);
+    window.requestAnimationFrame = window.__acutezzaOriginalRaf;
+    window.cancelAnimationFrame = window.__acutezzaOriginalCancelRaf;
+    for (const callback of callbacks) callback(performance.now());
+  });
+  await expect(page.locator('[data-sense6-view="gallery"]')).toBeVisible();
 });
 
 test('Acutezza invalidates a measured run when display geometry changes', async ({ page }) => {
@@ -508,6 +603,8 @@ test('Acutezza carries the 20% fallback and unusable controls through results an
   });
   expect(journal.quality).toBe('limited');
   expect(journal.setup).toMatchObject({
+    completedEyes: 'right',
+    completionVariant: 'single-eye',
     contrastPercent: 20,
     controlsCorrect: 0,
     controlsPresented: 2,

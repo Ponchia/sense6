@@ -24,13 +24,28 @@ import { createExamLifecycle } from '../lib/lifecycle.js';
 import { drawLandoltRing } from '../lib/optotypes.js';
 import { seededRandom } from '../lib/random.js';
 import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
-import { createResultStore, isRecord } from '../lib/storage.js';
+import { createResultStore } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
+import {
+  isAcutezzaLatestResult,
+  isLegacyAcutezzaLatestResult,
+  migrateLegacyAcutezzaLatestResult,
+} from './contracts.js';
 import { protocolPassport } from './protocols.js';
 import { ACUTEZZA_INSTRUMENTS, acutezzaIntroMarkup } from './views/acutezza-intro.js';
 
 const STORAGE_KEY = 'sense6:acutezza:last';
-const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isRecord });
+const LEGACY_RESULT_STORE = createResultStore({
+  key: STORAGE_KEY,
+  version: 1,
+  validate: isLegacyAcutezzaLatestResult,
+});
+const RESULT_STORE = createResultStore({
+  key: STORAGE_KEY,
+  version: 2,
+  validate: isAcutezzaLatestResult,
+  migrations: { 2: migrateLegacyAcutezzaLatestResult },
+});
 const MOUNT_OWNER = Symbol('acutezza');
 let state = null;
 
@@ -42,6 +57,7 @@ export function mount(context) {
     app: context.app,
     announcer: context.announcer,
     goHome: context.navigateHome,
+    goJournal: () => context.navigate('journal'),
     lifecycle,
     locale: context.locale,
     config: runtimeConfig(),
@@ -51,6 +67,7 @@ export function mount(context) {
     responseOpen: false,
     feedbackTimer: 0,
     sweepFrame: 0,
+    sweepCheckFrame: 0,
     sweepStartedAt: 0,
     sweepGeometry: null,
     geometryTimer: 0,
@@ -60,7 +77,9 @@ export function mount(context) {
   state = mountState;
   document.body.classList.add('ac-active');
   wireEvents(lifecycle.signal);
-  const themeObserver = new MutationObserver(themeChanged);
+  const themeObserver = new MutationObserver(() => {
+    if (isCurrentMount(mountState)) themeChanged();
+  });
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   renderIntro();
   lifecycle.onCleanup(() => {
@@ -188,18 +207,23 @@ function renderBlindSpotCalibration({ recheck = false } = {}) {
       <div class="ac-sweep" data-ac-sweep-field><div class="ac-sweep__dot" data-ac-sweep-dot aria-hidden="true"></div><div class="ac-sweep__fixation" data-ac-fixation role="img" aria-label="Fixation square"></div></div>
       <div class="ac-sweep__status" aria-live="polite"><strong data-ac-sweep-count>${state.session.sweep.expected} sweeps remaining</strong><span data-ac-sweep-status>Keep the right eye covered and look only at the square.</span></div>
       <div class="ui-cluster ac-calibration__actions"><button class="ui-button ui-button--lg" type="button" data-action="ac-start-sweep">Start sweep</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-record-sweep" disabled>Dot disappeared <span aria-hidden="true">· Space</span></button><button class="ui-link" type="button" data-action="ac-manual-distance">Use a ruler-measured distance</button></div></section>`);
-  requestAnimationFrame(checkSweepSpace);
+  const mountState = state;
+  state.sweepCheckFrame = requestAnimationFrame(() => checkSweepSpace(mountState));
 }
 
-function checkSweepSpace() {
-  const field = state.app.querySelector('[data-ac-sweep-field]');
-  if (!field || !state.session?.sweep) return;
-  const maxOffsetMm = (field.getBoundingClientRect().width * 0.82) / state.session.calibration.cssPixelsPerMm;
-  const maxDistance = maxOffsetMm / Math.tan((state.config.calibration.blindSpotDegrees * Math.PI) / 180);
-  if (maxDistance < state.config.calibration.minDistanceMm) {
+function checkSweepSpace(mountState) {
+  if (!isCurrentMount(mountState)) return;
+  mountState.sweepCheckFrame = 0;
+  const field = mountState.app.querySelector('[data-ac-sweep-field]');
+  if (!field || !mountState.session?.sweep) return;
+  const maxOffsetMm =
+    (field.getBoundingClientRect().width * 0.82) / mountState.session.calibration.cssPixelsPerMm;
+  const maxDistance =
+    maxOffsetMm / Math.tan((mountState.config.calibration.blindSpotDegrees * Math.PI) / 180);
+  if (maxDistance < mountState.config.calibration.minDistanceMm) {
     field.classList.add('is-too-small');
-    state.app.querySelector('[data-action="ac-start-sweep"]').disabled = true;
-    state.app.querySelector('[data-ac-sweep-status]').textContent = t(
+    mountState.app.querySelector('[data-action="ac-start-sweep"]').disabled = true;
+    mountState.app.querySelector('[data-ac-sweep-status]').textContent = t(
       'This viewport is too narrow for a reliable sweep. Use landscape, a larger display, or a ruler-measured distance.',
     );
   }
@@ -207,6 +231,7 @@ function checkSweepSpace() {
 
 function startSweep() {
   if (state.sweepFrame || !state.session?.sweep) return;
+  const mountState = state;
   const field = state.app.querySelector('[data-ac-sweep-field]');
   const dot = state.app.querySelector('[data-ac-sweep-dot]');
   const fixation = state.app.querySelector('[data-ac-fixation]');
@@ -221,23 +246,24 @@ function startSweep() {
     'The dot is moving. Keep looking at the square.',
   );
   const animate = (now) => {
-    const progress = Math.min(1, (now - state.sweepStartedAt) / state.config.calibration.sweepMs);
+    if (!isCurrentMount(mountState) || !mountState.session?.sweep) return;
+    const progress = Math.min(1, (now - mountState.sweepStartedAt) / mountState.config.calibration.sweepMs);
     const offset =
-      state.sweepGeometry.startOffset +
-      (state.sweepGeometry.endOffset - state.sweepGeometry.startOffset) * progress;
-    state.sweepGeometry.currentOffset = offset;
+      mountState.sweepGeometry.startOffset +
+      (mountState.sweepGeometry.endOffset - mountState.sweepGeometry.startOffset) * progress;
+    mountState.sweepGeometry.currentOffset = offset;
     dot.style.insetInlineStart = `${fixCenter - offset}px`;
     if (progress >= 1) {
       clearSweep();
-      state.app.querySelector('[data-action="ac-start-sweep"]').disabled = false;
-      state.app.querySelector('[data-ac-sweep-status]').textContent = t(
+      mountState.app.querySelector('[data-action="ac-start-sweep"]').disabled = false;
+      mountState.app.querySelector('[data-ac-sweep-status]').textContent = t(
         'The sweep ended without a response. Start again or use a ruler-measured distance.',
       );
       return;
     }
     // Do not expose a response until a position can actually be recorded.
-    state.app.querySelector('[data-action="ac-record-sweep"]').disabled = false;
-    state.sweepFrame = requestAnimationFrame(animate);
+    mountState.app.querySelector('[data-action="ac-record-sweep"]').disabled = false;
+    mountState.sweepFrame = requestAnimationFrame(animate);
   };
   state.sweepFrame = requestAnimationFrame(animate);
 }
@@ -497,7 +523,8 @@ function chooseDirection(direction) {
   }
   trial.responseCommitted = true;
   state.pendingAdvance = true;
-  state.feedbackTimer = window.setTimeout(advanceCommittedTrial, state.config.feedbackMs);
+  const mountState = state;
+  state.feedbackTimer = window.setTimeout(() => advanceCommittedTrial(mountState), state.config.feedbackMs);
 }
 
 function updateAcuityProgress() {
@@ -649,11 +676,21 @@ function renderResults() {
       ? 'Interpret with caution'
       : 'Run unusable';
   state.session.result = { setupQuality, usable, strongest, bounded, controlCorrect, controlCount };
-  saveLast({ setupQuality, eyes: state.session.eyeResults.length, recordedAt: Date.now() });
-  saveJournalResult({ setupQuality, usable, strongest, bounded, controlCorrect, controlCount });
+  const completion = acutezzaCompletion();
+  saveLast({ setupQuality, completion, recordedAt: Date.now() });
+  const journalSaved = saveJournalResult({
+    setupQuality,
+    usable,
+    strongest,
+    bounded,
+    controlCorrect,
+    controlCount,
+    completion,
+  });
+  state.session.journalSaved = journalSaved;
   document.title = t('Your calibrated sharpness observations — Acutezza | Sense6');
   renderScreen(
-    `<section class="ac-results ui-container ui-container--wide"><button class="back-link" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button><header class="ac-results__hero"><div><p class="ui-eyebrow">Acutezza / this display / this distance</p><h1>Separate observations.<br><em>No vision label.</em></h1><p>${strongest ? 'Measured calibration and every per-condition task-control pair support this run at the stated distance.' : usable ? 'At least one calibration, bound, interruption, or control condition requires caution before comparison.' : 'A per-condition task-control check failed. Repeat before interpreting this run.'}</p></div><div class="ac-results__stamp ${strongest ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>${String(state.session.eyeResults.length).padStart(2, '0')} / 02</strong></div></header><div class="ac-eye-results">${state.session.eyeResults.map(eyeResultMarkup).join('')}</div><div class="ac-context-grid"><article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the target.</h2><dl><div><dt>Scope</dt><dd>${state.session.scope === 'focused' ? 'Focused Sharpness' : 'Sharpness + nominal contrast'}</dd></div><div><dt>Correction</dt><dd>${correctionLabel(state.session.correction)}</dd></div><div><dt>Distance</dt><dd>${Math.round(state.session.calibration.distanceMm / 10)} cm · ${t(state.session.calibration.state)}</dd></div><div><dt>Second-eye distance recheck</dt><dd>${state.session.distanceRecheckPassed === null ? 'Not applicable' : state.session.distanceRecheckPassed ? 'Passed' : 'Not passed'}</dd></div><div><dt>Card scale</dt><dd>${Math.round(state.session.calibration.cardWidthCssPx)} CSS px</dd></div><div><dt>Low contrast</dt><dd>${contrastLabel()}</dd></div><div><dt>Surround theme</dt><dd>${state.session.theme}</dd></div><div><dt>Task controls</dt><dd>${controlCorrect} / ${controlCount}, assessed per condition</dd></div><div><dt>Interruptions</dt><dd>${state.session.interruptions}</dd></div></dl></article><article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Calibrated experiment, not an eye examination.</h2><p>Acutezza describes one self-administered run on this display at this estimated distance. It is not vision screening, diagnosis, or a prescription.</p><p>Do not infer normal vision, 20/20, refractive error, cylinder power, or an astigmatism axis. Meridiani scoring is suspended.</p></article></div><aside class="ac-results__safety"><strong>Sudden changes need care, not another run.</strong><p>Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.</p></aside><div class="ui-cluster ac-results__actions"><button class="ui-button" type="button" data-action="ac-restart">Repeat this scope independently</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-copy">${resultActionLabel(t)}</button></div></section>`,
+    `<section class="ac-results ui-container ui-container--wide"><button class="back-link" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button><header class="ac-results__hero"><div><p class="ui-eyebrow">Acutezza / this display / this distance</p><h1>Separate observations.<br><em>No vision label.</em></h1><p>${strongest ? 'Measured calibration and every per-condition task-control pair support this run at the stated distance.' : usable ? 'At least one calibration, bound, interruption, or control condition requires caution before comparison.' : 'A per-condition task-control check failed. Repeat before interpreting this run.'}</p></div><div class="ac-results__stamp ${strongest ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>${String(state.session.eyeResults.length).padStart(2, '0')} / 02</strong></div></header><div class="ui-alert ${journalSaved ? 'ui-alert--success' : 'ui-alert--danger'}" data-ac-journal-status role="${journalSaved ? 'status' : 'alert'}"><strong class="ui-alert__title">${journalSaved ? 'Saved to the private journal on this device.' : 'Journal entry not saved.'}</strong><p class="ui-alert__body">${journalSaved ? 'The structured run context is available for later same-setup comparison.' : 'The result remains available here and can still be copied, but it was not added to the private journal.'}</p></div><div class="ac-eye-results">${state.session.eyeResults.map(eyeResultMarkup).join('')}</div><div class="ac-context-grid"><article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the target.</h2><dl><div><dt>Scope</dt><dd>${state.session.scope === 'focused' ? 'Focused Sharpness' : 'Sharpness + nominal contrast'}</dd></div><div><dt>Correction</dt><dd>${correctionLabel(state.session.correction)}</dd></div><div><dt>Distance</dt><dd>${Math.round(state.session.calibration.distanceMm / 10)} cm · ${t(state.session.calibration.state)}</dd></div><div><dt>Second-eye distance recheck</dt><dd>${state.session.distanceRecheckPassed === null ? 'Not applicable' : state.session.distanceRecheckPassed ? 'Passed' : 'Not passed'}</dd></div><div><dt>Card scale</dt><dd>${Math.round(state.session.calibration.cardWidthCssPx)} CSS px</dd></div><div><dt>Low contrast</dt><dd>${contrastLabel()}</dd></div><div><dt>Surround theme</dt><dd>${state.session.theme}</dd></div><div><dt>Task controls</dt><dd>${controlCorrect} / ${controlCount}, assessed per condition</dd></div><div><dt>Interruptions</dt><dd>${state.session.interruptions}</dd></div></dl></article><article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Calibrated experiment, not an eye examination.</h2><p>Acutezza describes one self-administered run on this display at this estimated distance. It is not vision screening, diagnosis, or a prescription.</p><p>Do not infer normal vision, 20/20, refractive error, cylinder power, or an astigmatism axis. Meridiani scoring is suspended.</p></article></div><aside class="ac-results__safety"><strong>Sudden changes need care, not another run.</strong><p>Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.</p></aside><div class="ui-cluster ac-results__actions"><button class="ui-button" type="button" data-action="ac-restart">Repeat this scope independently</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-copy">${resultActionLabel(t)}</button>${journalSaved ? `<button class="ui-button ui-button--ghost" type="button" data-action="ac-journal">${t('Open private journal')}</button>` : ''}</div></section>`,
   );
 }
 
@@ -676,6 +713,7 @@ function resultCard(index, label, value, detail, copy) {
 
 async function copyResults() {
   if (!state.session?.result) return;
+  const mountState = state;
   const resultState = state.session.result;
   const lines = [
     t('Acutezza — calibrated sharpness observations'),
@@ -710,9 +748,9 @@ async function copyResults() {
       route: 'acutezza',
       locale: state.locale,
     });
-    if (outcome === 'copied') toast(t('Result summary copied.'));
+    if (isCurrentMount(mountState) && outcome === 'copied') toast(t('Result summary copied.'));
   } catch {
-    toast(t('Copy was unavailable in this browser.'));
+    if (isCurrentMount(mountState)) toast(t('Copy was unavailable in this browser.'));
   }
 }
 
@@ -742,7 +780,9 @@ function resumeRun() {
 function geometryChanged() {
   clearTimeout(state.geometryTimer);
   if (!hasLockedSession()) return;
+  const mountState = state;
   state.geometryTimer = window.setTimeout(() => {
+    if (!isCurrentMount(mountState)) return;
     ensureGeometry('Browser zoom, viewport size, pixel ratio, or orientation changed during the run.');
   }, 120);
 }
@@ -844,6 +884,7 @@ function wireEvents(signal) {
         },
         'ac-restart': renderPreparation,
         'ac-copy': copyResults,
+        'ac-journal': () => state.goJournal(),
         'ac-recalibrate': renderPreparation,
       };
       actions[action.dataset.action]?.();
@@ -894,7 +935,9 @@ function wireEvents(signal) {
 }
 
 function clearSweep() {
+  cancelAnimationFrame(state.sweepCheckFrame);
   cancelAnimationFrame(state.sweepFrame);
+  state.sweepCheckFrame = 0;
   state.sweepFrame = 0;
   state.sweepStartedAt = 0;
   state.sweepGeometry = null;
@@ -913,8 +956,8 @@ function clearRuntime() {
   state.pendingAdvance = false;
 }
 
-function advanceCommittedTrial() {
-  if (!state.pendingAdvance || !state.session?.currentEye) return;
+function advanceCommittedTrial(mountState) {
+  if (!isCurrentMount(mountState) || !state.pendingAdvance || !state.session?.currentEye) return;
   clearTimeout(state.feedbackTimer);
   state.feedbackTimer = 0;
   state.pendingAdvance = false;
@@ -925,6 +968,10 @@ function advanceCommittedTrial() {
 function withTrialIdentity(trial) {
   state.trialSequence += 1;
   return { ...trial, id: `acutezza-${state.trialSequence}`, responseCommitted: false };
+}
+
+function isCurrentMount(mountState) {
+  return state === mountState && !mountState.lifecycle.signal.aborted;
 }
 
 function maximumAcuityCanvasBox() {
@@ -1044,7 +1091,15 @@ function saveLast(result) {
   }
 }
 
-function saveJournalResult({ setupQuality, usable, strongest, bounded, controlCorrect, controlCount }) {
+function saveJournalResult({
+  setupQuality,
+  usable,
+  strongest,
+  bounded,
+  controlCorrect,
+  controlCount,
+  completion,
+}) {
   const measurements = state.session.eyeResults.flatMap((eye) => {
     const prefix = eye.eye;
     return [
@@ -1072,6 +1127,8 @@ function saveJournalResult({ setupQuality, usable, strongest, bounded, controlCo
       controlsPresented: controlCount,
       interruptions: state.session.interruptions,
       distanceRecheckPassed: state.session.distanceRecheckPassed,
+      completedEyes: completion.eyes.join(','),
+      completionVariant: completion.variant,
     },
     qualityEvidence: Object.fromEntries(
       state.session.eyeResults.flatMap((eye) => [
@@ -1091,7 +1148,15 @@ function saveJournalResult({ setupQuality, usable, strongest, bounded, controlCo
       ...(state.session.distanceRecheckPassed === true ? ['second-eye-distance-recheck-passed'] : []),
     ],
   });
-  if (entry) appendJournalEntry(entry);
+  return Boolean(entry && appendJournalEntry(entry));
+}
+
+function acutezzaCompletion() {
+  const eyes = state.session.eyeResults.map(({ eye }) => eye).sort();
+  return {
+    variant: eyes.length === 2 ? 'both-eyes' : 'single-eye',
+    eyes,
+  };
 }
 
 function acuityMeasurement(id, result) {
@@ -1106,5 +1171,11 @@ function acuityMeasurement(id, result) {
 }
 
 function loadLast() {
-  return RESULT_STORE.load();
+  const current = RESULT_STORE.load();
+  if (current) return current;
+  const legacy = LEGACY_RESULT_STORE.load();
+  const migrated = migrateLegacyAcutezzaLatestResult(legacy);
+  if (!migrated) return null;
+  RESULT_STORE.save(migrated);
+  return migrated;
 }
