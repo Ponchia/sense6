@@ -3,16 +3,7 @@ import { initThemeToggle } from '@ponchia/ui/behaviors';
 import './styles.css';
 
 import { EXAM_BY_ID, EXAMS, loadExam } from './exams/registry.js';
-import {
-  getLocale,
-  initializeI18n,
-  localeHref,
-  localizedRoot,
-  m,
-  setLocale,
-  t,
-  translateTree,
-} from './i18n.js';
+import { getLocale, initializeI18n, localeHref, localizedRoot, m, setLocale, t } from './i18n.js';
 import { disposeActiveExamLifecycles } from './lib/lifecycle.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from './metrics.js';
 import { currentLocation, currentRoute, navigate, startRouter } from './router.js';
@@ -127,12 +118,12 @@ function retireOutgoingRoute() {
  * swap atomically. Static pages whose renderer can be adopted do not mutate at
  * all; the same path still handles personalized and experiment views.
  * @param {() => (() => void)} mountRoute
- * @param {{ animate: boolean, initial: boolean, routeName: string, token: number, translate?: boolean, updateLinks?: boolean }} options
+ * @param {{ animate: boolean, initial: boolean, routeName: string, token: number, updateLinks?: boolean }} options
  * @returns {Promise<boolean>}
  */
 async function commitRoute(
   mountRoute,
-  { animate, initial, routeName, token, translate = true, updateLinks = true },
+  { animate, initial, routeName, token, updateLinks = true },
 ) {
   const generation = ++routeCommitGeneration;
   const previousHeight = appElement.getBoundingClientRect().height;
@@ -153,7 +144,6 @@ async function commitRoute(
       mountedCleanup = mountRoute();
       if (typeof mountedCleanup !== 'function') throw new TypeError('Route mount must return a cleanup.');
       cleanup = mountedCleanup;
-      if (translate) translateTree(appElement);
       if (updateLinks) updateShellLinks();
       appElement.dataset.sense6Hydrated = routeName;
       rendered = true;
@@ -223,7 +213,6 @@ async function renderRouteLoadFailure(error, route, token) {
         initial,
         routeName: 'error',
         token,
-        translate: false,
         updateLinks: false,
       },
     );
@@ -266,7 +255,9 @@ function disposeRoute(dispose) {
 function detectDisplay() {
   const p3 = window.matchMedia?.('(color-gamut: p3)').matches;
   const srgb = window.matchMedia?.('(color-gamut: srgb)').matches;
-  gamutChip.textContent = p3 ? t('P3 reported') : srgb ? t('sRGB reported') : t('Color gamut unknown');
+  const source = p3 ? 'P3 reported' : srgb ? 'sRGB reported' : 'Color gamut unknown';
+  gamutChip.dataset.i18nSource = source;
+  gamutChip.textContent = t(source);
   gamutChip.dataset.gamut = p3 ? 'p3' : srgb ? 'srgb' : 'unknown';
 }
 
