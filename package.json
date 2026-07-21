@@ -10,6 +10,7 @@
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
+    "social:images": "node scripts/generate-social-images.mjs",
     "build": "vite build && node scripts/generate-static-pages.mjs",
     "preview": "vite preview --host 0.0.0.0 --port 4173",
     "lint": "biome check src functions scripts tests audits playwright.config.js playwright.site.config.js unlighthouse.config.mjs",

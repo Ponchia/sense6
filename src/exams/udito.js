@@ -19,6 +19,7 @@ import { HearingAudio } from '../lib/hearing-audio.js';
 import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
 import { createExamLifecycle } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
+import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 import { renderInstrumentList, renderResearchSection } from './landing.js';
@@ -717,7 +718,7 @@ function renderResults() {
         <article class="ui-card"><p class="ui-eyebrow">${t('Interpretation boundary')}</p><h2>${t('Device-relative, never dB HL.')}</h2><p>${t('A browser knows digital amplitude, not sound pressure at your eardrum. Headphone response, fit, output, age, room noise, device processing, and the volume setting all shape these numbers.')}</p><p>${t('Do not infer hearing age, “normal” hearing, safety for work, or a medical diagnosis. If hearing concerns affect daily life, use calibrated clinical audiometry.')}</p></article>
       </div>
       <aside class="au-results__safety"><strong>${t('Keep the same volume only for comparison.')}</strong><p>${t('Compare your own runs only with the same device, headphones, fit, room, and volume. Stop testing if any sound is uncomfortable.')}</p></aside>
-      <div class="ui-cluster au-results__actions"><button class="ui-button" type="button" data-action="au-restart">Repeat this scope independently</button><button class="ui-button ui-button--ghost" type="button" data-action="au-copy">${t('Copy result summary')}</button>${journalSaved ? `<button class="ui-button ui-button--ghost" type="button" data-action="au-journal">${t('Open private journal')}</button>` : ''}</div>
+      <div class="ui-cluster au-results__actions"><button class="ui-button" type="button" data-action="au-restart">Repeat this scope independently</button><button class="ui-button ui-button--ghost" type="button" data-action="au-copy">${resultActionLabel(t)}</button>${journalSaved ? `<button class="ui-button ui-button--ghost" type="button" data-action="au-journal">${t('Open private journal')}</button>` : ''}</div>
     </section>`;
   focusStage(
     'h1',
@@ -905,7 +906,7 @@ function handleOutputDeviceChange() {
   }
 }
 
-function copyResults() {
+async function copyResults() {
   if (!state.session?.result) return;
   const { headphones, range, pitch, usable, setupQuality, cautionReasons } = state.session.result;
   const text = [
@@ -948,14 +949,17 @@ function copyResults() {
         ]),
     t('This is not dB HL, a hearing-age score, screening, or diagnosis.'),
   ].join('\n');
-  const copy = navigator.clipboard?.writeText(text);
-  if (!copy) {
+  try {
+    const outcome = await shareOrCopyResult({
+      title: t('Device-relative hearing lab — Udito | Sense6'),
+      summary: text,
+      route: 'udito',
+      locale: state.locale,
+    });
+    if (outcome === 'copied') toast(t('Result summary copied.'));
+  } catch {
     toast(t('Copy was unavailable in this browser.'));
-    return;
   }
-  copy
-    .then(() => toast(t('Result summary copied.')))
-    .catch(() => toast(t('Copy was unavailable in this browser.')));
 }
 
 function setResponseDisabled(disabled) {

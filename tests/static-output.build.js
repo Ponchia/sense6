@@ -30,6 +30,12 @@ test('every canonical route has substantive, localized raw HTML', async () => {
     assert.match(html, /<meta name="description" content="[^"].+">/, path);
     assert.match(
       html,
+      /<meta property="og:image" content="https:\/\/sense6\.net\/social\/[^".]+\.png">/,
+      path,
+    );
+    assert.match(html, /<meta name="twitter:card" content="summary_large_image"\s*\/?>/, path);
+    assert.match(
+      html,
       new RegExp(`<link rel="canonical" href="https://sense6\\.net${escapeRegex(path)}">`),
       path,
     );
@@ -66,6 +72,31 @@ test('every canonical route has substantive, localized raw HTML', async () => {
   }
 });
 
+test('experiment discovery pages expose useful copy, related routes, images, and provenance', async () => {
+  for (const definition of EXAMS) {
+    const html = await readFile(new URL(`en/${definition.route}/index.html`, DIST), 'utf8');
+    const main = html.match(/<main[^>]*>([\s\S]*?)<\/main>/)?.[1] ?? '';
+    const words = stripTags(main).split(/\s+/).filter(Boolean);
+    assert.ok(words.length >= 200, `${definition.route} raw entry has only ${words.length} words`);
+    assert.match(
+      html,
+      new RegExp(`<img src="/social/${escapeRegex(definition.id)}\\.svg" width="1200" height="630"`),
+    );
+    for (const related of definition.discovery.related) {
+      assert.match(html, new RegExp(`href="/en/${escapeRegex(related)}/"`));
+    }
+
+    const data = JSON.parse(html.match(/<script type="application\/ld\+json">(.+)<\/script>/)?.[1] ?? '{}');
+    assert.deepEqual(
+      data['@graph'].map((entry) => entry['@type']),
+      ['WebApplication', 'BreadcrumbList'],
+    );
+    assert.equal(data['@graph'][0].dateModified, '2026-07-21');
+    assert.equal(data['@graph'][0].creator.url, 'https://personal.brontolotto.observer');
+    assert.equal(data['@graph'][0].image, `https://sense6.net/social/${definition.id}.png`);
+  }
+});
+
 test('sitemap, robots, llms index, and 404 match the registry', async () => {
   const redirects = await readFile(new URL('_redirects', DIST), 'utf8');
   assert.match(redirects, /^\/pt-BR\/\* \/pt-br\/:splat 301$/m);
@@ -76,6 +107,12 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
     (match) => match[1],
   );
   assert.deepEqual(sitemapPaths, expectedPaths);
+  const lastModified = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((match) => match[1]);
+  assert.equal(lastModified.length, 1 + LOCALES.length * (EXAMS.length + 2));
+  for (const date of lastModified) {
+    assert.match(date, /^\d{4}-\d{2}-\d{2}$/);
+    assert.ok(Date.parse(`${date}T00:00:00Z`) <= Date.now(), `future sitemap date: ${date}`);
+  }
 
   const robots = await readFile(new URL('robots.txt', DIST), 'utf8');
   assert.ok(

@@ -843,6 +843,20 @@ a:focus-visible {
   max-inline-size: 72ch;
 }
 
+.static-preview {
+  margin: 0;
+  max-inline-size: 60rem;
+}
+
+.static-preview img {
+  aspect-ratio: 40 / 21;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  display: block;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
 .static-page-grid {
   display: grid;
   gap: var(--space-md);

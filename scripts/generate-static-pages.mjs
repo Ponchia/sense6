@@ -12,9 +12,11 @@ import { privacyCopy, privacyHtml } from '../src/privacy.js';
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DIST = join(ROOT, 'dist');
 const ORIGIN = 'https://sense6.net';
+const SITE_DATE_MODIFIED = '2026-07-21';
 const template = await readFile(join(DIST, 'index.html'), 'utf8');
 const routeStyles = await indexRouteStyles();
-const canonicalPaths = ['/'];
+const canonicalPaths = [{ path: '/', lastModified: SITE_DATE_MODIFIED }];
+const examById = new Map(EXAMS.map((definition) => [definition.id, definition]));
 const catalogs = new Map(
   await Promise.all(LOCALES.map(async ({ code }) => [code, await loadMessages(code)])),
 );
@@ -27,6 +29,8 @@ await writePage('index.html', {
   title: 'Sense6 — choose your language',
   description:
     'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
+  socialImage: '/social/sense6.png',
+  socialImageAlt: 'Sense6 browser perception experiments',
   main: rootMarkup(),
   stylesheet: routeStyles.get('gallery'),
   alternates: galleryAlternates(),
@@ -41,7 +45,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
       messages.get(source) ?? source,
     );
   const galleryPath = `/${locale}/`;
-  canonicalPaths.push(galleryPath);
+  canonicalPaths.push({ path: galleryPath, lastModified: SITE_DATE_MODIFIED });
   await writePage(`${locale}/index.html`, {
     locale,
     languageTag,
@@ -50,6 +54,10 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     title: translate('Sense6 — measure what your senses notice'),
     description: translate(
       'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
+    ),
+    socialImage: '/social/sense6.png',
+    socialImageAlt: translate(
+      'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',
     ),
     main: galleryMarkup(locale, translate),
     stylesheet: routeStyles.get('gallery'),
@@ -64,7 +72,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
 
   for (const definition of EXAMS) {
     const path = `/${locale}/${definition.route}/`;
-    canonicalPaths.push(path);
+    canonicalPaths.push({ path, lastModified: SITE_DATE_MODIFIED });
     await writePage(`${locale}/${definition.route}/index.html`, {
       locale,
       languageTag,
@@ -72,6 +80,8 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
       path,
       title: translate(definition.pageTitle),
       description: translate(definition.blurb),
+      socialImage: `/social/${definition.id}.png`,
+      socialImageAlt: `${definition.name} — ${translate(definition.tagline)}`,
       main: examMarkup(definition, locale, translate),
       stylesheet: routeStyles.get(definition.id),
       alternates: pageAlternates(definition.route),
@@ -81,7 +91,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
 
   const about = aboutCopy(locale);
   const aboutPath = `/${locale}/about/`;
-  canonicalPaths.push(aboutPath);
+  canonicalPaths.push({ path: aboutPath, lastModified: ABOUT_DATE_MODIFIED });
   await writePage(`${locale}/about/index.html`, {
     locale,
     languageTag,
@@ -89,6 +99,8 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     path: aboutPath,
     title: about.pageTitle,
     description: about.description,
+    socialImage: '/social/sense6.png',
+    socialImageAlt: about.description,
     main: aboutMarkup(locale),
     stylesheet: routeStyles.get('about'),
     alternates: pageAlternates('about'),
@@ -97,7 +109,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
 
   const journal = journalCopy(locale);
   const journalPath = `/${locale}/journal/`;
-  canonicalPaths.push(journalPath);
+  canonicalPaths.push({ path: journalPath });
   await writePage(`${locale}/journal/index.html`, {
     locale,
     languageTag,
@@ -105,6 +117,8 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     path: journalPath,
     title: `${journal.title} | Sense6`,
     description: journal.intro,
+    socialImage: '/social/sense6.png',
+    socialImageAlt: journal.intro,
     main: journalMarkup(journal, locale),
     stylesheet: routeStyles.get('journal'),
     alternates: pageAlternates('journal'),
@@ -113,7 +127,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
 
   const copy = privacyCopy(locale);
   const privacyPath = `/${locale}/privacy/`;
-  canonicalPaths.push(privacyPath);
+  canonicalPaths.push({ path: privacyPath });
   await writePage(`${locale}/privacy/index.html`, {
     locale,
     languageTag,
@@ -121,6 +135,8 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     path: privacyPath,
     title: `${copy.title} | Sense6`,
     description: copy.intro,
+    socialImage: '/social/sense6.png',
+    socialImageAlt: copy.intro,
     main: privacyMarkup(copy, locale),
     stylesheet: routeStyles.get('privacy'),
     alternates: pageAlternates('privacy'),
@@ -143,6 +159,12 @@ async function writePage(relativePath, page) {
   html = replaceMeta(html, 'property', 'og:title', page.title);
   html = replaceMeta(html, 'property', 'og:description', page.description);
   html = replaceMeta(html, 'property', 'og:url', `${ORIGIN}${page.path}`);
+  html = replaceMeta(html, 'property', 'og:image', `${ORIGIN}${page.socialImage}`);
+  html = replaceMeta(html, 'property', 'og:image:alt', page.socialImageAlt);
+  html = replaceMeta(html, 'name', 'twitter:title', page.title);
+  html = replaceMeta(html, 'name', 'twitter:description', page.description);
+  html = replaceMeta(html, 'name', 'twitter:image', `${ORIGIN}${page.socialImage}`);
+  html = replaceMeta(html, 'name', 'twitter:image:alt', page.socialImageAlt);
   html = html.replace(
     /<link rel="canonical" href="[^"]+"\s*\/?>/,
     `<link rel="canonical" href="${ORIGIN}${page.path}">`,
@@ -239,6 +261,11 @@ function galleryMarkup(locale, tr) {
 }
 
 function examMarkup(definition, locale, tr) {
+  const related = definition.discovery.related.map((id) => {
+    const entry = examById.get(id);
+    if (!entry) throw new Error(`Unknown related experiment: ${id}`);
+    return entry;
+  });
   return `<article class="static-entry ui-container ui-container--wide" id="interactive-test">
     <a class="back-link" data-sense6-route="" href="/${locale}/"><span aria-hidden="true">←</span> ${escapeHtml(tr('All tests'))}</a>
     <header>
@@ -247,8 +274,12 @@ function examMarkup(definition, locale, tr) {
       <p>${escapeHtml(tr(definition.blurb))}</p>
       <a class="ui-button" href="#interactive-test">${escapeHtml(tr('Open test'))}</a>
     </header>
+    <figure class="static-preview">
+      <img src="/social/${definition.id}.svg" width="1200" height="630" alt="${escapeAttribute(`${definition.name} — ${tr(definition.tagline)}`)}" loading="lazy">
+    </figure>
     <section>
       <h2>${escapeHtml(tr('What this test includes'))}</h2>
+      ${definition.discovery.paragraphs.map((paragraph) => `<p>${escapeHtml(tr(paragraph))}</p>`).join('')}
       <ul>${definition.facts.map((fact) => `<li>${escapeHtml(tr(fact))}</li>`).join('')}</ul>
     </section>
     <section>
@@ -263,6 +294,17 @@ function examMarkup(definition, locale, tr) {
             `<li><strong>${escapeHtml(tr(sourceRoleLabel(role)))}:</strong> <a href="${escapeAttribute(href)}" rel="noreferrer">${escapeHtml(label)}</a></li>`,
         )
         .join('')}</ul>
+    </section>
+    <section>
+      <h2>${escapeHtml(tr('Start with what you want to learn.'))}</h2>
+      <div class="static-page-grid">${related
+        .map(
+          (entry) => `<article class="ui-card">
+            <h3><a data-sense6-route="${entry.route}" href="/${locale}/${entry.route}/">${escapeHtml(entry.name)} — ${escapeHtml(tr(entry.tagline))}</a></h3>
+            <p>${escapeHtml(tr(entry.blurb))}</p>
+          </article>`,
+        )
+        .join('')}</div>
     </section>
   </article>`;
 }
@@ -316,6 +358,8 @@ function websiteData(locale, description = 'Private, device-relative browser per
     url: ORIGIN,
     inLanguage: locale,
     description,
+    image: `${ORIGIN}/social/sense6.png`,
+    dateModified: SITE_DATE_MODIFIED,
     creator: {
       '@type': 'Person',
       '@id': `${ORIGIN}/#creator`,
@@ -361,16 +405,53 @@ function aboutData(copy, locale, path) {
 }
 
 function examData(definition, locale, path, tr) {
+  const url = `${ORIGIN}${path}`;
   return {
     '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: definition.name,
-    url: `${ORIGIN}${path}`,
-    description: tr(definition.blurb),
-    applicationCategory: 'EducationalApplication',
-    isAccessibleForFree: true,
-    inLanguage: locale,
-    citation: definition.sources.map(({ href }) => href),
+    '@graph': [
+      {
+        '@type': 'WebApplication',
+        '@id': `${url}#application`,
+        name: definition.name,
+        url,
+        description: tr(definition.blurb),
+        applicationCategory: 'EducationalApplication',
+        isAccessibleForFree: true,
+        inLanguage: locale,
+        image: `${ORIGIN}/social/${definition.id}.png`,
+        dateModified: SITE_DATE_MODIFIED,
+        creator: creatorData(),
+        isPartOf: {
+          '@type': 'WebSite',
+          '@id': `${ORIGIN}/#website`,
+          name: 'Sense6',
+          url: ORIGIN,
+        },
+        citation: definition.sources.map(({ href }) => href),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${url}#breadcrumb`,
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: tr('All tests'),
+            item: `${ORIGIN}/${path.split('/')[1]}/`,
+          },
+          { '@type': 'ListItem', position: 2, name: definition.name, item: url },
+        ],
+      },
+    ],
+  };
+}
+
+function creatorData() {
+  return {
+    '@type': 'Person',
+    '@id': `${ORIGIN}/#creator`,
+    name: 'Zeno',
+    url: 'https://personal.brontolotto.observer',
   };
 }
 
@@ -400,7 +481,10 @@ async function write404() {
 
 async function writeDiscoveryFiles() {
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${canonicalPaths
-    .map((path) => `  <url><loc>${ORIGIN}${path}</loc></url>`)
+    .map(
+      ({ path, lastModified }) =>
+        `  <url><loc>${ORIGIN}${path}</loc>${lastModified ? `<lastmod>${lastModified}</lastmod>` : ''}</url>`,
+    )
     .join('\n')}\n</urlset>\n`;
   await writeFile(join(DIST, 'sitemap.xml'), sitemap);
   await writeFile(join(DIST, 'robots.txt'), renderRobots(ORIGIN));

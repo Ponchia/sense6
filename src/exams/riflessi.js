@@ -11,6 +11,7 @@ import {
   randomWait,
   summarizeRiflessi,
 } from '../lib/reflexes.js';
+import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 import { renderInstrumentList, renderMethodSteps, renderResearchSection } from './landing.js';
@@ -728,7 +729,7 @@ function renderResults() {
 
       <div class="ui-cluster rx-results__actions">
         <button class="ui-button" type="button" data-action="rx-restart">${t('Repeat this scope independently')}</button>
-        <button class="ui-button ui-button--ghost" type="button" data-action="rx-copy">Copy result summary</button>
+        <button class="ui-button ui-button--ghost" type="button" data-action="rx-copy">${resultActionLabel(t)}</button>
       </div>
     </section>
   `;
@@ -903,7 +904,7 @@ function timingHealth(diagnostics) {
   };
 }
 
-function copyResults() {
+async function copyResults() {
   if (!state.session?.result) return;
   const result = state.session.result;
   const timing = timingHealth(state.session.diagnostics);
@@ -951,11 +952,17 @@ function copyResults() {
     ),
     t('Compare only on the same device and input. Not a clinical or population score.'),
   );
-  const text = lines.join('\n');
-  navigator.clipboard
-    ?.writeText(text)
-    .then(() => toast(t('Result summary copied.')))
-    .catch(() => toast(t('Copy was unavailable in this browser.')));
+  try {
+    const outcome = await shareOrCopyResult({
+      title: t('Response speed and consistency — Riflessi | Sense6'),
+      summary: lines.join('\n'),
+      route: 'riflessi',
+      locale: state.locale,
+    });
+    if (outcome === 'copied') toast(t('Result summary copied.'));
+  } catch {
+    toast(t('Copy was unavailable in this browser.'));
+  }
 }
 
 function wireEvents(signal) {

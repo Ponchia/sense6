@@ -23,6 +23,7 @@ import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '
 import { createExamLifecycle } from '../lib/lifecycle.js';
 import { drawLandoltRing } from '../lib/optotypes.js';
 import { seededRandom } from '../lib/random.js';
+import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 import { protocolPassport } from './protocols.js';
@@ -652,7 +653,7 @@ function renderResults() {
   saveJournalResult({ setupQuality, usable, strongest, bounded, controlCorrect, controlCount });
   document.title = t('Your calibrated sharpness observations — Acutezza | Sense6');
   renderScreen(
-    `<section class="ac-results ui-container ui-container--wide"><button class="back-link" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button><header class="ac-results__hero"><div><p class="ui-eyebrow">Acutezza / this display / this distance</p><h1>Separate observations.<br><em>No vision label.</em></h1><p>${strongest ? 'Measured calibration and every per-condition task-control pair support this run at the stated distance.' : usable ? 'At least one calibration, bound, interruption, or control condition requires caution before comparison.' : 'A per-condition task-control check failed. Repeat before interpreting this run.'}</p></div><div class="ac-results__stamp ${strongest ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>${String(state.session.eyeResults.length).padStart(2, '0')} / 02</strong></div></header><div class="ac-eye-results">${state.session.eyeResults.map(eyeResultMarkup).join('')}</div><div class="ac-context-grid"><article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the target.</h2><dl><div><dt>Scope</dt><dd>${state.session.scope === 'focused' ? 'Focused Sharpness' : 'Sharpness + nominal contrast'}</dd></div><div><dt>Correction</dt><dd>${correctionLabel(state.session.correction)}</dd></div><div><dt>Distance</dt><dd>${Math.round(state.session.calibration.distanceMm / 10)} cm · ${t(state.session.calibration.state)}</dd></div><div><dt>Second-eye distance recheck</dt><dd>${state.session.distanceRecheckPassed === null ? 'Not applicable' : state.session.distanceRecheckPassed ? 'Passed' : 'Not passed'}</dd></div><div><dt>Card scale</dt><dd>${Math.round(state.session.calibration.cardWidthCssPx)} CSS px</dd></div><div><dt>Low contrast</dt><dd>${contrastLabel()}</dd></div><div><dt>Surround theme</dt><dd>${state.session.theme}</dd></div><div><dt>Task controls</dt><dd>${controlCorrect} / ${controlCount}, assessed per condition</dd></div><div><dt>Interruptions</dt><dd>${state.session.interruptions}</dd></div></dl></article><article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Calibrated experiment, not an eye examination.</h2><p>Acutezza describes one self-administered run on this display at this estimated distance. It is not vision screening, diagnosis, or a prescription.</p><p>Do not infer normal vision, 20/20, refractive error, cylinder power, or an astigmatism axis. Meridiani scoring is suspended.</p></article></div><aside class="ac-results__safety"><strong>Sudden changes need care, not another run.</strong><p>Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.</p></aside><div class="ui-cluster ac-results__actions"><button class="ui-button" type="button" data-action="ac-restart">Repeat this scope independently</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-copy">Copy result summary</button></div></section>`,
+    `<section class="ac-results ui-container ui-container--wide"><button class="back-link" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button><header class="ac-results__hero"><div><p class="ui-eyebrow">Acutezza / this display / this distance</p><h1>Separate observations.<br><em>No vision label.</em></h1><p>${strongest ? 'Measured calibration and every per-condition task-control pair support this run at the stated distance.' : usable ? 'At least one calibration, bound, interruption, or control condition requires caution before comparison.' : 'A per-condition task-control check failed. Repeat before interpreting this run.'}</p></div><div class="ac-results__stamp ${strongest ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>${String(state.session.eyeResults.length).padStart(2, '0')} / 02</strong></div></header><div class="ac-eye-results">${state.session.eyeResults.map(eyeResultMarkup).join('')}</div><div class="ac-context-grid"><article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the target.</h2><dl><div><dt>Scope</dt><dd>${state.session.scope === 'focused' ? 'Focused Sharpness' : 'Sharpness + nominal contrast'}</dd></div><div><dt>Correction</dt><dd>${correctionLabel(state.session.correction)}</dd></div><div><dt>Distance</dt><dd>${Math.round(state.session.calibration.distanceMm / 10)} cm · ${t(state.session.calibration.state)}</dd></div><div><dt>Second-eye distance recheck</dt><dd>${state.session.distanceRecheckPassed === null ? 'Not applicable' : state.session.distanceRecheckPassed ? 'Passed' : 'Not passed'}</dd></div><div><dt>Card scale</dt><dd>${Math.round(state.session.calibration.cardWidthCssPx)} CSS px</dd></div><div><dt>Low contrast</dt><dd>${contrastLabel()}</dd></div><div><dt>Surround theme</dt><dd>${state.session.theme}</dd></div><div><dt>Task controls</dt><dd>${controlCorrect} / ${controlCount}, assessed per condition</dd></div><div><dt>Interruptions</dt><dd>${state.session.interruptions}</dd></div></dl></article><article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Calibrated experiment, not an eye examination.</h2><p>Acutezza describes one self-administered run on this display at this estimated distance. It is not vision screening, diagnosis, or a prescription.</p><p>Do not infer normal vision, 20/20, refractive error, cylinder power, or an astigmatism axis. Meridiani scoring is suspended.</p></article></div><aside class="ac-results__safety"><strong>Sudden changes need care, not another run.</strong><p>Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.</p></aside><div class="ui-cluster ac-results__actions"><button class="ui-button" type="button" data-action="ac-restart">Repeat this scope independently</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-copy">${resultActionLabel(t)}</button></div></section>`,
   );
 }
 
@@ -673,7 +674,7 @@ function resultCard(index, label, value, detail, copy) {
   return `<article class="ac-metric"><div><span>${index}</span><p>${label}</p></div><strong>${value}</strong><small>${detail}</small><p>${copy}</p></article>`;
 }
 
-function copyResults() {
+async function copyResults() {
   if (!state.session?.result) return;
   const resultState = state.session.result;
   const lines = [
@@ -702,10 +703,17 @@ function copyResults() {
   if (!resultState.usable || resultState.bounded)
     lines.push(t('Interpret with caution; repeat before comparing runs.'));
   lines.push(t('This is not vision screening, diagnosis, or a prescription.'));
-  navigator.clipboard
-    ?.writeText(lines.join('\n'))
-    .then(() => toast(t('Result summary copied.')))
-    .catch(() => toast(t('Copy was unavailable in this browser.')));
+  try {
+    const outcome = await shareOrCopyResult({
+      title: t('Calibrated sharpness experiment — Acutezza | Sense6'),
+      summary: lines.join('\n'),
+      route: 'acutezza',
+      locale: state.locale,
+    });
+    if (outcome === 'copied') toast(t('Result summary copied.'));
+  } catch {
+    toast(t('Copy was unavailable in this browser.'));
+  }
 }
 
 function pauseRun() {
