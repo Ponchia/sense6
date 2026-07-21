@@ -1,3 +1,4 @@
+import { landingRows } from './landing-copy.js';
 import { mobileUxRows } from './mobile-ux-copy.js';
 import { registryRows } from './registry-copy.js';
 
@@ -1340,7 +1341,7 @@ const rows = [
   ['False starts', 'False partenze'],
   ['Missed signals', 'Segnali mancati'],
   ['Wrong choices', 'Scelte errate'],
-  ['Input', 'Input'],
+  ['Input', 'Modalità di input'],
   ['Frame cadence', 'Cadenza dei fotogrammi'],
   ['Unknown', 'Sconosciuto'],
   ['Interrupted trials', 'Prove interrotte'],
@@ -1395,7 +1396,7 @@ const rows = [
     'Sessione sperimentale Daltonia nel browser — {thresholds}; controlli del compito {correct}/{total}. Relativa allo schermo, non convalidata e non diagnostica.',
   ],
   ['Riflessi — device-relative response profile', 'Riflessi — profilo di risposta relativo al dispositivo'],
-  ['Input: {input}', 'Input: {input}'],
+  ['Input: {input}', 'Modalità di input: {input}'],
   ['Signal median: {value} ms', 'Mediana del segnale: {value} ms'],
   [
     'Choice median: {median} ms; accuracy: {accuracy}%; cost: {cost} ms',
@@ -1621,6 +1622,6 @@ rows.push(
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 );
 
-const catalogRows = [...rows, ...registryRows('it'), ...mobileUxRows('it')];
+const catalogRows = [...rows, ...registryRows('it'), ...mobileUxRows('it'), ...landingRows('it')];
 export const MESSAGE_COUNT = catalogRows.length;
 export default new Map(catalogRows);

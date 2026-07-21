@@ -202,8 +202,10 @@ test('German Udito stages localize generated listening labels', async ({ page },
   await page.locator('[data-action="au-start"]').click();
   await expect(page.locator('.au-brief__copy')).toContainText('Kopfhörer-Konfidenz');
   await expect(page.getByRole('heading', { name: 'Welcher Ton ist am leisesten?' })).toBeVisible();
+  await expect(page.locator('#announcer')).toHaveText('Die Anweisungen für Cuffie sind bereit.');
   await page.locator('[data-action="au-begin-stage"]').click();
   await expect(page.getByRole('heading', { name: 'Hörtest für Cuffie' })).toBeAttached();
+  await expect(page.locator('#announcer')).toHaveText('Der Tonlauf für Cuffie ist bereit.');
   await expect(page.locator('.au-runner__header strong')).toHaveText('Übung');
   await expect(page.locator('[data-au-response="0"]')).toContainText('Intervall 1');
   await expect(page.locator('[data-action="au-stop"]')).toHaveText('Sicher stoppen');
