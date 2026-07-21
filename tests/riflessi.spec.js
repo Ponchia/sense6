@@ -83,6 +83,67 @@ test('Riflessi signal scope ends independently without placeholder instruments',
   expect(copied).not.toContain('wrong choices');
 });
 
+test('Riflessi keeps storage failure visible and prioritizes copying the unsaved result', async ({
+  page,
+}) => {
+  await installQuickRiflessi(page);
+  await page.addInitScript(() => {
+    Storage.prototype.setItem = () => {
+      throw new DOMException('Storage blocked', 'SecurityError');
+    };
+  });
+  await page.goto('/en/riflessi/');
+  await prepareRiflessi(page, 'keyboard', 'signal');
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  await respondWithKey(page, 'Space');
+  await page.getByRole('button', { name: /Begin measured block/i }).click();
+  const total = Number(
+    await page.locator('[data-rx-count]').evaluate((element) => element.textContent.split('/')[1]),
+  );
+  for (let trial = 0; trial < total; trial += 1) await respondWithKey(page, 'Space');
+
+  await expect(page.getByRole('alert')).toContainText(/This result was not saved/i);
+  await expect(page.getByRole('alert')).toContainText(/copy it before leaving/i);
+  await expect(page.locator('.rx-results__actions .ui-button').first()).toContainText(/Copy result summary/i);
+});
+
+test('Riflessi accepts legacy result shapes and rejects malformed latest-result storage', async ({
+  page,
+}) => {
+  const legacyResult = {
+    signal: { medianMs: 215, spreadMs: 10, valid: 20 },
+    choice: { medianMs: 310, accuracyPercent: 94, costMs: 95, valid: 30, attempts: 32 },
+    stability: { medianMs: 245, slowestGapMs: 40, driftMs: 15, valid: 18 },
+    events: { falseStarts: 0, anticipations: 1, misses: 0, wrongChoices: 2 },
+    usable: true,
+    inputMode: 'pointer',
+    timing: 'Timing appeared steady',
+    recordedAt: 1_750_000_000_000,
+  };
+  await page.goto('/en/');
+  await page.evaluate((stored) => {
+    localStorage.setItem('sense6:riflessi:last', JSON.stringify(stored));
+  }, legacyResult);
+  await page.goto('/en/riflessi/');
+  await expect(page.locator('.previous-score')).toContainText(/touch \/ pointer input/i);
+  await expect
+    .poll(() =>
+      page.evaluate(() => JSON.parse(localStorage.getItem('sense6:riflessi:last') ?? 'null')?.format),
+    )
+    .toBe('sense6-result');
+
+  for (const malformed of [
+    { ...legacyResult, inputMode: 'gamepad' },
+    { ...legacyResult, signal: { medianMs: 'fast', valid: 20 } },
+  ]) {
+    await page.evaluate((stored) => {
+      localStorage.setItem('sense6:riflessi:last', JSON.stringify(stored));
+    }, malformed);
+    await page.reload();
+    await expect(page.locator('.previous-score')).toHaveCount(0);
+  }
+});
+
 async function finishSignalAndOpenChoice(page) {
   await page.getByRole('button', { name: /Start practice/i }).click();
   await respondWithKey(page, 'Space');

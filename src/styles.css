@@ -220,8 +220,8 @@ a:focus-visible {
   opacity: 0.48;
 }
 
-.hero__copy .ui-eyebrow,
-.hero__lede,
+.tetracromia-hero__copy .ui-eyebrow,
+.tetracromia-hero__lede,
 .hero__limit,
 .section-heading .ui-eyebrow,
 .section-heading h2,
@@ -239,7 +239,7 @@ a:focus-visible {
   min-inline-size: 0;
 }
 
-.hero h1,
+.tetracromia-hero h1,
 .setup-copy h1,
 .results-head h1 {
   font-family: var(--display);
@@ -785,7 +785,7 @@ a:focus-visible {
 }
 
 @media (max-width: 900px) {
-  .hero,
+  .tetracromia-hero,
   .method__layout,
   .science {
     grid-template-columns: minmax(0, 1fr);
@@ -844,13 +844,13 @@ a:focus-visible {
     padding-inline: 0.45rem 1.2rem;
   }
 
-  .hero h1,
+  .tetracromia-hero h1,
   .setup-copy h1,
   .results-head h1 {
     font-size: clamp(3.25rem, 17vw, 5.2rem);
   }
 
-  .hero h1,
+  .tetracromia-hero h1,
   .results-head h1 {
     hyphens: auto;
     max-inline-size: 100%;
@@ -888,6 +888,18 @@ a:focus-visible {
 
   #app {
     view-transition-name: none;
+  }
+}
+
+@media print {
+  .site-chrome,
+  .ui-sitefooter,
+  .results-actions {
+    display: none;
+  }
+
+  .results-view {
+    padding: 0;
   }
 }
 

@@ -40,6 +40,8 @@ export function mount(context) {
     responseUnlockTimer: 0,
     transitionFrame: 0,
     fieldRedrawFrame: 0,
+    announcementFrame: 0,
+    dragReleaseTimer: 0,
     measurementEnvironment: null,
   };
   state = mountState;
@@ -216,11 +218,15 @@ function renderLab({ semanticTransition = false, restoreChoice = null } = {}) {
 
   armResponseGate(restoreChoice === null ? null : `[data-choice="${restoreChoice}"]`);
   if (trial.kind === 'field') {
+    const mountedState = state;
     const nonce = trial.nonce;
-    requestAnimationFrame(() => {
-      if (state.session?.currentTrial.nonce !== nonce) return;
+    const frame = requestAnimationFrame(() => {
+      if (state !== mountedState || mountedState.fieldRedrawFrame !== frame) return;
+      mountedState.fieldRedrawFrame = 0;
+      if (mountedState.session?.currentTrial.nonce !== nonce) return;
       drawFields(trial);
     });
+    mountedState.fieldRedrawFrame = frame;
   }
   if (semanticTransition) positionLabTransition();
 }
@@ -324,8 +330,12 @@ function cancelTrialEffects() {
   cancelResponseGate();
   cancelAnimationFrame(state.transitionFrame);
   cancelAnimationFrame(state.fieldRedrawFrame);
+  cancelAnimationFrame(state.announcementFrame);
+  clearTimeout(state.dragReleaseTimer);
   state.transitionFrame = 0;
   state.fieldRedrawFrame = 0;
+  state.announcementFrame = 0;
+  state.dragReleaseTimer = 0;
 }
 
 function armResponseGate(restoreFocusSelector) {
@@ -570,7 +580,7 @@ function renderResults() {
   document.body.classList.add('lab-mode');
   document.title = t('Screen Colour Lab observations — Tetracromia | Sense6');
   const result = state.session.results();
-  saveJournalResult(result);
+  const journalSaved = saveJournalResult(result);
 
   state.app.innerHTML = `
     <section class="results-view ui-container ui-container--wide" tabindex="-1">
@@ -585,6 +595,11 @@ function renderResults() {
           <strong>29</strong>
           <small>blocks</small>
         </div>
+      </div>
+
+      <div class="ui-alert ${journalSaved ? 'ui-alert--success' : 'ui-alert--danger'} tetracromia-journal-status" data-tetracromia-journal-status role="${journalSaved ? 'status' : 'alert'}">
+        <strong class="ui-alert__title">${journalSaved ? 'Saved to the private journal on this device.' : 'Journal entry not saved.'}</strong>
+        <p class="ui-alert__body">${journalSaved ? 'The structured run context is available for later same-setup comparison.' : 'The result remains available here and can still be copied, but it was not added to the private journal.'}</p>
       </div>
 
       <div class="result-details">
@@ -606,8 +621,11 @@ function renderResults() {
       </div>
 
       <div class="results-actions">
-        <button class="ui-button ui-button--lg" type="button" data-action="setup">Repeat independently</button>
-        <button class="ui-button ui-button--ghost" type="button" data-action="copy-results">${resultActionLabel(t, 'Copy summary')}</button>
+        ${
+          journalSaved
+            ? `<button class="ui-button ui-button--lg" type="button" data-action="setup">Repeat independently</button><button class="ui-button ui-button--ghost" type="button" data-action="copy-results">${resultActionLabel(t, 'Copy summary')}</button>`
+            : `<button class="ui-button ui-button--lg" type="button" data-action="copy-results">${resultActionLabel(t, 'Copy summary')}</button><button class="ui-button ui-button--ghost" type="button" data-action="setup">Repeat independently</button>`
+        }
         <button class="ui-button ui-button--subtle" type="button" data-action="home">Return to method</button>
       </div>
     </section>
@@ -658,7 +676,7 @@ function saveJournalResult(result) {
     ],
     notes: ['short-exploratory-protocol', 'not-a-stable-threshold'],
   });
-  if (entry) appendJournalEntry(entry);
+  return Boolean(entry && appendJournalEntry(entry));
 }
 
 async function copyResults() {
@@ -680,9 +698,13 @@ async function copyResults() {
 }
 
 function announce(message) {
-  const mountedAnnouncer = state.announcer;
+  const mountedState = state;
+  const mountedAnnouncer = mountedState.announcer;
+  cancelAnimationFrame(mountedState.announcementFrame);
   mountedAnnouncer.textContent = '';
-  requestAnimationFrame(() => {
+  mountedState.announcementFrame = requestAnimationFrame(() => {
+    if (state !== mountedState) return;
+    mountedState.announcementFrame = 0;
     mountedAnnouncer.textContent = t(message);
   });
 }
@@ -874,7 +896,10 @@ function endSequenceDrag(commit) {
   if (!drag.started) return;
   state.suppressNextSequenceClick = true;
   const mountedState = state;
-  window.setTimeout(() => {
+  clearTimeout(mountedState.dragReleaseTimer);
+  mountedState.dragReleaseTimer = window.setTimeout(() => {
+    if (state !== mountedState) return;
+    mountedState.dragReleaseTimer = 0;
     mountedState.suppressNextSequenceClick = false;
   }, 120);
 

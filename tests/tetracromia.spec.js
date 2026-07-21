@@ -199,14 +199,40 @@ test('screen setup gates the adaptive lab and advances into the field instrument
   await expect(page.getByRole('button', { name: 'Dotted field 1' })).toBeVisible();
 });
 
-test('screen setup exposes its warning when forced colors are active', async ({ page }) => {
+test('a direct Tetracromia route owns its forced-colors warning and preserved stimuli', async ({ page }) => {
   await page.emulateMedia({ forcedColors: 'active' });
   await page.goto('/en/tetracromia/');
   await page.getByRole('button', { name: /Begin the color lab/i }).click();
 
   await expect(page.getByText('Color override detected', { exact: true })).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() => ({
+        gradient: getComputedStyle(document.querySelector('.calibration-gradient')).forcedColorAdjust,
+        step: getComputedStyle(document.querySelector('.calibration-steps > span')).forcedColorAdjust,
+      })),
+    )
+    .toEqual({ gradient: 'none', step: 'none' });
   await page.getByLabel(/I can distinguish the steps/i).check();
   await expect(page.getByRole('button', { name: /Start instrument 01/i })).toBeDisabled();
+});
+
+test('a direct Tetracromia result applies the shared print contract without visiting Udito', async ({
+  page,
+}) => {
+  await reachSequence(page);
+  const submit = page.getByRole('button', { name: /Lock this order/i });
+  await submit.click();
+  await submit.click();
+  await submit.click();
+  await expect(page.locator('.results-view')).toBeVisible();
+
+  await page.emulateMedia({ media: 'print' });
+  await expect(page.locator('.site-chrome')).toHaveCSS('display', 'none');
+  await expect(page.locator('body > .ui-sitefooter')).toHaveCSS('display', 'none');
+  await expect(page.locator('.results-actions')).toHaveCSS('display', 'none');
+  await expect(page.locator('.results-view')).toHaveCSS('padding-top', '0px');
+  await expect(page.locator('.results-view')).toHaveCSS('padding-bottom', '0px');
 });
 
 test('a complete session produces honest, separate observations', async ({ page }) => {
@@ -248,6 +274,70 @@ test('a complete session produces honest, separate observations', async ({ page 
 
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
+});
+
+test('storage failure leaves a persistent recovery alert instead of claiming the journal is durable', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    Storage.prototype.setItem = () => {
+      throw new DOMException('Storage blocked', 'SecurityError');
+    };
+  });
+  await reachSequence(page);
+  const submit = page.getByRole('button', { name: /Lock this order/i });
+  await submit.click();
+  await submit.click();
+  await submit.click();
+
+  await expect(page.getByRole('alert')).toContainText(/Journal entry not saved/i);
+  await expect(page.getByRole('alert')).toContainText(/can still be copied/i);
+  await expect(page.locator('.results-actions .ui-button').first()).toContainText(/Copy summary/i);
+});
+
+test('disposing Tetracromia cancels held Field and announcement frames', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Deterministic lifecycle instrumentation');
+  await page.addInitScript(() => {
+    const nativeRequest = window.requestAnimationFrame.bind(window);
+    const nativeCancel = window.cancelAnimationFrame.bind(window);
+    const heldFrames = new Map();
+    let holding = false;
+    let nextFrameId = 1_000_000;
+    window.__tetracromiaFrameProbe = {
+      begin() {
+        holding = true;
+      },
+      end() {
+        holding = false;
+      },
+      count() {
+        return heldFrames.size;
+      },
+    };
+    window.requestAnimationFrame = (callback) => {
+      if (!holding) return nativeRequest(callback);
+      nextFrameId += 1;
+      heldFrames.set(nextFrameId, callback);
+      return nextFrameId;
+    };
+    window.cancelAnimationFrame = (frameId) => {
+      if (!heldFrames.delete(frameId)) nativeCancel(frameId);
+    };
+  });
+
+  await startLab(page);
+  await answerTrials(page, '[data-choice="0"]', 13);
+  await page.evaluate(() => window.__tetracromiaFrameProbe.begin());
+  await page.locator('[data-choice="0"]').first().click();
+  await page.evaluate(() => window.__tetracromiaFrameProbe.end());
+  await expect(page.locator('.field-choice')).toHaveCount(4);
+  expect(await page.evaluate(() => window.__tetracromiaFrameProbe.count())).toBeGreaterThan(0);
+
+  page.once('dialog', (dialog) => dialog.accept());
+  await page.locator('.brand').click({ force: true });
+  await expect(page).toHaveURL(/\/en\/$/);
+  await expect(page.locator('#app[data-sense6-hydrated="gallery"]')).toBeVisible();
+  expect(await page.evaluate(() => window.__tetracromiaFrameProbe.count())).toBe(0);
 });
 
 test('pointer drag reorders tiles by insertion and tap-swap is one-shot', async ({ page }) => {
@@ -567,7 +657,7 @@ test('German landing and results reflow readably across narrow viewports', async
   for (const viewport of viewports) {
     await page.setViewportSize(viewport);
     const landing = await page.evaluate(() => {
-      const heading = document.querySelector('.hero h1');
+      const heading = document.querySelector('.tetracromia-hero h1');
       const bounds = heading.getBoundingClientRect();
       return {
         noPageOverflow: document.documentElement.scrollWidth <= document.documentElement.clientWidth,

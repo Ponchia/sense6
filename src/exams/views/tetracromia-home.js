@@ -12,18 +12,18 @@ export function tetracromiaHomeMarkup(phases, _translate, message, colorCss) {
     return `<span style="--bar-color: ${colorCss(0.7, 0.13, hue)}; --bar-delay: ${index * 18}ms"></span>`;
   }).join('');
   return `
-    <section class="hero ui-container ui-container--wide" id="top">
-      <div class="hero__copy">
+    <section class="tetracromia-hero ui-container ui-container--wide" id="top">
+      <div class="tetracromia-hero__copy">
         <button class="back-link exam-back" type="button" data-action="gallery">
           <span aria-hidden="true">←</span> ${message('nav.allTests')}
         </button>
         <p class="ui-eyebrow">Screen Colour Lab / 29 blocks / about 4 minutes</p>
         <h1>Notice colour in <em>three different ways</em>.</h1>
-        <p class="hero__lede">
+        <p class="tetracromia-hero__lede">
           Tetracromia is a short recreational experiment: 14 tile choices, 12 dot-field choices,
           and 3 ordering arcs. Each observation stays separate.
         </p>
-        <div class="ui-cluster hero__actions">
+        <div class="ui-cluster tetracromia-hero__actions">
           <button class="ui-button ui-button--lg" type="button" data-action="setup">
             Begin the color lab <span aria-hidden="true">→</span>
           </button>
@@ -35,7 +35,7 @@ export function tetracromiaHomeMarkup(phases, _translate, message, colorCss) {
         </p>
       </div>
 
-      <div class="hero__instrument" aria-hidden="true">
+      <div class="tetracromia-hero__instrument" aria-hidden="true">
         <div class="color-orbit color-orbit--outer"></div>
         <div class="color-orbit color-orbit--middle"></div>
         <div class="color-orbit color-orbit--inner"></div>
