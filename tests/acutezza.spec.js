@@ -735,6 +735,7 @@ test('Acutezza completes both scopes through every audited mobile viewport witho
         await answerAcutezzaTarget(page);
       }
 
+      await expect(page.getByRole('heading', { name: /Rest before switching/i })).toBeVisible();
       await expectAcutezzaPageToReflow(page, `${label} between-eye card`);
       await expectAcutezzaActionsToBeReachable(page, `${label} between-eye card`);
       if (viewport.width === 320) await expectAcutezzaAtTwoHundredPercent(page, `${label} between-eye card`);
