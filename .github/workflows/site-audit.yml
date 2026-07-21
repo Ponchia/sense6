@@ -49,6 +49,7 @@ jobs:
           if-no-files-found: ignore
 
   visual-regression:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     container:
@@ -56,6 +57,8 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
@@ -63,9 +66,22 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Build the static site
+      - name: Check out and build the base revision
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BASE_WORKTREE: ${{ runner.temp }}/sense6-visual-base
+        run: |
+          git worktree add --detach "$BASE_WORKTREE" "$BASE_SHA"
+          npm ci --prefix "$BASE_WORKTREE"
+          npm run build --prefix "$BASE_WORKTREE"
+      - name: Capture base revision on this runner
+        env:
+          HOME: /root
+          PLAYWRIGHT_SITE_DIR: ${{ runner.temp }}/sense6-visual-base
+        run: npm run test:visual:container -- --update-snapshots
+      - name: Build the candidate revision
         run: npm run build
-      - name: Compare visual baselines in the pinned browser container
+      - name: Compare the candidate with the base revision
         env:
           HOME: /root
         run: npm run test:visual:container

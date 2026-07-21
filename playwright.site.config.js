@@ -2,6 +2,10 @@ import { defineConfig, devices } from '@playwright/test';
 
 const port = process.env.PLAYWRIGHT_SITE_PORT ?? '4174';
 const baseURL = `http://127.0.0.1:${port}`;
+const siteDirectory = process.env.PLAYWRIGHT_SITE_DIR;
+const previewCommand = siteDirectory
+  ? `npm --prefix ${JSON.stringify(siteDirectory)} run preview -- --port ${port} --strictPort`
+  : `npm run preview -- --port ${port} --strictPort`;
 
 export default defineConfig({
   testDir: './audits',
@@ -23,7 +27,7 @@ export default defineConfig({
   },
   projects: [{ name: 'chromium' }],
   webServer: {
-    command: `npm run preview -- --port ${port} --strictPort`,
+    command: previewCommand,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
   },
