@@ -2,6 +2,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
+import { EXAMS } from '../src/exams/registry.js';
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const OUTPUT = join(ROOT, 'public', 'social');
@@ -55,6 +56,14 @@ const CARDS = [
     glyph: 'A',
   },
 ];
+
+const expectedCardIds = ['sense6', ...EXAMS.map(({ id }) => id)].sort();
+const cardIds = CARDS.map(({ id }) => id).sort();
+if (JSON.stringify(cardIds) !== JSON.stringify(expectedCardIds)) {
+  throw new Error(
+    `Social-card registry drift: expected ${expectedCardIds.join(', ')}, found ${cardIds.join(', ')}`,
+  );
+}
 
 await mkdir(OUTPUT, { recursive: true });
 const browser = await chromium.launch({ headless: true });

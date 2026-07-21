@@ -13,6 +13,19 @@
       "trailingCommas": "all"
     }
   },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "complexity": {
+        "noExcessiveCognitiveComplexity": {
+          "level": "error",
+          "options": {
+            "maxAllowedComplexity": 28
+          }
+        }
+      }
+    }
+  },
   "overrides": [
     {
       "includes": ["src/locales/generated/*.json"],

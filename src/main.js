@@ -7,6 +7,7 @@ import { getLocale, initializeI18n, localeHref, localizedRoot, m, setLocale, t }
 import { disposeActiveMounts } from './lib/mount-registry.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from './metrics.js';
 import { currentLocation, currentRoute, navigate, startRouter } from './router.js';
+import { STATIC_ADOPTED_ROUTES } from './routes.js';
 import { renderGallery } from './site.js';
 
 const appElement = document.querySelector('#app');
@@ -89,7 +90,7 @@ startRouter(async ({ route, locale }) => {
     }
 
     const initial = !committedRoute;
-    const adoptsStaticView = route === '' || route === 'about' || route === 'privacy';
+    const adoptsStaticView = STATIC_ADOPTED_ROUTES.includes(route);
     const animate = initial ? !adoptsStaticView : route !== committedRouteName;
     const committed = await commitRoute(mountRoute, {
       animate,

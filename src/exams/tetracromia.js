@@ -757,95 +757,85 @@ function isRepeatedTouchCommit(event) {
 }
 
 function wireEvents(signal) {
-  document.addEventListener(
-    'change',
-    (event) => {
-      if (event.target.matches('#screen-ready')) {
-        updateSetupEligibility();
-      }
-    },
-    { signal },
-  );
-
-  document.addEventListener(
-    'click',
-    (event) => {
-      const choice = event.target.closest('[data-choice]');
-      if (choice) {
-        if (isRepeatedTouchCommit(event)) return;
-        answerChoice(Number(choice.dataset.choice), { restoreFocus: event.detail === 0 });
-        return;
-      }
-
-      const sequenceTile = event.target.closest('[data-sequence-index]');
-      if (sequenceTile) {
-        if (state.suppressNextSequenceClick) {
-          state.suppressNextSequenceClick = false;
-          return;
-        }
-        selectSequence(Number(sequenceTile.dataset.sequenceIndex));
-        return;
-      }
-
-      const action = event.target.closest('[data-action]');
-      if (!action) return;
-
-      if (action.dataset.action === 'setup') renderSetup();
-      if (action.dataset.action === 'start' && !action.disabled) startLab();
-      if (action.dataset.action === 'home') {
-        if (state.labActive && !window.confirm(t('End this session? Your progress will be lost.'))) return;
-        renderHome();
-      }
-      if (action.dataset.action === 'gallery') {
-        if (state.labActive && !window.confirm(t('Leave the lab? Your progress will be lost.'))) return;
-        state.goHome();
-      }
-      if (action.dataset.action === 'move-sequence') moveSequence(Number(action.dataset.direction));
-      if (action.dataset.action === 'submit-sequence' && !isRepeatedTouchCommit(event)) submitSequence();
-      if (action.dataset.action === 'copy-results') copyResults();
-    },
-    { signal },
-  );
-
-  document.addEventListener(
-    'keydown',
-    (event) => {
-      const tile = event.target.closest('[data-sequence-index]');
-      if (!tile || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
-      event.preventDefault();
-      state.selectedSequenceIndex = Number(tile.dataset.sequenceIndex);
-      moveSequence(event.key === 'ArrowLeft' ? -1 : 1);
-    },
-    { signal },
-  );
+  document.addEventListener('change', handleSetupChange, { signal });
+  document.addEventListener('click', handleLabClick, { signal });
+  document.addEventListener('keydown', handleSequenceKeydown, { signal });
 
   document.addEventListener('pointerdown', onSequencePointerDown, { signal });
   document.addEventListener('pointermove', onSequencePointerMove, { signal });
   document.addEventListener('pointerup', onSequencePointerUp, { signal });
   document.addEventListener('pointercancel', onSequencePointerCancel, { signal });
   window.addEventListener('resize', scheduleFieldRedraw, { signal });
-  document.addEventListener(
-    'visibilitychange',
-    () => {
-      if (document.visibilityState === 'hidden') {
-        invalidateVisualRun(
-          'The page was hidden. This run stopped before saving; restart when you can keep it visible.',
-        );
-      }
-    },
-    { signal },
+  document.addEventListener('visibilitychange', handleVisibilityChange, { signal });
+  window
+    .matchMedia?.('(forced-colors: active)')
+    .addEventListener('change', handleForcedColorsChange, { signal });
+}
+
+function handleSetupChange(event) {
+  if (event.target.matches('#screen-ready')) updateSetupEligibility();
+}
+
+function handleLabClick(event) {
+  const choice = event.target.closest('[data-choice]');
+  if (choice) {
+    if (isRepeatedTouchCommit(event)) return;
+    answerChoice(Number(choice.dataset.choice), { restoreFocus: event.detail === 0 });
+    return;
+  }
+
+  const sequenceTile = event.target.closest('[data-sequence-index]');
+  if (sequenceTile) {
+    if (state.suppressNextSequenceClick) {
+      state.suppressNextSequenceClick = false;
+      return;
+    }
+    selectSequence(Number(sequenceTile.dataset.sequenceIndex));
+    return;
+  }
+
+  const action = event.target.closest('[data-action]');
+  if (!action) return;
+  if (action.dataset.action === 'setup') renderSetup();
+  if (action.dataset.action === 'start' && !action.disabled) startLab();
+  if (action.dataset.action === 'home') return leaveLabForHome();
+  if (action.dataset.action === 'gallery') return leaveLabForGallery();
+  if (action.dataset.action === 'move-sequence') moveSequence(Number(action.dataset.direction));
+  if (action.dataset.action === 'submit-sequence' && !isRepeatedTouchCommit(event)) submitSequence();
+  if (action.dataset.action === 'copy-results') copyResults();
+}
+
+function leaveLabForHome() {
+  if (state.labActive && !window.confirm(t('End this session? Your progress will be lost.'))) return;
+  renderHome();
+}
+
+function leaveLabForGallery() {
+  if (state.labActive && !window.confirm(t('Leave the lab? Your progress will be lost.'))) return;
+  state.goHome();
+}
+
+function handleSequenceKeydown(event) {
+  const tile = event.target.closest('[data-sequence-index]');
+  if (!tile || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+  event.preventDefault();
+  state.selectedSequenceIndex = Number(tile.dataset.sequenceIndex);
+  moveSequence(event.key === 'ArrowLeft' ? -1 : 1);
+}
+
+function handleVisibilityChange() {
+  if (document.visibilityState !== 'hidden') return;
+  invalidateVisualRun(
+    'The page was hidden. This run stopped before saving; restart when you can keep it visible.',
   );
-  window.matchMedia?.('(forced-colors: active)').addEventListener(
-    'change',
-    () => {
-      if (state.labActive && forcedColorsActive()) {
-        invalidateVisualRun('Color override detected. This run stopped and was not saved.');
-        return;
-      }
-      updateSetupEligibility();
-    },
-    { signal },
-  );
+}
+
+function handleForcedColorsChange() {
+  if (state.labActive && forcedColorsActive()) {
+    invalidateVisualRun('Color override detected. This run stopped and was not saved.');
+    return;
+  }
+  updateSetupEligibility();
 }
 
 /*
