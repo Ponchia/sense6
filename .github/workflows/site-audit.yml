@@ -79,6 +79,7 @@ jobs:
         env:
           HOME: /root
           PLAYWRIGHT_SITE_DIR: ${{ runner.temp }}/sense6-visual-base
+          VISUAL_BASELINE_CAPTURE: '1'
         run: npm run test:visual:container -- --update-snapshots
       - name: Build the candidate revision
         run: npm run build

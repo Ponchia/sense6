@@ -106,13 +106,21 @@ async function expectAcutezzaActionsToBeReachable(page, label) {
         return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
       });
 
-    return initialActions.map((_, index) => {
-      let element = visibleActions()[index];
+    const normalizedText = (element) => element.textContent.replace(/\s+/g, ' ').trim();
+    return initialActions.map((initialElement) => {
+      const action = initialElement.getAttribute('data-action');
+      const text = normalizedText(initialElement);
+      const currentActions = visibleActions();
+      let element =
+        currentActions.find((candidate) => action && candidate.getAttribute('data-action') === action) ??
+        currentActions.find((candidate) => normalizedText(candidate) === text);
       if (!element) return null;
       element.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' });
       // A scroll can synchronously re-render the current card. Re-query so the
       // geometry audit never measures a detached button from the old render.
-      element = visibleActions()[index];
+      element =
+        visibleActions().find((candidate) => action && candidate.getAttribute('data-action') === action) ??
+        visibleActions().find((candidate) => normalizedText(candidate) === text);
       if (!element) return null;
       const rect = element.getBoundingClientRect();
       const viewport = window.visualViewport;
