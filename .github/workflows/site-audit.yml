@@ -73,7 +73,8 @@ jobs:
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
         run: |
-          if git diff --quiet "$BASE_SHA"...HEAD -- audits/visual-regression.spec.js-snapshots; then
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          if git diff --quiet "$BASE_SHA" HEAD -- audits/visual-regression.spec.js-snapshots; then
             echo "updated=false" >> "$GITHUB_OUTPUT"
           else
             echo "updated=true" >> "$GITHUB_OUTPUT"
