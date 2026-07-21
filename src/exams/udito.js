@@ -27,7 +27,8 @@ import { protocolPassport } from './protocols.js';
 import { sourcesFor } from './sources.js';
 
 const STORAGE_KEY = 'sense6:udito:last';
-const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isRecord });
+const SETUP_QUALITIES = new Set(['Setup checks coherent', 'Interpret with caution']);
+const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isLatestResult });
 const MOUNT_OWNER = Symbol('udito');
 const TRIAL_PHASES = Object.freeze({
   idle: 'idle',
@@ -85,6 +86,7 @@ export function mount(context) {
     trialPhase: TRIAL_PHASES.idle,
     pausedFrom: TRIAL_PHASES.idle,
     trialSequence: 0,
+    playbackOperation: 0,
     lastFeedback: '',
     pausePromise: Promise.resolve(),
   };
@@ -96,6 +98,7 @@ export function mount(context) {
 
   lifecycle.onCleanup(() => {
     clearTimeout(mountState.feedbackTimer);
+    mountState.playbackOperation += 1;
     if (mountState.audio) {
       mountState.audio.onStateChange = null;
       mountState.audio.onOutputChange = null;
@@ -265,9 +268,12 @@ function renderSetup() {
 }
 
 async function playReference() {
-  const button = state.app.querySelector('[data-action="au-reference"]');
-  const status = state.app.querySelector('[data-au-reference-status]');
-  if (!button || !status) return;
+  const mountState = state;
+  const audio = mountState?.audio;
+  const button = mountState?.app.querySelector('[data-action="au-reference"]');
+  const status = mountState?.app.querySelector('[data-au-reference-status]');
+  if (!mountState || !audio || !button || !status) return;
+  const operation = beginPlaybackOperation(mountState);
   invalidateReference();
   button.disabled = true;
   button.textContent = t('Playing maximum-level reference…');
@@ -275,23 +281,25 @@ async function playReference() {
     'Keep this quiet and comfortable. Later signals use the same or a lower digital level.',
   );
   try {
-    const completed = await state.audio.playReference();
-    if (!completed || state.audio.state !== 'running') throw new Error('Reference did not complete');
-    state.referencePlayed = true;
+    const completed = await audio.playReference();
+    if (!isCurrentPlayback(mountState, operation)) return;
+    if (!completed || audio.state !== 'running') throw new Error('Reference did not complete');
+    mountState.referencePlayed = true;
     button.textContent = t('Play reference again');
     status.textContent = t(
       'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
-      { sampleRate: formatNumber(state.audio.sampleRate) },
+      { sampleRate: formatNumber(audio.sampleRate) },
     );
     updateSetupGate();
   } catch {
+    if (!isCurrentPlayback(mountState, operation)) return;
     invalidateReference(
       'The reference did not complete on the audio clock. Check browser audio output and play it again.',
     );
     button.textContent = t('Play reference again');
     toast(t('The reference sound did not complete.'));
   } finally {
-    button.disabled = false;
+    if (isCurrentMount(mountState) && mountState.app.contains(button)) button.disabled = false;
   }
 }
 
@@ -309,27 +317,32 @@ function invalidateReference(message = '') {
 }
 
 async function playAudibilityAnchors() {
-  const button = state.app.querySelector('[data-action="au-anchors"]');
-  const status = state.app.querySelector('[data-au-anchor-status]');
-  const confirmation = state.app.querySelector('[data-au-anchors-confirmed]');
-  if (!button || !status || !confirmation) return;
-  state.anchorsPlayed = false;
+  const mountState = state;
+  const audio = mountState?.audio;
+  const button = mountState?.app.querySelector('[data-action="au-anchors"]');
+  const status = mountState?.app.querySelector('[data-au-anchor-status]');
+  const confirmation = mountState?.app.querySelector('[data-au-anchors-confirmed]');
+  if (!mountState || !audio || !button || !status || !confirmation) return;
+  const operation = beginPlaybackOperation(mountState);
+  mountState.anchorsPlayed = false;
   confirmation.checked = false;
   confirmation.disabled = true;
   button.disabled = true;
   status.textContent = 'Playing low, mid, and pitch-task anchors at the fixed digital level…';
   try {
-    const completed = await state.audio.playAudibilityAnchors();
-    if (!completed || state.audio.state !== 'running') throw new Error('Anchor playback did not complete');
-    state.anchorsPlayed = true;
+    const completed = await audio.playAudibilityAnchors();
+    if (!isCurrentPlayback(mountState, operation)) return;
+    if (!completed || audio.state !== 'running') throw new Error('Anchor playback did not complete');
+    mountState.anchorsPlayed = true;
     confirmation.disabled = false;
     confirmation.focus();
     status.textContent = 'Anchor playback completed. Confirm all three were audible without changing volume.';
   } catch {
+    if (!isCurrentPlayback(mountState, operation)) return;
     status.textContent = 'Anchor playback did not complete. Check the audio route and try again.';
   } finally {
-    button.disabled = false;
-    updateSetupGate();
+    if (isCurrentMount(mountState) && mountState.app.contains(button)) button.disabled = false;
+    if (isCurrentPlayback(mountState, operation)) updateSetupGate();
   }
 }
 
@@ -496,44 +509,50 @@ function prepareNextTrial() {
 }
 
 async function playTrial() {
-  if (!state.activeTrial || !state.session) return;
-  state.trialPhase = TRIAL_PHASES.playing;
-  state.responseOpen = false;
+  const mountState = state;
+  const session = mountState?.session;
+  const trial = mountState?.activeTrial;
+  const audio = mountState?.audio;
+  if (!mountState || !session || !trial || !audio) return;
+  const operation = beginPlaybackOperation(mountState);
+  mountState.trialPhase = TRIAL_PHASES.playing;
+  mountState.responseOpen = false;
   setResponseDisabled(true);
-  const runner = state.app.querySelector('[data-au-runner]');
+  const runner = mountState.app.querySelector('[data-au-runner]');
   if (runner) {
-    runner.dataset.correctInterval = String(correctInterval(state.activeTrial));
-    runner.dataset.trialId = state.activeTrial.trialId;
-    runner.dataset.trialPhase = state.trialPhase;
+    runner.dataset.correctInterval = String(correctInterval(trial));
+    runner.dataset.trialId = trial.trialId;
+    runner.dataset.trialPhase = mountState.trialPhase;
   }
-  const status = state.app.querySelector('[data-au-status]');
+  const status = mountState.app.querySelector('[data-au-status]');
   if (status) status.textContent = t('Listen…');
   let completed = false;
   try {
-    const onInterval = (index) => showInterval(index);
-    if (state.session.instrument === 'headphones')
-      completed = await state.audio.playHeadphoneTrial(state.activeTrial, onInterval);
-    if (state.session.instrument === 'range')
-      completed = await state.audio.playRangeTrial(state.activeTrial, onInterval);
-    if (state.session.instrument === 'pitch')
-      completed = await state.audio.playPitchTrial(state.activeTrial, onInterval);
+    const onInterval = (index) => {
+      if (isCurrentPlayback(mountState, operation)) showInterval(index);
+    };
+    if (session.instrument === 'headphones') completed = await audio.playHeadphoneTrial(trial, onInterval);
+    if (session.instrument === 'range') completed = await audio.playRangeTrial(trial, onInterval);
+    if (session.instrument === 'pitch') completed = await audio.playPitchTrial(trial, onInterval);
   } catch {
+    if (!isCurrentPlayback(mountState, operation)) return;
     pauseRun('Audio playback was interrupted.');
     return;
   }
+  if (!isCurrentPlayback(mountState, operation)) return;
   if (!completed) {
-    if (state.session && document.body.classList.contains('au-running'))
+    if (mountState.session && document.body.classList.contains('au-running'))
       pauseRun('Audio playback did not complete.');
     return;
   }
-  if (!state.session || !document.body.classList.contains('au-running')) return;
+  if (!mountState.session || !document.body.classList.contains('au-running')) return;
   clearIntervalHighlights();
-  state.trialPhase = TRIAL_PHASES.awaitingResponse;
-  if (runner) runner.dataset.trialPhase = state.trialPhase;
-  state.responseOpen = true;
+  mountState.trialPhase = TRIAL_PHASES.awaitingResponse;
+  if (runner) runner.dataset.trialPhase = mountState.trialPhase;
+  mountState.responseOpen = true;
   setResponseDisabled(false);
-  if (status) status.textContent = t(questionFor(state.session.instrument));
-  state.app.querySelector('[data-au-response]')?.focus({ preventScroll: true });
+  if (status) status.textContent = t(questionFor(mountState.session.instrument));
+  mountState.app.querySelector('[data-au-response]')?.focus({ preventScroll: true });
 }
 
 function showInterval(index) {
@@ -851,9 +870,13 @@ function pauseRun(message = 'This playback was interrupted.', { setupRequired = 
 }
 
 async function resumeRun() {
-  await state.pausePromise;
-  if (!state.session || state.trialPhase !== TRIAL_PHASES.paused) return;
-  const resumeFrom = state.pausedFrom;
+  const mountState = state;
+  if (!mountState) return;
+  const operation = mountState.playbackOperation;
+  await mountState.pausePromise;
+  if (!isCurrentPlayback(mountState, operation)) return;
+  if (!mountState.session || mountState.trialPhase !== TRIAL_PHASES.paused) return;
+  const resumeFrom = mountState.pausedFrom;
   renderRunner();
   if (resumeFrom === TRIAL_PHASES.committedFeedback) {
     prepareNextTrial();
@@ -908,8 +931,9 @@ function handleOutputDeviceChange() {
 }
 
 async function copyResults() {
-  if (!state.session?.result) return;
-  const { headphones, range, pitch, usable, setupQuality, cautionReasons } = state.session.result;
+  const mountState = state;
+  if (!mountState?.session?.result) return;
+  const { headphones, range, pitch, usable, setupQuality, cautionReasons } = mountState.session.result;
   const text = [
     t('Udito — device-relative listening observations'),
     t('Run quality: {quality}', { quality: t(setupQuality) }),
@@ -955,10 +979,12 @@ async function copyResults() {
       title: t('Device-relative hearing lab — Udito | Sense6'),
       summary: text,
       route: 'udito',
-      locale: state.locale,
+      locale: mountState.locale,
     });
+    if (!isCurrentMount(mountState)) return;
     if (outcome === 'copied') toast(t('Result summary copied.'));
   } catch {
+    if (!isCurrentMount(mountState)) return;
     toast(t('Copy was unavailable in this browser.'));
   }
 }
@@ -967,11 +993,26 @@ function setResponseDisabled(disabled) {
   for (const button of state.app.querySelectorAll('[data-au-response]')) button.disabled = disabled;
 }
 
-function stopPlayback() {
-  clearTimeout(state.feedbackTimer);
-  state.feedbackTimer = 0;
-  state.responseOpen = false;
-  state.audio?.stop();
+function stopPlayback(mountState = state) {
+  if (!mountState) return;
+  mountState.playbackOperation += 1;
+  clearTimeout(mountState.feedbackTimer);
+  mountState.feedbackTimer = 0;
+  mountState.responseOpen = false;
+  mountState.audio?.stop();
+}
+
+function beginPlaybackOperation(mountState) {
+  mountState.playbackOperation += 1;
+  return mountState.playbackOperation;
+}
+
+function isCurrentMount(mountState) {
+  return state === mountState && !mountState.lifecycle.signal.aborted;
+}
+
+function isCurrentPlayback(mountState, operation) {
+  return isCurrentMount(mountState) && mountState.playbackOperation === operation;
 }
 
 function wireEvents(signal) {
@@ -1176,4 +1217,17 @@ function saveJournalResult(result) {
 
 function loadLast() {
   return RESULT_STORE.load();
+}
+
+function isLatestResult(value) {
+  return (
+    isRecord(value) &&
+    SETUP_QUALITIES.has(value.setupQuality) &&
+    typeof value.sampleRate === 'number' &&
+    Number.isFinite(value.sampleRate) &&
+    value.sampleRate > 0 &&
+    typeof value.recordedAt === 'number' &&
+    Number.isFinite(value.recordedAt) &&
+    value.recordedAt >= 0
+  );
 }

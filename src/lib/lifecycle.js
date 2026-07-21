@@ -5,6 +5,11 @@ import { setNavigationGuard } from './navigation.js';
 /** @type {Map<symbol, ExamLifecycle>} */
 const activeMounts = new Map();
 
+/** Dispose every active exam mount after a route commit fails before returning its cleanup. */
+export function disposeActiveExamLifecycles() {
+  for (const lifecycle of [...activeMounts.values()]) lifecycle.dispose();
+}
+
 /**
  * Own one exam mount and guarantee idempotent, exclusive cleanup.
  * @param {symbol} owner

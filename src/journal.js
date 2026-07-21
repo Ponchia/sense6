@@ -61,10 +61,18 @@ export function renderJournal(context) {
     const input = event.target.closest('[data-journal-import]');
     const file = input?.files?.[0];
     if (!file) return;
-    const result =
-      file.size > JOURNAL_LIMITS.maxImportBytes
-        ? { ok: false, reason: 'too-large' }
-        : importJournal(await file.text());
+    let result = { ok: false, reason: 'too-large' };
+    if (file.size <= JOURNAL_LIMITS.maxImportBytes) {
+      try {
+        const source = await file.text();
+        if (controller.signal.aborted) return;
+        result = importJournal(source);
+      } catch {
+        if (controller.signal.aborted) return;
+        result = { ok: false, reason: 'invalid' };
+      }
+    }
+    if (controller.signal.aborted) return;
     if (result.ok) {
       toast(copy.importSuccess, { tone: 'success' });
       render();
