@@ -98,30 +98,24 @@ async function expectAcutezzaPageToReflow(page, label) {
 }
 
 async function expectAcutezzaActionsToBeReachable(page, label) {
-  const geometries = await page.locator('main button:visible').evaluateAll((initialActions) => {
-    const visibleActions = () =>
-      [...document.querySelectorAll('main button')].filter((element) => {
-        const rect = element.getBoundingClientRect();
-        const style = window.getComputedStyle(element);
-        return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
-      });
-
-    const normalizedText = (element) => element.textContent.replace(/\s+/g, ' ').trim();
-    return initialActions.map((initialElement) => {
-      const action = initialElement.getAttribute('data-action');
-      const text = normalizedText(initialElement);
-      const currentActions = visibleActions();
-      let element =
-        currentActions.find((candidate) => action && candidate.getAttribute('data-action') === action) ??
-        currentActions.find((candidate) => normalizedText(candidate) === text);
-      if (!element) return null;
-      element.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' });
-      // A scroll can synchronously re-render the current card. Re-query so the
-      // geometry audit never measures a detached button from the old render.
-      element =
-        visibleActions().find((candidate) => action && candidate.getAttribute('data-action') === action) ??
-        visibleActions().find((candidate) => normalizedText(candidate) === text);
-      if (!element) return null;
+  const identities = await page.locator('main button:visible').evaluateAll((actions) =>
+    actions.map((element) => ({
+      action: element.getAttribute('data-action'),
+      text: element.textContent.replace(/\s+/g, ' ').trim(),
+    })),
+  );
+  for (const [index, identity] of identities.entries()) {
+    let action = identity.action
+      ? page.locator(`main button[data-action=${JSON.stringify(identity.action)}]:visible`)
+      : page.locator('main button:visible').filter({ hasText: identity.text });
+    if (identity.text) action = action.filter({ hasText: identity.text });
+    action = action.first();
+    await expect(action, `${label} action ${index} remains rendered`).toBeVisible();
+    // Playwright re-resolves this locator after scrolling, so a responsive card
+    // re-render cannot leave the geometry audit holding a detached button.
+    await action.scrollIntoViewIfNeeded();
+    await expect(action, `${label} action ${index} remains rendered after scroll`).toBeVisible();
+    const geometry = await action.evaluate((element) => {
       const rect = element.getBoundingClientRect();
       const viewport = window.visualViewport;
       const viewportLeft = viewport?.offsetLeft ?? 0;
@@ -146,10 +140,6 @@ async function expectAcutezzaActionsToBeReachable(page, label) {
         width: rect.width,
       };
     });
-  });
-  for (const [index, geometry] of geometries.entries()) {
-    expect(geometry, `${label} action ${index} remains rendered after scroll`).not.toBeNull();
-    if (!geometry) continue;
     expect(geometry.left, `${label} action ${index} left`).toBeGreaterThanOrEqual(geometry.viewportLeft - 1);
     expect(geometry.right, `${label} action ${index} right`).toBeLessThanOrEqual(geometry.viewportRight + 1);
     expect(geometry.top, `${label} action ${index} top`).toBeGreaterThanOrEqual(geometry.viewportTop - 1);
