@@ -12,93 +12,35 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  verify-core:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@v6
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Verify code and production build
-        run: npm run check:core
-
-  verify-browser:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - project: chromium
-            engine: chromium
-          - project: mobile
-            engine: chromium
-          - project: chromium-smoke
-            engine: chromium
-          - project: firefox
-            engine: firefox
-          - project: webkit
-            engine: webkit
-
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@v6
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install ${{ matrix.engine }}
-        run: npx playwright install --with-deps ${{ matrix.engine }}
-
-      - name: Verify the ${{ matrix.project }} project
-        run: npx playwright test --project=${{ matrix.project }}
+  verify:
+    uses: ./.github/workflows/verify.yml
 
   preview:
     if: github.event.pull_request.head.repo.full_name == github.repository
-    needs: [verify-core, verify-browser]
+    needs: verify
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v6
+      - name: Check out deployment scripts
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
+      - name: Download the verified artifact
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
         with:
-          node-version: 24
-          cache: npm
+          name: verified-dist-${{ github.sha }}
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build and verify the preview artifact
-        run: npm run build && npm run test:static
+      - name: Verify the artifact checksum
+        run: sha256sum --check dist.sha256
 
       - name: Publish the verified preview
         id: preview
-        uses: cloudflare/wrangler-action@v4
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: 4.112.0
-          command: pages deploy dist --project-name=sense6 --branch=pr-${{ github.event.pull_request.number }} --commit-hash=${{ github.event.pull_request.head.sha }}
+          command: pages deploy dist --project-name=sense6 --branch=pr-${{ github.event.pull_request.number }} --commit-hash=${{ github.sha }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Smoke-test the real preview
