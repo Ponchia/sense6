@@ -12,9 +12,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  verify:
+  verify-core:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 10
 
     steps:
       - name: Check out the repository
@@ -29,14 +29,69 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install browser engines
-        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Verify code and production build
+        run: npm run check:core
 
-      - name: Run unit, build, browser, responsive, and accessibility checks
-        run: timeout --verbose --signal=TERM --kill-after=30s 10m npm run check
+  verify-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: chromium
+            engine: chromium
+          - project: mobile
+            engine: chromium
+          - project: chromium-smoke
+            engine: chromium
+          - project: firefox
+            engine: firefox
+          - project: webkit
+            engine: webkit
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install ${{ matrix.engine }}
+        run: npx playwright install --with-deps ${{ matrix.engine }}
+
+      - name: Verify the ${{ matrix.project }} project
+        run: npx playwright test --project=${{ matrix.project }}
+
+  preview:
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    needs: [verify-core, verify-browser]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and verify the preview artifact
+        run: npm run build && npm run test:static
 
       - name: Publish the verified preview
-        if: github.event.pull_request.head.repo.full_name == github.repository
         id: preview
         uses: cloudflare/wrangler-action@v4
         with:
@@ -47,5 +102,4 @@ jobs:
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Smoke-test the real preview
-        if: github.event.pull_request.head.repo.full_name == github.repository
         run: node scripts/smoke-preview.mjs "${{ steps.preview.outputs.deployment-url }}"
