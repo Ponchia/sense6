@@ -53,7 +53,6 @@ jobs:
     timeout-minutes: 15
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble
-      options: --user 1001
     steps:
       - name: Check out the repository
         uses: actions/checkout@v6
@@ -67,6 +66,8 @@ jobs:
       - name: Build the static site
         run: npm run build
       - name: Compare visual baselines in the pinned browser container
+        env:
+          HOME: /root
         run: npm run test:visual:container
       - name: Upload the browser report on failure
         if: failure()
