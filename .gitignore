@@ -2,6 +2,7 @@ node_modules/
 dist/
 test-results/
 playwright-report/
+.unlighthouse/
 .wrangler/
 validation/acutezza/*.local.json
 .DS_Store

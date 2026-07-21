@@ -118,8 +118,8 @@ export const EXAM_SOURCES = Object.freeze({
     source(
       'uievents-timestamp',
       'method',
-      'W3C UI Events: event timestamps',
-      'https://w3c.github.io/uievents/#dom-event-timestamp',
+      'DOM Standard: event timestamps',
+      'https://dom.spec.whatwg.org/#dom-event-timestamp',
     ),
   ]),
   udito: sources([

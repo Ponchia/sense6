@@ -35,6 +35,12 @@ test('every canonical route has substantive, localized raw HTML', async () => {
     );
     assert.equal((html.match(/rel="alternate" hreflang=/g) ?? []).length, LOCALES.length + 1, path);
     assert.match(html, /<script type="application\/ld\+json">.+<\/script>/, path);
+    const stylesheet = path.split('/').filter(Boolean)[1] ?? 'gallery';
+    assert.match(
+      html,
+      new RegExp(`<link rel="stylesheet" crossorigin href="/assets/${escapeRegex(stylesheet)}-[^"]+\\.css">`),
+      `${path} must load its route stylesheet before JavaScript`,
+    );
     assert.match(
       html,
       new RegExp(`<a[^>]+href="/(?:${LOCALES.map(({ code }) => escapeRegex(code)).join('|')})/`),
@@ -104,6 +110,7 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   assert.doesNotMatch(notFound, /<script type="module"/);
 
   const privacy = await readFile(new URL('en/privacy/index.html', DIST), 'utf8');
+  assert.match(privacy, /<!--email_off--><a href="mailto:privacy@sense6\.net">/);
   assert.match(privacy, /href="mailto:privacy@sense6\.net"/);
   assert.match(privacy, /href="https:\/\/www\.cloudflare\.com\/privacypolicy\/"/);
 

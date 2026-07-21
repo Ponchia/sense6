@@ -12,11 +12,18 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build && node scripts/generate-static-pages.mjs",
     "preview": "vite preview --host 0.0.0.0 --port 4173",
-    "lint": "biome check src functions scripts tests playwright.config.js",
+    "lint": "biome check src functions scripts tests audits playwright.config.js playwright.site.config.js unlighthouse.config.mjs",
     "test": "node --test tests/*.test.js",
     "test:coverage": "node --test --experimental-test-coverage --test-coverage-lines=95 --test-coverage-branches=80 --test-coverage-functions=90 --test-coverage-include='src/lib/*.js' tests/*.test.js",
     "test:static": "node --test tests/static-output.build.js",
     "test:e2e": "playwright test",
+    "test:html": "vnu --errors-only --skip-non-html dist",
+    "test:links": "node scripts/check-internal-links.mjs",
+    "test:site-integrity": "playwright test --config playwright.site.config.js audits/site-integrity.spec.js",
+    "test:site-audit": "npm run test:site-integrity",
+    "test:visual:container": "playwright test --config playwright.site.config.js audits/visual-regression.spec.js --workers=1",
+    "audit:lighthouse": "npx --yes @unlighthouse/cli@0.18.0 --config-file unlighthouse.config.mjs && node scripts/check-lighthouse-metrics.mjs",
+    "audit:site": "npm run build && npm run test:html && npm run test:links && npm run test:site-audit",
     "locales:check": "node scripts/check-locales.mjs",
     "typecheck": "node scripts/check-type-ratchet.mjs && tsc -p jsconfig.json",
     "check:ui": "bronto-ui-check src functions scripts",
@@ -30,6 +37,7 @@
     "@biomejs/biome": "^2.5.0",
     "@playwright/test": "^1.55.0",
     "typescript": "^7.0.2",
-    "vite": "^8.0.0"
+    "vite": "^8.0.0",
+    "vnu-jar": "^26.7.16"
   }
 }
