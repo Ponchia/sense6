@@ -66,7 +66,19 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Detect intentional visual baseline updates
+        id: visual-baselines
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          if git diff --quiet "$BASE_SHA" HEAD -- audits/visual-regression.spec.js-snapshots; then
+            echo "updated=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "updated=true" >> "$GITHUB_OUTPUT"
+          fi
       - name: Check out and build the base revision
+        if: steps.visual-baselines.outputs.updated == 'false'
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           BASE_WORKTREE: ${{ runner.temp }}/sense6-visual-base
@@ -76,9 +88,11 @@ jobs:
           npm ci --prefix "$BASE_WORKTREE"
           npm run build --prefix "$BASE_WORKTREE"
       - name: Capture base revision on this runner
+        if: steps.visual-baselines.outputs.updated == 'false'
         env:
           HOME: /root
           PLAYWRIGHT_SITE_DIR: ${{ runner.temp }}/sense6-visual-base
+          VISUAL_BASELINE_CAPTURE: '1'
         run: npm run test:visual:container -- --update-snapshots
       - name: Build the candidate revision
         run: npm run build

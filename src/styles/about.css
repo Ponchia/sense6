@@ -4,20 +4,20 @@
 
 .about-view {
   max-inline-size: 82rem;
-  padding-block: clamp(2rem, 5vw, 4rem) clamp(5rem, 9vw, 8rem);
+  padding-block: clamp(1.5rem, 4vw, 3rem) var(--s6-space-section);
 }
 
 .about-view__back {
-  margin-block-end: clamp(2rem, 5vw, 4rem);
+  margin-block-end: clamp(1.5rem, 4vw, 3rem);
   text-decoration: none;
 }
 
 .about-hero {
   align-items: end;
   display: grid;
-  gap: clamp(2rem, 6vw, 6rem);
+  gap: var(--s6-space-layout);
   grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.65fr);
-  padding-block-end: clamp(2.5rem, 6vw, 5rem);
+  padding-block-end: var(--s6-space-section);
 }
 
 .about-hero h1 {
@@ -59,6 +59,7 @@
   background: var(--text);
   color: var(--bg);
   display: grid;
+  direction: ltr;
   overflow: hidden;
   place-items: center;
   position: relative;
@@ -83,7 +84,8 @@
 .about-orbit i {
   border-block-start: 1px solid color-mix(in srgb, var(--bg) 55%, transparent);
   inset-block-start: 50%;
-  inset-inline-start: 50%;
+  left: 50%;
+  right: auto;
   position: absolute;
   transform: rotate(calc(var(--signal) * 60deg));
   transform-origin: left;
@@ -114,7 +116,7 @@
   display: grid;
   gap: 1px;
   grid-template-columns: repeat(5, 1fr);
-  margin-block-end: clamp(2rem, 5vw, 4rem);
+  margin-block-end: var(--s6-space-card);
 }
 
 .about-signal > span {
@@ -159,7 +161,7 @@
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  padding-block-end: clamp(3rem, 7vw, 6rem);
+  padding-block-end: var(--s6-space-section);
 }
 
 .about-facts .ui-card {
@@ -186,9 +188,9 @@
 .about-section {
   border-block-end: 1px solid var(--line);
   display: grid;
-  gap: clamp(1.5rem, 4vw, 4rem);
+  gap: var(--s6-space-card);
   grid-template-columns: 3rem minmax(0, 1fr);
-  padding-block: clamp(2rem, 5vw, 3.5rem);
+  padding-block: clamp(2rem, 4vw, 3rem);
 }
 
 .about-section > div {
@@ -208,7 +210,7 @@
   color: var(--text-soft);
   line-height: 1.7;
   margin: 0;
-  max-inline-size: 54rem;
+  max-inline-size: var(--s6-measure-prose);
 }
 
 .about-section > div > p + p {

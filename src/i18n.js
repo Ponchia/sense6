@@ -55,10 +55,7 @@ export async function setLocale(nextLocale, { notify = true } = {}) {
 /** @param {string} source @param {Record<string, string | number>} values */
 export function t(source, values = {}) {
   const translated = messages.get(source) ?? (Object.keys(values).length ? source : translateExact(source));
-  return Object.entries(values).reduce(
-    (output, [key, value]) => output.replaceAll(`{${key}}`, interpolationValue(value)),
-    translated,
-  );
+  return interpolateMessage(translated, values, locale);
 }
 
 /**
@@ -70,10 +67,22 @@ export function m(id, values = {}) {
   return t(messageSource(id), values);
 }
 
-/** @param {string | number} value */
-function interpolationValue(value) {
+/**
+ * @param {string} template
+ * @param {Record<string, string | number>} values
+ * @param {LocaleCode} localeCode
+ */
+export function interpolateMessage(template, values, localeCode) {
+  return Object.entries(values).reduce(
+    (output, [key, value]) => output.replaceAll(`{${key}}`, interpolationValue(value, localeCode)),
+    template,
+  );
+}
+
+/** @param {string | number} value @param {LocaleCode} [localeCode] */
+function interpolationValue(value, localeCode = locale) {
   const rendered = String(value);
-  return localeMetadata(locale).direction === 'rtl' ? `\u2068${rendered}\u2069` : rendered;
+  return localeMetadata(localeCode).direction === 'rtl' ? `\u2068${rendered}\u2069` : rendered;
 }
 
 /** @param {number} value @param {Intl.NumberFormatOptions} [options] */

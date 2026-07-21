@@ -8,16 +8,16 @@
 
 .cb-intro__hero {
   padding-block-start: 2rem;
-  padding-inline-end: max(1rem, env(safe-area-inset-right));
-  padding-inline-start: max(1rem, env(safe-area-inset-left));
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
 }
 
 .cb-hero {
   align-items: center;
   display: grid;
-  gap: clamp(2rem, 5vw, 5rem);
+  gap: var(--s6-space-layout);
   grid-template-columns: minmax(0, 1.1fr) minmax(16rem, 0.9fr);
-  padding-block: clamp(1rem, 4vw, 3rem);
+  padding-block: var(--s6-space-hero);
 }
 
 .cb-hero__copy h1 {
@@ -193,12 +193,12 @@
   padding-block-end: max(2rem, env(safe-area-inset-bottom));
 }
 
-.setup-view,
-.results-view,
+.cb-active .setup-view,
+.cb-active .results-view,
 .cb-view .lab-topbar,
 .cb-stage {
-  padding-inline-end: max(1rem, env(safe-area-inset-right));
-  padding-inline-start: max(1rem, env(safe-area-inset-left));
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
 }
 
 .cb-topbar__label {
@@ -375,28 +375,28 @@
   margin-block-start: 0.25rem;
 }
 
-.results-head > div:first-child {
+.cb-active .results-head > div:first-child {
   min-inline-size: 0;
 }
 
-.results-head h1 {
+.cb-active .results-head h1 {
   hyphens: auto;
   max-inline-size: 100%;
   overflow-wrap: anywhere;
 }
 
-.setup-panel #cb-start,
-.results-actions .ui-button {
+.cb-active .setup-panel #cb-start,
+.cb-active .results-actions .ui-button {
   max-inline-size: 100%;
   overflow-wrap: anywhere;
   white-space: normal;
 }
 
-.setup-panel #cb-start {
+.cb-active .setup-panel #cb-start {
   inline-size: 100%;
 }
 
-.setup-panel .ready-check span {
+.cb-active .setup-panel .ready-check span {
   min-inline-size: 0;
   overflow-wrap: break-word;
 }
@@ -608,8 +608,8 @@
     gap: 0.5rem;
     grid-template-columns: minmax(0, 1fr) auto;
     padding-block: 0.45rem;
-    padding-inline-end: max(0.5rem, env(safe-area-inset-right));
-    padding-inline-start: max(0.5rem, env(safe-area-inset-left));
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+    padding-right: max(0.5rem, env(safe-area-inset-right));
   }
 
   .cb-view .trial-count {
@@ -629,8 +629,8 @@
     justify-content: center;
     max-inline-size: 100vw;
     padding-block-start: 0.5rem;
-    padding-inline-end: max(0.5rem, env(safe-area-inset-right));
-    padding-inline-start: max(0.5rem, env(safe-area-inset-left));
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+    padding-right: max(0.5rem, env(safe-area-inset-right));
   }
 
   .cb-plate {
@@ -729,12 +729,12 @@
     margin-block: 0.85rem 1rem;
   }
 
-  .setup-view,
-  .results-view {
+  .cb-active .setup-view,
+  .cb-active .results-view {
     padding-block-end: max(3rem, env(safe-area-inset-bottom));
   }
 
-  .setup-panel {
+  .cb-active .setup-panel {
     gap: 1rem;
     padding: 1rem;
   }
@@ -755,7 +755,7 @@
     block-size: 8rem;
   }
 
-  .results-head h1 {
+  .cb-active .results-head h1 {
     font-size: clamp(2.25rem, 12vw, 3.75rem);
     inline-size: 100%;
   }
@@ -776,8 +776,8 @@
     gap: 0.5rem;
     grid-template-columns: minmax(0, 1fr) auto;
     padding-block: 0.25rem;
-    padding-inline-end: max(0.5rem, env(safe-area-inset-right));
-    padding-inline-start: max(0.5rem, env(safe-area-inset-left));
+    padding-left: max(0.5rem, env(safe-area-inset-left));
+    padding-right: max(0.5rem, env(safe-area-inset-right));
   }
 
   .cb-view .trial-count {
@@ -839,7 +839,7 @@
 }
 
 @media (forced-colors: active) {
-  .setup-view .forced-colors-warning {
+  .cb-active .setup-view .forced-colors-warning {
     display: block;
   }
 }

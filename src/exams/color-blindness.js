@@ -79,7 +79,8 @@ const RESEARCH_SOURCES = sourcesFor('color-blindness');
 let state = null;
 
 export function mount(context) {
-  const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClasses: ['lab-mode'] });
+  const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClasses: ['lab-mode', 'cb-active'] });
+  document.body.classList.add('cb-active');
   const mountState = {
     app: context.app,
     announcer: context.announcer,

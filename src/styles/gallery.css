@@ -5,9 +5,9 @@
 .gallery-hero {
   align-items: center;
   display: grid;
-  gap: clamp(2.5rem, 5vw, 6rem);
+  gap: var(--s6-space-layout);
   grid-template-columns: minmax(0, 1.05fr) minmax(24rem, 0.75fr);
-  padding-block: clamp(2.75rem, 5vw, 4rem);
+  padding-block: var(--s6-space-hero);
 }
 
 .gallery-hero__copy {
@@ -90,6 +90,7 @@
 
 .sense-mark__field {
   aspect-ratio: 1;
+  direction: ltr;
   overflow: hidden;
   position: relative;
 }
@@ -99,7 +100,8 @@
   background: var(--line-strong);
   content: "";
   inset-block-start: 50%;
-  inset-inline-start: 50%;
+  left: 50%;
+  right: auto;
   position: absolute;
   transform: translate(-50%, -50%);
 }
@@ -137,7 +139,8 @@
   block-size: 2px;
   inline-size: 39%;
   inset-block-start: 50%;
-  inset-inline-start: 50%;
+  left: 50%;
+  right: auto;
   position: absolute;
   transform: rotate(calc(var(--signal) * 60deg - 90deg));
   transform-origin: 0 50%;
@@ -203,7 +206,7 @@
 }
 
 .tests-section {
-  padding-block: clamp(3rem, 6vw, 5rem);
+  padding-block: var(--s6-space-section);
   scroll-margin-block-start: 4rem;
 }
 
@@ -246,7 +249,9 @@
   min-inline-size: 0;
   overflow: hidden;
   padding: 0;
-  transition: transform var(--duration-base) var(--ease-standard);
+  transition:
+    background-color var(--s6-motion-utility) var(--ease-standard),
+    transform var(--s6-motion-utility) var(--ease-standard);
 }
 
 .exam-card__link {
@@ -288,6 +293,20 @@
   justify-content: center;
   position: absolute;
   z-index: 2;
+}
+
+.exam-grid > .exam-card:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+.exam-grid > .exam-card:last-child:nth-child(odd) .exam-card__link {
+  grid-template-columns: minmax(18rem, 0.72fr) minmax(0, 1.28fr);
+  grid-template-rows: none;
+}
+
+.exam-grid > .exam-card:last-child:nth-child(odd) .exam-card__visual {
+  border-block-end: 0;
+  border-inline-end: 1px solid var(--line);
 }
 
 .mini-spectrum {
@@ -349,6 +368,7 @@
   border: 1px solid color-mix(in srgb, var(--card-accent) 48%, var(--line));
   border-radius: 50%;
   display: flex;
+  direction: ltr;
   inline-size: min(64%, 14rem);
   justify-content: center;
   position: relative;
@@ -380,7 +400,7 @@
 }
 
 .exam-card .mini-reflex span {
-  animation: rx-preview-sweep 3.2s linear infinite;
+  animation: none;
   block-size: 50%;
   border-inline-start: 1px solid var(--card-accent);
   inset-block-start: 0;
@@ -409,6 +429,12 @@
 @keyframes rx-preview-sweep {
   to {
     transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .exam-card .mini-reflex span {
+    animation: rx-preview-sweep 3.2s linear 1 both;
   }
 }
 
@@ -536,6 +562,10 @@
   text-transform: uppercase;
 }
 
+.exam-card .exam-card__cta span {
+  transition: transform var(--s6-motion-utility) var(--ease-standard);
+}
+
 .roadmap {
   border-block: 1px solid var(--line);
   display: grid;
@@ -632,6 +662,14 @@
     border-block-end: 0;
     border-inline-end: 1px solid var(--line);
   }
+
+  .exam-grid > .exam-card:last-child:nth-child(odd) {
+    grid-column: auto;
+  }
+
+  .exam-grid > .exam-card:last-child:nth-child(odd) .exam-card__link {
+    grid-template-columns: minmax(18rem, 0.78fr) minmax(0, 1.22fr);
+  }
 }
 
 @media (max-width: 700px) {
@@ -660,10 +698,20 @@
     grid-template-rows: minmax(15rem, auto) 1fr;
   }
 
+  .exam-grid > .exam-card:last-child:nth-child(odd) .exam-card__link {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(15rem, auto) 1fr;
+  }
+
   .exam-card__visual {
     border-block-end: 1px solid var(--line);
     border-inline-end: 0;
     min-block-size: 15rem;
+  }
+
+  .exam-grid > .exam-card:last-child:nth-child(odd) .exam-card__visual {
+    border-block-end: 1px solid var(--line);
+    border-inline-end: 0;
   }
 
   .roadmap-item {
