@@ -98,11 +98,9 @@ async function expectAcutezzaPageToReflow(page, label) {
 }
 
 async function expectAcutezzaActionsToBeReachable(page, label) {
-  const actions = page.locator('main button:visible');
-  for (let index = 0; index < (await actions.count()); index += 1) {
-    const action = actions.nth(index);
-    await action.scrollIntoViewIfNeeded();
-    const geometry = await action.evaluate((element) => {
+  const geometries = await page.locator('main button:visible').evaluateAll((actions) =>
+    actions.map((element) => {
+      element.scrollIntoView({ behavior: 'instant', block: 'center', inline: 'center' });
       const rect = element.getBoundingClientRect();
       const viewport = window.visualViewport;
       const viewportLeft = viewport?.offsetLeft ?? 0;
@@ -126,7 +124,9 @@ async function expectAcutezzaActionsToBeReachable(page, label) {
         viewportTop,
         width: rect.width,
       };
-    });
+    }),
+  );
+  for (const [index, geometry] of geometries.entries()) {
     expect(geometry.left, `${label} action ${index} left`).toBeGreaterThanOrEqual(geometry.viewportLeft - 1);
     expect(geometry.right, `${label} action ${index} right`).toBeLessThanOrEqual(geometry.viewportRight + 1);
     expect(geometry.top, `${label} action ${index} top`).toBeGreaterThanOrEqual(geometry.viewportTop - 1);
