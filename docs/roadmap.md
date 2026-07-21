@@ -1,7 +1,9 @@
 # Sense6 roadmap
 <!-- vale Vale.Spelling = NO -->
 
-Status: current, 2026-07-20
+Status: current, 2026-07-21
+
+Lifecycle: current
 
 This document records the current product and engineering priorities for
 Sense6. It does not promise release dates.
@@ -50,7 +52,13 @@ The completed foundation includes:
 - checked public declarations for every lazy-loaded experiment controller;
 - guarded phase variants for the Tetracromia session and fail-closed browser and
   persistence boundaries; and
-- enforced JavaScript and CSS production bundle budgets.
+- enforced JavaScript and CSS production bundle budgets;
+- checksummed, commit-stamped release output that is built, audited, and
+  deployed without a rebuild in one job after the browser matrix passes;
+- generated per-locale copy with a stale-output check and a true transitive
+  startup-graph budget; and
+- source complexity and large-file ceilings that require extraction instead of
+  allowing the existing controllers and styles to grow.
 
 The journal is now a separate versioned store. Existing concise latest-or-best
 keys remain compatible and are not rewritten as journal history.
@@ -126,6 +134,27 @@ and professional endorsement remain outside the product plan. Future evidence
 work improves an honest recreational experiment; it doesn't turn Sense6 into a
 medical service.
 
+## Controller and style decomposition backlog
+
+The large controllers and route style sheets remain bounded debt, not a reason
+for a suite-wide framework rewrite. Work through them when the owning feature
+changes, in this order:
+
+1. Extract Udito's latest-result schema, audio-operation state, and result view;
+   then move one guarded phase at a time into the strict typed-JavaScript set.
+2. Extract Riflessi's latest-result schema and result view, followed by its
+   instrument-specific event coordination.
+3. Separate Acutezza calibration, eye-run, and result rendering after its
+   current persistence and migration contracts have settled.
+4. Continue splitting Tetracromia and Daltonia phase handlers and pure views
+   without changing their frozen measurement schedules.
+5. Split each route style sheet by stable visual ownership when it approaches
+   its recorded ceiling; don't move experiment rules back into global CSS.
+
+Keep every extraction behavior-preserving, covered by the existing production
+dose invariants and accelerated browser journeys, and small enough to review
+independently.
+
 ## Maintenance gates
 
 - Review `src/crawler-policy.js` by its recorded deadline and whenever provider
@@ -134,6 +163,9 @@ medical service.
   aligned with the permanent experimental boundary.
 - Keep the entry, per-route, and combined bundle budgets green. Split
   Tetracromia CSS when the global entry approaches its 125 kB ceiling.
+- Keep cognitive complexity at or below 28 and the large-file ceilings green.
+  Extract a focused module instead of raising a ceiling without an explicit
+  architecture decision.
 - Put reusable controls and safety boundaries in
   `src/i18n/message-ids.js`. Migrate older source-keyed prose when it changes;
   don't create a high-risk catalog rewrite only to change key shape.

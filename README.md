@@ -38,7 +38,8 @@ cross-cutting boundary. To add an experiment, follow the
 [experiment extension guide](docs/adding-an-experiment.md). It covers the
 service contract, presentation registry, domain model, mount lifecycle,
 journal passport, localization, route stylesheet, static content, and required
-tests.
+tests. The [documentation index](docs/README.md) distinguishes maintained
+guides from decisions, archived research snapshots, and operational runbooks.
 
 Acutezza's source-backed [research and implementation
 brief](docs/research/acutezza.md) records the method, product boundary, completed
@@ -108,7 +109,8 @@ never pools repeats silently or keeps only a best run.
 You need Node.js 22 or later.
 
 ```sh
-npm install
+npm ci
+npx playwright install --with-deps chromium firefox webkit
 ```
 
 ## Usage
@@ -187,7 +189,10 @@ controls retain physical left/right placement and numbered keyboard order in
 every writing direction.
 
 English source phrases and their eleven translations live in
-`src/locales/<language>.js`. Only the active language catalog is loaded.
+`src/locales/<language>.js`. Coordinated registry, landing, and mobile copy is
+authored in shared source modules and generated into
+`src/locales/generated/*.json`; run `npm run locales:generate` after changing
+those rows. Only the active language catalog is loaded at runtime.
 Reusable controls and safety boundaries use stable IDs from
 `src/i18n/message-ids.js`; call `m(id)` for that copy. Existing experiment
 prose remains source-keyed and migrates when it is changed. Add every new source
@@ -293,13 +298,28 @@ Run every gate:
 npm run check
 ```
 
+The release-only artifact checks add generated HTML validation, internal-link
+validation, and the production site audit:
+
+```sh
+npm run check:release
+```
+
+`check:core` covers lint, the typed-JavaScript and locale ratchets, Bronto UI
+contracts, coverage, the production build, static output, security policy, and
+bundle budgets. `check` adds the browser matrix. `check:release` adds checks
+against the exact generated site. Container visual regression, Lighthouse,
+external-link, and passive ZAP scans remain scheduled or operator-run audits;
+they aren't silently treated as part of the per-commit release gate.
+
 ## Deploy
 
 Every push to `main` runs the complete lint, locale, unit, build, browser,
-responsive, accessibility, static-output, and bundle-budget gate. The deploy
-job builds and verifies one `dist/` directory, then uploads that same directory
-directly to Cloudflare Pages. The verification step has a ten-minute ceiling;
-if the suite reaches it, shard Playwright instead of raising the ceiling.
+responsive, accessibility, static-output, and bundle-budget gate. Verification
+builds `dist/` once, stamps `build-meta.json` with the workflow commit, writes a
+file-by-file SHA-256 manifest, verifies it, and runs the production site audit.
+After the browser matrix passes, the same release job deploys that working tree
+without rebuilding production output or depending on external artifact storage.
 
 Same-repository pull requests run that gate and publish the already verified
 `dist/` directory to a stable `pr-<number>.sense6.pages.dev` branch preview. CI
@@ -308,10 +328,11 @@ then smoke-tests the real deployment. Cloudflare and `_headers` mark previews
 `https://sense6.net`. Fork pull requests verify without deployment credentials
 or a preview.
 
-The initial route budget is at most 110 kB of raw JavaScript. Entry CSS is
-limited to 125 kB raw, every route stylesheet to 40 kB raw, and entry plus the
-largest route stylesheet to 150 kB raw. The gallery and Tetracromia have their
-own route chunks.
+The initial English route budget is at most 110 kB of raw JavaScript across the
+complete transitive graph recorded in Vite's manifest, not only the entry
+chunk. Entry CSS is limited to 125 kB raw, every route stylesheet to 40 kB raw,
+and entry plus the largest route stylesheet to 150 kB raw. The gallery and
+Tetracromia have their own route chunks.
 `tests/static-output.build.js` discovers all generated route stylesheets and
 fails when a bundle crosses those ceilings. The budgets intentionally use
 uncompressed sizes so regressions stay visible independently of transfer
@@ -331,9 +352,11 @@ The deployment workflow requires the `CLOUDFLARE_API_TOKEN` and
 edits for the account that owns `sense6.net`.
 
 The Pages project also requires a D1 binding named `ANALYTICS_DB`. Apply
-`migrations/0001_daily_metrics.sql` to that database before enabling the
-binding. Keep metric reads private in the Cloudflare dashboard or Wrangler;
-don't add a public read endpoint.
+the complete ordered migration set in `migrations/` to that database before
+enabling the binding or merging code that adds a metric pair. Migration tests
+execute the full set in SQLite and prove that every runtime-allowed pair fits
+the production constraints. Keep metric reads private in the Cloudflare
+dashboard or Wrangler; don't add a public read endpoint.
 
 Add the zone's single rate-limiting rule for production before enabling the
 counter. Match `POST` requests whose path equals `/api/metric`, allow 10 requests
@@ -341,6 +364,9 @@ per 10 seconds per source IP, and block excess requests for 10 seconds. This is
 the free-plan minimum window and leaves ample room for a page load, test start,
 completion, and report download. Cloudflare uses the request IP transiently for
 this edge control; Sense6 doesn't copy or store it.
+
+Use the [Cloudflare Pages release runbook](docs/runbooks/cloudflare-pages-release.md)
+for migration, binding, preview, production verification, and rollback steps.
 
 ## Scientific limits
 

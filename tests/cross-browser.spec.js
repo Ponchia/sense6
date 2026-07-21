@@ -9,7 +9,7 @@ test('the gallery opens a localized experiment with route CSS', async ({ page })
 
   await expect(page).toHaveURL(/\/en\/tetracromia\/$/);
   await expect(page.getByRole('heading', { name: /Notice colour in three different ways/i })).toBeVisible();
-  await expect(page.locator('.hero__instrument')).toHaveCSS('position', 'relative');
+  await expect(page.locator('.tetracromia-hero__instrument')).toHaveCSS('position', 'relative');
 });
 
 test('the Tetracromia setup reaches an enabled measured choice', async ({ page }) => {

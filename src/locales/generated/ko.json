@@ -1,0 +1,261 @@
+[
+  ["Screen Colour Lab", "화면 색상 실험실"],
+  ["Three short colour observations", "세 가지 짧은 색상 관찰"],
+  [
+    "Tetracromia is a recreational screen-colour lab with three separate, short-run observations and no overall score.",
+    "Tetracromia는 서로 분리된 세 가지 짧은 관찰을 제공하는 오락용 화면 색상 실험실이며 종합 점수는 없습니다."
+  ],
+  ["Fixed 29-block dose", "고정 29블록 구성"],
+  ["3 separate observations", "3가지 독립 관찰"],
+  ["Screen Colour Lab — Tetracromia | Sense6", "화면 색상 실험실 — Tetracromia | Sense6"],
+  ["Calibrated sharpness & nominal contrast", "보정된 선명도 및 명목 대비"],
+  [
+    "Two per-eye conditions describe angular detail and nominal low-contrast cost without making a clinical claim.",
+    "눈마다 두 조건으로 각도 세부와 명목 저대비의 영향을 설명하며 임상적 주장을 하지 않습니다."
+  ],
+  ["2 per-eye conditions", "눈마다 2가지 조건"],
+  ["Adaptive levels", "적응형 단계"],
+  ["Response speed, choice task & consistency", "반응 속도, 선택 과제 및 일관성"],
+  [
+    "Three instruments keep simple response, a choice task, and within-run stability as separate observations.",
+    "세 가지 도구는 단순 반응, 선택 과제, 실행 중 안정성을 서로 다른 관찰로 유지합니다."
+  ],
+  ["Notice colour in", "색상을"],
+  ["three different ways", "세 가지 방식으로 관찰"],
+  ["Three observations from one short screen-colour run.", "한 번의 짧은 화면 색상 실행에서 얻은 세 가지 관찰입니다."],
+  ["Tile choices", "타일 선택"],
+  ["Dot-field choices", "점 필드 선택"],
+  ["Hue ordering", "색상 순서 정하기"],
+  ["Complete set", "전체 세트"],
+  ["Riflessi — device-relative response observations", "Riflessi — 기기 기준 반응 관찰"],
+  ["Udito — device-relative listening observations", "Udito — 기기 기준 청취 관찰"],
+  ["Acutezza — calibrated sharpness observations", "Acutezza — 보정된 선명도 관찰"],
+  [
+    "The setup checks and adaptive tracks produced coherent run-level observations.",
+    "설정 확인과 적응형 트랙에서 이번 실행에 대해 일관된 관찰을 얻었습니다."
+  ],
+  ["Method source", "방법 출처"],
+  ["Related instrument", "관련 도구"],
+  ["Sense6 validation", "Sense6 검증"],
+  ["Share result", "결과 공유"],
+  ["How much do you want to run?", "검사를 어느 정도 깊이 진행할까요?"],
+  ["about 2 minutes", "약 2분"],
+  ["about 4 minutes", "약 4분"],
+  ["about 7 minutes", "약 7분"],
+  ["Physical setup", "신체 및 기기 배치"],
+  ["Seated · device on a stable surface", "앉은 자세 · 안정된 표면에 기기 놓기"],
+  ["Handheld or standing", "기기를 손에 들거나 서서 진행"],
+  ["Begin selected scope", "선택한 범위 시작"],
+  ["Your response observations — Riflessi | Sense6", "반응 관찰 결과 — Riflessi | Sense6"],
+  [
+    "The selected instruments captured enough clean responses for separate run-level observations.",
+    "선택한 측정 항목에서 이번 실행을 별도로 관찰하기에 충분한 유효 반응을 수집했습니다."
+  ],
+  [
+    "Median of {valid} clean simple responses from {scheduled} scheduled events. Within-run spread: {spread} ms; this is not estimate uncertainty.",
+    "예정된 이벤트 {scheduled}개 중 유효한 단순 반응 {valid}개의 중앙값입니다. 실행 내 분산: {spread}ms. 이는 추정 불확실성이 아닙니다."
+  ],
+  [
+    "{scheduledAccuracy}% correct across all {scheduled} scheduled choices; {conditionalAccuracy}% among left/right responses.",
+    "예정된 선택 {scheduled}개 전체에서 {scheduledAccuracy}% 정답, 좌/우 반응 중에서는 {conditionalAccuracy}% 정답이었습니다."
+  ],
+  ["Descriptive block difference", "블록 간 기술적 차이"],
+  [
+    "Choice-block median minus the earlier simple-response median. Fixed order and different motor responses remain confounded.",
+    "선택 블록 중앙값에서 앞서 측정한 단순 반응 중앙값을 뺀 값입니다. 고정된 순서와 서로 다른 운동 반응의 영향은 분리되지 않습니다."
+  ],
+  [
+    "Median of {valid} clean responses across this custom sustained block.",
+    "이 사용자 정의 지속 블록에서 유효한 반응 {valid}개의 중앙값입니다."
+  ],
+  [
+    "A descriptive slow-tail difference for this custom block—not a PVT lapse count.",
+    "이 사용자 정의 블록의 느린 반응 꼬리에 대한 기술적 차이이며 PVT 실수 횟수가 아닙니다."
+  ],
+  ["No-signal checks", "무신호 확인"],
+  ["Repeat this scope independently", "이 범위를 독립적으로 다시 실행"],
+  ["Controls passed", "대조 확인 통과"],
+  ["Control caution", "대조 확인 주의"],
+  ["Controls not passed", "대조 확인 미통과"],
+  ["correct / scheduled", "정답 / 예정"],
+  ["Ending adaptive level", "최종 적응 수준"],
+  ["Correct / scheduled", "정답 / 예정"],
+  [
+    "{correct} of {total} scheduled high-contrast gap controls were answered correctly.",
+    "예정된 고대비 틈 대조 확인 {total}개 중 {correct}개에 올바르게 답했습니다."
+  ],
+  ["Keep these observations only with a control caution.", "이 관찰은 대조 확인 주의 표시와 함께만 보관하세요."],
+  ["Display-relative adaptive levels from this run", "이번 실행의 화면 상대적 최종 적응 수준"],
+  ["Display-relative observations with a control caution", "대조 확인 주의가 필요한 화면 상대적 관찰"],
+  [
+    "Lower values mean the short adaptive track ended at a smaller colour shift in that direction on this display. These are not precise thresholds, cone measurements, clinical scores, or diagnoses.",
+    "값이 낮을수록 이 화면의 해당 방향에서 짧은 적응 트랙이 더 작은 색상 차이로 끝났음을 뜻합니다. 이는 정밀한 역치, 원추세포 측정값, 임상 점수 또는 진단이 아닙니다."
+  ],
+  [
+    "Two of three high-contrast task controls passed. The observations are retained with a caution, but should not be treated as a strong run.",
+    "고대비 과제 대조 확인 3개 중 2개를 통과했습니다. 관찰은 주의 표시와 함께 유지되지만 신뢰도 높은 실행으로 취급해서는 안 됩니다."
+  ],
+  [
+    "Fewer than two high-contrast task controls passed, so the adaptive levels are not treated as usable. Check the instructions and viewing setup, then try again.",
+    "고대비 과제 대조 확인을 2개 미만 통과했으므로 적응 수준을 사용 가능한 것으로 보지 않습니다. 지침과 관찰 환경을 확인한 뒤 다시 시도하세요."
+  ],
+  ["Focused", "집중"],
+  ["Standard", "표준"],
+  ["Cuffie + Portata · about 3–4 minutes", "Cuffie + Portata · 약 3~4분"],
+  ["All three instruments · about 5–7 minutes", "세 가지 측정 항목 모두 · 약 5~7분"],
+  ["Two focused listening measures.", "두 가지 집중 청취 측정."],
+  [
+    "Keep the tasks separate. This fixed 29-block experiment is too short to establish a stable threshold, stable hue characteristic, or overall ability score.",
+    "각 과제는 따로 해석하세요. 고정된 29블록 실험은 안정적인 역치, 안정적인 색상 특성 또는 종합 능력 점수를 정하기에는 너무 짧습니다."
+  ],
+  ["blocks", "블록"],
+  ["{correct} of {presentations} correct", "{presentations}개 중 {correct}개 정답"],
+  [
+    "The adaptive level ended near {level}° of OKLCH hue (ΔEOK {delta}).",
+    "적응 수준은 OKLCH 색상각 약 {level}°(ΔEOK {delta})에서 끝났습니다."
+  ],
+  [
+    "Presented range {minimum}°–{maximum}° · {reversals} direction changes",
+    "제시 범위 {minimum}°~{maximum}° · 방향 변경 {reversals}회"
+  ],
+  ["{percent}% of pairs ordered", "쌍의 {percent}%를 순서대로 배열"],
+  ["Mean pair ordering across {runs} fixed-anchor arcs.", "고정 앵커 호 {runs}개에서의 평균 쌍 순서."],
+  ["Run values: {values}%", "각 실행의 값: {values}%"],
+  [
+    "The ending adaptive levels summarize where this brief run happened to finish; they are not stable thresholds or uncertainty estimates. Ordering is a separate task. None of these observations is a population score, diagnosis, clinical screen, or evidence for tetrachromacy. A repeat is stored independently—Sense6 never pools runs or keeps a best.",
+    "최종 적응 수준은 이 짧은 실행이 끝난 위치를 요약할 뿐이며 안정적인 역치나 불확실성 추정값이 아닙니다. 순서 배열은 별도 과제입니다. 어떤 관찰도 집단 점수, 진단, 임상 선별검사 또는 사색형 색각의 근거가 아닙니다. 반복 실행은 독립적으로 저장되며 Sense6는 실행을 합치거나 최고값을 보관하지 않습니다."
+  ],
+  ["Repeat independently", "독립적으로 다시 실행"],
+  ["29 completed blocks", "29개 블록 완료"],
+  ["Completed", "완료"],
+  ["Screen Colour Lab / 29 blocks / about 4 minutes", "화면 색상 실험실 / 29블록 / 약 4분"],
+  [
+    "Tetracromia is a short recreational experiment: 14 tile choices, 12 dot-field choices, and 3 ordering arcs. Each observation stays separate.",
+    "Tetracromia는 짧은 오락용 실험입니다. 색상 타일 선택 14회, 점 필드 선택 12회, 순서 배열 호 3개를 진행하며 각 관찰 결과는 따로 제시됩니다."
+  ],
+  ["Three short screen-colour observations.", "화면 색상에 대한 세 가지 짧은 관찰."],
+  ["14 trials", "14회 시도"],
+  ["12 trials", "12회 시도"],
+  ["Dot fields", "점 필드"],
+  ["3 runs", "3회 실행"],
+  ["The displayed difference adapts during two tasks.", "표시되는 차이는 두 과제 중에 적응합니다."],
+  [
+    "Tile choices and Dot fields use a two-correct-down, one-error-up rule. With only 14 and 12 choices, the ending level describes this run; it is not a stable threshold.",
+    "색상 타일 선택과 점 필드는 두 번 정답이면 차이를 줄이고 한 번 오답이면 늘리는 규칙을 사용합니다. 선택 횟수가 14회와 12회뿐이므로 최종 수준은 이번 실행을 설명할 뿐 안정적인 역치가 아닙니다."
+  ],
+  ["Adaptive path", "적응 경로"],
+  ["Correct and missed choices change the next displayed difference.", "정답과 오답에 따라 다음에 표시되는 차이가 바뀝니다."],
+  [
+    "Three observations describe this screen, light, fatigue level, and run—with no composite.",
+    "세 관찰 결과는 이 화면, 조명, 피로 수준과 이번 실행을 설명하며 종합 점수는 없습니다."
+  ],
+  ["Make three colour observations.", "세 가지 색상 관찰을 진행하세요."],
+  [
+    "A C-shaped target becomes harder to separate from its field. Three independent staircases record where each short display-relative track ends during this run.",
+    "C자 모양 표적은 배경과 점점 구분하기 어려워집니다. 독립된 세 계단법이 이번 실행에서 각 화면 상대적 트랙이 끝난 지점을 기록합니다."
+  ],
+  ["Three display directions", "화면상의 세 가지 색상 방향"],
+  [
+    "You receive ending adaptive levels and track evidence, not cone thresholds, a normal/deficient label, or a clinical score.",
+    "최종 적응 수준과 트랙 근거를 제공하며, 원추세포 역치, 정상/이상 분류 또는 임상 점수는 제공하지 않습니다."
+  ],
+  [
+    "Two clear targets teach the C-gap interaction with immediate feedback before the exploratory track.",
+    "탐색 트랙 전에 잘 보이는 두 표적으로 C자 틈 찾기를 연습하고 즉시 피드백을 받습니다."
+  ],
+  [
+    "Target and field are luminance-matched in linear sRGB and share the same dot-level brightness variation.",
+    "표적과 배경은 선형 sRGB에서 휘도를 맞췄으며 점 단위 밝기 변화도 동일합니다."
+  ],
+  [
+    "Directions become harder after correct responses. “No gap visible” counts as a miss and makes that display direction easier.",
+    "정답 후에는 방향 구분이 더 어려워집니다. “틈이 보이지 않음”은 오답으로 처리되어 해당 화면 방향이 쉬워집니다."
+  ],
+  ["Signal", "신호"],
+  ["ready", "준비 완료"],
+  [
+    "A left or right arrow appears. Respond on the matching side. The block median can be described alongside Segnale, with fixed-order and motor differences left explicit.",
+    "왼쪽 또는 오른쪽 화살표가 나타나면 같은 쪽으로 반응하세요. 이 블록의 중앙값은 Segnale와 함께 설명할 수 있지만, 고정 순서와 동작 차이는 명시적으로 남겨 둡니다."
+  ],
+  ["Custom sustained block", "사용자 정의 지속 반응 블록"],
+  [
+    "A three-minute sequence describes changes within this run. PVT-B is a comparator, not validation of this different event schedule.",
+    "3분간의 순서열로 이번 실행 중 변화를 설명합니다. PVT-B는 비교 기준일 뿐, 이와 다른 이벤트 일정의 타당성을 입증하지 않습니다."
+  ],
+  [
+    "One of three intervals contains a tone. Its frequency adapts to find the upper boundary available in this run, on this device, while you report keeping volume unchanged.",
+    "세 구간 중 하나에 소리가 들어 있습니다. 음량을 바꾸지 않았다고 확인한 상태에서 주파수가 적응해 이번 실행과 이 기기에서 가능한 상한을 찾습니다."
+  ],
+  ["Udito listening lab ready.", "Udito 청취 실험실을 시작할 수 있습니다."],
+  ["Vision lab / selectable scope / about 4–8 minutes", "시각 실험실 / 범위 선택 / 약 4~8분"],
+  [
+    "Acutezza describes angular detail for each eye and, in Standard scope, the within-run cost of a nominal low-contrast condition. Meridiani scoring is suspended. This is a perception experiment, not an eye examination.",
+    "Acutezza는 각 눈의 각도 세부 식별 능력과 표준 범위에서 공칭 저대비 조건이 이번 실행에 미친 영향을 설명합니다. Meridiani 채점은 중단된 상태입니다. 이는 지각 실험이지 안과 검사가 아닙니다."
+  ],
+  ["Two conditions. No composite score.", "두 조건. 종합 점수 없음."],
+  [
+    "High-contrast detail and nominal low-contrast cost remain separate. The former Meridiani score is suspended pending redesign and pilot evidence.",
+    "고대비 세부 식별 결과와 공칭 저대비의 영향은 분리해 제시합니다. 기존 Meridiani 점수는 재설계와 예비 자료가 마련될 때까지 중단됩니다."
+  ],
+  [
+    "Audio setup ready. Play the maximum-level reference before beginning.",
+    "오디오 설정이 준비되었습니다. 시작하기 전에 최대 레벨 기준음을 재생하세요."
+  ],
+  ["{name} instructions ready.", "{name} 안내가 준비되었습니다."],
+  ["{name} sound runner ready.", "{name} 소리 테스트가 준비되었습니다."],
+  ["Cuffie practice complete.", "Cuffie 연습이 완료되었습니다."],
+  ["{name} complete.", "{name} 측정이 완료되었습니다."],
+  ["Confirm whether device volume stayed unchanged during the run.", "이번 실행 중 기기 음량이 바뀌지 않았는지 확인하세요."],
+  [
+    "Udito results ready. {quality}. Saved to the private journal.",
+    "Udito 결과가 준비되었습니다. {quality}. 비공개 기록장에 저장했습니다."
+  ],
+  [
+    "Udito results ready. {quality}. The journal entry was not saved.",
+    "Udito 결과가 준비되었습니다. {quality}. 기록장 항목은 저장되지 않았습니다."
+  ],
+  ["Listening paused. {explanation}", "청취가 일시 중지되었습니다. {explanation}"],
+  ["Set the room before the observations.", "관찰 전에 주변 환경을 정리하세요."],
+  [
+    "Display settings and ambient light can change what appears visible. This one-minute check makes the 29-block run easier to repeat under similar conditions.",
+    "화면 설정과 주변 조명에 따라 보이는 정도가 달라질 수 있습니다. 이 1분 확인을 거치면 비슷한 조건에서 29블록을 더 쉽게 반복할 수 있습니다."
+  ],
+  ["Color override detected", "색상 표시 재정의가 감지되었습니다"],
+  [
+    "Turn off forced-colors or high-contrast mode before a visual color task.",
+    "색상을 사용하는 시각 과제 전에 강제 색상 또는 고대비 모드를 끄세요."
+  ],
+  ["Eleven brightness steps from black to white", "검정부터 흰색까지 11단계 밝기"],
+  ["Continuous grayscale gradient", "연속 회색조 그라데이션"],
+  [
+    "The adaptive track only describes this browser, display, lighting, and viewing position. Colour-shifting features can move them substantially.",
+    "적응 트랙은 이 브라우저, 화면, 조명과 관찰 위치만 설명합니다. 색상을 바꾸는 기능은 결과를 크게 변화시킬 수 있습니다."
+  ],
+  ["Colour override detected", "색상 표시 재정의가 감지되었습니다"],
+  ["Audio setup / keep volume unchanged after this screen", "오디오 설정 / 이 화면 이후에는 음량을 바꾸지 마세요"],
+  ["Sound sensitivity comes first.", "소리 민감도를 가장 먼저 고려하세요."],
+  [
+    "If you have tinnitus, hyperacusis, or sounds are uncomfortable today, skip the experiment or stop immediately. Sense6 cannot measure sound pressure.",
+    "이명이나 청각과민이 있거나 오늘 소리가 불편하게 느껴진다면 실험을 건너뛰거나 즉시 중단하세요. Sense6는 음압을 측정할 수 없습니다."
+  ],
+  ["Play maximum-level reference", "최대 레벨 기준음 재생"],
+  [
+    "Start device volume low before playing. This 1 kHz preview represents the loudest digital level used later; it does not measure acoustic output.",
+    "재생하기 전에 기기 음량을 낮게 설정하세요. 이 1 kHz 미리 듣기는 이후 사용할 가장 높은 디지털 레벨을 나타내며, 실제 음향 출력을 측정하지 않습니다."
+  ],
+  ["Connection", "연결"],
+  ["Wired", "유선"],
+  ["Wireless / Bluetooth", "무선 / Bluetooth"],
+  ["Built-in / assistive route", "내장 / 보조 기기 경로"],
+  ["Play 200 Hz, 500 Hz, and 2 kHz audibility anchors", "200 Hz, 500 Hz, 2 kHz 가청 확인음 재생"],
+  [
+    "Confirm that all three are audible at the same comfortable volume. This is a self-report gate, not calibration.",
+    "세 소리가 모두 같은 편안한 음량으로 들리는지 확인하세요. 이는 자기 보고 확인이며 보정이 아닙니다."
+  ],
+  ["I heard all three anchors comfortably without changing volume.", "음량을 바꾸지 않고 세 확인음을 모두 편안하게 들었습니다."],
+  ["Choose this run's scope", "이번 실행 범위 선택"],
+  ["Focused Sharpness", "선명도만"],
+  ["24 interactions per eye", "한쪽 눈당 24회 조작"],
+  ["Sharpness + nominal contrast", "선명도 + 공칭 대비"],
+  ["44 interactions per eye", "한쪽 눈당 44회 조작"]
+]

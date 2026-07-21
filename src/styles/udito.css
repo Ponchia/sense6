@@ -1349,28 +1349,3 @@
 .measurement-active .au-intervals > div.is-live {
   transform: none;
 }
-
-@media (forced-colors: active) {
-  .forced-colors-warning {
-    display: flex;
-  }
-  .color-tile,
-  .field-choice,
-  .sequence-anchor,
-  .sequence-tile,
-  .calibration-steps > span,
-  .calibration-gradient {
-    forced-color-adjust: none;
-  }
-}
-
-@media print {
-  .site-chrome,
-  .ui-sitefooter,
-  .results-actions {
-    display: none;
-  }
-  .results-view {
-    padding: 0;
-  }
-}

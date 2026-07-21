@@ -1,5 +1,6 @@
 # Changelog
 <!-- vale Vale.Spelling = NO -->
+<!-- markdownlint-disable MD024 -->
 
 All notable changes to this project are documented in this file.
 
@@ -7,6 +8,38 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## Unreleased
+
+### Added
+
+- A checksummed, commit-stamped release working tree audited and deployed
+  unchanged in one job after the browser matrix passes.
+- Forward D1 migration coverage for every runtime metric pair, exact Cloudflare
+  header and function-route tests, and a read-only production smoke contract.
+- Complexity, large-file, locale-generation, audit-discovery, coverage-report,
+  and true transitive startup-bundle ratchets.
+
+### Changed
+
+- Locale switching is last-request-wins, persistent shell translation uses
+  stable source attributes, and coordinated copy is generated into per-locale
+  payloads without loading all catalogs on startup.
+- Route, research-source, result-schema, and lifecycle boundaries are separated
+  so unrelated policy no longer enters the initial browser graph.
+- Repository and release documentation now distinguish current architecture,
+  research history, decisions, runbooks, and bounded decomposition work.
+
+### Fixed
+
+- Experiment mounts, delayed journal imports, Udito playback, and locale changes
+  no longer commit stale asynchronous work after navigation or a newer request.
+- Acutezza metrics and comparisons, journal import counts, malformed payload
+  handling, and local persistence failures now fail closed and report truthful
+  outcomes.
+- Static template generation, route-owned styles, forced-colors behavior, and
+  social-card coverage now detect drift instead of silently emitting partial
+  output.
+
+## [0.1.0] - 2026-07-21
 
 ### Added
 

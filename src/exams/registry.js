@@ -3,16 +3,14 @@
  * loading. Non-visual service rules live in contracts.js.
  */
 import { EXAM_IDS as CONTRACT_IDS, examContract } from './contracts.js';
-import { sourcesFor } from './sources.js';
 
 /** @typedef {import('./contracts.js').ExamId} ExamId */
 /** @typedef {import('./contracts.js').ExamContract} ExamContract */
 /** @typedef {import('./module-contract.js').ExamMountContext} ExamMountContext */
-/** @typedef {import('./sources.js').EvidenceSource} ResearchSource */
 /** @typedef {{ mount: (context: ExamMountContext) => (() => void) }} ExamModule */
 /** @typedef {{ paragraphs: string[], related: ExamId[] }} DiscoveryCopy */
-/** @typedef {{ id: ExamId, name: string, tagline: string, blurb: string, accent: string, durationMinutes: number, glyph: string, category: string, facts: string[], pageTitle: string, limit: string, discovery: DiscoveryCopy, load: () => Promise<ExamModule>, sources: readonly Readonly<ResearchSource>[] }} ExamDefinition */
-/** @typedef {Readonly<Omit<ExamDefinition, 'facts' | 'sources' | 'discovery'> & { route: ExamId, metricTest: string, contract: Readonly<ExamContract>, facts: readonly string[], discovery: Readonly<{ paragraphs: readonly string[], related: readonly ExamId[] }>, sources: readonly Readonly<ResearchSource>[] }>} RegisteredExam */
+/** @typedef {{ id: ExamId, name: string, tagline: string, blurb: string, accent: string, durationMinutes: number, glyph: string, category: string, facts: string[], pageTitle: string, limit: string, discovery: DiscoveryCopy, load: () => Promise<ExamModule> }} ExamDefinition */
+/** @typedef {Readonly<Omit<ExamDefinition, 'facts' | 'discovery'> & { route: ExamId, metricTest: string, contract: Readonly<ExamContract>, facts: readonly string[], discovery: Readonly<{ paragraphs: readonly string[], related: readonly ExamId[] }> }>} RegisteredExam */
 
 /** @type {readonly RegisteredExam[]} */
 export const EXAMS = Object.freeze([
@@ -38,7 +36,6 @@ export const EXAMS = Object.freeze([
       related: ['color-blindness', 'acutezza'],
     },
     load: () => import('./tetracromia.js'),
-    sources: sourcesFor('tetracromia'),
   }),
   exam({
     id: 'color-blindness',
@@ -62,7 +59,6 @@ export const EXAMS = Object.freeze([
       related: ['tetracromia', 'acutezza'],
     },
     load: () => import('./color-blindness.js'),
-    sources: sourcesFor('color-blindness'),
   }),
   exam({
     id: 'riflessi',
@@ -86,7 +82,6 @@ export const EXAMS = Object.freeze([
       related: ['acutezza', 'udito'],
     },
     load: () => import('./riflessi.js'),
-    sources: sourcesFor('riflessi'),
   }),
   exam({
     id: 'udito',
@@ -110,7 +105,6 @@ export const EXAMS = Object.freeze([
       related: ['riflessi', 'acutezza'],
     },
     load: () => import('./udito.js'),
-    sources: sourcesFor('udito'),
   }),
   exam({
     id: 'acutezza',
@@ -133,7 +127,6 @@ export const EXAMS = Object.freeze([
       related: ['tetracromia', 'udito'],
     },
     load: () => import('./acutezza.js'),
-    sources: sourcesFor('acutezza'),
   }),
 ]);
 
@@ -161,6 +154,5 @@ function exam(definition) {
       paragraphs: Object.freeze(definition.discovery.paragraphs),
       related: Object.freeze(definition.discovery.related),
     }),
-    sources: definition.sources,
   });
 }

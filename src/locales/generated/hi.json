@@ -1,0 +1,279 @@
+[
+  ["Screen Colour Lab", "स्क्रीन रंग प्रयोगशाला"],
+  ["Three short colour observations", "रंग के तीन छोटे अवलोकन"],
+  [
+    "Tetracromia is a recreational screen-colour lab with three separate, short-run observations and no overall score.",
+    "Tetracromia मनोरंजन के लिए स्क्रीन रंग प्रयोगशाला है, जिसमें तीन अलग छोटे अवलोकन हैं और कोई समग्र स्कोर नहीं है।"
+  ],
+  ["Fixed 29-block dose", "29 ब्लॉक की निश्चित मात्रा"],
+  ["3 separate observations", "3 अलग अवलोकन"],
+  ["Screen Colour Lab — Tetracromia | Sense6", "स्क्रीन रंग प्रयोगशाला — Tetracromia | Sense6"],
+  ["Calibrated sharpness & nominal contrast", "कैलिब्रेट की गई तीक्ष्णता और नाममात्र कंट्रास्ट"],
+  [
+    "Two per-eye conditions describe angular detail and nominal low-contrast cost without making a clinical claim.",
+    "हर आँख की दो स्थितियाँ कोणीय विवरण और नाममात्र कम-कंट्रास्ट के प्रभाव का वर्णन करती हैं, कोई चिकित्सीय दावा नहीं करतीं।"
+  ],
+  ["2 per-eye conditions", "प्रति आँख 2 स्थितियाँ"],
+  ["Adaptive levels", "अनुकूली स्तर"],
+  ["Response speed, choice task & consistency", "प्रतिक्रिया की गति, चयन कार्य और स्थिरता"],
+  [
+    "Three instruments keep simple response, a choice task, and within-run stability as separate observations.",
+    "तीन उपकरण सरल प्रतिक्रिया, चयन कार्य और सत्र के भीतर स्थिरता को अलग-अलग अवलोकन रखते हैं।"
+  ],
+  ["Notice colour in", "रंग को"],
+  ["three different ways", "तीन अलग तरीकों से देखें"],
+  ["Three observations from one short screen-colour run.", "स्क्रीन-रंग के एक छोटे सत्र से तीन अवलोकन।"],
+  ["Tile choices", "टाइल चयन"],
+  ["Dot-field choices", "डॉट-फ़ील्ड चयन"],
+  ["Hue ordering", "रंग क्रम"],
+  ["Complete set", "पूरा सेट"],
+  ["Riflessi — device-relative response observations", "Riflessi — डिवाइस-सापेक्ष प्रतिक्रिया अवलोकन"],
+  ["Udito — device-relative listening observations", "Udito — डिवाइस-सापेक्ष सुनने के अवलोकन"],
+  ["Acutezza — calibrated sharpness observations", "Acutezza — कैलिब्रेट किए गए तीक्ष्णता अवलोकन"],
+  [
+    "The setup checks and adaptive tracks produced coherent run-level observations.",
+    "सेटअप जाँच और अनुकूली ट्रैक ने इस सत्र के लिए सुसंगत अवलोकन दिए।"
+  ],
+  ["Method source", "विधि स्रोत"],
+  ["Related instrument", "संबंधित उपकरण"],
+  ["Sense6 validation", "Sense6 सत्यापन"],
+  ["Share result", "परिणाम साझा करें"],
+  ["How much do you want to run?", "आप परीक्षण कितनी गहराई तक करना चाहते हैं?"],
+  ["about 2 minutes", "लगभग 2 मिनट"],
+  ["about 4 minutes", "लगभग 4 मिनट"],
+  ["about 7 minutes", "लगभग 7 मिनट"],
+  ["Physical setup", "शारीरिक व्यवस्था"],
+  ["Seated · device on a stable surface", "बैठकर · डिवाइस स्थिर सतह पर"],
+  ["Handheld or standing", "डिवाइस हाथ में लेकर या खड़े होकर"],
+  ["Begin selected scope", "चुना हुआ दायरा शुरू करें"],
+  ["Your response observations — Riflessi | Sense6", "आपके प्रतिक्रिया अवलोकन — Riflessi | Sense6"],
+  [
+    "The selected instruments captured enough clean responses for separate run-level observations.",
+    "चुने गए उपकरणों ने इस रन के अलग-अलग अवलोकन दिखाने के लिए पर्याप्त मान्य प्रतिक्रियाएँ दर्ज कीं।"
+  ],
+  [
+    "Median of {valid} clean simple responses from {scheduled} scheduled events. Within-run spread: {spread} ms; this is not estimate uncertainty.",
+    "निर्धारित {scheduled} घटनाओं में से {valid} मान्य सरल प्रतिक्रियाओं का माध्यिका। रन के भीतर फैलाव: {spread} मि.से.; यह अनुमान की अनिश्चितता नहीं है।"
+  ],
+  [
+    "{scheduledAccuracy}% correct across all {scheduled} scheduled choices; {conditionalAccuracy}% among left/right responses.",
+    "सभी {scheduled} निर्धारित विकल्पों में {scheduledAccuracy}% सही; बाएँ/दाएँ प्रतिक्रियाओं में {conditionalAccuracy}% सही।"
+  ],
+  ["Descriptive block difference", "ब्लॉक के बीच वर्णनात्मक अंतर"],
+  [
+    "Choice-block median minus the earlier simple-response median. Fixed order and different motor responses remain confounded.",
+    "विकल्प ब्लॉक की माध्यिका में से पहले की सरल-प्रतिक्रिया माध्यिका घटाई गई है। तय क्रम और अलग मोटर प्रतिक्रियाओं का प्रभाव अलग नहीं किया जा सकता।"
+  ],
+  [
+    "Median of {valid} clean responses across this custom sustained block.",
+    "इस विशेष सतत ब्लॉक में {valid} मान्य प्रतिक्रियाओं का माध्यिका।"
+  ],
+  [
+    "A descriptive slow-tail difference for this custom block—not a PVT lapse count.",
+    "इस विशेष ब्लॉक की धीमी प्रतिक्रियाओं के छोर का वर्णनात्मक अंतर—PVT चूक की गिनती नहीं।"
+  ],
+  ["No-signal checks", "बिना संकेत की जाँच"],
+  ["Repeat this scope independently", "इस दायरे को स्वतंत्र रूप से दोहराएँ"],
+  ["Controls passed", "नियंत्रण जाँच सफल"],
+  ["Control caution", "नियंत्रण जाँच में सावधानी"],
+  ["Controls not passed", "नियंत्रण जाँच असफल"],
+  ["correct / scheduled", "सही / निर्धारित"],
+  ["Ending adaptive level", "अंतिम अनुकूली स्तर"],
+  ["Correct / scheduled", "सही / निर्धारित"],
+  [
+    "{correct} of {total} scheduled high-contrast gap controls were answered correctly.",
+    "निर्धारित {total} उच्च-कंट्रास्ट अंतर नियंत्रणों में से {correct} का सही उत्तर दिया गया।"
+  ],
+  [
+    "Keep these observations only with a control caution.",
+    "इन अवलोकनों को केवल नियंत्रण-सावधानी के साथ रखें।"
+  ],
+  ["Display-relative adaptive levels from this run", "इस रन के स्क्रीन-सापेक्ष अंतिम अनुकूली स्तर"],
+  ["Display-relative observations with a control caution", "नियंत्रण-सावधानी के साथ स्क्रीन-सापेक्ष अवलोकन"],
+  [
+    "Lower values mean the short adaptive track ended at a smaller colour shift in that direction on this display. These are not precise thresholds, cone measurements, clinical scores, or diagnoses.",
+    "कम मान का अर्थ है कि इस स्क्रीन पर उस दिशा में छोटा अनुकूली ट्रैक कम रंग-अंतर पर समाप्त हुआ। ये सटीक सीमाएँ, कोन माप, चिकित्सीय स्कोर या निदान नहीं हैं।"
+  ],
+  [
+    "Two of three high-contrast task controls passed. The observations are retained with a caution, but should not be treated as a strong run.",
+    "तीन उच्च-कंट्रास्ट कार्य नियंत्रणों में से दो सफल रहे। अवलोकन सावधानी के साथ रखे गए हैं, लेकिन इन्हें मजबूत रन नहीं माना जाना चाहिए।"
+  ],
+  [
+    "Fewer than two high-contrast task controls passed, so the adaptive levels are not treated as usable. Check the instructions and viewing setup, then try again.",
+    "दो से कम उच्च-कंट्रास्ट कार्य नियंत्रण सफल रहे, इसलिए अनुकूली स्तर उपयोग योग्य नहीं माने जाते। निर्देश और देखने की व्यवस्था जाँचें, फिर दोबारा प्रयास करें।"
+  ],
+  ["Focused", "केंद्रित"],
+  ["Standard", "मानक"],
+  ["Cuffie + Portata · about 3–4 minutes", "Cuffie + Portata · लगभग 3–4 मिनट"],
+  ["All three instruments · about 5–7 minutes", "तीनों उपकरण · लगभग 5–7 मिनट"],
+  ["Two focused listening measures.", "दो केंद्रित श्रवण माप।"],
+  [
+    "Keep the tasks separate. This fixed 29-block experiment is too short to establish a stable threshold, stable hue characteristic, or overall ability score.",
+    "कार्यों को अलग-अलग रखें। यह तय 29-ब्लॉक प्रयोग स्थिर सीमा, स्थिर रंग विशेषता या समग्र क्षमता स्कोर निर्धारित करने के लिए बहुत छोटा है।"
+  ],
+  ["blocks", "ब्लॉक"],
+  ["{correct} of {presentations} correct", "{presentations} में से {correct} सही"],
+  [
+    "The adaptive level ended near {level}° of OKLCH hue (ΔEOK {delta}).",
+    "अनुकूली स्तर OKLCH रंगत के लगभग {level}° (ΔEOK {delta}) पर समाप्त हुआ।"
+  ],
+  [
+    "Presented range {minimum}°–{maximum}° · {reversals} direction changes",
+    "प्रस्तुत सीमा {minimum}°–{maximum}° · दिशा में {reversals} बदलाव"
+  ],
+  ["{percent}% of pairs ordered", "{percent}% जोड़ियाँ क्रम में"],
+  ["Mean pair ordering across {runs} fixed-anchor arcs.", "{runs} स्थिर-एंकर चापों में औसत जोड़ी क्रम।"],
+  ["Run values: {values}%", "रन मान: {values}%"],
+  [
+    "The ending adaptive levels summarize where this brief run happened to finish; they are not stable thresholds or uncertainty estimates. Ordering is a separate task. None of these observations is a population score, diagnosis, clinical screen, or evidence for tetrachromacy. A repeat is stored independently—Sense6 never pools runs or keeps a best.",
+    "अंतिम अनुकूली स्तर केवल यह बताते हैं कि यह छोटा रन कहाँ समाप्त हुआ; ये स्थिर सीमाएँ या अनिश्चितता के अनुमान नहीं हैं। क्रम लगाना एक अलग कार्य है। इनमें से कोई भी अवलोकन जनसंख्या स्कोर, निदान, चिकित्सीय स्क्रीनिंग या चतुर्वर्णिता का प्रमाण नहीं है। हर दोहराव अलग सहेजा जाता है—Sense6 रन को मिलाता नहीं और सर्वोत्तम परिणाम नहीं रखता।"
+  ],
+  ["Repeat independently", "स्वतंत्र रूप से दोहराएँ"],
+  ["29 completed blocks", "29 ब्लॉक पूरे"],
+  ["Completed", "पूर्ण"],
+  ["Screen Colour Lab / 29 blocks / about 4 minutes", "स्क्रीन रंग प्रयोगशाला / 29 ब्लॉक / लगभग 4 मिनट"],
+  [
+    "Tetracromia is a short recreational experiment: 14 tile choices, 12 dot-field choices, and 3 ordering arcs. Each observation stays separate.",
+    "Tetracromia एक छोटा मनोरंजक प्रयोग है: 14 रंग-टाइल चयन, 12 बिंदु-क्षेत्र चयन और 3 क्रमबद्ध करने वाले चाप। हर अवलोकन अलग रखा जाता है।"
+  ],
+  ["Three short screen-colour observations.", "स्क्रीन के रंग पर तीन छोटे अवलोकन।"],
+  ["14 trials", "14 प्रयास"],
+  ["12 trials", "12 प्रयास"],
+  ["Dot fields", "बिंदु-क्षेत्र"],
+  ["3 runs", "3 रन"],
+  [
+    "The displayed difference adapts during two tasks.",
+    "दिखाया गया अंतर दो कार्यों के दौरान अनुकूली रूप से बदलता है।"
+  ],
+  [
+    "Tile choices and Dot fields use a two-correct-down, one-error-up rule. With only 14 and 12 choices, the ending level describes this run; it is not a stable threshold.",
+    "रंग-टाइल चयन और बिंदु-क्षेत्र में दो सही उत्तरों पर अंतर घटता है और एक गलती पर बढ़ता है। केवल 14 और 12 चयनों के कारण अंतिम स्तर इस रन का वर्णन करता है; यह स्थिर सीमा नहीं है।"
+  ],
+  ["Adaptive path", "अनुकूली क्रम"],
+  [
+    "Correct and missed choices change the next displayed difference.",
+    "सही और गलत चयन अगले दिखाए जाने वाले अंतर को बदलते हैं।"
+  ],
+  [
+    "Three observations describe this screen, light, fatigue level, and run—with no composite.",
+    "तीन अवलोकन इस स्क्रीन, रोशनी, थकान के स्तर और रन का वर्णन करते हैं—कोई संयुक्त स्कोर नहीं दिया जाता।"
+  ],
+  ["Make three colour observations.", "रंग के तीन अवलोकन करें।"],
+  [
+    "A C-shaped target becomes harder to separate from its field. Three independent staircases record where each short display-relative track ends during this run.",
+    "C आकार का लक्ष्य अपने क्षेत्र से अलग पहचानना धीरे-धीरे कठिन हो जाता है। तीन स्वतंत्र सीढ़ी-विधियाँ दर्ज करती हैं कि इस रन में हर स्क्रीन-सापेक्ष ट्रैक कहाँ समाप्त हुआ।"
+  ],
+  ["Three display directions", "स्क्रीन पर रंग की तीन दिशाएँ"],
+  [
+    "You receive ending adaptive levels and track evidence, not cone thresholds, a normal/deficient label, or a clinical score.",
+    "आपको अंतिम अनुकूली स्तर और ट्रैक के प्रमाण मिलते हैं—कोन की सीमाएँ, सामान्य/कमज़ोर का लेबल या चिकित्सीय स्कोर नहीं।"
+  ],
+  [
+    "Two clear targets teach the C-gap interaction with immediate feedback before the exploratory track.",
+    "खोजी ट्रैक से पहले दो स्पष्ट लक्ष्य तुरंत प्रतिक्रिया के साथ C के अंतर को चुनना सिखाते हैं।"
+  ],
+  [
+    "Target and field are luminance-matched in linear sRGB and share the same dot-level brightness variation.",
+    "लक्ष्य और क्षेत्र की चमक रैखिक sRGB में बराबर रखी गई है और दोनों में बिंदु-स्तर की चमक का बदलाव समान है।"
+  ],
+  [
+    "Directions become harder after correct responses. “No gap visible” counts as a miss and makes that display direction easier.",
+    "सही उत्तरों के बाद दिशाएँ कठिन होती हैं। “कोई अंतर दिखाई नहीं देता” को गलती माना जाता है और वह स्क्रीन-दिशा आसान हो जाती है।"
+  ],
+  ["Signal", "संकेत"],
+  ["ready", "तैयार"],
+  [
+    "A left or right arrow appears. Respond on the matching side. The block median can be described alongside Segnale, with fixed-order and motor differences left explicit.",
+    "बाएँ या दाएँ तीर के दिखाई देने पर उसी ओर प्रतिक्रिया दें। इस ब्लॉक की माध्यिका को Segnale के साथ बताया जा सकता है, जबकि तय क्रम और शारीरिक प्रतिक्रिया के अंतर स्पष्ट रखे जाते हैं।"
+  ],
+  ["Custom sustained block", "विशेष सतत प्रतिक्रिया ब्लॉक"],
+  [
+    "A three-minute sequence describes changes within this run. PVT-B is a comparator, not validation of this different event schedule.",
+    "तीन मिनट का क्रम इस रन के भीतर हुए बदलावों का वर्णन करता है। PVT-B केवल तुलना का आधार है, इस अलग घटना-क्रम का सत्यापन नहीं।"
+  ],
+  [
+    "One of three intervals contains a tone. Its frequency adapts to find the upper boundary available in this run, on this device, while you report keeping volume unchanged.",
+    "तीन अंतरालों में से एक में ध्वनि होती है। जब आप वॉल्यूम को अपरिवर्तित रखने की पुष्टि करते हैं, आवृत्ति अनुकूली रूप से बदलकर इस रन और इस डिवाइस पर उपलब्ध ऊपरी सीमा खोजती है।"
+  ],
+  ["Udito listening lab ready.", "Udito श्रवण प्रयोगशाला तैयार है।"],
+  [
+    "Vision lab / selectable scope / about 4–8 minutes",
+    "दृष्टि प्रयोगशाला / चुना जा सकने वाला दायरा / लगभग 4–8 मिनट"
+  ],
+  [
+    "Acutezza describes angular detail for each eye and, in Standard scope, the within-run cost of a nominal low-contrast condition. Meridiani scoring is suspended. This is a perception experiment, not an eye examination.",
+    "Acutezza हर आँख की कोणीय सूक्ष्मता और मानक दायरे में नाममात्र कम-कंट्रास्ट स्थिति की इस रन के भीतर की अतिरिक्त कठिनाई का वर्णन करता है। Meridiani स्कोरिंग स्थगित है। यह दृष्टि-बोध का प्रयोग है, आँखों की जाँच नहीं।"
+  ],
+  ["Two conditions. No composite score.", "दो स्थितियाँ। कोई संयुक्त स्कोर नहीं।"],
+  [
+    "High-contrast detail and nominal low-contrast cost remain separate. The former Meridiani score is suspended pending redesign and pilot evidence.",
+    "उच्च-कंट्रास्ट सूक्ष्मता और नाममात्र कम-कंट्रास्ट की अतिरिक्त कठिनाई अलग रखी जाती हैं। पुराने Meridiani स्कोर को पुनर्रचना और प्रारंभिक अध्ययन के प्रमाण मिलने तक स्थगित किया गया है।"
+  ],
+  [
+    "Audio setup ready. Play the maximum-level reference before beginning.",
+    "ऑडियो सेटअप तैयार है। शुरू करने से पहले अधिकतम स्तर वाला संदर्भ चलाएँ।"
+  ],
+  ["{name} instructions ready.", "{name} के निर्देश तैयार हैं।"],
+  ["{name} sound runner ready.", "{name} का ध्वनि परीक्षण तैयार है।"],
+  ["Cuffie practice complete.", "Cuffie अभ्यास पूरा हुआ।"],
+  ["{name} complete.", "{name} माप पूरा हुआ।"],
+  [
+    "Confirm whether device volume stayed unchanged during the run.",
+    "पुष्टि करें कि रन के दौरान डिवाइस का वॉल्यूम अपरिवर्तित रहा।"
+  ],
+  [
+    "Udito results ready. {quality}. Saved to the private journal.",
+    "Udito के परिणाम तैयार हैं। {quality}। निजी जर्नल में सहेजे गए।"
+  ],
+  [
+    "Udito results ready. {quality}. The journal entry was not saved.",
+    "Udito के परिणाम तैयार हैं। {quality}। जर्नल प्रविष्टि सहेजी नहीं गई।"
+  ],
+  ["Listening paused. {explanation}", "श्रवण कार्य रुका हुआ है। {explanation}"],
+  ["Set the room before the observations.", "अवलोकनों से पहले कमरे की व्यवस्था करें।"],
+  [
+    "Display settings and ambient light can change what appears visible. This one-minute check makes the 29-block run easier to repeat under similar conditions.",
+    "डिस्प्ले की सेटिंग और आसपास की रोशनी दिखाई देने वाली चीज़ों को बदल सकती हैं। एक मिनट की यह जाँच समान परिस्थितियों में 29 ब्लॉक दोहराना आसान बनाती है।"
+  ],
+  ["Color override detected", "रंग प्रदर्शन का ओवरराइड मिला"],
+  [
+    "Turn off forced-colors or high-contrast mode before a visual color task.",
+    "दृश्य रंग-कार्य से पहले फ़ोर्स्ड कलर्स या हाई-कंट्रास्ट मोड बंद करें।"
+  ],
+  ["Eleven brightness steps from black to white", "काले से सफ़ेद तक चमक के ग्यारह स्तर"],
+  ["Continuous grayscale gradient", "निरंतर ग्रेस्केल ढाल"],
+  [
+    "The adaptive track only describes this browser, display, lighting, and viewing position. Colour-shifting features can move them substantially.",
+    "अनुकूली ट्रैक केवल इस ब्राउज़र, स्क्रीन, रोशनी और देखने की स्थिति का वर्णन करता है। रंग बदलने वाली सुविधाएँ परिणामों को काफ़ी बदल सकती हैं।"
+  ],
+  ["Colour override detected", "रंग प्रदर्शन का ओवरराइड मिला"],
+  ["Audio setup / keep volume unchanged after this screen", "ऑडियो सेटअप / इस स्क्रीन के बाद वॉल्यूम न बदलें"],
+  ["Sound sensitivity comes first.", "ध्वनि के प्रति संवेदनशीलता सबसे पहले आती है।"],
+  [
+    "If you have tinnitus, hyperacusis, or sounds are uncomfortable today, skip the experiment or stop immediately. Sense6 cannot measure sound pressure.",
+    "यदि आपको टिनिटस या हाइपरएक्यूसिस है, या आज ध्वनियाँ असहज लग रही हैं, तो प्रयोग छोड़ दें या तुरंत रोक दें। Sense6 ध्वनि-दाब नहीं माप सकता।"
+  ],
+  ["Play maximum-level reference", "अधिकतम स्तर वाला संदर्भ चलाएँ"],
+  [
+    "Start device volume low before playing. This 1 kHz preview represents the loudest digital level used later; it does not measure acoustic output.",
+    "चलाने से पहले डिवाइस का वॉल्यूम कम रखें। यह 1 kHz नमूना बाद में इस्तेमाल होने वाला सबसे ऊँचा डिजिटल स्तर दर्शाता है; यह ध्वनिक आउटपुट नहीं मापता।"
+  ],
+  ["Connection", "कनेक्शन"],
+  ["Wired", "तार वाला"],
+  ["Wireless / Bluetooth", "वायरलेस / Bluetooth"],
+  ["Built-in / assistive route", "अंतर्निहित / सहायक मार्ग"],
+  ["Play 200 Hz, 500 Hz, and 2 kHz audibility anchors", "200 Hz, 500 Hz और 2 kHz के श्रव्यता संदर्भ चलाएँ"],
+  [
+    "Confirm that all three are audible at the same comfortable volume. This is a self-report gate, not calibration.",
+    "पुष्टि करें कि तीनों एक ही आरामदायक वॉल्यूम पर सुनाई देते हैं। यह स्व-रिपोर्ट की जाँच है, कैलिब्रेशन नहीं।"
+  ],
+  [
+    "I heard all three anchors comfortably without changing volume.",
+    "मैंने वॉल्यूम बदले बिना तीनों संदर्भ आराम से सुने।"
+  ],
+  ["Choose this run's scope", "इस रन का दायरा चुनें"],
+  ["Focused Sharpness", "केवल स्पष्टता"],
+  ["24 interactions per eye", "हर आँख के लिए 24 क्रियाएँ"],
+  ["Sharpness + nominal contrast", "स्पष्टता + नाममात्र कंट्रास्ट"],
+  ["44 interactions per eye", "हर आँख के लिए 44 क्रियाएँ"]
+]

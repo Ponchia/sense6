@@ -1,8 +1,6 @@
-import { landingRows } from './landing-copy.js';
-import { mobileUxRows } from './mobile-ux-copy.js';
-import { registryRows } from './registry-copy.js';
+import copyRows from './generated/en.json' with { type: 'json' };
 
-// Generated once from the former combined catalog; edit this locale directly.
+// Manual locale catalog; edit this locale directly.
 /** @type {Array<[string, string]>} */
 const rows = [
   ['Skip to content', 'Skip to content'],
@@ -18,7 +16,6 @@ const rows = [
   ['All tests', 'All tests'],
   ['About', 'About'],
   ['How Sense6 works', 'How Sense6 works'],
-  ['Anonymous daily counts · no cookies', 'Anonymous daily counts · no cookies'],
   ['Source', 'Source'],
   ['Sense6 — measure what your senses notice', 'Sense6 — measure what your senses notice'],
   ['Measure what your', 'Measure what your'],
@@ -26,10 +23,6 @@ const rows = [
   [
     'Short, careful tests that turn what you notice into honest, device-relative results.',
     'Short, careful tests that turn what you notice into honest, device-relative results.',
-  ],
-  [
-    'No account, no answers or results uploaded, no diagnosis theatre.',
-    'No account, no answers or results uploaded, no diagnosis theatre.',
   ],
   ['No account, no answers or results uploaded.', 'No account, no answers or results uploaded.'],
   [
@@ -44,7 +37,6 @@ const rows = [
   ['Colour', 'Colour'],
   ['Hearing', 'Hearing'],
   ['Threshold', 'Threshold'],
-  ['Pattern', 'Pattern'],
   ['Profile', 'Profile'],
   ['Ready now / choose a test', 'Ready now / choose a test'],
   ['Start with what you want to learn.', 'Start with what you want to learn.'],
@@ -58,31 +50,17 @@ const rows = [
     'In development — visible here as direction, not as something you can start yet.',
     'In development — visible here as direction, not as something you can start yet.',
   ],
-  ['Calibrated sharpness & meridional clarity', 'Calibrated sharpness & meridional clarity'],
   ['Open test', 'Open test'],
   ['What this test includes', 'What this test includes'],
-  ['How finely do you see colour?', 'How finely do you see colour?'],
-  [
-    'An adaptive colour-discrimination lab: three instruments measure the smallest hue steps you can resolve on this screen.',
-    'An adaptive colour-discrimination lab: three instruments measure the smallest hue steps you can resolve on this screen.',
-  ],
   ['Colour discrimination', 'Colour discrimination'],
-  ['Adaptive difficulty', 'Adaptive difficulty'],
-  ['Detailed profile', 'Detailed profile'],
   ['Adaptive browser colour-vision experiment', 'Adaptive browser colour-vision experiment'],
   [
     'Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.',
     'Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.',
   ],
   ['Colour-vision experiment', 'Colour-vision experiment'],
-  ['Adaptive thresholds', 'Adaptive thresholds'],
   ['3 display directions', '3 display directions'],
   ['Run-relative result', 'Run-relative result'],
-  ['Response speed, choice cost & consistency', 'Response speed, choice cost & consistency'],
-  [
-    'Three short instruments separate a simple visual response from decision cost and within-run stability.',
-    'Three short instruments separate a simple visual response from decision cost and within-run stability.',
-  ],
   ['Response timing', 'Response timing'],
   ['Device-relative timing', 'Device-relative timing'],
   ['No composite score', 'No composite score'],
@@ -95,21 +73,11 @@ const rows = [
   ['Volume safety contract', 'Volume safety contract'],
   ['No hearing label', 'No hearing label'],
   ['3 instruments', '3 instruments'],
-  [
-    'Three per-eye instruments measure angular detail, low-contrast cost, and repeatable orientation preference without making a clinical claim.',
-    'Three per-eye instruments measure angular detail, low-contrast cost, and repeatable orientation preference without making a clinical claim.',
-  ],
   ['Calibrated sharpness experiment', 'Calibrated sharpness experiment'],
   ['Physical screen calibration', 'Physical screen calibration'],
-  ['3 per-eye instruments', '3 per-eye instruments'],
   ['No clinical label', 'No clinical label'],
-  ['Vision lab / three instruments / about 8 minutes', 'Vision lab / three instruments / about 8 minutes'],
   ['Calibrate the screen.', 'Calibrate the screen.'],
   ['Resolve the opening.', 'Resolve the opening.'],
-  [
-    'Acutezza measures the angular detail resolved by each eye, the cost of lower contrast, and whether a directional clarity preference repeats. It is a perception experiment, not an eye examination.',
-    'Acutezza measures the angular detail resolved by each eye, the cost of lower contrast, and whether a directional clarity preference repeats. It is a perception experiment, not an eye examination.',
-  ],
   ['Prepare the vision lab', 'Prepare the vision lab'],
   [
     'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
@@ -117,17 +85,10 @@ const rows = [
   ],
   ['Gap angle', 'Gap angle'],
   ['calibrated', 'calibrated'],
-  ['Three observations. No composite score.', 'Three observations. No composite score.'],
-  [
-    'High-contrast detail, low-contrast cost, and directional preference remain separate.',
-    'High-contrast detail, low-contrast cost, and directional preference remain separate.',
-  ],
   ['High-contrast sharpness', 'High-contrast sharpness'],
   ['Find the opening.', 'Find the opening.'],
   ['Low-contrast cost', 'Low-contrast cost'],
   ['Find the quieter opening.', 'Find the quieter opening.'],
-  ['Orientation consistency', 'Orientation consistency'],
-  ['Which line field looks clearer?', 'Which line field looks clearer?'],
   ['Comfort and context come first.', 'Comfort and context come first.'],
   [
     'Use your usual correction for this distance. Cover one eye without pressing it, keep your head upright, and stop for discomfort.',
@@ -214,17 +175,6 @@ const rows = [
   ],
   ['Begin Nitidezza', 'Begin Nitidezza'],
   ['Continue to Contrasto', 'Continue to Contrasto'],
-  ['Continue to Meridiani', 'Continue to Meridiani'],
-  [
-    'Without moving closer, which line field looks clearer?',
-    'Without moving closer, which line field looks clearer?',
-  ],
-  ['Left line field', 'Left line field'],
-  ['Right line field', 'Right line field'],
-  ['Left clearer', 'Left clearer'],
-  ['No difference', 'No difference'],
-  ['Right clearer', 'Right clearer'],
-  ['No astigmatism claim', 'No astigmatism claim'],
   ['First eye complete', 'First eye complete'],
   ['Finish with one eye', 'Finish with one eye'],
   ['Separate observations.', 'Separate observations.'],
@@ -232,16 +182,13 @@ const rows = [
   ['High-contrast angular gap', 'High-contrast angular gap'],
   ['Low-contrast angular gap', 'Low-contrast angular gap'],
   ['Meridional consistency', 'Meridional consistency'],
-  ['No stable preference', 'No stable preference'],
   ['Calibrated experiment, not an eye examination.', 'Calibrated experiment, not an eye examination.'],
   ['Sudden changes need care, not another run.', 'Sudden changes need care, not another run.'],
   [
     'This is not vision screening, diagnosis, or a prescription.',
     'This is not vision screening, diagnosis, or a prescription.',
   ],
-  ['Acutezza — calibrated sharpness profile', 'Acutezza — calibrated sharpness profile'],
   ['preference', 'preference'],
-  ['no stable preference', 'no stable preference'],
   [
     'Calibrated sharpness experiment — Acutezza | Sense6',
     'Calibrated sharpness experiment — Acutezza | Sense6',
@@ -249,34 +196,15 @@ const rows = [
   ['Calibrate screen size — Acutezza | Sense6', 'Calibrate screen size — Acutezza | Sense6'],
   ['Estimate viewing distance — Acutezza | Sense6', 'Estimate viewing distance — Acutezza | Sense6'],
   [
-    'Your calibrated sharpness profile — Acutezza | Sense6',
-    'Your calibrated sharpness profile — Acutezza | Sense6',
-  ],
-  ['Gap at top', 'Gap at top'],
-  ['Gap at upper right', 'Gap at upper right'],
-  ['Gap at right', 'Gap at right'],
-  ['Gap at lower right', 'Gap at lower right'],
-  ['Gap at bottom', 'Gap at bottom'],
-  ['Gap at lower left', 'Gap at lower left'],
-  ['Gap at left', 'Gap at left'],
-  ['Gap at upper left', 'Gap at upper left'],
-  [
     'A Landolt ring changes size while you identify its opening. The estimate belongs to this calibrated distance and display.',
     'A Landolt ring changes size while you identify its opening. The estimate belongs to this calibrated distance and display.',
   ],
   [
     'The same task repeats with a pale target. Sense6 compares conditions within this run, not across devices.',
     'The same task repeats with a pale target. Sense6 compares conditions within this run, not across devices.',
-  ],
-  [
-    'Line fields repeat at two scales and changing pixel phases. A preference appears only when it replicates.',
-    'Line fields repeat at two scales and changing pixel phases. A preference appears only when it replicates.',
   ],
   ['Before testing', 'Before testing'],
   ['Acutezza setup rules', 'Acutezza setup rules'],
-  ['Adaptive burden', 'Adaptive burden'],
-  ['Standard optotype', 'Standard optotype'],
-  ['Urgent symptoms', 'Urgent symptoms'],
   ['Camera', 'Camera'],
   ['Result', 'Result'],
   ['None', 'None'],
@@ -285,25 +213,6 @@ const rows = [
   ['Calibration 02 / estimated viewing distance', 'Calibration 02 / estimated viewing distance'],
   ['Calibration 03 / contrast availability', 'Calibration 03 / contrast availability'],
   ['Between-eye setup check', 'Between-eye setup check'],
-  ['Changing pixel phase', 'Changing pixel phase'],
-  ['Two repeated scales', 'Two repeated scales'],
-  ['Comparison recorded.', 'Comparison recorded.'],
-  [
-    'A physical card and blind-spot sweeps establish screen scale and estimated viewing distance.',
-    'A physical card and blind-spot sweeps establish screen scale and estimated viewing distance.',
-  ],
-  [
-    'The Landolt ring provides language-independent, eight-direction geometry.',
-    'The Landolt ring provides language-independent, eight-direction geometry.',
-  ],
-  [
-    'Eighteen eight-choice trials balance precision and effort in FrACT research.',
-    'Eighteen eight-choice trials balance precision and effort in FrACT research.',
-  ],
-  [
-    'Safety copy reflects guidance for sudden floaters, flashes, or curtain-like shadows.',
-    'Safety copy reflects guidance for sudden floaters, flashes, or curtain-like shadows.',
-  ],
   [
     'Use a laptop, tablet, or monitor without glare. Reset browser zoom, keep brightness comfortable, and leave the display still after calibration.',
     'Use a laptop, tablet, or monitor without glare. Reset browser zoom, keep brightness comfortable, and leave the display still after calibration.',
@@ -327,10 +236,6 @@ const rows = [
   [
     'Rotate to landscape or continue on a larger tablet, laptop, or monitor. Acutezza will not guess physical screen size.',
     'Rotate to landscape or continue on a larger tablet, laptop, or monitor. Acutezza will not guess physical screen size.',
-  ],
-  [
-    'Keep this viewport, browser zoom, orientation, and viewing distance unchanged.',
-    'Keep this viewport, browser zoom, orientation, and viewing distance unchanged.',
   ],
   [
     'Screen scale is measured, but distance came from manual entry. Results retain this caution.',
@@ -378,14 +283,6 @@ const rows = [
     'Keep the right eye covered and look only at the square.',
   ],
   ['Acutezza / this display / this distance', 'Acutezza / this display / this distance'],
-  [
-    'The calibration and task controls support interpretation of this run at the stated distance.',
-    'The calibration and task controls support interpretation of this run at the stated distance.',
-  ],
-  [
-    'A calibration or task-control check was limited. Repeat before comparing runs.',
-    'A calibration or task-control check was limited. Repeat before comparing runs.',
-  ],
   ['What travelled with the target.', 'What travelled with the target.'],
   ['Correction', 'Correction'],
   ['Distance', 'Distance'],
@@ -402,37 +299,13 @@ const rows = [
     'Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.',
     'Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.',
   ],
-  ['Three measures for this eye.', 'Three measures for this eye.'],
-  ['{lower}–{upper} uncertainty interval', '{lower}–{upper} uncertainty interval'],
   ['{cost}% gap size versus high contrast', '{cost}% gap size versus high contrast'],
-  ['{consistency}% leading-choice consistency', '{consistency}% leading-choice consistency'],
   ['not measured', 'not measured'],
   [
-    'The estimate touches the display range; treat it as a bound.',
-    'The estimate touches the display range; treat it as a bound.',
-  ],
-  [
-    'A calibrated angular threshold from forced-choice trials.',
-    'A calibrated angular threshold from forced-choice trials.',
-  ],
-  [
     'A within-run difference, not clinical contrast sensitivity.',
     'A within-run difference, not clinical contrast sensitivity.',
-  ],
-  [
-    'The display could not preserve a dependable low-contrast condition.',
-    'The display could not preserve a dependable low-contrast condition.',
-  ],
-  [
-    'The preference repeated at both scales. It does not identify astigmatism.',
-    'The preference repeated at both scales. It does not identify astigmatism.',
-  ],
-  [
-    'No preference met the replication rule across scale and pixel phase.',
-    'No preference met the replication rule across scale and pixel phase.',
   ],
   ['Instrument 01 complete', 'Instrument 01 complete'],
-  ['Threshold tasks complete', 'Threshold tasks complete'],
   [
     'A calibrated estimate was recorded with {trials} measured targets.',
     'A calibrated estimate was recorded with {trials} measured targets.',
@@ -440,14 +313,6 @@ const rows = [
   [
     'Rest your eye for a moment. Keep the same correction, distance, screen, and covered eye.',
     'Rest your eye for a moment. Keep the same correction, distance, screen, and covered eye.',
-  ],
-  [
-    'High- and low-contrast estimates remain separate in the result.',
-    'High- and low-contrast estimates remain separate in the result.',
-  ],
-  [
-    'Contrasto is unavailable on this setup, so no low-contrast value will be inferred.',
-    'Contrasto is unavailable on this setup, so no low-contrast value will be inferred.',
   ],
   [
     'Listening lab / three instruments / about 6 minutes',
@@ -484,25 +349,17 @@ const rows = [
     'Start with device volume low. Raise it only until the reference is quiet and comfortable, never beyond about 60%. Then lock it for the whole run.',
     'Start with device volume low. Raise it only until the reference is quiet and comfortable, never beyond about 60%. Then lock it for the whole run.',
   ],
-  [
-    'Never raise volume to chase a missing high tone. Stop immediately for discomfort, pain, pressure, or ringing.',
-    'Never raise volume to chase a missing high tone. Stop immediately for discomfort, pain, pressure, or ringing.',
-  ],
   ['Research trail', 'Research trail'],
   ['What informed Udito.', 'What informed Udito.'],
-  ['Read the primary source', 'Read the primary source'],
   ['Safe listening', 'Safe listening'],
-  ['Audio setup / volume locks after this screen', 'Audio setup / volume locks after this screen'],
   ['Quiet room.', 'Quiet room.'],
   ['Low volume.', 'Low volume.'],
   ['Headphones.', 'Headphones.'],
-  ['Play quiet reference', 'Play quiet reference'],
   ['Start device volume low before playing.', 'Start device volume low before playing.'],
   ['Listening setup', 'Listening setup'],
   ['Over-ear / on-ear headphones', 'Over-ear / on-ear headphones'],
   ['Earbuds / in-ear headphones', 'Earbuds / in-ear headphones'],
   ['Other / unsure', 'Other / unsure'],
-  ['Begin instrument 01', 'Begin instrument 01'],
   ['Volume contract', 'Volume contract'],
   ['Start low', 'Start low'],
   ['Find quiet comfort', 'Find quiet comfort'],
@@ -515,10 +372,8 @@ const rows = [
   ['Start practice', 'Start practice'],
   ['Listen…', 'Listen…'],
   ['Stop safely', 'Stop safely'],
-  ['Volume locked', 'Volume locked'],
   ['Short ramped tones', 'Short ramped tones'],
   ['Response recorded.', 'Response recorded.'],
-  ['Run again', 'Run again'],
   ['Not settled', 'Not settled'],
   ['Device-relative, never dB HL.', 'Device-relative, never dB HL.'],
   [
@@ -541,27 +396,16 @@ const rows = [
     'A device control, not a measured sound-pressure level. The browser cannot know dB SPL.',
   ],
   ['Upload', 'Upload'],
-  ['Playing quiet reference…', 'Playing quiet reference…'],
   ['Keep this quiet and comfortable.', 'Keep this quiet and comfortable.'],
   ['Play reference again', 'Play reference again'],
   ['audio context', 'audio context'],
   ['now leave volume unchanged.', 'now leave volume unchanged.'],
-  [
-    'Audio could not start. Check browser audio permissions and try again.',
-    'Audio could not start. Check browser audio permissions and try again.',
-  ],
-  ['The reference sound could not start.', 'The reference sound could not start.'],
-  [
-    'Play the quiet reference and confirm the volume contract first.',
-    'Play the quiet reference and confirm the volume contract first.',
-  ],
   ['Never raise volume to chase a missing high tone.', 'Never raise volume to chase a missing high tone.'],
   [
     'Stop immediately for discomfort, pain, pressure, or ringing.',
     'Stop immediately for discomfort, pain, pressure, or ringing.',
   ],
   ['Instrument', 'Instrument'],
-  ['of 03', 'of 03'],
   [
     'Choose the quietest tone. Two practice trials come first; the measured check is six trials.',
     'Choose the quietest tone. Two practice trials come first; the measured check is six trials.',
@@ -574,9 +418,6 @@ const rows = [
     'Choose which tone was higher. Loudness changes slightly on purpose, so follow pitch rather than loudness.',
     'Choose which tone was higher. Loudness changes slightly on purpose, so follow pitch rather than loudness.',
   ],
-  ['Start Cuffie', 'Start Cuffie'],
-  ['Start Portata', 'Start Portata'],
-  ['Start Intonazione', 'Start Intonazione'],
   ['Practice', 'Practice'],
   ['Adaptive run', 'Adaptive run'],
   ['Preparing…', 'Preparing…'],
@@ -614,18 +455,9 @@ const rows = [
   ['without changing volume.', 'without changing volume.'],
   ['Adaptive', 'Adaptive'],
   ['Interleaved', 'Interleaved'],
-  ['Your listening profile — Udito | Sense6', 'Your listening profile — Udito | Sense6'],
   ['Udito / this setup / this run', 'Udito / this setup / this run'],
   ['Three listening measures.', 'Three listening measures.'],
   ['No hearing label.', 'No hearing label.'],
-  [
-    'The setup checks and adaptive tracks produced a coherent run-level profile.',
-    'The setup checks and adaptive tracks produced a coherent run-level profile.',
-  ],
-  [
-    'At least one setup check or adaptive track did not settle. The observations remain visible, but comparison should wait for a steadier repeat.',
-    'At least one setup check or adaptive track did not settle. The observations remain visible, but comparison should wait for a steadier repeat.',
-  ],
   ['Setup checks coherent', 'Setup checks coherent'],
   ['Interpret with caution', 'Interpret with caution'],
   ['Headphone-like', 'Headphone-like'],
@@ -635,23 +467,9 @@ const rows = [
     'A phase-based presentation check, not hardware detection.',
   ],
   ['Upper run boundary', 'Upper run boundary'],
-  ['boundary estimate', 'boundary estimate'],
-  ['adaptive estimate', 'adaptive estimate'],
   ['Over-ear / on-ear', 'Over-ear / on-ear'],
-  [
-    'Reached the device-safe test ceiling; your personal boundary may be higher.',
-    'Reached the device-safe test ceiling; your personal boundary may be higher.',
-  ],
-  [
-    'Relative to this device, fixed volume, room, and audio sample rate.',
-    'Relative to this device, fixed volume, room, and audio sample rate.',
-  ],
   ['Pitch step near 500 Hz', 'Pitch step near 500 Hz'],
   ['Pitch step near 2 kHz', 'Pitch step near 2 kHz'],
-  [
-    'Reversal-based just-noticeable difference for this run.',
-    'Reversal-based just-noticeable difference for this run.',
-  ],
   [
     'Reported separately; no composite hearing score is calculated.',
     'Reported separately; no composite hearing score is calculated.',
@@ -677,11 +495,6 @@ const rows = [
     'Compare your own runs only with the same device, headphones, fit, room, and volume. Stop testing if any sound is uncomfortable.',
   ],
   ['Screen check / 01 of 01', 'Screen check / 01 of 01'],
-  ['Prepare the environment before the score.', 'Prepare the environment before the score.'],
-  [
-    'Display settings and ambient light can move a color threshold. This one-minute check makes your run more repeatable.',
-    'Display settings and ambient light can move a color threshold. This one-minute check makes your run more repeatable.',
-  ],
   [
     'Use one screen. Disable Night Shift, True Tone, blue-light filters, and vivid modes.',
     'Use one screen. Disable Night Shift, True Tone, blue-light filters, and vivid modes.',
@@ -707,10 +520,6 @@ const rows = [
   ['Start instrument 01', 'Start instrument 01'],
   ['Viewing setup / 01 of 01', 'Viewing setup / 01 of 01'],
   ['Colour filters off, please.', 'Colour filters off, please.'],
-  [
-    'The thresholds only describe this browser, display, lighting, and viewing position. Colour-shifting features can move them substantially.',
-    'The thresholds only describe this browser, display, lighting, and viewing position. Colour-shifting features can move them substantially.',
-  ],
   [
     'Turn off Night Shift, True Tone, blue-light filters, and vivid display modes.',
     'Turn off Night Shift, True Tone, blue-light filters, and vivid display modes.',
@@ -776,26 +585,17 @@ const rows = [
     'Results are calculated locally and are not uploaded.',
     'Results are calculated locally and are not uploaded.',
   ],
-  [
-    'Color perception / 03 instruments / about 4 minutes',
-    'Color perception / 03 instruments / about 4 minutes',
-  ],
-  ['How finely do you', 'How finely do you'],
   ['see', 'see'],
-  ['colour?', 'colour?'],
   ['Begin the color lab', 'Begin the color lab'],
-  ['Set the room before the score.', 'Set the room before the score.'],
   ['Which tile is different?', 'Which tile is different?'],
   ['Which field shifts in color?', 'Which field shifts in color?'],
   ['Build the smoothest color path.', 'Build the smoothest color path.'],
   ['Lock this order', 'Lock this order'],
-  ['Your visible boundary, on this display.', 'Your visible boundary, on this display.'],
   [
     'This is not a medical test and cannot confirm tetrachromacy.',
     'This is not a medical test and cannot confirm tetrachromacy.',
   ],
   ['Lab progress', 'Lab progress'],
-  ['Current instrument progress', 'Current instrument progress'],
   [
     'Choose once. Trust the first stable difference you see.',
     'Choose once. Trust the first stable difference you see.',
@@ -827,18 +627,10 @@ const rows = [
   ],
   ['tile', 'tile'],
   ['Tap its new place to swap, or use the arrows.', 'Tap its new place to swap, or use the arrows.'],
-  ['Your colour profile — Tetracromia | Sense6', 'Your colour profile — Tetracromia | Sense6'],
   ['Session complete', 'Session complete'],
   ['Session index', 'Session index'],
-  ['Hue profile', 'Hue profile'],
   ['Display-relative', 'Display-relative'],
-  [
-    'Each spoke is one hue region, drawn in its real color. The dot shows the share of discrimination trials you answered correctly there — the test keeps overall difficulty near your limit, so shorter spokes mark your relatively weaker directions.',
-    'Each spoke is one hue region, drawn in its real color. The dot shows the share of discrimination trials you answered correctly there — the test keeps overall difficulty near your limit, so shorter spokes mark your relatively weaker directions.',
-  ],
   ['Sequence', 'Sequence'],
-  ['Finest step', 'Finest step'],
-  ['Finest shift', 'Finest shift'],
   ['Rose', 'Rose'],
   ['Amber', 'Amber'],
   ['Lime', 'Lime'],
@@ -846,39 +638,7 @@ const rows = [
   ['Cyan', 'Cyan'],
   ['Blue', 'Blue'],
   ['Magenta', 'Magenta'],
-  ['of hue', 'of hue'],
-  ['through noise', 'through noise'],
-  ['correct · smaller angle = finer vision', 'correct · smaller angle = finer vision'],
-  ['Hue ordering between fixed anchors', 'Hue ordering between fixed anchors'],
-  [
-    'perfect order · each out-of-place pair costs points',
-    'perfect order · each out-of-place pair costs points',
-  ],
   ['How to read this', 'How to read this'],
-  [
-    'Threshold and Field report the smallest hue difference you kept answering correctly, found adaptively (the app floor is 1.2°, near what an sRGB screen can render). The session index weighs them 35% + 35%, plus 30% for Sequence. Scores describe this run on this browser and screen — useful for comparing your own sessions under similar conditions, not a population percentile, diagnosis, or evidence for tetrachromacy.',
-    'Threshold and Field report the smallest hue difference you kept answering correctly, found adaptively (the app floor is 1.2°, near what an sRGB screen can render). The session index weighs them 35% + 35%, plus 30% for Sequence. Scores describe this run on this browser and screen — useful for comparing your own sessions under similar conditions, not a population percentile, diagnosis, or evidence for tetrachromacy.',
-  ],
-  ['Very fine screen-level discrimination', 'Very fine screen-level discrimination'],
-  ['Fine screen-level discrimination', 'Fine screen-level discrimination'],
-  ['Moderate screen-level discrimination', 'Moderate screen-level discrimination'],
-  ['Broad screen-level discrimination', 'Broad screen-level discrimination'],
-  [
-    'You resolved small display differences consistently across the three instruments.',
-    'You resolved small display differences consistently across the three instruments.',
-  ],
-  [
-    'You resolved subtle display differences with a stable overall profile.',
-    'You resolved subtle display differences with a stable overall profile.',
-  ],
-  [
-    'You found clear differences; the finest steps were less consistent in this run.',
-    'You found clear differences; the finest steps were less consistent in this run.',
-  ],
-  [
-    'The smallest display steps were difficult in this run. Screen setup and fatigue can matter.',
-    'The smallest display steps were difficult in this run. Screen setup and fatigue can matter.',
-  ],
   [
     'Colour vision / adaptive experiment / about 3 minutes',
     'Colour vision / adaptive experiment / about 3 minutes',
@@ -907,7 +667,6 @@ const rows = [
   ['left', 'left'],
   ['top', 'top'],
   ['bottom', 'bottom'],
-  ['Adaptive colour threshold', 'Adaptive colour threshold'],
   ['Experiment progress', 'Experiment progress'],
   ['Dotted colour target with a C-shaped gap', 'Dotted colour target with a C-shaped gap'],
   ['Adaptive response', 'Adaptive response'],
@@ -919,15 +678,10 @@ const rows = [
   ['Gap at', 'Gap at'],
   ['Keyboard: arrow keys · N for no gap', 'Keyboard: arrow keys · N for no gap'],
   ['Experimental run complete', 'Experimental run complete'],
-  ['Display-relative thresholds from this run', 'Display-relative thresholds from this run'],
   ['Run inconclusive — repeat the controls', 'Run inconclusive — repeat the controls'],
   [
     'Lower values mean you followed a smaller colour shift in that direction on this display. The three directions are not clinical scores and should not be compared as diagnoses.',
     'Lower values mean you followed a smaller colour shift in that direction on this display. The three directions are not clinical scores and should not be compared as diagnoses.',
-  ],
-  [
-    'Too many high-contrast task controls were missed to interpret the adaptive thresholds. Check the instructions and viewing setup, then try again.',
-    'Too many high-contrast task controls were missed to interpret the adaptive thresholds. Check the instructions and viewing setup, then try again.',
   ],
   ['L direction', 'L direction'],
   ['M direction', 'M direction'],
@@ -938,11 +692,7 @@ const rows = [
   ['Staircase settled', 'Staircase settled'],
   ['Limited reversals', 'Limited reversals'],
   ['reversals', 'reversals'],
-  ['Experiment floor confirmed', 'Experiment floor confirmed'],
-  ['Experiment maximum reached', 'Experiment maximum reached'],
   ['presentations', 'presentations'],
-  ['lower measurement bound', 'lower measurement bound'],
-  ['upper measurement bound', 'upper measurement bound'],
   ['run spread', 'run spread'],
   ['High-contrast gap trials', 'High-contrast gap trials'],
   ['Enough controls were read to report this run.', 'Enough controls were read to report this run.'],
@@ -955,20 +705,11 @@ const rows = [
     'Daltonia has no clinical norms and has not been validated against an anomaloscope, CAD, Cambridge Colour Test, or a diagnosed cohort. These values cannot confirm or rule out a colour-vision deficiency. Compare repeat runs only on the same display and setup.',
   ],
   ['Copy run summary', 'Copy run summary'],
-  [
-    'A careful, adaptive lab for the differences your display can reproduce—and your eyes can resolve.',
-    'A careful, adaptive lab for the differences your display can reproduce—and your eyes can resolve.',
-  ],
   ['display relative', 'display relative'],
   ['Hue', 'Hue'],
   ['Field', 'Field'],
   ['Order', 'Order'],
   ['The lab', 'The lab'],
-  ['Three views of discrimination.', 'Three views of discrimination.'],
-  [
-    'No names, no account, no upload. Your session stays in this browser.',
-    'No names, no account, no upload. Your session stays in this browser.',
-  ],
   [
     'No names, no account, no result upload. Your session stays in this browser.',
     'No names, no account, no result upload. Your session stays in this browser.',
@@ -988,11 +729,6 @@ const rows = [
     'Arrange three short hue arcs between fixed endpoints, with no color names as clues.',
   ],
   ['Method, not magic', 'Method, not magic'],
-  ['The difference gets smaller as you succeed.', 'The difference gets smaller as you succeed.'],
-  [
-    'Threshold and Field use a two-correct-down, one-error-up staircase. It spends more trials near your current boundary instead of asking the same easy question repeatedly.',
-    'Threshold and Field use a two-correct-down, one-error-up staircase. It spends more trials near your current boundary instead of asking the same easy question repeatedly.',
-  ],
   ['Neutral surround', 'Neutral surround'],
   [
     'Stimuli sit on the same middle-gray chamber in either theme.',
@@ -1003,16 +739,7 @@ const rows = [
     'Colors are generated in OKLCH and mapped safely into sRGB.',
     'Colors are generated in OKLCH and mapped safely into sRGB.',
   ],
-  ['Adaptive estimate', 'Adaptive estimate'],
-  [
-    'Reversals around the boundary produce a session-relative threshold.',
-    'Reversals around the boundary produce a session-relative threshold.',
-  ],
   ['Honest result', 'Honest result'],
-  [
-    'Your profile describes this screen, light, fatigue level, and run.',
-    'Your profile describes this screen, light, fatigue level, and run.',
-  ],
   ['The fourth-cone question', 'The fourth-cone question'],
   ['An RGB screen cannot test tetrachromacy.', 'An RGB screen cannot test tetrachromacy.'],
   [
@@ -1020,7 +747,6 @@ const rows = [
     'Consumer displays mix three primaries. Confirming functional tetrachromacy requires spectral stimuli that can separate a fourth response, specialized hardware, genetics, and controlled conditions. Tetracromia measures ordinary on-screen color discrimination instead—and says exactly that.',
   ],
   ['Ready when your screen is', 'Ready when your screen is'],
-  ['Find your visible boundary.', 'Find your visible boundary.'],
   ['Start the lab', 'Start the lab'],
   [
     'A C-shaped target becomes harder to separate from its field. Three independent staircases estimate the smallest colour shift you follow in each display-relative direction during this run.',
@@ -1031,50 +757,18 @@ const rows = [
     'Experimental and unvalidated. This is not a screening result or diagnosis.',
   ],
   ['Last run on this browser:', 'Last run on this browser:'],
-  ['display-relative thresholds recorded', 'display-relative thresholds recorded'],
   ['An adaptive task, not a plate score.', 'An adaptive task, not a plate score.'],
   [
     'The design borrows established psychophysical techniques without claiming their clinical validation.',
     'The design borrows established psychophysical techniques without claiming their clinical validation.',
   ],
-  [
-    'Two clear targets teach the C-gap interaction with immediate feedback before any threshold is measured.',
-    'Two clear targets teach the C-gap interaction with immediate feedback before any threshold is measured.',
-  ],
   ['Luminance noise', 'Luminance noise'],
-  [
-    'Target and field dots share the same brightness variation, reducing a consistent lightness cue.',
-    'Target and field dots share the same brightness variation, reducing a consistent lightness cue.',
-  ],
   ['Three staircases', 'Three staircases'],
-  [
-    'Directions become harder after correct responses. “No gap visible” counts as a miss and makes that direction easier.',
-    'Directions become harder after correct responses. “No gap visible” counts as a miss and makes that direction easier.',
-  ],
   ['Run-relative output', 'Run-relative output'],
-  [
-    'You receive thresholds and run spread, not a normal/deficient label or a clinical score.',
-    'You receive thresholds and run spread, not a normal/deficient label or a clinical score.',
-  ],
   ['What informed Daltonia.', 'What informed Daltonia.'],
   [
     'These sources inform the stimulus model and task design. They do not validate this implementation.',
     'These sources inform the stimulus model and task design. They do not validate this implementation.',
-  ],
-  ['Adaptive colour thresholds', 'Adaptive colour thresholds'],
-  [
-    'Random Landolt-C orientation, spatial and luminance noise, and interleaved confusion-line staircases.',
-    'Random Landolt-C orientation, spatial and luminance noise, and interleaved confusion-line staircases.',
-  ],
-  ['Cone-contrast testing', 'Cone-contrast testing'],
-  [
-    'Randomized cone-specific optotypes and validation against anomaloscope and plate results.',
-    'Randomized cone-specific optotypes and validation against anomaloscope and plate results.',
-  ],
-  ['Modern screener validation', 'Modern screener validation'],
-  [
-    'A multicentre comparison on calibrated displays demonstrates the evidence required for screening claims.',
-    'A multicentre comparison on calibrated displays demonstrates the evidence required for screening claims.',
   ],
   [
     'Response lab / three instruments / about 7 minutes',
@@ -1124,10 +818,6 @@ const rows = [
     'Wait while the chamber is quiet, then respond as soon as the central mark appears. Random waits make anticipation visible.',
   ],
   [
-    'A left or right arrow appears. Respond on the matching side. The difference from Segnale estimates the cost of choosing.',
-    'A left or right arrow appears. Respond on the matching side. The difference from Segnale estimates the cost of choosing.',
-  ],
-  [
     'For three minutes, respond to the same simple signal across longer, irregular waits. The pattern within this run matters more than one fastest press.',
     'For three minutes, respond to the same simple signal across longer, irregular waits. The pattern within this run matters more than one fastest press.',
   ],
@@ -1141,11 +831,6 @@ const rows = [
     'A transparent reaction-time task with practice, randomized intervals, and separate simple and choice measures.',
     'A transparent reaction-time task with practice, randomized intervals, and separate simple and choice measures.',
   ],
-  ['Brief vigilance task', 'Brief vigilance task'],
-  [
-    'The three-minute PVT-B informs the sustained-response duration and emphasis on lapses and false starts.',
-    'The three-minute PVT-B informs the sustained-response duration and emphasis on lapses and false starts.',
-  ],
   ['Browser timing reality', 'Browser timing reality'],
   [
     'Browser experiments can be precise enough for many effects, while input hardware and presentation still add latency.',
@@ -1156,53 +841,21 @@ const rows = [
     'Three low tones play in sequence. Choose the quietest. A phase-based decoy helps check whether the sound is arriving like headphones, without claiming to identify your hardware.',
   ],
   [
-    'One of three intervals contains a tone. Its frequency adapts to find the upper boundary available in this run, on this device, at the locked volume.',
-    'One of three intervals contains a tone. Its frequency adapts to find the upper boundary available in this run, on this device, at the locked volume.',
-  ],
-  [
     'Two tones play in sequence. Separate adaptive tracks estimate the smallest pitch step resolved around 500 Hz and 2 kHz.',
     'Two tones play in sequence. Separate adaptive tracks estimate the smallest pitch step resolved around 500 Hz and 2 kHz.',
   ],
   [
     'Established task structures inform the experiment. Consumer audio hardware remains uncalibrated.',
     'Established task structures inform the experiment. Consumer audio hardware remains uncalibrated.',
-  ],
-  [
-    'A six-trial, three-alternative phase-cancellation task informs Cuffie and its cautious setup language.',
-    'A six-trial, three-alternative phase-cancellation task informs Cuffie and its cautious setup language.',
-  ],
-  [
-    'Transformed up-down staircases inform the reversal-based Portata and Intonazione estimates.',
-    'Transformed up-down staircases inform the reversal-based Portata and Intonazione estimates.',
-  ],
-  ['Browser psychoacoustics', 'Browser psychoacoustics'],
-  [
-    'Web and mobile adaptive frequency-discrimination work supports the browser task structure—not clinical interpretation.',
-    'Web and mobile adaptive frequency-discrimination work supports the browser task structure—not clinical interpretation.',
-  ],
-  [
-    'Safe-listening guidance informs the low reference, volume lock, short tones, and stop warnings.',
-    'Safe-listening guidance informs the low reference, volume lock, short tones, and stop warnings.',
   ],
   ['Copy result summary', 'Copy result summary'],
   ['practice', 'practice'],
   ['practice complete', 'practice complete'],
   ['Measurement recorded:', 'Measurement recorded:'],
-  ['Keyboard timing', 'Keyboard timing'],
-  ['Touch / pointer timing', 'Touch / pointer timing'],
   ['Median of', 'Median of'],
   ['clean responses', 'clean responses'],
-  ['measured events', 'measured events'],
   ['Under', 'Under'],
   [
-    'Keep the same hand position. Early responses, misses, and no-signal responses will be recorded.',
-    'Keep the same hand position. Early responses, misses, and no-signal responses will be recorded.',
-  ],
-  [
-    'Keep the same hand position. Early responses, misses, and wrong sides will be recorded.',
-    'Keep the same hand position. Early responses, misses, and wrong sides will be recorded.',
-  ],
-  [
     'Please acknowledge the device-relative limit before starting.',
     'Please acknowledge the device-relative limit before starting.',
   ],
@@ -1213,10 +866,6 @@ const rows = [
   [
     '8 practice choices, then 32 balanced measured choices.',
     '8 practice choices, then 32 balanced measured choices.',
-  ],
-  [
-    'A 3-minute PVT-B-inspired sequence. No fatigue or attention diagnosis is inferred.',
-    'A 3-minute PVT-B-inspired sequence. No fatigue or attention diagnosis is inferred.',
   ],
   [
     'Rest one hand near the arrow keys. Use the matching key.',
@@ -1261,16 +910,7 @@ const rows = [
   ['clean response', 'clean response'],
   ['captured across', 'captured across'],
   ['measured event', 'measured event'],
-  [
-    'Interpretation waits until all three instruments are complete.',
-    'Interpretation waits until all three instruments are complete.',
-  ],
-  ['Your response profile — Riflessi | Sense6', 'Your response profile — Riflessi | Sense6'],
   ['Riflessi / this run / this device', 'Riflessi / this run / this device'],
-  [
-    'The three instruments captured enough clean responses for a run-level profile.',
-    'The three instruments captured enough clean responses for a run-level profile.',
-  ],
   [
     'Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.',
     'Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.',
@@ -1278,24 +918,10 @@ const rows = [
   ['Run usable', 'Run usable'],
   ['Limited run', 'Limited run'],
   ['Typical signal response', 'Typical signal response'],
-  [
-    'clean simple responses. Typical is more robust than your single fastest response.',
-    'clean simple responses. Typical is more robust than your single fastest response.',
-  ],
   ['Choice response', 'Choice response'],
   ['correct across', 'correct across'],
-  ['valid choices.', 'valid choices.'],
   ['Choice cost', 'Choice cost'],
-  [
-    'Difference between the choice and simple-response medians in this run.',
-    'Difference between the choice and simple-response medians in this run.',
-  ],
-  ['clean responses across the sustained block.', 'clean responses across the sustained block.'],
   ['Slow-response tail', 'Slow-response tail'],
-  [
-    'How much slower the slowest fifth was than the sustained median.',
-    'How much slower the slowest fifth was than the sustained median.',
-  ],
   ['Within-run drift', 'Within-run drift'],
   [
     'Not enough clean responses to estimate a first-to-second-half change.',
@@ -1342,27 +968,13 @@ const rows = [
   ['Leave the experiment? Your progress will be lost.', 'Leave the experiment? Your progress will be lost.'],
   ['Prepare your screen — Tetracromia | Sense6', 'Prepare your screen — Tetracromia | Sense6'],
   ['Prepare your display — Daltonia | Sense6', 'Prepare your display — Daltonia | Sense6'],
-  [
-    'Your display-relative thresholds — Daltonia | Sense6',
-    'Your display-relative thresholds — Daltonia | Sense6',
-  ],
   ['Prepare your response setup — Riflessi | Sense6', 'Prepare your response setup — Riflessi | Sense6'],
   ['Prepare your audio setup — Udito | Sense6', 'Prepare your audio setup — Udito | Sense6'],
-  ['Reference played', 'Reference played'],
   ['Result summary copied.', 'Result summary copied.'],
   ['Copy was unavailable in this browser.', 'Copy was unavailable in this browser.'],
   ['Result summary copied', 'Result summary copied'],
   ['Run summary copied', 'Run summary copied'],
   ['Could not access the clipboard', 'Could not access the clipboard'],
-  [
-    'Tetracromia — {overall}/100 screen-level color discrimination. Threshold {threshold}, Field {field}, Sequence {sequence}. Device-relative, not diagnostic.',
-    'Tetracromia — {overall}/100 screen-level color discrimination. Threshold {threshold}, Field {field}, Sequence {sequence}. Device-relative, not diagnostic.',
-  ],
-  [
-    'Daltonia experimental browser run — {thresholds}; task controls {correct}/{total}. Display-relative, unvalidated, and not diagnostic.',
-    'Daltonia experimental browser run — {thresholds}; task controls {correct}/{total}. Display-relative, unvalidated, and not diagnostic.',
-  ],
-  ['Riflessi — device-relative response profile', 'Riflessi — device-relative response profile'],
   ['Input: {input}', 'Input: {input}'],
   ['Signal median: {value} ms', 'Signal median: {value} ms'],
   [
@@ -1383,15 +995,11 @@ const rows = [
   ],
   ['touch / pointer', 'touch / pointer'],
   ['keyboard', 'keyboard'],
-  ['Udito — device-relative listening profile', 'Udito — device-relative listening profile'],
-  ['Setup: {device}; {sampleRate} Hz audio context', 'Setup: {device}; {sampleRate} Hz audio context'],
   [
     'Headphone confidence: {correct}/{trials} ({confidence})',
     'Headphone confidence: {correct}/{trials} ({confidence})',
   ],
   ['Upper run boundary: {boundary}', 'Upper run boundary: {boundary}'],
-  ['Pitch step near 500 Hz: {step}', 'Pitch step near 500 Hz: {step}'],
-  ['Pitch step near 2 kHz: {step}', 'Pitch step near 2 kHz: {step}'],
   ['headphone-like', 'headphone-like'],
   ['uncertain', 'uncertain'],
   [
@@ -1420,9 +1028,6 @@ const rows = [
     'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',
     'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',
   ],
-];
-
-rows.push(
   [
     'Movable color tile {position} of {total}{selected}',
     'Movable color tile {position} of {total}{selected}',
@@ -1433,17 +1038,10 @@ rows.push(
     '{count} long frame intervals observed in the sample.',
   ],
   ['{count} sweeps remaining', '{count} sweeps remaining'],
-  [
-    'Reference played · {sampleRate} Hz audio context · now leave volume unchanged.',
-    'Reference played · {sampleRate} Hz audio context · now leave volume unchanged.',
-  ],
   ['Sound {number}', 'Sound {number}'],
   ['Adaptive · {count}', 'Adaptive · {count}'],
   ['Interleaved · {count}', 'Interleaved · {count}'],
   ['≈ {minutes} min', '≈ {minutes} min'],
-);
-
-rows.push(
   [
     'Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses, {wrongChoices} wrong choices',
     'Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses, {wrongChoices} wrong choices',
@@ -1471,10 +1069,6 @@ rows.push(
     'Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials',
     'Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials',
   ],
-  [
-    'Play the maximum-level reference and confirm the volume contract first.',
-    'Play the maximum-level reference and confirm the volume contract first.',
-  ],
   ['Playback interruptions: {count}', 'Playback interruptions: {count}'],
   ['Playing maximum-level reference…', 'Playing maximum-level reference…'],
   ['Portata control accuracy: {accuracy}', 'Portata control accuracy: {accuracy}'],
@@ -1482,8 +1076,6 @@ rows.push(
     'Recorded. Look at the square and start the next sweep.',
     'Recorded. Look at the square and start the next sweep.',
   ],
-  ['Recorded. Next trial.', 'Recorded. Next trial.'],
-  ['Recorded. The difference will increase.', 'Recorded. The difference will increase.'],
   [
     'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
     'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
@@ -1517,17 +1109,9 @@ rows.push(
     'Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials',
     'Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials',
   ],
-  [
-    'Volume: self-reported unchanged during the run; the browser could not verify it.',
-    'Volume: self-reported unchanged during the run; the browser could not verify it.',
-  ],
   ['indeterminate (display-range bound)', 'indeterminate (display-range bound)'],
   ['lower bound at the display ceiling', 'lower bound at the display ceiling'],
   ['upper bound at the display floor', 'upper bound at the display floor'],
-  [
-    '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
-    '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
-  ],
   ['Usable run', 'Usable run'],
   ['{name} response runner', '{name} response runner'],
   ['Open private journal', 'Open private journal'],
@@ -1538,10 +1122,6 @@ rows.push(
   [
     'Display conditions changed. This measured run stopped and was not saved.',
     'Display conditions changed. This measured run stopped and was not saved.',
-  ],
-  [
-    'Instrument one. Threshold. Find the different tile.',
-    'Instrument one. Threshold. Find the different tile.',
   ],
   ['Practice one of two. Find the clear gap in the C.', 'Practice one of two. Find the clear gap in the C.'],
   ['That tile is already at the edge.', 'That tile is already at the edge.'],
@@ -1578,8 +1158,8 @@ rows.push(
     'Leave this calibrated vision session? Your unfinished result will not be saved.',
   ],
   ['{eye} — {instrument}', '{eye} — {instrument}'],
-);
+];
 
-const catalogRows = [...rows, ...registryRows('en'), ...mobileUxRows('en'), ...landingRows('en')];
+const catalogRows = [...rows, .../** @type {Array<[string, string]>} */ (copyRows)];
 export const MESSAGE_COUNT = catalogRows.length;
 export default new Map(catalogRows);

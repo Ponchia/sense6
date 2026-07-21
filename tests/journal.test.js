@@ -93,8 +93,24 @@ test('exports merge idempotently and reject unsafe imports', () => {
   appendJournalEntry(entry({ id: 'portable' }), source);
   const exported = exportJournal(source);
   const target = memoryStorage();
-  assert.deepEqual(importJournal(exported, target), { ok: true, imported: 1, duplicates: 0, total: 1 });
-  assert.deepEqual(importJournal(exported, target), { ok: true, imported: 0, duplicates: 1, total: 1 });
+  assert.deepEqual(importJournal(exported, target), {
+    ok: true,
+    imported: 1,
+    duplicates: 0,
+    discarded: 0,
+    evicted: 0,
+    skipped: 0,
+    total: 1,
+  });
+  assert.deepEqual(importJournal(exported, target), {
+    ok: true,
+    imported: 0,
+    duplicates: 1,
+    discarded: 0,
+    evicted: 0,
+    skipped: 1,
+    total: 1,
+  });
   assert.deepEqual(importJournal('{', target), { ok: false, reason: 'malformed' });
   assert.deepEqual(importJournal('x'.repeat(JOURNAL_LIMITS.maxImportBytes + 1), target), {
     ok: false,
@@ -123,9 +139,54 @@ test('exports merge idempotently and reject unsafe imports', () => {
       }),
       target,
     ),
-    { ok: true, imported: 1, duplicates: 1, total: 2 },
+    {
+      ok: true,
+      imported: 1,
+      duplicates: 1,
+      discarded: 0,
+      evicted: 0,
+      skipped: 1,
+      total: 2,
+    },
   );
   assert.equal(loadJournal(target).filter(({ id }) => id === duplicateEntry.id).length, 1);
+});
+
+test('imports report only additions retained after the cap and distinguish evictions', () => {
+  const full = memoryStorage();
+  for (let index = 0; index < JOURNAL_LIMITS.maxEntries; index += 1) {
+    appendJournalEntry(
+      entry({ id: `current-${index}`, recordedAt: new Date(2026, 0, index + 1).toISOString() }),
+      full,
+    );
+  }
+
+  const older = entry({ id: 'older-import', recordedAt: '2025-01-01T00:00:00.000Z' });
+  assert.deepEqual(importJournal(exportWith([older]), full), {
+    ok: true,
+    imported: 0,
+    duplicates: 0,
+    discarded: 1,
+    evicted: 0,
+    skipped: 1,
+    total: JOURNAL_LIMITS.maxEntries,
+  });
+  assert.equal(
+    loadJournal(full).some(({ id }) => id === older.id),
+    false,
+  );
+
+  const newer = entry({ id: 'newer-import', recordedAt: '2027-01-01T00:00:00.000Z' });
+  assert.deepEqual(importJournal(exportWith([newer]), full), {
+    ok: true,
+    imported: 1,
+    duplicates: 0,
+    discarded: 0,
+    evicted: 1,
+    skipped: 0,
+    total: JOURNAL_LIMITS.maxEntries,
+  });
+  assert.equal(loadJournal(full)[0].id, newer.id);
 });
 
 test('delete operations preserve unrelated entries and tolerate unavailable storage', () => {
@@ -216,19 +277,11 @@ test('schema-one entries remain readable but migrate into an explicit legacy coh
 });
 
 test('instrument rules include distance tolerance, run quality, and unverifiable audio volume', () => {
-  const acutezza = entry({
+  const acutezza = acutezzaEntry({
     id: 'acutezza-one',
-    examId: 'acutezza',
-    setup: {
-      display: '100x100@1',
-      correction: 'glasses',
-      contrastPercent: 20,
-      theme: 'light',
-      distanceMm: 500,
-      calibrationState: 'measured',
-      cardWidthCssPx: 320,
-    },
+    eyes: ['left', 'right'],
   });
+  acutezza.setup.contrastPercent = 20;
   const close = entry({ ...acutezza, id: 'acutezza-two', setup: { ...acutezza.setup, distanceMm: 525 } });
   assert.deepEqual(compareJournalEntries(close, acutezza), { status: 'comparable', reasons: [] });
   const caution = entry({
@@ -280,6 +333,43 @@ test('instrument rules include distance tolerance, run quality, and unverifiable
   assert.deepEqual(compareJournalEntries(changedConnection, audio), {
     status: 'not-comparable',
     reasons: ['changed:connection'],
+  });
+});
+
+test('Acutezza comparisons require a common completed eye and preserve useful shared-eye deltas', () => {
+  const full = acutezzaEntry({ id: 'full', eyes: ['left', 'right'] });
+  const repeatedFull = acutezzaEntry({
+    id: 'full-repeat',
+    eyes: ['left', 'right'],
+    values: { left: 4, right: 5 },
+  });
+  const leftOnly = acutezzaEntry({ id: 'left-only', eyes: ['left'], values: { left: 4 } });
+  const rightOnly = acutezzaEntry({ id: 'right-only', eyes: ['right'], values: { right: 5 } });
+
+  assert.deepEqual(compareJournalEntries(repeatedFull, full), { status: 'comparable', reasons: [] });
+  assert.deepEqual(compareJournalEntries(rightOnly, leftOnly), {
+    status: 'not-comparable',
+    reasons: ['no-common-eye'],
+  });
+  assert.deepEqual(compareJournalEntries(leftOnly, full), {
+    status: 'caution',
+    reasons: ['changed:completedEyes'],
+  });
+  assert.deepEqual(measurementChanges(leftOnly, full), [
+    { id: 'left-high', delta: 1, unit: 'arcmin', uncertainty: null, bounded: false },
+  ]);
+});
+
+test('legacy Acutezza journal entries infer completed eyes from measurements', () => {
+  const legacyFull = acutezzaEntry({ id: 'legacy-full', eyes: ['left', 'right'], persistCompletion: false });
+  const currentFull = acutezzaEntry({ id: 'current-full', eyes: ['left', 'right'] });
+  const legacyLeft = acutezzaEntry({ id: 'legacy-left', eyes: ['left'], persistCompletion: false });
+  const currentRight = acutezzaEntry({ id: 'current-right', eyes: ['right'] });
+
+  assert.deepEqual(compareJournalEntries(currentFull, legacyFull), { status: 'comparable', reasons: [] });
+  assert.deepEqual(compareJournalEntries(currentRight, legacyLeft), {
+    status: 'not-comparable',
+    reasons: ['no-common-eye'],
   });
 });
 
@@ -407,6 +497,35 @@ function entry(overrides = {}) {
     notes: [],
     ...overrides,
   };
+}
+
+function acutezzaEntry({ id, eyes, values = { left: 3, right: 6 }, persistCompletion = true }) {
+  const setup = {
+    display: '100x100@1',
+    correction: 'glasses',
+    contrastPercent: 10,
+    theme: 'light',
+    distanceMm: 500,
+    calibrationState: 'measured',
+    cardWidthCssPx: 320,
+    ...(persistCompletion
+      ? {
+          completedEyes: [...eyes].sort().join(','),
+          completionVariant: eyes.length === 2 ? 'both-eyes' : 'single-eye',
+        }
+      : {}),
+  };
+  return entry({
+    id,
+    examId: 'acutezza',
+    protocol: protocolPassport('acutezza'),
+    setup,
+    measurements: eyes.map((eye) => ({ id: `${eye}-high`, value: values[eye], unit: 'arcmin' })),
+  });
+}
+
+function exportWith(entries) {
+  return JSON.stringify({ format: 'sense6-journal-export', schemaVersion: 2, entries });
 }
 
 function memoryStorage(initial = {}) {

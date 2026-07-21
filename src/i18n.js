@@ -12,17 +12,21 @@ const attributeSources = new WeakMap();
 let locale = DEFAULT_LOCALE;
 /** @type {Map<string, string>} */
 let messages = new Map();
+/** @type {Map<string, Array<{ key: string, value: string, order: number }>>} */
+let dynamicMessageBuckets = new Map();
 /** @type {((locale: LocaleCode) => void | Promise<void>) | null} */
 let localeChangeHandler = null;
+let localeRequestGeneration = 0;
 
 /** @param {{ initialLocale?: unknown, onLocaleChange?: (locale: LocaleCode) => void | Promise<void> }} options */
 export async function initializeI18n({ initialLocale, onLocaleChange } = {}) {
   localeChangeHandler = onLocaleChange ?? null;
   locale = normalizeLocale(initialLocale) ?? storedLocale() ?? browserLocale() ?? DEFAULT_LOCALE;
   messages = await loadMessages(locale);
+  dynamicMessageBuckets = indexDynamicMessages(messages);
   applyDocumentLocale();
   renderLocaleSelector();
-  translateTree(document.documentElement);
+  translatePersistentShell();
   localizeInternalLinks(document);
   return locale;
 }
@@ -34,10 +38,14 @@ export function getLocale() {
 /** @param {unknown} nextLocale @param {{ notify?: boolean }} options */
 export async function setLocale(nextLocale, { notify = true } = {}) {
   const normalized = normalizeLocale(nextLocale);
-  if (!normalized || normalized === locale) return false;
+  if (!normalized) return false;
+  const requestGeneration = ++localeRequestGeneration;
+  if (normalized === locale) return false;
   const nextMessages = await loadMessages(normalized);
+  if (requestGeneration !== localeRequestGeneration) return false;
   locale = normalized;
   messages = nextMessages;
+  dynamicMessageBuckets = indexDynamicMessages(messages);
   applyDocumentLocale();
   try {
     localStorage.setItem(STORAGE_KEY, locale);
@@ -46,7 +54,7 @@ export async function setLocale(nextLocale, { notify = true } = {}) {
   }
   const selector = document.querySelector('[data-locale-select]');
   if (selector instanceof HTMLSelectElement) selector.value = locale;
-  translateTree(document.documentElement);
+  translatePersistentShell();
   localizeInternalLinks(document);
   if (notify) await localeChangeHandler?.(locale);
   return true;
@@ -141,7 +149,8 @@ function translateTextNode(node) {
   const current = node.data;
   const trimmed = current.trim();
   if (!trimmed) return;
-  const source = textSources.get(node) ?? trimmed;
+  const declaredSource = node.parentElement?.getAttribute('data-i18n-source');
+  const source = declaredSource ?? textSources.get(node) ?? trimmed;
   textSources.set(node, source);
   const translated = translateExact(source);
   if (translated === trimmed) return;
@@ -160,7 +169,8 @@ function translateAttributes(element) {
   }
   for (const attribute of translatable) {
     if (!element.hasAttribute(attribute)) continue;
-    const source = sources.get(attribute) ?? element.getAttribute(attribute) ?? '';
+    const declaredSource = element.getAttribute(`data-i18n-${attribute}`);
+    const source = declaredSource ?? sources.get(attribute) ?? element.getAttribute(attribute) ?? '';
     sources.set(attribute, source);
     const translated = translateExact(source);
     if (element.getAttribute(attribute) !== translated) element.setAttribute(attribute, translated);
@@ -189,26 +199,31 @@ function translateExact(source) {
  */
 /** @param {string} source */
 function translateDynamicText(source) {
-  const candidates = [...messages]
-    .filter(([key, value]) => key !== value && !key.includes('{') && key.length > 1 && source.includes(key))
-    .sort(([left], [right]) => right.length - left.length);
-  if (!candidates.length) return null;
-
+  const possibleMatches = [];
+  for (let offset = 0; offset < source.length - 1; offset += 1) {
+    const candidates = dynamicMessageBuckets.get(source.slice(offset, offset + 2));
+    if (!candidates) continue;
+    for (const candidate of candidates) {
+      if (!source.startsWith(candidate.key, offset)) continue;
+      const end = offset + candidate.key.length;
+      const beginsInsideWord = isWord(source[offset - 1]) && isWord(candidate.key[0]);
+      const endsInsideWord = isWord(candidate.key.at(-1)) && isWord(source[end]);
+      if (!beginsInsideWord && !endsInsideWord) {
+        possibleMatches.push({ ...candidate, offset, end });
+      }
+    }
+  }
+  if (!possibleMatches.length) return null;
+  possibleMatches.sort(
+    (left, right) =>
+      right.key.length - left.key.length || left.order - right.order || left.offset - right.offset,
+  );
   const occupied = new Uint8Array(source.length);
   const matches = [];
-  for (const [key, value] of candidates) {
-    let offset = source.indexOf(key);
-    while (offset !== -1) {
-      const end = offset + key.length;
-      const overlaps = occupied.slice(offset, end).some(Boolean);
-      const beginsInsideWord = isWord(source[offset - 1]) && isWord(key[0]);
-      const endsInsideWord = isWord(key.at(-1)) && isWord(source[end]);
-      if (!overlaps && !beginsInsideWord && !endsInsideWord) {
-        occupied.fill(1, offset, end);
-        matches.push({ offset, end, value });
-      }
-      offset = source.indexOf(key, offset + key.length);
-    }
+  for (const match of possibleMatches) {
+    if (occupied.subarray(match.offset, match.end).some(Boolean)) continue;
+    occupied.fill(1, match.offset, match.end);
+    matches.push(match);
   }
   if (!matches.length) return null;
 
@@ -221,6 +236,22 @@ function translateDynamicText(source) {
     cursor = match.end;
   }
   return output + dynamicFragment(source.slice(cursor));
+}
+
+/** @param {Map<string, string>} catalog */
+function indexDynamicMessages(catalog) {
+  /** @type {Map<string, Array<{ key: string, value: string, order: number }>>} */
+  const buckets = new Map();
+  let order = 0;
+  for (const [key, value] of catalog) {
+    if (key === value || key.includes('{') || key.length <= 1) continue;
+    const prefix = key.slice(0, 2);
+    const bucket = buckets.get(prefix) ?? [];
+    bucket.push({ key, value, order });
+    buckets.set(prefix, bucket);
+    order += 1;
+  }
+  return buckets;
 }
 
 /** @param {string} fragment */
@@ -243,6 +274,14 @@ function renderLocaleSelector() {
   ).join('');
   selector.value = locale;
   selector.addEventListener('change', () => void setLocale(selector.value));
+}
+
+function translatePersistentShell() {
+  for (const element of document.querySelectorAll(
+    '[data-i18n-source], [data-i18n-aria-label], [data-i18n-placeholder], [data-i18n-title]',
+  )) {
+    translateTree(element);
+  }
 }
 
 /** @param {ParentNode} root */

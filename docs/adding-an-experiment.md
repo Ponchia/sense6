@@ -1,6 +1,8 @@
 # Adding a Sense6 experiment
 <!-- vale Vale.Spelling = NO -->
 
+Lifecycle: current
+
 Use this guide when you add a new interactive experiment. It's a checklist for
 the current architecture, not a template for the scientific method.
 
@@ -33,6 +35,11 @@ Update `src/exams/contracts.js`:
 `tests/contracts.test.js` requires the contract and registry to contain the
 same IDs and unique metrics.
 
+If the metric name is new, add a forward-only numbered migration under
+`migrations/` before changing the runtime allowlist. Extend the migration tests
+so the complete ordered migration set accepts every event and experiment pair
+that production can emit while preserving existing aggregate rows.
+
 ## 2. Register presentation metadata
 
 Add one frozen entry to `src/exams/registry.js`. Include the route, public
@@ -55,6 +62,11 @@ Add `src/exams/<id>.d.ts` beside the controller and expose its `mount` through
 the shared `ExamModule` contract in `src/exams/module-contract.d.ts`. The
 registry's dynamic loader must satisfy that public boundary even while
 maintainers convert the controller implementation incrementally.
+
+Add a card definition to `scripts/generate-social-images.mjs`, then run
+`npm run social:images` and commit the generated SVG and PNG. The generator
+compares its IDs with the experiment registry and fails on missing or orphaned
+cards.
 
 Don't put journal or analytics policy in the registry. Those consumers use the
 service contract.
@@ -109,7 +121,9 @@ derive uncertainty from an interval unless the estimator defines it as
 uncertainty.
 
 Version any separate latest-result store and validate reads. Preserve a legacy
-key only when one already exists.
+key only when one already exists. Put experiment-specific payload validation
+and migration in `src/exams/results/<id>.js`; those modules enter the strict
+typed-JavaScript program automatically.
 
 ## 6. Localize every surface
 
@@ -117,6 +131,13 @@ Add reusable controls or safety boundaries to
 `src/i18n/message-ids.js` and render them with `m(id)`. Add experiment prose
 to every catalog in `src/locales/` with identical placeholders. Extend the
 structured About copy in `src/about.js` for all supported locales.
+
+When coordinated copy lives in a shared locale source module, regenerate the
+per-locale rows before auditing:
+
+```sh
+npm run locales:generate
+```
 
 Run the catalog report while authoring:
 
@@ -146,12 +167,16 @@ identifying at least two real consumers.
 Update the README, changelog, About boundaries, research links, privacy wording
 when the data boundary changes, and roadmap only when commitments change. The
 static generator creates every localized route from the registry and catalogs.
+Its checked substitutions deliberately fail when `index.html` drifts. Update
+the template and generator contract together instead of adding an unchecked
+string replacement.
 
 ## 9. Verify the extension
 
 Run:
 
 ```sh
+npm ci
 npm run lint
 npm run typecheck
 npm run locales:check
@@ -159,6 +184,9 @@ npm run test:coverage
 npm run build
 npm run test:static
 npm run test:e2e
+npm run test:html
+npm run test:links
+npm run test:site-audit
 ```
 
 Add browser coverage for each selectable scope, the complete happy path,
@@ -171,8 +199,10 @@ sheet. The ratchet discovers modules in the strict roots
 automatically. Add a named runtime boundary to `jsconfig.json` and the
 type-ratchet script together when it lives elsewhere.
 
-Before merging, confirm that `npm run check` passes from a clean checkout and
-that the built route stays inside the documented JavaScript and CSS ceilings.
+Before merging, confirm that `npm run check:release` passes from a clean
+checkout and that the built route stays inside the documented JavaScript and
+CSS ceilings. The 110 kB startup budget traverses the complete Vite-manifest
+dependency graph for the initial English route.
 Same-repository pull requests publish the already verified `dist/` directory to
 a `noindex` Pages preview and smoke-test that real URL. Production metrics must
 remain off there.

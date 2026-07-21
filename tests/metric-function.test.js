@@ -125,6 +125,45 @@ test('the metric endpoint rejects oversized bodies and missing storage', async (
   assert.equal(unavailable.status, 503);
 });
 
+test('the metric endpoint rejects malformed JSON and unsupported media types', async () => {
+  const db = database();
+  const malformed = await onRequest({
+    request: request('{'),
+    env: { ANALYTICS_DB: db.binding },
+  });
+  const unsupported = await onRequest({
+    request: request('{"event":"site_loaded","test":"site"}', {
+      'content-type': 'text/plain',
+    }),
+    env: { ANALYTICS_DB: db.binding },
+  });
+
+  assert.equal(malformed.status, 400);
+  assert.equal(unsupported.status, 415);
+  assert.equal(db.calls.length, 0);
+});
+
+test('the metric endpoint reports D1 execution failures without claiming success', async () => {
+  const db = database();
+  db.binding.prepare = (sql) => ({
+    bind(...values) {
+      db.calls.push({ sql, values });
+      return {
+        async run() {
+          throw new Error('D1 unavailable');
+        },
+      };
+    },
+  });
+  const result = await onRequest({
+    request: request({ event: 'test_completed', test: 'acutezza' }),
+    env: { ANALYTICS_DB: db.binding },
+  });
+
+  assert.equal(result.status, 503);
+  assert.equal(db.calls.length, 1);
+});
+
 test('the metric endpoint rejects non-POST methods without touching storage', async () => {
   const db = database();
   const result = await onRequest({

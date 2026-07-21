@@ -4,13 +4,14 @@ import { fileURLToPath } from 'node:url';
 import { ABOUT_DATE_MODIFIED, aboutCopy, aboutMarkup } from '../src/about.js';
 import { CRAWLER_POLICY, renderRobots } from '../src/crawler-policy.js';
 import { EXAMS } from '../src/exams/registry.js';
-import { SOURCE_ROLE_LABELS } from '../src/exams/sources.js';
+import { SOURCE_ROLE_LABELS, sourcesFor } from '../src/exams/sources.js';
 import { galleryMarkup } from '../src/gallery-markup.js';
 import { messageSource } from '../src/i18n/message-ids.js';
 import { interpolateMessage } from '../src/i18n.js';
 import { journalCopy } from '../src/journal-copy.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
 import { privacyCopy, privacyMarkup } from '../src/privacy.js';
+import { UTILITY_ROUTES } from '../src/routes.js';
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DIST = join(ROOT, 'dist');
@@ -158,9 +159,11 @@ await writeDiscoveryFiles();
 async function writePage(relativePath, page) {
   const json = JSON.stringify(page.structuredData);
   let html = localizeShell(template, page.locale);
-  html = html.replace(
+  html = replaceChecked(
+    html,
     /<html lang="[^"]+"(?: dir="[^"]+")?/,
     `<html lang="${page.languageTag}" dir="${page.direction}"`,
+    'document language and direction',
   );
   html = replaceTitle(html, page.title);
   html = replaceMeta(html, 'name', 'description', page.description);
@@ -173,15 +176,24 @@ async function writePage(relativePath, page) {
   html = replaceMeta(html, 'name', 'twitter:description', page.description);
   html = replaceMeta(html, 'name', 'twitter:image', `${ORIGIN}${page.socialImage}`);
   html = replaceMeta(html, 'name', 'twitter:image:alt', page.socialImageAlt);
-  html = html.replace(
+  html = replaceChecked(
+    html,
     /<link rel="canonical" href="[^"]+"\s*\/?>/,
     `<link rel="canonical" href="${ORIGIN}${page.path}">`,
+    'canonical link',
   );
-  html = html.replace(
+  html = replaceChecked(
+    html,
     '</head>',
     `    ${displayFontPreload(page.locale)}<link rel="stylesheet" crossorigin href="/assets/${page.stylesheet}">\n    ${page.alternates}\n    <script type="application/ld+json">${json}</script>\n  </head>`,
+    'head insertion point',
   );
-  html = html.replace('<div id="app"></div>', `<div id="app">${page.main}</div>`);
+  html = replaceChecked(
+    html,
+    '<div id="app"></div>',
+    `<div id="app">${page.main}</div>`,
+    'static application mount',
+  );
   const output = join(DIST, relativePath);
   await mkdir(dirname(output), { recursive: true });
   await writeFile(output, html);
@@ -193,7 +205,7 @@ function displayFontPreload(locale) {
 }
 
 function indexRouteStyles(assets) {
-  const routeNames = ['gallery', ...EXAMS.map(({ id }) => id), 'about', 'journal', 'privacy'];
+  const routeNames = ['gallery', ...EXAMS.map(({ id }) => id), ...UTILITY_ROUTES];
   return new Map(
     routeNames.map((name) => {
       const pattern = new RegExp(`^${escapeRegExp(name)}-.+\\.css$`);
@@ -218,33 +230,52 @@ function localizeShell(html, locale) {
   const catalog = catalogs.get(locale);
   if (!catalog) throw new Error(`Catalog ${locale} was not primed`);
   const tr = (source) => catalog.get(source) ?? source;
-  return html
-    .replace('>Skip to content<', `>${escapeHtml(tr('Skip to content'))}<`)
-    .replace('aria-label="Sense6 — all tests"', `aria-label="${escapeAttribute(tr('Sense6 — all tests'))}"`)
-    .replace('>Checking display…<', `>${escapeHtml(tr('Checking display…'))}<`)
-    .replace('>Language<', `>${escapeHtml(tr('Language'))}<`)
-    .replace('aria-label="Language"', `aria-label="${escapeAttribute(tr('Language'))}"`)
-    .replace(
-      'aria-label="Toggle light and dark theme"',
-      `aria-label="${escapeAttribute(tr('Toggle light and dark theme'))}"`,
-    )
-    .replace('>Theme<', `>${escapeHtml(tr('Theme'))}<`)
-    .replace('Measure carefully. Keep it private.', escapeHtml(tr('Measure carefully. Keep it private.')))
-    .replace('>About<', `>${escapeHtml(tr('About'))}<`)
-    .replace('>Journal<', `>${escapeHtml(tr('Journal'))}<`)
-    .replace('>Privacy<', `>${escapeHtml(tr('Privacy'))}<`)
-    .replace('>All tests<', `>${escapeHtml(tr('All tests'))}<`)
-    .replaceAll('href="/en/"', `href="/${locale}/"`)
-    .replace('href="/en/about/"', `href="/${locale}/about/"`)
-    .replace('href="/en/journal/"', `href="/${locale}/journal/"`)
-    .replace('href="/en/privacy/"', `href="/${locale}/privacy/"`)
-    .replace(
-      `<select data-locale-select aria-label="${escapeAttribute(tr('Language'))}"></select>`,
-      `<select data-locale-select aria-label="${escapeAttribute(tr('Language'))}">${LOCALES.map(
-        ({ code, languageTag, direction, label }) =>
-          `<option value="${code}" lang="${languageTag}" dir="${direction}"${code === locale ? ' selected' : ''}>${label}</option>`,
-      ).join('')}</select>`,
+  let localized = html;
+  for (const [source, replacement] of [
+    ['Skip to content', tr('Skip to content')],
+    ['Checking display…', tr('Checking display…')],
+    ['Language', tr('Language')],
+    ['Theme', tr('Theme')],
+    ['Measure carefully. Keep it private.', tr('Measure carefully. Keep it private.')],
+    ['About', tr('About')],
+    ['Journal', tr('Journal')],
+    ['Privacy', tr('Privacy')],
+    ['All tests', tr('All tests')],
+  ]) {
+    localized = replaceChecked(
+      localized,
+      `>${source}<`,
+      `>${escapeHtml(replacement)}<`,
+      `shell message: ${source}`,
     );
+  }
+  for (const source of ['Sense6 — all tests', 'Language', 'Toggle light and dark theme']) {
+    localized = replaceChecked(
+      localized,
+      ` aria-label="${source}"`,
+      ` aria-label="${escapeAttribute(tr(source))}"`,
+      `shell accessible label: ${source}`,
+    );
+  }
+  localized = replaceChecked(localized, 'href="/en/"', `href="/${locale}/"`, 'gallery links', 2);
+  for (const route of UTILITY_ROUTES) {
+    localized = replaceChecked(
+      localized,
+      `href="/en/${route}/"`,
+      `href="/${locale}/${route}/"`,
+      `${route} shell link`,
+    );
+  }
+  const languageLabel = escapeAttribute(tr('Language'));
+  return replaceChecked(
+    localized,
+    `<select data-locale-select aria-label="${languageLabel}" data-i18n-aria-label="Language"></select>`,
+    `<select data-locale-select aria-label="${languageLabel}" data-i18n-aria-label="Language">${LOCALES.map(
+      ({ code, languageTag, direction, label }) =>
+        `<option value="${code}" lang="${languageTag}" dir="${direction}"${code === locale ? ' selected' : ''}>${label}</option>`,
+    ).join('')}</select>`,
+    'locale options',
+  );
 }
 
 function rootMarkup() {
@@ -288,7 +319,7 @@ function examMarkup(definition, locale, tr) {
     </section>
     <section>
       <h2>${escapeHtml(tr('Research trail'))}</h2>
-      <ul>${definition.sources
+      <ul>${sourcesFor(definition.id)
         .map(
           ({ label, href, role }) =>
             `<li><strong>${escapeHtml(tr(sourceRoleLabel(role)))}:</strong> <a href="${escapeAttribute(href)}" rel="noreferrer">${escapeHtml(label)}</a></li>`,
@@ -411,7 +442,7 @@ function examData(definition, locale, path, tr) {
           name: 'Sense6',
           url: ORIGIN,
         },
-        citation: definition.sources.map(({ href }) => href),
+        citation: sourcesFor(definition.id).map(({ href }) => href),
       },
       {
         '@type': 'BreadcrumbList',
@@ -454,12 +485,19 @@ async function write404() {
   let html = localizeShell(template, 'en');
   html = replaceTitle(html, 'Page not found | Sense6');
   html = replaceMeta(html, 'name', 'description', 'This Sense6 page does not exist.');
-  html = html.replace('</head>', '    <meta name="robots" content="noindex">\n  </head>');
-  html = html.replace(
+  html = replaceChecked(
+    html,
+    '</head>',
+    '    <meta name="robots" content="noindex">\n  </head>',
+    '404 head insertion point',
+  );
+  html = replaceChecked(
+    html,
     '<div id="app"></div>',
     '<div id="app"><section class="static-entry ui-container"><p class="ui-eyebrow">404</p><h1>Page not found.</h1><p>The requested Sense6 page does not exist.</p><a href="/en/">All tests</a></section></div>',
+    '404 application mount',
   );
-  html = html.replace(/\s*<script type="module"[^>]*><\/script>/, '');
+  html = replaceChecked(html, /\s*<script type="module"[^>]*><\/script>/, '', '404 module script removal');
   await writeFile(join(DIST, '404.html'), html);
 }
 
@@ -477,17 +515,41 @@ async function writeDiscoveryFiles() {
       `- [${definition.name}](${ORIGIN}/en/${definition.route}/): ${definition.blurb} ${definition.limit}`,
   ).join(
     '\n',
-  )}\n\n## Research sources\n\n${EXAMS.flatMap((definition) => definition.sources.map(({ label, href, role }) => `- ${definition.name} (${sourceRoleLabel(role)}): [${label}](${href})`)).join('\n')}\n`;
+  )}\n\n## Research sources\n\n${EXAMS.flatMap((definition) => sourcesFor(definition.id).map(({ label, href, role }) => `- ${definition.name} (${sourceRoleLabel(role)}): [${label}](${href})`)).join('\n')}\n`;
   await writeFile(join(DIST, 'llms.txt'), llms);
 }
 
 function replaceTitle(html, title) {
-  return html.replace(/<title>[^<]*<\/title>/, `<title>${escapeHtml(title)}</title>`);
+  return replaceChecked(
+    html,
+    /<title>[^<]*<\/title>/,
+    `<title>${escapeHtml(title)}</title>`,
+    'document title',
+  );
 }
 
 function replaceMeta(html, attribute, key, value) {
   const pattern = new RegExp(`<meta\\s+${attribute}="${escapeRegExp(key)}"\\s+content="[^"]*"\\s*\\/?>`);
-  return html.replace(pattern, `<meta ${attribute}="${key}" content="${escapeAttribute(value)}">`);
+  return replaceChecked(
+    html,
+    pattern,
+    `<meta ${attribute}="${key}" content="${escapeAttribute(value)}">`,
+    `${key} metadata`,
+  );
+}
+
+function replaceChecked(source, search, replacement, label, expected = 1) {
+  const pattern =
+    typeof search === 'string'
+      ? new RegExp(escapeRegExp(search), 'g')
+      : new RegExp(search.source, search.flags.includes('g') ? search.flags : `${search.flags}g`);
+  const matches = [...source.matchAll(pattern)];
+  if (matches.length !== expected) {
+    throw new Error(
+      `Expected ${expected} ${label} match${expected === 1 ? '' : 'es'}, found ${matches.length}`,
+    );
+  }
+  return source.replace(pattern, replacement);
 }
 
 function escapeHtml(value) {

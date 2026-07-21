@@ -17,6 +17,7 @@
     "src/exams/contracts.js",
     "src/exams/landing.js",
     "src/exams/registry.js",
+    "src/exams/results/**/*.js",
     "src/exams/views/**/*.js",
     "src/i18n.js",
     "src/i18n/**/*.js",

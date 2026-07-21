@@ -1,0 +1,126 @@
+name: Verify Sense6
+
+on:
+  workflow_call:
+    inputs:
+      deploy_target:
+        description: Deploy the verified working tree to preview, production, or nowhere.
+        required: false
+        default: none
+        type: string
+      deploy_branch:
+        description: Cloudflare Pages branch used when deployment is enabled.
+        required: false
+        default: ''
+        type: string
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - project: chromium
+            engine: chromium
+          - project: mobile
+            engine: chromium
+          - project: chromium-smoke
+            engine: chromium
+          - project: firefox
+            engine: firefox
+          - project: webkit
+            engine: webkit
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install ${{ matrix.engine }}
+        run: npx playwright install --with-deps ${{ matrix.engine }}
+
+      - name: Verify the ${{ matrix.project }} project
+        run: npx playwright test --project=${{ matrix.project }}
+
+  release:
+    needs: browser
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Verify code and build the production artifact
+        run: npm run check:core
+
+      - name: Validate generated HTML and links
+        run: |
+          npm run test:html
+          npm run test:links
+
+      - name: Stamp and checksum the verified artifact
+        run: |
+          node scripts/write-build-metadata.mjs "$GITHUB_SHA"
+          find dist -type f -print0 | sort -z | xargs -0 sha256sum > dist.sha256
+
+      - name: Verify the artifact checksum
+        run: sha256sum --check dist.sha256
+
+      - name: Audit the production artifact
+        run: npm run test:site-audit
+
+      - name: Publish the verified preview
+        if: inputs.deploy_target == 'preview'
+        id: preview
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: 4.112.0
+          command: pages deploy dist --project-name=sense6 --branch=${{ inputs.deploy_branch }} --commit-hash=${{ github.sha }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Smoke-test the real preview
+        if: inputs.deploy_target == 'preview'
+        run: node scripts/smoke-preview.mjs "${{ steps.preview.outputs.deployment-url }}"
+
+      - name: Publish the verified production bundle
+        if: inputs.deploy_target == 'production'
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: 4.112.0
+          command: pages deploy dist --project-name=sense6 --branch=${{ inputs.deploy_branch }} --commit-hash=${{ github.sha }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify the live production commit and contract
+        if: inputs.deploy_target == 'production'
+        run: node scripts/smoke-production.mjs https://sense6.net "${{ github.sha }}"

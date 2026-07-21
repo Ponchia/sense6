@@ -1,8 +1,6 @@
-import { landingRows } from './landing-copy.js';
-import { mobileUxRows } from './mobile-ux-copy.js';
-import { registryRows } from './registry-copy.js';
+import copyRows from './generated/de.json' with { type: 'json' };
 
-// Generated once from the former combined catalog; edit this locale directly.
+// Manual locale catalog; edit this locale directly.
 /** @type {Array<[string, string]>} */
 const rows = [
   ['Skip to content', 'Zum Inhalt springen'],
@@ -18,7 +16,6 @@ const rows = [
   ['All tests', 'Alle Tests'],
   ['About', 'Über Sense6'],
   ['How Sense6 works', 'So funktioniert Sense6'],
-  ['Anonymous daily counts · no cookies', 'Anonyme Tageszähler · keine Cookies'],
   ['Source', 'Quellcode'],
   ['Sense6 — measure what your senses notice', 'Sense6 — messen, was Ihre Sinne wahrnehmen'],
   ['Measure what your', 'Messen, was Ihre'],
@@ -26,10 +23,6 @@ const rows = [
   [
     'Short, careful tests that turn what you notice into honest, device-relative results.',
     'Kurze, sorgfältige Tests machen Ihre Wahrnehmung als ehrliche, gerätebezogene Ergebnisse sichtbar.',
-  ],
-  [
-    'No account, no answers or results uploaded, no diagnosis theatre.',
-    'Kein Konto, keine hochgeladenen Antworten oder Ergebnisse, keine Scheindiagnose.',
   ],
   [
     'No account, no answers or results uploaded.',
@@ -47,7 +40,6 @@ const rows = [
   ['Colour', 'Farbe'],
   ['Hearing', 'Hören'],
   ['Threshold', 'Schwelle'],
-  ['Pattern', 'Muster'],
   ['Profile', 'Profil'],
   ['Ready now / choose a test', 'Jetzt bereit / Test auswählen'],
   ['Start with what you want to learn.', 'Beginnen Sie mit dem, was Sie erfahren möchten.'],
@@ -61,31 +53,17 @@ const rows = [
     'In development — visible here as direction, not as something you can start yet.',
     'In Entwicklung — hier als Ausblick sichtbar, aber noch nicht startbereit.',
   ],
-  ['Calibrated sharpness & meridional clarity', 'Kalibrierte Sehschärfe und meridionale Klarheit'],
   ['Open test', 'Test öffnen'],
   ['What this test includes', 'Inhalt dieses Tests'],
-  ['How finely do you see colour?', 'Wie fein unterscheiden Sie Farben?'],
-  [
-    'An adaptive colour-discrimination lab: three instruments measure the smallest hue steps you can resolve on this screen.',
-    'Ein adaptives Farbdiskriminationslabor: Drei Instrumente messen die kleinsten auf diesem Bildschirm erkennbaren Farbtonschritte.',
-  ],
   ['Colour discrimination', 'Farbdiskrimination'],
-  ['Adaptive difficulty', 'Adaptive Schwierigkeit'],
-  ['Detailed profile', 'Detailliertes Profil'],
   ['Adaptive browser colour-vision experiment', 'Adaptives Browserexperiment zum Farbsehen'],
   [
     'Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.',
     'Finden Sie eine Lücke in Punkten mit Luminanzrauschen, während sich drei bildschirmbezogene Farbrichtungen unabhängig anpassen.',
   ],
   ['Colour-vision experiment', 'Farbsehexperiment'],
-  ['Adaptive thresholds', 'Adaptive Schwellen'],
   ['3 display directions', '3 Bildschirmrichtungen'],
   ['Run-relative result', 'Laufbezogenes Ergebnis'],
-  ['Response speed, choice cost & consistency', 'Reaktionsgeschwindigkeit, Wahlkosten und Konstanz'],
-  [
-    'Three short instruments separate a simple visual response from decision cost and within-run stability.',
-    'Drei kurze Instrumente trennen einfache visuelle Reaktion, Entscheidungskosten und Stabilität innerhalb des Laufs.',
-  ],
   ['Response timing', 'Reaktionszeit'],
   ['Device-relative timing', 'Gerätebezogene Zeitmessung'],
   ['No composite score', 'Kein Gesamtwert'],
@@ -98,21 +76,11 @@ const rows = [
   ['Volume safety contract', 'Sicherheitsvereinbarung zur Lautstärke'],
   ['No hearing label', 'Keine Hörbewertung'],
   ['3 instruments', '3 Instrumente'],
-  [
-    'Three per-eye instruments measure angular detail, low-contrast cost, and repeatable orientation preference without making a clinical claim.',
-    'Drei Instrumente pro Auge messen Winkeldetails, den Aufwand bei niedrigem Kontrast und wiederholbare Orientierungspräferenzen, ohne klinische Aussagen zu treffen.',
-  ],
   ['Calibrated sharpness experiment', 'Kalibriertes Sehschärfeexperiment'],
   ['Physical screen calibration', 'Physische Bildschirmkalibrierung'],
-  ['3 per-eye instruments', '3 Instrumente pro Auge'],
   ['No clinical label', 'Keine klinische Bewertung'],
-  ['Vision lab / three instruments / about 8 minutes', 'Sehlabor / drei Instrumente / etwa 8 Minuten'],
   ['Calibrate the screen.', 'Kalibrieren Sie den Bildschirm.'],
   ['Resolve the opening.', 'Erkennen Sie die Öffnung.'],
-  [
-    'Acutezza measures the angular detail resolved by each eye, the cost of lower contrast, and whether a directional clarity preference repeats. It is a perception experiment, not an eye examination.',
-    'Acutezza misst die von jedem Auge aufgelösten Winkeldetails, den Aufwand bei geringerem Kontrast und ob sich eine richtungsabhängige Klarheitspräferenz wiederholt. Es ist ein Wahrnehmungsexperiment, keine Augenuntersuchung.',
-  ],
   ['Prepare the vision lab', 'Sehlabor vorbereiten'],
   [
     'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
@@ -120,17 +88,10 @@ const rows = [
   ],
   ['Gap angle', 'Öffnungswinkel'],
   ['calibrated', 'kalibriert'],
-  ['Three observations. No composite score.', 'Drei Beobachtungen. Kein Gesamtwert.'],
-  [
-    'High-contrast detail, low-contrast cost, and directional preference remain separate.',
-    'Hochkontrastdetail, Niedrigkontrastaufwand und Richtungspräferenz bleiben getrennt.',
-  ],
   ['High-contrast sharpness', 'Hochkontrast-Sehschärfe'],
   ['Find the opening.', 'Finden Sie die Öffnung.'],
   ['Low-contrast cost', 'Niedrigkontrastaufwand'],
   ['Find the quieter opening.', 'Finden Sie die blassere Öffnung.'],
-  ['Orientation consistency', 'Orientierungskonsistenz'],
-  ['Which line field looks clearer?', 'Welches Linienfeld wirkt klarer?'],
   ['Comfort and context come first.', 'Komfort und Kontext stehen an erster Stelle.'],
   [
     'Use your usual correction for this distance. Cover one eye without pressing it, keep your head upright, and stop for discomfort.',
@@ -217,17 +178,6 @@ const rows = [
   ],
   ['Begin Nitidezza', 'Nitidezza starten'],
   ['Continue to Contrasto', 'Weiter zu Contrasto'],
-  ['Continue to Meridiani', 'Weiter zu Meridiani'],
-  [
-    'Without moving closer, which line field looks clearer?',
-    'Welches Linienfeld wirkt klarer, ohne dass Sie näher rücken?',
-  ],
-  ['Left line field', 'Linkes Linienfeld'],
-  ['Right line field', 'Rechtes Linienfeld'],
-  ['Left clearer', 'Links klarer'],
-  ['No difference', 'Kein Unterschied'],
-  ['Right clearer', 'Rechts klarer'],
-  ['No astigmatism claim', 'Keine Astigmatismusaussage'],
   ['First eye complete', 'Erstes Auge abgeschlossen'],
   ['Finish with one eye', 'Mit einem Auge abschließen'],
   ['Separate observations.', 'Getrennte Beobachtungen.'],
@@ -235,7 +185,6 @@ const rows = [
   ['High-contrast angular gap', 'Hochkontrast-Öffnungswinkel'],
   ['Low-contrast angular gap', 'Niedrigkontrast-Öffnungswinkel'],
   ['Meridional consistency', 'Meridionale Konsistenz'],
-  ['No stable preference', 'Keine stabile Präferenz'],
   ['Calibrated experiment, not an eye examination.', 'Kalibriertes Experiment, keine Augenuntersuchung.'],
   [
     'Sudden changes need care, not another run.',
@@ -245,27 +194,13 @@ const rows = [
     'This is not vision screening, diagnosis, or a prescription.',
     'Dies ist weder Sehscreening noch Diagnose oder Verordnung.',
   ],
-  ['Acutezza — calibrated sharpness profile', 'Acutezza — kalibriertes Sehschärfeprofil'],
   ['preference', 'Präferenz'],
-  ['no stable preference', 'keine stabile Präferenz'],
   [
     'Calibrated sharpness experiment — Acutezza | Sense6',
     'Kalibriertes Sehschärfeexperiment — Acutezza | Sense6',
   ],
   ['Calibrate screen size — Acutezza | Sense6', 'Bildschirmgröße kalibrieren — Acutezza | Sense6'],
   ['Estimate viewing distance — Acutezza | Sense6', 'Betrachtungsabstand schätzen — Acutezza | Sense6'],
-  [
-    'Your calibrated sharpness profile — Acutezza | Sense6',
-    'Ihr kalibriertes Sehschärfeprofil — Acutezza | Sense6',
-  ],
-  ['Gap at top', 'Öffnung oben'],
-  ['Gap at upper right', 'Öffnung oben rechts'],
-  ['Gap at right', 'Öffnung rechts'],
-  ['Gap at lower right', 'Öffnung unten rechts'],
-  ['Gap at bottom', 'Öffnung unten'],
-  ['Gap at lower left', 'Öffnung unten links'],
-  ['Gap at left', 'Öffnung links'],
-  ['Gap at upper left', 'Öffnung oben links'],
   [
     'A Landolt ring changes size while you identify its opening. The estimate belongs to this calibrated distance and display.',
     'Ein Landolt-Ring ändert seine Größe, während Sie seine Öffnung bestimmen. Die Schätzung gilt für diesen kalibrierten Abstand und diesen Bildschirm.',
@@ -274,15 +209,8 @@ const rows = [
     'The same task repeats with a pale target. Sense6 compares conditions within this run, not across devices.',
     'Dieselbe Aufgabe wird mit einem blassen Ziel wiederholt. Sense6 vergleicht Bedingungen innerhalb dieses Durchlaufs, nicht zwischen Geräten.',
   ],
-  [
-    'Line fields repeat at two scales and changing pixel phases. A preference appears only when it replicates.',
-    'Linienfelder werden in zwei Größen und mit wechselnden Pixelphasen wiederholt. Eine Präferenz erscheint nur, wenn sie sich wiederholt.',
-  ],
   ['Before testing', 'Vor dem Test'],
   ['Acutezza setup rules', 'Acutezza-Einrichtungsregeln'],
-  ['Adaptive burden', 'Adaptive Belastung'],
-  ['Standard optotype', 'Standardoptotyp'],
-  ['Urgent symptoms', 'Dringende Symptome'],
   ['Camera', 'Kamera'],
   ['Result', 'Ergebnis'],
   ['None', 'Keine'],
@@ -291,25 +219,6 @@ const rows = [
   ['Calibration 02 / estimated viewing distance', 'Kalibrierung 02 / geschätzter Betrachtungsabstand'],
   ['Calibration 03 / contrast availability', 'Kalibrierung 03 / Kontrastverfügbarkeit'],
   ['Between-eye setup check', 'Einrichtungsprüfung zwischen den Augen'],
-  ['Changing pixel phase', 'Wechselnde Pixelphase'],
-  ['Two repeated scales', 'Zwei wiederholte Größen'],
-  ['Comparison recorded.', 'Vergleich erfasst.'],
-  [
-    'A physical card and blind-spot sweeps establish screen scale and estimated viewing distance.',
-    'Eine physische Karte und Blinder-Fleck-Durchläufe bestimmen Bildschirmmaßstab und geschätzten Betrachtungsabstand.',
-  ],
-  [
-    'The Landolt ring provides language-independent, eight-direction geometry.',
-    'Der Landolt-Ring bietet eine sprachunabhängige Geometrie mit acht Richtungen.',
-  ],
-  [
-    'Eighteen eight-choice trials balance precision and effort in FrACT research.',
-    'Achtzehn Versuche mit acht Wahlmöglichkeiten gleichen in der FrACT-Forschung Präzision und Aufwand aus.',
-  ],
-  [
-    'Safety copy reflects guidance for sudden floaters, flashes, or curtain-like shadows.',
-    'Der Sicherheitstext folgt Hinweisen zu plötzlich auftretenden Floatern, Lichtblitzen oder vorhangartigen Schatten.',
-  ],
   [
     'Use a laptop, tablet, or monitor without glare. Reset browser zoom, keep brightness comfortable, and leave the display still after calibration.',
     'Verwenden Sie einen Laptop, ein Tablet oder einen Monitor ohne Blendung. Setzen Sie den Browserzoom zurück, wählen Sie eine angenehme Helligkeit und lassen Sie den Bildschirm nach der Kalibrierung unverändert.',
@@ -333,10 +242,6 @@ const rows = [
   [
     'Rotate to landscape or continue on a larger tablet, laptop, or monitor. Acutezza will not guess physical screen size.',
     'Drehen Sie ins Querformat oder verwenden Sie ein größeres Tablet, einen Laptop oder Monitor. Acutezza schätzt die physische Bildschirmgröße nicht.',
-  ],
-  [
-    'Keep this viewport, browser zoom, orientation, and viewing distance unchanged.',
-    'Lassen Sie Ansichtsbereich, Browserzoom, Ausrichtung und Betrachtungsabstand unverändert.',
   ],
   [
     'Screen scale is measured, but distance came from manual entry. Results retain this caution.',
@@ -387,14 +292,6 @@ const rows = [
     'Lassen Sie das rechte Auge abgedeckt und schauen Sie nur auf das Quadrat.',
   ],
   ['Acutezza / this display / this distance', 'Acutezza / dieser Bildschirm / dieser Abstand'],
-  [
-    'The calibration and task controls support interpretation of this run at the stated distance.',
-    'Kalibrierung und Aufgabenkontrollen ermöglichen die Interpretation dieses Durchlaufs beim angegebenen Abstand.',
-  ],
-  [
-    'A calibration or task-control check was limited. Repeat before comparing runs.',
-    'Eine Kalibrierungs- oder Aufgabenkontrolle war eingeschränkt. Wiederholen Sie den Test vor dem Vergleich von Durchläufen.',
-  ],
   ['What travelled with the target.', 'Was das Ziel begleitete.'],
   ['Correction', 'Korrektur'],
   ['Distance', 'Abstand'],
@@ -411,37 +308,13 @@ const rows = [
     'Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.',
     'Suchen Sie bei plötzlichem Sehverlust, starken Augenschmerzen, neuen Lichtblitzen oder Floatern oder einem Vorhang oder Schatten im Gesichtsfeld umgehend professionelle Hilfe.',
   ],
-  ['Three measures for this eye.', 'Drei Messwerte für dieses Auge.'],
-  ['{lower}–{upper} uncertainty interval', 'Unsicherheitsintervall {lower}–{upper}'],
   ['{cost}% gap size versus high contrast', 'Öffnungsgröße {cost}% gegenüber hohem Kontrast'],
-  ['{consistency}% leading-choice consistency', 'Konsistenz der häufigsten Wahl: {consistency}%'],
   ['not measured', 'nicht gemessen'],
-  [
-    'The estimate touches the display range; treat it as a bound.',
-    'Die Schätzung berührt den Darstellungsbereich; behandeln Sie sie als Grenze.',
-  ],
-  [
-    'A calibrated angular threshold from forced-choice trials.',
-    'Eine kalibrierte Winkelschwelle aus Versuchen mit erzwungener Wahl.',
-  ],
   [
     'A within-run difference, not clinical contrast sensitivity.',
     'Ein Unterschied innerhalb des Durchlaufs, keine klinische Kontrastempfindlichkeit.',
   ],
-  [
-    'The display could not preserve a dependable low-contrast condition.',
-    'Der Bildschirm konnte keine verlässliche Niedrigkontrastbedingung darstellen.',
-  ],
-  [
-    'The preference repeated at both scales. It does not identify astigmatism.',
-    'Die Präferenz wiederholte sich bei beiden Größen. Sie weist keinen Astigmatismus nach.',
-  ],
-  [
-    'No preference met the replication rule across scale and pixel phase.',
-    'Keine Präferenz erfüllte die Replikationsregel über Größe und Pixelphase hinweg.',
-  ],
   ['Instrument 01 complete', 'Instrument 01 abgeschlossen'],
-  ['Threshold tasks complete', 'Schwellenaufgaben abgeschlossen'],
   [
     'A calibrated estimate was recorded with {trials} measured targets.',
     'Eine kalibrierte Schätzung wurde mit {trials} gemessenen Zielen erfasst.',
@@ -449,14 +322,6 @@ const rows = [
   [
     'Rest your eye for a moment. Keep the same correction, distance, screen, and covered eye.',
     'Ruhen Sie das Auge kurz aus. Behalten Sie Korrektur, Abstand, Bildschirm und abgedecktes Auge bei.',
-  ],
-  [
-    'High- and low-contrast estimates remain separate in the result.',
-    'Hoch- und Niedrigkontrastschätzungen bleiben im Ergebnis getrennt.',
-  ],
-  [
-    'Contrasto is unavailable on this setup, so no low-contrast value will be inferred.',
-    'Contrasto ist mit dieser Einrichtung nicht verfügbar; daher wird kein Niedrigkontrastwert abgeleitet.',
   ],
   ['Listening lab / three instruments / about 6 minutes', 'Hörlabor / drei Instrumente / etwa 6 Minuten'],
   ['Listen for the boundary.', 'Hören Sie auf die Grenze.'],
@@ -490,25 +355,17 @@ const rows = [
     'Start with device volume low. Raise it only until the reference is quiet and comfortable, never beyond about 60%. Then lock it for the whole run.',
     'Beginnen Sie mit niedriger Gerätelautstärke. Erhöhen Sie sie nur, bis die Referenz leise und angenehm ist, niemals über etwa 60 %. Lassen Sie sie dann unverändert.',
   ],
-  [
-    'Never raise volume to chase a missing high tone. Stop immediately for discomfort, pain, pressure, or ringing.',
-    'Erhöhen Sie niemals die Lautstärke, um einen fehlenden hohen Ton zu finden. Stoppen Sie sofort bei Unbehagen, Schmerzen, Druck oder Ohrgeräuschen.',
-  ],
   ['Research trail', 'Forschungsgrundlage'],
   ['What informed Udito.', 'Grundlagen von Udito.'],
-  ['Read the primary source', 'Primärquelle lesen'],
   ['Safe listening', 'Sicheres Hören'],
-  ['Audio setup / volume locks after this screen', 'Audioeinrichtung / Lautstärke danach unverändert'],
   ['Quiet room.', 'Ruhiger Raum.'],
   ['Low volume.', 'Niedrige Lautstärke.'],
   ['Headphones.', 'Kopfhörer.'],
-  ['Play quiet reference', 'Leise Referenz abspielen'],
   ['Start device volume low before playing.', 'Stellen Sie die Lautstärke vor dem Abspielen niedrig ein.'],
   ['Listening setup', 'Höreinrichtung'],
   ['Over-ear / on-ear headphones', 'Over-Ear- / On-Ear-Kopfhörer'],
   ['Earbuds / in-ear headphones', 'Ohrhörer / In-Ear-Kopfhörer'],
   ['Other / unsure', 'Andere / unsicher'],
-  ['Begin instrument 01', 'Instrument 01 starten'],
   ['Volume contract', 'Lautstärkevereinbarung'],
   ['Start low', 'Niedrig beginnen'],
   ['Find quiet comfort', 'Leisen Komfort finden'],
@@ -521,10 +378,8 @@ const rows = [
   ['Start practice', 'Übung starten'],
   ['Listen…', 'Hören…'],
   ['Stop safely', 'Sicher stoppen'],
-  ['Volume locked', 'Lautstärke gesperrt'],
   ['Short ramped tones', 'Kurze ein- und ausgeblendete Töne'],
   ['Response recorded.', 'Antwort erfasst.'],
-  ['Run again', 'Erneut durchführen'],
   ['Not settled', 'Nicht stabilisiert'],
   ['Device-relative, never dB HL.', 'Gerätebezogen, niemals dB HL.'],
   [
@@ -547,20 +402,10 @@ const rows = [
     'Eine Geräteeinstellung, kein gemessener Schalldruckpegel. Der Browser kennt keine dB SPL.',
   ],
   ['Upload', 'Hochladen'],
-  ['Playing quiet reference…', 'Leise Referenz wird abgespielt…'],
   ['Keep this quiet and comfortable.', 'Halten Sie dies leise und angenehm.'],
   ['Play reference again', 'Referenz erneut abspielen'],
   ['audio context', 'Audiokontext'],
   ['now leave volume unchanged.', 'Lassen Sie die Lautstärke jetzt unverändert.'],
-  [
-    'Audio could not start. Check browser audio permissions and try again.',
-    'Audio konnte nicht gestartet werden. Prüfen Sie die Audioberechtigungen des Browsers und versuchen Sie es erneut.',
-  ],
-  ['The reference sound could not start.', 'Der Referenzton konnte nicht gestartet werden.'],
-  [
-    'Play the quiet reference and confirm the volume contract first.',
-    'Spielen Sie zuerst die leise Referenz ab und bestätigen Sie die Lautstärkevereinbarung.',
-  ],
   [
     'Never raise volume to chase a missing high tone.',
     'Erhöhen Sie niemals die Lautstärke, um einen fehlenden hohen Ton zu finden.',
@@ -570,7 +415,6 @@ const rows = [
     'Stoppen Sie sofort bei Unbehagen, Schmerzen, Druck oder Ohrgeräuschen.',
   ],
   ['Instrument', 'Instrument'],
-  ['of 03', 'von 03'],
   [
     'Choose the quietest tone. Two practice trials come first; the measured check is six trials.',
     'Wählen Sie den leisesten Ton. Zuerst kommen zwei Übungsversuche, danach sechs Messversuche.',
@@ -583,9 +427,6 @@ const rows = [
     'Choose which tone was higher. Loudness changes slightly on purpose, so follow pitch rather than loudness.',
     'Wählen Sie den höheren Ton. Die Lautstärke ändert sich absichtlich leicht; achten Sie daher auf die Tonhöhe, nicht auf die Lautstärke.',
   ],
-  ['Start Cuffie', 'Cuffie starten'],
-  ['Start Portata', 'Portata starten'],
-  ['Start Intonazione', 'Intonazione starten'],
   ['Practice', 'Übung'],
   ['Adaptive run', 'Adaptiver Durchlauf'],
   ['Preparing…', 'Vorbereitung…'],
@@ -623,18 +464,9 @@ const rows = [
   ['without changing volume.', 'ohne die Lautstärke zu ändern.'],
   ['Adaptive', 'Adaptiv'],
   ['Interleaved', 'Verschachtelt'],
-  ['Your listening profile — Udito | Sense6', 'Ihr Hörprofil — Udito | Sense6'],
   ['Udito / this setup / this run', 'Udito / diese Einrichtung / dieser Durchlauf'],
   ['Three listening measures.', 'Drei Hörmessungen.'],
   ['No hearing label.', 'Keine Hörbewertung.'],
-  [
-    'The setup checks and adaptive tracks produced a coherent run-level profile.',
-    'Einrichtungsprüfungen und adaptive Spuren ergaben ein stimmiges Profil für diesen Durchlauf.',
-  ],
-  [
-    'At least one setup check or adaptive track did not settle. The observations remain visible, but comparison should wait for a steadier repeat.',
-    'Mindestens eine Einrichtungsprüfung oder adaptive Spur stabilisierte sich nicht. Die Beobachtungen bleiben sichtbar, ein Vergleich sollte jedoch auf eine stabilere Wiederholung warten.',
-  ],
   ['Setup checks coherent', 'Einrichtungsprüfungen stimmig'],
   ['Interpret with caution', 'Mit Vorsicht interpretieren'],
   ['Headphone-like', 'Kopfhörerähnlich'],
@@ -644,23 +476,9 @@ const rows = [
     'Eine phasenbasierte Wiedergabeprüfung, keine Hardwareerkennung.',
   ],
   ['Upper run boundary', 'Obere Laufgrenze'],
-  ['boundary estimate', 'Grenzschätzung'],
-  ['adaptive estimate', 'adaptive Schätzung'],
   ['Over-ear / on-ear', 'Over-Ear / On-Ear'],
-  [
-    'Reached the device-safe test ceiling; your personal boundary may be higher.',
-    'Die gerätesichere Testobergrenze wurde erreicht; Ihre persönliche Grenze kann höher liegen.',
-  ],
-  [
-    'Relative to this device, fixed volume, room, and audio sample rate.',
-    'Bezogen auf dieses Gerät, feste Lautstärke, Raum und Audio-Abtastrate.',
-  ],
   ['Pitch step near 500 Hz', 'Tonhöhenschritt um 500 Hz'],
   ['Pitch step near 2 kHz', 'Tonhöhenschritt um 2 kHz'],
-  [
-    'Reversal-based just-noticeable difference for this run.',
-    'Umkehrpunktbasierter eben merklicher Unterschied für diesen Durchlauf.',
-  ],
   [
     'Reported separately; no composite hearing score is calculated.',
     'Separat ausgewiesen; es wird kein Gesamt-Hörwert berechnet.',
@@ -686,11 +504,6 @@ const rows = [
     'Vergleichen Sie eigene Durchläufe nur mit demselben Gerät, Kopfhörer, Sitz, Raum und derselben Lautstärke. Stoppen Sie bei unangenehmen Tönen.',
   ],
   ['Screen check / 01 of 01', 'Bildschirmprüfung / 01 von 01'],
-  ['Prepare the environment before the score.', 'Bereiten Sie die Umgebung vor der Messung vor.'],
-  [
-    'Display settings and ambient light can move a color threshold. This one-minute check makes your run more repeatable.',
-    'Bildschirmeinstellungen und Umgebungslicht können eine Farbschwelle verschieben. Diese einminütige Prüfung macht Ihren Durchlauf besser wiederholbar.',
-  ],
   [
     'Use one screen. Disable Night Shift, True Tone, blue-light filters, and vivid modes.',
     'Verwenden Sie einen Bildschirm. Deaktivieren Sie Night Shift, True Tone, Blaulichtfilter und lebhafte Modi.',
@@ -716,10 +529,6 @@ const rows = [
   ['Start instrument 01', 'Instrument 01 starten'],
   ['Viewing setup / 01 of 01', 'Seheinrichtung / 01 von 01'],
   ['Colour filters off, please.', 'Bitte Farbfilter deaktivieren.'],
-  [
-    'The thresholds only describe this browser, display, lighting, and viewing position. Colour-shifting features can move them substantially.',
-    'Die Schwellen beschreiben nur diesen Browser, Bildschirm, diese Beleuchtung und Betrachtungsposition. Farbverändernde Funktionen können sie deutlich verschieben.',
-  ],
   [
     'Turn off Night Shift, True Tone, blue-light filters, and vivid display modes.',
     'Deaktivieren Sie Night Shift, True Tone, Blaulichtfilter und lebhafte Bildschirmmodi.',
@@ -785,26 +594,17 @@ const rows = [
     'Results are calculated locally and are not uploaded.',
     'Die Ergebnisse werden lokal berechnet und nicht hochgeladen.',
   ],
-  [
-    'Color perception / 03 instruments / about 4 minutes',
-    'Farbwahrnehmung / 03 Instrumente / etwa 4 Minuten',
-  ],
-  ['How finely do you', 'Wie fein können Sie Farben'],
   ['see', 'unterscheiden'],
-  ['colour?', '?'],
   ['Begin the color lab', 'Farblabor starten'],
-  ['Set the room before the score.', 'Richten Sie den Raum vor der Messung ein.'],
   ['Which tile is different?', 'Welche Kachel ist anders?'],
   ['Which field shifts in color?', 'Welches Feld verändert die Farbe?'],
   ['Build the smoothest color path.', 'Erstellen Sie den gleichmäßigsten Farbverlauf.'],
   ['Lock this order', 'Reihenfolge bestätigen'],
-  ['Your visible boundary, on this display.', 'Ihre sichtbare Grenze auf diesem Bildschirm.'],
   [
     'This is not a medical test and cannot confirm tetrachromacy.',
     'Dies ist kein medizinischer Test und kann Tetrachromasie nicht bestätigen.',
   ],
   ['Lab progress', 'Laborfortschritt'],
-  ['Current instrument progress', 'Fortschritt des aktuellen Instruments'],
   [
     'Choose once. Trust the first stable difference you see.',
     'Wählen Sie einmal. Vertrauen Sie dem ersten stabilen Unterschied, den Sie sehen.',
@@ -839,18 +639,10 @@ const rows = [
     'Tap its new place to swap, or use the arrows.',
     'Tippen Sie zum Tauschen auf die neue Position oder verwenden Sie die Pfeile.',
   ],
-  ['Your colour profile — Tetracromia | Sense6', 'Ihr Farbprofil — Tetracromia | Sense6'],
   ['Session complete', 'Sitzung abgeschlossen'],
   ['Session index', 'Sitzungsindex'],
-  ['Hue profile', 'Farbtonprofil'],
   ['Display-relative', 'Bildschirmbezogen'],
-  [
-    'Each spoke is one hue region, drawn in its real color. The dot shows the share of discrimination trials you answered correctly there — the test keeps overall difficulty near your limit, so shorter spokes mark your relatively weaker directions.',
-    'Jede Speiche steht für einen Farbtonbereich in seiner tatsächlichen Farbe. Der Punkt zeigt den Anteil richtig beantworteter Unterscheidungsversuche. Der Test hält die Gesamtschwierigkeit nahe Ihrer Grenze; kürzere Speichen markieren daher relativ schwächere Richtungen.',
-  ],
   ['Sequence', 'Reihenfolge'],
-  ['Finest step', 'Feinster Schritt'],
-  ['Finest shift', 'Kleinste Verschiebung'],
   ['Rose', 'Rosa'],
   ['Amber', 'Bernstein'],
   ['Lime', 'Limette'],
@@ -858,39 +650,7 @@ const rows = [
   ['Cyan', 'Cyan'],
   ['Blue', 'Blau'],
   ['Magenta', 'Magenta'],
-  ['of hue', 'im Farbton'],
-  ['through noise', 'durch Rauschen'],
-  ['correct · smaller angle = finer vision', 'richtig · kleinerer Winkel = feinere Sicht'],
-  ['Hue ordering between fixed anchors', 'Farbtonsortierung zwischen festen Ankern'],
-  [
-    'perfect order · each out-of-place pair costs points',
-    'perfekte Reihenfolge · jedes falsche Paar kostet Punkte',
-  ],
   ['How to read this', 'So lesen Sie das Ergebnis'],
-  [
-    'Threshold and Field report the smallest hue difference you kept answering correctly, found adaptively (the app floor is 1.2°, near what an sRGB screen can render). The session index weighs them 35% + 35%, plus 30% for Sequence. Scores describe this run on this browser and screen — useful for comparing your own sessions under similar conditions, not a population percentile, diagnosis, or evidence for tetrachromacy.',
-    'Schwelle und Feld geben den kleinsten Farbtonunterschied an, den Sie wiederholt richtig erkannten; er wird adaptiv bestimmt (die Untergrenze der App liegt bei 1,2°, nahe dem, was ein sRGB-Bildschirm darstellen kann). Der Sitzungsindex gewichtet beide mit 35 % + 35 % und die Reihenfolge mit 30 %. Die Werte beschreiben diesen Durchlauf in diesem Browser und auf diesem Bildschirm – nützlich zum Vergleich eigener Sitzungen unter ähnlichen Bedingungen, nicht als Bevölkerungsperzentil, Diagnose oder Nachweis für Tetrachromasie.',
-  ],
-  ['Very fine screen-level discrimination', 'Sehr feine Unterscheidung am Bildschirm'],
-  ['Fine screen-level discrimination', 'Feine Unterscheidung am Bildschirm'],
-  ['Moderate screen-level discrimination', 'Mittlere Unterscheidung am Bildschirm'],
-  ['Broad screen-level discrimination', 'Grobe Unterscheidung am Bildschirm'],
-  [
-    'You resolved small display differences consistently across the three instruments.',
-    'Sie erkannten kleine Bildschirmunterschiede in allen drei Instrumenten zuverlässig.',
-  ],
-  [
-    'You resolved subtle display differences with a stable overall profile.',
-    'Sie erkannten feine Bildschirmunterschiede mit einem insgesamt stabilen Profil.',
-  ],
-  [
-    'You found clear differences; the finest steps were less consistent in this run.',
-    'Sie erkannten deutliche Unterschiede; die feinsten Schritte waren in diesem Durchlauf weniger stabil.',
-  ],
-  [
-    'The smallest display steps were difficult in this run. Screen setup and fatigue can matter.',
-    'Die kleinsten Bildschirmschritte waren in diesem Durchlauf schwierig. Einrichtung und Ermüdung können eine Rolle spielen.',
-  ],
   [
     'Colour vision / adaptive experiment / about 3 minutes',
     'Farbsehen / adaptives Experiment / etwa 3 Minuten',
@@ -922,7 +682,6 @@ const rows = [
   ['left', 'links'],
   ['top', 'oben'],
   ['bottom', 'unten'],
-  ['Adaptive colour threshold', 'Adaptive Farbschwelle'],
   ['Experiment progress', 'Experimentfortschritt'],
   ['Dotted colour target with a C-shaped gap', 'Gepunktetes Farbziel mit C-förmiger Lücke'],
   ['Adaptive response', 'Adaptive Antwort'],
@@ -934,15 +693,10 @@ const rows = [
   ['Gap at', 'Lücke'],
   ['Keyboard: arrow keys · N for no gap', 'Tastatur: Pfeiltasten · N für keine Lücke'],
   ['Experimental run complete', 'Experimenteller Durchlauf abgeschlossen'],
-  ['Display-relative thresholds from this run', 'Bildschirmbezogene Schwellen dieses Durchlaufs'],
   ['Run inconclusive — repeat the controls', 'Durchlauf nicht aussagekräftig – Kontrollen wiederholen'],
   [
     'Lower values mean you followed a smaller colour shift in that direction on this display. The three directions are not clinical scores and should not be compared as diagnoses.',
     'Niedrigere Werte bedeuten, dass Sie auf diesem Bildschirm eine kleinere Farbverschiebung in dieser Richtung erkannten. Die drei Richtungen sind keine klinischen Werte und dürfen nicht diagnostisch verglichen werden.',
-  ],
-  [
-    'Too many high-contrast task controls were missed to interpret the adaptive thresholds. Check the instructions and viewing setup, then try again.',
-    'Zu viele kontrastreiche Kontrollaufgaben wurden verpasst, um die adaptiven Schwellen zu interpretieren. Prüfen Sie Anleitung und Seheinrichtung und versuchen Sie es erneut.',
   ],
   ['L direction', 'L-Richtung'],
   ['M direction', 'M-Richtung'],
@@ -953,11 +707,7 @@ const rows = [
   ['Staircase settled', 'Treppe stabilisiert'],
   ['Limited reversals', 'Wenige Umkehrpunkte'],
   ['reversals', 'Umkehrpunkte'],
-  ['Experiment floor confirmed', 'Experimentuntergrenze bestätigt'],
-  ['Experiment maximum reached', 'Experimentmaximum erreicht'],
   ['presentations', 'Darbietungen'],
-  ['lower measurement bound', 'untere Messgrenze'],
-  ['upper measurement bound', 'obere Messgrenze'],
   ['run spread', 'Laufstreuung'],
   ['High-contrast gap trials', 'Kontrastreiche Lückenversuche'],
   [
@@ -973,20 +723,11 @@ const rows = [
     'Daltonia hat keine klinischen Normen und wurde nicht mit Anomaloskop, CAD, Cambridge Colour Test oder einer diagnostizierten Kohorte validiert. Diese Werte können eine Farbsehschwäche weder bestätigen noch ausschließen. Vergleichen Sie Wiederholungen nur auf demselben Bildschirm und mit derselben Einrichtung.',
   ],
   ['Copy run summary', 'Laufübersicht kopieren'],
-  [
-    'A careful, adaptive lab for the differences your display can reproduce—and your eyes can resolve.',
-    'Ein sorgfältiges, adaptives Labor für Unterschiede, die Ihr Bildschirm darstellen und Ihre Augen erkennen können.',
-  ],
   ['display relative', 'bildschirmbezogen'],
   ['Hue', 'Farbton'],
   ['Field', 'Feld'],
   ['Order', 'Reihenfolge'],
   ['The lab', 'Das Labor'],
-  ['Three views of discrimination.', 'Drei Perspektiven auf die Unterscheidung.'],
-  [
-    'No names, no account, no upload. Your session stays in this browser.',
-    'Keine Namen, kein Konto, kein Upload. Ihre Sitzung bleibt in diesem Browser.',
-  ],
   [
     'No names, no account, no result upload. Your session stays in this browser.',
     'Keine Namen, kein Konto, kein Ergebnis-Upload. Ihre Sitzung bleibt in diesem Browser.',
@@ -1006,11 +747,6 @@ const rows = [
     'Ordnen Sie drei kurze Farbtonbögen zwischen festen Endpunkten – ohne Farbnamen als Hinweise.',
   ],
   ['Method, not magic', 'Methode statt Magie'],
-  ['The difference gets smaller as you succeed.', 'Der Unterschied wird mit richtigen Antworten kleiner.'],
-  [
-    'Threshold and Field use a two-correct-down, one-error-up staircase. It spends more trials near your current boundary instead of asking the same easy question repeatedly.',
-    'Schwelle und Feld verwenden eine Treppe: Nach zwei richtigen Antworten wird es schwieriger, nach einem Fehler leichter. So liegen mehr Versuche nahe Ihrer aktuellen Grenze statt bei wiederholt einfachen Aufgaben.',
-  ],
   ['Neutral surround', 'Neutrale Umgebung'],
   [
     'Stimuli sit on the same middle-gray chamber in either theme.',
@@ -1021,16 +757,7 @@ const rows = [
     'Colors are generated in OKLCH and mapped safely into sRGB.',
     'Farben werden in OKLCH erzeugt und sicher in sRGB abgebildet.',
   ],
-  ['Adaptive estimate', 'Adaptive Schätzung'],
-  [
-    'Reversals around the boundary produce a session-relative threshold.',
-    'Umkehrpunkte an der Grenze ergeben eine sitzungsbezogene Schwelle.',
-  ],
   ['Honest result', 'Ehrliches Ergebnis'],
-  [
-    'Your profile describes this screen, light, fatigue level, and run.',
-    'Ihr Profil beschreibt diesen Bildschirm, dieses Licht, Ihren Ermüdungsgrad und diesen Durchlauf.',
-  ],
   ['The fourth-cone question', 'Die Frage des vierten Zapfens'],
   ['An RGB screen cannot test tetrachromacy.', 'Ein RGB-Bildschirm kann Tetrachromasie nicht testen.'],
   [
@@ -1038,7 +765,6 @@ const rows = [
     'Gewöhnliche Bildschirme mischen drei Primärfarben. Der Nachweis funktionaler Tetrachromasie erfordert spektrale Reize, die eine vierte Reaktion trennen können, Spezialhardware, Genetik und kontrollierte Bedingungen. Tetracromia misst stattdessen die gewöhnliche Farbdiskrimination am Bildschirm und sagt das ausdrücklich.',
   ],
   ['Ready when your screen is', 'Bereit, wenn Ihr Bildschirm bereit ist'],
-  ['Find your visible boundary.', 'Finden Sie Ihre sichtbare Grenze.'],
   ['Start the lab', 'Labor starten'],
   [
     'A C-shaped target becomes harder to separate from its field. Three independent staircases estimate the smallest colour shift you follow in each display-relative direction during this run.',
@@ -1049,50 +775,18 @@ const rows = [
     'Experimentell und nicht validiert. Dies ist weder ein Screening-Ergebnis noch eine Diagnose.',
   ],
   ['Last run on this browser:', 'Letzter Durchlauf in diesem Browser:'],
-  ['display-relative thresholds recorded', 'bildschirmbezogene Schwellen erfasst'],
   ['An adaptive task, not a plate score.', 'Eine adaptive Aufgabe, kein Farbtafelwert.'],
   [
     'The design borrows established psychophysical techniques without claiming their clinical validation.',
     'Das Design nutzt etablierte psychophysische Verfahren, ohne eine klinische Validierung zu beanspruchen.',
   ],
-  [
-    'Two clear targets teach the C-gap interaction with immediate feedback before any threshold is measured.',
-    'Zwei deutliche Ziele erklären die C-Lücken-Aufgabe mit sofortiger Rückmeldung, bevor eine Schwelle gemessen wird.',
-  ],
   ['Luminance noise', 'Luminanzrauschen'],
-  [
-    'Target and field dots share the same brightness variation, reducing a consistent lightness cue.',
-    'Ziel- und Feldpunkte teilen dieselbe Helligkeitsvariation, wodurch ein gleichbleibender Helligkeitshinweis reduziert wird.',
-  ],
   ['Three staircases', 'Drei Treppen'],
-  [
-    'Directions become harder after correct responses. “No gap visible” counts as a miss and makes that direction easier.',
-    'Die Richtungen werden nach richtigen Antworten schwieriger. „Keine Lücke sichtbar“ zählt als Fehler und macht diese Richtung leichter.',
-  ],
   ['Run-relative output', 'Laufbezogene Ausgabe'],
-  [
-    'You receive thresholds and run spread, not a normal/deficient label or a clinical score.',
-    'Sie erhalten Schwellen und Laufstreuung, keine Einstufung als normal/defizitär und keinen klinischen Wert.',
-  ],
   ['What informed Daltonia.', 'Grundlagen von Daltonia.'],
   [
     'These sources inform the stimulus model and task design. They do not validate this implementation.',
     'Diese Quellen prägen Reizmodell und Aufgabendesign. Sie validieren diese Umsetzung nicht.',
-  ],
-  ['Adaptive colour thresholds', 'Adaptive Farbschwellen'],
-  [
-    'Random Landolt-C orientation, spatial and luminance noise, and interleaved confusion-line staircases.',
-    'Zufällige Landolt-C-Ausrichtung, räumliches und Luminanzrauschen sowie verschachtelte Treppen entlang der Verwechslungslinien.',
-  ],
-  ['Cone-contrast testing', 'Zapfenkontrast-Test'],
-  [
-    'Randomized cone-specific optotypes and validation against anomaloscope and plate results.',
-    'Randomisierte zapfenspezifische Sehzeichen und Validierung gegenüber Anomaloskop- und Farbtafelergebnissen.',
-  ],
-  ['Modern screener validation', 'Validierung eines modernen Screenings'],
-  [
-    'A multicentre comparison on calibrated displays demonstrates the evidence required for screening claims.',
-    'Ein multizentrischer Vergleich auf kalibrierten Bildschirmen zeigt, welche Evidenz für Screening-Aussagen erforderlich ist.',
   ],
   [
     'Response lab / three instruments / about 7 minutes',
@@ -1142,10 +836,6 @@ const rows = [
     'Warten Sie, solange die Fläche ruhig ist, und reagieren Sie, sobald die mittlere Markierung erscheint. Zufällige Wartezeiten machen Vorwegnahmen sichtbar.',
   ],
   [
-    'A left or right arrow appears. Respond on the matching side. The difference from Segnale estimates the cost of choosing.',
-    'Ein Pfeil nach links oder rechts erscheint. Reagieren Sie auf der passenden Seite. Der Unterschied zu Segnale schätzt die Kosten der Wahl.',
-  ],
-  [
     'For three minutes, respond to the same simple signal across longer, irregular waits. The pattern within this run matters more than one fastest press.',
     'Reagieren Sie drei Minuten lang auf dasselbe einfache Signal nach längeren, unregelmäßigen Wartezeiten. Das Muster im Durchlauf ist wichtiger als ein einzelner schnellster Tastendruck.',
   ],
@@ -1159,11 +849,6 @@ const rows = [
     'A transparent reaction-time task with practice, randomized intervals, and separate simple and choice measures.',
     'Eine transparente Reaktionszeitaufgabe mit Übung, zufälligen Intervallen und getrennten Maßen für einfache und Wahlreaktionen.',
   ],
-  ['Brief vigilance task', 'Kurze Vigilanzaufgabe'],
-  [
-    'The three-minute PVT-B informs the sustained-response duration and emphasis on lapses and false starts.',
-    'Der dreiminütige PVT-B prägt die Dauer der anhaltenden Reaktion und den Fokus auf Aussetzer und Fehlstarts.',
-  ],
   ['Browser timing reality', 'Realität der Browser-Zeitmessung'],
   [
     'Browser experiments can be precise enough for many effects, while input hardware and presentation still add latency.',
@@ -1174,10 +859,6 @@ const rows = [
     'Drei tiefe Töne werden nacheinander abgespielt. Wählen Sie den leisesten. Ein phasenbasierter Köder hilft zu prüfen, ob der Klang kopfhörerähnlich ankommt, ohne Ihre Hardware identifizieren zu wollen.',
   ],
   [
-    'One of three intervals contains a tone. Its frequency adapts to find the upper boundary available in this run, on this device, at the locked volume.',
-    'Eines von drei Intervallen enthält einen Ton. Seine Frequenz passt sich an, um die obere Grenze dieses Durchlaufs auf diesem Gerät bei fester Lautstärke zu finden.',
-  ],
-  [
     'Two tones play in sequence. Separate adaptive tracks estimate the smallest pitch step resolved around 500 Hz and 2 kHz.',
     'Zwei Töne werden nacheinander abgespielt. Getrennte adaptive Spuren schätzen den kleinsten erkannten Tonhöhenschritt um 500 Hz und 2 kHz.',
   ],
@@ -1185,41 +866,13 @@ const rows = [
     'Established task structures inform the experiment. Consumer audio hardware remains uncalibrated.',
     'Etablierte Aufgabenstrukturen prägen das Experiment. Audiogeräte für Verbraucher bleiben unkalibriert.',
   ],
-  [
-    'A six-trial, three-alternative phase-cancellation task informs Cuffie and its cautious setup language.',
-    'Eine Phasenauslöschungsaufgabe mit sechs Versuchen und drei Alternativen prägt Cuffie und seine vorsichtige Einrichtungssprache.',
-  ],
-  [
-    'Transformed up-down staircases inform the reversal-based Portata and Intonazione estimates.',
-    'Transformierte Auf-und-ab-Treppen prägen die umkehrpunktbasierten Schätzungen von Portata und Intonazione.',
-  ],
-  ['Browser psychoacoustics', 'Browser-Psychoakustik'],
-  [
-    'Web and mobile adaptive frequency-discrimination work supports the browser task structure—not clinical interpretation.',
-    'Arbeiten zur adaptiven Frequenzunterscheidung im Web und auf Mobilgeräten stützen die Browser-Aufgabenstruktur – nicht die klinische Interpretation.',
-  ],
-  [
-    'Safe-listening guidance informs the low reference, volume lock, short tones, and stop warnings.',
-    'Empfehlungen für sicheres Hören prägen die leise Referenz, die feste Lautstärke, kurze Töne und Stoppwarnungen.',
-  ],
   ['Copy result summary', 'Ergebnisübersicht kopieren'],
   ['practice', 'Übung'],
   ['practice complete', 'Übung abgeschlossen'],
   ['Measurement recorded:', 'Messung erfasst:'],
-  ['Keyboard timing', 'Zeitmessung per Tastatur'],
-  ['Touch / pointer timing', 'Zeitmessung per Touch / Zeiger'],
   ['Median of', 'Median aus'],
   ['clean responses', 'saubere Reaktionen'],
-  ['measured events', 'Messereignisse'],
   ['Under', 'Unter'],
-  [
-    'Keep the same hand position. Early responses, misses, and no-signal responses will be recorded.',
-    'Behalten Sie dieselbe Handposition. Frühe Reaktionen, Auslassungen und Reaktionen ohne Signal werden erfasst.',
-  ],
-  [
-    'Keep the same hand position. Early responses, misses, and wrong sides will be recorded.',
-    'Behalten Sie dieselbe Handposition. Frühe Reaktionen, Auslassungen und falsche Seiten werden erfasst.',
-  ],
   [
     'Please acknowledge the device-relative limit before starting.',
     'Bestätigen Sie vor dem Start die gerätebezogene Grenze.',
@@ -1231,10 +884,6 @@ const rows = [
   [
     '8 practice choices, then 32 balanced measured choices.',
     '8 Übungswahlen, dann 32 ausgewogene Messwahlen.',
-  ],
-  [
-    'A 3-minute PVT-B-inspired sequence. No fatigue or attention diagnosis is inferred.',
-    'Eine dreiminütige, vom PVT-B inspirierte Sequenz. Es wird keine Ermüdungs- oder Aufmerksamkeitsdiagnose abgeleitet.',
   ],
   [
     'Rest one hand near the arrow keys. Use the matching key.',
@@ -1279,16 +928,7 @@ const rows = [
   ['clean response', 'saubere Reaktion'],
   ['captured across', 'erfasst bei'],
   ['measured event', 'Messereignis'],
-  [
-    'Interpretation waits until all three instruments are complete.',
-    'Die Interpretation erfolgt erst nach Abschluss aller drei Instrumente.',
-  ],
-  ['Your response profile — Riflessi | Sense6', 'Ihr Reaktionsprofil — Riflessi | Sense6'],
   ['Riflessi / this run / this device', 'Riflessi / dieser Durchlauf / dieses Gerät'],
-  [
-    'The three instruments captured enough clean responses for a run-level profile.',
-    'Die drei Instrumente erfassten genügend saubere Reaktionen für ein Laufprofil.',
-  ],
   [
     'Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.',
     'Mehrere Reaktionen waren unterbrochen oder ungültig. Behandeln Sie die Werte als Teildurchlauf und wiederholen Sie unter stabileren Bedingungen.',
@@ -1296,24 +936,10 @@ const rows = [
   ['Run usable', 'Durchlauf nutzbar'],
   ['Limited run', 'Eingeschränkter Durchlauf'],
   ['Typical signal response', 'Typische Signalreaktion'],
-  [
-    'clean simple responses. Typical is more robust than your single fastest response.',
-    'saubere einfache Reaktionen. Der typische Wert ist robuster als Ihre einzelne schnellste Reaktion.',
-  ],
   ['Choice response', 'Wahlreaktion'],
   ['correct across', 'richtig bei'],
-  ['valid choices.', 'gültigen Wahlen.'],
   ['Choice cost', 'Wahlkosten'],
-  [
-    'Difference between the choice and simple-response medians in this run.',
-    'Differenz zwischen den Medianen von Wahl- und einfacher Reaktion in diesem Durchlauf.',
-  ],
-  ['clean responses across the sustained block.', 'saubere Reaktionen im anhaltenden Block.'],
   ['Slow-response tail', 'Langsame Reaktionsflanke'],
-  [
-    'How much slower the slowest fifth was than the sustained median.',
-    'Wie viel langsamer das langsamste Fünftel als der Median des anhaltenden Blocks war.',
-  ],
   ['Within-run drift', 'Verlauf im Durchlauf'],
   [
     'Not enough clean responses to estimate a first-to-second-half change.',
@@ -1366,27 +992,13 @@ const rows = [
   ],
   ['Prepare your screen — Tetracromia | Sense6', 'Bildschirm vorbereiten — Tetracromia | Sense6'],
   ['Prepare your display — Daltonia | Sense6', 'Bildschirm vorbereiten — Daltonia | Sense6'],
-  [
-    'Your display-relative thresholds — Daltonia | Sense6',
-    'Ihre bildschirmbezogenen Schwellen — Daltonia | Sense6',
-  ],
   ['Prepare your response setup — Riflessi | Sense6', 'Reaktionseinrichtung vorbereiten — Riflessi | Sense6'],
   ['Prepare your audio setup — Udito | Sense6', 'Audioeinrichtung vorbereiten — Udito | Sense6'],
-  ['Reference played', 'Referenz abgespielt'],
   ['Result summary copied.', 'Ergebnisübersicht kopiert.'],
   ['Copy was unavailable in this browser.', 'Kopieren war in diesem Browser nicht verfügbar.'],
   ['Result summary copied', 'Ergebnisübersicht kopiert'],
   ['Run summary copied', 'Laufübersicht kopiert'],
   ['Could not access the clipboard', 'Kein Zugriff auf die Zwischenablage'],
-  [
-    'Tetracromia — {overall}/100 screen-level color discrimination. Threshold {threshold}, Field {field}, Sequence {sequence}. Device-relative, not diagnostic.',
-    'Tetracromia — {overall}/100 Farbdiskrimination am Bildschirm. Schwelle {threshold}, Feld {field}, Reihenfolge {sequence}. Gerätebezogen, nicht diagnostisch.',
-  ],
-  [
-    'Daltonia experimental browser run — {thresholds}; task controls {correct}/{total}. Display-relative, unvalidated, and not diagnostic.',
-    'Experimenteller Daltonia-Browserdurchlauf — {thresholds}; Aufgabenkontrollen {correct}/{total}. Bildschirmbezogen, nicht validiert und nicht diagnostisch.',
-  ],
-  ['Riflessi — device-relative response profile', 'Riflessi — gerätebezogenes Reaktionsprofil'],
   ['Input: {input}', 'Eingabe: {input}'],
   ['Signal median: {value} ms', 'Signalmedian: {value} ms'],
   [
@@ -1407,18 +1019,11 @@ const rows = [
   ],
   ['touch / pointer', 'Touch / Zeiger'],
   ['keyboard', 'Tastatur'],
-  ['Udito — device-relative listening profile', 'Udito — gerätebezogenes Hörprofil'],
-  [
-    'Setup: {device}; {sampleRate} Hz audio context',
-    'Einrichtung: {device}; Audiokontext mit {sampleRate} Hz',
-  ],
   [
     'Headphone confidence: {correct}/{trials} ({confidence})',
     'Kopfhörer-Konfidenz: {correct}/{trials} ({confidence})',
   ],
   ['Upper run boundary: {boundary}', 'Obere Laufgrenze: {boundary}'],
-  ['Pitch step near 500 Hz: {step}', 'Tonhöhenschritt um 500 Hz: {step}'],
-  ['Pitch step near 2 kHz: {step}', 'Tonhöhenschritt um 2 kHz: {step}'],
   ['headphone-like', 'kopfhörerähnlich'],
   ['uncertain', 'unsicher'],
   [
@@ -1444,9 +1049,6 @@ const rows = [
     'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',
     'Private Browsertests für Farbe, Reaktionszeit und Hören. Antworten und Ergebnisse bleiben in Ihrem Browser.',
   ],
-];
-
-rows.push(
   [
     'Movable color tile {position} of {total}{selected}',
     'Verschiebbare Farbkachel {position} von {total}{selected}',
@@ -1457,17 +1059,10 @@ rows.push(
     '{count} lange Bildintervalle in der Stichprobe beobachtet.',
   ],
   ['{count} sweeps remaining', '{count} Durchläufe verbleiben'],
-  [
-    'Reference played · {sampleRate} Hz audio context · now leave volume unchanged.',
-    'Referenz abgespielt · Audiokontext mit {sampleRate} Hz · Lautstärke jetzt unverändert lassen.',
-  ],
   ['Sound {number}', 'Ton {number}'],
   ['Adaptive · {count}', 'Adaptiv · {count}'],
   ['Interleaved · {count}', 'Verschachtelt · {count}'],
   ['≈ {minutes} min', '≈ {minutes} Min.'],
-);
-
-rows.push(
   [
     'Events: {falseStarts} false starts, {anticipations} anticipations, {misses} misses, {wrongChoices} wrong choices',
     'Ereignisse: {falseStarts} Fehlstarts, {anticipations} Vorwegnahmen, {misses} verpasste Signale, {wrongChoices} falsche Entscheidungen',
@@ -1498,10 +1093,6 @@ rows.push(
     'Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials',
     'Tonhöhenschritt um {anchor} Hz: {step}; {completion}; {reversals} Umkehrungen / {trials} Versuche',
   ],
-  [
-    'Play the maximum-level reference and confirm the volume contract first.',
-    'Spielen Sie zuerst die Referenz mit maximalem Pegel ab und bestätigen Sie die Lautstärkevereinbarung.',
-  ],
   ['Playback interruptions: {count}', 'Wiedergabeunterbrechungen: {count}'],
   ['Playing maximum-level reference…', 'Referenz mit maximalem Pegel wird abgespielt…'],
   ['Portata control accuracy: {accuracy}', 'Genauigkeit der Portata-Kontrollen: {accuracy}'],
@@ -1509,8 +1100,6 @@ rows.push(
     'Recorded. Look at the square and start the next sweep.',
     'Aufgezeichnet. Schauen Sie auf das Quadrat und starten Sie den nächsten Durchlauf.',
   ],
-  ['Recorded. Next trial.', 'Aufgezeichnet. Nächster Versuch.'],
-  ['Recorded. The difference will increase.', 'Aufgezeichnet. Der Unterschied wird vergrößert.'],
   [
     'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
     'Referenz nach Audiouhr abgeschlossen · Audiokontext mit {sampleRate} Hz · Lautstärke jetzt unverändert lassen.',
@@ -1550,17 +1139,9 @@ rows.push(
     'Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials',
     'Obere Laufgrenze: {boundary}; {completion}; {reversals} Umkehrungen / {trials} Versuche',
   ],
-  [
-    'Volume: self-reported unchanged during the run; the browser could not verify it.',
-    'Lautstärke: laut eigener Angabe während des Durchlaufs unverändert; der Browser konnte dies nicht prüfen.',
-  ],
   ['indeterminate (display-range bound)', 'unbestimmt (Grenze des Bildschirmbereichs)'],
   ['lower bound at the display ceiling', 'Untergrenze an der Bildschirmobergrenze'],
   ['upper bound at the display floor', 'Obergrenze an der Bildschirmuntergrenze'],
-  [
-    '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
-    '{eye}: Hochkontrastlücke {gap}; Niedrigkontrastlücke {low}; Kontrastkosten {cost}; Meridiane {meridians}',
-  ],
   ['Usable run', 'Brauchbarer Durchlauf'],
   ['{name} response runner', 'Reaktionstest für {name}'],
   ['Open private journal', 'Privates Journal öffnen'],
@@ -1571,10 +1152,6 @@ rows.push(
   [
     'Display conditions changed. This measured run stopped and was not saved.',
     'Die Bildschirmbedingungen haben sich geändert. Dieser Messdurchlauf wurde beendet und nicht gespeichert.',
-  ],
-  [
-    'Instrument one. Threshold. Find the different tile.',
-    'Instrument eins. Schwelle. Finden Sie die abweichende Kachel.',
   ],
   [
     'Practice one of two. Find the clear gap in the C.',
@@ -1620,8 +1197,8 @@ rows.push(
     'Diese kalibrierte Sehsitzung verlassen? Ihr unvollständiges Ergebnis wird nicht gespeichert.',
   ],
   ['{eye} — {instrument}', '{eye} — {instrument}'],
-);
+];
 
-const catalogRows = [...rows, ...registryRows('de'), ...mobileUxRows('de'), ...landingRows('de')];
+const catalogRows = [...rows, .../** @type {Array<[string, string]>} */ (copyRows)];
 export const MESSAGE_COUNT = catalogRows.length;
 export default new Map(catalogRows);

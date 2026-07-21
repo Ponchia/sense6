@@ -2,19 +2,19 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import test from 'node:test';
+import { measureInitialLocaleGraph } from '../scripts/vite-manifest.mjs';
 import { CRAWLER_POLICY } from '../src/crawler-policy.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { LOCALES } from '../src/locales.js';
+import { routePath, UTILITY_ROUTES } from '../src/routes.js';
 
 const DIST = new URL('../dist/', import.meta.url);
 const expectedPaths = [
   '/',
   ...LOCALES.flatMap(({ code }) => [
-    `/${code}/`,
-    ...EXAMS.map(({ route }) => `/${code}/${route}/`),
-    `/${code}/about/`,
-    `/${code}/journal/`,
-    `/${code}/privacy/`,
+    routePath(code),
+    ...EXAMS.map(({ route }) => routePath(code, route)),
+    ...UTILITY_ROUTES.map((route) => routePath(code, route)),
   ]),
 ];
 
@@ -192,24 +192,55 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   assert.equal(aboutJson['@graph'][0].dateModified, '2026-07-19');
 });
 
+test('Cloudflare headers and function routes stay fail-closed', async () => {
+  const headers = await readFile(new URL('_headers', DIST), 'utf8');
+  const rootBlock = headerBlock(headers, '/*');
+  const csp = rootBlock.get('Content-Security-Policy') ?? '';
+  for (const directive of [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "connect-src 'self'",
+    "font-src 'self' data:",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    "img-src 'self' data:",
+    "object-src 'none'",
+    "script-src 'self'",
+    "style-src 'self' 'unsafe-inline'",
+  ]) {
+    assert.ok(csp.includes(directive), `CSP is missing ${directive}`);
+  }
+  assert.equal(rootBlock.get('Cross-Origin-Opener-Policy'), 'same-origin');
+  assert.equal(rootBlock.get('Cross-Origin-Resource-Policy'), 'same-origin');
+  assert.equal(
+    rootBlock.get('Permissions-Policy'),
+    'camera=(), geolocation=(), microphone=(), payment=(), usb=()',
+  );
+  assert.equal(rootBlock.get('Referrer-Policy'), 'no-referrer');
+  assert.equal(rootBlock.get('Strict-Transport-Security'), 'max-age=31536000');
+  assert.equal(rootBlock.get('X-Content-Type-Options'), 'nosniff');
+  assert.equal(rootBlock.get('X-Frame-Options'), 'DENY');
+
+  assert.equal(headerBlock(headers, '/assets/*').get('Cache-Control'), 'public, max-age=31536000, immutable');
+  for (const preview of ['https://sense6.pages.dev/*', 'https://:version.sense6.pages.dev/*']) {
+    assert.equal(headerBlock(headers, preview).get('X-Robots-Tag'), 'noindex');
+  }
+
+  const routes = JSON.parse(await readFile(new URL('_routes.json', DIST), 'utf8'));
+  assert.deepEqual(routes, { version: 1, include: ['/api/metric'], exclude: [] });
+});
+
 test('the entry bundle stays route-split and within its documented budget', async () => {
+  const INITIAL_JS_BUDGET = 110_000;
   const ENTRY_CSS_BUDGET = 125_000;
   const ROUTE_CSS_BUDGET = 40_000;
   const COMBINED_CSS_BUDGET = 150_000;
   const files = await readdir(new URL('assets/', DIST));
-  const entry = files.find((file) => /^index-.+\.js$/.test(file));
-  const english = files.find((file) => /^en-.+\.js$/.test(file));
-  let sharedRuntime;
-  for (const file of files.filter((candidate) => candidate.endsWith('.js'))) {
-    const source = await readFile(new URL(`assets/${file}`, DIST), 'utf8');
-    if (source.includes('site_loaded') && source.includes('test_started')) {
-      sharedRuntime = file;
-      break;
-    }
-  }
-  assert.ok(entry && english && sharedRuntime);
-  const initialBytes = await sumSizes([entry, english, sharedRuntime]);
-  assert.ok(initialBytes <= 110_000, `initial English JS is ${initialBytes} bytes; budget is 110000`);
+  const initialGraph = await measureInitialLocaleGraph('en', DIST);
+  assert.ok(
+    initialGraph.bytes <= INITIAL_JS_BUDGET,
+    `initial English JS is ${initialGraph.bytes} bytes; budget is ${INITIAL_JS_BUDGET}; graph: ${initialGraph.files.map(({ file, bytes }) => `${file} (${bytes})`).join(', ')}`,
+  );
   for (const { id } of EXAMS)
     assert.ok(
       files.some(
@@ -272,4 +303,18 @@ function assertBalanced(html, tag, path) {
   const opens = html.match(new RegExp(`<${tag}(?:\\s|>)`, 'g'))?.length ?? 0;
   const closes = html.match(new RegExp(`</${tag}>`, 'g'))?.length ?? 0;
   assert.equal(opens, closes, `${path} has unbalanced <${tag}> markup`);
+}
+
+function headerBlock(headers, route) {
+  const lines = headers.split('\n');
+  const start = lines.indexOf(route);
+  assert.notEqual(start, -1, `missing _headers block for ${route}`);
+  const entries = new Map();
+  for (const line of lines.slice(start + 1)) {
+    if (!line.startsWith('  ')) break;
+    const separator = line.indexOf(':');
+    assert.ok(separator > 2, `malformed header in ${route}: ${line}`);
+    entries.set(line.slice(2, separator), line.slice(separator + 1).trim());
+  }
+  return entries;
 }

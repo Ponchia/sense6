@@ -1,8 +1,6 @@
-import { landingRows } from './landing-copy.js';
-import { mobileUxRows } from './mobile-ux-copy.js';
-import { registryRows } from './registry-copy.js';
+import copyRows from './generated/ar.json' with { type: 'json' };
 
-// Generated once from the former combined catalog; edit this locale directly.
+// Manual locale catalog; edit this locale directly.
 /** @type {Array<[string, string]>} */
 const rows = [
   ['Skip to content', 'تخطَّ إلى المحتوى'],
@@ -18,7 +16,6 @@ const rows = [
   ['All tests', 'جميع الاختبارات'],
   ['About', 'حول Sense6'],
   ['How Sense6 works', 'كيف تعمل Sense6'],
-  ['Anonymous daily counts · no cookies', 'إحصاءات يومية مجهولة الهوية · بلا ملفات تعريف ارتباط'],
   ['Source', 'المصدر'],
   ['Sense6 — measure what your senses notice', 'Sense6 — قِس ما تدركه حواسّك'],
   ['Measure what your', 'قِس ما تدركه'],
@@ -26,10 +23,6 @@ const rows = [
   [
     'Short, careful tests that turn what you notice into honest, device-relative results.',
     'اختبارات قصيرة ودقيقة تحول ما تلاحظه إلى نتائج صادقة متعلقة بالجهاز.',
-  ],
-  [
-    'No account, no answers or results uploaded, no diagnosis theatre.',
-    'لا حساب، ولا تُرفع أي إجابات أو نتائج، ولا ادعاءات تشخيصية زائفة.',
   ],
   ['No account, no answers or results uploaded.', 'لا حساب، ولا تُرفع أي إجابات أو نتائج.'],
   [
@@ -44,7 +37,6 @@ const rows = [
   ['Colour', 'الألوان'],
   ['Hearing', 'السمع'],
   ['Threshold', 'عتبة'],
-  ['Pattern', 'نمط'],
   ['Profile', 'الملف'],
   ['Ready now / choose a test', 'جاهز الآن / اختر اختبارًا'],
   ['Start with what you want to learn.', 'ابدأ بما تريد أن تتعلمه.'],
@@ -58,31 +50,17 @@ const rows = [
     'In development — visible here as direction, not as something you can start yet.',
     'في مرحلة التطوير — يمكن رؤيته هنا كتوجيه، وليس كشيء يمكنك البدء به بعد.',
   ],
-  ['Calibrated sharpness & meridional clarity', 'معايرة الحدة والوضوح الزوالي'],
   ['Open test', 'فتح الاختبار'],
   ['What this test includes', 'ماذا يتضمن هذا الاختبار'],
-  ['How finely do you see colour?', 'ما مدى دقة رؤية اللون؟'],
-  [
-    'An adaptive colour-discrimination lab: three instruments measure the smallest hue steps you can resolve on this screen.',
-    'مختبر متكيّف لتمييز الألوان: تقيس ثلاث أدوات أصغر فروق درجات اللون التي يمكنك تمييزها على هذه الشاشة.',
-  ],
   ['Colour discrimination', 'التمييز اللوني'],
-  ['Adaptive difficulty', 'صعوبة متكيّفة'],
-  ['Detailed profile', 'الملف التفصيلي'],
   ['Adaptive browser colour-vision experiment', 'تجربة رؤية الألوان في المتصفح التكيفي'],
   [
     'Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.',
     'اعثر على فجوة مخفية بين نقاط متفاوتة النصوع، بينما تتكيّف ثلاثة اتجاهات لونية مرتبطة بالشاشة كلٌّ على حدة.',
   ],
   ['Colour-vision experiment', 'تجربة رؤية الألوان'],
-  ['Adaptive thresholds', 'عتبات التكيف'],
   ['3 display directions', '3 اتجاهات مرتبطة بالشاشة'],
   ['Run-relative result', 'نتيجة خاصة بهذه الجولة'],
-  ['Response speed, choice cost & consistency', 'سرعة الاستجابة وتكلفة الاختيار والاتساق'],
-  [
-    'Three short instruments separate a simple visual response from decision cost and within-run stability.',
-    'تفصل ثلاث أدوات قصيرة بين الاستجابة البصرية البسيطة، والكلفة الزمنية للاختيار، ومدى ثبات الاستجابة خلال الجولة.',
-  ],
   ['Response timing', 'توقيت الاستجابة'],
   ['Device-relative timing', 'توقيت مرتبط بالجهاز'],
   ['No composite score', 'لا درجة إجمالية مركّبة'],
@@ -98,21 +76,11 @@ const rows = [
   ['Volume safety contract', 'تعليمات سلامة مستوى الصوت'],
   ['No hearing label', 'لا تصنيف للسمع'],
   ['3 instruments', '3 أدوات'],
-  [
-    'Three per-eye instruments measure angular detail, low-contrast cost, and repeatable orientation preference without making a clinical claim.',
-    'تقيس ثلاث أدوات لكل عين دقة التفاصيل الزاوية، وأثر انخفاض التباين، وما إذا كان تفضيل اتجاه معيّن يتكرر، من دون أي ادعاء سريري.',
-  ],
   ['Calibrated sharpness experiment', 'تجربة حدّة بصرية مُعايرة'],
   ['Physical screen calibration', 'معايرة الأبعاد الفعلية للشاشة'],
-  ['3 per-eye instruments', '3 أدوات لكل عين'],
   ['No clinical label', 'لا تصنيف سريري'],
-  ['Vision lab / three instruments / about 8 minutes', 'مختبر البصر / ثلاث أدوات / نحو 8 دقائق'],
   ['Calibrate the screen.', 'عاير الشاشة.'],
   ['Resolve the opening.', 'حدّد اتجاه الفتحة.'],
-  [
-    'Acutezza measures the angular detail resolved by each eye, the cost of lower contrast, and whether a directional clarity preference repeats. It is a perception experiment, not an eye examination.',
-    'يقيس Acutezza أدق التفاصيل الزاوية التي تميّزها كل عين، وأثر انخفاض التباين، وما إذا كان تفضيل وضوح اتجاه معيّن يتكرر. إنها تجربة إدراك وليست فحصًا للعين.',
-  ],
   ['Prepare the vision lab', 'تحضير معمل الرؤية'],
   [
     'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
@@ -120,17 +88,10 @@ const rows = [
   ],
   ['Gap angle', 'زاوية الفجوة'],
   ['calibrated', 'مُعاير'],
-  ['Three observations. No composite score.', 'ثلاث ملاحظات. لا توجد نتيجة مركبة.'],
-  [
-    'High-contrast detail, low-contrast cost, and directional preference remain separate.',
-    'تبقى دقة التفاصيل عالية التباين، وأثر انخفاض التباين، وتفضيل الاتجاه نتائج منفصلة.',
-  ],
   ['High-contrast sharpness', 'حدة عالية التباين'],
   ['Find the opening.', 'حدّد اتجاه الفتحة.'],
   ['Low-contrast cost', 'أثر انخفاض التباين'],
   ['Find the quieter opening.', 'حدّد الفتحة الأقل وضوحًا.'],
-  ['Orientation consistency', 'ثبات تفضيل الاتجاه'],
-  ['Which line field looks clearer?', 'أي نمط من الخطوط يبدو أوضح؟'],
   ['Comfort and context come first.', 'الراحة والسياق أولًا.'],
   [
     'Use your usual correction for this distance. Cover one eye without pressing it, keep your head upright, and stop for discomfort.',
@@ -217,14 +178,6 @@ const rows = [
   ],
   ['Begin Nitidezza', 'ابدأ Nitidezza'],
   ['Continue to Contrasto', 'المتابعة إلى Contrasto'],
-  ['Continue to Meridiani', 'المتابعة إلى Meridiani'],
-  ['Without moving closer, which line field looks clearer?', 'دون الاقتراب، أي مجال خطي يبدو أكثر وضوحًا؟'],
-  ['Left line field', 'نمط الخطوط الأيسر'],
-  ['Right line field', 'نمط الخطوط الأيمن'],
-  ['Left clearer', 'النمط الأيسر أوضح'],
-  ['No difference', 'لا فرق'],
-  ['Right clearer', 'النمط الأيمن أوضح'],
-  ['No astigmatism claim', 'لا ادعاء بكشف اللابؤرية'],
   ['First eye complete', 'اكتمل اختبار العين الأولى'],
   ['Finish with one eye', 'أكمل الاختبار بعين واحدة'],
   ['Separate observations.', 'ملاحظات منفصلة.'],
@@ -232,31 +185,16 @@ const rows = [
   ['High-contrast angular gap', 'فجوة زاويّة عالية التباين'],
   ['Low-contrast angular gap', 'فجوة زاويّة منخفضة التباين'],
   ['Meridional consistency', 'الاتساق الزوالي'],
-  ['No stable preference', 'لا يوجد تفضيل ثابت'],
   ['Calibrated experiment, not an eye examination.', 'تجربة مُعايرة، وليست فحصًا للعين.'],
   ['Sudden changes need care, not another run.', 'التغيّرات المفاجئة تستلزم الرعاية، لا إعادة الاختبار.'],
   [
     'This is not vision screening, diagnosis, or a prescription.',
     'هذا ليس فحصًا تحرّيًا للبصر، ولا تشخيصًا، ولا وصفة طبية.',
   ],
-  ['Acutezza — calibrated sharpness profile', 'Acutezza - ملف تعريف الحدة المُعاير'],
   ['preference', 'التفضيل'],
-  ['no stable preference', 'لا يوجد تفضيل مستقر'],
   ['Calibrated sharpness experiment — Acutezza | Sense6', 'تجربة الحدة المعايرة — Acutezza | Sense6'],
   ['Calibrate screen size — Acutezza | Sense6', 'معايرة حجم الشاشة — Acutezza | Sense6'],
   ['Estimate viewing distance — Acutezza | Sense6', 'تقدير مسافة المشاهدة — Acutezza | Sense6'],
-  [
-    'Your calibrated sharpness profile — Acutezza | Sense6',
-    'ملف تعريف الحدة الذي تمت معايرته — Acutezza | Sense6',
-  ],
-  ['Gap at top', 'الفجوة في الأعلى'],
-  ['Gap at upper right', 'الفجوة في أعلى اليمين'],
-  ['Gap at right', 'الفجوة على اليمين'],
-  ['Gap at lower right', 'الفجوة في أسفل اليمين'],
-  ['Gap at bottom', 'الفجوة في الأسفل'],
-  ['Gap at lower left', 'الفجوة في أسفل اليسار'],
-  ['Gap at left', 'الفجوة على اليسار'],
-  ['Gap at upper left', 'الفجوة في أعلى اليسار'],
   [
     'A Landolt ring changes size while you identify its opening. The estimate belongs to this calibrated distance and display.',
     'يتغيّر حجم حلقة لاندولت بينما تحدّد اتجاه فتحتها. يخصّ التقدير هذه الشاشة وهذه المسافة المُعايرة.',
@@ -265,15 +203,8 @@ const rows = [
     'The same task repeats with a pale target. Sense6 compares conditions within this run, not across devices.',
     'تتكرر المهمة نفسها بهدف باهت. يقارن Sense6 بين الظروف داخل هذه الجولة، لا بين أجهزة مختلفة.',
   ],
-  [
-    'Line fields repeat at two scales and changing pixel phases. A preference appears only when it replicates.',
-    'تتكرر حقول الخط بمقياسين ومراحل بكسل متغيرة. يظهر التفضيل فقط عند تكراره.',
-  ],
   ['Before testing', 'قبل الاختبار'],
   ['Acutezza setup rules', 'قواعد إعداد Acutezza'],
-  ['Adaptive burden', 'العبء التكيفي'],
-  ['Standard optotype', 'النموذج البصري القياسي'],
-  ['Urgent symptoms', 'أعراض تستدعي رعاية عاجلة'],
   ['Camera', 'الكاميرا'],
   ['Result', 'نتيجة'],
   ['None', 'لا شيء'],
@@ -282,25 +213,6 @@ const rows = [
   ['Calibration 02 / estimated viewing distance', 'المعايرة 02/مسافة المشاهدة المقدرة'],
   ['Calibration 03 / contrast availability', 'المعايرة 03 / توفر التباين'],
   ['Between-eye setup check', 'فحص الإعداد بين العينين'],
-  ['Changing pixel phase', 'تغيير مرحلة البكسل'],
-  ['Two repeated scales', 'مقياسين متكررين'],
-  ['Comparison recorded.', 'سُجّلت المقارنة.'],
-  [
-    'A physical card and blind-spot sweeps establish screen scale and estimated viewing distance.',
-    'تحدد البطاقة الفعلية وعمليات مسح النقاط العمياء مقياس الشاشة ومسافة المشاهدة المقدرة.',
-  ],
-  [
-    'The Landolt ring provides language-independent, eight-direction geometry.',
-    'توفّر حلقة لاندولت شكلًا هندسيًا ذا ثمانية اتجاهات لا يعتمد على اللغة.',
-  ],
-  [
-    'Eighteen eight-choice trials balance precision and effort in FrACT research.',
-    'ثمانية عشر تجربة من ثمانية اختيارات توازن بين الدقة والجهد في أبحاث FrACT.',
-  ],
-  [
-    'Safety copy reflects guidance for sudden floaters, flashes, or curtain-like shadows.',
-    'يعكس نص السلامة الإرشادات المتعلقة بظهور عوائم أو ومضات مفاجئة أو ظلال تشبه الستار.',
-  ],
   [
     'Use a laptop, tablet, or monitor without glare. Reset browser zoom, keep brightness comfortable, and leave the display still after calibration.',
     'استخدم جهاز كمبيوتر محمولاً أو جهازًا لوحيًا أو شاشة بدون وهج. قم بإعادة ضبط تكبير/تصغير المتصفح، وحافظ على السطوع مريحًا، واترك الشاشة ثابتة بعد المعايرة.',
@@ -324,10 +236,6 @@ const rows = [
   [
     'Rotate to landscape or continue on a larger tablet, laptop, or monitor. Acutezza will not guess physical screen size.',
     'يمكنك التدوير إلى الوضع الأفقي أو المتابعة على جهاز لوحي أو كمبيوتر محمول أو شاشة أكبر. لن يخمن Acutezza حجم الشاشة الفعلي.',
-  ],
-  [
-    'Keep this viewport, browser zoom, orientation, and viewing distance unchanged.',
-    'حافظ على إطار العرض هذا وتكبير/تصغير المتصفح والاتجاه ومسافة العرض دون تغيير.',
   ],
   [
     'Screen scale is measured, but distance came from manual entry. Results retain this caution.',
@@ -372,14 +280,6 @@ const rows = [
   ],
   ['Keep the right eye covered and look only at the square.', 'أبقِ عينك اليمنى مغطاة وانظر فقط إلى المربع.'],
   ['Acutezza / this display / this distance', 'Acutezza / هذه الشاشة / هذه المسافة'],
-  [
-    'The calibration and task controls support interpretation of this run at the stated distance.',
-    'تدعم أدوات التحكم في المعايرة والمهمة تفسير هذا التشغيل على المسافة المحددة.',
-  ],
-  [
-    'A calibration or task-control check was limited. Repeat before comparing runs.',
-    'كان فحص المعايرة أو التحكم في المهام محدودًا. كرر قبل مقارنة أشواط.',
-  ],
   ['What travelled with the target.', 'سياق عرض الهدف.'],
   ['Correction', 'تصحيح'],
   ['Distance', 'مسافة'],
@@ -396,37 +296,13 @@ const rows = [
     'Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.',
     'اطلب تقييمًا مهنيًا عاجلًا عند فقدان البصر المفاجئ، أو ألم العين الشديد، أو ظهور ومضات أو عوائم جديدة، أو ستار أو ظل في مجال الرؤية.',
   ],
-  ['Three measures for this eye.', 'ثلاثة مقاييس لهذه العين.'],
-  ['{lower}–{upper} uncertainty interval', 'فترة عدم اليقين {lower} – {upper}'],
   ['{cost}% gap size versus high contrast', 'حجم الفجوة {cost}% مقابل التباين العالي'],
-  ['{consistency}% leading-choice consistency', 'ثبات الاختيار الغالب: {consistency}%'],
   ['not measured', 'لم يُقَس'],
-  [
-    'The estimate touches the display range; treat it as a bound.',
-    'بلغ التقدير حدّ نطاق الشاشة؛ تعامل معه بوصفه حدًا تقريبيًا.',
-  ],
-  [
-    'A calibrated angular threshold from forced-choice trials.',
-    'عتبة زاويّة مُعايرة من تجارب الاختيار القسري.',
-  ],
   [
     'A within-run difference, not clinical contrast sensitivity.',
     'فرق داخل هذه الجولة، وليس قياسًا سريريًا لحساسية التباين.',
   ],
-  [
-    'The display could not preserve a dependable low-contrast condition.',
-    'لم تتمكن الشاشة من الحفاظ على حالة التباين المنخفض التي يمكن الاعتماد عليها.',
-  ],
-  [
-    'The preference repeated at both scales. It does not identify astigmatism.',
-    'تكرر التفضيل في كلا المقياسين. لا يحدد الاستجماتيزم.',
-  ],
-  [
-    'No preference met the replication rule across scale and pixel phase.',
-    'لم يحقق أي تفضيل قاعدة التكرار عبر المقاييس ومراحل البكسل.',
-  ],
   ['Instrument 01 complete', 'اكتملت الأداة 01'],
-  ['Threshold tasks complete', 'اكتملت مهام العتبة'],
   [
     'A calibrated estimate was recorded with {trials} measured targets.',
     'تم تسجيل تقدير معايرة مع الأهداف المقاسة {trials}.',
@@ -434,14 +310,6 @@ const rows = [
   [
     'Rest your eye for a moment. Keep the same correction, distance, screen, and covered eye.',
     'أرح عينك للحظة. حافظ على نفس التصحيح والمسافة والشاشة والعين المغطاة.',
-  ],
-  [
-    'High- and low-contrast estimates remain separate in the result.',
-    'تظل تقديرات التباين العالية والمنخفضة منفصلة في النتيجة.',
-  ],
-  [
-    'Contrasto is unavailable on this setup, so no low-contrast value will be inferred.',
-    'Contrasto غير متاح في هذا الإعداد، لذلك لن يتم استنتاج أي قيمة منخفضة التباين.',
   ],
   ['Listening lab / three instruments / about 6 minutes', 'مختبر السمع / ثلاث أدوات / نحو 6 دقائق'],
   ['Listen for the boundary.', 'استمع للحدود.'],
@@ -475,25 +343,17 @@ const rows = [
     'Start with device volume low. Raise it only until the reference is quiet and comfortable, never beyond about 60%. Then lock it for the whole run.',
     'ابدأ بمستوى صوت منخفض على الجهاز. ارفعه فقط حتى تصبح النغمة المرجعية هادئة ومريحة، ولا تتجاوز نحو 60% مطلقًا. ثم لا تغيّره طوال الجولة.',
   ],
-  [
-    'Never raise volume to chase a missing high tone. Stop immediately for discomfort, pain, pressure, or ringing.',
-    'لا ترفع مستوى الصوت لمحاولة سماع نغمة عالية غائبة. توقّف فورًا عند الشعور بانزعاج أو ألم أو ضغط أو طنين.',
-  ],
   ['Research trail', 'مسار البحوث'],
   ['What informed Udito.', 'الأسس العلمية التي استند إليها Udito.'],
-  ['Read the primary source', 'إقرأ المصدر الأساسي'],
   ['Safe listening', 'الاستماع الآمن'],
-  ['Audio setup / volume locks after this screen', 'إعداد الصوت / قفل مستوى الصوت بعد هذه الشاشة'],
   ['Quiet room.', 'غرفة هادئة.'],
   ['Low volume.', 'مستوى صوت منخفض.'],
   ['Headphones.', 'سماعات الرأس.'],
-  ['Play quiet reference', 'شغّل النغمة المرجعية الهادئة'],
   ['Start device volume low before playing.', 'اخفض مستوى صوت الجهاز قبل التشغيل.'],
   ['Listening setup', 'إعداد الاستماع'],
   ['Over-ear / on-ear headphones', 'سماعات رأس فوق الأذن/على الأذن'],
   ['Earbuds / in-ear headphones', 'سماعات الأذن / سماعات داخل الأذن'],
   ['Other / unsure', 'أخرى / غير متأكد'],
-  ['Begin instrument 01', 'ابدأ الأداة 01'],
   ['Volume contract', 'تعليمات مستوى الصوت'],
   ['Start low', 'ابدأ بالمستوى المنخفض'],
   ['Find quiet comfort', 'ابحث عن الراحة الهادئة'],
@@ -506,10 +366,8 @@ const rows = [
   ['Start practice', 'ابدأ التدريب'],
   ['Listen…', 'يستمع…'],
   ['Stop safely', 'توقف بأمان'],
-  ['Volume locked', 'مستوى الصوت ثابت'],
   ['Short ramped tones', 'نغمات قصيرة منحدرة'],
   ['Response recorded.', 'تم تسجيل الرد'],
-  ['Run again', 'تشغيل مرة أخرى'],
   ['Not settled', 'لم يستقر'],
   ['Device-relative, never dB HL.', 'يتعلق بالجهاز، وليس dB HL أبدًا.'],
   [
@@ -532,20 +390,10 @@ const rows = [
     'جهاز تحكم بالجهاز، وليس مستوى ضغط الصوت المُقاس. لا يمكن للمتصفح معرفة dB SPL.',
   ],
   ['Upload', 'رفع'],
-  ['Playing quiet reference…', 'تشغيل مرجع هادئ...'],
   ['Keep this quiet and comfortable.', 'حافظ على هذا هادئًا ومريحًا.'],
   ['Play reference again', 'تشغيل المرجع مرة أخرى'],
   ['audio context', 'السياق الصوتي'],
   ['now leave volume unchanged.', 'لا تغيّر مستوى الصوت الآن.'],
-  [
-    'Audio could not start. Check browser audio permissions and try again.',
-    'تعذر بدء تشغيل الصوت. تحقق من أذونات الصوت في المتصفح وحاول مرة أخرى.',
-  ],
-  ['The reference sound could not start.', 'تعذر بدء الصوت المرجعي.'],
-  [
-    'Play the quiet reference and confirm the volume contract first.',
-    'شغّل النغمة المرجعية الهادئة وأكّد تعليمات مستوى الصوت أولًا.',
-  ],
   [
     'Never raise volume to chase a missing high tone.',
     'لا ترفع أبدًا مستوى الصوت لمطاردة النغمة العالية المفقودة.',
@@ -555,7 +403,6 @@ const rows = [
     'توقّف فورًا عند الشعور بانزعاج أو ألم أو ضغط أو طنين.',
   ],
   ['Instrument', 'أداة'],
-  ['of 03', 'من 03'],
   [
     'Choose the quietest tone. Two practice trials come first; the measured check is six trials.',
     'اختر النغمة الأهدأ. تبدأ بتجربتين تدريبيتين، ثم يتكوّن الفحص المقاس من ست محاولات.',
@@ -568,9 +415,6 @@ const rows = [
     'Choose which tone was higher. Loudness changes slightly on purpose, so follow pitch rather than loudness.',
     'اختر النغمة التي كانت أعلى. يتغير جهارة الصوت قليلاً عن قصد، لذا اتبع درجة الصوت بدلاً من جهارة الصوت.',
   ],
-  ['Start Cuffie', 'ابدأ Cuffie'],
-  ['Start Portata', 'ابدأ Portata'],
-  ['Start Intonazione', 'ابدأ Intonazione'],
   ['Practice', 'تدريب'],
   ['Adaptive run', 'جولة متكيّفة'],
   ['Preparing…', 'جارٍ التحضير…'],
@@ -608,18 +452,9 @@ const rows = [
   ['without changing volume.', 'من دون تغيير مستوى الصوت.'],
   ['Adaptive', 'التكيف'],
   ['Interleaved', 'متداخل'],
-  ['Your listening profile — Udito | Sense6', 'ملف تعريف الاستماع الخاص بك — Udito | Sense6'],
   ['Udito / this setup / this run', 'Udito / هذا الإعداد / هذا التشغيل'],
   ['Three listening measures.', 'ثلاثة تدابير الاستماع.'],
   ['No hearing label.', 'لا تصنيف للسمع.'],
-  [
-    'The setup checks and adaptive tracks produced a coherent run-level profile.',
-    'أنتجت فحوصات الإعداد والمسارات التكيفية ملفًا تعريفيًا متماسكًا لمستوى التشغيل.',
-  ],
-  [
-    'At least one setup check or adaptive track did not settle. The observations remain visible, but comparison should wait for a steadier repeat.',
-    'لم يتم تسوية فحص الإعداد أو المسار التكيفي مرة واحدة على الأقل. تظل الملاحظات مرئية، لكن المقارنة يجب أن تنتظر تكرارًا أكثر ثباتًا.',
-  ],
   ['Setup checks coherent', 'فحوص الإعداد متّسقة'],
   ['Interpret with caution', 'تفسير بحذر'],
   ['Headphone-like', 'تشبه سماعة الرأس'],
@@ -629,23 +464,9 @@ const rows = [
     'فحص لطريقة تقديم الصوت قائم على الطور، وليس كشفًا لنوع الجهاز.',
   ],
   ['Upper run boundary', 'حد التشغيل العلوي'],
-  ['boundary estimate', 'تقدير الحدود'],
-  ['adaptive estimate', 'تقدير التكيف'],
   ['Over-ear / on-ear', 'فوق الأذن/على الأذن'],
-  [
-    'Reached the device-safe test ceiling; your personal boundary may be higher.',
-    'وصلت إلى سقف الاختبار الآمن للجهاز؛ قد تكون حدودك الشخصية أعلى.',
-  ],
-  [
-    'Relative to this device, fixed volume, room, and audio sample rate.',
-    'مرتبطة بهذا الجهاز، ومستوى الصوت الثابت، والغرفة، ومعدل أخذ العينات الصوتية.',
-  ],
   ['Pitch step near 500 Hz', 'فرق طبقة الصوت قرب 500 Hz'],
   ['Pitch step near 2 kHz', 'فرق طبقة الصوت قرب 2 kHz'],
-  [
-    'Reversal-based just-noticeable difference for this run.',
-    'أصغر فرق ملحوظ في هذه الجولة، مقدّر من نقاط انعكاس المسار المتكيّف.',
-  ],
   [
     'Reported separately; no composite hearing score is calculated.',
     'تُعرض النتائج منفصلة، ولا تُحسب درجة سمع إجمالية مركّبة.',
@@ -671,11 +492,6 @@ const rows = [
     'لا تقارن جولاتك إلا عند استخدام الجهاز والسماعات وملاءمتها والغرفة ومستوى الصوت نفسها. أوقف الاختبار إذا كان أي صوت مزعجًا.',
   ],
   ['Screen check / 01 of 01', 'فحص الشاشة / 01 من 01'],
-  ['Prepare the environment before the score.', 'إعداد البيئة قبل النتيجة.'],
-  [
-    'Display settings and ambient light can move a color threshold. This one-minute check makes your run more repeatable.',
-    'قد تغيّر إعدادات الشاشة والإضاءة المحيطة عتبة تمييز اللون. يجعل هذا الفحص الذي يستغرق دقيقة واحدة جولتك أكثر قابلية للتكرار.',
-  ],
   [
     'Use one screen. Disable Night Shift, True Tone, blue-light filters, and vivid modes.',
     'استخدم شاشة واحدة. قم بتعطيل Night Shift وTrue Tone ومرشحات الضوء الأزرق والأوضاع الحيوية.',
@@ -701,10 +517,6 @@ const rows = [
   ['Start instrument 01', 'أداة البدء 01'],
   ['Viewing setup / 01 of 01', 'إعداد المشاهدة / 01 من 01'],
   ['Colour filters off, please.', 'مرشحات الألوان معطلة، من فضلك.'],
-  [
-    'The thresholds only describe this browser, display, lighting, and viewing position. Colour-shifting features can move them substantially.',
-    'تصف الحدود فقط هذا المتصفح والشاشة والإضاءة وموضع العرض. يمكن لميزات تغيير اللون تحريكها بشكل كبير.',
-  ],
   [
     'Turn off Night Shift, True Tone, blue-light filters, and vivid display modes.',
     'قم بإيقاف تشغيل Night Shift وTrue Tone ومرشحات الضوء الأزرق وأوضاع العرض الحيوية.',
@@ -767,23 +579,17 @@ const rows = [
     'كل شيء يعمل محليا. لا توجد إجابة تترك المتصفح.',
   ],
   ['Results are calculated locally and are not uploaded.', 'يتم احتساب النتائج محليًا ولا يتم تحميلها.'],
-  ['Color perception / 03 instruments / about 4 minutes', 'إدراك اللون / 03 أدوات / حوالي 4 دقائق'],
-  ['How finely do you', 'ما مدى دقة'],
   ['see', 'تمييزك'],
-  ['colour?', 'للألوان؟'],
   ['Begin the color lab', 'ابدأ معمل الألوان'],
-  ['Set the room before the score.', 'ضبط الغرفة قبل النتيجة.'],
   ['Which tile is different?', 'أي مربع لوني مختلف؟'],
   ['Which field shifts in color?', 'أي حقل يتغير في اللون؟'],
   ['Build the smoothest color path.', 'رتّب أنعم تدرّج لوني ممكن.'],
   ['Lock this order', 'ثبّت هذا الترتيب'],
-  ['Your visible boundary, on this display.', 'حدودك المرئية، على هذه الشاشة.'],
   [
     'This is not a medical test and cannot confirm tetrachromacy.',
     'هذا ليس اختبارًا طبيًا ولا يمكنه تأكيد وجود رباعي الألوان.',
   ],
   ['Lab progress', 'تقدم المختبر'],
-  ['Current instrument progress', 'تقدّم الأداة الحالية'],
   [
     'Choose once. Trust the first stable difference you see.',
     'اختر مرة واحدة. ثق بالفرق المستقر الأول الذي تراه.',
@@ -815,18 +621,10 @@ const rows = [
   ],
   ['tile', 'مربع'],
   ['Tap its new place to swap, or use the arrows.', 'اضغط على مكانه الجديد للتبديل، أو استخدم الأسهم.'],
-  ['Your colour profile — Tetracromia | Sense6', 'ملف تعريف الألوان الخاص بك — Tetracromia | Sense6'],
   ['Session complete', 'اكتملت الجلسة'],
   ['Session index', 'مؤشر الجلسة'],
-  ['Hue profile', 'ملف تمييز درجات اللون'],
   ['Display-relative', 'مرتبط بالشاشة'],
-  [
-    'Each spoke is one hue region, drawn in its real color. The dot shows the share of discrimination trials you answered correctly there — the test keeps overall difficulty near your limit, so shorter spokes mark your relatively weaker directions.',
-    'كل شعاع عبارة عن منطقة لونية واحدة، مرسومة بلونها الحقيقي. تُظهر النقطة نسبة تجارب التمييز التي أجبت عليها بشكل صحيح هناك - الاختبار يبقي الصعوبة الإجمالية بالقرب من الحد الخاص بك، لذا فإن المتحدث الأقصر يشير إلى اتجاهاتك الأضعف نسبيًا.',
-  ],
   ['Sequence', 'تسلسل'],
-  ['Finest step', 'أدق فرق'],
-  ['Finest shift', 'أدق تغيّر'],
   ['Rose', 'وردي'],
   ['Amber', 'العنبر'],
   ['Lime', 'أخضر ليموني'],
@@ -834,36 +632,7 @@ const rows = [
   ['Cyan', 'سماوي'],
   ['Blue', 'أزرق'],
   ['Magenta', 'أرجواني'],
-  ['of hue', 'في درجة اللون'],
-  ['through noise', 'من خلال الضوضاء'],
-  ['correct · smaller angle = finer vision', 'الصحيح · الزاوية الأصغر = رؤية أدق'],
-  ['Hue ordering between fixed anchors', 'ترتيب درجات اللون بين نقطتين ثابتتين'],
-  ['perfect order · each out-of-place pair costs points', 'ترتيب مثالي · كل زوج خارج المكان يكلف نقطة'],
   ['How to read this', 'كيف تقرأ هذا'],
-  [
-    'Threshold and Field report the smallest hue difference you kept answering correctly, found adaptively (the app floor is 1.2°, near what an sRGB screen can render). The session index weighs them 35% + 35%, plus 30% for Sequence. Scores describe this run on this browser and screen — useful for comparing your own sessions under similar conditions, not a population percentile, diagnosis, or evidence for tetrachromacy.',
-    'يعرض قسما «العتبة» و«المجال» أصغر فرق في درجة اللون واصلت تمييزه بصورة صحيحة، ويُحدَّد ذلك تكيّفيًا (الحد الأدنى للتطبيق هو 1.2°، قريبًا مما تستطيع شاشة sRGB عرضه). يمنح مؤشر الجلسة لكل منهما وزن 35%، ويمنح «التسلسل» 30%. تصف الدرجات هذه الجولة على هذا المتصفح وهذه الشاشة؛ وهي مفيدة لمقارنة جلساتك في ظروف متشابهة، وليست ترتيبًا مئويًا سكانيًا ولا تشخيصًا ولا دليلًا على الرؤية رباعية الألوان.',
-  ],
-  ['Very fine screen-level discrimination', 'تمييز جيد جدًا على مستوى الشاشة'],
-  ['Fine screen-level discrimination', 'التمييز الدقيق على مستوى الشاشة'],
-  ['Moderate screen-level discrimination', 'تمييز معتدل على مستوى الشاشة'],
-  ['Broad screen-level discrimination', 'تمييز واسع النطاق على مستوى الشاشة'],
-  [
-    'You resolved small display differences consistently across the three instruments.',
-    'لقد قمت بحل الاختلافات الصغيرة في العرض بشكل متسق عبر الأدوات الثلاثة.',
-  ],
-  [
-    'You resolved subtle display differences with a stable overall profile.',
-    'لقد قمت بحل الاختلافات الدقيقة في العرض من خلال ملف تعريف عام مستقر.',
-  ],
-  [
-    'You found clear differences; the finest steps were less consistent in this run.',
-    'ميّزت الفروق الواضحة، لكن استجاباتك لأدق الفروق كانت أقل اتساقًا في هذه الجولة.',
-  ],
-  [
-    'The smallest display steps were difficult in this run. Screen setup and fatigue can matter.',
-    'كان تمييز أصغر فروق الشاشة صعبًا في هذه الجولة. قد يؤثر إعداد الشاشة والإجهاد.',
-  ],
   ['Colour vision / adaptive experiment / about 3 minutes', 'رؤية الألوان / تجربة التكيف / حوالي 3 دقائق'],
   ['Find the gap', 'العثور على الفجوة'],
   ['in the dots', 'في النقاط'],
@@ -889,7 +658,6 @@ const rows = [
   ['left', 'يسار'],
   ['top', 'أعلى'],
   ['bottom', 'أسفل'],
-  ['Adaptive colour threshold', 'عتبة اللون التكيفية'],
   ['Experiment progress', 'تقدم التجربة'],
   ['Dotted colour target with a C-shaped gap', 'هدف لون منقط مع وجود فجوة على شكل C'],
   ['Adaptive response', 'الاستجابة التكيفية'],
@@ -901,15 +669,10 @@ const rows = [
   ['Gap at', 'الفجوة عند'],
   ['Keyboard: arrow keys · N for no gap', 'لوحة المفاتيح: مفاتيح الأسهم · N لعدم وجود فجوة'],
   ['Experimental run complete', 'اكتمل التشغيل التجريبي'],
-  ['Display-relative thresholds from this run', 'العتبات النسبية للعرض من هذا التشغيل'],
   ['Run inconclusive — repeat the controls', 'تشغيل غير حاسم - كرر عناصر التحكم'],
   [
     'Lower values mean you followed a smaller colour shift in that direction on this display. The three directions are not clinical scores and should not be compared as diagnoses.',
     'تعني القيم المنخفضة أنك اتبعت تغيرًا طفيفًا في اللون في هذا الاتجاه على هذه الشاشة. الاتجاهات الثلاثة ليست نتائج سريرية ولا ينبغي مقارنتها بالتشخيصات.',
-  ],
-  [
-    'Too many high-contrast task controls were missed to interpret the adaptive thresholds. Check the instructions and viewing setup, then try again.',
-    'تم تفويت عدد كبير جدًا من عناصر التحكم في المهام عالية التباين لتفسير العتبات التكيفية. تحقق من التعليمات وإعدادات العرض، ثم حاول مرة أخرى.',
   ],
   ['L direction', 'اتجاه L'],
   ['M direction', 'اتجاه M'],
@@ -920,11 +683,7 @@ const rows = [
   ['Staircase settled', 'استقر المسار المتكيّف'],
   ['Limited reversals', 'انتكاسات محدودة'],
   ['reversals', 'انعكاسات'],
-  ['Experiment floor confirmed', 'تم تأكيد أرضية التجربة'],
-  ['Experiment maximum reached', 'تم الوصول إلى الحد الأقصى للتجربة'],
   ['presentations', 'مرات عرض'],
-  ['lower measurement bound', 'الحد الأدنى للقياس'],
-  ['upper measurement bound', 'حد القياس العلوي'],
   ['run spread', 'تشتّت الجولة'],
   ['High-contrast gap trials', 'تجارب الفجوة عالية التباين'],
   ['Enough controls were read to report this run.', 'تمت قراءة عناصر تحكم كافية للإبلاغ عن هذا التشغيل.'],
@@ -937,20 +696,11 @@ const rows = [
     'لا يملك Daltonia معايير سريرية، ولم تُتحقق صلاحيته بمقارنته بمنظار الشذوذ أو CAD أو Cambridge Colour Test أو بمجموعة مشخصة. لا تستطيع هذه القيم تأكيد قصور رؤية الألوان أو استبعاده. لا تقارن الجولات المتكررة إلا على الشاشة والإعداد نفسيهما.',
   ],
   ['Copy run summary', 'نسخ ملخص الجولة'],
-  [
-    'A careful, adaptive lab for the differences your display can reproduce—and your eyes can resolve.',
-    'مختبر دقيق وقابل للتكيف للاختلافات التي يمكن أن تنتجها شاشتك، والتي يمكن لعينيك حلها.',
-  ],
   ['display relative', 'مرتبط بالشاشة'],
   ['Hue', 'درجة اللون'],
   ['Field', 'مجال'],
   ['Order', 'الترتيب'],
   ['The lab', 'المختبر'],
-  ['Three views of discrimination.', 'ثلاث زوايا لقياس التمييز.'],
-  [
-    'No names, no account, no upload. Your session stays in this browser.',
-    'لا أسماء، لا حساب، لا تحميل. تبقى جلستك في هذا المتصفح.',
-  ],
   [
     'No names, no account, no result upload. Your session stays in this browser.',
     'لا أسماء، لا حساب، لا تحميل النتيجة. تبقى جلستك في هذا المتصفح.',
@@ -970,11 +720,6 @@ const rows = [
     'رتّب ثلاثة تدرّجات قصيرة بين نقطتي نهاية ثابتتين، من دون أسماء ألوان تساعدك.',
   ],
   ['Method, not magic', 'الطريقة وليس السحر'],
-  ['The difference gets smaller as you succeed.', 'الفرق يصبح أصغر كلما نجحت.'],
-  [
-    'Threshold and Field use a two-correct-down, one-error-up staircase. It spends more trials near your current boundary instead of asking the same easy question repeatedly.',
-    'تستخدم "العتبة" و"الميدان" سلمًا ثنائيًا للأسفل وخطأ واحدًا للأعلى. فهو يقضي المزيد من التجارب بالقرب من حدودك الحالية بدلاً من طرح نفس السؤال السهل بشكل متكرر.',
-  ],
   ['Neutral surround', 'محيط محايد'],
   [
     'Stimuli sit on the same middle-gray chamber in either theme.',
@@ -985,16 +730,7 @@ const rows = [
     'Colors are generated in OKLCH and mapped safely into sRGB.',
     'يتم إنشاء الألوان في OKLCH وتعيينها بأمان في sRGB.',
   ],
-  ['Adaptive estimate', 'تقدير التكيف'],
-  [
-    'Reversals around the boundary produce a session-relative threshold.',
-    'تنتج الانعكاسات حول الحدود عتبة نسبية للجلسة.',
-  ],
   ['Honest result', 'نتيجة صادقة'],
-  [
-    'Your profile describes this screen, light, fatigue level, and run.',
-    'يصف ملف التعريف الخاص بك هذه الشاشة والضوء ومستوى التعب والتشغيل.',
-  ],
   ['The fourth-cone question', 'سؤال النوع الرابع من الخلايا المخروطية'],
   ['An RGB screen cannot test tetrachromacy.', 'لا يمكن لشاشة RGB اختبار رباعي الألوان.'],
   [
@@ -1002,7 +738,6 @@ const rows = [
     'تمزج شاشات المستهلك ثلاثة ألوان أساسية. يتطلب إثبات الرؤية الوظيفية رباعية الألوان محفزات طيفية تفصل استجابة رابعة، وأجهزة متخصصة، وبيانات وراثية، وظروفًا مضبوطة. لذلك يقيس Tetracromia تمييز الألوان العادي على الشاشة ويصرّح بذلك بوضوح.',
   ],
   ['Ready when your screen is', 'جاهز عندما تكون شاشتك جاهزة'],
-  ['Find your visible boundary.', 'ابحث عن حدودك المرئية.'],
   ['Start the lab', 'ابدأ المختبر'],
   [
     'A C-shaped target becomes harder to separate from its field. Three independent staircases estimate the smallest colour shift you follow in each display-relative direction during this run.',
@@ -1013,50 +748,18 @@ const rows = [
     'تجريبي ولم تُتحقق صلاحيته. هذه ليست نتيجة فحص تحرٍّ ولا تشخيصًا.',
   ],
   ['Last run on this browser:', 'آخر جولة في هذا المتصفح:'],
-  ['display-relative thresholds recorded', 'تم تسجيل العتبات النسبية للعرض'],
   ['An adaptive task, not a plate score.', 'مهمة تكيفية، وليست نتيجة لوحة.'],
   [
     'The design borrows established psychophysical techniques without claiming their clinical validation.',
     'يستعير التصميم تقنيات نفسية فيزيائية راسخة دون المطالبة بالتحقق من صحتها السريرية.',
   ],
-  [
-    'Two clear targets teach the C-gap interaction with immediate feedback before any threshold is measured.',
-    'يشرح هدفان واضحان كيفية تحديد فجوة الشكل C، مع ملاحظات فورية، قبل قياس أي عتبة.',
-  ],
   ['Luminance noise', 'ضجيج النصوع'],
-  [
-    'Target and field dots share the same brightness variation, reducing a consistent lightness cue.',
-    'تشترك النقاط المستهدفة والميدان في نفس اختلاف السطوع، مما يقلل من إشارة الخفة المتسقة.',
-  ],
   ['Three staircases', 'ثلاثة سلالم'],
-  [
-    'Directions become harder after correct responses. “No gap visible” counts as a miss and makes that direction easier.',
-    'تصبح التوجيهات أكثر صعوبة بعد الإجابات الصحيحة. تعتبر عبارة "لا توجد فجوة مرئية" بمثابة خطأ وتجعل هذا الاتجاه أسهل.',
-  ],
   ['Run-relative output', 'نتيجة خاصة بهذه الجولة'],
-  [
-    'You receive thresholds and run spread, not a normal/deficient label or a clinical score.',
-    'تتلقى عتبات وانتشارًا، وليس علامة عادية/ناقصة أو نتيجة سريرية.',
-  ],
   ['What informed Daltonia.', 'ما أبلغ Daltonia.'],
   [
     'These sources inform the stimulus model and task design. They do not validate this implementation.',
     'تبلغ هذه المصادر نموذج التحفيز وتصميم المهمة. إنهم لا يؤكدون صحة هذا التنفيذ.',
-  ],
-  ['Adaptive colour thresholds', 'عتبات الألوان التكيفية'],
-  [
-    'Random Landolt-C orientation, spatial and luminance noise, and interleaved confusion-line staircases.',
-    'اتجاه Landolt-C العشوائي والضوضاء المكانية والنصوع وسلالم خط الارتباك المتداخلة.',
-  ],
-  ['Cone-contrast testing', 'اختبار التباين المخروطي'],
-  [
-    'Randomized cone-specific optotypes and validation against anomaloscope and plate results.',
-    'الأنماط العشوائية الخاصة بالمخروط والتحقق من صحتها ضد نتائج الشذوذ واللوحة.',
-  ],
-  ['Modern screener validation', 'التحقق من صحة الفحص الحديث'],
-  [
-    'A multicentre comparison on calibrated displays demonstrates the evidence required for screening claims.',
-    'توضّح مقارنة متعددة المراكز على شاشات مُعايرة مستوى الأدلة المطلوب لتقديم ادعاءات الفحص التحري.',
   ],
   ['Response lab / three instruments / about 7 minutes', 'مختبر الاستجابة / ثلاث أدوات / حوالي 7 دقائق'],
   ['Notice the signal.', 'لاحظ الإشارة.'],
@@ -1100,10 +803,6 @@ const rows = [
     'انتظر بينما تكون الغرفة هادئة، ثم استجب بمجرد ظهور العلامة المركزية. الانتظار العشوائي يجعل الترقب مرئيًا.',
   ],
   [
-    'A left or right arrow appears. Respond on the matching side. The difference from Segnale estimates the cost of choosing.',
-    'يظهر سهم لليسار أو لليمين. الرد على الجانب المطابق. الفرق من Segnale يقدر تكلفة الاختيار.',
-  ],
-  [
     'For three minutes, respond to the same simple signal across longer, irregular waits. The pattern within this run matters more than one fastest press.',
     'لمدة ثلاث دقائق، استجب لنفس الإشارة البسيطة خلال فترات انتظار أطول وغير منتظمة. النمط الموجود في هذا المدى يهم أكثر من ضغطة واحدة سريعة.',
   ],
@@ -1117,11 +816,6 @@ const rows = [
     'A transparent reaction-time task with practice, randomized intervals, and separate simple and choice measures.',
     'مهمة شفافة لوقت رد الفعل مع الممارسة والفواصل العشوائية والتدابير البسيطة والاختيارية المنفصلة.',
   ],
-  ['Brief vigilance task', 'مهمة يقظة قصيرة'],
-  [
-    'The three-minute PVT-B informs the sustained-response duration and emphasis on lapses and false starts.',
-    'يسترشد طول اختبار الاستجابة المستمرة والتركيز على حالات التأخر والبدايات المبكرة باختبار PVT-B ذي الثلاث دقائق.',
-  ],
   ['Browser timing reality', 'حقيقة توقيت المتصفح'],
   [
     'Browser experiments can be precise enough for many effects, while input hardware and presentation still add latency.',
@@ -1132,10 +826,6 @@ const rows = [
     'يتم تشغيل ثلاث نغمات منخفضة بالتسلسل. اختر الأكثر هدوءًا. يساعد الخداع المرحلي في التحقق مما إذا كان الصوت يصل مثل سماعات الرأس، دون المطالبة بالتعرف على أجهزتك.',
   ],
   [
-    'One of three intervals contains a tone. Its frequency adapts to find the upper boundary available in this run, on this device, at the locked volume.',
-    'تحتوي واحدة من ثلاث فترات على نغمة. يتكيّف ترددها لتقدير الحد الأعلى المتاح في هذه الجولة، على هذا الجهاز وعند مستوى الصوت المثبّت.',
-  ],
-  [
     'Two tones play in sequence. Separate adaptive tracks estimate the smallest pitch step resolved around 500 Hz and 2 kHz.',
     'تُشغَّل نغمتان بالتتابع. تقدّر مسارات متكيّفة منفصلة أصغر فرق في طبقة الصوت يمكن تمييزه قرب 500 Hz و2 kHz.',
   ],
@@ -1143,41 +833,13 @@ const rows = [
     'Established task structures inform the experiment. Consumer audio hardware remains uncalibrated.',
     'هياكل المهام المنشأة تبلغ التجربة. تظل أجهزة الصوت الاستهلاكية غير معايرة.',
   ],
-  [
-    'A six-trial, three-alternative phase-cancellation task informs Cuffie and its cautious setup language.',
-    'تسترشد أداة Cuffie وصياغة إعدادها الحذرة بمهمة إلغاء طور من ست محاولات وثلاثة بدائل.',
-  ],
-  [
-    'Transformed up-down staircases inform the reversal-based Portata and Intonazione estimates.',
-    'تُعلم السلالم المحولة من الأعلى إلى الأسفل تقديرات Portata و Intonazione المستندة إلى الانعكاس.',
-  ],
-  ['Browser psychoacoustics', 'متصفح علم النفس النفسي'],
-  [
-    'Web and mobile adaptive frequency-discrimination work supports the browser task structure—not clinical interpretation.',
-    'يدعم عمل تمييز التردد التكيفي على الويب والهواتف المحمولة بنية مهمة المتصفح - وليس التفسير السريري.',
-  ],
-  [
-    'Safe-listening guidance informs the low reference, volume lock, short tones, and stop warnings.',
-    'تسترشد النغمة المرجعية المنخفضة وتثبيت مستوى الصوت وقِصر النغمات وتحذيرات التوقف بإرشادات الاستماع الآمن.',
-  ],
   ['Copy result summary', 'نسخ ملخص النتيجة'],
   ['practice', 'تدريب'],
   ['practice complete', 'اكتمل التدريب'],
   ['Measurement recorded:', 'تم تسجيل القياس:'],
-  ['Keyboard timing', 'توقيت لوحة المفاتيح'],
-  ['Touch / pointer timing', 'توقيت اللمس / المؤشر'],
   ['Median of', 'متوسط'],
   ['clean responses', 'ردود نظيفة'],
-  ['measured events', 'الأحداث المقاسة'],
   ['Under', 'تحت'],
-  [
-    'Keep the same hand position. Early responses, misses, and no-signal responses will be recorded.',
-    'حافظ على نفس وضع اليد. سيتم تسجيل الاستجابات المبكرة، والأخطاء، والاستجابات بدون إشارة.',
-  ],
-  [
-    'Keep the same hand position. Early responses, misses, and wrong sides will be recorded.',
-    'حافظ على نفس وضع اليد. سيتم تسجيل الاستجابات المبكرة والأخطاء والجوانب الخاطئة.',
-  ],
   [
     'Please acknowledge the device-relative limit before starting.',
     'يُرجى الإقرار بأن النتائج مرتبطة بالجهاز قبل البدء.',
@@ -1189,10 +851,6 @@ const rows = [
   [
     '8 practice choices, then 32 balanced measured choices.',
     '8 اختيارات للتمرين، ثم 32 خيارًا متوازنًا ومقاسًا.',
-  ],
-  [
-    'A 3-minute PVT-B-inspired sequence. No fatigue or attention diagnosis is inferred.',
-    'تسلسل مدته 3 دقائق مستوحى من PVT-B. لا يُستنتج منه تشخيص للتعب أو الانتباه.',
   ],
   [
     'Rest one hand near the arrow keys. Use the matching key.',
@@ -1237,16 +895,7 @@ const rows = [
   ['clean response', 'استجابة نظيفة'],
   ['captured across', 'تم التقاطها عبر'],
   ['measured event', 'الحدث المقاس'],
-  [
-    'Interpretation waits until all three instruments are complete.',
-    'ينتظر التفسير حتى تكتمل الأدوات الثلاثة.',
-  ],
-  ['Your response profile — Riflessi | Sense6', 'ملف تعريف الاستجابة الخاص بك — Riflessi | Sense6'],
   ['Riflessi / this run / this device', 'Riflessi / هذا التشغيل / هذا الجهاز'],
-  [
-    'The three instruments captured enough clean responses for a run-level profile.',
-    'التقطت الأدوات الثلاثة ما يكفي من الاستجابات النظيفة لملف تعريف مستوى التشغيل.',
-  ],
   [
     'Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.',
     'تمت مقاطعة العديد من الاستجابات أو أنها غير صالحة. تعامل مع الأرقام على أنها عملية جزئية وكررها في ظل ظروف أكثر ثباتًا.',
@@ -1254,24 +903,10 @@ const rows = [
   ['Run usable', 'تشغيل صالح للاستخدام'],
   ['Limited run', 'تشغيل محدود'],
   ['Typical signal response', 'استجابة إشارة نموذجية'],
-  [
-    'clean simple responses. Typical is more robust than your single fastest response.',
-    'ردود بسيطة نظيفة. النموذجي أقوى من أسرع استجابة منفردة.',
-  ],
   ['Choice response', 'رد الاختيار'],
   ['correct across', 'الصحيح عبر'],
-  ['valid choices.', 'اختيارات صالحة.'],
   ['Choice cost', 'تكلفة الاختيار'],
-  [
-    'Difference between the choice and simple-response medians in this run.',
-    'الفرق بين الاختيار ومتوسطات الاستجابة البسيطة في هذا التشغيل.',
-  ],
-  ['clean responses across the sustained block.', 'استجابات نظيفة عبر الكتلة المستدامة.'],
   ['Slow-response tail', 'ذيل بطيء الاستجابة'],
-  [
-    'How much slower the slowest fifth was than the sustained median.',
-    'ما مدى أبطأ الخُمس الأبطأ من المتوسط ​​المستدام.',
-  ],
   ['Within-run drift', 'التغيّر خلال الجولة'],
   [
     'Not enough clean responses to estimate a first-to-second-half change.',
@@ -1318,27 +953,16 @@ const rows = [
   ['Leave the experiment? Your progress will be lost.', 'هل تريد مغادرة التجربة؟ سيضيع تقدّمك.'],
   ['Prepare your screen — Tetracromia | Sense6', 'جهز شاشتك — Tetracromia | Sense6'],
   ['Prepare your display — Daltonia | Sense6', 'قم بإعداد شاشتك — Daltonia | Sense6'],
-  ['Your display-relative thresholds — Daltonia | Sense6', 'الحدود النسبية للعرض — Daltonia | Sense6'],
   [
     'Prepare your response setup — Riflessi | Sense6',
     'قم بإعداد إعداد الاستجابة الخاص بك - Riflessi | Sense6',
   ],
   ['Prepare your audio setup — Udito | Sense6', 'قم بإعداد إعداد الصوت الخاص بك - Udito | Sense6'],
-  ['Reference played', 'شُغّلت النغمة المرجعية'],
   ['Result summary copied.', 'نُسخ ملخص النتيجة.'],
   ['Copy was unavailable in this browser.', 'تعذّر النسخ في هذا المتصفح.'],
   ['Result summary copied', 'نُسخ ملخص النتيجة'],
   ['Run summary copied', 'نُسخ ملخص الجولة'],
   ['Could not access the clipboard', 'تعذّر الوصول إلى الحافظة'],
-  [
-    'Tetracromia — {overall}/100 screen-level color discrimination. Threshold {threshold}, Field {field}, Sequence {sequence}. Device-relative, not diagnostic.',
-    'Tetracromia — {overall}/100 تمييز الألوان على مستوى الشاشة. عتبة {threshold}، الحقل {field}، التسلسل {sequence}. يتعلق بالجهاز، وليس تشخيصيًا.',
-  ],
-  [
-    'Daltonia experimental browser run — {thresholds}; task controls {correct}/{total}. Display-relative, unvalidated, and not diagnostic.',
-    'جولة متصفح تجريبية من Daltonia — {thresholds}؛ فحوص المهمة {correct}/{total}. مرتبطة بالشاشة، ولم تُتحقق صلاحيتها، وليست تشخيصية.',
-  ],
-  ['Riflessi — device-relative response profile', 'Riflessi — ملف استجابة مرتبط بالجهاز'],
   ['Input: {input}', 'الإدخال: {input}'],
   ['Signal median: {value} ms', 'وسيط استجابة الإشارة: {value} ms'],
   [
@@ -1359,15 +983,11 @@ const rows = [
   ],
   ['touch / pointer', 'اللمس / المؤشر'],
   ['keyboard', 'لوحة المفاتيح'],
-  ['Udito — device-relative listening profile', 'Udito — ملف استماع مرتبط بالجهاز'],
-  ['Setup: {device}; {sampleRate} Hz audio context', 'الإعداد: {device}؛ سياق صوت بمعدل {sampleRate} Hz'],
   [
     'Headphone confidence: {correct}/{trials} ({confidence})',
     'موثوقية إعداد السماعات: {correct}/{trials} ({confidence})',
   ],
   ['Upper run boundary: {boundary}', 'الحد الأعلى في الجولة: {boundary}'],
-  ['Pitch step near 500 Hz: {step}', 'فرق طبقة الصوت قرب 500 Hz: {step}'],
-  ['Pitch step near 2 kHz: {step}', 'فرق طبقة الصوت قرب 2 kHz: {step}'],
   ['headphone-like', 'تشبه سماعة الرأس'],
   ['uncertain', 'غير مؤكد'],
   [
@@ -1400,10 +1020,6 @@ const rows = [
     'رُصدت {count} فترات طويلة بين الإطارات في العينة.',
   ],
   ['{count} sweeps remaining', 'جولات المسح المتبقية: {count}'],
-  [
-    'Reference played · {sampleRate} Hz audio context · now leave volume unchanged.',
-    'شُغّلت النغمة المرجعية · سياق صوت بمعدل {sampleRate} Hz · لا تغيّر مستوى الصوت الآن.',
-  ],
   ['Sound {number}', 'الصوت {number}'],
   ['Adaptive · {count}', 'متكيّف · {count}'],
   ['Interleaved · {count}', 'متداخل · {count}'],
@@ -1432,10 +1048,6 @@ const rows = [
     'Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials',
     'فرق طبقة الصوت قرب {anchor} Hz: {step}؛ {completion}؛ {reversals} انعكاسات / {trials} محاولات',
   ],
-  [
-    'Play the maximum-level reference and confirm the volume contract first.',
-    'شغّل النغمة المرجعية ذات المستوى الأقصى وأكّد تعليمات مستوى الصوت أولًا.',
-  ],
   ['Playback interruptions: {count}', 'انقطاعات التشغيل: {count}'],
   ['Playing maximum-level reference…', 'جارٍ تشغيل النغمة المرجعية ذات المستوى الأقصى…'],
   ['Portata control accuracy: {accuracy}', 'دقة التحكم في Portata: {accuracy}'],
@@ -1443,8 +1055,6 @@ const rows = [
     'Recorded. Look at the square and start the next sweep.',
     'تم التسجيل. انظر إلى المربع وابدأ جولة المسح التالية.',
   ],
-  ['Recorded. Next trial.', 'تم التسجيل. المحاولة التالية.'],
-  ['Recorded. The difference will increase.', 'تم التسجيل. سيزداد الفرق.'],
   [
     'Reference completed on the audio clock · {sampleRate} Hz context · now leave volume unchanged.',
     'اكتمل تشغيل النغمة المرجعية وفق ساعة الصوت · سياق بمعدل {sampleRate} Hz · لا تغيّر مستوى الصوت الآن.',
@@ -1478,17 +1088,9 @@ const rows = [
     'Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials',
     'الحد الأعلى في الجولة: {boundary}؛ {completion}؛ {reversals} انعكاسات / {trials} محاولات',
   ],
-  [
-    'Volume: self-reported unchanged during the run; the browser could not verify it.',
-    'مستوى الصوت: وفقًا لإفادتك، ظل دون تغيير خلال الجولة؛ ولم يتمكن المتصفح من التحقق من ذلك.',
-  ],
   ['indeterminate (display-range bound)', 'غير محدد (مقيّد بنطاق الشاشة)'],
   ['lower bound at the display ceiling', 'حد أدنى عند أقصى قدرة للشاشة'],
   ['upper bound at the display floor', 'حد أعلى عند أدنى قدرة للشاشة'],
-  [
-    '{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}; meridians {meridians}',
-    '{eye}: فجوة عالية التباين {gap}؛ فجوة منخفضة التباين {low}؛ أثر انخفاض التباين {cost}؛ الاتجاهات الزوالية {meridians}',
-  ],
   ['Usable run', 'جولة صالحة للاستخدام'],
   ['{name} response runner', 'مشغّل استجابة {name}'],
   ['Open private journal', 'فتح السجل الخاص'],
@@ -1500,7 +1102,6 @@ const rows = [
     'Display conditions changed. This measured run stopped and was not saved.',
     'تغيرت ظروف الشاشة. توقفت هذه الجولة المقاسة ولم تُحفظ.',
   ],
-  ['Instrument one. Threshold. Find the different tile.', 'الأداة الأولى. العتبة. اعثر على المربع المختلف.'],
   [
     'Practice one of two. Find the clear gap in the C.',
     'التدريب الأول من اثنين. اعثر على الفجوة الواضحة في حرف C.',
@@ -1541,6 +1142,6 @@ const rows = [
   ['{eye} — {instrument}', '{eye} — {instrument}'],
 ];
 
-const catalogRows = [...rows, ...registryRows('ar'), ...mobileUxRows('ar'), ...landingRows('ar')];
+const catalogRows = [...rows, .../** @type {Array<[string, string]>} */ (copyRows)];
 export const MESSAGE_COUNT = catalogRows.length;
 export default new Map(catalogRows);

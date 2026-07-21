@@ -1,9 +1,12 @@
+import { activeMount, clearActiveMount, disposeActiveMounts, registerActiveMount } from './mount-registry.js';
 import { setNavigationGuard } from './navigation.js';
 
 /** @typedef {{ signal: AbortSignal, onCleanup: (callback: (() => void)) => (() => void), setActive: (active: boolean, message?: string) => void, present: (root?: ParentNode, options?: { focus?: string | false, scroll?: boolean }) => void, dispose: () => void }} ExamLifecycle */
 
-/** @type {Map<symbol, ExamLifecycle>} */
-const activeMounts = new Map();
+/** Dispose every active exam mount after a route commit fails before returning its cleanup. */
+export function disposeActiveExamLifecycles() {
+  disposeActiveMounts();
+}
 
 /**
  * Own one exam mount and guarantee idempotent, exclusive cleanup.
@@ -12,7 +15,7 @@ const activeMounts = new Map();
  * @returns {ExamLifecycle}
  */
 export function createExamLifecycle(owner, { bodyClasses = [] } = {}) {
-  activeMounts.get(owner)?.dispose();
+  activeMount(owner)?.dispose();
   const controller = new AbortController();
   /** @type {Array<() => void>} */
   const cleanups = [];
@@ -103,9 +106,9 @@ export function createExamLifecycle(owner, { bodyClasses = [] } = {}) {
       updateShellControls(false);
       document.body.classList.remove('measurement-active');
       if (bodyClasses.length) document.body.classList.remove(...bodyClasses);
-      if (activeMounts.get(owner) === lifecycle) activeMounts.delete(owner);
+      clearActiveMount(owner, lifecycle);
     },
   });
-  activeMounts.set(owner, lifecycle);
+  registerActiveMount(owner, lifecycle);
   return lifecycle;
 }

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createExamLifecycle } from '../src/lib/lifecycle.js';
+import { createExamLifecycle, disposeActiveExamLifecycles } from '../src/lib/lifecycle.js';
 import { allowsNavigation } from '../src/lib/navigation.js';
 
 test('a new owner mount disposes the previous mount exactly once', () => {
@@ -42,6 +42,26 @@ test('cleanup failures do not strand later cleanup or body state', () => {
     assert.deepEqual(removed, ['measurement-active', 'lab-mode', 'running']);
   } finally {
     console.error = originalError;
+    delete globalThis.document;
+  }
+});
+
+test('all partial exam mounts can be retired after a route commit failure', () => {
+  globalThis.document = { body: { classList: { remove() {}, toggle() {} } } };
+  try {
+    const first = createExamLifecycle(Symbol('first'));
+    const second = createExamLifecycle(Symbol('second'));
+    let cleanups = 0;
+    first.onCleanup(() => cleanups++);
+    second.onCleanup(() => cleanups++);
+
+    disposeActiveExamLifecycles();
+    disposeActiveExamLifecycles();
+
+    assert.equal(first.signal.aborted, true);
+    assert.equal(second.signal.aborted, true);
+    assert.equal(cleanups, 2);
+  } finally {
     delete globalThis.document;
   }
 });

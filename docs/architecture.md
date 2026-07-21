@@ -1,7 +1,9 @@
 # Sense6 architecture
 <!-- vale Vale.Spelling = NO -->
 
-Status: current, 2026-07-20
+Status: current, 2026-07-21
+
+Lifecycle: current
 
 This document describes the app boundaries you need when changing or
 extending Sense6. Read the decision records in `docs/adr/` for the reasons
@@ -41,16 +43,17 @@ and uncertainty, but it can't turn a browser task into a clinical instrument.
 
 | Boundary | Source | Responsibility |
 | --- | --- | --- |
-| Shell and router | `src/main.js`, `src/router.js` | Resolve locale-aware routes, mount one view, and dispose the previous view |
+| Shell and router | `src/main.js`, `src/router.js`, `src/routes.js` | Resolve locale-aware routes, mount one view, and dispose the previous view |
 | Service contracts | `src/exams/contracts.js` | Define experiment identity, metric names, and journal-comparison policy |
 | Presentation registry | `src/exams/registry.js` | Define gallery and static-page metadata plus lazy experiment loaders |
 | Protocol passports | `src/exams/protocols.js` | Freeze method versions, selectable profiles, schedule digests, stopping rules, and interpretation boundaries |
 | Evidence ledger | `src/exams/sources.js` | Classify canonical sources as method, boundary, comparator, or exact Sense6 validation evidence |
 | Experiment controllers | `src/exams/*.js`, `src/exams/*.d.ts` | Coordinate setup, response handling, phase changes, and results for one experiment; declarations define their checked public mount boundary |
+| Result schemas | `src/exams/results/*.js` | Validate and migrate experiment-specific latest-result payloads without coupling service contracts to route code |
 | Experiment views | `src/exams/views/*.js` | Produce pure markup for large landing or phase views without owning runtime state |
 | Domain models | `src/lib/*.js` | Implement strictly checked adaptive tracks, schedules, summaries, persistence, lifecycle behavior, and guarded state transitions |
 | Shared landing views | `src/exams/landing.js` | Render repeated instrument, method, and research structures |
-| Localization | `src/i18n.js`, `src/i18n/message-ids.js`, `src/i18n/catalog-audit.js`, `src/locales/` | Load one catalog, translate stable shared IDs and legacy source-keyed prose, apply locale metadata, and report catalog drift |
+| Localization | `src/i18n.js`, `src/i18n/message-ids.js`, `src/i18n/catalog-audit.js`, `src/locales/` | Generate coordinated locale rows, load one catalog, translate stable shared IDs and source-keyed prose, apply locale metadata, and report catalog drift |
 | Static generator | `scripts/generate-static-pages.mjs` | Produce localized discovery HTML, metadata, sitemap, crawler files, and the 404 page |
 | Local journal | `src/lib/journal.js`, `src/journal.js` | Validate, store, compare, import, export, and render structured runs |
 | Anonymous metrics | `src/metrics.js`, `functions/api/metric.js` | Allowlist client events and increment daily aggregate counts |
@@ -108,26 +111,30 @@ partially registered experiment fails early.
 
 ## Quality gates
 
-`npm run check` is the release gate. It covers formatting, strict typed
-JavaScript, locale-catalog integrity, unit coverage, production build, static
-output, browser journeys, responsive layouts, and accessibility. Chromium and
+`npm run check` is the behavioral release gate. It covers formatting, strict
+typed JavaScript, locale-catalog integrity, unit coverage, production build,
+static output, browser journeys, responsive layouts, and accessibility.
+`npm run check:release` adds generated HTML, internal-link, and production-site
+audits. Chromium and
 the mobile Chromium profile run the complete journey suite. A full Screen
 Colour Lab result journey and active-run invalidation also run in Firefox and
 WebKit as the selected compatibility paths.
 
 The type gate automatically includes every module under `src/lib/`,
-`src/exams/views/`, `src/i18n/`, and `src/locales/`, plus named shared runtime
-boundaries and controller declarations. The ratchet fails if the configuration
-omits a strict file. It also rejects type-suppression comments and explicit
-JSDoc `any`. `noUncheckedIndexedAccess` requires fixed tuples or explicit
-handling for array, record, regular-expression, and other indexed lookups.
+`src/exams/results/`, `src/exams/views/`, `src/i18n/`, and `src/locales/`, plus
+named shared runtime boundaries and controller declarations. The ratchet fails
+if the configuration omits a strict file. It also rejects type-suppression
+comments and explicit JSDoc `any`. `noUncheckedIndexedAccess` requires fixed
+tuples or explicit handling for array, record, regular-expression, and other
+indexed lookups.
 Values crossing browser and storage boundaries still require runtime
 validation.
 
-CI gives the release gate ten minutes. Crossing that ceiling is a signal to
-shard the Playwright workload rather than silently accepting a slower feedback
-loop. Dependency installation and Pages publication sit outside that measured
-verification window.
+CI runs browser projects first, then one release job creates `dist/`, stamps the
+commit in `build-meta.json`, writes and verifies a SHA-256 manifest, and audits
+the production site. When deployment is enabled, that same job publishes its
+verified working tree without rebuilding it. This keeps artifact identity exact
+without depending on account-wide artifact storage.
 
 Raw bundle ceilings are:
 
@@ -136,19 +143,22 @@ Raw bundle ceilings are:
 - each route style sheet: 40 kB; and
 - entry CSS plus the largest route style sheet: 150 kB.
 
-The static-output test discovers generated route style sheets instead of keeping
-a filename allowlist.
+The static-output test traverses the Vite manifest for the full initial locale
+graph, discovers generated route style sheets instead of keeping a filename
+allowlist, and verifies the Cloudflare headers and function-routing contract.
 
 ## Known pressure points
 
 Experiment controllers still contain substantial unchecked phase-specific
 event orchestration. The type gate checks their public `mount(context)`
-contract, and the Tetracromia domain session now models discrimination and
-sequence trials as separate guarded states. Acutezza's intro and Tetracromia's
-home view establish the incremental pattern: don't add a suite-wide base
-controller. When you change one phase, extract its pure markup or state
-transition behind a small typed interface and keep the measurement behavior
-covered.
+contract, the cognitive-complexity gate rejects functions above 28, and the
+maintainability test prevents known large controllers and style sheets from
+growing beyond their decomposition ceilings. Acutezza's intro, the strict
+result-schema boundary, and Tetracromia's extracted views and event handlers
+establish the incremental pattern: don't add a suite-wide base controller.
+When you change one phase, extract its pure markup, result schema, or state
+transition behind a small typed interface and keep measurement behavior
+covered. The ordered controller backlog lives in `roadmap.md`.
 
 Legacy localization uses English source prose as catalog keys. Stable IDs now
 cover reusable controls and safety boundaries. `npm run locales:check` reports
@@ -169,14 +179,16 @@ when expanding the color lab.
 
 ## Delivery environments
 
-Every same-repository pull request first passes the complete release gate and
-then publishes that exact `dist/` directory to a stable Cloudflare Pages branch
-preview. CI smoke-tests the real preview URL, including substantive localized
-HTML, `X-Robots-Tag: noindex`, and a closed metrics endpoint. Fork pull requests
-run verification without receiving deployment credentials or a preview.
+Every same-repository pull request first passes the browser matrix and complete
+release gate, then publishes the checksummed working tree to a stable Cloudflare
+Pages branch preview. CI smoke-tests the real preview URL, including substantive
+localized HTML, `X-Robots-Tag: noindex`, and a closed metrics endpoint. Fork
+pull requests run verification without receiving deployment credentials or a
+preview.
 
 Production remains `https://sense6.net`. Both the client and the Pages Function
 require that exact origin before writing an anonymous metric, so Pages project
 URLs and branch previews cannot contaminate production counts. A push to `main`
-repeats the release gate and publishes the verified bundle to the production
-branch.
+repeats verification, publishes the same checksummed bundle to the production
+branch, and confirms the live `build-meta.json` commit plus the read-only site
+contract.

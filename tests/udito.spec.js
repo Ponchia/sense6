@@ -318,6 +318,135 @@ test('audio-clock interruption keeps the gate closed and persistent playback fai
   await expect(page.getByRole('heading', { name: /Listen for the boundary/i })).toBeVisible();
 });
 
+test('navigation during every Udito playback stage leaves no stale continuation', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Single-browser lifecycle regression');
+  await page.addInitScript(
+    (configuration) => {
+      window.__SENSE6_TEST_CONFIG__ = configuration;
+    },
+    {
+      udito: {
+        feedbackMs: 20,
+        audio: { toneMs: 350, gapMs: 30, rampMs: 8, referenceMs: 800 },
+        headphones: { practiceTrials: 1, scoredTrials: 1, passCorrect: 1 },
+        range: { targetReversals: 0, minTrials: 1, maxTrials: 1, controlAt: [] },
+        pitch: { targetReversals: 0, minTrials: 1, maxTrials: 1 },
+      },
+    },
+  );
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+
+  for (const stage of ['reference', 'anchors', 'trial']) {
+    await page.goto('/en/udito/');
+    await page.locator('[data-action="au-setup"]').click();
+
+    if (stage === 'reference') {
+      await page.locator('[data-action="au-reference"]').click();
+      await expect(page.locator('[data-action="au-reference"]')).toContainText('Playing');
+    } else {
+      await page.locator('[data-action="au-reference"]').click();
+      await expect(page.locator('[data-au-reference-status]')).toContainText(
+        'Reference completed on the audio clock',
+      );
+      await page.locator('[data-action="au-anchors"]').click();
+      if (stage === 'anchors') {
+        await expect(page.locator('[data-au-anchor-status]')).toContainText('Playing');
+      } else {
+        await expect(page.locator('[data-au-anchors-confirmed]')).toBeEnabled();
+        await page.locator('[data-au-anchors-confirmed]').check();
+        await page.locator('[data-au-consent]').check();
+        await page.locator('[data-action="au-start"]').click();
+        await page.locator('[data-action="au-begin-stage"]').click();
+        await expect(page.locator('[data-au-status]')).toHaveText(/Listen|Sound 1/);
+        page.once('dialog', (dialog) => dialog.accept());
+      }
+    }
+
+    await page.locator('.brand').click();
+    await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  }
+
+  expect(pageErrors).toEqual([]);
+});
+
+test('a superseded Udito mount cannot alter the replacement mount', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Single-browser lifecycle regression');
+  await page.addInitScript(
+    (configuration) => {
+      window.__SENSE6_TEST_CONFIG__ = configuration;
+    },
+    {
+      udito: {
+        audio: { toneMs: 50, gapMs: 10, rampMs: 4, referenceMs: 800 },
+      },
+    },
+  );
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  await page.goto('/en/udito/');
+  await page.locator('[data-action="au-setup"]').click();
+  await page.locator('[data-action="au-reference"]').click();
+  await expect(page.locator('[data-action="au-reference"]')).toContainText('Playing');
+
+  await page.evaluate(async () => {
+    const { mount } = await import('/src/exams/udito.js');
+    window.__disposeRapidUditoMount = mount({
+      app: document.querySelector('#app'),
+      announcer: document.querySelector('#announcer'),
+      locale: 'en',
+      navigate() {},
+      navigateHome() {},
+    });
+    document.querySelector('[data-action="au-setup"]').click();
+    document.querySelector('[data-action="au-reference"]').click();
+  });
+
+  await expect(page.locator('[data-au-reference-status]')).toContainText(
+    'Reference completed on the audio clock',
+  );
+  await expect(page.getByText('The reference sound did not complete.', { exact: true })).toHaveCount(0);
+  expect(pageErrors).toEqual([]);
+  await page.evaluate(() => window.__disposeRapidUditoMount());
+});
+
+test('Udito accepts its existing latest-result shape and rejects malformed records', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Single-browser storage validation');
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'sense6:udito:last',
+      JSON.stringify({
+        setupQuality: 'Setup checks coherent',
+        sampleRate: 48_000,
+        recordedAt: 1_721_000_000_000,
+      }),
+    );
+  });
+  await page.goto('/en/udito/');
+  await expect(page.locator('.previous-score')).toContainText('Setup checks coherent');
+
+  await page.evaluate(() => {
+    localStorage.setItem(
+      'sense6:udito:last',
+      JSON.stringify({
+        format: 'sense6-result',
+        schemaVersion: 1,
+        payload: {
+          setupQuality: '<img src=x onerror=alert(1)>',
+          sampleRate: '48000',
+          recordedAt: null,
+        },
+      }),
+    );
+  });
+  await page.reload();
+  await expect(page.locator('.previous-score')).toHaveCount(0);
+});
+
 test('visibility changes replay only uncommitted trials and advance after committed feedback', async ({
   page,
 }, testInfo) => {

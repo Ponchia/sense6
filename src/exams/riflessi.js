@@ -19,7 +19,7 @@ import { protocolPassport } from './protocols.js';
 import { sourcesFor } from './sources.js';
 
 const STORAGE_KEY = 'sense6:riflessi:last';
-const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isRecord });
+const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isLatestRiflessiResult });
 const MOUNT_OWNER = Symbol('riflessi');
 const INSTRUMENTS = {
   signal: {
@@ -674,8 +674,8 @@ function renderResults() {
     timing: timing.label,
     recordedAt: Date.now(),
   };
-  saveLast(stored);
-  saveJournalResult(result, timing);
+  const lastResultSaved = saveLast(stored);
+  const journalSaved = saveJournalResult(result, timing);
   state.session.result = result;
 
   state.app.innerHTML = `
@@ -689,6 +689,8 @@ function renderResults() {
         </div>
         <div class="rx-results__stamp ${result.usable ? '' : 'is-limited'}"><span>${result.usable ? 'Run usable' : 'Limited run'}</span><strong>${String(scopeInstrumentCount(state.session.scope)).padStart(2, '0')} / 03</strong></div>
       </header>
+
+      ${persistenceStatus(lastResultSaved, journalSaved)}
 
       <div class="rx-result-grid">
         ${metricCard('01', t('Typical signal response'), metric(result.signal.medianMs), 'ms', t('Median of {valid} clean simple responses from {scheduled} scheduled events. Within-run spread: {spread} ms; this is not estimate uncertainty.', { valid: result.signal.valid, scheduled: result.signal.scheduled, spread: metric(result.signal.withinRunSpreadMs) }))}
@@ -728,8 +730,11 @@ function renderResults() {
       </aside>
 
       <div class="ui-cluster rx-results__actions">
-        <button class="ui-button" type="button" data-action="rx-restart">${t('Repeat this scope independently')}</button>
-        <button class="ui-button ui-button--ghost" type="button" data-action="rx-copy">${resultActionLabel(t)}</button>
+        ${
+          lastResultSaved && journalSaved
+            ? `<button class="ui-button" type="button" data-action="rx-restart">${t('Repeat this scope independently')}</button><button class="ui-button ui-button--ghost" type="button" data-action="rx-copy">${resultActionLabel(t)}</button>`
+            : `<button class="ui-button" type="button" data-action="rx-copy">${resultActionLabel(t)}</button><button class="ui-button ui-button--ghost" type="button" data-action="rx-restart">${t('Repeat this scope independently')}</button>`
+        }
       </div>
     </section>
   `;
@@ -740,6 +745,11 @@ function metricCard(index, label, value, unit, copy) {
   return `<article class="rx-metric">
     <div><span>${index}</span><p>${label}</p></div><strong>${value}<small>${unit}</small></strong><p>${copy}</p>
   </article>`;
+}
+
+function persistenceStatus(lastResultSaved, journalSaved) {
+  if (lastResultSaved && journalSaved) return '';
+  return `<div class="ui-alert ui-alert--danger rx-persistence-status" data-rx-persistence-status role="alert"><strong class="ui-alert__title">${t('The result is ready, but this browser did not allow local storage.')}</strong></div>`;
 }
 
 /** @param {'signal' | 'signal-choice' | 'complete'} scope */
@@ -1086,10 +1096,6 @@ function eventTimestamp(event) {
   return Number.isFinite(event.timeStamp) && Math.abs(event.timeStamp - now) < 60_000 ? event.timeStamp : now;
 }
 
-function announce(message) {
-  if (state.announcer) state.announcer.textContent = t(message);
-}
-
 function stopClocks() {
   clearTrialClocks();
   window.clearTimeout(state.deadlineId);
@@ -1115,9 +1121,7 @@ function runtimeConfig() {
 }
 
 function saveLast(result) {
-  if (!RESULT_STORE.save(result)) {
-    announce('The result is ready, but this browser did not allow local storage.');
-  }
+  return RESULT_STORE.save(result);
 }
 
 function saveJournalResult(result, timing) {
@@ -1170,9 +1174,42 @@ function saveJournalResult(result, timing) {
     ],
     notes: result.usable ? ['device-relative-custom-tasks'] : ['limited-run', ...result.qualityReasons],
   });
-  if (entry) appendJournalEntry(entry);
+  return Boolean(entry && appendJournalEntry(entry));
 }
 
 function loadLast() {
   return RESULT_STORE.load();
+}
+
+/** @param {unknown} value */
+function isLatestRiflessiResult(value) {
+  if (
+    !isRecord(value) ||
+    !['keyboard', 'pointer'].includes(value.inputMode) ||
+    typeof value.timing !== 'string' ||
+    value.timing.length === 0 ||
+    !Number.isFinite(value.recordedAt) ||
+    typeof value.usable !== 'boolean'
+  ) {
+    return false;
+  }
+  if (!isCommonResultMetric(value.signal) || !isCommonResultMetric(value.choice)) return false;
+  if (!isCommonResultMetric(value.stability) || !isRecord(value.events)) return false;
+  return ['falseStarts', 'anticipations', 'misses', 'wrongChoices'].every((field) =>
+    isNonNegativeInteger(value.events[field]),
+  );
+}
+
+/** @param {unknown} value */
+function isCommonResultMetric(value) {
+  return (
+    isRecord(value) &&
+    (value.medianMs === null || Number.isFinite(value.medianMs)) &&
+    isNonNegativeInteger(value.valid)
+  );
+}
+
+/** @param {unknown} value */
+function isNonNegativeInteger(value) {
+  return Number.isInteger(value) && Number(value) >= 0;
 }

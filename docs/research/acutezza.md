@@ -6,6 +6,8 @@
 Status: historical design rationale; the cross-test audit is the current
 protocol decision, 2026-07-20
 
+Lifecycle: archive
+
 Update, 2026-07-20: this brief records the design that preceded implementation.
 The later cross-test [evidence and product
 audit](five-test-evidence-and-product-audit.md) is the current decision source

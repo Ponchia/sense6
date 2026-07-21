@@ -1,5 +1,5 @@
 /* Tetracromia-owned presentation and phase styles. */
-.hero {
+.tetracromia-hero {
   align-items: center;
   display: grid;
   gap: var(--s6-space-layout);
@@ -8,28 +8,28 @@
   padding-block: var(--s6-space-hero);
 }
 
-.hero__copy {
+.tetracromia-hero__copy {
   max-inline-size: 50rem;
   min-inline-size: 0;
 }
 
-.hero h1 em {
+.tetracromia-hero h1 em {
   color: var(--accent-text);
   font-style: normal;
 }
 
-.hero__lede {
+.tetracromia-hero__lede {
   color: var(--text-soft);
   font-size: clamp(1.15rem, 2vw, 1.55rem);
   line-height: 1.45;
   max-inline-size: 37rem;
 }
 
-.hero__actions {
+.tetracromia-hero__actions {
   margin-block-start: 2rem;
 }
 
-.hero__instrument {
+.tetracromia-hero__instrument {
   aspect-ratio: 1;
   inline-size: min(100%, 36rem);
   justify-self: center;
@@ -37,8 +37,8 @@
   position: relative;
 }
 
-.hero__instrument::before,
-.hero__instrument::after {
+.tetracromia-hero__instrument::before,
+.tetracromia-hero__instrument::after {
   border: 1px solid var(--line);
   content: "";
   inset: 4%;
@@ -46,7 +46,7 @@
   transform: rotate(45deg);
 }
 
-.hero__instrument::after {
+.tetracromia-hero__instrument::after {
   border-color: var(--line-strong);
   inset: 14%;
 }
@@ -287,7 +287,16 @@
 
 @media (forced-colors: active) {
   .tetracromia-forced-colors-warning {
-    display: block;
+    display: flex;
+  }
+
+  .color-tile,
+  .field-choice,
+  .sequence-anchor,
+  .sequence-tile,
+  .calibration-steps > span,
+  .calibration-gradient {
+    forced-color-adjust: none;
   }
 }
 
@@ -699,6 +708,10 @@
   background: var(--panel);
 }
 
+.tetracromia-journal-status {
+  margin-block: 2rem;
+}
+
 .result-metric {
   border-block-end: 1px solid var(--line);
   padding: clamp(1.5rem, 4vw, 2.5rem);
@@ -762,11 +775,11 @@
 }
 
 @media (max-width: 900px) {
-  .hero {
+  .tetracromia-hero {
     padding-block: 5rem;
   }
 
-  .hero__instrument {
+  .tetracromia-hero__instrument {
     inline-size: min(100%, 82vw, 31rem);
   }
 
@@ -804,18 +817,18 @@
 }
 
 @media (max-width: 640px) {
-  .hero {
+  .tetracromia-hero {
     gap: 3rem;
     grid-template-columns: 1fr;
     min-block-size: 0;
     padding-block: 4rem 3rem;
   }
 
-  .hero__actions > * {
+  .tetracromia-hero__actions > * {
     inline-size: 100%;
   }
 
-  .hero__instrument {
+  .tetracromia-hero__instrument {
     inline-size: min(100%, 86vw, 25rem);
   }
 

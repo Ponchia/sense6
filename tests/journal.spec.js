@@ -64,6 +64,50 @@ test('the added locales render portable journal entries without fallback or over
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
+test('a deferred journal file read cannot write or render after route disposal', async ({ page }) => {
+  await page.goto('/en/journal/');
+  await expect(page.locator('[data-journal-import]')).toBeAttached();
+  const before = await page.evaluate(() => localStorage.getItem('sense6:journal'));
+  const importedJournal = JSON.stringify({
+    format: 'sense6-journal',
+    schemaVersion: 1,
+    entries: [run('deferred-import', '2026-07-20T12:00:00.000Z', 76)],
+  });
+
+  await page.evaluate((source) => {
+    let resolveText;
+    const pendingText = new Promise((resolve) => {
+      resolveText = resolve;
+    });
+    const file = new File([source], 'journal.json', { type: 'application/json' });
+    Object.defineProperty(file, 'text', {
+      value: () => {
+        window.__deferredJournalTextStarted = true;
+        return pendingText;
+      },
+    });
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    const input = document.querySelector('[data-journal-import]');
+    Object.defineProperty(input, 'files', { configurable: true, value: transfer.files });
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+    window.__resolveDeferredJournalText = async () => {
+      resolveText(source);
+      await pendingText;
+      await Promise.resolve();
+    };
+  }, importedJournal);
+  await expect.poll(() => page.evaluate(() => window.__deferredJournalTextStarted)).toBe(true);
+
+  await page.locator('.journal-view .back-link').click();
+  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await page.evaluate(() => window.__resolveDeferredJournalText());
+
+  expect(await page.evaluate(() => localStorage.getItem('sense6:journal'))).toBe(before);
+  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.locator('[data-journal-entry="deferred-import"]')).toHaveCount(0);
+});
+
 function run(id, recordedAt, value) {
   return {
     id,

@@ -49,7 +49,7 @@ test('route-owned CSS stays deterministic after cross-route navigation', async (
   await page.locator('.brand').click();
   await expect(page.locator('[data-sense6-view="gallery"]')).toBeVisible();
   await page.locator('[data-sense6-route="tetracromia"]').first().click();
-  await expect(page.locator('.hero')).toBeVisible();
+  await expect(page.locator('.tetracromia-hero')).toBeVisible();
 
   expect(await page.locator('body').evaluate((body) => body.classList.contains('cb-active'))).toBe(false);
   const leakingSelectors = await page.evaluate(() => {

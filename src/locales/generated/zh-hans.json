@@ -1,0 +1,246 @@
+[
+  ["Screen Colour Lab", "屏幕色彩实验室"],
+  ["Three short colour observations", "三项简短的色彩观察"],
+  [
+    "Tetracromia is a recreational screen-colour lab with three separate, short-run observations and no overall score.",
+    "Tetracromia 是一项娱乐性的屏幕色彩实验，包含三项相互独立的短时观察，不提供总分。"
+  ],
+  ["Fixed 29-block dose", "固定 29 个区块"],
+  ["3 separate observations", "3 项独立观察"],
+  ["Screen Colour Lab — Tetracromia | Sense6", "屏幕色彩实验室 — Tetracromia | Sense6"],
+  ["Calibrated sharpness & nominal contrast", "校准后的视敏度与标称对比度"],
+  [
+    "Two per-eye conditions describe angular detail and nominal low-contrast cost without making a clinical claim.",
+    "每只眼睛采用两种条件来描述角度细节和标称低对比度的影响，不作临床结论。"
+  ],
+  ["2 per-eye conditions", "每眼 2 种条件"],
+  ["Adaptive levels", "自适应水平"],
+  ["Response speed, choice task & consistency", "反应速度、选择任务与一致性"],
+  [
+    "Three instruments keep simple response, a choice task, and within-run stability as separate observations.",
+    "三项工具将简单反应、选择任务和单次运行中的稳定性作为彼此独立的观察。"
+  ],
+  ["Notice colour in", "用"],
+  ["three different ways", "三种不同方式观察色彩"],
+  ["Three observations from one short screen-colour run.", "一次简短屏幕色彩运行中的三项观察。"],
+  ["Tile choices", "色块选择"],
+  ["Dot-field choices", "点阵区域选择"],
+  ["Hue ordering", "色相排序"],
+  ["Complete set", "完整组合"],
+  ["Riflessi — device-relative response observations", "Riflessi — 与设备相关的反应观察"],
+  ["Udito — device-relative listening observations", "Udito — 与设备相关的听觉观察"],
+  ["Acutezza — calibrated sharpness observations", "Acutezza — 校准后的敏锐度观察"],
+  [
+    "The setup checks and adaptive tracks produced coherent run-level observations.",
+    "设置检查和自适应轨迹为本次运行产生了相互一致的观察。"
+  ],
+  ["Method source", "方法来源"],
+  ["Related instrument", "相关工具"],
+  ["Sense6 validation", "Sense6 验证"],
+  ["Share result", "分享结果"],
+  ["How much do you want to run?", "你希望测试进行到什么程度？"],
+  ["about 2 minutes", "约2分钟"],
+  ["about 4 minutes", "约4分钟"],
+  ["about 7 minutes", "约7分钟"],
+  ["Physical setup", "身体与设备摆放"],
+  ["Seated · device on a stable surface", "坐姿 · 设备放在稳定表面上"],
+  ["Handheld or standing", "手持设备或站立"],
+  ["Begin selected scope", "开始所选范围"],
+  ["Your response observations — Riflessi | Sense6", "你的反应观察 — Riflessi | Sense6"],
+  [
+    "The selected instruments captured enough clean responses for separate run-level observations.",
+    "所选测量项目收集到了足够的有效反应，可分别呈现本次运行的观察结果。"
+  ],
+  [
+    "Median of {valid} clean simple responses from {scheduled} scheduled events. Within-run spread: {spread} ms; this is not estimate uncertainty.",
+    "在计划的{scheduled}个事件中，{valid}个有效简单反应的中位数。运行内离散程度：{spread}毫秒；这不是估计值的不确定度。"
+  ],
+  [
+    "{scheduledAccuracy}% correct across all {scheduled} scheduled choices; {conditionalAccuracy}% among left/right responses.",
+    "在全部{scheduled}个计划选择中，正确率为{scheduledAccuracy}%；在左/右反应中，正确率为{conditionalAccuracy}%。"
+  ],
+  ["Descriptive block difference", "区块间的描述性差值"],
+  [
+    "Choice-block median minus the earlier simple-response median. Fixed order and different motor responses remain confounded.",
+    "选择区块中位数减去先前简单反应中位数。固定顺序和不同动作反应的影响仍然混杂。"
+  ],
+  ["Median of {valid} clean responses across this custom sustained block.", "此自定义持续区块中{valid}个有效反应的中位数。"],
+  [
+    "A descriptive slow-tail difference for this custom block—not a PVT lapse count.",
+    "此自定义区块慢反应尾部的描述性差值，并非PVT疏漏次数。"
+  ],
+  ["No-signal checks", "无信号检查"],
+  ["Repeat this scope independently", "独立重复此范围"],
+  ["Controls passed", "控制检查通过"],
+  ["Control caution", "控制检查需谨慎"],
+  ["Controls not passed", "控制检查未通过"],
+  ["correct / scheduled", "正确 / 计划"],
+  ["Ending adaptive level", "最终自适应水平"],
+  ["Correct / scheduled", "正确 / 计划"],
+  [
+    "{correct} of {total} scheduled high-contrast gap controls were answered correctly.",
+    "计划的{total}个高对比度缺口控制检查中，有{correct}个回答正确。"
+  ],
+  ["Keep these observations only with a control caution.", "仅在标注控制检查需谨慎的情况下保留这些观察。"],
+  ["Display-relative adaptive levels from this run", "本次运行的屏幕相对最终自适应水平"],
+  ["Display-relative observations with a control caution", "控制检查需谨慎的屏幕相对观察"],
+  [
+    "Lower values mean the short adaptive track ended at a smaller colour shift in that direction on this display. These are not precise thresholds, cone measurements, clinical scores, or diagnoses.",
+    "值越低，表示在此屏幕的该方向上，短程自适应轨迹在更小的颜色差异处结束。这些结果不是精确阈值、视锥细胞测量、临床评分或诊断。"
+  ],
+  [
+    "Two of three high-contrast task controls passed. The observations are retained with a caution, but should not be treated as a strong run.",
+    "三个高对比度任务控制检查中有两个通过。观察结果会保留并标注谨慎，但不应视为一次可靠的运行。"
+  ],
+  [
+    "Fewer than two high-contrast task controls passed, so the adaptive levels are not treated as usable. Check the instructions and viewing setup, then try again.",
+    "通过的高对比度任务控制检查少于两个，因此这些自适应水平不视为可用。请检查说明和观看设置后重试。"
+  ],
+  ["Focused", "精简"],
+  ["Standard", "标准"],
+  ["Cuffie + Portata · about 3–4 minutes", "Cuffie + Portata · 约3–4分钟"],
+  ["All three instruments · about 5–7 minutes", "全部三个测量项目 · 约5–7分钟"],
+  ["Two focused listening measures.", "两项精简听觉测量。"],
+  [
+    "Keep the tasks separate. This fixed 29-block experiment is too short to establish a stable threshold, stable hue characteristic, or overall ability score.",
+    "请将各项任务分开理解。这项固定29区块实验太短，无法确定稳定阈值、稳定色相特征或总体能力评分。"
+  ],
+  ["blocks", "区块"],
+  ["{correct} of {presentations} correct", "{presentations}次中{correct}次正确"],
+  [
+    "The adaptive level ended near {level}° of OKLCH hue (ΔEOK {delta}).",
+    "自适应水平在OKLCH色相约{level}°（ΔEOK {delta}）处结束。"
+  ],
+  [
+    "Presented range {minimum}°–{maximum}° · {reversals} direction changes",
+    "呈现范围 {minimum}°–{maximum}° · 方向变化 {reversals} 次"
+  ],
+  ["{percent}% of pairs ordered", "{percent}%的配对顺序正确"],
+  ["Mean pair ordering across {runs} fixed-anchor arcs.", "在{runs}个固定锚点弧段上的平均配对顺序。"],
+  ["Run values: {values}%", "各次运行值：{values}%"],
+  [
+    "The ending adaptive levels summarize where this brief run happened to finish; they are not stable thresholds or uncertainty estimates. Ordering is a separate task. None of these observations is a population score, diagnosis, clinical screen, or evidence for tetrachromacy. A repeat is stored independently—Sense6 never pools runs or keeps a best.",
+    "最终自适应水平仅概括这次短时运行结束的位置；它们不是稳定阈值或不确定度估计。排序是另一项独立任务。这些观察都不是人群评分、诊断、临床筛查或四色视觉的证据。每次重复都会独立保存；Sense6不会合并多次运行，也不会保留最佳值。"
+  ],
+  ["Repeat independently", "独立重复"],
+  ["29 completed blocks", "已完成29个区块"],
+  ["Completed", "已完成"],
+  ["Screen Colour Lab / 29 blocks / about 4 minutes", "屏幕色彩实验室 / 29个区块 / 约4分钟"],
+  [
+    "Tetracromia is a short recreational experiment: 14 tile choices, 12 dot-field choices, and 3 ordering arcs. Each observation stays separate.",
+    "Tetracromia 是一项简短的娱乐性实验：14次色块选择、12次点阵选择和3段排序弧。每项观察结果都会单独呈现。"
+  ],
+  ["Three short screen-colour observations.", "三项简短的屏幕色彩观察。"],
+  ["14 trials", "14次试验"],
+  ["12 trials", "12次试验"],
+  ["Dot fields", "点阵"],
+  ["3 runs", "3次测量"],
+  ["The displayed difference adapts during two tasks.", "显示的差异会在两项任务中自适应变化。"],
+  [
+    "Tile choices and Dot fields use a two-correct-down, one-error-up rule. With only 14 and 12 choices, the ending level describes this run; it is not a stable threshold.",
+    "色块选择和点阵使用答对两次减小差异、答错一次增大差异的规则。由于分别只有14次和12次选择，最终水平只描述本次测量，并不是稳定阈值。"
+  ],
+  ["Adaptive path", "自适应过程"],
+  ["Correct and missed choices change the next displayed difference.", "正确和错误选择会改变下一次显示的差异。"],
+  [
+    "Three observations describe this screen, light, fatigue level, and run—with no composite.",
+    "三项观察描述当前屏幕、光线、疲劳程度和本次测量，不会合成总分。"
+  ],
+  ["Make three colour observations.", "完成三项色彩观察。"],
+  [
+    "A C-shaped target becomes harder to separate from its field. Three independent staircases record where each short display-relative track ends during this run.",
+    "C形视标会逐渐变得更难与背景区分。三条独立阶梯记录本次测量中各条屏幕相对轨迹的结束位置。"
+  ],
+  ["Three display directions", "屏幕上的三个色彩方向"],
+  [
+    "You receive ending adaptive levels and track evidence, not cone thresholds, a normal/deficient label, or a clinical score.",
+    "你会获得最终自适应水平和轨迹记录，而不是视锥细胞阈值、正常/缺陷标签或临床评分。"
+  ],
+  [
+    "Two clear targets teach the C-gap interaction with immediate feedback before the exploratory track.",
+    "探索轨迹开始前，两个清晰视标会通过即时反馈教你如何选择C形缺口。"
+  ],
+  [
+    "Target and field are luminance-matched in linear sRGB and share the same dot-level brightness variation.",
+    "视标与背景在线性sRGB中匹配亮度，并采用相同的逐点亮度变化。"
+  ],
+  [
+    "Directions become harder after correct responses. “No gap visible” counts as a miss and makes that display direction easier.",
+    "答对后方向辨别会变难。“看不到缺口”按错误作答处理，并使该屏幕方向变得更容易。"
+  ],
+  ["Signal", "信号"],
+  ["ready", "准备就绪"],
+  [
+    "A left or right arrow appears. Respond on the matching side. The block median can be described alongside Segnale, with fixed-order and motor differences left explicit.",
+    "出现左箭头或右箭头时，请在相应一侧作答。该区块的中位数可以与Segnale并列描述，但固定顺序和动作差异会明确保留。"
+  ],
+  ["Custom sustained block", "自定义持续反应区块"],
+  [
+    "A three-minute sequence describes changes within this run. PVT-B is a comparator, not validation of this different event schedule.",
+    "三分钟序列用于描述本次测量中的变化。PVT-B只是比较参照，并不验证这一不同的事件安排。"
+  ],
+  [
+    "One of three intervals contains a tone. Its frequency adapts to find the upper boundary available in this run, on this device, while you report keeping volume unchanged.",
+    "三个时段中有一个包含声音。在你确认音量保持不变的情况下，频率会自适应变化，以寻找本次测量和当前设备可达到的上限。"
+  ],
+  ["Udito listening lab ready.", "Udito听觉实验室已准备就绪。"],
+  ["Vision lab / selectable scope / about 4–8 minutes", "视力实验室 / 可选范围 / 约4–8分钟"],
+  [
+    "Acutezza describes angular detail for each eye and, in Standard scope, the within-run cost of a nominal low-contrast condition. Meridiani scoring is suspended. This is a perception experiment, not an eye examination.",
+    "Acutezza描述每只眼睛的角度细节分辨能力；在标准范围中，还描述标称低对比度条件在本次测量内带来的影响。Meridiani评分已暂停。这是一项知觉实验，不是眼科检查。"
+  ],
+  ["Two conditions. No composite score.", "两种条件。不合成总分。"],
+  [
+    "High-contrast detail and nominal low-contrast cost remain separate. The former Meridiani score is suspended pending redesign and pilot evidence.",
+    "高对比度细节与标称低对比度的影响会分开呈现。原Meridiani评分已暂停，等待重新设计和初步研究数据。"
+  ],
+  ["Audio setup ready. Play the maximum-level reference before beginning.", "音频设置已准备就绪。开始前请播放最高电平参考音。"],
+  ["{name} instructions ready.", "{name}说明已准备就绪。"],
+  ["{name} sound runner ready.", "{name}声音测试已准备就绪。"],
+  ["Cuffie practice complete.", "Cuffie练习已完成。"],
+  ["{name} complete.", "{name}测量已完成。"],
+  ["Confirm whether device volume stayed unchanged during the run.", "请确认本次测量期间设备音量是否保持不变。"],
+  ["Udito results ready. {quality}. Saved to the private journal.", "Udito结果已准备就绪。{quality}。已保存到私人记录。"],
+  ["Udito results ready. {quality}. The journal entry was not saved.", "Udito结果已准备就绪。{quality}。记录条目未保存。"],
+  ["Listening paused. {explanation}", "听觉测试已暂停。{explanation}"],
+  ["Set the room before the observations.", "观察前请先准备好周围环境。"],
+  [
+    "Display settings and ambient light can change what appears visible. This one-minute check makes the 29-block run easier to repeat under similar conditions.",
+    "显示设置和环境光会改变可见效果。这项一分钟检查可帮助你在相似条件下重复完成29个区块。"
+  ],
+  ["Color override detected", "检测到颜色显示覆盖"],
+  ["Turn off forced-colors or high-contrast mode before a visual color task.", "开始视觉色彩任务前，请关闭强制颜色或高对比度模式。"],
+  ["Eleven brightness steps from black to white", "从黑到白的11级亮度"],
+  ["Continuous grayscale gradient", "连续灰度渐变"],
+  [
+    "The adaptive track only describes this browser, display, lighting, and viewing position. Colour-shifting features can move them substantially.",
+    "自适应轨迹只描述当前浏览器、屏幕、光线和观看位置。改变色彩的功能可能明显影响结果。"
+  ],
+  ["Colour override detected", "检测到颜色显示覆盖"],
+  ["Audio setup / keep volume unchanged after this screen", "音频设置 / 离开此屏幕后不要改变音量"],
+  ["Sound sensitivity comes first.", "请优先考虑对声音的不适。"],
+  [
+    "If you have tinnitus, hyperacusis, or sounds are uncomfortable today, skip the experiment or stop immediately. Sense6 cannot measure sound pressure.",
+    "如果你有耳鸣或听觉过敏，或今天对声音感到不适，请跳过实验或立即停止。Sense6无法测量声压。"
+  ],
+  ["Play maximum-level reference", "播放最高电平参考音"],
+  [
+    "Start device volume low before playing. This 1 kHz preview represents the loudest digital level used later; it does not measure acoustic output.",
+    "播放前请将设备音量调低。这段1 kHz试听音代表之后使用的最高数字电平；它不会测量实际声学输出。"
+  ],
+  ["Connection", "连接"],
+  ["Wired", "有线"],
+  ["Wireless / Bluetooth", "无线 / Bluetooth"],
+  ["Built-in / assistive route", "内置 / 辅助设备路径"],
+  ["Play 200 Hz, 500 Hz, and 2 kHz audibility anchors", "播放200 Hz、500 Hz和2 kHz可听性参考音"],
+  [
+    "Confirm that all three are audible at the same comfortable volume. This is a self-report gate, not calibration.",
+    "请确认三个声音都能以相同的舒适音量听到。这是自我报告检查，并非校准。"
+  ],
+  ["I heard all three anchors comfortably without changing volume.", "我在没有改变音量的情况下舒适地听到了三个参考音。"],
+  ["Choose this run's scope", "选择本次测量范围"],
+  ["Focused Sharpness", "仅测清晰度"],
+  ["24 interactions per eye", "每只眼24次操作"],
+  ["Sharpness + nominal contrast", "清晰度 + 标称对比度"],
+  ["44 interactions per eye", "每只眼44次操作"]
+]

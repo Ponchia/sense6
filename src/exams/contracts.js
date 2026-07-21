@@ -9,7 +9,6 @@
 /** @typedef {{ field: string, cautionRatio: number, hardRatio: number }} DistanceTolerance */
 /** @typedef {{ hard: readonly string[], caution: readonly string[], alwaysCaution: readonly string[], distanceTolerance?: Readonly<DistanceTolerance> }} JournalPolicy */
 /** @typedef {{ id: ExamId, metricTest: string, journal: Readonly<JournalPolicy> }} ExamContract */
-
 /** @param {ExamContract} contract @returns {Readonly<ExamContract>} */
 function defineContract(contract) {
   const distanceTolerance = contract.journal.distanceTolerance

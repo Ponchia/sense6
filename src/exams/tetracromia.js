@@ -40,6 +40,8 @@ export function mount(context) {
     responseUnlockTimer: 0,
     transitionFrame: 0,
     fieldRedrawFrame: 0,
+    announcementFrame: 0,
+    dragReleaseTimer: 0,
     measurementEnvironment: null,
   };
   state = mountState;
@@ -216,11 +218,15 @@ function renderLab({ semanticTransition = false, restoreChoice = null } = {}) {
 
   armResponseGate(restoreChoice === null ? null : `[data-choice="${restoreChoice}"]`);
   if (trial.kind === 'field') {
+    const mountedState = state;
     const nonce = trial.nonce;
-    requestAnimationFrame(() => {
-      if (state.session?.currentTrial.nonce !== nonce) return;
+    const frame = requestAnimationFrame(() => {
+      if (state !== mountedState || mountedState.fieldRedrawFrame !== frame) return;
+      mountedState.fieldRedrawFrame = 0;
+      if (mountedState.session?.currentTrial.nonce !== nonce) return;
       drawFields(trial);
     });
+    mountedState.fieldRedrawFrame = frame;
   }
   if (semanticTransition) positionLabTransition();
 }
@@ -324,8 +330,12 @@ function cancelTrialEffects() {
   cancelResponseGate();
   cancelAnimationFrame(state.transitionFrame);
   cancelAnimationFrame(state.fieldRedrawFrame);
+  cancelAnimationFrame(state.announcementFrame);
+  clearTimeout(state.dragReleaseTimer);
   state.transitionFrame = 0;
   state.fieldRedrawFrame = 0;
+  state.announcementFrame = 0;
+  state.dragReleaseTimer = 0;
 }
 
 function armResponseGate(restoreFocusSelector) {
@@ -570,7 +580,7 @@ function renderResults() {
   document.body.classList.add('lab-mode');
   document.title = t('Screen Colour Lab observations — Tetracromia | Sense6');
   const result = state.session.results();
-  saveJournalResult(result);
+  const journalSaved = saveJournalResult(result);
 
   state.app.innerHTML = `
     <section class="results-view ui-container ui-container--wide" tabindex="-1">
@@ -586,6 +596,8 @@ function renderResults() {
           <small>blocks</small>
         </div>
       </div>
+
+      ${journalSaved ? '' : `<div class="ui-alert ui-alert--danger tetracromia-journal-status" data-tetracromia-journal-status role="alert"><strong class="ui-alert__title">${t('The result is ready, but this browser did not allow local storage.')}</strong></div>`}
 
       <div class="result-details">
         ${observationMetric('01', 'Tile choices', t('{correct} of {presentations} correct', { correct: result.tile.correct, presentations: result.tile.presentations }), t('The adaptive level ended near {level}° of OKLCH hue (ΔEOK {delta}).', { level: formatNumber(result.tile.adaptiveLevelDegrees, { maximumFractionDigits: 1 }), delta: formatNumber(result.tile.deltaEok, { maximumFractionDigits: 3 }) }), t('Presented range {minimum}°–{maximum}° · {reversals} direction changes', { minimum: result.tile.presentedMinimum, maximum: result.tile.presentedMaximum, reversals: result.tile.reversals }))}
@@ -606,8 +618,11 @@ function renderResults() {
       </div>
 
       <div class="results-actions">
-        <button class="ui-button ui-button--lg" type="button" data-action="setup">Repeat independently</button>
-        <button class="ui-button ui-button--ghost" type="button" data-action="copy-results">${resultActionLabel(t, 'Copy summary')}</button>
+        ${
+          journalSaved
+            ? `<button class="ui-button ui-button--lg" type="button" data-action="setup">Repeat independently</button><button class="ui-button ui-button--ghost" type="button" data-action="copy-results">${resultActionLabel(t, 'Copy summary')}</button>`
+            : `<button class="ui-button ui-button--lg" type="button" data-action="copy-results">${resultActionLabel(t, 'Copy summary')}</button><button class="ui-button ui-button--ghost" type="button" data-action="setup">Repeat independently</button>`
+        }
         <button class="ui-button ui-button--subtle" type="button" data-action="home">Return to method</button>
       </div>
     </section>
@@ -658,7 +673,7 @@ function saveJournalResult(result) {
     ],
     notes: ['short-exploratory-protocol', 'not-a-stable-threshold'],
   });
-  if (entry) appendJournalEntry(entry);
+  return Boolean(entry && appendJournalEntry(entry));
 }
 
 async function copyResults() {
@@ -680,9 +695,13 @@ async function copyResults() {
 }
 
 function announce(message) {
-  const mountedAnnouncer = state.announcer;
+  const mountedState = state;
+  const mountedAnnouncer = mountedState.announcer;
+  cancelAnimationFrame(mountedState.announcementFrame);
   mountedAnnouncer.textContent = '';
-  requestAnimationFrame(() => {
+  mountedState.announcementFrame = requestAnimationFrame(() => {
+    if (state !== mountedState) return;
+    mountedState.announcementFrame = 0;
     mountedAnnouncer.textContent = t(message);
   });
 }
@@ -738,95 +757,85 @@ function isRepeatedTouchCommit(event) {
 }
 
 function wireEvents(signal) {
-  document.addEventListener(
-    'change',
-    (event) => {
-      if (event.target.matches('#screen-ready')) {
-        updateSetupEligibility();
-      }
-    },
-    { signal },
-  );
-
-  document.addEventListener(
-    'click',
-    (event) => {
-      const choice = event.target.closest('[data-choice]');
-      if (choice) {
-        if (isRepeatedTouchCommit(event)) return;
-        answerChoice(Number(choice.dataset.choice), { restoreFocus: event.detail === 0 });
-        return;
-      }
-
-      const sequenceTile = event.target.closest('[data-sequence-index]');
-      if (sequenceTile) {
-        if (state.suppressNextSequenceClick) {
-          state.suppressNextSequenceClick = false;
-          return;
-        }
-        selectSequence(Number(sequenceTile.dataset.sequenceIndex));
-        return;
-      }
-
-      const action = event.target.closest('[data-action]');
-      if (!action) return;
-
-      if (action.dataset.action === 'setup') renderSetup();
-      if (action.dataset.action === 'start' && !action.disabled) startLab();
-      if (action.dataset.action === 'home') {
-        if (state.labActive && !window.confirm(t('End this session? Your progress will be lost.'))) return;
-        renderHome();
-      }
-      if (action.dataset.action === 'gallery') {
-        if (state.labActive && !window.confirm(t('Leave the lab? Your progress will be lost.'))) return;
-        state.goHome();
-      }
-      if (action.dataset.action === 'move-sequence') moveSequence(Number(action.dataset.direction));
-      if (action.dataset.action === 'submit-sequence' && !isRepeatedTouchCommit(event)) submitSequence();
-      if (action.dataset.action === 'copy-results') copyResults();
-    },
-    { signal },
-  );
-
-  document.addEventListener(
-    'keydown',
-    (event) => {
-      const tile = event.target.closest('[data-sequence-index]');
-      if (!tile || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
-      event.preventDefault();
-      state.selectedSequenceIndex = Number(tile.dataset.sequenceIndex);
-      moveSequence(event.key === 'ArrowLeft' ? -1 : 1);
-    },
-    { signal },
-  );
+  document.addEventListener('change', handleSetupChange, { signal });
+  document.addEventListener('click', handleLabClick, { signal });
+  document.addEventListener('keydown', handleSequenceKeydown, { signal });
 
   document.addEventListener('pointerdown', onSequencePointerDown, { signal });
   document.addEventListener('pointermove', onSequencePointerMove, { signal });
   document.addEventListener('pointerup', onSequencePointerUp, { signal });
   document.addEventListener('pointercancel', onSequencePointerCancel, { signal });
   window.addEventListener('resize', scheduleFieldRedraw, { signal });
-  document.addEventListener(
-    'visibilitychange',
-    () => {
-      if (document.visibilityState === 'hidden') {
-        invalidateVisualRun(
-          'The page was hidden. This run stopped before saving; restart when you can keep it visible.',
-        );
-      }
-    },
-    { signal },
+  document.addEventListener('visibilitychange', handleVisibilityChange, { signal });
+  window
+    .matchMedia?.('(forced-colors: active)')
+    .addEventListener('change', handleForcedColorsChange, { signal });
+}
+
+function handleSetupChange(event) {
+  if (event.target.matches('#screen-ready')) updateSetupEligibility();
+}
+
+function handleLabClick(event) {
+  const choice = event.target.closest('[data-choice]');
+  if (choice) {
+    if (isRepeatedTouchCommit(event)) return;
+    answerChoice(Number(choice.dataset.choice), { restoreFocus: event.detail === 0 });
+    return;
+  }
+
+  const sequenceTile = event.target.closest('[data-sequence-index]');
+  if (sequenceTile) {
+    if (state.suppressNextSequenceClick) {
+      state.suppressNextSequenceClick = false;
+      return;
+    }
+    selectSequence(Number(sequenceTile.dataset.sequenceIndex));
+    return;
+  }
+
+  const action = event.target.closest('[data-action]');
+  if (!action) return;
+  if (action.dataset.action === 'setup') renderSetup();
+  if (action.dataset.action === 'start' && !action.disabled) startLab();
+  if (action.dataset.action === 'home') return leaveLabForHome();
+  if (action.dataset.action === 'gallery') return leaveLabForGallery();
+  if (action.dataset.action === 'move-sequence') moveSequence(Number(action.dataset.direction));
+  if (action.dataset.action === 'submit-sequence' && !isRepeatedTouchCommit(event)) submitSequence();
+  if (action.dataset.action === 'copy-results') copyResults();
+}
+
+function leaveLabForHome() {
+  if (state.labActive && !window.confirm(t('End this session? Your progress will be lost.'))) return;
+  renderHome();
+}
+
+function leaveLabForGallery() {
+  if (state.labActive && !window.confirm(t('Leave the lab? Your progress will be lost.'))) return;
+  state.goHome();
+}
+
+function handleSequenceKeydown(event) {
+  const tile = event.target.closest('[data-sequence-index]');
+  if (!tile || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+  event.preventDefault();
+  state.selectedSequenceIndex = Number(tile.dataset.sequenceIndex);
+  moveSequence(event.key === 'ArrowLeft' ? -1 : 1);
+}
+
+function handleVisibilityChange() {
+  if (document.visibilityState !== 'hidden') return;
+  invalidateVisualRun(
+    'The page was hidden. This run stopped before saving; restart when you can keep it visible.',
   );
-  window.matchMedia?.('(forced-colors: active)').addEventListener(
-    'change',
-    () => {
-      if (state.labActive && forcedColorsActive()) {
-        invalidateVisualRun('Color override detected. This run stopped and was not saved.');
-        return;
-      }
-      updateSetupEligibility();
-    },
-    { signal },
-  );
+}
+
+function handleForcedColorsChange() {
+  if (state.labActive && forcedColorsActive()) {
+    invalidateVisualRun('Color override detected. This run stopped and was not saved.');
+    return;
+  }
+  updateSetupEligibility();
 }
 
 /*
@@ -874,7 +883,10 @@ function endSequenceDrag(commit) {
   if (!drag.started) return;
   state.suppressNextSequenceClick = true;
   const mountedState = state;
-  window.setTimeout(() => {
+  clearTimeout(mountedState.dragReleaseTimer);
+  mountedState.dragReleaseTimer = window.setTimeout(() => {
+    if (state !== mountedState) return;
+    mountedState.dragReleaseTimer = 0;
     mountedState.suppressNextSequenceClick = false;
   }, 120);
 
