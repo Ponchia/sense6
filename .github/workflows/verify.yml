@@ -15,22 +15,10 @@ on:
 
 jobs:
   browser:
-    runs-on: ubuntu-latest
-    timeout-minutes: 12
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - project: chromium
-            engine: chromium
-          - project: mobile
-            engine: chromium
-          - project: chromium-smoke
-            engine: chromium
-          - project: firefox
-            engine: firefox
-          - project: webkit
-            engine: webkit
+    runs-on: arc-vps-sense6
+    timeout-minutes: 30
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
 
     steps:
       - name: Check out the repository
@@ -40,21 +28,28 @@ jobs:
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 24
-          cache: npm
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Install ${{ matrix.engine }}
-        run: npx playwright install --with-deps ${{ matrix.engine }}
-
-      - name: Verify the ${{ matrix.project }} project
-        run: npx playwright test --project=${{ matrix.project }}
+      - name: Verify every browser project
+        env:
+          HOME: /root
+        run: >-
+          npx playwright test
+          --project=chromium
+          --project=mobile
+          --project=chromium-smoke
+          --project=firefox
+          --project=webkit
+          --workers=1
 
   release:
     needs: browser
-    runs-on: ubuntu-latest
+    runs-on: arc-vps-sense6
     timeout-minutes: 30
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
 
     steps:
       - name: Check out the repository
@@ -64,13 +59,9 @@ jobs:
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 24
-          cache: npm
 
       - name: Install dependencies
         run: npm ci
-
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
 
       - name: Verify code and build the production artifact
         run: npm run check:core
@@ -112,7 +103,7 @@ jobs:
         run: npm run test:deployed
 
       - name: Preserve deployed-browser failure artifacts
-        if: always() && inputs.publish_production
+        if: failure() && inputs.publish_production
         continue-on-error: true
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -121,3 +112,4 @@ jobs:
             playwright-report/deployed
             test-results/deployed
           if-no-files-found: ignore
+          retention-days: 3

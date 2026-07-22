@@ -1,0 +1,5 @@
+self-hosted-runner:
+  labels:
+    - arc-vps-sense6
+
+config-variables: null

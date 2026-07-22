@@ -22,6 +22,9 @@ for (const snapshot of approvedSnapshots) {
 
 for (const route of REPRESENTATIVE_ROUTES) {
   test(`${route} matches the visual baseline`, async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__SENSE6_TEST_CONFIG__ = { daltonia: { seed: 'visual-regression' } };
+    });
     await page.goto(route, { waitUntil: 'domcontentloaded' });
     await settlePage(page);
     await compareScreenshot(page, `${slug(route)}-desktop.png`);

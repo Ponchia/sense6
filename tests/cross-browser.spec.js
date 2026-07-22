@@ -29,9 +29,9 @@ test('a complete Screen Colour Lab journey reaches separate observations', async
   await page.locator('[data-action="setup"]').first().click();
   await page.locator('#screen-ready').check();
   await page.locator('[data-action="start"]').click();
-  for (let trial = 0; trial < 14; trial += 1) await page.locator('[data-choice="0"]').first().click();
-  for (let trial = 0; trial < 12; trial += 1) await page.locator('[data-choice="0"]').first().click();
-  for (let run = 0; run < 3; run += 1) await page.getByRole('button', { name: /Lock this order/i }).click();
+  await answerTrials(page, 14);
+  await answerTrials(page, 12);
+  await submitSequenceRuns(page, 3);
 
   await expect(
     page.getByRole('heading', { name: /Three observations from one short screen-colour run/i }),
@@ -55,9 +55,9 @@ test('completed results survive a throwing localStorage getter', async ({ page }
   await page.locator('[data-action="setup"]').first().click();
   await page.locator('#screen-ready').check();
   await page.locator('[data-action="start"]').click();
-  for (let trial = 0; trial < 14; trial += 1) await page.locator('[data-choice="0"]').first().click();
-  for (let trial = 0; trial < 12; trial += 1) await page.locator('[data-choice="0"]').first().click();
-  for (let run = 0; run < 3; run += 1) await page.getByRole('button', { name: /Lock this order/i }).click();
+  await answerTrials(page, 14);
+  await answerTrials(page, 12);
+  await submitSequenceRuns(page, 3);
 
   await expect(
     page.getByRole('heading', { name: /Three observations from one short screen-colour run/i }),
@@ -81,4 +81,29 @@ test('a display resize invalidates an active Screen Colour Lab journey', async (
 async function gotoHydrated(page, route) {
   await page.goto(route);
   await page.locator('#app[data-sense6-hydrated]').waitFor();
+  await page.locator('#app > .static-entry').waitFor({ state: 'detached' });
+}
+
+async function answerTrials(page, count) {
+  const trialNumber = page.locator('.trial-count b');
+  for (let trial = 0; trial < count; trial += 1) {
+    const previousTrial = await trialNumber.textContent();
+    const choice = page.locator('[data-choice="0"]').first();
+    await expect(choice).toBeEnabled();
+    await choice.click();
+    await expect(trialNumber).not.toHaveText(previousTrial);
+  }
+}
+
+async function submitSequenceRuns(page, count) {
+  const trialNumber = page.locator('.trial-count b');
+  const results = page.locator('.results-view');
+  for (let run = 0; run < count; run += 1) {
+    const previousRun = await trialNumber.textContent();
+    const submit = page.locator('[data-action="submit-sequence"]');
+    await expect(submit).toBeEnabled();
+    await submit.click();
+    if (run < count - 1) await expect(trialNumber).not.toHaveText(previousRun);
+    else await expect(results).toBeVisible();
+  }
 }

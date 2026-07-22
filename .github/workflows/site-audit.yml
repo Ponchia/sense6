@@ -17,8 +17,10 @@ concurrency:
 
 jobs:
   route-integrity:
-    runs-on: ubuntu-latest
+    runs-on: arc-vps-sense6
     timeout-minutes: 20
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
     steps:
       - name: Check out the repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -26,11 +28,8 @@ jobs:
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 24
-          cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
       - name: Build the static site
         run: npm run build
       - name: Validate all generated HTML
@@ -47,10 +46,11 @@ jobs:
           name: site-audit-playwright-report
           path: playwright-report/site-audit
           if-no-files-found: ignore
+          retention-days: 3
 
   visual-regression:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: arc-vps-sense6
     timeout-minutes: 15
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
@@ -63,7 +63,6 @@ jobs:
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 24
-          cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Record intentional visual baseline updates
@@ -106,10 +105,13 @@ jobs:
           name: visual-regression-playwright-report
           path: playwright-report/site-audit
           if-no-files-found: ignore
+          retention-days: 3
 
   lighthouse:
-    runs-on: ubuntu-latest
+    runs-on: arc-vps-sense6
     timeout-minutes: 45
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
     env:
       FULL_SITE_AUDIT: ${{ github.event_name != 'pull_request' && '1' || '0' }}
       UNLIGHTHOUSE_OUTPUT_PATH: .unlighthouse
@@ -121,11 +123,8 @@ jobs:
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 24
-          cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
       - name: Build and serve the static site
         run: |
           npm run build
@@ -134,7 +133,7 @@ jobs:
       - name: Enforce Lighthouse budgets
         run: npm run audit:lighthouse
       - name: Upload Lighthouse results
-        if: always()
+        if: failure()
         continue-on-error: true
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -142,10 +141,11 @@ jobs:
           path: .unlighthouse
           if-no-files-found: ignore
           include-hidden-files: true
+          retention-days: 3
 
   external-links:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: arc-vps-sense6
     timeout-minutes: 15
     steps:
       - name: Check out the repository
@@ -154,7 +154,6 @@ jobs:
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 24
-          cache: npm
       - name: Install dependencies
         run: npm ci
       - name: Build the static site
@@ -172,7 +171,7 @@ jobs:
 
   passive-security:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: arc-vps-sense6
     timeout-minutes: 15
     steps:
       - name: Run the passive ZAP baseline against production
