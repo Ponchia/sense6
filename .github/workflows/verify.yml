@@ -9,9 +9,9 @@ on:
         default: false
         type: boolean
 
-permissions:
-  contents: read
-  deployments: write
+# Token capabilities are inherited from the explicit caller policy: CI grants
+# read-only contents access, while the production workflow additionally grants
+# deployment access.
 
 jobs:
   browser:

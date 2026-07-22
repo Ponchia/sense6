@@ -25,6 +25,8 @@ test('the reusable verifier cannot publish pull request previews', () => {
   assert.doesNotMatch(workflow, /deploy_target == 'preview'/);
   assert.doesNotMatch(workflow, /Publish the verified preview/);
   assert.doesNotMatch(workflow, /Smoke-test the real preview/);
+  assert.doesNotMatch(workflow, /^permissions:/m);
+  assert.match(deployWorkflow, /permissions:\n\s+contents: read\n\s+deployments: write/);
   assert.match(deployWorkflow, /if: github\.ref == 'refs\/heads\/main'/);
   assert.match(deployWorkflow, /publish_production: true/);
 });
@@ -48,7 +50,7 @@ test('production publication is followed by a non-writing deployed-browser gate'
   assert.match(config, /screenshot: 'only-on-failure'/);
   assert.match(primaryConfig, /testIgnore: \['\*\*\/cross-browser\.spec\.js', '\*\*\/deployed\/\*\*'\]/);
   assert.match(siteConfig, /failOnFlakyTests: true/);
-  assert.match(journey, /route\.abort\('blockedbyclient'\)/);
+  assert.match(journey, /route\.fulfill\(\{ status: 204, body: '' \}\)/);
   assert.doesNotMatch(journey, /request\.(?:post|put|patch|delete)\(/);
 });
 
