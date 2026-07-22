@@ -19,6 +19,8 @@ jobs:
   route-integrity:
     runs-on: arc-vps-sense6
     timeout-minutes: 20
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
     steps:
       - name: Check out the repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -29,8 +31,6 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
       - name: Build the static site
         run: npm run build
       - name: Validate all generated HTML
@@ -112,6 +112,8 @@ jobs:
   lighthouse:
     runs-on: arc-vps-sense6
     timeout-minutes: 45
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
     env:
       FULL_SITE_AUDIT: ${{ github.event_name != 'pull_request' && '1' || '0' }}
       UNLIGHTHOUSE_OUTPUT_PATH: .unlighthouse
@@ -126,8 +128,6 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
       - name: Build and serve the static site
         run: |
           npm run build
