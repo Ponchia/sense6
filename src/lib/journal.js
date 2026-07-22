@@ -1,6 +1,7 @@
 import { examContract, isExamId } from '../exams/contracts.js';
 import { legacyProtocolPassport, protocolPassport } from '../exams/protocols.js';
 import { LOCALE_CODES } from '../locale-metadata.js';
+import { resolveOptionalStorage } from './storage-access.js';
 
 const FORMAT = 'sense6-journal';
 const EXPORT_FORMAT = 'sense6-journal-export';
@@ -12,11 +13,107 @@ const MAX_NOTES = 12;
 
 const QUALITY = new Set(['usable', 'caution', 'limited']);
 const BOUNDS = new Set(['lower', 'upper']);
+/** @type {readonly (keyof ProtocolPassport)[]} */
+const PROTOCOL_FIELDS = Object.freeze([
+  'methodVersion',
+  'profileId',
+  'configDigest',
+  'stimulusVersion',
+  'estimator',
+  'stoppingRule',
+  'responsePolicy',
+  'interruptionPolicy',
+  'replayPolicy',
+]);
+
+/** @type {Readonly<Record<string, readonly string[]>>} */
+export const JOURNAL_EXPORT_SCHEMA = Object.freeze({
+  envelope: Object.freeze(['format', 'schemaVersion', 'exportedAt', 'entries']),
+  entry: Object.freeze([
+    'id',
+    'examId',
+    'recordedAt',
+    'locale',
+    'quality',
+    'protocol',
+    'setup',
+    'qualityEvidence',
+    'measurements',
+    'notes',
+  ]),
+  protocol: PROTOCOL_FIELDS,
+  measurement: Object.freeze(['id', 'value', 'unit', 'lower', 'upper', 'uncertainty', 'bound']),
+});
+
+/** @type {Readonly<Record<string, Readonly<Record<string, string>>>>} */
+const JOURNAL_FIELD_DISCLOSURES = Object.freeze({
+  envelope: Object.freeze({
+    format: 'schema',
+    schemaVersion: 'schema',
+    exportedAt: 'exportTime',
+    entries: 'measurements',
+  }),
+  entry: Object.freeze({
+    id: 'identifiers',
+    examId: 'identifiers',
+    recordedAt: 'timestamps',
+    locale: 'locale',
+    quality: 'quality',
+    protocol: 'protocol',
+    setup: 'setup',
+    qualityEvidence: 'quality',
+    measurements: 'measurements',
+    notes: 'notes',
+  }),
+  protocol: Object.freeze(Object.fromEntries(PROTOCOL_FIELDS.map((field) => [field, 'protocol']))),
+  measurement: Object.freeze({
+    id: 'measurements',
+    value: 'measurements',
+    unit: 'measurements',
+    lower: 'measurements',
+    upper: 'measurements',
+    uncertainty: 'measurements',
+    bound: 'measurements',
+  }),
+});
+
+export const JOURNAL_DISCLOSURE_KEYS = Object.freeze([
+  'schema',
+  'exportTime',
+  'identifiers',
+  'timestamps',
+  'locale',
+  'protocol',
+  'setup',
+  'quality',
+  'measurements',
+  'notes',
+  'idPurpose',
+]);
+
+for (const scope of Object.keys(JOURNAL_EXPORT_SCHEMA)) {
+  const disclosed = JOURNAL_FIELD_DISCLOSURES[scope];
+  const fields = JOURNAL_EXPORT_SCHEMA[scope];
+  if (!fields) throw new Error(`Journal export schema scope ${scope} is unavailable`);
+  for (const field of fields) {
+    if (!disclosed?.[field]) throw new Error(`Journal export field ${scope}.${field} is not disclosed`);
+  }
+}
+for (const disclosed of Object.values(JOURNAL_FIELD_DISCLOSURES).flatMap((scope) => Object.values(scope))) {
+  if (!JOURNAL_DISCLOSURE_KEYS.includes(disclosed)) {
+    throw new Error(`Journal disclosure category ${disclosed} has no public copy key`);
+  }
+}
 
 /** @typedef {{ getItem: (key: string) => string | null, setItem: (key: string, value: string) => void, removeItem?: (key: string) => void }} JournalStorage */
 /** @typedef {{ id: string, value: number | null, unit: string, lower?: number, upper?: number, uncertainty?: number, bound?: 'lower' | 'upper' }} JournalMeasurement */
 /** @typedef {import('../exams/protocols.js').ProtocolPassport} ProtocolPassport */
 /** @typedef {{ id: string, examId: string, recordedAt: string, locale: string, quality: 'usable' | 'caution' | 'limited', protocol: ProtocolPassport, setup: Record<string, string | number | boolean | null>, qualityEvidence: Record<string, string | number | boolean | null>, measurements: JournalMeasurement[], notes: string[] }} JournalEntry */
+/** @typedef {'inaccessible' | 'malformed' | 'oversized' | 'future-schema' | 'empty' | 'ready'} JournalReadStatus */
+/** @typedef {{ status: JournalReadStatus, entries: JournalEntry[], raw: string | null, writable: boolean }} JournalReadState */
+/** @typedef {{ ok: true, additions: number, duplicates: number, discarded: number, evicted: number, total: number }} ImportSummary */
+/** @typedef {{ ok: true, summary: ImportSummary, entries: JournalEntry[] }} ImportPlan */
+/** @typedef {{ ok: false, reason: 'too-large' | 'malformed' | 'future' | 'invalid' | 'storage' | 'confirmation-required' | 'changed' }} ImportFailure */
 
 /**
  * Create a portable, language-neutral journal entry.
@@ -37,41 +134,45 @@ export function createJournalEntry(value) {
     measurements: value.measurements,
     notes: value.notes ?? [],
   };
-  return isJournalEntry(entry) ? entry : null;
+  return isJournalEntry(entry) ? canonicalJournalEntry(entry) : null;
 }
 
 /** @param {JournalStorage} [storage] @returns {JournalEntry[]} */
-export function loadJournal(storage = globalThis.localStorage) {
-  return storage ? readJournal(storage).entries : [];
+export function loadJournal(storage) {
+  return readJournalState(storage).entries;
 }
 
 /** @param {JournalEntry} entry @param {JournalStorage} [storage] */
-export function appendJournalEntry(entry, storage = globalThis.localStorage) {
-  if (!storage || !isJournalEntry(entry)) return false;
-  const journal = readJournal(storage);
+export function appendJournalEntry(entry, storage) {
+  const resolvedStorage = resolveOptionalStorage(storage);
+  const canonical = canonicalJournalEntry(entry);
+  if (!resolvedStorage || !canonical) return false;
+  const journal = readJournal(resolvedStorage);
   if (!journal.writable) return false;
-  const entries = journal.entries.filter((candidate) => candidate.id !== entry.id);
-  entries.unshift(entry);
-  return writeJournal(entries.slice(0, MAX_ENTRIES), storage);
+  const entries = journal.entries.filter((candidate) => candidate.id !== canonical.id);
+  entries.unshift(canonical);
+  return writeJournal(entries.slice(0, MAX_ENTRIES), resolvedStorage);
 }
 
 /** @param {string} id @param {JournalStorage} [storage] */
-export function removeJournalEntry(id, storage = globalThis.localStorage) {
-  if (!storage || typeof id !== 'string') return false;
-  const journal = readJournal(storage);
+export function removeJournalEntry(id, storage) {
+  const resolvedStorage = resolveOptionalStorage(storage);
+  if (!resolvedStorage || typeof id !== 'string') return false;
+  const journal = readJournal(resolvedStorage);
   if (!journal.writable) return false;
   return writeJournal(
     journal.entries.filter((entry) => entry.id !== id),
-    storage,
+    resolvedStorage,
   );
 }
 
 /** @param {JournalStorage} [storage] */
-export function clearJournal(storage = globalThis.localStorage) {
-  if (!storage) return false;
+export function clearJournal(storage) {
+  const resolvedStorage = resolveOptionalStorage(storage);
+  if (!resolvedStorage) return false;
   try {
-    if (typeof storage.removeItem === 'function') storage.removeItem(STORAGE_KEY);
-    else return writeJournal([], storage);
+    if (typeof resolvedStorage.removeItem === 'function') resolvedStorage.removeItem(STORAGE_KEY);
+    else return writeJournal([], resolvedStorage);
     return true;
   } catch {
     return false;
@@ -79,7 +180,7 @@ export function clearJournal(storage = globalThis.localStorage) {
 }
 
 /** @param {JournalStorage} [storage] */
-export function exportJournal(storage = globalThis.localStorage) {
+export function exportJournal(storage) {
   return JSON.stringify(
     {
       format: EXPORT_FORMAT,
@@ -93,14 +194,40 @@ export function exportJournal(storage = globalThis.localStorage) {
 }
 
 /**
- * Merge a documented export into local storage. Existing IDs win, making
- * repeated imports idempotent.
+ * Preview a documented export without changing local storage. Existing IDs
+ * win, making repeated imports idempotent.
  * @param {string} raw
  * @param {JournalStorage} [storage]
- * @returns {{ ok: true, imported: number, duplicates: number, discarded: number, evicted: number, skipped: number, total: number } | { ok: false, reason: 'too-large' | 'malformed' | 'future' | 'invalid' | 'storage' }}
+ * @returns {ImportSummary | ImportFailure}
  */
-export function importJournal(raw, storage = globalThis.localStorage) {
-  if (!storage) return { ok: false, reason: 'storage' };
+export function previewJournalImport(raw, storage) {
+  const resolvedStorage = resolveOptionalStorage(storage);
+  if (!resolvedStorage) return { ok: false, reason: 'storage' };
+  const planned = planJournalImport(raw, resolvedStorage);
+  return planned.ok === false ? planned : planned.summary;
+}
+
+/**
+ * Commit a previously confirmed preview. Recompute it first so changed local
+ * data cannot silently invalidate the counts that the person approved.
+ * @param {string} raw
+ * @param {JournalStorage} [storage]
+ * @param {ImportSummary} [confirmedPreview]
+ * @returns {ImportSummary | ImportFailure}
+ */
+export function importJournal(raw, storage, confirmedPreview) {
+  const resolvedStorage = resolveOptionalStorage(storage);
+  if (!resolvedStorage) return { ok: false, reason: 'storage' };
+  const planned = planJournalImport(raw, resolvedStorage);
+  if (planned.ok === false) return planned;
+  if (!confirmedPreview) return { ok: false, reason: 'confirmation-required' };
+  if (!sameImportSummary(planned.summary, confirmedPreview)) return { ok: false, reason: 'changed' };
+  if (!writeJournal(planned.entries, resolvedStorage)) return { ok: false, reason: 'storage' };
+  return planned.summary;
+}
+
+/** @param {string} raw @param {JournalStorage} storage @returns {ImportPlan | ImportFailure} */
+function planJournalImport(raw, storage) {
   if (typeof raw !== 'string' || byteLength(raw) > MAX_IMPORT_BYTES)
     return { ok: false, reason: 'too-large' };
   let parsed;
@@ -132,20 +259,33 @@ export function importJournal(raw, storage = globalThis.localStorage) {
     additions.push(entry);
   }
   const entries = sortEntries([...current, ...additions]).slice(0, MAX_ENTRIES);
-  if (!writeJournal(entries, storage)) return { ok: false, reason: 'storage' };
   const retained = new Set(entries.map((entry) => entry.id));
-  const imported = additions.filter((entry) => retained.has(entry.id)).length;
-  const discarded = additions.length - imported;
+  const retainedAdditions = additions.filter((entry) => retained.has(entry.id)).length;
+  const discarded = additions.length - retainedAdditions;
   const evicted = current.filter((entry) => !retained.has(entry.id)).length;
   return {
     ok: true,
-    imported,
-    duplicates,
-    discarded,
-    evicted,
-    skipped: duplicates + discarded,
-    total: entries.length,
+    summary: {
+      ok: true,
+      additions: retainedAdditions,
+      duplicates,
+      discarded,
+      evicted,
+      total: entries.length,
+    },
+    entries,
   };
+}
+
+/** @param {ImportSummary} left @param {ImportSummary} right */
+function sameImportSummary(left, right) {
+  return (
+    left.additions === right.additions &&
+    left.duplicates === right.duplicates &&
+    left.discarded === right.discarded &&
+    left.evicted === right.evicted &&
+    left.total === right.total
+  );
 }
 
 /**
@@ -193,10 +333,17 @@ export function compareJournalEntries(newer, older) {
  * @param {JournalEntry} older
  */
 export function measurementChanges(newer, older) {
+  if (compareJournalEntries(newer, older).status === 'not-comparable') return [];
   const previous = new Map(older.measurements.map((measurement) => [measurement.id, measurement]));
   return newer.measurements.flatMap((measurement) => {
     const before = previous.get(measurement.id);
-    if (!before || !Number.isFinite(measurement.value) || !Number.isFinite(before.value)) return [];
+    if (
+      !before ||
+      measurement.unit !== before.unit ||
+      !Number.isFinite(measurement.value) ||
+      !Number.isFinite(before.value)
+    )
+      return [];
     const uncertainty = combinedUncertainty(measurement, before);
     return [
       {
@@ -232,9 +379,15 @@ export const JOURNAL_LIMITS = Object.freeze({ maxEntries: MAX_ENTRIES, maxImport
 /** @param {JournalEntry[]} entries @param {JournalStorage} storage */
 function writeJournal(entries, storage) {
   try {
+    const canonical = entries.map(canonicalJournalEntry);
+    if (canonical.some((entry) => entry === null)) return false;
     storage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ format: FORMAT, schemaVersion: SCHEMA_VERSION, entries: sortEntries(entries) }),
+      JSON.stringify({
+        format: FORMAT,
+        schemaVersion: SCHEMA_VERSION,
+        entries: sortEntries(/** @type {JournalEntry[]} */ (canonical)),
+      }),
     );
     return true;
   } catch {
@@ -242,23 +395,48 @@ function writeJournal(entries, storage) {
   }
 }
 
-/** @param {JournalStorage} storage */
-function readJournal(storage) {
-  try {
-    const raw = storage.getItem(STORAGE_KEY);
-    if (!raw) return { entries: [], writable: true };
-    if (byteLength(raw) > MAX_IMPORT_BYTES) return { entries: [], writable: false };
-    const parsed = JSON.parse(raw);
-    if (parsed?.format !== FORMAT || !Number.isInteger(parsed.schemaVersion)) {
-      return { entries: [], writable: false };
-    }
-    if (parsed.schemaVersion > SCHEMA_VERSION) return { entries: [], writable: false };
-    const entries = migrateEntries(parsed.schemaVersion, parsed.entries);
-    if (!entries) return { entries: [], writable: false };
-    return { entries: sortEntries(entries), writable: true };
-  } catch {
-    return { entries: [], writable: false };
+/** @param {JournalStorage} [storage] @returns {JournalReadState} */
+export function readJournalState(storage) {
+  const resolvedStorage = resolveOptionalStorage(storage);
+  if (!resolvedStorage) {
+    return { status: 'inaccessible', entries: [], raw: null, writable: false };
   }
+  return readJournal(resolvedStorage);
+}
+
+/** @param {JournalStorage} storage @returns {JournalReadState} */
+function readJournal(storage) {
+  let raw;
+  try {
+    raw = storage.getItem(STORAGE_KEY);
+  } catch {
+    return { status: 'inaccessible', entries: [], raw: null, writable: false };
+  }
+  if (!raw) return { status: 'empty', entries: [], raw: null, writable: true };
+  if (byteLength(raw) > MAX_IMPORT_BYTES) {
+    return { status: 'oversized', entries: [], raw, writable: false };
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return { status: 'malformed', entries: [], raw, writable: false };
+  }
+  if (parsed?.format !== FORMAT || !Number.isInteger(parsed.schemaVersion)) {
+    return { status: 'malformed', entries: [], raw, writable: false };
+  }
+  if (parsed.schemaVersion > SCHEMA_VERSION) {
+    return { status: 'future-schema', entries: [], raw, writable: false };
+  }
+  const entries = migrateEntries(parsed.schemaVersion, parsed.entries);
+  if (!entries) return { status: 'malformed', entries: [], raw, writable: false };
+  const sortedEntries = sortEntries(entries);
+  return {
+    status: sortedEntries.length ? 'ready' : 'empty',
+    entries: sortedEntries,
+    raw,
+    writable: true,
+  };
 }
 
 /** @param {unknown} value @returns {value is JournalEntry} */
@@ -309,20 +487,9 @@ function validInstrumentEntry(value) {
 /** @param {unknown} value */
 function validProtocol(value) {
   if (!isRecord(value)) return false;
-  const fields = [
-    'methodVersion',
-    'profileId',
-    'configDigest',
-    'stimulusVersion',
-    'estimator',
-    'stoppingRule',
-    'responsePolicy',
-    'interruptionPolicy',
-    'replayPolicy',
-  ];
   return (
-    Object.keys(value).length === fields.length &&
-    fields.every(
+    Object.keys(value).length === PROTOCOL_FIELDS.length &&
+    PROTOCOL_FIELDS.every(
       (field) => typeof value[field] === 'string' && value[field].length > 0 && value[field].length <= 160,
     )
   );
@@ -382,19 +549,7 @@ function validScalarRecord(value, maximumFields) {
 
 /** @param {ProtocolPassport} newer @param {ProtocolPassport} older */
 function protocolDifferences(newer, older) {
-  /** @type {readonly (keyof ProtocolPassport)[]} */
-  const fields = [
-    'methodVersion',
-    'profileId',
-    'configDigest',
-    'stimulusVersion',
-    'estimator',
-    'stoppingRule',
-    'responsePolicy',
-    'interruptionPolicy',
-    'replayPolicy',
-  ];
-  return fields.flatMap((field) => (newer[field] === older[field] ? [] : [`changed:${field}`]));
+  return PROTOCOL_FIELDS.flatMap((field) => (newer[field] === older[field] ? [] : [`changed:${field}`]));
 }
 
 /** @param {ProtocolPassport} protocol */
@@ -449,17 +604,59 @@ function sameValues(left, right) {
 function migrateEntries(schemaVersion, entries) {
   if (!Array.isArray(entries) || entries.length > MAX_ENTRIES) return null;
   if (schemaVersion === SCHEMA_VERSION) {
-    return entries.every(isJournalEntry) ? /** @type {JournalEntry[]} */ (entries) : null;
+    if (!entries.every(isJournalEntry)) return null;
+    return /** @type {JournalEntry[]} */ (entries.map(canonicalJournalEntry));
   }
   if (schemaVersion !== 1 || !entries.every(isLegacyJournalEntry)) return null;
-  return entries.map((entry) => ({
-    ...entry,
-    protocol: legacyProtocolPassport(/** @type {import('../exams/contracts.js').ExamId} */ (entry.examId)),
-    qualityEvidence: {},
-    notes: entry.notes.includes('legacy-exploratory')
-      ? entry.notes
-      : [...entry.notes.slice(0, MAX_NOTES - 1), 'legacy-exploratory'],
-  }));
+  return /** @type {JournalEntry[]} */ (
+    entries.map((entry) =>
+      canonicalJournalEntry({
+        ...entry,
+        protocol: legacyProtocolPassport(
+          /** @type {import('../exams/contracts.js').ExamId} */ (entry.examId),
+        ),
+        qualityEvidence: {},
+        notes: entry.notes.includes('legacy-exploratory')
+          ? entry.notes
+          : [...entry.notes.slice(0, MAX_NOTES - 1), 'legacy-exploratory'],
+      }),
+    )
+  );
+}
+
+/** @param {unknown} value @returns {JournalEntry | null} */
+function canonicalJournalEntry(value) {
+  if (!isJournalEntry(value)) return null;
+  return {
+    id: value.id,
+    examId: value.examId,
+    recordedAt: value.recordedAt,
+    locale: value.locale,
+    quality: value.quality,
+    protocol: /** @type {ProtocolPassport} */ (
+      Object.fromEntries(PROTOCOL_FIELDS.map((field) => [field, value.protocol[field]]))
+    ),
+    setup: canonicalScalarRecord(value.setup),
+    qualityEvidence: canonicalScalarRecord(value.qualityEvidence),
+    measurements: value.measurements.map(canonicalMeasurement),
+    notes: [...value.notes],
+  };
+}
+
+/** @param {JournalMeasurement} value @returns {JournalMeasurement} */
+function canonicalMeasurement(value) {
+  /** @type {JournalMeasurement} */
+  const measurement = { id: value.id, value: value.value, unit: value.unit };
+  if (value.lower !== undefined) measurement.lower = value.lower;
+  if (value.upper !== undefined) measurement.upper = value.upper;
+  if (value.uncertainty !== undefined) measurement.uncertainty = value.uncertainty;
+  if (value.bound !== undefined) measurement.bound = value.bound;
+  return measurement;
+}
+
+/** @param {Record<string, string | number | boolean | null>} value */
+function canonicalScalarRecord(value) {
+  return Object.fromEntries(Object.entries(value).sort(([left], [right]) => left.localeCompare(right)));
 }
 
 /** @param {unknown} value */

@@ -3,9 +3,10 @@ import test from 'node:test';
 import { aboutCopy, aboutMarkup } from '../src/about.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { MESSAGE_SOURCES, messageSource } from '../src/i18n/message-ids.js';
-import { journalCopy, journalSetupLabel } from '../src/journal-copy.js';
+import { journalCopy, journalSetupLabel, prepareJournalCopy } from '../src/journal-copy.js';
+import { journalRecoveryCopy } from '../src/journal-recovery-copy.js';
 import { DEFAULT_LOCALE, LOCALES, loadMessages, localeMetadata, resolveLocale } from '../src/locales.js';
-import { privacyCopy } from '../src/privacy.js';
+import { preparePrivacyCopy, privacyCopy } from '../src/privacy.js';
 
 test('the supported global locale set has complete catalog keys', async () => {
   assert.equal(DEFAULT_LOCALE, 'en');
@@ -60,9 +61,10 @@ test('regional browser locales resolve without collapsing distinct language vari
   assert.equal(localeMetadata('unknown').code, DEFAULT_LOCALE);
 });
 
-test('privacy and journal routes have dedicated copy in every supported language', () => {
+test('privacy and journal routes have dedicated copy in every supported language', async () => {
   const englishPrivacy = privacyCopy('en');
   const englishJournalKeys = Object.keys(journalCopy('en')).sort();
+  const englishRecoveryKeys = Object.keys(journalRecoveryCopy('en')).sort();
   const setupKeys = [
     'display',
     'viewport',
@@ -80,8 +82,10 @@ test('privacy and journal routes have dedicated copy in every supported language
     'cardWidthCssPx',
   ];
   for (const { code } of LOCALES) {
+    await Promise.all([preparePrivacyCopy(code), prepareJournalCopy(code)]);
     const privacy = privacyCopy(code);
     const journal = journalCopy(code);
+    const recovery = journalRecoveryCopy(code);
     assert.ok(privacy.title);
     assert.deepEqual(
       privacy.sections.map(({ paragraphs }) => paragraphs.length),
@@ -90,15 +94,27 @@ test('privacy and journal routes have dedicated copy in every supported language
     );
     assert.ok(journal.title);
     assert.ok(journal.reasonSetup);
+    assert.ok(privacy.sections[1].paragraphs[1].length > 180, `${code} export disclosure is incomplete`);
+    assert.match(privacy.updated, /22/);
     assert.deepEqual(
       Object.keys(journal).sort(),
       englishJournalKeys,
       `${code} journal keys differ from English`,
     );
+    assert.deepEqual(
+      Object.keys(recovery).sort(),
+      englishRecoveryKeys,
+      `${code} journal recovery keys differ from English`,
+    );
     for (const key of setupKeys) assert.ok(journalSetupLabel(key, code), `${code} is missing ${key}`);
     if (code === 'en') continue;
     assert.notEqual(privacy.title, englishPrivacy.title, `${code} privacy copy fell back to English`);
     assert.notEqual(journal.title, journalCopy('en').title, `${code} journal copy fell back to English`);
+    assert.notEqual(
+      recovery.title,
+      journalRecoveryCopy('en').title,
+      `${code} journal recovery copy fell back to English`,
+    );
     assert.notEqual(
       journalSetupLabel('display', code),
       journalSetupLabel('display', 'en'),

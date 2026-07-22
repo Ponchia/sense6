@@ -2,7 +2,7 @@
 /** @typedef {{ toneMs: number, gapMs: number, rampMs: number, referenceMs: number, masterGain: number }} HearingAudioConfig */
 /** @typedef {{ practiceTrials: number, scoredTrials: number, passCorrect: number }} HeadphoneConfig */
 /** @typedef {{ startHz: number, minHz: number, maxHz: number, targetReversals: number, minTrials: number, maxTrials: number, controlAt: readonly number[], initialStepOctaves: number, fineStepOctaves: number }} RangeConfig */
-/** @typedef {{ anchorsHz: readonly number[], startPercent: number, minPercent: number, maxPercent: number, targetReversals: number, minTrials: number, maxTrials: number, initialFactor: number, fineFactor: number }} PitchConfig */
+/** @typedef {{ anchorsHz: readonly number[], startPercent: number, minPercent: number, maxPercent: number, targetReversals: number, minTrials: number, maxTrials: number, initialFactor: number, fineFactor: number, pitchRoveMaxDb: number }} PitchConfig */
 /** @typedef {{ feedbackMs: number, audio: HearingAudioConfig, headphones: HeadphoneConfig, range: RangeConfig, pitch: PitchConfig }} HearingConfig */
 /** @typedef {Partial<Omit<HearingConfig, 'audio' | 'headphones' | 'range' | 'pitch'>> & { audio?: Partial<HearingAudioConfig>, headphones?: Partial<HeadphoneConfig>, range?: Partial<RangeConfig>, pitch?: Partial<PitchConfig> }} HearingConfigOverride */
 /** @typedef {'up' | 'down'} StaircaseDirection */
@@ -17,6 +17,14 @@
 /** @typedef {PitchTrial & { selectedInterval: number, correct: boolean, direction: StaircaseDirection | null, nextDeltaPercent: number }} PitchRecord */
 /** @typedef {{ anchorHz: number, config: PitchConfig, deltaPercent: number, correctStreak: number, lastDirection: StaircaseDirection | null, reversals: number[], records: PitchRecord[], complete: boolean, completionReason: CompletionReason | null }} PitchTrack */
 /** @typedef {{ correct: boolean }} CorrectnessRecord */
+
+export const HEARING_DIGITAL_LEVELS = Object.freeze({
+  reference: 1.12,
+  headphones: 1,
+  range: 0.82,
+  pitchBase: 0.78,
+  pitchRoveMaxDb: 3,
+});
 
 export const DEFAULT_HEARING_CONFIG = Object.freeze({
   feedbackMs: 420,
@@ -53,15 +61,8 @@ export const DEFAULT_HEARING_CONFIG = Object.freeze({
     maxTrials: 18,
     initialFactor: 1.55,
     fineFactor: 1.22,
+    pitchRoveMaxDb: HEARING_DIGITAL_LEVELS.pitchRoveMaxDb,
   }),
-});
-
-export const HEARING_DIGITAL_LEVELS = Object.freeze({
-  reference: 1.12,
-  headphones: 1,
-  range: 0.82,
-  pitchBase: 0.78,
-  pitchRoveMaxDb: 3,
 });
 
 /** @param {HearingConfigOverride | null} override @returns {HearingConfig} */
@@ -233,12 +234,13 @@ export function nextPitchTrial(tracks, random = Math.random) {
   const shortest = Math.min(...open.map((track) => track.records.length));
   const candidates = open.filter((track) => track.records.length <= shortest + 1);
   const track = requiredElement(candidates[randomIndex(candidates.length, random)], 'pitch track');
+  const roveMaxDb = Math.max(0, track.config.pitchRoveMaxDb);
   return {
     kind: 'pitch',
     anchorHz: track.anchorHz,
     deltaPercent: track.deltaPercent,
     higherInterval: randomIndex(2, random),
-    roveDb: [randomBetween(-3, 3, random), randomBetween(-3, 3, random)],
+    roveDb: [randomBetween(-roveMaxDb, roveMaxDb, random), randomBetween(-roveMaxDb, roveMaxDb, random)],
   };
 }
 

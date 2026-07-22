@@ -188,7 +188,6 @@ const rows = [
     'This is not vision screening, diagnosis, or a prescription.',
     'これは視力スクリーニング、診断、処方ではありません。',
   ],
-  ['preference', '偏り'],
   ['Calibrated sharpness experiment — Acutezza | Sense6', '較正した視認精度の実験 — Acutezza | Sense6'],
   ['Calibrate screen size — Acutezza | Sense6', '画面サイズを較正 — Acutezza | Sense6'],
   ['Estimate viewing distance — Acutezza | Sense6', '視距離を推定 — Acutezza | Sense6'],

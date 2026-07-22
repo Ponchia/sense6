@@ -31,6 +31,21 @@ test('Udito completes three safe-listening instruments and keeps results separat
 
   await page.getByRole('button', { name: /Prepare the sound lab/i }).click();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect(
+    await page
+      .locator(
+        '[data-au-device], [data-au-connection], [data-action="au-reference"], [data-action="au-anchors"]',
+      )
+      .evaluateAll((elements) =>
+        elements.map((element) =>
+          element.getAttribute('data-au-device') !== null
+            ? 'device'
+            : element.getAttribute('data-au-connection') !== null
+              ? 'connection'
+              : element.getAttribute('data-action'),
+        ),
+      ),
+  ).toEqual(['device', 'connection', 'au-reference', 'au-anchors']);
   await expect(page.locator('.experiment-boundary')).toHaveText(
     /recreational experiment for curiosity and fun—not a medical test or diagnosis/i,
   );
@@ -55,6 +70,8 @@ test('Udito completes three safe-listening instruments and keeps results separat
   await expect(page.locator('[data-locale-select]')).toBeDisabled();
   await page.getByRole('button', { name: /Start practice/i }).click();
   await expect(page.locator('[data-au-response="0"]')).toBeEnabled();
+  await expect(page.locator('[data-au-status]')).not.toHaveAttribute('role');
+  await expect(page.locator('[data-au-status]')).not.toHaveAttribute('aria-live');
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await answerCurrentSoundTrial(page);
   await page.getByRole('button', { name: /Begin headphone check/i }).click();
@@ -98,9 +115,29 @@ test('Udito completes three safe-listening instruments and keeps results separat
   expect(journalSetup.connection).toBe('wireless');
   expect(journalSetup.selfReportedVolumeConsistent).toBe(true);
   expect(journalSetup.volumeLockedWithinRun).toBeUndefined();
+  expect(await page.evaluate(() => Boolean(navigator.mediaDevices))).toBe(true);
+  await page.evaluate(() => navigator.mediaDevices.dispatchEvent(new Event('devicechange')));
+  await expect(page.getByRole('heading', { name: /Three listening measures/i })).toBeVisible();
+  await expect(page.locator('.au-metric')).toHaveCount(4);
   await page.getByRole('button', { name: /Open private journal/i }).click();
   await expect(page).toHaveURL(/\/en\/journal\/$/);
   await expect(page.getByRole('heading', { name: /Your private measurement journal/i })).toBeVisible();
+});
+
+test('an audio-output change stops an active Udito run at the setup boundary', async ({ page }) => {
+  await installQuickUdito(page);
+  await page.goto('/en/udito/');
+  await page.getByRole('button', { name: /Prepare the sound lab/i }).click();
+  await completeUditoSetup(page);
+  await page.getByRole('button', { name: /Begin selected scope/i }).click();
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  await expect(page.locator('[data-au-response="0"]')).toBeEnabled();
+
+  await page.evaluate(() => navigator.mediaDevices.dispatchEvent(new Event('devicechange')));
+
+  await expect(page.locator('[data-au-paused]')).toHaveAttribute('data-resume-mode', 'setup');
+  await expect(page.getByRole('button', { name: /Return to audio setup/i })).toBeVisible();
+  await expect(page.locator('[data-au-response]')).toHaveCount(0);
 });
 
 test('Udito focused scope ends after Portata and omits pitch placeholders', async ({ page }) => {

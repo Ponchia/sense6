@@ -1,7 +1,7 @@
 export const privacy = Object.freeze({
   title: 'Privacidade no Sense6',
   eyebrow: 'Privacidade / linguagem clara',
-  updated: 'Última atualização: 19 de julho de 2026',
+  updated: 'Última atualização: 22 de julho de 2026',
   back: 'Todos os testes',
   intro:
     'Seus testes permanecem no seu dispositivo. O Sense6 mantém apenas totais diários anônimos de atividade e não usa cookies, rastreadores publicitários nem perfis de usuário.',
@@ -19,7 +19,7 @@ export const privacy = Object.freeze({
       title: 'O que permanece no seu navegador',
       paragraphs: [
         'As respostas, medições e resultados dos testes são processados no seu navegador e não são enviados ao Sense6. O idioma e o tema escolhidos, resumos dos resultados mais recentes ou melhores e o diário privado de várias sessões podem ser salvos no armazenamento local do navegador.',
-        'Você pode excluir uma entrada do diário, limpar o diário inteiro ou remover todas as informações apagando os dados do site sense6.net no seu navegador. Os recursos de copiar, importar e exportar só são executados quando você os escolhe. Um arquivo de diário exportado contém as medições e os detalhes de configuração exibidos para você.',
+        'Você pode excluir uma entrada do diário, limpar o diário inteiro ou remover todas as informações apagando os dados do site sense6.net no seu navegador. Copiar, importar e exportar só funciona quando você escolhe. Uma exportação canônica contém o nome e a versão do esquema, horário da exportação, identificadores da sessão e do experimento, horários exatos, idioma registrado, identidade e versão do protocolo, passaporte de configuração, classificação e evidências de qualidade, identificadores, valores, unidades, limites, intervalos do modelo e incerteza explícita das medições, além das notas da sessão. Os identificadores permitem a deduplicação local; não são identificadores de conta nem identidade de rede.',
       ],
     },
     {
@@ -97,6 +97,24 @@ export const journal = Object.freeze({
   reasonVolume: 'O volume do navegador não pode ser verificado entre as sessões.',
   reasonLimited: 'Pelo menos uma sessão tem qualidade limitada de configuração ou medição.',
   reasonMinor: 'Um detalhe da configuração mudou ou está ausente.',
+  modelInterval: 'intervalo de modelo exibido, não incerteza combinável',
+  importPreview:
+    'Prévia da importação: {additions} adições, {duplicates} duplicatas, {discarded} adições descartadas, {evicted} entradas existentes removidas, {total} entradas após a importação. Continuar?',
+  exportDisclosure: Object.freeze({
+    schema: 'Nome e versão do esquema.',
+    exportTime: 'Horário da exportação.',
+    identifiers: 'Identificadores da sessão e do experimento.',
+    timestamps: 'Horários exatos das sessões.',
+    locale: 'Idioma registrado.',
+    protocol: 'Identidade e versão do protocolo.',
+    setup: 'Passaporte de configuração.',
+    quality: 'Classificação e evidências de qualidade.',
+    measurements:
+      'Identificadores, valores, unidades, limites, intervalos do modelo e incerteza explícita das medições.',
+    notes: 'Notas da sessão.',
+    idPurpose:
+      'Os identificadores permitem a deduplicação local. Não são identificadores de conta nem identidade de rede.',
+  }),
 });
 
 export const setupLabels = Object.freeze([

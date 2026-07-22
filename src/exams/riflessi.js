@@ -428,7 +428,7 @@ function renderRunner() {
         <button class="rx-runner__stop" type="button" data-action="rx-stop">Stop safely</button>
       </header>
       <div class="rx-chamber" data-rx-chamber data-rx-state="waiting">
-        <div class="rx-chamber__status" aria-live="polite" data-rx-status>Wait for the signal</div>
+        <div class="rx-chamber__status" data-rx-status>Wait for the signal</div>
         <div class="rx-target" data-rx-target aria-hidden="true">
           ${choice ? '<span class="rx-arrow" data-rx-arrow>→</span>' : '<span class="rx-flash"><i></i></span>'}
         </div>
@@ -674,8 +674,6 @@ function renderResults() {
     timing: timing.label,
     recordedAt: Date.now(),
   };
-  const lastResultSaved = saveLast(stored);
-  const journalSaved = saveJournalResult(result, timing);
   state.session.result = result;
 
   state.app.innerHTML = `
@@ -690,7 +688,7 @@ function renderResults() {
         <div class="rx-results__stamp ${result.usable ? '' : 'is-limited'}"><span>${result.usable ? 'Run usable' : 'Limited run'}</span><strong>${String(scopeInstrumentCount(state.session.scope)).padStart(2, '0')} / 03</strong></div>
       </header>
 
-      ${persistenceStatus(lastResultSaved, journalSaved)}
+      <div data-rx-persistence></div>
 
       <div class="rx-result-grid">
         ${metricCard('01', t('Typical signal response'), metric(result.signal.medianMs), 'ms', t('Median of {valid} clean simple responses from {scheduled} scheduled events. Within-run spread: {spread} ms; this is not estimate uncertainty.', { valid: result.signal.valid, scheduled: result.signal.scheduled, spread: metric(result.signal.withinRunSpreadMs) }))}
@@ -729,15 +727,22 @@ function renderResults() {
         <p>Browser, display, keyboard, touchscreen, operating system, posture, and attention all remain in the numbers. Compare repeated runs only on the same device and input. Riflessi does not assess concussion, driving fitness, fatigue, neurological health, or a population percentile.</p>
       </aside>
 
-      <div class="ui-cluster rx-results__actions">
-        ${
-          lastResultSaved && journalSaved
-            ? `<button class="ui-button" type="button" data-action="rx-restart">${t('Repeat this scope independently')}</button><button class="ui-button ui-button--ghost" type="button" data-action="rx-copy">${resultActionLabel(t)}</button>`
-            : `<button class="ui-button" type="button" data-action="rx-copy">${resultActionLabel(t)}</button><button class="ui-button ui-button--ghost" type="button" data-action="rx-restart">${t('Repeat this scope independently')}</button>`
-        }
-      </div>
+      <div class="ui-cluster rx-results__actions"></div>
     </section>
   `;
+
+  const lastResultSaved = saveLast(stored);
+  const journalSaved = saveJournalResult(result, timing);
+  const persistence = state.app.querySelector('[data-rx-persistence]');
+  if (lastResultSaved && journalSaved) persistence?.remove();
+  else if (persistence) persistence.outerHTML = persistenceStatus(lastResultSaved, journalSaved);
+  const actions = state.app.querySelector('.rx-results__actions');
+  if (actions) {
+    actions.innerHTML =
+      lastResultSaved && journalSaved
+        ? `<button class="ui-button" type="button" data-action="rx-restart">${t('Repeat this scope independently')}</button><button class="ui-button ui-button--ghost" type="button" data-action="rx-copy">${resultActionLabel(t)}</button>`
+        : `<button class="ui-button" type="button" data-action="rx-copy">${resultActionLabel(t)}</button><button class="ui-button ui-button--ghost" type="button" data-action="rx-restart">${t('Repeat this scope independently')}</button>`;
+  }
   resetScreen();
 }
 
@@ -915,18 +920,21 @@ function timingHealth(diagnostics) {
 }
 
 async function copyResults() {
-  if (!state.session?.result) return;
-  const result = state.session.result;
-  const timing = timingHealth(state.session.diagnostics);
-  const includesChoice = state.session.scope !== 'signal';
-  const includesStability = state.session.scope === 'complete';
+  const mountState = state;
+  if (!mountState?.session?.result) return;
+  const result = mountState.session.result;
+  const timing = timingHealth(mountState.session.diagnostics);
+  const includesChoice = mountState.session.scope !== 'signal';
+  const includesStability = mountState.session.scope === 'complete';
   const lines = [
     t('Riflessi — device-relative response observations'),
-    t('Input: {input}', { input: t(state.session.inputMode === 'pointer' ? 'touch / pointer' : 'keyboard') }),
+    t('Input: {input}', {
+      input: t(mountState.session.inputMode === 'pointer' ? 'touch / pointer' : 'keyboard'),
+    }),
     t('Run quality: {quality}', { quality: t(result.usable ? 'Usable run' : 'Limited run') }),
     t('Timing: {timing}; interruptions: {interruptions}', {
       timing: t(timing.label),
-      interruptions: state.session.diagnostics.interruptions,
+      interruptions: mountState.session.diagnostics.interruptions,
     }),
     t('Signal median: {value} ms', { value: metric(result.signal.medianMs) }),
   ];
@@ -967,12 +975,16 @@ async function copyResults() {
       title: t('Response speed and consistency — Riflessi | Sense6'),
       summary: lines.join('\n'),
       route: 'riflessi',
-      locale: state.locale,
+      locale: mountState.locale,
     });
-    if (outcome === 'copied') toast(t('Result summary copied.'));
+    if (outcome === 'copied' && isCurrentMount(mountState)) toast(t('Result summary copied.'));
   } catch {
-    toast(t('Copy was unavailable in this browser.'));
+    if (isCurrentMount(mountState)) toast(t('Copy was unavailable in this browser.'));
   }
+}
+
+function isCurrentMount(mountState) {
+  return state === mountState && !mountState.lifecycle.signal.aborted;
 }
 
 function wireEvents(signal) {
@@ -1046,6 +1058,7 @@ function wireEvents(signal) {
   document.addEventListener(
     'pointerdown',
     (event) => {
+      if (!event.isPrimary || event.button !== 0) return;
       const response = event.target.closest('[data-rx-response]');
       if (response) handleResponse(response.dataset.rxResponse, event);
     },
@@ -1057,16 +1070,15 @@ function wireEvents(signal) {
     (event) => {
       if (event.repeat || !state.session || state.session.inputMode !== 'keyboard') return;
       const target = event.target instanceof Element ? event.target : null;
-      if (
-        !target?.closest('.rx-runner') ||
-        target.closest('button, input, select, textarea, [contenteditable]')
-      )
-        return;
+      if (!target?.closest('.rx-runner')) return;
       let response = null;
-      if (state.session.instrument === 'choice' && event.key === 'ArrowLeft') response = 'left';
-      if (state.session.instrument === 'choice' && event.key === 'ArrowRight') response = 'right';
-      if (state.session.instrument !== 'choice' && (event.code === 'Space' || event.key === ' '))
-        response = 'signal';
+      const responseControl = target.closest('[data-rx-response]');
+      if (responseControl && (event.code === 'Space' || event.key === ' ' || event.key === 'Enter')) {
+        response = responseControl.dataset.rxResponse;
+      } else if (!target.closest('button, input, select, textarea, [contenteditable]')) {
+        if (state.session.instrument === 'choice' && event.key === 'ArrowLeft') response = 'left';
+        if (state.session.instrument === 'choice' && event.key === 'ArrowRight') response = 'right';
+      }
       if (response) {
         event.preventDefault();
         handleResponse(response, event);

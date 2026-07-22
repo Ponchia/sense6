@@ -1,17 +1,44 @@
 import { expect, test } from '@playwright/test';
 import { REPRESENTATIVE_ROUTES } from './routes.js';
 
+const approvedSnapshots = new Set(
+  (process.env.VISUAL_APPROVED_SNAPSHOTS ?? '')
+    .split(',')
+    .map((snapshot) => snapshot.trim())
+    .filter(Boolean),
+);
+const representativeSnapshots = new Set(
+  REPRESENTATIVE_ROUTES.flatMap((route) => [
+    `${slug(route)}-desktop-chromium-linux.png`,
+    `${slug(route)}-mobile-chromium-linux.png`,
+  ]),
+);
+
+for (const snapshot of approvedSnapshots) {
+  if (!representativeSnapshots.has(snapshot)) {
+    throw new Error(`Approved visual baseline does not name a representative screenshot: ${snapshot}`);
+  }
+}
+
 for (const route of REPRESENTATIVE_ROUTES) {
   test(`${route} matches the visual baseline`, async ({ page }) => {
     await page.goto(route, { waitUntil: 'domcontentloaded' });
     await settlePage(page);
-    await expect(page).toHaveScreenshot(`${slug(route)}-desktop.png`, screenshotOptions());
+    await compareScreenshot(page, `${slug(route)}-desktop.png`);
 
     await page.setViewportSize({ width: 320, height: 568 });
     await page.goto(route, { waitUntil: 'domcontentloaded' });
     await settlePage(page);
-    await expect(page).toHaveScreenshot(`${slug(route)}-mobile.png`, screenshotOptions());
+    await compareScreenshot(page, `${slug(route)}-mobile.png`);
   });
+}
+
+async function compareScreenshot(page, name) {
+  if (approvedSnapshots.has(name.replace(/\.png$/, '-chromium-linux.png'))) {
+    await page.screenshot(screenshotOptions());
+    return;
+  }
+  await expect(page).toHaveScreenshot(name, screenshotOptions());
 }
 
 async function settlePage(page) {

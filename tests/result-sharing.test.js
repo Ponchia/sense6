@@ -75,3 +75,45 @@ test('a cancelled native share does not copy behind the user’s back', async ()
   assert.equal(outcome, 'cancelled');
   assert.equal(copied, false);
 });
+
+test('a denied native share stays explicit and performs no clipboard fallback', async () => {
+  let copied = false;
+  const denied = new Error('denied');
+  denied.name = 'NotAllowedError';
+  const outcome = await shareOrCopyResult({
+    title: 'Riflessi',
+    summary: 'Device-relative result',
+    route: 'riflessi',
+    locale: 'en',
+    browserNavigator: {
+      share: async () => {
+        throw denied;
+      },
+      clipboard: { writeText: async () => (copied = true) },
+    },
+  });
+
+  assert.equal(outcome, 'denied');
+  assert.equal(copied, false);
+});
+
+test('an unexpected native-share failure rejects without writing to the clipboard', async () => {
+  let copied = false;
+  const failure = new Error('share failed');
+  await assert.rejects(
+    shareOrCopyResult({
+      title: 'Riflessi',
+      summary: 'Device-relative result',
+      route: 'riflessi',
+      locale: 'en',
+      browserNavigator: {
+        share: async () => {
+          throw failure;
+        },
+        clipboard: { writeText: async () => (copied = true) },
+      },
+    }),
+    failure,
+  );
+  assert.equal(copied, false);
+});

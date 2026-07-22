@@ -222,7 +222,9 @@ export async function answerCurrentSoundTrial(page) {
 export async function respondWithKey(page, key) {
   const chamber = page.locator('[data-rx-chamber]');
   await expect(chamber).toHaveAttribute('data-rx-state', 'live');
-  await page.keyboard.press(key);
+  const response = page.locator('[data-rx-response="signal"]');
+  await response.focus();
+  await response.press(key);
 }
 
 export async function respondToChoice(page) {

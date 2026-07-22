@@ -1,6 +1,13 @@
-import { supplementalJournal, supplementalSetupLabels } from './locales/supplemental.js';
+import {
+  loadSupplementalLocale,
+  supplementalJournal,
+  supplementalSetupLabels,
+} from './locales/supplemental.js';
 
-/** @type {Readonly<Record<string, Readonly<Record<string, string>>>>} */
+/** @typedef {{ schema: string, exportTime: string, identifiers: string, timestamps: string, locale: string, protocol: string, setup: string, quality: string, measurements: string, notes: string, idPurpose: string }} JournalDisclosure */
+/** @typedef {{ title: string, eyebrow: string, intro: string, privacy: string, emptyTitle: string, empty: string, filter: string, all: string, export: string, import: string, deleteAll: string, deleteOne: string, back: string, setup: string, measurements: string, latest: string, compare: string, comparable: string, caution: string, notComparable: string, noPrevious: string, change: string, uncertainty: string, noUncertainty: string, bounded: string, lowerBound: string, upperBound: string, yes: string, no: string, importSuccess: string, importFailure: string, storageFailure: string, confirmAll: string, confirmOne: string, entries: string, reasonInstrument: string, reasonProtocol: string, reasonSetup: string, reasonVolume: string, reasonLimited: string, reasonMinor: string, modelInterval: string, importPreview: string, exportDisclosure: Readonly<JournalDisclosure> }} JournalCopy */
+
+/** @type {Readonly<Record<string, Readonly<JournalCopy>>>} */
 const COPY = Object.freeze({
   en: copy({
     title: 'Your private measurement journal',
@@ -46,6 +53,24 @@ const COPY = Object.freeze({
     reasonVolume: 'Browser volume cannot be verified between runs.',
     reasonLimited: 'At least one run has limited setup or measurement quality.',
     reasonMinor: 'A setup detail changed or is missing.',
+    modelInterval: 'displayed model interval, not combinable uncertainty',
+    importPreview:
+      'Import preview: {additions} additions, {duplicates} duplicates, {discarded} discarded additions, {evicted} existing entries evicted, {total} entries after import. Continue?',
+    exportDisclosure: disclosure({
+      schema: 'Schema name and version.',
+      exportTime: 'Export time.',
+      identifiers: 'Run and experiment identifiers.',
+      timestamps: 'Exact run timestamps.',
+      locale: 'Recorded locale.',
+      protocol: 'Protocol identity and version.',
+      setup: 'Setup passport.',
+      quality: 'Quality rating and evidence.',
+      measurements:
+        'Measurement identifiers, values, units, bounds, model intervals, and explicit uncertainty.',
+      notes: 'Run notes.',
+      idPurpose:
+        'The identifiers support local deduplication. They are not account identifiers or network identity.',
+    }),
   }),
   it: copy({
     title: 'Il tuo diario privato delle misurazioni',
@@ -91,6 +116,23 @@ const COPY = Object.freeze({
     reasonVolume: 'Il volume del browser non può essere verificato tra sessioni.',
     reasonLimited: 'Almeno una sessione ha qualità di configurazione o misura limitata.',
     reasonMinor: 'Un dettaglio della configurazione è cambiato o manca.',
+    modelInterval: 'intervallo del modello visualizzato, non incertezza combinabile',
+    importPreview:
+      'Anteprima importazione: {additions} aggiunte, {duplicates} duplicati, {discarded} aggiunte scartate, {evicted} voci esistenti rimosse, {total} voci dopo l’importazione. Continuare?',
+    exportDisclosure: disclosure({
+      schema: 'Nome e versione dello schema.',
+      exportTime: 'Ora dell’esportazione.',
+      identifiers: 'Identificatori della sessione e dell’esperimento.',
+      timestamps: 'Orari esatti delle sessioni.',
+      locale: 'Lingua registrata.',
+      protocol: 'Identità e versione del protocollo.',
+      setup: 'Passaporto della configurazione.',
+      quality: 'Valutazione ed elementi della qualità.',
+      measurements:
+        'Identificatori, valori, unità, limiti, intervalli del modello e incertezza esplicita delle misurazioni.',
+      notes: 'Note della sessione.',
+      idPurpose: 'Gli identificatori servono alla deduplicazione locale. Non identificano account o rete.',
+    }),
   }),
   de: copy({
     title: 'Ihr privates Messjournal',
@@ -136,6 +178,24 @@ const COPY = Object.freeze({
     reasonVolume: 'Die Browserlautstärke kann zwischen Durchläufen nicht geprüft werden.',
     reasonLimited: 'Mindestens ein Durchlauf hat eingeschränkte Einrichtungs- oder Messqualität.',
     reasonMinor: 'Ein Einrichtungsdetail hat sich geändert oder fehlt.',
+    modelInterval: 'angezeigtes Modellintervall, keine kombinierbare Unsicherheit',
+    importPreview:
+      'Importvorschau: {additions} Ergänzungen, {duplicates} Duplikate, {discarded} verworfene Ergänzungen, {evicted} verdrängte vorhandene Einträge, {total} Einträge nach dem Import. Fortfahren?',
+    exportDisclosure: disclosure({
+      schema: 'Schemaname und -version.',
+      exportTime: 'Exportzeit.',
+      identifiers: 'Durchlauf- und Versuchskennungen.',
+      timestamps: 'Genaue Zeitstempel der Durchläufe.',
+      locale: 'Gespeicherte Sprache.',
+      protocol: 'Protokollidentität und -version.',
+      setup: 'Einrichtungspass.',
+      quality: 'Qualitätsbewertung und -nachweise.',
+      measurements:
+        'Messkennungen, Werte, Einheiten, Grenzen, Modellintervalle und ausdrückliche Unsicherheit.',
+      notes: 'Durchlaufnotizen.',
+      idPurpose:
+        'Die Kennungen dienen der lokalen Deduplizierung. Sie sind keine Konto- oder Netzwerkidentität.',
+    }),
   }),
   fr: copy({
     title: 'Votre journal privé de mesures',
@@ -181,6 +241,24 @@ const COPY = Object.freeze({
     reasonVolume: 'Le volume du navigateur ne peut pas être vérifié entre les sessions.',
     reasonLimited: 'Au moins une session a une qualité de configuration ou de mesure limitée.',
     reasonMinor: 'Un détail de configuration a changé ou manque.',
+    modelInterval: 'intervalle de modèle affiché, pas une incertitude combinable',
+    importPreview:
+      'Aperçu de l’import : {additions} ajouts, {duplicates} doublons, {discarded} ajouts écartés, {evicted} entrées existantes évincées, {total} entrées après import. Continuer ?',
+    exportDisclosure: disclosure({
+      schema: 'Nom et version du schéma.',
+      exportTime: 'Heure de l’export.',
+      identifiers: 'Identifiants de session et d’expérience.',
+      timestamps: 'Horodatages exacts des sessions.',
+      locale: 'Langue enregistrée.',
+      protocol: 'Identité et version du protocole.',
+      setup: 'Passeport de configuration.',
+      quality: 'Évaluation et éléments de qualité.',
+      measurements:
+        'Identifiants, valeurs, unités, limites, intervalles de modèle et incertitude explicite des mesures.',
+      notes: 'Notes de session.',
+      idPurpose:
+        'Les identifiants servent à la déduplication locale. Ils ne sont ni des identifiants de compte ni une identité réseau.',
+    }),
   }),
   es: copy({
     title: 'Tu diario privado de mediciones',
@@ -226,6 +304,24 @@ const COPY = Object.freeze({
     reasonVolume: 'El volumen del navegador no puede verificarse entre sesiones.',
     reasonLimited: 'Al menos una sesión tiene calidad limitada de configuración o medición.',
     reasonMinor: 'Un detalle de configuración cambió o falta.',
+    modelInterval: 'intervalo de modelo mostrado, no incertidumbre combinable',
+    importPreview:
+      'Vista previa de importación: {additions} adiciones, {duplicates} duplicados, {discarded} adiciones descartadas, {evicted} entradas existentes expulsadas, {total} entradas tras importar. ¿Continuar?',
+    exportDisclosure: disclosure({
+      schema: 'Nombre y versión del esquema.',
+      exportTime: 'Hora de exportación.',
+      identifiers: 'Identificadores de sesión y experimento.',
+      timestamps: 'Marcas de tiempo exactas de las sesiones.',
+      locale: 'Idioma registrado.',
+      protocol: 'Identidad y versión del protocolo.',
+      setup: 'Pasaporte de configuración.',
+      quality: 'Calificación y pruebas de calidad.',
+      measurements:
+        'Identificadores, valores, unidades, límites, intervalos de modelo e incertidumbre explícita de las mediciones.',
+      notes: 'Notas de la sesión.',
+      idPurpose:
+        'Los identificadores permiten la deduplicación local. No son identificadores de cuenta ni identidad de red.',
+    }),
   }),
   pt: copy({
     title: 'O seu diário privado de medições',
@@ -271,6 +367,24 @@ const COPY = Object.freeze({
     reasonVolume: 'O volume do navegador não pode ser verificado entre sessões.',
     reasonLimited: 'Pelo menos uma sessão tem qualidade limitada de configuração ou medição.',
     reasonMinor: 'Um detalhe da configuração mudou ou está em falta.',
+    modelInterval: 'intervalo de modelo apresentado, não incerteza combinável',
+    importPreview:
+      'Pré-visualização da importação: {additions} adições, {duplicates} duplicados, {discarded} adições descartadas, {evicted} entradas existentes removidas, {total} entradas após a importação. Continuar?',
+    exportDisclosure: disclosure({
+      schema: 'Nome e versão do esquema.',
+      exportTime: 'Hora da exportação.',
+      identifiers: 'Identificadores da sessão e da experiência.',
+      timestamps: 'Marcas temporais exatas das sessões.',
+      locale: 'Idioma registado.',
+      protocol: 'Identidade e versão do protocolo.',
+      setup: 'Passaporte da configuração.',
+      quality: 'Classificação e evidência de qualidade.',
+      measurements:
+        'Identificadores, valores, unidades, limites, intervalos do modelo e incerteza explícita das medições.',
+      notes: 'Notas da sessão.',
+      idPurpose:
+        'Os identificadores servem para deduplicação local. Não são identificadores de conta nem identidade de rede.',
+    }),
   }),
 });
 
@@ -566,6 +680,12 @@ export function journalCopy(locale) {
   return COPY[locale] ?? supplementalJournal(locale) ?? COPY.en;
 }
 
+/** @param {string} locale */
+export async function prepareJournalCopy(locale) {
+  await loadSupplementalLocale(locale);
+  return journalCopy(locale);
+}
+
 /** @param {string} id @param {(source: string) => string} [translate] */
 export function journalMetricLabel(id, translate = (source) => source) {
   const eye = id.match(/^(right|left)-(high|low|contrast-cost|meridian)$/);
@@ -595,8 +715,13 @@ export function journalSetupLabel(key, locale) {
   return labels?.[key] ?? fallback[key] ?? humanize(key);
 }
 
-/** @param {Record<string, string>} value */
+/** @param {JournalCopy} value */
 function copy(value) {
+  return Object.freeze(value);
+}
+
+/** @param {JournalDisclosure} value */
+function disclosure(value) {
   return Object.freeze(value);
 }
 

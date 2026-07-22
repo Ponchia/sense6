@@ -2,7 +2,11 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import test from 'node:test';
-import { measureInitialLocaleGraph } from '../scripts/vite-manifest.mjs';
+import {
+  activeRouteModuleFiles,
+  measureActiveRouteGraph,
+  measureInitialLocaleGraph,
+} from '../scripts/vite-manifest.mjs';
 import { CRAWLER_POLICY } from '../src/crawler-policy.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { LOCALES } from '../src/locales.js';
@@ -103,7 +107,7 @@ test('experiment discovery pages expose useful copy, related routes, images, and
       data['@graph'].map((entry) => entry['@type']),
       ['WebApplication', 'BreadcrumbList'],
     );
-    assert.equal(data['@graph'][0].dateModified, '2026-07-21');
+    assert.equal(data['@graph'][0].dateModified, '2026-07-22');
     assert.equal(data['@graph'][0].creator.url, 'https://personal.brontolotto.observer');
     assert.equal(data['@graph'][0].image, `https://sense6.net/social/${definition.id}.png`);
   }
@@ -157,6 +161,9 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   const notFound = await readFile(new URL('404.html', DIST), 'utf8');
   assert.match(notFound, /<meta name="robots" content="noindex">/);
   assert.doesNotMatch(notFound, /<script type="module"/);
+  assert.doesNotMatch(notFound, /rel="canonical"/);
+  assert.doesNotMatch(notFound, /property="og:/);
+  assert.doesNotMatch(notFound, /name="twitter:/);
 
   const privacy = await readFile(new URL('en/privacy/index.html', DIST), 'utf8');
   assert.match(privacy, /<!--email_off--><a href="mailto:privacy@sense6\.net">/);
@@ -190,6 +197,51 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
     ['AboutPage', 'WebSite', 'Person'],
   );
   assert.equal(aboutJson['@graph'][0].dateModified, '2026-07-19');
+});
+
+test('static pages preload only the active route and requested supplemental locale graph', async () => {
+  const manifest = JSON.parse(await readFile(new URL('.vite/manifest.json', DIST), 'utf8'));
+  const supplementalFiles = Object.entries(manifest)
+    .filter(([key]) => key.startsWith('src/locales/supplemental/'))
+    .map(([, record]) => record.file);
+  assert.equal(supplementalFiles.length, 6);
+
+  for (const { code: locale } of LOCALES) {
+    for (const route of [...EXAMS.map(({ route: examRoute }) => examRoute), ...UTILITY_ROUTES]) {
+      const files = await activeRouteModuleFiles(locale, route);
+      const html = await readFile(new URL(`${locale}/${route}/index.html`, DIST), 'utf8');
+      assert.ok(files.length > 0, `${locale}/${route} must have an active route graph`);
+      for (const file of files) {
+        assert.match(
+          html,
+          new RegExp(`rel="modulepreload" crossorigin href="/${escapeRegex(file)}"`),
+          `${locale}/${route} must preload ${file}`,
+        );
+      }
+      const activeSupplemental = files.filter((file) => supplementalFiles.includes(file));
+      const needsSupplemental =
+        ['ar', 'hi', 'ja', 'ko', 'pt-br', 'zh-hans'].includes(locale) &&
+        ['journal', 'privacy'].includes(route);
+      assert.equal(
+        activeSupplemental.length,
+        needsSupplemental ? 1 : 0,
+        `${locale}/${route} must preload only its requested supplemental locale chunk`,
+      );
+    }
+  }
+
+  const chooser = await readFile(new URL('index.html', DIST), 'utf8');
+  const gallery = await readFile(new URL('en/index.html', DIST), 'utf8');
+  assert.deepEqual(
+    modulePreloadHrefs(chooser),
+    modulePreloadHrefs(gallery),
+    'the language chooser and gallery must contain only Vite entry preloads',
+  );
+
+  const englishPrivacy = await measureActiveRouteGraph('en', 'privacy');
+  const arabicPrivacy = await measureActiveRouteGraph('ar', 'privacy');
+  assert.ok(englishPrivacy.bytes > 0);
+  assert.ok(arabicPrivacy.bytes > englishPrivacy.bytes, 'Arabic adds exactly its measured copy chunk');
 });
 
 test('Cloudflare headers and function routes stay fail-closed', async () => {
@@ -297,6 +349,10 @@ function stripTags(html) {
 
 function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function modulePreloadHrefs(html) {
+  return [...html.matchAll(/<link rel="modulepreload"[^>]+href="([^"]+)"/g)].map((match) => match[1]);
 }
 
 function assertBalanced(html, tag, path) {

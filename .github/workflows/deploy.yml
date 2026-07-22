@@ -15,8 +15,8 @@ permissions:
 
 jobs:
   verify:
+    if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/verify.yml
     with:
-      deploy_target: production
-      deploy_branch: main
+      publish_production: true
     secrets: inherit

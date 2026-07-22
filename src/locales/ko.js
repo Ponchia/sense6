@@ -191,7 +191,6 @@ const rows = [
     'This is not vision screening, diagnosis, or a prescription.',
     '이것은 시력 선별검사나 진단, 처방이 아닙니다.',
   ],
-  ['preference', '선호'],
   ['Calibrated sharpness experiment — Acutezza | Sense6', '보정된 선명도 실험 — Acutezza | Sense6'],
   ['Calibrate screen size — Acutezza | Sense6', '화면 크기 보정 — Acutezza | Sense6'],
   ['Estimate viewing distance — Acutezza | Sense6', '예상 시청 거리 — Acutezza | Sense6'],

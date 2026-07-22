@@ -629,6 +629,12 @@ body.ac-active {
   font-size: var(--text-sm);
 }
 
+@media (forced-colors: active) {
+  .ac-blocked[data-ac-forced-colors] > span:first-child {
+    color: CanvasText;
+  }
+}
+
 .ac-calibration-summary__grid {
   background: var(--line);
   border: 1px solid var(--line);

@@ -188,7 +188,6 @@ const rows = [
     'This is not vision screening, diagnosis, or a prescription.',
     'यह दृष्टि-स्क्रीनिंग, निदान या चश्मे का नुस्खा नहीं है।',
   ],
-  ['preference', 'पसंद'],
   ['Calibrated sharpness experiment — Acutezza | Sense6', 'मापित तीक्ष्णता प्रयोग — Acutezza | Sense6'],
   ['Calibrate screen size — Acutezza | Sense6', 'स्क्रीन का आकार कैलिब्रेट करें — Acutezza | Sense6'],
   ['Estimate viewing distance — Acutezza | Sense6', 'दृश्य दूरी का अनुमान लगाएँ — Acutezza | Sense6'],

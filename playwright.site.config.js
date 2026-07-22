@@ -12,6 +12,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: true,
   retries: process.env.CI ? 1 : 0,
+  failOnFlakyTests: true,
   timeout: 30_000,
   expect: { timeout: 5_000 },
   reporter: [['list'], ['html', { open: 'never', outputFolder: 'playwright-report/site-audit' }]],

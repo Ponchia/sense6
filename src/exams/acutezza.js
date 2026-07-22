@@ -19,6 +19,10 @@ import {
   summarizeBlindSpot,
   summarizeContrastCost,
 } from '../lib/acuity.js';
+import {
+  captureDisplayGeometry as captureGeometry,
+  displayGeometryMatches as geometryMatches,
+} from '../lib/display-geometry.js';
 import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
 import { createExamLifecycle } from '../lib/lifecycle.js';
 import { drawLandoltRing } from '../lib/optotypes.js';
@@ -35,6 +39,7 @@ import {
 import { ACUTEZZA_INSTRUMENTS, acutezzaIntroMarkup } from './views/acutezza-intro.js';
 
 const STORAGE_KEY = 'sense6:acutezza:last';
+const FORCED_COLORS_QUERY = '(forced-colors: active)';
 const LEGACY_RESULT_STORE = createResultStore({
   key: STORAGE_KEY,
   version: 1,
@@ -73,6 +78,7 @@ export function mount(context) {
     geometryTimer: 0,
     pendingAdvance: false,
     trialSequence: 0,
+    forcedColorsRetry: null,
   };
   state = mountState;
   document.body.classList.add('ac-active');
@@ -149,11 +155,16 @@ function beginCalibration() {
     interruptions: 0,
     distanceRecheckPassed: null,
   };
+  state.lifecycle.setActive(
+    true,
+    t('Leave this calibration? Your unfinished vision setup will not be saved.'),
+  );
   renderCardCalibration();
 }
 
 function renderCardCalibration() {
   clearRuntime();
+  if (!guardForcedColors('card')) return;
   const maximum = Math.max(180, Math.min(620, window.innerWidth - 40));
   const initial = Math.min(340, maximum);
   document.title = t('Calibrate screen size — Acutezza | Sense6');
@@ -162,6 +173,7 @@ function renderCardCalibration() {
       <div class="ac-card-stage"><div class="ac-card" data-ac-card-shape style="inline-size:${initial}px" aria-hidden="true"><i></i><span>${CARD_WIDTH_MM.toFixed(1)} × ${CARD_HEIGHT_MM.toFixed(2)} mm</span></div><label>Card width<input type="range" data-ac-card-size min="160" max="${maximum}" value="${initial}" step="1"></label><div class="ac-card-controls"><button class="ui-button ui-button--ghost" type="button" data-action="ac-card-smaller">Smaller</button><output data-ac-card-output>${initial} px</output><button class="ui-button ui-button--ghost" type="button" data-action="ac-card-larger">Larger</button></div></div>
       <div class="ui-alert ui-alert--info"><strong class="ui-alert__title">No card?</strong><p class="ui-alert__body">Use a ruler and set the rectangle to exactly 85.6 mm wide. If the card cannot fit, rotate to landscape or use a larger screen.</p></div>
       <div class="ui-cluster ac-calibration__actions"><button class="ui-button ui-button--lg" type="button" data-action="ac-confirm-card">The edges match <span aria-hidden="true">→</span></button><button class="ui-link" type="button" data-action="ac-card-no-fit">The card cannot fit</button></div></section>`);
+  checkpointGeometry();
 }
 
 function adjustCard(delta) {
@@ -181,6 +193,7 @@ function updateCardSize() {
 }
 
 function confirmCard() {
+  if (!ensureGeometry() || !guardForcedColors('card')) return;
   const widthCssPx = state.app.querySelector('[data-ac-card-shape]')?.getBoundingClientRect().width;
   if (!(widthCssPx > 0)) return;
   state.session.calibration.cardWidthCssPx = widthCssPx;
@@ -189,12 +202,14 @@ function confirmCard() {
 }
 
 function renderCardNoFit() {
+  state.session.calibration.geometry = null;
   renderScreen(
     `<section class="ac-blocked ui-container"><span aria-hidden="true">↔</span><p class="ui-eyebrow">Display too narrow</p><h1>This screen cannot show the calibration card at physical size.</h1><p>Rotate to landscape or continue on a larger tablet, laptop, or monitor. Acutezza will not guess physical screen size.</p><button class="ui-button" type="button" data-action="ac-card-retry">Try card calibration again</button></section>`,
   );
 }
 
 function renderBlindSpotCalibration({ recheck = false } = {}) {
+  if (!ensureGeometry() || !guardForcedColors('distance')) return;
   clearSweep();
   state.session.sweep = {
     recheck,
@@ -230,7 +245,7 @@ function checkSweepSpace(mountState) {
 }
 
 function startSweep() {
-  if (state.sweepFrame || !state.session?.sweep) return;
+  if (state.sweepFrame || !state.session?.sweep || !ensureGeometry()) return;
   const mountState = state;
   const field = state.app.querySelector('[data-ac-sweep-field]');
   const dot = state.app.querySelector('[data-ac-sweep-dot]');
@@ -269,7 +284,7 @@ function startSweep() {
 }
 
 function recordSweep() {
-  if (!state.sweepFrame || !state.sweepGeometry?.currentOffset) return;
+  if (!state.sweepFrame || !state.sweepGeometry?.currentOffset || !ensureGeometry()) return;
   const distance = estimateViewingDistance(
     state.sweepGeometry.currentOffset,
     state.session.calibration.cssPixelsPerMm,
@@ -312,6 +327,7 @@ function acceptDistance() {
 }
 
 function renderManualDistance() {
+  if (!ensureGeometry() || !guardForcedColors('distance')) return;
   clearSweep();
   renderScreen(
     `<section class="ac-distance-result ui-container"><span class="ac-distance-result__mark" aria-hidden="true">cm</span><p class="ui-eyebrow">Ruler-measured fallback</p><h1>Measure eye to screen.</h1><p>Sit in the position you will keep and measure from the bridge of your nose to the screen. This run remains labelled “assumed distance.”</p><label class="ac-field">Distance in centimetres<input type="number" data-ac-manual-distance min="30" max="100" step="1" value="50" inputmode="decimal"></label><div class="ui-cluster ac-calibration__actions"><button class="ui-button ui-button--lg" type="button" data-action="ac-confirm-manual-distance">Use measured distance</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-repeat-distance">Return to blind-spot sweeps</button></div></section>`,
@@ -319,6 +335,7 @@ function renderManualDistance() {
 }
 
 function confirmManualDistance() {
+  if (!ensureGeometry() || !guardForcedColors('distance')) return;
   const centimetres = Number(state.app.querySelector('[data-ac-manual-distance]')?.value);
   if (centimetres < 30 || centimetres > 100) return toast(t('Enter a distance from 30 to 100 centimetres.'));
   Object.assign(state.session.calibration, {
@@ -339,6 +356,7 @@ function continueAfterDistance() {
 }
 
 function renderContrastCheck({ stronger = false } = {}) {
+  if (!ensureGeometry() || !guardForcedColors('contrast')) return;
   const contrast = stronger ? 0.2 : state.config.low.contrast;
   const colors = contrastGrays(contrast);
   state.session.pendingContrast = contrast;
@@ -348,11 +366,13 @@ function renderContrastCheck({ stronger = false } = {}) {
 }
 
 function acceptContrast() {
+  if (!ensureGeometry() || !guardForcedColors('contrast')) return;
   state.session.contrast = state.session.pendingContrast;
   lockCalibration();
 }
 
 function rejectContrast() {
+  if (!ensureGeometry() || !guardForcedColors('contrast')) return;
   if (state.session.pendingContrast < 0.2) renderContrastCheck({ stronger: true });
   else {
     state.session.contrast = null;
@@ -361,6 +381,7 @@ function rejectContrast() {
 }
 
 function lockCalibration() {
+  if (!ensureGeometry() || !guardForcedColors('lock')) return;
   const maxDiameterCssPx = maximumAcuityCanvasBox();
   const bounds = measurableGapBounds({
     distanceMm: state.session.calibration.distanceMm,
@@ -677,8 +698,15 @@ function renderResults() {
       : 'Run unusable';
   state.session.result = { setupQuality, usable, strongest, bounded, controlCorrect, controlCount };
   const completion = acutezzaCompletion();
-  const latestResultSaved = saveLast({ setupQuality, completion, recordedAt: Date.now() });
-  const journalSaved = saveJournalResult({
+  let latestResultSaved = true;
+  let journalSaved = true;
+  state.session.journalSaved = true;
+  document.title = t('Your calibrated sharpness observations — Acutezza | Sense6');
+  renderScreen(
+    `<section class="ac-results ui-container ui-container--wide"><button class="back-link" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button><header class="ac-results__hero"><div><p class="ui-eyebrow">Acutezza / this display / this distance</p><h1>Separate observations.<br><em>No vision label.</em></h1><p>${strongest ? 'Measured calibration and every per-condition task-control pair support this run at the stated distance.' : usable ? 'At least one calibration, bound, interruption, or control condition requires caution before comparison.' : 'A per-condition task-control check failed. Repeat before interpreting this run.'}</p></div><div class="ac-results__stamp ${strongest ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>${String(state.session.eyeResults.length).padStart(2, '0')} / 02</strong></div></header>${latestResultSaved && journalSaved ? '' : `<div class="ui-alert ui-alert--danger" data-ac-journal-status role="alert"><strong class="ui-alert__title">${t('The result is ready, but this browser did not allow local storage.')}</strong></div>`}<div class="ac-eye-results">${state.session.eyeResults.map(eyeResultMarkup).join('')}</div><div class="ac-context-grid"><article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the target.</h2><dl><div><dt>Scope</dt><dd>${state.session.scope === 'focused' ? 'Focused Sharpness' : 'Sharpness + nominal contrast'}</dd></div><div><dt>Correction</dt><dd>${correctionLabel(state.session.correction)}</dd></div><div><dt>Distance</dt><dd>${Math.round(state.session.calibration.distanceMm / 10)} cm · ${t(state.session.calibration.state)}</dd></div><div><dt>Second-eye distance recheck</dt><dd>${state.session.distanceRecheckPassed === null ? 'Not applicable' : state.session.distanceRecheckPassed ? 'Passed' : 'Not passed'}</dd></div><div><dt>Card scale</dt><dd>${Math.round(state.session.calibration.cardWidthCssPx)} CSS px</dd></div><div><dt>Low contrast</dt><dd>${contrastLabel()}</dd></div><div><dt>Surround theme</dt><dd>${state.session.theme}</dd></div><div><dt>Task controls</dt><dd>${controlCorrect} / ${controlCount}, assessed per condition</dd></div><div><dt>Interruptions</dt><dd>${state.session.interruptions}</dd></div></dl></article><article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Calibrated experiment, not an eye examination.</h2><p>Acutezza describes one self-administered run on this display at this estimated distance. It is not vision screening, diagnosis, or a prescription.</p><p>Do not infer normal vision, 20/20, refractive error, cylinder power, or an astigmatism axis. Meridiani scoring is suspended.</p></article></div><aside class="ac-results__safety"><strong>Sudden changes need care, not another run.</strong><p>Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.</p></aside><div class="ui-cluster ac-results__actions">${latestResultSaved && journalSaved ? `<button class="ui-button" type="button" data-action="ac-restart">Repeat this scope independently</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-copy">${resultActionLabel(t)}</button>` : `<button class="ui-button" type="button" data-action="ac-copy">${resultActionLabel(t)}</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-restart">Repeat this scope independently</button>`}${journalSaved ? `<button class="ui-button ui-button--ghost" type="button" data-action="ac-journal">${t('Open private journal')}</button>` : ''}</div></section>`,
+  );
+  latestResultSaved = saveLast({ setupQuality, completion, recordedAt: Date.now() });
+  journalSaved = saveJournalResult({
     setupQuality,
     usable,
     strongest,
@@ -688,10 +716,18 @@ function renderResults() {
     completion,
   });
   state.session.journalSaved = journalSaved;
-  document.title = t('Your calibrated sharpness observations — Acutezza | Sense6');
-  renderScreen(
-    `<section class="ac-results ui-container ui-container--wide"><button class="back-link" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button><header class="ac-results__hero"><div><p class="ui-eyebrow">Acutezza / this display / this distance</p><h1>Separate observations.<br><em>No vision label.</em></h1><p>${strongest ? 'Measured calibration and every per-condition task-control pair support this run at the stated distance.' : usable ? 'At least one calibration, bound, interruption, or control condition requires caution before comparison.' : 'A per-condition task-control check failed. Repeat before interpreting this run.'}</p></div><div class="ac-results__stamp ${strongest ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>${String(state.session.eyeResults.length).padStart(2, '0')} / 02</strong></div></header>${latestResultSaved && journalSaved ? '' : `<div class="ui-alert ui-alert--danger" data-ac-journal-status role="alert"><strong class="ui-alert__title">${t('The result is ready, but this browser did not allow local storage.')}</strong></div>`}<div class="ac-eye-results">${state.session.eyeResults.map(eyeResultMarkup).join('')}</div><div class="ac-context-grid"><article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the target.</h2><dl><div><dt>Scope</dt><dd>${state.session.scope === 'focused' ? 'Focused Sharpness' : 'Sharpness + nominal contrast'}</dd></div><div><dt>Correction</dt><dd>${correctionLabel(state.session.correction)}</dd></div><div><dt>Distance</dt><dd>${Math.round(state.session.calibration.distanceMm / 10)} cm · ${t(state.session.calibration.state)}</dd></div><div><dt>Second-eye distance recheck</dt><dd>${state.session.distanceRecheckPassed === null ? 'Not applicable' : state.session.distanceRecheckPassed ? 'Passed' : 'Not passed'}</dd></div><div><dt>Card scale</dt><dd>${Math.round(state.session.calibration.cardWidthCssPx)} CSS px</dd></div><div><dt>Low contrast</dt><dd>${contrastLabel()}</dd></div><div><dt>Surround theme</dt><dd>${state.session.theme}</dd></div><div><dt>Task controls</dt><dd>${controlCorrect} / ${controlCount}, assessed per condition</dd></div><div><dt>Interruptions</dt><dd>${state.session.interruptions}</dd></div></dl></article><article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Calibrated experiment, not an eye examination.</h2><p>Acutezza describes one self-administered run on this display at this estimated distance. It is not vision screening, diagnosis, or a prescription.</p><p>Do not infer normal vision, 20/20, refractive error, cylinder power, or an astigmatism axis. Meridiani scoring is suspended.</p></article></div><aside class="ac-results__safety"><strong>Sudden changes need care, not another run.</strong><p>Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.</p></aside><div class="ui-cluster ac-results__actions">${latestResultSaved && journalSaved ? `<button class="ui-button" type="button" data-action="ac-restart">Repeat this scope independently</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-copy">${resultActionLabel(t)}</button>` : `<button class="ui-button" type="button" data-action="ac-copy">${resultActionLabel(t)}</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-restart">Repeat this scope independently</button>`}${journalSaved ? `<button class="ui-button ui-button--ghost" type="button" data-action="ac-journal">${t('Open private journal')}</button>` : ''}</div></section>`,
-  );
+  if (!latestResultSaved || !journalSaved) {
+    state.app
+      .querySelector('.ac-eye-results')
+      ?.insertAdjacentHTML(
+        'beforebegin',
+        `<div class="ui-alert ui-alert--danger" data-ac-journal-status role="alert"><strong class="ui-alert__title">${t('The result is ready, but this browser did not allow local storage.')}</strong></div>`,
+      );
+  }
+  const actions = state.app.querySelector('.ac-results__actions');
+  if (actions) {
+    actions.innerHTML = `${latestResultSaved && journalSaved ? `<button class="ui-button" type="button" data-action="ac-restart">${t('Repeat this scope independently')}</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-copy">${resultActionLabel(t)}</button>` : `<button class="ui-button" type="button" data-action="ac-copy">${resultActionLabel(t)}</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-restart">${t('Repeat this scope independently')}</button>`}${journalSaved ? `<button class="ui-button ui-button--ghost" type="button" data-action="ac-journal">${t('Open private journal')}</button>` : ''}`;
+  }
 }
 
 function eyeResultMarkup(result) {
@@ -779,7 +815,7 @@ function resumeRun() {
 
 function geometryChanged() {
   clearTimeout(state.geometryTimer);
-  if (!hasLockedSession()) return;
+  if (!hasGeometryCheckpoint()) return;
   const mountState = state;
   state.geometryTimer = window.setTimeout(() => {
     if (!isCurrentMount(mountState)) return;
@@ -790,13 +826,17 @@ function geometryChanged() {
 function ensureGeometry(
   reason = 'Browser zoom, viewport size, pixel ratio, or orientation changed after calibration.',
 ) {
-  if (!hasLockedSession()) return true;
+  if (!hasGeometryCheckpoint()) return true;
   if (geometryMatches(state.session.calibration.geometry, captureGeometry())) return true;
   return renderCalibrationInvalid(reason);
 }
 
 function hasLockedSession() {
   return Boolean(state.session?.calibration?.valid && !state.session.result);
+}
+
+function hasGeometryCheckpoint() {
+  return Boolean(state.session?.calibration?.geometry && !state.session.result);
 }
 
 function themeChanged() {
@@ -814,30 +854,53 @@ function renderCalibrationInvalid(reason) {
   if (state.session?.calibration) state.session.calibration.valid = false;
   document.body.classList.remove('ac-running');
   renderScreen(
-    `<section class="ac-blocked ui-container"><span aria-hidden="true">!</span><p class="ui-eyebrow">Calibration invalid</p><h1>The measured geometry changed.</h1><p>${reason}</p><p>No unfinished value will be saved. Return to a stable display and calibrate again.</p><button class="ui-button ui-button--lg" type="button" data-action="ac-recalibrate">Recalibrate</button></section>`,
+    `<section class="ac-blocked ui-container" data-ac-calibration-invalid tabindex="-1"><span aria-hidden="true">!</span><p class="ui-eyebrow">Calibration invalid</p><h1>The measured geometry changed.</h1><p>${reason}</p><p>No unfinished value will be saved. Return to a stable display and calibrate again.</p><button class="ui-button ui-button--lg" type="button" data-action="ac-recalibrate">Recalibrate</button></section>`,
+    { focus: '[data-ac-calibration-invalid]' },
   );
   return false;
 }
 
-function captureGeometry() {
-  return {
-    width: window.innerWidth,
-    height: window.innerHeight,
-    dpr: window.devicePixelRatio,
-    scale: window.visualViewport?.scale ?? 1,
-    orientation: screen.orientation?.type ?? `${window.orientation ?? 0}`,
-  };
+function checkpointGeometry() {
+  if (state.session?.calibration) state.session.calibration.geometry = captureGeometry();
 }
 
-function geometryMatches(left, right) {
-  return (
-    left &&
-    Math.abs(left.width - right.width) <= 2 &&
-    Math.abs(left.height - right.height) <= 20 &&
-    Math.abs(left.dpr - right.dpr) < 0.01 &&
-    Math.abs(left.scale - right.scale) < 0.01 &&
-    left.orientation === right.orientation
+function forcedColorsActive() {
+  return Boolean(window.matchMedia?.(FORCED_COLORS_QUERY).matches);
+}
+
+function guardForcedColors(retry) {
+  if (!forcedColorsActive()) return true;
+  renderForcedColorsBlocked(retry);
+  return false;
+}
+
+function renderForcedColorsBlocked(retry) {
+  clearRuntime();
+  state.forcedColorsRetry = retry;
+  document.body.classList.remove('ac-running');
+  renderScreen(
+    `<section class="ac-blocked ui-container" data-ac-forced-colors tabindex="-1"><span aria-hidden="true">◐</span><p class="ui-eyebrow">Display mode incompatible</p><h1>High-contrast or forced-colors mode is active.</h1><p>This mode replaces the exact grays and contrast that Acutezza needs. Only the Acutezza measurement surface is blocked; no result or calibration value was saved.</p><p>Turn off forced-colors or high-contrast mode for this site, keep the display and browser zoom stable, then retry the display check.</p><button class="ui-button ui-button--lg" type="button" data-action="ac-forced-colors-retry">Retry display check</button></section>`,
+    { focus: '[data-ac-forced-colors]' },
   );
+}
+
+function retryForcedColors() {
+  if (forcedColorsActive()) return renderForcedColorsBlocked(state.forcedColorsRetry ?? 'card');
+  const retry = state.forcedColorsRetry;
+  state.forcedColorsRetry = null;
+  if (retry === 'distance') return renderBlindSpotCalibration();
+  if (retry === 'contrast') return renderContrastCheck();
+  if (retry === 'lock') return lockCalibration();
+  if (retry === 'recalibrate') return renderPreparation();
+  return renderCardCalibration();
+}
+
+function forcedColorsChanged() {
+  if (!forcedColorsActive() || !state.session || state.session.result) return;
+  if (hasLockedSession() || state.session.currentEye) return renderForcedColorsBlocked('recalibrate');
+  if (state.app.querySelector('.ac-contrast')) return renderForcedColorsBlocked('contrast');
+  if (state.session.calibration.cardWidthCssPx) return renderForcedColorsBlocked('distance');
+  renderForcedColorsBlocked('card');
 }
 
 function wireEvents(signal) {
@@ -886,6 +949,7 @@ function wireEvents(signal) {
         'ac-copy': copyResults,
         'ac-journal': () => state.goJournal(),
         'ac-recalibrate': renderPreparation,
+        'ac-forced-colors-retry': retryForcedColors,
       };
       actions[action.dataset.action]?.();
     },
@@ -932,6 +996,7 @@ function wireEvents(signal) {
   window.addEventListener('resize', geometryChanged, { signal });
   window.addEventListener('orientationchange', geometryChanged, { signal });
   window.visualViewport?.addEventListener('resize', geometryChanged, { signal });
+  window.matchMedia?.(FORCED_COLORS_QUERY).addEventListener('change', forcedColorsChanged, { signal });
 }
 
 function clearSweep() {
@@ -1001,9 +1066,9 @@ function availableAcuityCanvasBox() {
   return Math.max(1, Math.floor(Math.min(maximumAcuityCanvasBox(), blockBudget, inlineBudget)));
 }
 
-function renderScreen(markup) {
+function renderScreen(markup, options) {
   state.app.innerHTML = markup;
-  state.lifecycle.present(state.app);
+  state.lifecycle.present(state.app, options);
 }
 
 function directionLabel(direction) {

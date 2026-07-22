@@ -1,4 +1,4 @@
-import { supplementalPrivacy } from './locales/supplemental.js';
+import { loadSupplementalLocale, supplementalPrivacy } from './locales/supplemental.js';
 
 const PRIVACY_EMAIL = 'privacy@sense6.net';
 
@@ -6,7 +6,7 @@ export const PRIVACY_COPY = Object.freeze({
   en: {
     title: 'Privacy at Sense6',
     eyebrow: 'Privacy / plain language',
-    updated: 'Last updated 19 July 2026',
+    updated: 'Last updated 22 July 2026',
     back: 'All tests',
     intro:
       'Your tests stay on your device. Sense6 keeps only anonymous daily activity totals and uses no cookies, advertising trackers, or user profiles.',
@@ -23,7 +23,7 @@ export const PRIVACY_COPY = Object.freeze({
         title: 'What stays in your browser',
         paragraphs: [
           'Test answers, measurements, and results are processed in your browser and are not uploaded to Sense6. Your selected language, theme, concise latest or best results, and private multi-run journal may be saved in local browser storage.',
-          'You can delete one journal entry, clear the complete journal, or remove all information by clearing the site data for sense6.net in your browser. Copy, import, and export features run only when you choose them. An exported journal file contains the measurements and setup details shown to you.',
+          'You can delete one journal entry, clear the complete journal, or remove all information by clearing the site data for sense6.net in your browser. Copy, import, and export features run only when you choose them. A canonical journal export contains its schema name and version, export time, run and experiment identifiers, exact run timestamps, recorded locale, protocol identity and version, setup passport, quality rating and evidence, measurement identifiers, values, units, bounds, model intervals and explicit uncertainty, and run notes. The identifiers support local deduplication; they are not account identifiers or network identity.',
         ],
       },
       {
@@ -59,7 +59,7 @@ export const PRIVACY_COPY = Object.freeze({
   it: {
     title: 'Privacy su Sense6',
     eyebrow: 'Privacy / linguaggio chiaro',
-    updated: 'Ultimo aggiornamento: 19 luglio 2026',
+    updated: 'Ultimo aggiornamento: 22 luglio 2026',
     back: 'Tutti i test',
     intro:
       'I tuoi test rimangono sul tuo dispositivo. Sense6 conserva soltanto totali giornalieri anonimi e non utilizza cookie, sistemi pubblicitari di tracciamento o profili utente.',
@@ -77,7 +77,7 @@ export const PRIVACY_COPY = Object.freeze({
         title: 'Cosa rimane nel tuo browser',
         paragraphs: [
           'Le risposte, le misurazioni e i risultati dei test vengono elaborati nel browser e non sono caricati su Sense6. La lingua e il tema scelti, i risultati sintetici più recenti o migliori e il diario privato con più sessioni possono essere salvati nella memoria locale del browser.',
-          'Puoi eliminare una voce, cancellare l’intero diario o rimuovere tutte le informazioni cancellando nel browser i dati del sito sense6.net. Le funzioni di copia, importazione ed esportazione si attivano soltanto quando le scegli. Un diario esportato contiene le misurazioni e i dettagli di configurazione mostrati.',
+          'Puoi eliminare una voce, cancellare l’intero diario o rimuovere tutte le informazioni cancellando nel browser i dati del sito sense6.net. Le funzioni di copia, importazione ed esportazione si attivano soltanto quando le scegli. Un’esportazione canonica contiene nome e versione dello schema, ora di esportazione, identificatori di sessione ed esperimento, orari esatti, lingua registrata, identità e versione del protocollo, passaporto della configurazione, valutazione ed elementi della qualità, identificatori, valori, unità, limiti, intervalli del modello e incertezza esplicita delle misurazioni, e note della sessione. Gli identificatori servono alla deduplicazione locale; non identificano account o rete.',
         ],
       },
       {
@@ -113,7 +113,7 @@ export const PRIVACY_COPY = Object.freeze({
   de: {
     title: 'Datenschutz bei Sense6',
     eyebrow: 'Datenschutz / verständlich erklärt',
-    updated: 'Zuletzt aktualisiert am 19. Juli 2026',
+    updated: 'Zuletzt aktualisiert am 22. Juli 2026',
     back: 'Alle Tests',
     intro:
       'Ihre Tests bleiben auf Ihrem Gerät. Sense6 speichert nur anonyme tägliche Aktivitätssummen und verwendet keine Cookies, Werbetracker oder Nutzerprofile.',
@@ -131,7 +131,7 @@ export const PRIVACY_COPY = Object.freeze({
         title: 'Was in Ihrem Browser bleibt',
         paragraphs: [
           'Testantworten, Messwerte und Ergebnisse werden in Ihrem Browser verarbeitet und nicht an Sense6 übermittelt. Die gewählte Sprache, das Design, knappe letzte oder beste Ergebnisse und das private Journal mit mehreren Durchläufen können im lokalen Browserspeicher gesichert werden.',
-          'Sie können einen Journaleintrag oder das gesamte Journal löschen. Alle Informationen entfernen Sie über die Websitedaten für sense6.net im Browser. Kopier-, Import- und Exportfunktionen laufen nur auf Ihre Auswahl hin. Eine exportierte Journaldatei enthält die angezeigten Messwerte und Einrichtungsdetails.',
+          'Sie können einen Journaleintrag oder das gesamte Journal löschen. Alle Informationen entfernen Sie über die Websitedaten für sense6.net im Browser. Kopier-, Import- und Exportfunktionen laufen nur auf Ihre Auswahl hin. Ein kanonischer Export enthält Schemaname und -version, Exportzeit, Durchlauf- und Versuchskennungen, genaue Zeitstempel, gespeicherte Sprache, Protokollidentität und -version, Einrichtungspass, Qualitätsbewertung und -nachweise, Messkennungen, Werte, Einheiten, Grenzen, Modellintervalle und ausdrückliche Unsicherheit sowie Durchlaufnotizen. Die Kennungen dienen der lokalen Deduplizierung; sie sind keine Konto- oder Netzwerkidentität.',
         ],
       },
       {
@@ -167,7 +167,7 @@ export const PRIVACY_COPY = Object.freeze({
   fr: {
     title: 'Confidentialité chez Sense6',
     eyebrow: 'Confidentialité / en termes simples',
-    updated: 'Dernière mise à jour : 19 juillet 2026',
+    updated: 'Dernière mise à jour : 22 juillet 2026',
     back: 'Tous les tests',
     intro:
       'Vos tests restent sur votre appareil. Sense6 ne conserve que des totaux d’activité quotidiens anonymes et n’utilise ni cookies, ni traceurs publicitaires, ni profils utilisateur.',
@@ -185,7 +185,7 @@ export const PRIVACY_COPY = Object.freeze({
         title: 'Ce qui reste dans votre navigateur',
         paragraphs: [
           'Les réponses, mesures et résultats sont traités dans votre navigateur et ne sont pas envoyés à Sense6. La langue, le thème, les derniers ou meilleurs résultats synthétiques et le journal privé de plusieurs sessions peuvent être enregistrés localement.',
-          'Vous pouvez supprimer une entrée, effacer le journal complet ou retirer toutes les informations en effaçant les données du site sense6.net. Les fonctions de copie, d’import et d’export ne s’exécutent que lorsque vous les choisissez. Un journal exporté contient les mesures et les détails de configuration affichés.',
+          'Vous pouvez supprimer une entrée, effacer le journal complet ou retirer toutes les informations en effaçant les données du site sense6.net. Les fonctions de copie, d’import et d’export ne s’exécutent que lorsque vous les choisissez. Un export canonique contient le nom et la version du schéma, l’heure d’export, les identifiants de session et d’expérience, les horodatages exacts, la langue enregistrée, l’identité et la version du protocole, le passeport de configuration, l’évaluation et les éléments de qualité, les identifiants, valeurs, unités, limites, intervalles de modèle et incertitude explicite des mesures, ainsi que les notes de session. Les identifiants servent à la déduplication locale ; ils ne sont ni des identifiants de compte ni une identité réseau.',
         ],
       },
       {
@@ -221,7 +221,7 @@ export const PRIVACY_COPY = Object.freeze({
   es: {
     title: 'Privacidad en Sense6',
     eyebrow: 'Privacidad / lenguaje claro',
-    updated: 'Última actualización: 19 de julio de 2026',
+    updated: 'Última actualización: 22 de julio de 2026',
     back: 'Todas las pruebas',
     intro:
       'Tus pruebas permanecen en tu dispositivo. Sense6 solo conserva totales diarios anónimos de actividad y no utiliza cookies, rastreadores publicitarios ni perfiles de usuario.',
@@ -238,7 +238,7 @@ export const PRIVACY_COPY = Object.freeze({
         title: 'Lo que permanece en tu navegador',
         paragraphs: [
           'Las respuestas, mediciones y resultados se procesan en tu navegador y no se envían a Sense6. El idioma, el tema, los resultados resumidos más recientes o mejores y el diario privado de varias sesiones pueden guardarse localmente.',
-          'Puedes eliminar una entrada, borrar todo el diario o retirar toda la información borrando los datos del sitio sense6.net. Las funciones de copia, importación y exportación solo se ejecutan cuando las eliges. Un diario exportado contiene las mediciones y los detalles de configuración mostrados.',
+          'Puedes eliminar una entrada, borrar todo el diario o retirar toda la información borrando los datos del sitio sense6.net. Las funciones de copia, importación y exportación solo se ejecutan cuando las eliges. Una exportación canónica contiene el nombre y la versión del esquema, la hora de exportación, identificadores de sesión y experimento, marcas de tiempo exactas, idioma registrado, identidad y versión del protocolo, pasaporte de configuración, calificación y pruebas de calidad, identificadores, valores, unidades, límites, intervalos de modelo e incertidumbre explícita de las mediciones, y notas de la sesión. Los identificadores permiten la deduplicación local; no son identificadores de cuenta ni identidad de red.',
         ],
       },
       {
@@ -274,7 +274,7 @@ export const PRIVACY_COPY = Object.freeze({
   pt: {
     title: 'Privacidade na Sense6',
     eyebrow: 'Privacidade / linguagem clara',
-    updated: 'Última atualização: 19 de julho de 2026',
+    updated: 'Última atualização: 22 de julho de 2026',
     back: 'Todos os testes',
     intro:
       'Os seus testes permanecem no seu dispositivo. A Sense6 conserva apenas totais diários anónimos de atividade e não utiliza cookies, rastreadores publicitários ou perfis de utilizador.',
@@ -291,7 +291,7 @@ export const PRIVACY_COPY = Object.freeze({
         title: 'O que permanece no seu navegador',
         paragraphs: [
           'As respostas, medições e resultados são processados no seu navegador e não são enviados para a Sense6. O idioma, o tema, os resultados resumidos mais recentes ou melhores e o diário privado de várias sessões podem ser guardados localmente.',
-          'Pode eliminar uma entrada, apagar todo o diário ou remover todas as informações apagando os dados do site sense6.net. As funções de cópia, importação e exportação só são executadas quando as escolhe. Um diário exportado contém as medições e os detalhes de configuração apresentados.',
+          'Pode eliminar uma entrada, apagar todo o diário ou remover todas as informações apagando os dados do site sense6.net. As funções de cópia, importação e exportação só são executadas quando as escolhe. Uma exportação canónica contém o nome e a versão do esquema, hora da exportação, identificadores da sessão e da experiência, marcas temporais exatas, idioma registado, identidade e versão do protocolo, passaporte da configuração, classificação e evidência de qualidade, identificadores, valores, unidades, limites, intervalos do modelo e incerteza explícita das medições, e notas da sessão. Os identificadores servem para deduplicação local; não são identificadores de conta nem identidade de rede.',
         ],
       },
       {
@@ -337,8 +337,6 @@ const LINKS = Object.freeze({
 export function renderPrivacy(context) {
   const { app, locale, localeHref } = context;
   const copy = privacyCopy(locale);
-  document.title = `${copy.title} | Sense6`;
-
   if (!app.querySelector(`:scope > [data-sense6-view="privacy"][data-sense6-locale="${locale}"]`)) {
     app.innerHTML = privacyMarkup(copy, localeHref, locale);
   }
@@ -400,6 +398,12 @@ export function privacyMarkup(copy, localeHref, locale) {
 
 export function privacyCopy(locale) {
   return PRIVACY_COPY[locale] ?? supplementalPrivacy(locale) ?? PRIVACY_COPY.en;
+}
+
+/** @param {string} locale */
+export async function preparePrivacyCopy(locale) {
+  await loadSupplementalLocale(locale);
+  return privacyCopy(locale);
 }
 
 export function privacyHtml(text) {

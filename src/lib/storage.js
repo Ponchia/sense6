@@ -1,3 +1,5 @@
+import { resolveOptionalStorage } from './storage-access.js';
+
 const FORMAT = 'sense6-result';
 
 /** @typedef {{ getItem: (key: string) => string | null, setItem: (key: string, value: string) => void }} StorageLike */
@@ -27,11 +29,12 @@ export function createResultStore({
   return Object.freeze({
     key,
     version,
-    load(storage = globalThis.localStorage) {
-      if (!storage) return null;
+    load(storage) {
+      const resolvedStorage = resolveOptionalStorage(storage);
+      if (!resolvedStorage) return null;
       try {
         for (const candidate of [key, ...legacyKeys]) {
-          const parsed = parse(storage.getItem(candidate));
+          const parsed = parse(resolvedStorage.getItem(candidate));
           if (!parsed) continue;
           if (candidate === key && isResultEnvelope(parsed) && parsed.schemaVersion > version) {
             return null;
@@ -40,7 +43,7 @@ export function createResultStore({
           if (!validate(value)) continue;
           const validated = /** @type {T} */ (value);
           if (candidate !== key || !isResultEnvelope(parsed) || parsed.schemaVersion !== version) {
-            write(storage, key, version, validated);
+            write(resolvedStorage, key, version, validated);
           }
           return validated;
         }
@@ -49,9 +52,10 @@ export function createResultStore({
       }
       return null;
     },
-    save(value, storage = globalThis.localStorage) {
-      if (!storage || !validate(value)) return false;
-      return write(storage, key, version, value);
+    save(value, storage) {
+      const resolvedStorage = resolveOptionalStorage(storage);
+      if (!resolvedStorage || !validate(value)) return false;
+      return write(resolvedStorage, key, version, value);
     },
   });
 }

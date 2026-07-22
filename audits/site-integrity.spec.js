@@ -1,6 +1,9 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { LOCALES } from '../src/locales.js';
 import { SITE_ROUTES } from './routes.js';
+
+const LOCALE_GALLERY_PATHS = new Set(LOCALES.map(({ code }) => `/${code}/`));
 
 test.describe('every canonical route', () => {
   for (const route of SITE_ROUTES) {
@@ -21,9 +24,17 @@ test.describe('every canonical route', () => {
       const heading = page.locator('main h1');
       await expect(heading, `${route} needs one visible main heading`).toHaveCount(1);
       await expect(heading).toBeVisible();
+      const hydratedPath = new URL(page.url()).pathname;
+      if (route === '/') {
+        expect(LOCALE_GALLERY_PATHS.has(hydratedPath), 'root hydration chooses a supported locale').toBe(
+          true,
+        );
+      } else {
+        expect(hydratedPath, `${route} must not navigate during hydration`).toBe(route);
+      }
       await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
         'href',
-        `https://sense6.net${route}`,
+        `https://sense6.net${hydratedPath}`,
       );
       expect(
         (await page.locator('main').innerText()).trim().length,

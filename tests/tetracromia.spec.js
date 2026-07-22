@@ -569,6 +569,9 @@ test('Field invalidates the run instead of regenerating a measured stimulus afte
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(page.getByRole('heading', { name: /Set the room before the observations/i })).toBeVisible();
   await expect(page.locator('canvas[data-field="0"]')).toHaveCount(0);
+  const invalidation = page.locator('[data-tetracromia-invalidation]');
+  await expect(invalidation).toContainText(/display size changed/i);
+  await expect(invalidation).toBeFocused();
   await expect(page.locator('#announcer')).toContainText(/display size changed/i);
 });
 
@@ -724,6 +727,24 @@ test('Tetracromia remains operable at 320px with 200% text sizing', async ({ pag
   await expectNoHorizontalOverflow(page, '200% text Tetracromia Field');
   await answerTrials(page, '[data-choice="0"]', 12);
   await expectNoHorizontalOverflow(page, '200% text Tetracromia Sequence');
+  const sequenceGeometry = await page.locator('.sequence-chamber').evaluate((chamber) => {
+    const run = chamber.querySelector('.sequence-run');
+    const tiles = [...chamber.querySelectorAll('.sequence-tile')];
+    const controls = chamber.querySelector('.sequence-controls');
+    const actions = [...controls.querySelectorAll('button')];
+    return {
+      controlsContainActions: actions.every((action) => controls.contains(action)),
+      minimumHeight: Math.min(...tiles.map((tile) => tile.getBoundingClientRect().height)),
+      minimumWidth: Math.min(...tiles.map((tile) => tile.getBoundingClientRect().width)),
+      overflowX: getComputedStyle(run).overflowX,
+      scrollsInline: run.scrollWidth > run.clientWidth,
+    };
+  });
+  expect(sequenceGeometry.minimumWidth).toBe(24);
+  expect(sequenceGeometry.minimumHeight).toBeGreaterThanOrEqual(24);
+  expect(sequenceGeometry.overflowX).toBe('auto');
+  expect(sequenceGeometry.scrollsInline).toBe(true);
+  expect(sequenceGeometry.controlsContainActions).toBe(true);
   const submit = page.locator('[data-action="submit-sequence"]');
   await submit.click();
   await submit.click();

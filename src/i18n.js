@@ -17,15 +17,37 @@ let dynamicMessageBuckets = new Map();
 /** @type {((locale: LocaleCode) => void | Promise<void>) | null} */
 let localeChangeHandler = null;
 let localeRequestGeneration = 0;
+/** @type {{ href: string, locale: LocaleCode } | null} */
+let initialCatalogFailure = null;
 
 /** @param {{ initialLocale?: unknown, onLocaleChange?: (locale: LocaleCode) => void | Promise<void> }} options */
 export async function initializeI18n({ initialLocale, onLocaleChange } = {}) {
   localeChangeHandler = onLocaleChange ?? null;
-  locale = normalizeLocale(initialLocale) ?? storedLocale() ?? browserLocale() ?? DEFAULT_LOCALE;
-  messages = await loadMessages(locale);
-  dynamicMessageBuckets = indexDynamicMessages(messages);
+  const requestedLocale =
+    normalizeLocale(initialLocale) ?? storedLocale() ?? browserLocale() ?? DEFAULT_LOCALE;
+  const requestGeneration = ++localeRequestGeneration;
+  try {
+    const initialMessages = await loadMessages(requestedLocale);
+    if (requestGeneration === localeRequestGeneration) {
+      initialCatalogFailure = null;
+      locale = requestedLocale;
+      messages = initialMessages;
+      dynamicMessageBuckets = indexDynamicMessages(messages);
+    }
+  } catch {
+    if (requestGeneration === localeRequestGeneration) {
+      initialCatalogFailure = {
+        href: initialLocaleHref(requestedLocale),
+        locale: requestedLocale,
+      };
+      locale = DEFAULT_LOCALE;
+      messages = new Map();
+      dynamicMessageBuckets = new Map();
+    }
+  }
   applyDocumentLocale();
   renderLocaleSelector();
+  renderInitialLocaleRetry();
   translatePersistentShell();
   localizeInternalLinks(document);
   return locale;
@@ -41,12 +63,26 @@ export async function setLocale(nextLocale, { notify = true } = {}) {
   if (!normalized) return false;
   const requestGeneration = ++localeRequestGeneration;
   if (normalized === locale) return false;
-  const nextMessages = await loadMessages(normalized);
+  let nextMessages;
+  let nextDynamicMessageBuckets;
+  try {
+    nextMessages = await loadMessages(normalized);
+    nextDynamicMessageBuckets = indexDynamicMessages(nextMessages);
+  } catch {
+    if (requestGeneration !== localeRequestGeneration) return false;
+    restoreLocaleSelector();
+    if (initialCatalogFailure?.locale === normalized) {
+      window.location.assign(initialCatalogFailure.href);
+    }
+    return false;
+  }
   if (requestGeneration !== localeRequestGeneration) return false;
+  initialCatalogFailure = null;
   locale = normalized;
   messages = nextMessages;
-  dynamicMessageBuckets = indexDynamicMessages(messages);
+  dynamicMessageBuckets = nextDynamicMessageBuckets;
   applyDocumentLocale();
+  renderInitialLocaleRetry();
   try {
     localStorage.setItem(STORAGE_KEY, locale);
   } catch {
@@ -276,6 +312,25 @@ function renderLocaleSelector() {
   selector.addEventListener('change', () => void setLocale(selector.value));
 }
 
+function restoreLocaleSelector() {
+  const selector = document.querySelector('[data-locale-select]');
+  if (selector instanceof HTMLSelectElement) selector.value = locale;
+}
+
+function renderInitialLocaleRetry() {
+  document.querySelector('[data-locale-retry]')?.remove();
+  if (!initialCatalogFailure) return;
+  const selector = document.querySelector('[data-locale-select]');
+  const picker = selector?.closest('.locale-picker');
+  if (!picker) return;
+  const retry = document.createElement('a');
+  retry.className = 'ui-link locale-retry';
+  retry.dataset.localeRetry = '';
+  retry.href = initialCatalogFailure.href;
+  retry.textContent = 'Retry language';
+  picker.insertAdjacentElement('afterend', retry);
+}
+
 function translatePersistentShell() {
   for (const element of document.querySelectorAll(
     '[data-i18n-source], [data-i18n-aria-label], [data-i18n-placeholder], [data-i18n-title]',
@@ -316,4 +371,14 @@ function browserLocale() {
     if (normalized) return normalized;
   }
   return null;
+}
+
+/** @param {LocaleCode} requestedLocale */
+function initialLocaleHref(requestedLocale) {
+  const rawRoute = window.location.hash.startsWith('#/')
+    ? window.location.hash.replace(/^#\/?/, '')
+    : window.location.pathname.replace(/^\/+|\/+$/g, '');
+  const parts = rawRoute.split('/').filter(Boolean);
+  if (normalizeLocale(parts[0])) parts.shift();
+  return `${localeHref(parts[0] ?? '', requestedLocale)}${window.location.search}`;
 }

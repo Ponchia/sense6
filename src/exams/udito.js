@@ -216,15 +216,6 @@ function renderSetup() {
           <h1>${t('Quiet room.')}<br>${t('Low volume.')}<br>${t('Headphones.')}</h1>
           <p class="au-lede">${t('Take off hearing protection only if you normally would. If you use hearing aids or another listening device, leave your usual setup unchanged and record it below.')}</p>
           <div class="ui-alert ui-alert--warning"><strong class="ui-alert__title">Sound sensitivity comes first.</strong><p class="ui-alert__body">If you have tinnitus, hyperacusis, or sounds are uncomfortable today, skip the experiment or stop immediately. Sense6 cannot measure sound pressure.</p></div>
-          ${
-            supported
-              ? `<div class="au-reference">
-                  <button class="ui-button ui-button--ghost" type="button" data-action="au-reference">Play maximum-level reference</button>
-                  <div class="au-reference__meter" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
-                  <p data-au-reference-status role="status" aria-live="polite">Start device volume low before playing. This 1 kHz preview represents the loudest digital level used later; it does not measure acoustic output.</p>
-                </div>`
-              : `<div class="ui-alert ui-alert--danger" role="alert"><strong class="ui-alert__title">Web Audio is unavailable.</strong><p class="ui-alert__body">Udito cannot present controlled intervals in this browser. Try a current browser with audio enabled.</p></div>`
-          }
           <label class="au-device-label">${t('Listening setup')}
             <select data-au-device ${supported ? '' : 'disabled'}>
               <option value="headphones">${t('Over-ear / on-ear headphones')}</option>
@@ -241,6 +232,15 @@ function renderSetup() {
               <option value="integrated">Built-in / assistive route</option>
             </select>
           </label>
+          ${
+            supported
+              ? `<div class="au-reference">
+                  <button class="ui-button ui-button--ghost" type="button" data-action="au-reference">Play maximum-level reference</button>
+                  <div class="au-reference__meter" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+                  <p data-au-reference-status role="status" aria-live="polite">Start device volume low before playing. This 1 kHz preview represents the loudest digital level used later; it does not measure acoustic output.</p>
+                </div>`
+              : `<div class="ui-alert ui-alert--danger" role="alert"><strong class="ui-alert__title">Web Audio is unavailable.</strong><p class="ui-alert__body">Udito cannot present controlled intervals in this browser. Try a current browser with audio enabled.</p></div>`
+          }
           <div class="au-reference">
             <button class="ui-button ui-button--ghost" type="button" data-action="au-anchors" ${supported ? '' : 'disabled'}>Play 200 Hz, 500 Hz, and 2 kHz audibility anchors</button>
             <p data-au-anchor-status role="status">Confirm that all three are audible at the same comfortable volume. This is a self-report gate, not calibration.</p>
@@ -468,7 +468,7 @@ function renderRunner() {
       <h1 class="sr-only" tabindex="-1" data-au-runner-heading>${t('{name} listening runner', { name: t(info.name) })}</h1>
       <header class="au-runner__header"><div><p class="ui-eyebrow">${info.number} / ${t(info.name)}</p><strong>${t(state.session.block === 'practice' ? 'Practice' : 'Adaptive run')}</strong></div><span data-au-count>${t('Preparing…')}</span><button type="button" data-action="au-stop" aria-keyshortcuts="Escape">${t('Stop safely')}</button></header>
       <div class="au-listening">
-        <p class="au-listening__status" data-au-status role="status" aria-live="polite" tabindex="-1">${t('Preparing the sounds…')}</p>
+        <p class="au-listening__status" data-au-status tabindex="-1">${t('Preparing the sounds…')}</p>
         <div class="au-intervals" data-au-intervals aria-hidden="true">${Array.from({ length: choices }, (_, index) => `<div><span>${index + 1}</span><i></i></div>`).join('')}</div>
         <div class="au-responses" aria-label="${t('Sound interval choices')}">${Array.from({ length: choices }, (_, index) => `<button type="button" data-au-response="${index}" disabled><span>${index + 1}</span><small>${state.session.instrument === 'pitch' ? t(index ? 'Second tone' : 'First tone') : `${t('Interval')} ${index + 1}`}</small></button>`).join('')}</div>
         <div class="au-feedback" data-au-feedback role="status" aria-live="polite">${state.lastFeedback}</div>
@@ -717,15 +717,12 @@ function renderResults() {
     cautionReasons: resultCautionReasons({ headphones, range, pitch }),
   };
   state.session.result = result;
-  saveLast({ setupQuality, sampleRate: state.session.sampleRate, recordedAt: Date.now() });
-  const journalSaved = saveJournalResult(result);
-  state.session.journalSaved = journalSaved;
 
   state.app.innerHTML = `
     <section class="au-results ui-container ui-container--wide">
       <button class="back-link" type="button" data-action="au-home"><span aria-hidden="true">←</span> ${m('nav.allTests')}</button>
       <header class="au-results__hero"><div><p class="ui-eyebrow">${t('Udito / this setup / this run')}</p><h1>${includesPitch ? t('Three listening measures.') : 'Two focused listening measures.'}<br><em>${t('No hearing label.')}</em></h1><p>${usable ? 'The setup checks and adaptive tracks produced coherent run-level observations.' : 'At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.'}</p></div><div class="au-results__stamp ${usable ? '' : 'is-limited'}"><span>${t(setupQuality)}</span><strong>${includesPitch ? '03 / 03' : '02 / 02'}</strong></div></header>
-      <div class="ui-alert ${journalSaved ? 'ui-alert--success' : 'ui-alert--danger'}" data-au-journal-status role="${journalSaved ? 'status' : 'alert'}"><strong class="ui-alert__title">${journalSaved ? 'Saved to the private journal on this device.' : 'Journal entry not saved.'}</strong><p class="ui-alert__body">${journalSaved ? 'The structured run context is available for later same-setup comparison.' : 'The result remains available here and can still be copied, but it was not added to the private journal.'}</p></div>
+      <div data-au-persistence></div>
       <div class="au-result-grid">
         ${resultCard('01', 'Headphone confidence', headphones.headphoneLike ? 'Headphone-like' : 'Uncertain', `${headphones.correct} / ${headphones.trials}`, 'A phase-based presentation check, not hardware detection.')}
         ${resultCard('02', 'Upper run boundary', formatHertz(range), rangeDetail(range), range.atCeiling && range.settled ? 'Reached the technical frequency ceiling; your personal boundary may be higher.' : 'Relative to this device, self-reported unchanged volume, room, and audio sample rate.')}
@@ -737,8 +734,19 @@ function renderResults() {
         <article class="ui-card"><p class="ui-eyebrow">${t('Interpretation boundary')}</p><h2>${t('Device-relative, never dB HL.')}</h2><p>${t('A browser knows digital amplitude, not sound pressure at your eardrum. Headphone response, fit, output, age, room noise, device processing, and the volume setting all shape these numbers.')}</p><p>${t('Do not infer hearing age, “normal” hearing, safety for work, or a medical diagnosis. If hearing concerns affect daily life, use calibrated clinical audiometry.')}</p></article>
       </div>
       <aside class="au-results__safety"><strong>${t('Keep the same volume only for comparison.')}</strong><p>${t('Compare your own runs only with the same device, headphones, fit, room, and volume. Stop testing if any sound is uncomfortable.')}</p></aside>
-      <div class="ui-cluster au-results__actions"><button class="ui-button" type="button" data-action="au-restart">Repeat this scope independently</button><button class="ui-button ui-button--ghost" type="button" data-action="au-copy">${resultActionLabel(t)}</button>${journalSaved ? `<button class="ui-button ui-button--ghost" type="button" data-action="au-journal">${t('Open private journal')}</button>` : ''}</div>
+      <div class="ui-cluster au-results__actions"></div>
     </section>`;
+  saveLast({ setupQuality, sampleRate: state.session.sampleRate, recordedAt: Date.now() });
+  const journalSaved = saveJournalResult(result);
+  state.session.journalSaved = journalSaved;
+  const persistence = state.app.querySelector('[data-au-persistence]');
+  if (persistence) {
+    persistence.outerHTML = `<div class="ui-alert ${journalSaved ? 'ui-alert--success' : 'ui-alert--danger'}" data-au-journal-status role="${journalSaved ? 'status' : 'alert'}"><strong class="ui-alert__title">${t(journalSaved ? 'Saved to the private journal on this device.' : 'Journal entry not saved.')}</strong><p class="ui-alert__body">${t(journalSaved ? 'The structured run context is available for later same-setup comparison.' : 'The result remains available here and can still be copied, but it was not added to the private journal.')}</p></div>`;
+  }
+  const actions = state.app.querySelector('.au-results__actions');
+  if (actions) {
+    actions.innerHTML = `<button class="ui-button" type="button" data-action="au-restart">${t('Repeat this scope independently')}</button><button class="ui-button ui-button--ghost" type="button" data-action="au-copy">${resultActionLabel(t)}</button>${journalSaved ? `<button class="ui-button ui-button--ghost" type="button" data-action="au-journal">${t('Open private journal')}</button>` : ''}`;
+  }
   focusStage(
     'h1',
     journalSaved
@@ -912,6 +920,7 @@ function handleOutputDeviceChange() {
       'The available audio outputs changed. Confirm the route and play the maximum-level reference again.',
     );
   }
+  if (state.session?.result) return;
   if (state.session && document.body.classList.contains('au-running')) {
     state.session.outputChanges += 1;
     pauseRun('The available audio output changed.', { setupRequired: true });

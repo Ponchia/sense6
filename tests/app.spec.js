@@ -4,7 +4,7 @@ import { aboutCopy } from '../src/about.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { LANDING_COPY_SOURCES, SETUP_COPY_SOURCES } from '../src/locales/landing-copy.js';
 import { LOCALES, loadMessages, localeMetadata } from '../src/locales.js';
-import { privacyCopy } from '../src/privacy.js';
+import { preparePrivacyCopy, privacyCopy } from '../src/privacy.js';
 import { expectInVisualViewport, expectNoHorizontalOverflow } from './helpers/browser.js';
 
 test('the gallery lists exams, is accessible, and routes into one', async ({ page }) => {
@@ -59,6 +59,50 @@ test('the gallery lists exams, is accessible, and routes into one', async ({ pag
   await expect(page.getByRole('heading', { name: /Find the gap in the dots/i })).toBeVisible();
 });
 
+test('SPA navigation commits complete canonical and social metadata for each active route', async ({
+  page,
+}) => {
+  await page.goto('/en/');
+  await expectRouteMetadata(page, {
+    title: 'Sense6 — measure what your senses notice',
+    description:
+      'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
+    path: '/en/',
+    image: '/social/sense6.png',
+    imageAlt:
+      'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',
+  });
+
+  await page.getByRole('link', { name: 'About' }).click();
+  const about = aboutCopy('en');
+  await expectRouteMetadata(page, {
+    title: about.pageTitle,
+    description: about.description,
+    path: '/en/about/',
+    image: '/social/sense6.png',
+  });
+
+  await page.getByRole('link', { name: 'Privacy', exact: true }).click();
+  const privacy = privacyCopy('en');
+  await expectRouteMetadata(page, {
+    title: `${privacy.title} | Sense6`,
+    description: privacy.intro,
+    path: '/en/privacy/',
+    image: '/social/sense6.png',
+  });
+
+  await page.locator('.brand').click();
+  const acutezza = EXAMS.find(({ id }) => id === 'acutezza');
+  await page.locator('.exam-card__link[href="/en/acutezza/"]').click();
+  await expectRouteMetadata(page, {
+    title: acutezza.pageTitle,
+    description: acutezza.blurb,
+    path: '/en/acutezza/',
+    image: '/social/acutezza.png',
+    imageAlt: `${acutezza.name} — ${acutezza.tagline}`,
+  });
+});
+
 test('legacy locale hashes resolve to the matching canonical path', async ({ page }) => {
   await page.goto('/#/it/udito');
   await expect(page).toHaveURL(/\/it\/udito\/$/);
@@ -75,6 +119,28 @@ test('regional language-tag paths redirect to canonical locale routes', async ({
     await expect(page).toHaveURL(new RegExp(`${canonicalPath.replaceAll('/', '\\/')}$`));
   }
 });
+
+async function expectRouteMetadata(page, { title, description, path, image, imageAlt = description }) {
+  const canonical = `https://sense6.net${path}`;
+  await expect(page).toHaveTitle(title);
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', description);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', canonical);
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute('content', title);
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute('content', description);
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content', canonical);
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    'content',
+    `https://sense6.net${image}`,
+  );
+  await expect(page.locator('meta[property="og:image:alt"]')).toHaveAttribute('content', imageAlt);
+  await expect(page.locator('meta[name="twitter:title"]')).toHaveAttribute('content', title);
+  await expect(page.locator('meta[name="twitter:description"]')).toHaveAttribute('content', description);
+  await expect(page.locator('meta[name="twitter:image"]')).toHaveAttribute(
+    'content',
+    `https://sense6.net${image}`,
+  );
+  await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute('content', imageAlt);
+}
 
 test('language routes translate, persist, and remain accessible', async ({ page }) => {
   await page.goto('/it/');
@@ -136,6 +202,67 @@ test('persistent shell copy keeps stable sources across de to it', async ({ page
   await expect(page.locator('#gamut-chip')).toHaveText(italian.get(gamutSource));
 });
 
+test('an initial catalog failure hydrates the source-language app with a retry path', async ({ page }) => {
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  let attempts = 0;
+  await page.route(/\/(?:assets\/de-[^/]+|src\/locales\/de)\.js(?:\?.*)?$/, (route) => {
+    attempts += 1;
+    if (attempts === 1) return route.abort('failed');
+    return route.continue();
+  });
+
+  await page.goto('/de/');
+  await expect(page).toHaveURL(/\/en\/$/);
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'gallery');
+  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
+  await expect(page.locator('[data-locale-select]')).toHaveValue('en');
+  await expect(page.locator('[data-locale-retry]')).toHaveAttribute('href', '/de/');
+
+  await page.locator('[data-locale-select]').selectOption('de');
+  await expect(page).toHaveURL(/\/de\/$/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'de');
+  await expect(page.locator('[data-locale-select]')).toHaveValue('de');
+  await expect(page.locator('[data-locale-retry]')).toHaveCount(0);
+  expect(attempts).toBe(2);
+  expect(pageErrors).toEqual([]);
+});
+
+test('a failed locale switch preserves every committed locale state', async ({ page }) => {
+  const italian = await loadMessages('it');
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  await page.route(/\/(?:assets\/de-[^/]+|src\/locales\/de)\.js(?:\?.*)?$/, (route) => route.abort('failed'));
+
+  await page.goto('/it/');
+  await page.locator('[data-locale-select]').selectOption('de');
+
+  await expect
+    .poll(() =>
+      page.evaluate(() => ({
+        direction: document.documentElement.dir,
+        heading: document.querySelector('.gallery-heading h2')?.textContent?.trim(),
+        language: document.documentElement.lang,
+        pathname: window.location.pathname,
+        selected: document.querySelector('[data-locale-select]')?.value,
+        shell: document.querySelector('.theme-button__label')?.textContent?.trim(),
+        stored: localStorage.getItem('sense6:locale'),
+      })),
+    )
+    .toEqual({
+      direction: 'ltr',
+      heading: italian.get('Start with what you want to learn.'),
+      language: 'it',
+      pathname: '/it/',
+      selected: 'it',
+      shell: italian.get('Theme'),
+      stored: null,
+    });
+  expect(pageErrors).toEqual([]);
+});
+
 test('a delayed it locale chunk cannot overwrite a later de selection', async ({ page }) => {
   const german = await loadMessages('de');
   let releaseItalian;
@@ -189,6 +316,61 @@ test('a delayed it locale chunk cannot overwrite a later de selection', async ({
     });
 });
 
+test('a stale catalog failure cannot roll back a later successful selection', async ({ page }) => {
+  const german = await loadMessages('de');
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  let releaseItalian;
+  let markItalianRequested;
+  let markItalianSettled;
+  const italianGate = new Promise((resolve) => {
+    releaseItalian = resolve;
+  });
+  const italianRequested = new Promise((resolve) => {
+    markItalianRequested = resolve;
+  });
+  const italianSettled = new Promise((resolve) => {
+    markItalianSettled = resolve;
+  });
+  await page.route(/\/(?:assets\/it-[^/]+|src\/locales\/it)\.js(?:\?.*)?$/, async (route) => {
+    markItalianRequested();
+    await italianGate;
+    await route.abort('failed');
+    markItalianSettled();
+  });
+
+  await page.goto('/en/');
+  await page.locator('[data-locale-select]').selectOption('it');
+  await italianRequested;
+  await page.locator('[data-locale-select]').selectOption('de');
+  await expect(page).toHaveURL(/\/de\/$/);
+  releaseItalian();
+  await italianSettled;
+
+  await expect
+    .poll(() =>
+      page.evaluate(() => ({
+        direction: document.documentElement.dir,
+        heading: document.querySelector('.gallery-heading h2')?.textContent?.trim(),
+        language: document.documentElement.lang,
+        pathname: window.location.pathname,
+        selected: document.querySelector('[data-locale-select]')?.value,
+        shell: document.querySelector('.theme-button__label')?.textContent?.trim(),
+        stored: localStorage.getItem('sense6:locale'),
+      })),
+    )
+    .toEqual({
+      direction: 'ltr',
+      heading: german.get('Start with what you want to learn.'),
+      language: 'de',
+      pathname: '/de/',
+      selected: 'de',
+      shell: german.get('Theme'),
+      stored: 'de',
+    });
+  expect(pageErrors).toEqual([]);
+});
+
 test('the privacy notice describes the deployed data boundary in every locale', async ({ page }) => {
   await page.goto('/en/');
   await page.getByRole('link', { name: 'Privacy', exact: true }).click();
@@ -202,6 +384,7 @@ test('the privacy notice describes the deployed data boundary in every locale', 
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
   for (const { code, languageTag, direction } of LOCALES) {
+    await preparePrivacyCopy(code);
     await page.goto(`/${code}/privacy/`);
     await expect(page.locator('html')).toHaveAttribute('lang', languageTag);
     await expect(page.locator('html')).toHaveAttribute('dir', direction);

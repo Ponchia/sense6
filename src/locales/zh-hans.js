@@ -185,7 +185,6 @@ const rows = [
   ['Calibrated experiment, not an eye examination.', '这是校准后的实验，不是眼科检查。'],
   ['Sudden changes need care, not another run.', '突然的变化需要就医，而不是再次测试。'],
   ['This is not vision screening, diagnosis, or a prescription.', '这不是视力筛查、诊断或处方。'],
-  ['preference', '偏好'],
   ['Calibrated sharpness experiment — Acutezza | Sense6', '校准后的视敏度实验 — Acutezza | Sense6'],
   ['Calibrate screen size — Acutezza | Sense6', '校准屏幕尺寸 — Acutezza | Sense6'],
   ['Estimate viewing distance — Acutezza | Sense6', '估算观看距离 — Acutezza | Sense6'],

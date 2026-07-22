@@ -36,7 +36,7 @@ export function resultActionLabel(
  * self-attributing result summary. A cancelled share is intentionally silent.
  *
  * @param {{ title: string, summary: string, route: string, locale: string, browserNavigator?: SharingNavigator }} options
- * @returns {Promise<'shared' | 'copied' | 'cancelled'>}
+ * @returns {Promise<'shared' | 'copied' | 'cancelled' | 'denied'>}
  */
 export async function shareOrCopyResult({
   title,
@@ -52,11 +52,20 @@ export async function shareOrCopyResult({
       await share.call(browserNavigator, { title, text: summary, url });
       return 'shared';
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') return 'cancelled';
+      const name = errorName(error);
+      if (name === 'AbortError') return 'cancelled';
+      if (name === 'NotAllowedError') return 'denied';
+      throw error;
     }
   }
 
   if (!browserNavigator?.clipboard?.writeText) throw new Error('Clipboard access is unavailable');
   await browserNavigator.clipboard.writeText(`${summary}\n${url}`);
   return 'copied';
+}
+
+/** @param {unknown} error */
+function errorName(error) {
+  if (!error || typeof error !== 'object' || !('name' in error)) return '';
+  return typeof error.name === 'string' ? error.name : '';
 }
