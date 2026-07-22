@@ -27,6 +27,15 @@ for (const route of REPRESENTATIVE_ROUTES) {
     });
     await page.goto(route, { waitUntil: 'domcontentloaded' });
     await settlePage(page);
+    if (route === '/en/color-blindness/') {
+      // The preview canvas measures its CSS box on the first animation frame.
+      // Re-render it after cold web fonts settle so both revisions draw from
+      // the final layout instead of comparing fallback-font canvas sizes.
+      await page.locator('[data-action="cb-setup"]').first().click();
+      await page.locator('[data-action="cb-home"]').click();
+      await settlePage(page);
+      await waitForPreviewCanvas(page);
+    }
     await compareScreenshot(page, `${slug(route)}-desktop.png`);
 
     await page.setViewportSize({ width: 320, height: 568 });
@@ -51,6 +60,17 @@ async function settlePage(page) {
   }
   await page.waitForFunction(() => !document.querySelector('#app > .static-entry'));
   await page.evaluate(async () => document.fonts?.ready);
+}
+
+async function waitForPreviewCanvas(page) {
+  await page.waitForFunction(() => {
+    const canvas = document.querySelector('[data-preview-target]');
+    if (!(canvas instanceof HTMLCanvasElement)) return false;
+    const bounds = canvas.getBoundingClientRect();
+    const cssSize = Math.max(1, Math.min(bounds.width || 320, bounds.height || bounds.width || 320));
+    const pixels = Math.round(cssSize * Math.min(window.devicePixelRatio || 1, 2));
+    return canvas.width === pixels && canvas.height === pixels;
+  });
 }
 
 function screenshotOptions() {
