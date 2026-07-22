@@ -1,10 +1,63 @@
+/*
+ * Give the tiny, self-hosted display face a fallback-blocking window. The
+ * UI package's Doto family uses `swap`; Sense6 needs stricter layout stability
+ * because translated headings can reflow the entire test gallery after paint.
+ */
+@font-face {
+  font-display: block;
+  font-family: "Sense6 Doto";
+  font-style: normal;
+  font-weight: 400;
+  src: url("@ponchia/ui/fonts/doto-400.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: block;
+  font-family: "Sense6 Doto";
+  font-style: normal;
+  font-weight: 500;
+  src: url("@ponchia/ui/fonts/doto-500.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: block;
+  font-family: "Sense6 Doto";
+  font-style: normal;
+  font-weight: 600;
+  src: url("@ponchia/ui/fonts/doto-600.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: block;
+  font-family: "Sense6 Doto";
+  font-style: normal;
+  font-weight: 700;
+  src: url("@ponchia/ui/fonts/doto-700.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: block;
+  font-family: "Sense6 Doto";
+  font-style: normal;
+  font-weight: 800;
+  src: url("@ponchia/ui/fonts/doto-800.woff2") format("woff2");
+}
+
+@font-face {
+  font-display: block;
+  font-family: "Sense6 Doto";
+  font-style: normal;
+  font-weight: 900;
+  src: url("@ponchia/ui/fonts/doto-900.woff2") format("woff2");
+}
+
 :root {
   --accent: #d51d3c;
   --accent-strong: #a80c28;
   --accent-text: #a80c28;
   --button-text: #ffffff;
   --container-wide: 91rem;
-  --display: "Doto", ui-monospace, monospace;
+  --display: "Sense6 Doto", ui-monospace, monospace;
   --lab-gray: #747472;
   --s6-measure-prose: 66ch;
   --s6-space-card: clamp(1.35rem, 3vw, 2.25rem);

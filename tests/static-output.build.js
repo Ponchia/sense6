@@ -88,6 +88,23 @@ test('RTL static interpolation matches the runtime directional-isolate contract'
   assert.match(html, /\u2068\d+\u2069/);
 });
 
+test('display fonts reserve a fallback-blocking window', async () => {
+  const assets = await readdir(new URL('assets/', DIST));
+  const stylesheet = assets.find((asset) => /^index-.+\.css$/.test(asset));
+  assert.ok(stylesheet, 'expected the generated application stylesheet');
+  const css = await readFile(new URL(`assets/${stylesheet}`, DIST), 'utf8');
+  for (const weight of [400, 500, 600, 700, 800, 900]) {
+    assert.match(
+      css,
+      new RegExp(
+        `font-display:block;font-family:(?:"Sense6 Doto"|Sense6 Doto);font-style:normal;font-weight:${weight}`,
+      ),
+      `Sense6 Doto ${weight} must use font-display: block`,
+    );
+  }
+  assert.match(css, /--display:(?:"Sense6 Doto"|Sense6 Doto),\s*ui-monospace,\s*monospace/);
+});
+
 test('experiment discovery pages expose useful copy, related routes, images, and provenance', async () => {
   for (const definition of EXAMS) {
     const html = await readFile(new URL(`en/${definition.route}/index.html`, DIST), 'utf8');
