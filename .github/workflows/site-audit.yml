@@ -15,6 +15,8 @@ concurrency:
   group: site-audit-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+# Browser-container jobs use the Node 24 runtime bundled with the pinned
+# Playwright image, avoiding a redundant download on every ephemeral runner.
 jobs:
   route-integrity:
     runs-on: arc-vps-sense6
@@ -24,10 +26,6 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-      - name: Set up Node.js
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
-        with:
-          node-version: 24
       - name: Install dependencies
         run: npm ci
       - name: Build the static site
@@ -59,10 +57,6 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           fetch-depth: 0
-      - name: Set up Node.js
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
-        with:
-          node-version: 24
       - name: Install dependencies
         run: npm ci
       - name: Record intentional visual baseline updates
@@ -119,10 +113,6 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-      - name: Set up Node.js
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
-        with:
-          node-version: 24
       - name: Install dependencies
         run: npm ci
       - name: Build and serve the static site
@@ -154,6 +144,7 @@ jobs:
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 24
+          package-manager-cache: false
       - name: Install dependencies
         run: npm ci
       - name: Build the static site
