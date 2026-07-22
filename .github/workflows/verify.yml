@@ -15,7 +15,7 @@ on:
 
 jobs:
   browser:
-    runs-on: ubuntu-latest
+    runs-on: arc-vps-sense6
     timeout-minutes: 12
     strategy:
       fail-fast: false
@@ -53,7 +53,7 @@ jobs:
 
   release:
     needs: browser
-    runs-on: ubuntu-latest
+    runs-on: arc-vps-sense6
     timeout-minutes: 30
 
     steps:
@@ -112,7 +112,7 @@ jobs:
         run: npm run test:deployed
 
       - name: Preserve deployed-browser failure artifacts
-        if: always() && inputs.publish_production
+        if: failure() && inputs.publish_production
         continue-on-error: true
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -121,3 +121,4 @@ jobs:
             playwright-report/deployed
             test-results/deployed
           if-no-files-found: ignore
+          retention-days: 3

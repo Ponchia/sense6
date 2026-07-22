@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   route-integrity:
-    runs-on: ubuntu-latest
+    runs-on: arc-vps-sense6
     timeout-minutes: 20
     steps:
       - name: Check out the repository
@@ -47,10 +47,11 @@ jobs:
           name: site-audit-playwright-report
           path: playwright-report/site-audit
           if-no-files-found: ignore
+          retention-days: 3
 
   visual-regression:
     if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: arc-vps-sense6
     timeout-minutes: 15
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
@@ -106,9 +107,10 @@ jobs:
           name: visual-regression-playwright-report
           path: playwright-report/site-audit
           if-no-files-found: ignore
+          retention-days: 3
 
   lighthouse:
-    runs-on: ubuntu-latest
+    runs-on: arc-vps-sense6
     timeout-minutes: 45
     env:
       FULL_SITE_AUDIT: ${{ github.event_name != 'pull_request' && '1' || '0' }}
@@ -134,7 +136,7 @@ jobs:
       - name: Enforce Lighthouse budgets
         run: npm run audit:lighthouse
       - name: Upload Lighthouse results
-        if: always()
+        if: failure()
         continue-on-error: true
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -142,10 +144,11 @@ jobs:
           path: .unlighthouse
           if-no-files-found: ignore
           include-hidden-files: true
+          retention-days: 3
 
   external-links:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: arc-vps-sense6
     timeout-minutes: 15
     steps:
       - name: Check out the repository
@@ -172,7 +175,7 @@ jobs:
 
   passive-security:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
+    runs-on: arc-vps-sense6
     timeout-minutes: 15
     steps:
       - name: Run the passive ZAP baseline against production
