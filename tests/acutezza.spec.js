@@ -115,6 +115,10 @@ async function expectAcutezzaActionsToBeReachable(page, label) {
     // re-render cannot leave the geometry audit holding a detached button.
     await action.scrollIntoViewIfNeeded();
     await expect(action, `${label} action ${index} remains rendered after scroll`).toBeVisible();
+    // Let Playwright find an unobscured pointer position. A center-point-only
+    // probe can falsely reject a usable control when the sticky site header
+    // overlaps the center after the browser's minimal scroll adjustment.
+    await action.hover();
     const geometry = await action.evaluate((element) => {
       const rect = element.getBoundingClientRect();
       const viewport = window.visualViewport;
@@ -122,14 +126,9 @@ async function expectAcutezzaActionsToBeReachable(page, label) {
       const viewportTop = viewport?.offsetTop ?? 0;
       const viewportRight = viewportLeft + (viewport?.width ?? window.innerWidth);
       const viewportBottom = viewportTop + (viewport?.height ?? window.innerHeight);
-      const hit = document.elementFromPoint(
-        Math.min(viewportRight - 1, Math.max(viewportLeft, rect.left + rect.width / 2)),
-        Math.min(viewportBottom - 1, Math.max(viewportTop, rect.top + rect.height / 2)),
-      );
       return {
         bottom: rect.bottom,
         height: rect.height,
-        hit: hit === element || element.contains(hit),
         left: rect.left,
         right: rect.right,
         top: rect.top,
@@ -148,7 +147,6 @@ async function expectAcutezzaActionsToBeReachable(page, label) {
     );
     expect(geometry.width, `${label} action ${index} width`).toBeGreaterThanOrEqual(44);
     expect(geometry.height, `${label} action ${index} height`).toBeGreaterThanOrEqual(44);
-    expect(geometry.hit, `${label} action ${index} hit target`).toBe(true);
   }
 }
 
