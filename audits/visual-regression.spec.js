@@ -27,6 +27,13 @@ for (const route of REPRESENTATIVE_ROUTES) {
     });
     await page.goto(route, { waitUntil: 'domcontentloaded' });
     await settlePage(page);
+    if (route === '/en/color-blindness/') {
+      // The preview canvas measures its CSS box on the first animation frame.
+      // Reload after cold web fonts settle so both revisions draw it at the
+      // same size instead of comparing fallback-font and final-font layouts.
+      await page.reload({ waitUntil: 'domcontentloaded' });
+      await settlePage(page);
+    }
     await compareScreenshot(page, `${slug(route)}-desktop.png`);
 
     await page.setViewportSize({ width: 320, height: 568 });
