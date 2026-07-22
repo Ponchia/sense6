@@ -321,12 +321,11 @@ file-by-file SHA-256 manifest, verifies it, and runs the production site audit.
 After the browser matrix passes, the same release job deploys that working tree
 without rebuilding production output or depending on external artifact storage.
 
-Same-repository pull requests run that gate and publish the already verified
-`dist/` directory to a stable `pr-<number>.sense6.pages.dev` branch preview. CI
-then smoke-tests the real deployment. Cloudflare and `_headers` mark previews
-`noindex`, and both the client and Pages Function accept metrics only on
-`https://sense6.net`. Fork pull requests verify without deployment credentials
-or a preview.
+Pull requests run that gate without deployment credentials or preview
+publication. Both the client and Pages Function accept metrics only on
+`https://sense6.net`; Pages project URLs remain non-production origins. The
+protected preview prerequisite and activation constraints appear below and in
+the release runbook.
 
 The initial English route budget is at most 110 kB of raw JavaScript across the
 complete transitive graph recorded in Vite's manifest, not only the entry
@@ -347,9 +346,16 @@ hostname and `www.sense6.net` redirect to the canonical domain through
 Cloudflare Single Redirect rules. Pages `_redirects` files cannot match source
 hostnames, so keep domain-level redirects in the corresponding Cloudflare zone.
 
-The deployment workflow requires the `CLOUDFLARE_API_TOKEN` and
-`CLOUDFLARE_ACCOUNT_ID` repository secrets. Scope the token to Cloudflare Pages
-edits for the account that owns `sense6.net`.
+Pull requests run that gate with read-only repository access and without
+deployment credentials. Pull-request preview publication is disabled. To
+activate it, first create and verify an isolated, protected preview environment,
+then add a default-branch-owned workflow that publishes only the verified
+artifact without running pull-request-controlled code. This repository change
+doesn't verify or create that external configuration.
+
+The production workflow uses the existing Cloudflare account credentials and
+can publish only from `main`. Scope its token to Cloudflare Pages edits for the
+account that owns `sense6.net`.
 
 The Pages project also requires a D1 binding named `ANALYTICS_DB`. Apply
 the complete ordered migration set in `migrations/` to that database before
@@ -366,7 +372,8 @@ completion, and report download. Cloudflare uses the request IP transiently for
 this edge control; Sense6 doesn't copy or store it.
 
 Use the [Cloudflare Pages release runbook](docs/runbooks/cloudflare-pages-release.md)
-for migration, binding, preview, production verification, and rollback steps.
+for migration, binding, production verification, rollback, and the protected
+preview activation prerequisite.
 
 ## Scientific limits
 

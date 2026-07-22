@@ -8,15 +8,16 @@ import { SOURCE_ROLE_LABELS, sourcesFor } from '../src/exams/sources.js';
 import { galleryMarkup } from '../src/gallery-markup.js';
 import { messageSource } from '../src/i18n/message-ids.js';
 import { interpolateMessage } from '../src/i18n.js';
-import { journalCopy } from '../src/journal-copy.js';
+import { journalCopy, prepareJournalCopy } from '../src/journal-copy.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
-import { privacyCopy, privacyMarkup } from '../src/privacy.js';
-import { UTILITY_ROUTES } from '../src/routes.js';
+import { preparePrivacyCopy, privacyCopy, privacyMarkup } from '../src/privacy.js';
+import { createRouteMetadata, SITE_ORIGIN, UTILITY_ROUTES } from '../src/routes.js';
+import { activeRouteModuleFiles } from './vite-manifest.mjs';
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DIST = join(ROOT, 'dist');
-const ORIGIN = 'https://sense6.net';
-const SITE_DATE_MODIFIED = '2026-07-21';
+const ORIGIN = SITE_ORIGIN;
+const SITE_DATE_MODIFIED = '2026-07-22';
 const template = await readFile(join(DIST, 'index.html'), 'utf8');
 const builtAssets = await readdir(join(DIST, 'assets'));
 const routeStyles = indexRouteStyles(builtAssets);
@@ -31,6 +32,7 @@ await writePage('index.html', {
   locale: 'en',
   languageTag: 'en',
   direction: 'ltr',
+  route: '',
   path: '/',
   title: 'Sense6 — choose your language',
   description:
@@ -41,6 +43,7 @@ await writePage('index.html', {
   stylesheet: routeStyles.get('gallery'),
   alternates: galleryAlternates(),
   structuredData: websiteData('en'),
+  preloadModules: false,
 });
 
 for (const { code: locale, languageTag, direction } of LOCALES) {
@@ -53,6 +56,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     locale,
     languageTag,
     direction,
+    route: '',
     path: galleryPath,
     title: translate('Sense6 — measure what your senses notice'),
     description: translate(
@@ -86,6 +90,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
       locale,
       languageTag,
       direction,
+      route: definition.route,
       path,
       title: translate(definition.pageTitle),
       description: translate(definition.blurb),
@@ -105,6 +110,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     locale,
     languageTag,
     direction,
+    route: 'about',
     path: aboutPath,
     title: about.pageTitle,
     description: about.description,
@@ -116,6 +122,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     structuredData: aboutData(about, languageTag, aboutPath),
   });
 
+  await prepareJournalCopy(locale);
   const journal = journalCopy(locale);
   const journalPath = `/${locale}/journal/`;
   canonicalPaths.push({ path: journalPath });
@@ -123,6 +130,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     locale,
     languageTag,
     direction,
+    route: 'journal',
     path: journalPath,
     title: `${journal.title} | Sense6`,
     description: journal.intro,
@@ -134,6 +142,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     structuredData: webpageData(`${journal.title} | Sense6`, journal.intro, languageTag, journalPath),
   });
 
+  await preparePrivacyCopy(locale);
   const copy = privacyCopy(locale);
   const privacyPath = `/${locale}/privacy/`;
   canonicalPaths.push({ path: privacyPath });
@@ -141,6 +150,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     locale,
     languageTag,
     direction,
+    route: 'privacy',
     path: privacyPath,
     title: `${copy.title} | Sense6`,
     description: copy.intro,
@@ -158,34 +168,41 @@ await writeDiscoveryFiles();
 
 async function writePage(relativePath, page) {
   const json = JSON.stringify(page.structuredData);
+  const metadata = createRouteMetadata(page);
   let html = localizeShell(template, page.locale);
+  const routeFiles =
+    page.preloadModules === false ? [] : await activeRouteModuleFiles(page.locale, page.route);
+  const modulePreloads = routeFiles
+    .filter((file) => !html.includes(`href="/${file}"`))
+    .map((file) => `<link rel="modulepreload" crossorigin href="/${file}">\n    `)
+    .join('');
   html = replaceChecked(
     html,
     /<html lang="[^"]+"(?: dir="[^"]+")?/,
     `<html lang="${page.languageTag}" dir="${page.direction}"`,
     'document language and direction',
   );
-  html = replaceTitle(html, page.title);
-  html = replaceMeta(html, 'name', 'description', page.description);
-  html = replaceMeta(html, 'property', 'og:title', page.title);
-  html = replaceMeta(html, 'property', 'og:description', page.description);
-  html = replaceMeta(html, 'property', 'og:url', `${ORIGIN}${page.path}`);
-  html = replaceMeta(html, 'property', 'og:image', `${ORIGIN}${page.socialImage}`);
-  html = replaceMeta(html, 'property', 'og:image:alt', page.socialImageAlt);
-  html = replaceMeta(html, 'name', 'twitter:title', page.title);
-  html = replaceMeta(html, 'name', 'twitter:description', page.description);
-  html = replaceMeta(html, 'name', 'twitter:image', `${ORIGIN}${page.socialImage}`);
-  html = replaceMeta(html, 'name', 'twitter:image:alt', page.socialImageAlt);
+  html = replaceTitle(html, metadata.title);
+  html = replaceMeta(html, 'name', 'description', metadata.description);
+  html = replaceMeta(html, 'property', 'og:title', metadata.title);
+  html = replaceMeta(html, 'property', 'og:description', metadata.description);
+  html = replaceMeta(html, 'property', 'og:url', metadata.canonical);
+  html = replaceMeta(html, 'property', 'og:image', metadata.socialImage);
+  html = replaceMeta(html, 'property', 'og:image:alt', metadata.socialImageAlt);
+  html = replaceMeta(html, 'name', 'twitter:title', metadata.title);
+  html = replaceMeta(html, 'name', 'twitter:description', metadata.description);
+  html = replaceMeta(html, 'name', 'twitter:image', metadata.socialImage);
+  html = replaceMeta(html, 'name', 'twitter:image:alt', metadata.socialImageAlt);
   html = replaceChecked(
     html,
     /<link rel="canonical" href="[^"]+"\s*\/?>/,
-    `<link rel="canonical" href="${ORIGIN}${page.path}">`,
+    `<link rel="canonical" href="${metadata.canonical}">`,
     'canonical link',
   );
   html = replaceChecked(
     html,
     '</head>',
-    `    ${displayFontPreload(page.locale)}<link rel="stylesheet" crossorigin href="/assets/${page.stylesheet}">\n    ${page.alternates}\n    <script type="application/ld+json">${json}</script>\n  </head>`,
+    `    ${displayFontPreload(page.locale)}${modulePreloads}<link rel="stylesheet" crossorigin href="/assets/${page.stylesheet}">\n    ${page.alternates}\n    <script type="application/ld+json">${json}</script>\n  </head>`,
     'head insertion point',
   );
   html = replaceChecked(
@@ -344,9 +361,11 @@ function journalMarkup(copy, locale) {
   return `<article class="static-entry ui-container">
     <a class="back-link" data-sense6-route="" href="/${locale}/"><span aria-hidden="true">←</span> ${escapeHtml(copy.back)}</a>
     <header><p class="ui-eyebrow">${escapeHtml(copy.eyebrow)}</p><h1>${escapeHtml(copy.title)}</h1><p>${escapeHtml(copy.intro)}</p></header>
-    <aside><p><strong>${escapeHtml(copy.privacy)}</strong></p><p>${escapeHtml(copy.empty)}</p></aside>
+    <aside><p><strong>${escapeHtml(copy.privacy)}</strong></p><ul>${Object.values(copy.exportDisclosure)
+      .map((item) => `<li>${escapeHtml(item)}</li>`)
+      .join('')}</ul><p>${escapeHtml(copy.empty)}</p></aside>
     <section><h2>${escapeHtml(copy.setup)}</h2><p>${escapeHtml(copy.reasonSetup)} ${escapeHtml(copy.reasonMinor)}</p></section>
-    <section><h2>${escapeHtml(copy.measurements)}</h2><p>${escapeHtml(copy.comparable)} · ${escapeHtml(copy.caution)} · ${escapeHtml(copy.notComparable)}. ${escapeHtml(copy.noUncertainty)}; ${escapeHtml(copy.bounded)}.</p></section>
+    <section><h2>${escapeHtml(copy.measurements)}</h2><p>${escapeHtml(copy.comparable)} · ${escapeHtml(copy.caution)} · ${escapeHtml(copy.notComparable)}. ${escapeHtml(copy.modelInterval)}; ${escapeHtml(copy.noUncertainty)}; ${escapeHtml(copy.bounded)}.</p></section>
   </article>`;
 }
 
@@ -485,6 +504,9 @@ async function write404() {
   let html = localizeShell(template, 'en');
   html = replaceTitle(html, 'Page not found | Sense6');
   html = replaceMeta(html, 'name', 'description', 'This Sense6 page does not exist.');
+  html = replaceChecked(html, /\s*<link rel="canonical" href="[^"]+"\s*\/?>/, '', '404 canonical removal');
+  html = html.replace(/\s*<meta\s+property="og:[^"]+"\s+content="[^"]*"\s*\/?>/g, '');
+  html = html.replace(/\s*<meta\s+name="twitter:[^"]+"\s+content="[^"]*"\s*\/?>/g, '');
   html = replaceChecked(
     html,
     '</head>',

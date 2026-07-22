@@ -78,7 +78,7 @@ function renderHome() {
   state.app.innerHTML = tetracromiaHomeMarkup(PHASES, t, m, toRgbCss);
 }
 
-function renderSetup() {
+function renderSetup({ invalidationMessage = '' } = {}) {
   cancelTrialEffects();
   state.session = null;
   state.labActive = false;
@@ -98,6 +98,11 @@ function renderSetup() {
             Display settings and ambient light can change what appears visible. This one-minute
             check makes the 29-block run easier to repeat under similar conditions.
           </p>
+          ${
+            invalidationMessage
+              ? `<div class="ui-alert ui-alert--warning tetracromia-invalidation" role="alert" tabindex="-1" data-tetracromia-invalidation>${t(invalidationMessage)}</div>`
+              : ''
+          }
           <div class="ui-alert ui-alert--info forced-colors-warning tetracromia-forced-colors-warning">
             <div class="ui-alert__body">
               <strong class="ui-alert__title">Color override detected</strong>
@@ -137,6 +142,9 @@ function renderSetup() {
     </section>
   `;
   updateSetupEligibility();
+  if (invalidationMessage) {
+    state.lifecycle.present(state.app, { focus: '[data-tetracromia-invalidation]' });
+  }
 }
 
 function startLab() {
@@ -580,7 +588,6 @@ function renderResults() {
   document.body.classList.add('lab-mode');
   document.title = t('Screen Colour Lab observations — Tetracromia | Sense6');
   const result = state.session.results();
-  const journalSaved = saveJournalResult(result);
 
   state.app.innerHTML = `
     <section class="results-view ui-container ui-container--wide" tabindex="-1">
@@ -597,7 +604,7 @@ function renderResults() {
         </div>
       </div>
 
-      ${journalSaved ? '' : `<div class="ui-alert ui-alert--danger tetracromia-journal-status" data-tetracromia-journal-status role="alert"><strong class="ui-alert__title">${t('The result is ready, but this browser did not allow local storage.')}</strong></div>`}
+      <div data-tetracromia-persistence></div>
 
       <div class="result-details">
         ${observationMetric('01', 'Tile choices', t('{correct} of {presentations} correct', { correct: result.tile.correct, presentations: result.tile.presentations }), t('The adaptive level ended near {level}° of OKLCH hue (ΔEOK {delta}).', { level: formatNumber(result.tile.adaptiveLevelDegrees, { maximumFractionDigits: 1 }), delta: formatNumber(result.tile.deltaEok, { maximumFractionDigits: 3 }) }), t('Presented range {minimum}°–{maximum}° · {reversals} direction changes', { minimum: result.tile.presentedMinimum, maximum: result.tile.presentedMaximum, reversals: result.tile.reversals }))}
@@ -617,16 +624,26 @@ function renderResults() {
         </div>
       </div>
 
-      <div class="results-actions">
-        ${
-          journalSaved
-            ? `<button class="ui-button ui-button--lg" type="button" data-action="setup">Repeat independently</button><button class="ui-button ui-button--ghost" type="button" data-action="copy-results">${resultActionLabel(t, 'Copy summary')}</button>`
-            : `<button class="ui-button ui-button--lg" type="button" data-action="copy-results">${resultActionLabel(t, 'Copy summary')}</button><button class="ui-button ui-button--ghost" type="button" data-action="setup">Repeat independently</button>`
-        }
+      <div class="results-actions" data-tetracromia-result-actions>
         <button class="ui-button ui-button--subtle" type="button" data-action="home">Return to method</button>
       </div>
     </section>
   `;
+
+  const journalSaved = saveJournalResult(result);
+  const persistence = state.app.querySelector('[data-tetracromia-persistence]');
+  if (journalSaved) persistence?.remove();
+  else if (persistence) {
+    persistence.outerHTML = `<div class="ui-alert ui-alert--danger tetracromia-journal-status" data-tetracromia-journal-status role="alert"><strong class="ui-alert__title">${t('The result is ready, but this browser did not allow local storage.')}</strong></div>`;
+  }
+  state.app
+    .querySelector('[data-tetracromia-result-actions]')
+    ?.insertAdjacentHTML(
+      'afterbegin',
+      journalSaved
+        ? `<button class="ui-button ui-button--lg" type="button" data-action="setup">${t('Repeat independently')}</button><button class="ui-button ui-button--ghost" type="button" data-action="copy-results">${resultActionLabel(t, 'Copy summary')}</button>`
+        : `<button class="ui-button ui-button--lg" type="button" data-action="copy-results">${resultActionLabel(t, 'Copy summary')}</button><button class="ui-button ui-button--ghost" type="button" data-action="setup">${t('Repeat independently')}</button>`,
+    );
 
   window.scrollTo({ top: 0, behavior: 'instant' });
   document.querySelector('.results-view').focus({ preventScroll: true });
@@ -744,7 +761,7 @@ function visualEnvironmentChanged(baseline, current) {
 function invalidateVisualRun(message) {
   if (!state.labActive) return;
   state.measurementEnvironment = null;
-  renderSetup();
+  renderSetup({ invalidationMessage: message });
   announce(message);
 }
 

@@ -108,6 +108,37 @@ test('Riflessi keeps storage failure visible and prioritizes copying the unsaved
   await expect(page.locator('.rx-results__actions .ui-button').first()).toContainText(/Copy result summary/i);
 });
 
+test('a settled Riflessi share cannot publish feedback after its mount is disposed', async ({ page }) => {
+  await installQuickRiflessi(page);
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: () =>
+        new Promise((_, reject) => {
+          window.__riflessiSharePending = true;
+          window.__rejectRiflessiShare = () => reject(new Error('settled after disposal'));
+        }),
+    });
+  });
+  await page.goto('/en/riflessi/');
+  await prepareRiflessi(page, 'keyboard', 'signal');
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  await respondWithKey(page, 'Space');
+  await page.getByRole('button', { name: /Begin measured block/i }).click();
+  const total = Number(
+    await page.locator('[data-rx-count]').evaluate((element) => element.textContent.split('/')[1]),
+  );
+  for (let trial = 0; trial < total; trial += 1) await respondWithKey(page, 'Space');
+
+  await page.getByRole('button', { name: /Share result/i }).click();
+  await expect.poll(() => page.evaluate(() => window.__riflessiSharePending)).toBe(true);
+  await page.getByRole('button', { name: /All tests/i }).click();
+  await expect(page).toHaveURL(/\/en\/$/);
+  await page.evaluate(() => window.__rejectRiflessiShare());
+  await page.waitForTimeout(50);
+  await expect(page.locator('.ui-toast')).toHaveCount(0);
+});
+
 test('Riflessi accepts legacy result shapes and rejects malformed latest-result storage', async ({
   page,
 }) => {
@@ -528,6 +559,59 @@ test('choice direction stays secret until an atomic, transition-free onset', asy
   });
 });
 
+test('Space and Enter require the focused Riflessi response control', async ({ page }) => {
+  await installQuickRiflessi(page);
+  await page.goto('/en/riflessi/');
+  await prepareRiflessi(page, 'keyboard', 'signal');
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  const chamber = page.locator('[data-rx-chamber]');
+  await expect(chamber).toHaveAttribute('data-rx-state', 'live');
+
+  const heading = page.locator('[data-rx-screen-title]');
+  await heading.focus();
+  await heading.press('Space');
+  await heading.press('Enter');
+  await expect(chamber).toHaveAttribute('data-rx-state', 'live');
+
+  const response = page.locator('[data-rx-response="signal"]');
+  await response.focus();
+  await response.press('Enter');
+  await expect(page.getByRole('heading', { name: /Now the measured block/i })).toBeVisible();
+});
+
+test('Riflessi ignores secondary and non-primary pointer responses', async ({ page }) => {
+  await installQuickRiflessi(page);
+  await page.goto('/en/riflessi/');
+  await prepareRiflessi(page, 'pointer', 'signal');
+  await page.getByRole('button', { name: /Start practice/i }).click();
+  const chamber = page.locator('[data-rx-chamber]');
+  await expect(chamber).toHaveAttribute('data-rx-state', 'live');
+  const response = page.locator('[data-rx-response="signal"]');
+
+  await response.evaluate((element) => {
+    element.dispatchEvent(
+      new PointerEvent('pointerdown', {
+        bubbles: true,
+        button: 2,
+        isPrimary: true,
+        pointerType: 'mouse',
+      }),
+    );
+    element.dispatchEvent(
+      new PointerEvent('pointerdown', {
+        bubbles: true,
+        button: 0,
+        isPrimary: false,
+        pointerType: 'touch',
+      }),
+    );
+  });
+  await expect(chamber).toHaveAttribute('data-rx-state', 'live');
+
+  await response.click();
+  await expect(page.getByRole('heading', { name: /Now the measured block/i })).toBeVisible();
+});
+
 test('runner progress, headings, focus, and paused state are accessible', async ({ page }) => {
   await page.addInitScript(() => {
     window.__SENSE6_TEST_CONFIG__ = {
@@ -551,6 +635,8 @@ test('runner progress, headings, focus, and paused state are accessible', async 
 
   const runnerTitle = page.getByRole('heading', { level: 1, name: /Segnale response runner/i });
   await expect(runnerTitle).toBeFocused();
+  await expect(page.locator('[data-rx-status]')).not.toHaveAttribute('aria-live');
+  await expect(page.locator('[data-rx-feedback]')).toHaveAttribute('aria-live', 'polite');
   await expect(page.getByRole('progressbar', { name: /Instrument progress/i })).toHaveAttribute(
     'aria-valuenow',
     '0',

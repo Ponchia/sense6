@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { protocolPassport } from '../src/exams/protocols.js';
-import { journalSetupLabel } from '../src/journal-copy.js';
+import { journalCopy, journalSetupLabel, prepareJournalCopy } from '../src/journal-copy.js';
 import {
   appendJournalEntry,
   captureDisplayPassport,
@@ -10,11 +10,16 @@ import {
   createJournalEntry,
   exportJournal,
   importJournal,
+  JOURNAL_DISCLOSURE_KEYS,
+  JOURNAL_EXPORT_SCHEMA,
   JOURNAL_LIMITS,
   loadJournal,
   measurementChanges,
+  previewJournalImport,
+  readJournalState,
   removeJournalEntry,
 } from '../src/lib/journal.js';
+import { LOCALE_CODES } from '../src/locale-metadata.js';
 
 test('the journal stores newest-first portable entries and caps retained history', () => {
   const storage = memoryStorage();
@@ -88,29 +93,115 @@ test('corrupt, oversized, invalid, and future stored journals fail closed', () =
   );
 });
 
+test('journal reads distinguish every recovery and healthy state', () => {
+  assert.deepEqual(readJournalState(null), {
+    status: 'inaccessible',
+    entries: [],
+    raw: null,
+    writable: false,
+  });
+  assert.deepEqual(readJournalState(memoryStorage()), {
+    status: 'empty',
+    entries: [],
+    raw: null,
+    writable: true,
+  });
+
+  const malformedRaw = '{';
+  assert.deepEqual(readJournalState(memoryStorage({ 'sense6:journal': malformedRaw })), {
+    status: 'malformed',
+    entries: [],
+    raw: malformedRaw,
+    writable: false,
+  });
+
+  const oversizedRaw = 'x'.repeat(JOURNAL_LIMITS.maxImportBytes + 1);
+  assert.deepEqual(readJournalState(memoryStorage({ 'sense6:journal': oversizedRaw })), {
+    status: 'oversized',
+    entries: [],
+    raw: oversizedRaw,
+    writable: false,
+  });
+
+  const futureRaw = JSON.stringify({
+    format: 'sense6-journal',
+    schemaVersion: 99,
+    entries: [],
+  });
+  assert.deepEqual(readJournalState(memoryStorage({ 'sense6:journal': futureRaw })), {
+    status: 'future-schema',
+    entries: [],
+    raw: futureRaw,
+    writable: false,
+  });
+
+  const readyStorage = memoryStorage();
+  const readyEntry = entry({ id: 'ready' });
+  appendJournalEntry(readyEntry, readyStorage);
+  const ready = readJournalState(readyStorage);
+  assert.equal(ready.status, 'ready');
+  assert.equal(ready.writable, true);
+  assert.deepEqual(ready.entries, [readyEntry]);
+  assert.equal(typeof ready.raw, 'string');
+
+  assert.deepEqual(
+    readJournalState({
+      getItem() {
+        throw new Error('read denied');
+      },
+      setItem() {},
+    }),
+    { status: 'inaccessible', entries: [], raw: null, writable: false },
+  );
+});
+
+test('a throwing localStorage getter cannot crash optional journal storage', () => {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    get() {
+      throw new Error('storage access denied');
+    },
+  });
+
+  try {
+    assert.deepEqual(loadJournal(), []);
+    assert.equal(readJournalState().status, 'inaccessible');
+    assert.equal(appendJournalEntry(entry()), false);
+    assert.equal(clearJournal(), false);
+  } finally {
+    if (descriptor) Object.defineProperty(globalThis, 'localStorage', descriptor);
+    else delete globalThis.localStorage;
+  }
+});
+
 test('exports merge idempotently and reject unsafe imports', () => {
   const source = memoryStorage();
   appendJournalEntry(entry({ id: 'portable' }), source);
   const exported = exportJournal(source);
   const target = memoryStorage();
-  assert.deepEqual(importJournal(exported, target), {
+  const firstPreview = previewJournalImport(exported, target);
+  assert.deepEqual(firstPreview, {
     ok: true,
-    imported: 1,
+    additions: 1,
     duplicates: 0,
     discarded: 0,
     evicted: 0,
-    skipped: 0,
     total: 1,
   });
-  assert.deepEqual(importJournal(exported, target), {
+  assert.deepEqual(loadJournal(target), [], 'preview must not write');
+  assert.deepEqual(importJournal(exported, target), { ok: false, reason: 'confirmation-required' });
+  assert.deepEqual(importJournal(exported, target, firstPreview), firstPreview);
+  const duplicatePreview = previewJournalImport(exported, target);
+  assert.deepEqual(duplicatePreview, {
     ok: true,
-    imported: 0,
+    additions: 0,
     duplicates: 1,
     discarded: 0,
     evicted: 0,
-    skipped: 1,
     total: 1,
   });
+  assert.deepEqual(importJournal(exported, target, duplicatePreview), duplicatePreview);
   assert.deepEqual(importJournal('{', target), { ok: false, reason: 'malformed' });
   assert.deepEqual(importJournal('x'.repeat(JOURNAL_LIMITS.maxImportBytes + 1), target), {
     ok: false,
@@ -130,25 +221,21 @@ test('exports merge idempotently and reject unsafe imports', () => {
   );
 
   const duplicateEntry = entry({ id: 'duplicate-inside-export' });
-  assert.deepEqual(
-    importJournal(
-      JSON.stringify({
-        format: 'sense6-journal-export',
-        schemaVersion: 2,
-        entries: [duplicateEntry, duplicateEntry],
-      }),
-      target,
-    ),
-    {
-      ok: true,
-      imported: 1,
-      duplicates: 1,
-      discarded: 0,
-      evicted: 0,
-      skipped: 1,
-      total: 2,
-    },
-  );
+  const duplicateSource = JSON.stringify({
+    format: 'sense6-journal-export',
+    schemaVersion: 2,
+    entries: [duplicateEntry, duplicateEntry],
+  });
+  const insidePreview = previewJournalImport(duplicateSource, target);
+  assert.deepEqual(insidePreview, {
+    ok: true,
+    additions: 1,
+    duplicates: 1,
+    discarded: 0,
+    evicted: 0,
+    total: 2,
+  });
+  assert.deepEqual(importJournal(duplicateSource, target, insidePreview), insidePreview);
   assert.equal(loadJournal(target).filter(({ id }) => id === duplicateEntry.id).length, 1);
 });
 
@@ -162,30 +249,34 @@ test('imports report only additions retained after the cap and distinguish evict
   }
 
   const older = entry({ id: 'older-import', recordedAt: '2025-01-01T00:00:00.000Z' });
-  assert.deepEqual(importJournal(exportWith([older]), full), {
+  const olderSource = exportWith([older]);
+  const olderPreview = previewJournalImport(olderSource, full);
+  assert.deepEqual(olderPreview, {
     ok: true,
-    imported: 0,
+    additions: 0,
     duplicates: 0,
     discarded: 1,
     evicted: 0,
-    skipped: 1,
     total: JOURNAL_LIMITS.maxEntries,
   });
+  assert.deepEqual(importJournal(olderSource, full, olderPreview), olderPreview);
   assert.equal(
     loadJournal(full).some(({ id }) => id === older.id),
     false,
   );
 
   const newer = entry({ id: 'newer-import', recordedAt: '2027-01-01T00:00:00.000Z' });
-  assert.deepEqual(importJournal(exportWith([newer]), full), {
+  const newerSource = exportWith([newer]);
+  const newerPreview = previewJournalImport(newerSource, full);
+  assert.deepEqual(newerPreview, {
     ok: true,
-    imported: 1,
+    additions: 1,
     duplicates: 0,
     discarded: 0,
     evicted: 1,
-    skipped: 0,
     total: JOURNAL_LIMITS.maxEntries,
   });
+  assert.deepEqual(importJournal(newerSource, full, newerPreview), newerPreview);
   assert.equal(loadJournal(full)[0].id, newer.id);
 });
 
@@ -351,6 +442,7 @@ test('Acutezza comparisons require a common completed eye and preserve useful sh
     status: 'not-comparable',
     reasons: ['no-common-eye'],
   });
+  assert.deepEqual(measurementChanges(rightOnly, leftOnly), []);
   assert.deepEqual(compareJournalEntries(leftOnly, full), {
     status: 'caution',
     reasons: ['changed:completedEyes'],
@@ -408,7 +500,8 @@ test('Daltonia comparisons preserve its measured display environment', () => {
   });
 });
 
-test('the journal labels enriched setup evidence in every supported language', () => {
+test('the journal labels enriched setup evidence in every supported language', async () => {
+  await Promise.all([...LOCALE_CODES].map((locale) => prepareJournalCopy(locale)));
   const connections = {
     en: 'Connection',
     it: 'Connessione',
@@ -480,7 +573,40 @@ test('measurement changes combine explicit uncertainty and do not relabel model 
     uncertainty: null,
     bounded: false,
   });
+  assert.deepEqual(
+    measurementChanges(
+      entry({ id: 'changed-setup', setup: { ...newer.setup, display: 'different' } }),
+      older,
+    ),
+    [],
+  );
+  assert.deepEqual(
+    measurementChanges(
+      entry({ id: 'changed-unit', measurements: [{ id: 'score', value: 13, unit: 's' }] }),
+      older,
+    ),
+    [],
+  );
   assert.match(captureDisplayPassport().display, /^\d+x\d+@/);
+});
+
+test('journal entries are canonical and every export schema field has localized disclosure', async () => {
+  const canonical = createJournalEntry({
+    ...entry(),
+    extra: 'discard me',
+    setup: { zeta: true, alpha: 'first' },
+    measurements: [{ id: 'score', value: 10, unit: '/100', extra: 'discard me' }],
+  });
+  assert.deepEqual(Object.keys(canonical), JOURNAL_EXPORT_SCHEMA.entry);
+  assert.deepEqual(Object.keys(canonical.setup), ['alpha', 'zeta']);
+  assert.deepEqual(Object.keys(canonical.measurements[0]), ['id', 'value', 'unit']);
+  const exported = JSON.parse(exportJournal(memoryStorage()));
+  assert.deepEqual(Object.keys(exported), JOURNAL_EXPORT_SCHEMA.envelope);
+
+  for (const locale of LOCALE_CODES) {
+    await prepareJournalCopy(locale);
+    assert.deepEqual(Object.keys(journalCopy(locale).exportDisclosure), JOURNAL_DISCLOSURE_KEYS);
+  }
 });
 
 function entry(overrides = {}) {

@@ -65,6 +65,25 @@ test('a future canonical payload is never replaced by older legacy data', () => 
   assert.equal(storage.getItem(key), futureValue);
 });
 
+test('a throwing localStorage getter cannot crash optional result storage', () => {
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'localStorage');
+  Object.defineProperty(globalThis, 'localStorage', {
+    configurable: true,
+    get() {
+      throw new Error('storage access denied');
+    },
+  });
+  const store = createResultStore({ key: 'sense6:test:last' });
+
+  try {
+    assert.equal(store.load(), null);
+    assert.equal(store.save({ score: 42 }), false);
+  } finally {
+    if (descriptor) Object.defineProperty(globalThis, 'localStorage', descriptor);
+    else delete globalThis.localStorage;
+  }
+});
+
 function memoryStorage(initial = {}) {
   const values = new Map(Object.entries(initial));
   return {

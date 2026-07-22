@@ -203,6 +203,6 @@ Before merging, confirm that `npm run check:release` passes from a clean
 checkout and that the built route stays inside the documented JavaScript and
 CSS ceilings. The 110 kB startup budget traverses the complete Vite-manifest
 dependency graph for the initial English route.
-Same-repository pull requests publish the already verified `dist/` directory to
-a `noindex` Pages preview and smoke-test that real URL. Production metrics must
-remain off there.
+Pull requests verify the generated `dist/` directory without deployment
+credentials. Preview publication remains disabled until the protected external
+configuration described in the release runbook exists.

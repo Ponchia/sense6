@@ -194,7 +194,6 @@ const rows = [
     'This is not vision screening, diagnosis, or a prescription.',
     'Dies ist weder Sehscreening noch Diagnose oder Verordnung.',
   ],
-  ['preference', 'Präferenz'],
   [
     'Calibrated sharpness experiment — Acutezza | Sense6',
     'Kalibriertes Sehschärfeexperiment — Acutezza | Sense6',

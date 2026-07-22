@@ -191,7 +191,6 @@ const rows = [
     'This is not vision screening, diagnosis, or a prescription.',
     'هذا ليس فحصًا تحرّيًا للبصر، ولا تشخيصًا، ولا وصفة طبية.',
   ],
-  ['preference', 'التفضيل'],
   ['Calibrated sharpness experiment — Acutezza | Sense6', 'تجربة الحدة المعايرة — Acutezza | Sense6'],
   ['Calibrate screen size — Acutezza | Sense6', 'معايرة حجم الشاشة — Acutezza | Sense6'],
   ['Estimate viewing distance — Acutezza | Sense6', 'تقدير مسافة المشاهدة — Acutezza | Sense6'],

@@ -1,7 +1,7 @@
 export const privacy = Object.freeze({
   title: 'Sense6 隐私说明',
   eyebrow: '隐私 / 通俗说明',
-  updated: '最后更新：2026年7月19日',
+  updated: '最后更新：2026年7月22日',
   back: '所有测试',
   intro: '测试只在你的设备上进行。Sense6 仅保留匿名的每日活动总数，不使用 Cookie、广告跟踪器或用户画像。',
   summaryTitle: '简要说明',
@@ -15,7 +15,7 @@ export const privacy = Object.freeze({
       title: '哪些信息留在浏览器中',
       paragraphs: [
         '测试回答、测量值和结果都在浏览器中处理，不会上传到 Sense6。你选择的语言和主题、最新或最佳结果的简要记录，以及包含多次测量的私密日志，可能会保存在浏览器本地存储中。',
-        '你可以删除一条日志记录、清空整个日志，或在浏览器中清除 sense6.net 的网站数据，以移除全部信息。复制、导入和导出功能只会在你选择使用时运行。导出的日志文件包含向你显示的测量值和设置详情。',
+        '你可以删除一条日志记录、清空整个日志，或在浏览器中清除 sense6.net 的网站数据，以移除全部信息。复制、导入和导出只会在你选择使用时运行。标准日志导出包含架构名称和版本、导出时间、测量记录和实验标识符、精确时间戳、记录时的语言、实验方案标识和版本、设置档案、质量评级和证据、测量标识符、数值、单位、边界、模型区间、明确的不确定度和测量备注。标识符用于本地去重，不是账户标识符或网络身份。',
       ],
     },
     {
@@ -91,6 +91,22 @@ export const journal = Object.freeze({
   reasonVolume: '无法核实两次测量之间的浏览器音量是否相同。',
   reasonLimited: '至少一次测量的设置或测量质量有限。',
   reasonMinor: '某项设置详情发生了变化或缺失。',
+  modelInterval: '显示的模型区间，不是可合并的不确定度',
+  importPreview:
+    '导入预览：新增 {additions} 条、重复 {duplicates} 条、丢弃新增 {discarded} 条、移除现有 {evicted} 条，导入后共 {total} 条。是否继续？',
+  exportDisclosure: Object.freeze({
+    schema: '架构名称和版本。',
+    exportTime: '导出时间。',
+    identifiers: '测量记录和实验标识符。',
+    timestamps: '每次测量的精确时间戳。',
+    locale: '记录时的语言。',
+    protocol: '实验方案标识和版本。',
+    setup: '设置档案。',
+    quality: '质量评级和证据。',
+    measurements: '测量标识符、数值、单位、边界、模型区间和明确的不确定度。',
+    notes: '测量备注。',
+    idPurpose: '标识符用于本地去重，不是账户标识符或网络身份。',
+  }),
 });
 
 export const setupLabels = Object.freeze([

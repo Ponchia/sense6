@@ -387,6 +387,7 @@ test('Acutezza ignores queued calibration and sweep frames after route disposal'
 
   await page.getByRole('button', { name: /The edges match/i }).click();
   await page.getByRole('button', { name: /Start sweep/i }).click();
+  page.once('dialog', (dialog) => dialog.accept());
   await page.locator('.brand').click();
   await expect(page).toHaveURL(/\/en\/$/);
   await expect(page.locator('[data-sense6-view="gallery"]')).toBeVisible();
@@ -479,6 +480,47 @@ test('Acutezza guards summary entry, theme, and shell navigation after calibrati
     document.documentElement.dataset.theme = 'dark';
   });
   await expect(page.getByText(/light or dark surround changed/i)).toBeVisible();
+});
+
+test('Acutezza guards calibration from the card checkpoint onward', async ({ page }) => {
+  await installQuickAcutezza(page);
+  await page.goto('/en/acutezza/');
+  await page.getByRole('button', { name: /Prepare the vision lab/i }).click();
+  await page.getByLabel(/I am 18 or older/i).check();
+  await page.getByRole('button', { name: /Calibrate the screen/i }).click();
+
+  page.once('dialog', (dialog) => dialog.dismiss());
+  await page.locator('.brand').click();
+  await expect(page).toHaveURL(/\/en\/acutezza\/$/);
+  await page.setViewportSize({ width: 900, height: 700 });
+  const blocked = page.locator('[data-ac-calibration-invalid]');
+  await expect(blocked).toBeFocused();
+  await expect(page.getByRole('heading', { name: /measured geometry changed/i })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Recalibrate/i })).toBeVisible();
+});
+
+test('Acutezza blocks forced colors before contrast measurement and offers a focused retry', async ({
+  page,
+}) => {
+  await installQuickAcutezza(page);
+  await page.goto('/en/acutezza/');
+  await page.getByRole('button', { name: /Prepare the vision lab/i }).click();
+  await page.getByLabel(/I am 18 or older/i).check();
+  await page.getByRole('button', { name: /Calibrate the screen/i }).click();
+  await page.getByRole('button', { name: /The edges match/i }).click();
+  await page.getByRole('button', { name: /Use a ruler-measured distance/i }).click();
+  await page.emulateMedia({ forcedColors: 'active' });
+
+  const blocked = page.locator('[data-ac-forced-colors]');
+  await expect(blocked).toBeFocused();
+  await expect(page.getByRole('heading', { name: /forced-colors mode is active/i })).toBeVisible();
+  await expect(page.locator('.ac-contrast__sample')).toHaveCount(0);
+  await page.getByRole('button', { name: /Retry display check/i }).click();
+  await expect(blocked).toBeFocused();
+
+  await page.emulateMedia({ forcedColors: 'none' });
+  await page.getByRole('button', { name: /Retry display check/i }).click();
+  await expect(page.getByRole('heading', { name: /natural blind spot/i })).toBeVisible();
 });
 
 test('German Acutezza calibration and runner keep generated labels localized', async ({ page }, testInfo) => {

@@ -18,12 +18,12 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      testIgnore: '**/cross-browser.spec.js',
+      testIgnore: ['**/cross-browser.spec.js', '**/deployed/**'],
       use: { ...devices['Desktop Chrome'] },
     },
     {
       name: 'mobile',
-      testIgnore: '**/cross-browser.spec.js',
+      testIgnore: ['**/cross-browser.spec.js', '**/deployed/**'],
       use: { ...devices['iPhone 13'], browserName: 'chromium' },
     },
     {

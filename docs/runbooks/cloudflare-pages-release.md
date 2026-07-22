@@ -4,15 +4,17 @@
 Lifecycle: current
 
 Use this runbook when a Sense6 change affects production deployment, the
-`ANALYTICS_DB` binding, or the D1 migration set. Pull-request previews don't
-write metrics and don't require a production migration.
+`ANALYTICS_DB` binding, or the D1 migration set. Pull-request preview
+publication is currently disabled.
 
 ## Symptom
 
 - A release adds or changes a runtime metric pair.
-- A Pages preview or production deployment doesn't match its source commit.
+- A production deployment doesn't match its source commit.
 - The production smoke test reports missing security headers, an open metric
   read path, or `noindex` on the canonical site.
+- The deployed-browser journey reports a hydration, content security policy,
+  asset, console, setup, or 404 failure.
 - The Pages Function reports that `ANALYTICS_DB` is unavailable or rejects an
   otherwise allowlisted metric.
 
@@ -21,8 +23,8 @@ write metrics and don't require a production migration.
 - The pull request is current with `main` and `npm run check:release` passes.
 - CI's release job produces `dist/`, `dist.sha256`, and
   `dist/build-meta.json` from one build after the browser matrix passes.
-- Repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` exist;
-  never print their values.
+- The existing production Cloudflare credentials are available to the `main`
+  deployment workflow; never print their values.
 - The Pages project is `sense6`, the production branch is `main`, and the D1
   binding is named `ANALYTICS_DB`.
 - A database name or identifier has been confirmed in the Cloudflare dashboard
@@ -55,11 +57,13 @@ write metrics and don't require a production migration.
    10-second block.
 5. Push the pull-request branch. Wait for the reusable browser matrix and
    release job. The release job runs the core and production-site audits,
-   verifies its checksum, deploys that same working tree, and smoke-tests the
-   preview. It must not rebuild between audit and deployment.
-6. Inspect the preview. Confirm substantive localized HTML, `noindex`, and a
-   closed metric endpoint. Preview traffic must not increment production
-   metrics.
+   and verifies its checksum without deployment credentials.
+6. Don't enable preview publication until an operator creates and verifies an
+   isolated, protected preview environment. The publication workflow must be
+   owned by the default branch, publish only the verified artifact without
+   checking out or executing pull-request-controlled code, and smoke-test the
+   resulting `noindex` URL. Repository code doesn't prove or create this
+   external prerequisite.
 7. After approval, merge to `main`. The production workflow repeats the
    browser-first release contract and runs:
 
@@ -69,6 +73,23 @@ write metrics and don't require a production migration.
 
    The probe reads public pages and sends `GET /api/metric`; it never writes a
    metric.
+8. Let the trusted production workflow run the deployed JavaScript journey.
+   The journey intercepts and blocks `POST /api/metric` before it reaches the
+   network. It verifies hydration, experiment setup, content security policy
+   and asset loading, browser errors, and a real 404. A retry-only success fails
+   the job, and the workflow retains the browser report, trace, screenshot, and
+   video.
+
+   To exercise the same generated-bundle path without contacting production,
+   run:
+
+   ```sh
+   npm run test:deployed:local
+   ```
+
+   Use this deterministic path for branch verification when needed.
+   Pull-request workflows do not receive a production publication path or run
+   branch code against a production credential.
 
 ## Verify
 
@@ -78,6 +99,9 @@ write metrics and don't require a production migration.
 - Production returns the checked security-header contract, including HSTS,
   frame denial, no-referrer, and cross-origin isolation headers.
 - `GET https://sense6.net/api/metric` with same-origin headers returns `405`.
+- The deployed Chromium journey hydrates Tetracromia, reaches its first measured
+  choice without a content security policy, console, or asset failure, and
+  receives HTTP `404` plus `noindex` from its missing route.
 - The Pages deployment identifies the expected commit and the release job's
   checksum verification passed before deployment.
 - D1 contains the pre-existing aggregate rows after migration. Inspect counts

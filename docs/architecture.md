@@ -1,7 +1,7 @@
 # Sense6 architecture
 <!-- vale Vale.Spelling = NO -->
 
-Status: current, 2026-07-21
+Status: current, 2026-07-22
 
 Lifecycle: current
 
@@ -43,7 +43,7 @@ and uncertainty, but it can't turn a browser task into a clinical instrument.
 
 | Boundary | Source | Responsibility |
 | --- | --- | --- |
-| Shell and router | `src/main.js`, `src/router.js`, `src/routes.js` | Resolve locale-aware routes, mount one view, and dispose the previous view |
+| Shell and router | `src/main.js`, `src/router.js`, `src/routes.js` | Resolve locale-aware routes, commit canonical and social metadata with one view, and dispose the previous view |
 | Service contracts | `src/exams/contracts.js` | Define experiment identity, metric names, and journal-comparison policy |
 | Presentation registry | `src/exams/registry.js` | Define gallery and static-page metadata plus lazy experiment loaders |
 | Protocol passports | `src/exams/protocols.js` | Freeze method versions, selectable profiles, schedule digests, stopping rules, and interpretation boundaries |
@@ -80,6 +80,21 @@ Render tokens prevent a slower dynamic import from overwriting a newer route.
 Gallery, Tetracromia, the other experiments, About, privacy, and journal styles
 load on their own route where practical.
 
+## Route identity and loading
+
+`src/routes.js` creates one route metadata record for the static generator and
+the runtime router. A successful navigation commits the title, description,
+canonical URL, Open Graph fields, and Twitter fields with the mounted view. The
+generated 404 removes canonical and social identity because it does not
+represent a real route.
+
+The static generator reads the Vite manifest and preloads the active route's
+transitive JavaScript modules. It does not add an active-route preload to the
+language chooser because that page has no selected locale route. Privacy and
+journal load one supplemental locale module only when the requested locale
+uses that separate copy bundle. Run `npm run build && npm run test:static` to
+verify the generated metadata, 404 boundary, and preload graph.
+
 ## Data and privacy
 
 The current design has three deliberately separate stores:
@@ -91,6 +106,12 @@ The current design has three deliberately separate stores:
 Don't merge these models. The metrics endpoint must never accept result,
 setup, locale, timing, or visitor data. Journal exports become portable files
 only when the person explicitly saves them.
+
+Journal imports first validate and canonicalize the file, then show additions,
+duplicates, discarded additions, existing-entry evictions, and the resulting
+total. The journal writes only after explicit confirmation of that preview.
+Displayed model intervals remain descriptive output; only explicit uncertainty
+fields can contribute to a subsequent-run combined uncertainty.
 
 ## Extension seams
 
@@ -120,6 +141,11 @@ the mobile Chromium profile run the complete journey suite. A full Screen
 Colour Lab result journey and active-run invalidation also run in Firefox and
 WebKit as the selected compatibility paths.
 
+The Sequence phase keeps each movable tile at least 24 by 24 CSS pixels. This
+minimum fits seven movable tiles and two anchors into the current 320 CSS pixel
+layout constraint. When less inline space remains, the tile row scrolls and the
+adjacent controls reflow instead of shrinking the tiles.
+
 The type gate automatically includes every module under `src/lib/`,
 `src/exams/results/`, `src/exams/views/`, `src/i18n/`, and `src/locales/`, plus
 named shared runtime boundaries and controller declarations. The ratchet fails
@@ -135,6 +161,13 @@ commit in `build-meta.json`, writes and verifies a SHA-256 manifest, and audits
 the production site. When deployment is enabled, that same job publishes its
 verified working tree without rebuilding it. This keeps artifact identity exact
 without depending on account-wide artifact storage.
+
+After a trusted production publication, one Chromium journey loads the deployed
+JavaScript, enters a real experiment setup, blocks metric POST requests, checks
+browser and content security policy failures, and verifies the generated 404
+response. CI treats a retry-only success as a failure and retains the trace,
+screenshot, video, and HTML report. Pull-request workflows do not run this
+production-origin check.
 
 Raw bundle ceilings are:
 
@@ -179,16 +212,15 @@ when expanding the color lab.
 
 ## Delivery environments
 
-Every same-repository pull request first passes the browser matrix and complete
-release gate, then publishes the checksummed working tree to a stable Cloudflare
-Pages branch preview. CI smoke-tests the real preview URL, including substantive
-localized HTML, `X-Robots-Tag: noindex`, and a closed metrics endpoint. Fork
-pull requests run verification without receiving deployment credentials or a
-preview.
+Every pull request passes the browser matrix and complete release gate with
+read-only repository access and without deployment credentials. Pull-request
+preview publication remains disabled until an operator provides an isolated,
+protected preview environment and a default-branch-owned publication workflow
+that never runs pull-request-controlled code.
 
 Production remains `https://sense6.net`. Both the client and the Pages Function
 require that exact origin before writing an anonymous metric, so Pages project
-URLs and branch previews cannot contaminate production counts. A push to `main`
+URLs cannot contaminate production counts. A push to `main`
 repeats verification, publishes the same checksummed bundle to the production
 branch, and confirms the live `build-meta.json` commit plus the read-only site
 contract.

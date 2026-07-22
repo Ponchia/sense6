@@ -34,7 +34,6 @@ export function navigate(name, locale = 'en', { replace = false } = {}) {
   }
   const target = `/${locale}/${route ? `${route}/` : ''}`;
   if (`${window.location.pathname}${window.location.search}${window.location.hash}` === target) {
-    window.dispatchEvent(new PopStateEvent('popstate'));
     return true;
   }
   const nextIndex = replace ? historyIndex : historyIndex + 1;
@@ -55,6 +54,7 @@ export function startRouter(onRoute) {
   let acceptedIndex = historyIndex;
   let acceptedLocation = currentLocation();
   let acceptedHref = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  approvedHref = null;
   /** @type {number | null} */
   let restoringIndex = null;
 
@@ -92,6 +92,7 @@ export function startRouter(onRoute) {
     acceptedIndex = nextIndex;
     acceptedLocation = next;
     acceptedHref = nextHref;
+    if (!routeChanged) return;
     void onRoute(next);
   };
   /** @param {MouseEvent} event */
@@ -107,7 +108,6 @@ export function startRouter(onRoute) {
   };
   window.addEventListener('popstate', handle);
   document.addEventListener('click', handleClick);
-  handle();
   return () => {
     window.removeEventListener('popstate', handle);
     document.removeEventListener('click', handleClick);

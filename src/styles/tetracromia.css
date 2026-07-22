@@ -285,6 +285,11 @@
   border: 1px solid var(--line-strong);
 }
 
+.tetracromia-invalidation:focus {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
 @media (forced-colors: active) {
   .tetracromia-forced-colors-warning {
     display: flex;
@@ -497,7 +502,11 @@
 .sequence-run {
   display: grid;
   gap: 0.25rem;
-  grid-template-columns: repeat(7, 1fr);
+  /* At 320 CSS px, scroll rather than shrink seven tiles below 24 CSS px. */
+  grid-template-columns: repeat(7, minmax(24px, 1fr));
+  min-inline-size: 0;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
 }
 
 .sequence-anchor,
@@ -505,6 +514,7 @@
   background: var(--tile-color);
   border: 1px solid rgb(0 0 0 / 0.18);
   forced-color-adjust: none;
+  min-block-size: 24px;
   min-inline-size: 0;
   position: relative;
 }
@@ -603,6 +613,7 @@
   align-items: center;
   background: color-mix(in srgb, black 16%, transparent);
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   justify-content: space-between;
   margin-block-start: 1rem;
@@ -611,9 +622,15 @@
 
 .sequence-controls p {
   color: white;
+  flex: 1 1 12rem;
   font-family: var(--mono);
   font-size: var(--text-xs);
   margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.sequence-controls .ui-cluster {
+  flex-wrap: wrap;
 }
 
 .sequence-controls .ui-button--ghost,
@@ -891,7 +908,8 @@
 
   .sequence-controls .ui-cluster {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    inline-size: 100%;
   }
 
   .sequence-controls .ui-button:last-child {

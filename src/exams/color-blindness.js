@@ -516,9 +516,6 @@ function renderResults() {
   window.scrollTo({ top: 0, behavior: 'instant' });
   document.title = t('Your display-relative adaptive levels — Daltonia | Sense6');
   const result = summarizeAdaptiveRun(state.run);
-  const lastResultSaved = saveLast(result);
-  const journalSaved = saveJournalResult(result);
-  const storageOk = lastResultSaved && journalSaved;
   state.dprGuardCleanup();
 
   state.app.innerHTML = `
@@ -548,27 +545,35 @@ function renderResults() {
         </div>
       </div>
 
-      ${
-        storageOk
-          ? ''
-          : `<div class="cb-save-warning ui-alert ui-alert--warning" role="alert">
-              <div class="ui-alert__body">
-                <strong class="ui-alert__title">This result was not saved</strong>
-                <p>Browser storage is unavailable. Copy the run summary before leaving this page.</p>
-              </div>
-            </div>`
-      }
+      <div data-cb-persistence></div>
 
-      <div class="results-actions">
-        ${
-          storageOk
-            ? `<button class="ui-button ui-button--lg" type="button" data-action="cb-setup">Repeat independently</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-copy">${resultActionLabel(t, 'Copy run summary')}</button>`
-            : `<button class="ui-button ui-button--lg" type="button" data-action="cb-copy">${resultActionLabel(t, 'Copy run summary')}</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-setup">Repeat independently</button>`
-        }
+      <div class="results-actions" data-cb-result-actions>
         <button class="ui-button ui-button--subtle" type="button" data-action="gallery">${m('nav.allTests')}</button>
       </div>
     </section>
   `;
+
+  const lastResultSaved = saveLast(result);
+  const journalSaved = saveJournalResult(result);
+  const storageOk = lastResultSaved && journalSaved;
+  const persistence = state.app.querySelector('[data-cb-persistence]');
+  if (storageOk) persistence?.remove();
+  else if (persistence) {
+    persistence.outerHTML = `<div class="cb-save-warning ui-alert ui-alert--warning" role="alert">
+      <div class="ui-alert__body">
+        <strong class="ui-alert__title">${t('This result was not saved')}</strong>
+        <p>${t('Browser storage is unavailable. Copy the run summary before leaving this page.')}</p>
+      </div>
+    </div>`;
+  }
+  state.app
+    .querySelector('[data-cb-result-actions]')
+    ?.insertAdjacentHTML(
+      'afterbegin',
+      storageOk
+        ? `<button class="ui-button ui-button--lg" type="button" data-action="cb-setup">${t('Repeat independently')}</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-copy">${resultActionLabel(t, 'Copy run summary')}</button>`
+        : `<button class="ui-button ui-button--lg" type="button" data-action="cb-copy">${resultActionLabel(t, 'Copy run summary')}</button><button class="ui-button ui-button--ghost" type="button" data-action="cb-setup">${t('Repeat independently')}</button>`,
+    );
 
   document.querySelector('#main').focus({ preventScroll: true });
   announce(`Experiment complete. ${result.title}. ${result.detail}`);

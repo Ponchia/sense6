@@ -61,7 +61,7 @@ const ABOUT_COPY = Object.freeze({
         'A hearing threshold in dB HL, hearing loss, hearing age, or headphone quality.',
       ],
       acutezza: [
-        'Angular detail, low-contrast cost, and orientation preference after browser calibration.',
+        'Angular detail and low-contrast cost after browser calibration.',
         'Clinical visual acuity, 20/20 vision, a prescription, or whether you have astigmatism.',
       ],
     },
@@ -147,7 +147,7 @@ const ABOUT_COPY = Object.freeze({
         'Una soglia uditiva in dB HL, perdita uditiva, età uditiva o qualità delle cuffie.',
       ],
       acutezza: [
-        'Dettaglio angolare, costo del basso contrasto e preferenza di orientamento dopo la calibrazione nel browser.',
+        'Dettaglio angolare e costo del basso contrasto dopo la calibrazione nel browser.',
         'Acuità visiva clinica, visione 20/20, una prescrizione o la presenza di astigmatismo.',
       ],
     },
@@ -236,7 +236,7 @@ const ABOUT_COPY = Object.freeze({
         'Eine Hörschwelle in dB HL, Hörverlust, Höralter oder Kopfhörerqualität.',
       ],
       acutezza: [
-        'Winkeldetail, Kontrastkosten und Orientierungspräferenz nach Browserkalibrierung.',
+        'Winkeldetail und Kontrastkosten nach Browserkalibrierung.',
         'Klinische Sehschärfe, 20/20-Sehen, eine Verordnung oder ob Astigmatismus vorliegt.',
       ],
     },
@@ -328,7 +328,7 @@ const ABOUT_COPY = Object.freeze({
         'Un seuil auditif en dB HL, une perte auditive, un âge auditif ou la qualité du casque.',
       ],
       acutezza: [
-        'Le détail angulaire, le coût du faible contraste et la préférence d’orientation après étalonnage dans le navigateur.',
+        'Le détail angulaire et le coût du faible contraste après étalonnage dans le navigateur.',
         'L’acuité visuelle clinique, une vision 20/20, une prescription ou la présence d’astigmatisme.',
       ],
     },
@@ -414,7 +414,7 @@ const ABOUT_COPY = Object.freeze({
         'Un umbral auditivo en dB HL, pérdida auditiva, edad auditiva o calidad de los auriculares.',
       ],
       acutezza: [
-        'Detalle angular, coste de bajo contraste y preferencia de orientación tras la calibración del navegador.',
+        'Detalle angular y coste de bajo contraste tras la calibración del navegador.',
         'Agudeza visual clínica, visión 20/20, una prescripción o la presencia de astigmatismo.',
       ],
     },
@@ -497,7 +497,7 @@ const ABOUT_COPY = Object.freeze({
         'Um limiar auditivo em dB HL, perda auditiva, idade auditiva ou qualidade dos auscultadores.',
       ],
       acutezza: [
-        'Detalhe angular, custo de baixo contraste e preferência de orientação após calibração no navegador.',
+        'Detalhe angular e custo de baixo contraste após calibração no navegador.',
         'Acuidade visual clínica, visão 20/20, uma prescrição ou a presença de astigmatismo.',
       ],
     },
@@ -580,7 +580,7 @@ const ABOUT_COPY = Object.freeze({
         'Um limiar auditivo em dB HL, perda auditiva, idade auditiva ou qualidade dos fones de ouvido.',
       ],
       acutezza: [
-        'Detalhe angular, custo de baixo contraste e preferência de orientação após a calibração no navegador.',
+        'Detalhe angular e custo de baixo contraste após a calibração no navegador.',
         'Acuidade visual clínica, visão 20/20, uma prescrição ou a presença de astigmatismo.',
       ],
     },
@@ -659,7 +659,7 @@ const ABOUT_COPY = Object.freeze({
         'عتبة سمع بوحدة dB HL أو فقدان السمع أو عمر السمع أو جودة سماعات الرأس.',
       ],
       acutezza: [
-        'التفاصيل الزاوية وكلفة التباين المنخفض وتفضيل الاتجاه بعد معايرة المتصفح.',
+        'التفاصيل الزاوية وكلفة التباين المنخفض بعد معايرة المتصفح.',
         'حدة البصر السريرية أو رؤية 20/20 أو وصفة طبية أو وجود اللابؤرية.',
       ],
     },
@@ -738,7 +738,7 @@ const ABOUT_COPY = Object.freeze({
         'dB HLの聴覚閾値、難聴、聴覚年齢、ヘッドホンの品質。',
       ],
       acutezza: [
-        'ブラウザー較正後の角度細部、低コントラストの影響、方向の好み。',
+        'ブラウザー較正後の角度細部と低コントラストの影響。',
         '臨床的な視力、20/20視力、処方、乱視の有無。',
       ],
     },
@@ -817,7 +817,7 @@ const ABOUT_COPY = Object.freeze({
         'dB HL 청력 역치, 청력 손실, 청력 나이 또는 헤드폰 품질.',
       ],
       acutezza: [
-        '브라우저 보정 후의 각도 세부, 낮은 대비 비용, 방향 선호.',
+        '브라우저 보정 후의 각도 세부와 낮은 대비 비용.',
         '임상 시력, 20/20 시력, 처방 또는 난시 여부.',
       ],
     },
@@ -894,7 +894,7 @@ const ABOUT_COPY = Object.freeze({
         'dB HL में सुनने की सीमा, श्रवण हानि, सुनने की उम्र या हेडफ़ोन की गुणवत्ता।',
       ],
       acutezza: [
-        'ब्राउज़र कैलिब्रेशन के बाद कोणीय विवरण, कम-कंट्रास्ट लागत और दिशा वरीयता।',
+        'ब्राउज़र कैलिब्रेशन के बाद कोणीय विवरण और कम-कंट्रास्ट लागत।',
         'नैदानिक दृष्टि तीक्ष्णता, 20/20 दृष्टि, पर्चा या दृष्टिवैषम्य की मौजूदगी।',
       ],
     },
@@ -970,10 +970,7 @@ const ABOUT_COPY = Object.freeze({
         '在选定音量和音频设置下，探索相对可听范围和音高差异。',
         '以 dB HL 表示的听阈、听力损失、听觉年龄或耳机质量。',
       ],
-      acutezza: [
-        '浏览器校准后的角度细节、低对比度代价和方向偏好。',
-        '临床视力、20/20 视力、处方或是否存在散光。',
-      ],
+      acutezza: ['浏览器校准后的角度细节和低对比度代价。', '临床视力、20/20 视力、处方或是否存在散光。'],
     },
     qualityTitle: '质量检查能证明什么',
     quality: [
@@ -1002,8 +999,6 @@ const ABOUT_COPY = Object.freeze({
 
 export function renderAbout(context) {
   const { app, locale, localeHref } = context;
-  const copy = aboutCopy(locale);
-  document.title = copy.pageTitle;
   if (!app.querySelector(`:scope > [data-sense6-view="about"][data-sense6-locale="${locale}"]`)) {
     app.innerHTML = aboutMarkup(locale, localeHref);
   }

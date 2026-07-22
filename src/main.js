@@ -7,7 +7,7 @@ import { getLocale, initializeI18n, localeHref, localizedRoot, m, setLocale, t }
 import { disposeActiveMounts } from './lib/mount-registry.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from './metrics.js';
 import { currentLocation, currentRoute, navigate, startRouter } from './router.js';
-import { STATIC_ADOPTED_ROUTES } from './routes.js';
+import { applyRouteMetadata, createRouteMetadata, STATIC_ADOPTED_ROUTES } from './routes.js';
 import { renderGallery } from './site.js';
 
 const appElement = document.querySelector('#app');
@@ -21,9 +21,7 @@ await initializeI18n({
   onLocaleChange: async (nextLocale) => navigate(currentRoute(), nextLocale),
 });
 
-if (initialLocation.legacy || !initialLocation.canonical) {
-  navigate(initialLocation.route, initialLocation.locale ?? getLocale(), { replace: true });
-} else if (!initialLocation.locale) {
+if (initialLocation.legacy || !initialLocation.canonical || initialLocation.locale !== getLocale()) {
   navigate(initialLocation.route, getLocale(), { replace: true });
 }
 
@@ -51,35 +49,79 @@ function context() {
   };
 }
 
-startRouter(async ({ route, locale }) => {
+startRouter(renderRoute);
+void renderRoute(currentLocation());
+
+async function renderRoute({ route, locale }) {
   const token = ++renderToken;
   try {
-    retireOutgoingRoute();
-    if (locale && locale !== getLocale()) await setLocale(locale, { notify: false });
+    if (!(await routeLocaleAvailable(locale))) return;
     if (token !== renderToken) return;
+    retireOutgoingRoute();
 
     let mountRoute;
+    let metadata;
     if (route === 'journal') {
-      const [{ renderJournal }] = await Promise.all([import('./journal.js'), import('./styles/journal.css')]);
+      const [{ renderJournal }, { journalCopy, prepareJournalCopy }] = await Promise.all([
+        import('./journal.js'),
+        import('./journal-copy.js'),
+        import('./styles/journal.css'),
+      ]);
+      await prepareJournalCopy(locale);
       if (token !== renderToken) return;
+      const copy = journalCopy(locale);
       mountRoute = () => renderJournal({ ...context(), exams: EXAMS });
+      metadata = createRouteMetadata({
+        locale,
+        route,
+        title: `${copy.title} | Sense6`,
+        description: copy.intro,
+        socialImageAlt: copy.intro,
+      });
     } else if (route === 'about') {
-      const [{ renderAbout }] = await Promise.all([import('./about.js'), import('./styles/about.css')]);
+      const [{ aboutCopy, renderAbout }] = await Promise.all([
+        import('./about.js'),
+        import('./styles/about.css'),
+      ]);
       if (token !== renderToken) return;
+      const copy = aboutCopy(locale);
       mountRoute = () => renderAbout(context());
+      metadata = createRouteMetadata({
+        locale,
+        route,
+        title: copy.pageTitle,
+        description: copy.description,
+        socialImageAlt: copy.description,
+      });
     } else if (route === 'privacy') {
-      const [{ renderPrivacy }] = await Promise.all([import('./privacy.js'), import('./styles/privacy.css')]);
+      const [{ preparePrivacyCopy, privacyCopy, renderPrivacy }] = await Promise.all([
+        import('./privacy.js'),
+        import('./styles/privacy.css'),
+      ]);
+      await preparePrivacyCopy(locale);
       if (token !== renderToken) return;
+      const copy = privacyCopy(locale);
       mountRoute = () => renderPrivacy(context());
+      metadata = createRouteMetadata({
+        locale,
+        route,
+        title: `${copy.title} | Sense6`,
+        description: copy.intro,
+        socialImageAlt: copy.intro,
+      });
     } else if (EXAM_BY_ID.has(route)) {
       const definition = EXAM_BY_ID.get(route);
       const exam = await loadExam(route);
       if (token !== renderToken || !exam) return;
-      mountRoute = () => {
-        const dispose = exam.mount(context());
-        document.title = t(definition.pageTitle);
-        return dispose;
-      };
+      mountRoute = () => exam.mount(context());
+      metadata = createRouteMetadata({
+        locale,
+        route,
+        title: t(definition.pageTitle),
+        description: t(definition.blurb),
+        socialImage: `/social/${definition.id}.png`,
+        socialImageAlt: `${definition.name} — ${t(definition.tagline)}`,
+      });
     } else if (route) {
       navigate('', getLocale(), { replace: true });
       return;
@@ -87,6 +129,16 @@ startRouter(async ({ route, locale }) => {
       await import('./styles/gallery.css');
       if (token !== renderToken) return;
       mountRoute = () => renderGallery({ ...context(), exams: EXAMS });
+      metadata = createRouteMetadata({
+        locale,
+        title: t('Sense6 — measure what your senses notice'),
+        description: t(
+          'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
+        ),
+        socialImageAlt: t(
+          'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',
+        ),
+      });
     }
 
     const initial = !committedRoute;
@@ -97,6 +149,7 @@ startRouter(async ({ route, locale }) => {
       initial,
       routeName: route || 'gallery',
       token,
+      metadata,
     });
     if (!committed) return;
     committedRoute = true;
@@ -104,7 +157,13 @@ startRouter(async ({ route, locale }) => {
   } catch (error) {
     if (token === renderToken) await renderRouteLoadFailure(error, route, token);
   }
-});
+}
+
+async function routeLocaleAvailable(locale) {
+  if (!locale || locale === getLocale()) return true;
+  const localeChanged = await setLocale(locale, { notify: false });
+  return localeChanged || locale === getLocale();
+}
 
 function retireOutgoingRoute() {
   if (!committedRoute) return;
@@ -119,10 +178,10 @@ function retireOutgoingRoute() {
  * swap atomically. Static pages whose renderer can be adopted do not mutate at
  * all; the same path still handles personalized and experiment views.
  * @param {() => (() => void)} mountRoute
- * @param {{ animate: boolean, initial: boolean, routeName: string, token: number, updateLinks?: boolean }} options
+ * @param {{ animate: boolean, initial: boolean, routeName: string, token: number, metadata: import('./routes.js').RouteMetadata, updateLinks?: boolean }} options
  * @returns {Promise<boolean>}
  */
-async function commitRoute(mountRoute, { animate, initial, routeName, token, updateLinks = true }) {
+async function commitRoute(mountRoute, { animate, initial, routeName, token, metadata, updateLinks = true }) {
   const generation = ++routeCommitGeneration;
   const previousHeight = appElement.getBoundingClientRect().height;
   const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -142,6 +201,7 @@ async function commitRoute(mountRoute, { animate, initial, routeName, token, upd
       mountedCleanup = mountRoute();
       if (typeof mountedCleanup !== 'function') throw new TypeError('Route mount must return a cleanup.');
       cleanup = mountedCleanup;
+      applyRouteMetadata(metadata);
       if (updateLinks) updateShellLinks();
       appElement.dataset.sense6Hydrated = routeName;
       rendered = true;
@@ -196,7 +256,6 @@ async function renderRouteLoadFailure(error, route, token) {
   try {
     const committed = await commitRoute(
       () => {
-        document.title = 'Sense6';
         appElement.innerHTML = `<section class="static-entry ui-container">
         <p class="ui-eyebrow">Sense6</p>
         <h1>Page unavailable.</h1>
@@ -211,6 +270,7 @@ async function renderRouteLoadFailure(error, route, token) {
         initial,
         routeName: 'error',
         token,
+        metadata: errorRouteMetadata(),
         updateLinks: false,
       },
     );
@@ -237,8 +297,19 @@ function forceRouteLoadFailure(route) {
     <p>This page could not load. Reload to try again.</p>
   </section>`;
   appElement.dataset.sense6Hydrated = 'error';
+  applyRouteMetadata(errorRouteMetadata());
   committedRoute = true;
   committedRouteName = route;
+}
+
+function errorRouteMetadata() {
+  return createRouteMetadata({
+    locale: getLocale(),
+    route: currentRoute(),
+    title: 'Page unavailable | Sense6',
+    description: 'This Sense6 page could not load.',
+    socialImageAlt: 'Sense6 browser perception experiments',
+  });
 }
 
 function disposeRoute(dispose) {

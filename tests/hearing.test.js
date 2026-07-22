@@ -226,6 +226,15 @@ test('the setup reference bounds every later representative digital stimulus', (
   }
 });
 
+test('pitch trials use the configured loudness-rove bound', () => {
+  const tracks = createPitchTracks({ pitchRoveMaxDb: 0.75 });
+  const trial = nextPitchTrial(tracks, sequenceRandom(0, 0, 0, 1));
+
+  assert.deepEqual(trial.roveDb, [-0.75, 0.75]);
+  assert.equal(tracks[0].config.pitchRoveMaxDb, 0.75);
+  assert.equal(mergeHearingConfig().pitch.pitchRoveMaxDb, HEARING_DIGITAL_LEVELS.pitchRoveMaxDb);
+});
+
 test('production configuration accepts an explicit null development override', () => {
   const config = mergeHearingConfig(null);
   assert.equal(config.audio.toneMs, 460);

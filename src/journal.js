@@ -1,13 +1,16 @@
 import { toast } from '@ponchia/ui/behaviors';
 import { journalCopy, journalMetricLabel, journalSetupLabel } from './journal-copy.js';
+import { journalRecoveryCopy } from './journal-recovery-copy.js';
 import {
   clearJournal,
   compareJournalEntries,
   exportJournal,
   importJournal,
+  JOURNAL_DISCLOSURE_KEYS,
   JOURNAL_LIMITS,
-  loadJournal,
   measurementChanges,
+  previewJournalImport,
+  readJournalState,
   removeJournalEntry,
 } from './lib/journal.js';
 import { localeMetadata } from './locales.js';
@@ -15,17 +18,19 @@ import { localeMetadata } from './locales.js';
 export function renderJournal(context) {
   const { app, exams, locale, localeHref, t } = context;
   const copy = journalCopy(locale);
+  const recoveryCopy = journalRecoveryCopy(locale);
   const controller = new AbortController();
   let filter = 'all';
 
-  document.title = `${copy.title} | Sense6`;
   render();
 
   app.addEventListener('change', handleChange, { signal: controller.signal });
   app.addEventListener('click', handleClick, { signal: controller.signal });
 
   function render() {
-    const entries = loadJournal();
+    const journal = readJournalState();
+    const entries = journal.entries;
+    const recoveryRequired = !journal.writable;
     const visible = filter === 'all' ? entries : entries.filter((entry) => entry.examId === filter);
     app.innerHTML = `
       <article class="journal-view ui-container ui-container--wide">
@@ -36,19 +41,20 @@ export function renderJournal(context) {
             <h1>${escapeHtml(copy.title)}</h1>
             <p>${escapeHtml(copy.intro)}</p>
           </div>
-          <aside class="ui-alert ui-alert--info"><div class="ui-alert__body"><p>${escapeHtml(copy.privacy)}</p></div></aside>
+          <aside class="ui-alert ui-alert--info"><div class="ui-alert__body"><p>${escapeHtml(copy.privacy)}</p><ul class="journal-export-disclosure">${JOURNAL_DISCLOSURE_KEYS.map((key) => `<li>${escapeHtml(copy.exportDisclosure[key])}</li>`).join('')}</ul></div></aside>
         </header>
+        ${recoveryMarkup(journal, recoveryCopy)}
         <div class="journal-toolbar">
-          <label><span>${escapeHtml(copy.filter)}</span><select data-journal-filter>${filterOptions(exams, copy, filter)}</select></label>
+          <label><span>${escapeHtml(copy.filter)}</span><select data-journal-filter${recoveryRequired ? ' disabled' : ''}>${filterOptions(exams, copy, filter)}</select></label>
           <div class="ui-cluster">
             <button class="ui-button ui-button--ghost" type="button" data-journal-export${entries.length ? '' : ' disabled'}>${escapeHtml(copy.export)}</button>
-            <label class="ui-button ui-button--ghost journal-import">${escapeHtml(copy.import)}<input type="file" accept="application/json,.json" data-journal-import></label>
-            <button class="ui-button ui-button--subtle" type="button" data-journal-clear>${escapeHtml(copy.deleteAll)}</button>
+            <label class="ui-button ui-button--ghost journal-import"${recoveryRequired ? ' aria-disabled="true"' : ''}>${escapeHtml(copy.import)}<input type="file" accept="application/json,.json" data-journal-import${recoveryRequired ? ' disabled' : ''}></label>
+            <button class="ui-button ui-button--subtle" type="button" data-journal-clear${recoveryRequired ? ' disabled' : ''}>${escapeHtml(copy.deleteAll)}</button>
           </div>
         </div>
-        <p class="journal-count" aria-live="polite">${entries.length} ${escapeHtml(copy.entries)}</p>
+        ${recoveryRequired ? '' : `<p class="journal-count" aria-live="polite">${entries.length} ${escapeHtml(copy.entries)}</p>`}
         <div data-journal-status class="sr-only" aria-live="polite"></div>
-        ${visible.length ? `<div class="journal-list">${visible.map((entry) => entryMarkup(entry, entries, exams, copy, locale, t)).join('')}</div>` : emptyMarkup(copy)}
+        ${recoveryRequired ? '' : visible.length ? `<div class="journal-list">${visible.map((entry) => entryMarkup(entry, entries, exams, copy, locale, t)).join('')}</div>` : emptyMarkup(copy)}
       </article>`;
   }
 
@@ -66,7 +72,12 @@ export function renderJournal(context) {
       try {
         const source = await file.text();
         if (controller.signal.aborted) return;
-        result = importJournal(source);
+        const preview = previewJournalImport(source);
+        if (preview.ok === false) result = preview;
+        else if (!window.confirm(importPreviewMessage(copy.importPreview, preview))) {
+          input.value = '';
+          return;
+        } else result = importJournal(source, undefined, preview);
       } catch {
         if (controller.signal.aborted) return;
         result = { ok: false, reason: 'invalid' };
@@ -83,6 +94,7 @@ export function renderJournal(context) {
   }
 
   function handleClick(event) {
+    if (handleRecoveryClick(event)) return;
     const exportButton = event.target.closest('[data-journal-export]');
     if (exportButton) {
       downloadJournal(exportJournal());
@@ -99,6 +111,26 @@ export function renderJournal(context) {
       if (!clearJournal()) toast(copy.storageFailure, { tone: 'danger' });
       render();
     }
+  }
+
+  function handleRecoveryClick(event) {
+    const recoveryAction = event.target.closest('[data-journal-raw-backup], [data-journal-recovery-clear]');
+    if (!recoveryAction) return false;
+    const expectedStatus = recoveryAction.dataset.journalRecoveryState;
+    const journal = readJournalState();
+    if (journal.status !== expectedStatus) {
+      render();
+      return true;
+    }
+    if (recoveryAction.matches('[data-journal-raw-backup]')) {
+      if (journal.raw !== null) downloadJournal(journal.raw, { raw: true });
+      return true;
+    }
+    const confirmation = recoveryConfirmation(journal.status, recoveryCopy);
+    if (!confirmation || !window.confirm(confirmation)) return true;
+    if (!clearJournal()) toast(copy.storageFailure, { tone: 'danger' });
+    render();
+    return true;
   }
 
   return () => controller.abort();
@@ -157,6 +189,38 @@ function emptyMarkup(copy) {
   return `<section class="journal-empty"><p class="ui-eyebrow">0 ${escapeHtml(copy.entries)}</p><h2>${escapeHtml(copy.emptyTitle)}</h2><p>${escapeHtml(copy.empty)}</p></section>`;
 }
 
+function recoveryMarkup(journal, copy) {
+  if (journal.writable) return '';
+  const message = {
+    inaccessible: copy.inaccessible,
+    malformed: copy.malformed,
+    oversized: copy.oversized,
+    'future-schema': copy.future,
+  }[journal.status];
+  if (!message) return '';
+  const actions =
+    journal.raw === null
+      ? ''
+      : `<div class="ui-cluster">
+          <button class="ui-button ui-button--ghost" type="button" data-journal-raw-backup data-journal-recovery-state="${journal.status}">${escapeHtml(copy.backup)}</button>
+          <button class="ui-button ui-button--danger" type="button" data-journal-recovery-clear data-journal-recovery-state="${journal.status}">${escapeHtml(copy.clear)}</button>
+        </div>`;
+  return `<aside class="ui-alert ui-alert--danger" data-journal-recovery="${journal.status}" role="alert">
+    <div class="ui-alert__body">
+      <h2>${escapeHtml(copy.title)}</h2>
+      <p>${escapeHtml(message)}</p>
+      ${actions}
+    </div>
+  </aside>`;
+}
+
+function recoveryConfirmation(status, copy) {
+  if (status === 'malformed') return copy.confirmMalformed;
+  if (status === 'oversized') return copy.confirmOversized;
+  if (status === 'future-schema') return copy.confirmFuture;
+  return null;
+}
+
 function statusLabel(status, copy) {
   if (status === 'comparable') return copy.comparable;
   if (status === 'caution') return copy.caution;
@@ -192,11 +256,18 @@ function reasonLabel(reason, copy) {
 
 function intervalLabel(measurement, copy) {
   if (Number.isFinite(measurement.lower) && Number.isFinite(measurement.upper))
-    return `${round(measurement.lower)}–${round(measurement.upper)} ${measurement.unit}`;
+    return `${round(measurement.lower)}–${round(measurement.upper)} ${measurement.unit} · ${copy.modelInterval}`;
   if (Number.isFinite(measurement.uncertainty))
     return `±${round(measurement.uncertainty)} ${measurement.unit}`;
   if (measurement.bound) return measurement.bound === 'lower' ? copy.lowerBound : copy.upperBound;
   return '';
+}
+
+function importPreviewMessage(template, preview) {
+  return ['additions', 'duplicates', 'discarded', 'evicted', 'total'].reduce(
+    (message, key) => message.replaceAll(`{${key}}`, String(preview[key])),
+    template,
+  );
 }
 
 function formatMeasurement(measurement) {
@@ -221,11 +292,13 @@ function round(value) {
   return String(Math.round(value * 100) / 100);
 }
 
-function downloadJournal(contents) {
-  const href = URL.createObjectURL(new Blob([contents], { type: 'application/json' }));
+function downloadJournal(contents, { raw = false } = {}) {
+  const href = URL.createObjectURL(
+    new Blob([contents], { type: raw ? 'application/octet-stream' : 'application/json' }),
+  );
   const link = document.createElement('a');
   link.href = href;
-  link.download = `sense6-journal-${new Date().toISOString().slice(0, 10)}.json`;
+  link.download = `sense6-journal-${raw ? 'raw-backup-' : ''}${new Date().toISOString().slice(0, 10)}.json`;
   document.body.append(link);
   link.click();
   link.remove();

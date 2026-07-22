@@ -1,5 +1,33 @@
 import { expect, test } from '@playwright/test';
 
+test('exact and hash-only navigation preserve the mounted experiment', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'Single-browser route lifecycle regression');
+  await page.goto('/en/riflessi/');
+  await expect(page.getByRole('heading', { name: /Notice the signal/i })).toBeVisible();
+  await page.evaluate(() => {
+    window.__sense6RouteRoot = document.querySelector('#app')?.firstElementChild;
+  });
+
+  await page.evaluate(async () => {
+    const { navigate } = await import('/src/router.js');
+    navigate('riflessi', 'en');
+  });
+  await expect.poll(() => routeRootWasPreserved(page)).toBe(true);
+
+  await page.evaluate(() => {
+    const nextIndex = (window.history.state?.__sense6Index ?? 0) + 1;
+    window.history.pushState(
+      { ...window.history.state, __sense6Index: nextIndex },
+      '',
+      '/en/riflessi/#rx-method',
+    );
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  });
+  await expect(page).toHaveURL(/\/en\/riflessi\/#rx-method$/);
+  await expect.poll(() => routeRootWasPreserved(page)).toBe(true);
+  await expect(page.getByRole('heading', { name: /Notice the signal/i })).toBeVisible();
+});
+
 test('a dynamic route import failure renders a recoverable route boundary', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'Single-browser route failure injection');
   const pageErrors = capturePageErrors(page);
@@ -14,11 +42,14 @@ test('a dynamic route import failure renders a recoverable route boundary', asyn
   expect(pageErrors).toEqual([]);
 });
 
-test('a locale load failure uses the same recoverable route boundary', async ({ page }, testInfo) => {
+test('a locale load failure preserves the committed route', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'Single-browser route failure injection');
   const pageErrors = capturePageErrors(page);
   await page.goto('/en/');
   await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await page.evaluate(() => {
+    window.__sense6RouteRoot = document.querySelector('#app')?.firstElementChild;
+  });
   await page.route('**/src/locales/de.js*', (route) => route.abort('failed'));
 
   await page.evaluate(() => {
@@ -27,8 +58,11 @@ test('a locale load failure uses the same recoverable route boundary', async ({ 
     window.dispatchEvent(new PopStateEvent('popstate'));
   });
 
-  await expectRouteFailure(page);
-  await recoverToGallery(page);
+  await expect.poll(() => routeRootWasPreserved(page)).toBe(true);
+  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('[data-locale-select]')).toHaveValue('en');
+  await expect(page.getByRole('heading', { name: 'Page unavailable.' })).toHaveCount(0);
   expect(pageErrors).toEqual([]);
 });
 
@@ -129,4 +163,8 @@ async function recoverToGallery(page) {
   await page.locator('#app').getByRole('link', { name: 'All tests', exact: true }).click();
   await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
   await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'gallery');
+}
+
+async function routeRootWasPreserved(page) {
+  return page.evaluate(() => window.__sense6RouteRoot === document.querySelector('#app')?.firstElementChild);
 }
