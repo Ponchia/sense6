@@ -15,6 +15,9 @@ on:
 
 # Container jobs use the Node 24 runtime bundled with the pinned Playwright
 # image, avoiding a redundant network download on every ephemeral runner.
+env:
+  PUPPETEER_SKIP_DOWNLOAD: 'true'
+
 jobs:
   browser:
     runs-on: arc-vps-sense6
