@@ -81,4 +81,5 @@ test('a display resize invalidates an active Screen Colour Lab journey', async (
 async function gotoHydrated(page, route) {
   await page.goto(route);
   await page.locator('#app[data-sense6-hydrated]').waitFor();
+  await page.locator('#app > .static-entry').waitFor({ state: 'detached' });
 }
