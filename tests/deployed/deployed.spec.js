@@ -19,7 +19,7 @@ test('the deployed bundle hydrates, starts setup, and serves a real 404 without 
   await page.route('**/api/metric', async (route) => {
     if (route.request().method() === 'POST') {
       blockedMetricPosts += 1;
-      await route.abort('blockedbyclient');
+      await route.fulfill({ status: 204, body: '' });
       return;
     }
     await route.continue();
