@@ -114,6 +114,5 @@ function creatorData() {
     '@type': 'Person',
     '@id': `${ORIGIN}/#creator`,
     name: 'Zeno',
-    url: 'https://personal.brontolotto.observer',
   };
 }

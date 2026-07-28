@@ -125,7 +125,8 @@ test('experiment discovery pages expose useful copy, related routes, images, and
       ['WebApplication', 'BreadcrumbList'],
     );
     assert.equal(data['@graph'][0].dateModified, '2026-07-22');
-    assert.equal(data['@graph'][0].creator.url, 'https://personal.brontolotto.observer');
+    assert.equal(data['@graph'][0].creator.name, 'Zeno');
+    assert.equal(data['@graph'][0].creator.url, undefined);
     assert.equal(data['@graph'][0].image, `https://sense6.net/social/${definition.id}.png`);
   }
 });
@@ -208,7 +209,8 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   );
   assert.match(about, /Careful experiments\. Modest claims\./);
   assert.match(about, /No certification or formal validation is planned\./);
-  assert.match(about, /href="https:\/\/personal\.brontolotto\.observer" rel="author">Zeno<\/a>/);
+  assert.match(about, /created and maintained by Zeno\./);
+  assert.doesNotMatch(about, /personal\.brontolotto\.observer/);
   assert.deepEqual(
     aboutJson['@graph'].map((entry) => entry['@type']),
     ['AboutPage', 'WebSite', 'Person'],

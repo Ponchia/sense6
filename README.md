@@ -419,7 +419,7 @@ result matters.
 
 ## Maintainer
 
-[Zeno](https://personal.brontolotto.observer)
+Zeno
 
 ## License
 
