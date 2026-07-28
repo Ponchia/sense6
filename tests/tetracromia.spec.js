@@ -484,13 +484,18 @@ test('semantic transitions reveal the stimulus and results while keyboard focus 
   const thresholdTransition = await page.evaluate(() => {
     const heading = document.querySelector('.trial-heading').getBoundingClientRect();
     const stimulus = document.querySelector('.threshold-grid').getBoundingClientRect();
+    const sessionControls = document.querySelector('.lab-topbar').getBoundingClientRect();
     return {
+      scrollY: window.scrollY,
+      sessionControlsVisible: sessionControls.top >= 0 && sessionControls.bottom <= innerHeight,
       headingVisible: heading.top >= 0 && heading.bottom <= innerHeight,
       stimulusVisible: stimulus.top >= 0 && stimulus.bottom <= innerHeight,
       headingFocused: document.activeElement?.classList.contains('trial-heading'),
     };
   });
   expect(thresholdTransition).toEqual({
+    scrollY: 0,
+    sessionControlsVisible: true,
     headingVisible: true,
     stimulusVisible: true,
     headingFocused: true,
@@ -507,13 +512,22 @@ test('semantic transitions reveal the stimulus and results while keyboard focus 
   const fieldTransition = await page.evaluate(() => {
     const heading = document.querySelector('.trial-heading').getBoundingClientRect();
     const stimulus = document.querySelector('.field-grid').getBoundingClientRect();
+    const sessionControls = document.querySelector('.lab-topbar').getBoundingClientRect();
     return {
+      scrollY: window.scrollY,
+      sessionControlsVisible: sessionControls.top >= 0 && sessionControls.bottom <= innerHeight,
       headingVisible: heading.top >= 0 && heading.bottom <= innerHeight,
       stimulusVisible: stimulus.top >= 0 && stimulus.bottom <= innerHeight,
       headingFocused: document.activeElement?.classList.contains('trial-heading'),
     };
   });
-  expect(fieldTransition).toEqual({ headingVisible: true, stimulusVisible: true, headingFocused: true });
+  expect(fieldTransition).toEqual({
+    scrollY: 0,
+    sessionControlsVisible: true,
+    headingVisible: true,
+    stimulusVisible: true,
+    headingFocused: true,
+  });
 
   const fieldChoice = page.locator('[data-choice="0"]');
   await fieldChoice.focus();

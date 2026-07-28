@@ -38,7 +38,10 @@ test('the gallery lists exams, is accessible, and routes into one', async ({ pag
   await expect(page.locator('.exam-card__link[href="/en/udito/"]')).toBeVisible();
   await expect(page.locator('.exam-card__link[href="/en/acutezza/"]')).toBeVisible();
   await expect(page.locator('.roadmap-item')).toHaveCount(0);
-  await expect(page.locator('.gallery-hero__actions, .gallery-proof, .principles')).toHaveCount(0);
+  await expect(page.locator('.gallery-proof, .principles')).toHaveCount(0);
+  const allTestsAction = page.locator('.gallery-hero__actions').getByRole('link', { name: 'All tests' });
+  await expect(allTestsAction).toHaveAttribute('href', '#tests');
+  await expectInVisualViewport(allTestsAction, 'gallery test-discovery action', { hitTest: true });
   await expect(page.getByRole('link', { name: /Try Udito|Explore all four tests/i })).toHaveCount(0);
   await expect
     .poll(() =>
@@ -401,7 +404,8 @@ test('the About page explains authorship, methodology, and permanent limits in e
   await expect(page).toHaveURL(/\/en\/about\/$/);
   await expect(page.getByRole('heading', { level: 1, name: aboutCopy('en').title })).toBeVisible();
   await expect(page.getByText('No certification or formal validation is planned.')).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Zeno', exact: true })).toHaveCount(2);
+  await expect(page.getByText(/created and maintained by Zeno\./)).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Zeno', exact: true })).toHaveCount(0);
   await expect(page.getByRole('link', { name: 'privacy notice', exact: true })).toBeVisible();
   await expect(page.locator('.about-orbit i')).toHaveCount(6);
   await expect(page.locator('.about-signal > span')).toHaveCount(5);

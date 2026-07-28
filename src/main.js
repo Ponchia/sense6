@@ -152,6 +152,7 @@ async function renderRoute({ route, locale }) {
       metadata,
     });
     if (!committed) return;
+    if (EXAM_BY_ID.has(route)) trackMetric(METRIC_EVENTS.testViewed, METRIC_TESTS[route]);
     committedRoute = true;
     committedRouteName = route;
   } catch (error) {

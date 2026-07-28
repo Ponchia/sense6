@@ -1,4 +1,5 @@
 import { toast } from '@ponchia/ui/behaviors';
+import '../styles/riflessi-landing.css';
 import '../styles/riflessi.css';
 import { m, t } from '../i18n.js';
 import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';

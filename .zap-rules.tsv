@@ -1,0 +1,7 @@
+10015	IGNORE	Public HTML revalidates; versioned assets use explicit immutable caching.
+10049	IGNORE	Sense6 intentionally serves public static content through shared caches.
+10050	IGNORE	Cached responses contain only public static content and no user-specific data.
+10055	IGNORE	Inline style attributes position generated visual stimuli; scripts remain nonce-free and hash-pinned.
+10096	IGNORE	Research constants in versioned JavaScript are not event timestamps or sensitive data.
+10098	IGNORE	Wildcard CORS exposes only the same public static resources available without credentials.
+90004	IGNORE	Cross-origin isolation is unnecessary because Sense6 uses no SharedArrayBuffer or embedded credentials.

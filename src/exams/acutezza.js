@@ -27,7 +27,7 @@ import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '
 import { createExamLifecycle } from '../lib/lifecycle.js';
 import { drawLandoltRing } from '../lib/optotypes.js';
 import { seededRandom } from '../lib/random.js';
-import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
+import { shareOrCopyResult } from '../lib/result-sharing.js';
 import { createResultStore } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 import { protocolPassport } from './protocols.js';
@@ -37,6 +37,14 @@ import {
   migrateLegacyAcutezzaLatestResult,
 } from './results/acutezza.js';
 import { ACUTEZZA_INSTRUMENTS, acutezzaIntroMarkup } from './views/acutezza-intro.js';
+import {
+  acutezzaResultActions,
+  acutezzaResultSummary,
+  acutezzaResultsMarkup,
+  eyeLabel,
+  formatArcmin,
+  formatBoundedAcuity,
+} from './views/acutezza-results.js';
 
 const STORAGE_KEY = 'sense6:acutezza:last';
 const FORCED_COLORS_QUERY = '(forced-colors: active)';
@@ -698,15 +706,20 @@ function renderResults() {
       : 'Run unusable';
   state.session.result = { setupQuality, usable, strongest, bounded, controlCorrect, controlCount };
   const completion = acutezzaCompletion();
-  let latestResultSaved = true;
-  let journalSaved = true;
   state.session.journalSaved = true;
   document.title = t('Your calibrated sharpness observations — Acutezza | Sense6');
   renderScreen(
-    `<section class="ac-results ui-container ui-container--wide"><button class="back-link" type="button" data-action="ac-home"><span aria-hidden="true">←</span> All tests</button><header class="ac-results__hero"><div><p class="ui-eyebrow">Acutezza / this display / this distance</p><h1>Separate observations.<br><em>No vision label.</em></h1><p>${strongest ? 'Measured calibration and every per-condition task-control pair support this run at the stated distance.' : usable ? 'At least one calibration, bound, interruption, or control condition requires caution before comparison.' : 'A per-condition task-control check failed. Repeat before interpreting this run.'}</p></div><div class="ac-results__stamp ${strongest ? '' : 'is-limited'}"><span>${setupQuality}</span><strong>${String(state.session.eyeResults.length).padStart(2, '0')} / 02</strong></div></header>${latestResultSaved && journalSaved ? '' : `<div class="ui-alert ui-alert--danger" data-ac-journal-status role="alert"><strong class="ui-alert__title">${t('The result is ready, but this browser did not allow local storage.')}</strong></div>`}<div class="ac-eye-results">${state.session.eyeResults.map(eyeResultMarkup).join('')}</div><div class="ac-context-grid"><article class="ui-card"><p class="ui-eyebrow">Run context</p><h2>What travelled with the target.</h2><dl><div><dt>Scope</dt><dd>${state.session.scope === 'focused' ? 'Focused Sharpness' : 'Sharpness + nominal contrast'}</dd></div><div><dt>Correction</dt><dd>${correctionLabel(state.session.correction)}</dd></div><div><dt>Distance</dt><dd>${Math.round(state.session.calibration.distanceMm / 10)} cm · ${t(state.session.calibration.state)}</dd></div><div><dt>Second-eye distance recheck</dt><dd>${state.session.distanceRecheckPassed === null ? 'Not applicable' : state.session.distanceRecheckPassed ? 'Passed' : 'Not passed'}</dd></div><div><dt>Card scale</dt><dd>${Math.round(state.session.calibration.cardWidthCssPx)} CSS px</dd></div><div><dt>Low contrast</dt><dd>${contrastLabel()}</dd></div><div><dt>Surround theme</dt><dd>${state.session.theme}</dd></div><div><dt>Task controls</dt><dd>${controlCorrect} / ${controlCount}, assessed per condition</dd></div><div><dt>Interruptions</dt><dd>${state.session.interruptions}</dd></div></dl></article><article class="ui-card"><p class="ui-eyebrow">Interpretation boundary</p><h2>Calibrated experiment, not an eye examination.</h2><p>Acutezza describes one self-administered run on this display at this estimated distance. It is not vision screening, diagnosis, or a prescription.</p><p>Do not infer normal vision, 20/20, refractive error, cylinder power, or an astigmatism axis. Meridiani scoring is suspended.</p></article></div><aside class="ac-results__safety"><strong>Sudden changes need care, not another run.</strong><p>Promptly seek professional assessment for sudden vision loss, severe eye pain, new flashes or floaters, or a curtain or shadow in the visual field.</p></aside><div class="ui-cluster ac-results__actions">${latestResultSaved && journalSaved ? `<button class="ui-button" type="button" data-action="ac-restart">Repeat this scope independently</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-copy">${resultActionLabel(t)}</button>` : `<button class="ui-button" type="button" data-action="ac-copy">${resultActionLabel(t)}</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-restart">Repeat this scope independently</button>`}${journalSaved ? `<button class="ui-button ui-button--ghost" type="button" data-action="ac-journal">${t('Open private journal')}</button>` : ''}</div></section>`,
+    acutezzaResultsMarkup({
+      session: state.session,
+      strongest,
+      usable,
+      setupQuality,
+      controlCorrect,
+      controlCount,
+    }),
   );
-  latestResultSaved = saveLast({ setupQuality, completion, recordedAt: Date.now() });
-  journalSaved = saveJournalResult({
+  const latestResultSaved = saveLast({ setupQuality, completion, recordedAt: Date.now() });
+  const journalSaved = saveJournalResult({
     setupQuality,
     usable,
     strongest,
@@ -725,62 +738,21 @@ function renderResults() {
       );
   }
   const actions = state.app.querySelector('.ac-results__actions');
-  if (actions) {
-    actions.innerHTML = `${latestResultSaved && journalSaved ? `<button class="ui-button" type="button" data-action="ac-restart">${t('Repeat this scope independently')}</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-copy">${resultActionLabel(t)}</button>` : `<button class="ui-button" type="button" data-action="ac-copy">${resultActionLabel(t)}</button><button class="ui-button ui-button--ghost" type="button" data-action="ac-restart">${t('Repeat this scope independently')}</button>`}${journalSaved ? `<button class="ui-button ui-button--ghost" type="button" data-action="ac-journal">${t('Open private journal')}</button>` : ''}`;
-  }
-}
-
-function eyeResultMarkup(result) {
-  const lowValue = result.low ? formatBoundedAcuity(result.low) : 'Unavailable';
-  const cost = result.contrastCostPercent;
-  const costDetail = result.contrastCostBounded
-    ? 'Contrast cost is indeterminate because an estimate meets the display range.'
-    : cost === null
-      ? 'not measured'
-      : t('{cost}% gap size versus high contrast', {
-          cost: `${cost >= 0 ? '+' : ''}${formatNumber(cost)}`,
-        });
-  return `<section class="ac-eye-result" aria-label="${eyeLabel(result.eye)}"><header><p class="ui-eyebrow">${eyeLabel(result.eye)}</p><h2>${result.low ? 'Two separate conditions' : 'Focused sharpness'} for this eye.</h2></header><div class="ac-metric-grid">${resultCard('01', 'High-contrast angular gap estimate', formatBoundedAcuity(result.high), acuityInterval(result.high), acuityInterpretation(result.high, 'A model-based angular-gap estimate from forced-choice trials.'))}${result.low ? resultCard('02', 'Nominal low-contrast angular gap estimate', lowValue, acuityInterval(result.low), `${costDetail} A within-run difference, not clinical contrast sensitivity.`) : ''}</div></section>`;
-}
-
-function resultCard(index, label, value, detail, copy) {
-  return `<article class="ac-metric"><div><span>${index}</span><p>${label}</p></div><strong>${value}</strong><small>${detail}</small><p>${copy}</p></article>`;
+  if (actions)
+    actions.innerHTML = acutezzaResultActions({
+      allSaved: latestResultSaved && journalSaved,
+      journalSaved,
+    });
 }
 
 async function copyResults() {
   if (!state.session?.result) return;
   const mountState = state;
   const resultState = state.session.result;
-  const lines = [
-    t('Acutezza — calibrated sharpness observations'),
-    t('Setup: {distance} cm ({distanceState}); correction: {correction}', {
-      distance: Math.round(state.session.calibration.distanceMm / 10),
-      distanceState: t(state.session.calibration.state),
-      correction: t(correctionLabel(state.session.correction)),
-    }),
-    `Calibration: card ${Math.round(state.session.calibration.cardWidthCssPx)} CSS px; contrast ${contrastLabel()}; surround ${state.session.theme}`,
-    `Quality: ${resultState.setupQuality}; controls ${resultState.controlCorrect} / ${resultState.controlCount}; interruptions ${state.session.interruptions}`,
-  ];
-  for (const result of state.session.eyeResults)
-    lines.push(
-      t('{eye}: high-contrast gap {gap}; low-contrast gap {low}; contrast cost {cost}', {
-        eye: t(eyeLabel(result.eye)),
-        gap: clipboardAcuity(result.high),
-        low: result.low ? clipboardAcuity(result.low) : t('Unavailable'),
-        cost: result.contrastCostBounded
-          ? t('indeterminate (display-range bound)')
-          : result.contrastCostPercent === null
-            ? t('not measured')
-            : `${result.contrastCostPercent >= 0 ? '+' : ''}${formatNumber(result.contrastCostPercent)}%`,
-      }),
-    );
-  if (!resultState.usable || resultState.bounded)
-    lines.push(t('Interpret with caution; repeat before comparing runs.'));
-  lines.push(t('This is not vision screening, diagnosis, or a prescription.'));
   try {
     const outcome = await shareOrCopyResult({
       title: t('Calibrated sharpness experiment — Acutezza | Sense6'),
-      summary: lines.join('\n'),
+      summary: acutezzaResultSummary(state.session, resultState),
       route: 'acutezza',
       locale: state.locale,
     });
@@ -1084,61 +1056,6 @@ function directionLabel(direction) {
       'up-left': 'at upper left',
     }[direction] ?? direction
   );
-}
-
-function eyeLabel(eye) {
-  return eye === 'right' ? 'Right eye' : 'Left eye';
-}
-function correctionLabel(correction) {
-  return (
-    { none: 'No correction', glasses: 'Glasses', contacts: 'Contact lenses' }[correction] ?? 'No correction'
-  );
-}
-
-function contrastLabel() {
-  return state.session.contrast === null
-    ? t('Unavailable')
-    : `${Math.round(state.session.contrast * 100)}% ${t('nominal')}`;
-}
-
-function formatArcmin(value) {
-  return `${formatNumber(value, { maximumFractionDigits: 1 })} arcmin`;
-}
-
-function formatBoundedAcuity(result) {
-  const prefix = result.atFloor ? '≤ ' : result.atCeiling ? '≥ ' : '';
-  return `${prefix}${formatArcmin(result.thresholdArcmin)}`;
-}
-
-function acuityInterval(result) {
-  const interval = t('{lower}–{upper} 90% model interval', {
-    lower: formatArcmin(result.lowerArcmin),
-    upper: formatArcmin(result.upperArcmin),
-  });
-  const bound = acuityBoundLabel(result);
-  return bound ? `${interval} · ${bound}` : interval;
-}
-
-function acuityBoundLabel(result) {
-  if (result.atFloor) return t('upper bound at the display floor');
-  if (result.atCeiling) return t('lower bound at the display ceiling');
-  return '';
-}
-
-function acuityInterpretation(result, fallback) {
-  const bound = acuityBoundLabel(result);
-  const article = result.atFloor ? 'an' : 'a';
-  return bound ? `The estimate is ${article} ${bound}; do not read it as an exact threshold.` : fallback;
-}
-
-function clipboardAcuity(result) {
-  const bound = acuityBoundLabel(result);
-  const details = [
-    `${formatArcmin(result.lowerArcmin)}–${formatArcmin(result.upperArcmin)} 90% model interval`,
-    `controls ${result.controlCorrect} / ${result.controls}`,
-  ];
-  if (bound) details.push(bound);
-  return `${formatBoundedAcuity(result)} (${details.join('; ')})`;
 }
 
 function runtimeConfig() {

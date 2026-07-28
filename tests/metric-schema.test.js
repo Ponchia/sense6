@@ -9,7 +9,7 @@ import { isAllowedMetric, METRIC_EVENTS, METRIC_TESTS } from '../src/metrics.js'
 const ORIGIN = 'https://sense6.net';
 const MIGRATIONS = new URL('../migrations/', import.meta.url);
 
-test('the forward metric migration retains rows, the primary-key index, and all constraints', () => {
+test('the forward metric migrations retain rows, the primary-key index, and all constraints', () => {
   const database = new DatabaseSync(':memory:');
   try {
     applyMigration(database, '0001_daily_metrics.sql');
@@ -54,9 +54,13 @@ test('the forward metric migration retains rows, the primary-key index, and all 
     for (const metric of ['test_started', 'test_completed', 'report_downloaded']) {
       insert.run('2026-07-21', 'acutezza', metric, 1);
     }
+    applyMigration(database, '0003_add_test_viewed_metric.sql');
+    database
+      .prepare('INSERT INTO daily_metrics (day, test, metric, count) VALUES (?, ?, ?, ?)')
+      .run('2026-07-21', 'acutezza', 'test_viewed', 1);
     assert.equal(
       database.prepare("SELECT count(*) AS total FROM daily_metrics WHERE test = 'acutezza'").get().total,
-      3,
+      4,
     );
   } finally {
     database.close();

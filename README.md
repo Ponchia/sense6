@@ -154,9 +154,12 @@ universal time day and atomically increments one row in D1. The resulting table
 contains only `day`, `test`, `metric`, and `count`.
 
 `site_loaded` measures document loads, not unique people. Reloads and bots can
-increase the count. `test_started` begins at the first measured block after any
-practice. Sense6 records `test_completed` only when the result view appears.
-Sense6 reserves `report_downloaded` for a future report action.
+increase the count. `test_viewed` records a successfully mounted experiment
+landing route, including repeated navigation. It makes aggregate
+landing-to-measured-start conversion visible without joining events into a
+visit. `test_started` begins at the first measured block after any practice.
+Sense6 records `test_completed` only when the result view appears. Sense6
+reserves `report_downloaded` for a future report action.
 
 The write endpoint has no read, update, or delete operation. It requires a JSON
 request whose request URL and `Origin` are both exactly `https://sense6.net`,
@@ -310,7 +313,11 @@ contracts, coverage, the production build, static output, security policy, and
 bundle budgets. `check` adds the browser matrix. `check:release` adds checks
 against the exact generated site. Container visual regression, Lighthouse,
 external-link, and passive ZAP scans remain scheduled or operator-run audits;
-they aren't silently treated as part of the per-commit release gate.
+they aren't silently treated as part of the per-commit release gate. The
+external-link job uses bounded retries and per-host concurrency for transient
+publisher failures. The passive scan fails on unreviewed ZAP alerts and records
+accepted static-site findings in `.zap-rules.tsv`; it prints the result directly
+instead of depending on account-wide artifact storage.
 
 ## Deploy
 
@@ -367,9 +374,9 @@ dashboard or Wrangler; don't add a public read endpoint.
 Add the zone's single rate-limiting rule for production before enabling the
 counter. Match `POST` requests whose path equals `/api/metric`, allow 10 requests
 per 10 seconds per source IP, and block excess requests for 10 seconds. This is
-the free-plan minimum window and leaves ample room for a page load, test start,
-completion, and report download. Cloudflare uses the request IP transiently for
-this edge control; Sense6 doesn't copy or store it.
+the free-plan minimum window and leaves ample room for a page load, experiment
+view, test start, completion, and report download. Cloudflare uses the request
+IP transiently for this edge control; Sense6 doesn't copy or store it.
 
 Use the [Cloudflare Pages release runbook](docs/runbooks/cloudflare-pages-release.md)
 for migration, binding, production verification, rollback, and the protected
@@ -412,7 +419,7 @@ result matters.
 
 ## Maintainer
 
-[Zeno](https://personal.brontolotto.observer)
+Zeno
 
 ## License
 

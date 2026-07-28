@@ -1060,7 +1060,7 @@ function experimentMarkup(exam, page, hrefFor) {
 
 function aboutHtml(text, page, hrefFor) {
   const links = {
-    profile: `<a href="https://personal.brontolotto.observer" rel="author">${escapeHtml(page.profileLabel)}</a>`,
+    profile: escapeHtml(page.profileLabel),
     privacy: `<a data-sense6-route="privacy" href="${escapeAttribute(hrefFor('privacy'))}">${escapeHtml(page.privacyLabel)}</a>`,
   };
   return Object.entries(links).reduce(

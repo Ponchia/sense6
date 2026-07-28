@@ -14,9 +14,11 @@ const PRODUCTION_LOCATION = { origin: PRODUCTION_METRIC_ORIGIN };
 
 test('the metric allowlist accepts only defined event and test pairs', () => {
   assert.equal(isAllowedMetric(METRIC_EVENTS.siteLoaded, METRIC_TESTS.site), true);
+  assert.equal(isAllowedMetric(METRIC_EVENTS.testViewed, METRIC_TESTS.tetracromia), true);
   assert.equal(isAllowedMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.udito), true);
   assert.equal(isAllowedMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.acutezza), true);
   assert.equal(isAllowedMetric(METRIC_EVENTS.siteLoaded, METRIC_TESTS.udito), false);
+  assert.equal(isAllowedMetric(METRIC_EVENTS.testViewed, METRIC_TESTS.site), false);
   assert.equal(isAllowedMetric('answer_submitted', METRIC_TESTS.udito), false);
   assert.equal(isAllowedMetric(METRIC_EVENTS.testCompleted, 'unknown'), false);
 });

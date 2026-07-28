@@ -104,6 +104,7 @@ test('Udito completes three safe-listening instruments and keeps results separat
     .poll(() => metrics)
     .toEqual([
       { event: 'site_loaded', test: 'site' },
+      { event: 'test_viewed', test: 'udito' },
       { event: 'test_started', test: 'udito' },
       { event: 'test_completed', test: 'udito' },
     ]);
@@ -453,7 +454,8 @@ test('Udito accepts its existing latest-result shape and rejects malformed recor
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'Single-browser storage validation');
-  await page.addInitScript(() => {
+  await page.goto('/en/udito/');
+  await page.evaluate(() => {
     localStorage.setItem(
       'sense6:udito:last',
       JSON.stringify({
@@ -463,7 +465,7 @@ test('Udito accepts its existing latest-result shape and rejects malformed recor
       }),
     );
   });
-  await page.goto('/en/udito/');
+  await page.reload();
   await expect(page.locator('.previous-score')).toContainText('Setup checks coherent');
 
   await page.evaluate(() => {
