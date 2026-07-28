@@ -175,7 +175,9 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - name: Prepare the reviewed passive-scan rules
-        run: install -D .zap-rules.tsv "$RUNNER_TEMP/zap/.zap-rules.tsv"
+        run: |
+          install -d -m 0777 "$RUNNER_TEMP/zap"
+          install -m 0644 .zap-rules.tsv "$RUNNER_TEMP/zap/.zap-rules.tsv"
       - name: Run the passive ZAP baseline against production
         run: >-
           docker run --rm
