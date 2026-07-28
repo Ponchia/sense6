@@ -3,7 +3,9 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 const globalCss = readFileSync(new URL('../src/styles.css', import.meta.url), 'utf8');
-const tetracromiaCss = readFileSync(new URL('../src/styles/tetracromia.css', import.meta.url), 'utf8');
+const tetracromiaCss = ['tetracromia-landing.css', 'tetracromia.css']
+  .map((filename) => readFileSync(new URL(`../src/styles/${filename}`, import.meta.url), 'utf8'))
+  .join('\n');
 const uditoCss = readFileSync(new URL('../src/styles/udito.css', import.meta.url), 'utf8');
 
 test('Tetracromia owns its forced-colors selectors without an Udito route dependency', () => {

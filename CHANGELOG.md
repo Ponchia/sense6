@@ -11,6 +11,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- Anonymous per-experiment landing-view totals, backed by a forward D1
+  migration, so aggregate view-to-start conversion no longer requires visitor
+  or session identifiers.
 - A checksummed, commit-stamped release working tree audited and deployed
   unchanged in one job after the browser matrix passes.
 - Forward D1 migration coverage for every runtime metric pair, exact Cloudflare
@@ -20,6 +23,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 
+- The scheduled link audit retries transient publisher failures with bounded
+  per-host concurrency. The passive security audit uses a reviewed ZAP
+  baseline and no longer depends on account-wide artifact capacity.
+- Static structured data, Udito landing markup, Acutezza result presentation,
+  and the large Riflessi and Tetracromia style surfaces now have focused
+  modules with lower growth ceilings.
 - Locale switching is last-request-wins, persistent shell translation uses
   stable source attributes, and coordinated copy is generated into per-locale
   payloads without loading all catalogs on startup.
@@ -30,6 +39,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Fixed
 
+- Tetracromia keeps its active-session controls visible after phase changes,
+  the gallery exposes a direct above-fold path to all tests, and Udito's
+  latest-result browser test no longer rewrites its own malformed fixture.
 - Experiment mounts, delayed journal imports, Udito playback, and locale changes
   no longer commit stale asynchronous work after navigation or a newer request.
 - Acutezza metrics and comparisons, journal import counts, malformed payload

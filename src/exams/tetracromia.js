@@ -1,4 +1,5 @@
 import { toast } from '@ponchia/ui/behaviors';
+import '../styles/tetracromia-landing.css';
 import '../styles/tetracromia.css';
 import { formatNumber, m, t } from '../i18n.js';
 import { toRgbCss } from '../lib/color.js';
@@ -384,9 +385,13 @@ function positionLabTransition() {
     if (state !== mountedState) return;
     const heading = document.querySelector('.trial-heading');
     if (!heading) return;
+    const compactLandscape = window.matchMedia('(min-width: 641px) and (max-height: 31.25rem)').matches;
     const chromeHeight = document.querySelector('.site-chrome')?.getBoundingClientRect().height ?? 0;
-    const top = Math.max(0, window.scrollY + heading.getBoundingClientRect().top - chromeHeight - 8);
-    window.scrollTo({ top, behavior: 'instant' });
+    const stimulusNeedsViewport = compactLandscape || state.session?.phase.id === 'sequence';
+    const top = stimulusNeedsViewport
+      ? Math.max(0, window.scrollY + heading.getBoundingClientRect().top - chromeHeight - 8)
+      : 0;
+    window.scrollTo({ top, left: 0, behavior: 'instant' });
     heading.focus({ preventScroll: true });
   });
 }

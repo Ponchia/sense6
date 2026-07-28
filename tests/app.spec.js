@@ -38,7 +38,10 @@ test('the gallery lists exams, is accessible, and routes into one', async ({ pag
   await expect(page.locator('.exam-card__link[href="/en/udito/"]')).toBeVisible();
   await expect(page.locator('.exam-card__link[href="/en/acutezza/"]')).toBeVisible();
   await expect(page.locator('.roadmap-item')).toHaveCount(0);
-  await expect(page.locator('.gallery-hero__actions, .gallery-proof, .principles')).toHaveCount(0);
+  await expect(page.locator('.gallery-proof, .principles')).toHaveCount(0);
+  const allTestsAction = page.locator('.gallery-hero__actions').getByRole('link', { name: 'All tests' });
+  await expect(allTestsAction).toHaveAttribute('href', '#tests');
+  await expectInVisualViewport(allTestsAction, 'gallery test-discovery action', { hitTest: true });
   await expect(page.getByRole('link', { name: /Try Udito|Explore all four tests/i })).toHaveCount(0);
   await expect
     .poll(() =>

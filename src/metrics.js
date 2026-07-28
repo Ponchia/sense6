@@ -2,6 +2,7 @@ import { METRIC_TEST_IDS } from './exams/contracts.js';
 
 export const METRIC_EVENTS = Object.freeze({
   siteLoaded: 'site_loaded',
+  testViewed: 'test_viewed',
   testStarted: 'test_started',
   testCompleted: 'test_completed',
   reportDownloaded: 'report_downloaded',
@@ -19,6 +20,7 @@ const ALLOWED_PAIRS = new Set([
   ...Object.values(METRIC_TESTS)
     .filter((test) => test !== METRIC_TESTS.site)
     .flatMap((test) => [
+      `${METRIC_EVENTS.testViewed}:${test}`,
       `${METRIC_EVENTS.testStarted}:${test}`,
       `${METRIC_EVENTS.testCompleted}:${test}`,
       `${METRIC_EVENTS.reportDownloaded}:${test}`,

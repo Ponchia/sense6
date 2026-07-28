@@ -159,8 +159,9 @@ jobs:
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
           args: >-
-            --root-dir dist --exclude '^https://sense6\\.net' --max-concurrency 8
-            --timeout 30 --max-retries 2 --no-progress 'dist/**/*.html'
+            --root-dir dist --exclude '^https://sense6\\.net' --max-concurrency 4
+            --host-concurrency 2 --timeout 30 --max-retries 5 --retry-wait-time 3
+            --no-progress 'dist/**/*.html'
           fail: true
           failIfEmpty: true
           jobSummary: true
@@ -171,9 +172,16 @@ jobs:
     runs-on: arc-vps-sense6
     timeout-minutes: 15
     steps:
+      - name: Check out the repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Prepare the reviewed passive-scan rules
+        run: install -D .zap-rules.tsv "$RUNNER_TEMP/zap/.zap-rules.tsv"
       - name: Run the passive ZAP baseline against production
-        uses: zaproxy/action-baseline@de8ad967d3548d44ef623df22cf95c3b0baf8b25 # v0.15.0
-        with:
-          target: https://sense6.net
-          allow_issue_writing: false
-          fail_action: true
+        run: >-
+          docker run --rm
+          --volume "$RUNNER_TEMP/zap:/zap/wrk/:rw"
+          ghcr.io/zaproxy/zaproxy:stable@sha256:8d387b1a63e3425beef4846e39719f5af2a787753af2d8b6558c6257d7a577a2
+          zap-baseline.py
+          -t https://sense6.net
+          -c .zap-rules.tsv
+          -s

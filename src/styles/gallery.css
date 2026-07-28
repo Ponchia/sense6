@@ -72,9 +72,16 @@
   white-space: normal;
 }
 
+.gallery-hero__actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.25rem;
+  margin-block-start: 0.75rem;
+}
+
 .gallery-hero__about {
   display: inline-flex;
-  margin-block-start: 0.75rem;
 }
 
 .sense-mark {
@@ -725,6 +732,15 @@
 }
 
 @media (max-width: 420px) {
+  .gallery-hero__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .gallery-hero__actions .ui-button {
+    justify-content: center;
+  }
+
   .gallery-hero h1 {
     font-size: clamp(2.5rem, 12.5vw, 3.25rem);
     max-inline-size: 100%;

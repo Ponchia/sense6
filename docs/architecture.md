@@ -1,7 +1,7 @@
 # Sense6 architecture
 <!-- vale Vale.Spelling = NO -->
 
-Status: current, 2026-07-22
+Status: current, 2026-07-28
 
 Lifecycle: current
 
@@ -50,11 +50,11 @@ and uncertainty, but it can't turn a browser task into a clinical instrument.
 | Evidence ledger | `src/exams/sources.js` | Classify canonical sources as method, boundary, comparator, or exact Sense6 validation evidence |
 | Experiment controllers | `src/exams/*.js`, `src/exams/*.d.ts` | Coordinate setup, response handling, phase changes, and results for one experiment; declarations define their checked public mount boundary |
 | Result schemas | `src/exams/results/*.js` | Validate and migrate experiment-specific latest-result payloads without coupling service contracts to route code |
-| Experiment views | `src/exams/views/*.js` | Produce pure markup for large landing or phase views without owning runtime state |
+| Experiment views | `src/exams/views/*.js` | Produce pure markup for large landing, result, or phase views without owning runtime state |
 | Domain models | `src/lib/*.js` | Implement strictly checked adaptive tracks, schedules, summaries, persistence, lifecycle behavior, and guarded state transitions |
 | Shared landing views | `src/exams/landing.js` | Render repeated instrument, method, and research structures |
 | Localization | `src/i18n.js`, `src/i18n/message-ids.js`, `src/i18n/catalog-audit.js`, `src/locales/` | Generate coordinated locale rows, load one catalog, translate stable shared IDs and source-keyed prose, apply locale metadata, and report catalog drift |
-| Static generator | `scripts/generate-static-pages.mjs` | Produce localized discovery HTML, metadata, sitemap, crawler files, and the 404 page |
+| Static generator | `scripts/generate-static-pages.mjs`, `scripts/static-structured-data.mjs` | Produce localized discovery HTML, structured metadata, sitemap, crawler files, and the 404 page |
 | Local journal | `src/lib/journal.js`, `src/journal.js` | Validate, store, compare, import, export, and render structured runs |
 | Anonymous metrics | `src/metrics.js`, `functions/api/metric.js` | Allowlist client events and increment daily aggregate counts |
 
@@ -73,8 +73,9 @@ and uncertainty, but it can't turn a browser task into a clinical instrument.
    presents those values but doesn't duplicate the numerical model.
 6. A completed run writes its protocol passport, setup passport, quality
    evidence, and separate measurements to a validated local journal entry.
-7. On the canonical production origin only, completion sends one allowlisted
-   aggregate counter with no result or setup data.
+7. On the canonical production origin only, a mounted experiment landing,
+   measured start, and completion each send one allowlisted aggregate counter
+   with no result, setup, locale, session, or visitor data.
 
 Render tokens prevent a slower dynamic import from overwriting a newer route.
 Gallery, Tetracromia, the other experiments, About, privacy, and journal styles
@@ -169,6 +170,12 @@ response. CI treats a retry-only success as a failure and retains the trace,
 screenshot, video, and HTML report. Pull-request workflows do not run this
 production-origin check.
 
+The scheduled external-link audit retries transient publisher failures with
+bounded per-host concurrency. The passive security audit treats unreviewed ZAP
+alerts as failures and keeps reviewed static-site exceptions in
+`.zap-rules.tsv`. It runs the pinned ZAP container directly, so a security
+result does not depend on account-wide artifact storage.
+
 Raw bundle ceilings are:
 
 - initial JavaScript: 110 kB;
@@ -186,9 +193,10 @@ Experiment controllers still contain substantial unchecked phase-specific
 event orchestration. The type gate checks their public `mount(context)`
 contract, the cognitive-complexity gate rejects functions above 28, and the
 maintainability test prevents known large controllers and style sheets from
-growing beyond their decomposition ceilings. Acutezza's intro, the strict
-result-schema boundary, and Tetracromia's extracted views and event handlers
-establish the incremental pattern: don't add a suite-wide base controller.
+growing beyond their decomposition ceilings. Acutezza's intro and result view,
+Udito's intro, the strict result-schema boundary, and Tetracromia's extracted
+views and event handlers establish the incremental pattern: don't add a
+suite-wide base controller.
 When you change one phase, extract its pure markup, result schema, or state
 transition behind a small typed interface and keep measurement behavior
 covered. The ordered controller backlog lives in `roadmap.md`.
@@ -206,9 +214,10 @@ a second presentation registry: keys still originate in product code, and the
 catalog audit rejects duplicates or placeholder drift.
 
 Shared shell, method, setup, and result primitives remain in the entry style
-sheet because several experiments use them. Tetracromia-owned visuals and
-phase layouts live in `src/styles/tetracromia.css`; keep that ownership boundary
-when expanding the color lab.
+sheet because several experiments use them. Tetracromia-owned landing visuals
+live in `src/styles/tetracromia-landing.css`; its lab and result layouts live in
+`src/styles/tetracromia.css`. Riflessi follows the same landing/core split.
+Keep those route ownership boundaries when expanding either experiment.
 
 ## Delivery environments
 

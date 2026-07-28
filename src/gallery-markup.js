@@ -40,9 +40,12 @@ export function galleryMarkup({ exams, locale, localeHref, m, t }) {
         <p class="gallery-hero__boundary">
           ${m('boundary.recreational')}
         </p>
-        <a class="ui-link gallery-hero__about" data-sense6-route="about" href="${localeHref('about')}">
-          ${t('How Sense6 works')} <span aria-hidden="true">→</span>
-        </a>
+        <div class="gallery-hero__actions">
+          <a class="ui-button" href="#tests">${m('nav.allTests')} <span aria-hidden="true">↓</span></a>
+          <a class="ui-link gallery-hero__about" data-sense6-route="about" href="${localeHref('about')}">
+            ${t('How Sense6 works')} <span aria-hidden="true">→</span>
+          </a>
+        </div>
       </div>
 
       <div class="sense-mark" aria-hidden="true">

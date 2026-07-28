@@ -8,9 +8,10 @@ Lifecycle: current
 
 ## Context
 
-Sense6 needs basic product signals: document loads, measured-test starts,
-measured-test completions, and future report downloads. It doesn't need visitor
-profiles, attribution, session replay, answer telemetry, or unique-user counts.
+Sense6 needs basic product signals: document loads, experiment landing views,
+measured-test starts, measured-test completions, and future report downloads.
+It doesn't need visitor profiles, attribution, session replay, answer
+telemetry, or unique-user counts.
 
 Cloudflare Web Analytics doesn't provide the required custom test lifecycle
 events. A conventional analytics product would add identifiers and event-level
@@ -25,9 +26,10 @@ person.
 ## Decision
 
 - Send only an allowlisted `event` and `test` pair to `/api/metric`.
-- Count `site_loaded`, `test_started`, `test_completed`, and
-  `report_downloaded`. Don't count trial answers, scores, setup details, errors,
-  locale, device properties, or navigation.
+- Count `site_loaded`, `test_viewed`, `test_started`, `test_completed`, and
+  `report_downloaded`. Define `test_viewed` as a successfully mounted
+  experiment landing route. Don't count trial answers, scores, setup details,
+  errors, locale, device properties, or other navigation.
 - Define a visit as a document load. Don't claim that it represents a unique
   person.
 - Let the Pages Function derive the coordinated universal time day. Don't accept
@@ -49,8 +51,8 @@ person.
 
 ## Consequences
 
-- Sense6 can compare daily loads, starts, completions, and future downloads by
-  test without holding analytics records about a person.
+- Sense6 can compare daily landing views, starts, completions, and future
+  downloads by test without holding analytics records about a person.
 - The counts are activity totals, not unique visitors. Reloads, repeated runs,
   blocked requests, network failures, and bots affect them.
 - Same-origin validation and strict schemas stop incidental cross-site traffic

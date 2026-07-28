@@ -275,6 +275,7 @@ test('Acutezza calibrates the display and reports separate non-clinical observat
     .poll(() => metrics)
     .toEqual([
       { event: 'site_loaded', test: 'site' },
+      { event: 'test_viewed', test: 'acutezza' },
       { event: 'test_started', test: 'acutezza' },
       { event: 'test_completed', test: 'acutezza' },
     ]);
