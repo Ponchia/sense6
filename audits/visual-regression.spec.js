@@ -1,6 +1,14 @@
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 import { REPRESENTATIVE_ROUTES } from './routes.js';
+
+/**
+ * The build of the revision this suite compares against, when the workflow knows
+ * it. Used only to answer "did this route exist at the base revision?" — see
+ * firstAppearance below.
+ */
+const baseSiteDirectory = process.env.VISUAL_BASE_SITE_DIR;
 
 const approvedSnapshots = new Set(
   (process.env.VISUAL_APPROVED_SNAPSHOTS ?? '')
@@ -23,15 +31,33 @@ for (const snapshot of approvedSnapshots) {
 
 for (const route of REPRESENTATIVE_ROUTES) {
   test(`${route} matches the visual baseline`, async ({ page }) => {
-    // KNOWN INERT. src/exams/color-blindness.js:800 reads this seed behind
-    // `import.meta.env.DEV`, which Vite compiles to `false` in a production
-    // build — and this suite runs against `npm run preview`, a production
-    // build. `__SENSE6_TEST_CONFIG__` does not appear anywhere in
+    if (firstAppearance(route)) {
+      // A route added in this revision has no comparable base capture. The base
+      // build answers its path with the 404 page, so the capture step would
+      // screenshot a 404 and the comparison would either fail on a difference
+      // nobody can act on or, if the snapshot were listed in
+      // audits/visual-baseline-approvals.txt, "review" a diff against a 404 as
+      // if it were the new page. Skip instead, and let the next run — where the
+      // base revision does contain the route — establish the comparison.
+      test.info().annotations.push({
+        type: 'first-appearance',
+        description: `${route} does not exist at the base revision; there is no baseline to compare against yet.`,
+      });
+      test.skip(true, `${route} is new in this revision; the base revision serves a 404 for it`);
+    }
+
+    // KNOWN INERT. src/exams/color-blindness.js:738 (`adaptiveRunEntropy`) reads
+    // this seed behind `import.meta.env.DEV && /^(localhost|127\.0\.0\.1)$/`
+    // against the hostname. Vite compiles `import.meta.env.DEV` to `false` in a
+    // production build — and this suite runs against `npm run preview`, a
+    // production build. `__SENSE6_TEST_CONFIG__` does not appear anywhere in
     // dist/assets/*.js, so the Daltonia seed has never taken effect here and
     // /en/color-blindness/ is captured with a fresh random seed on every run.
     // The line is kept because it states the intent and starts working the
     // moment the source gate admits a production-visible test hook; until then
-    // the determinism this suite claims for that route does not exist.
+    // the determinism this suite claims for that route does not exist. Note that
+    // even then the hostname condition has to hold: a preview served on
+    // 127.0.0.1 satisfies it, a deployed host does not.
     await page.addInitScript(() => {
       window.__SENSE6_TEST_CONFIG__ = { daltonia: { seed: 'visual-regression' } };
     });
@@ -122,6 +148,21 @@ async function compareScreenshot(page, name) {
     type: 'approved-visual-change',
     description: `${snapshotName} differs from the base revision; review the attached images. ${difference.split('\n')[0]}`,
   });
+}
+
+/**
+ * Whether this route is new in the candidate revision.
+ *
+ * Answered from the base revision's own build, because every other signal is
+ * ambiguous: the base capture for a new route succeeds (it screenshots the base
+ * revision's 404 page), so a present baseline proves nothing. Without
+ * VISUAL_BASE_SITE_DIR — a local run against one build — nothing is knowable and
+ * the comparison proceeds exactly as before.
+ * @param {string} route
+ */
+function firstAppearance(route) {
+  if (!baseSiteDirectory) return false;
+  return !existsSync(`${baseSiteDirectory}/dist${route}index.html`);
 }
 
 async function settlePage(page) {

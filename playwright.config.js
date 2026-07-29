@@ -15,14 +15,17 @@ import { defineConfig, devices } from '@playwright/test';
  *
  * `chromium` and `mobile` stay on the dev server, and that is a constraint
  * rather than a preference. The accelerated instrument fixtures those suites
- * depend on are read behind `import.meta.env.DEV` — see
- * src/exams/acutezza.js:1063, src/exams/riflessi.js:1130,
- * src/exams/udito.js:1052, and src/exams/color-blindness.js:800 — which Vite
- * compiles to `false` in a production build. The hooks are absent from the
- * shipped bundle, so against `dist` every fixture-driven journey falls back to
- * the full-length protocol and times out. Moving those projects onto the
- * artifact requires a build-visible test hook in `src/`; until then this split
- * is the strongest honest configuration.
+ * depend on sit behind a two-part gate — `import.meta.env.DEV` AND a
+ * `/^(localhost|127\.0\.0\.1)$/` test against `window.location.hostname` — in
+ * `runtimeConfig()` in src/exams/acutezza.js:1069, src/exams/riflessi.js:1033
+ * and src/exams/udito.js:1067, and in `adaptiveRunEntropy()` in
+ * src/exams/color-blindness.js:738. Vite compiles `import.meta.env.DEV` to
+ * `false` in a production build, so the hooks are absent from the shipped
+ * bundle: against `dist` every fixture-driven journey falls back to the
+ * full-length protocol and times out. Moving those projects onto the artifact
+ * requires a build-visible test hook in `src/`, and the hostname half of the
+ * gate would still have to admit whatever host serves the artifact. Until then
+ * this split is the strongest honest configuration.
  */
 const devPort = process.env.PLAYWRIGHT_PORT ?? '4173';
 const distPort = process.env.PLAYWRIGHT_DIST_PORT ?? '4176';

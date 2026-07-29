@@ -13,6 +13,7 @@ publication is currently disabled.
 - A production deployment doesn't match its source commit.
 - The production smoke test reports missing security headers, an open metric
   read path, or `noindex` on the canonical site.
+- The production smoke test reports that the edge never served the built assets.
 - The deployed-browser journey reports a hydration, content security policy,
   asset, console, setup, or 404 failure.
 - The Pages Function reports that `ANALYTICS_DB` is unavailable or rejects an
@@ -22,7 +23,9 @@ publication is currently disabled.
 
 - The pull request is current with `main` and `npm run check:release` passes.
 - CI's release job produces `dist/`, `dist.sha256`, and
-  `dist/build-meta.json` from one build after the browser matrix passes.
+  `dist/build-meta.json` from one build after the browser matrix passes. It
+  stamps the checksum immediately after that build and re-checks it immediately
+  before the upload, so every audit in between runs on the bytes that ship.
 - The existing production Cloudflare credentials are available to the `main`
   deployment workflow; never print their values.
 - The Pages project is `sense6`, the production branch is `main`, and the D1
@@ -32,6 +35,12 @@ publication is currently disabled.
 - A production preflight has recorded live state, drift, blast radius,
   rollback, and operator approval before applying a migration or merging to
   `main`.
+- Every workflow job that runs on `arc-vps-sense6`, the self-hosted runner in the
+  operator's cluster, carries a head-repository guard, so a fork pull request
+  cannot install and build its own code there. Confirm this before making the
+  repository public — the remedy for the missing branch protection — and whenever
+  a job is added. `tests/audit-wiring.test.js` resolves each job's condition
+  against a fork pull request and fails if any of them would start.
 
 ## Steps
 
@@ -56,8 +65,17 @@ publication is currently disabled.
    only `POST /api/metric` with the documented 10 requests per 10 seconds and a
    10-second block.
 5. Push the pull-request branch. Wait for the reusable browser matrix and
-   release job. The release job runs the core and production-site audits,
-   and verifies its checksum without deployment credentials.
+   release job. The release job builds once, stamps `dist.sha256` over that
+   build, runs the core, HTML, link, browser-journey, and production-site audits
+   against it, and re-checks the checksum as its last act before publication —
+   without deployment credentials on a pull request.
+
+   Read the checksum for what it attests: the bytes that were audited are the
+   bytes that were uploaded. It is not evidence of the artifact's provenance, it
+   says nothing about what Cloudflare serves after the upload, and it would
+   attest nothing at all if the stamp and the re-check were adjacent.
+   `tests/audit-wiring.test.js` pins that ordering; don't satisfy it by moving
+   the audits out of the window.
 6. Don't enable preview publication until an operator creates and verifies an
    isolated, protected preview environment. The publication workflow must be
    owned by the default branch, publish only the verified artifact without
@@ -72,7 +90,13 @@ publication is currently disabled.
    ```
 
    The probe reads public pages and sends `GET /api/metric`; it never writes a
-   metric.
+   metric. Before any other check it waits for the edge to serve every hashed
+   file of the new build — each pre-rendered page referencing its own chunks,
+   plus the chunks no page names — on three consecutive sweeps. A wait that
+   never settles fails the step and names the first file the edge is missing;
+   that is Cloudflare propagation, not a site regression. Waiting on the entry
+   chunk alone used to let a route-only change past instantly, because a route
+   chunk's hash changes while the entry chunk's does not.
 8. Let the trusted production workflow run the deployed JavaScript journey.
    The journey intercepts and blocks `POST /api/metric` before it reaches the
    network. It verifies hydration, experiment setup, content security policy
@@ -102,8 +126,8 @@ publication is currently disabled.
 - The deployed Chromium journey hydrates Tetracromia, reaches its first measured
   choice without a content security policy, console, or asset failure, and
   receives HTTP `404` plus `noindex` from its missing route.
-- The Pages deployment identifies the expected commit and the release job's
-  checksum verification passed before deployment.
+- The Pages deployment identifies the expected commit, and the release job's
+  checksum re-check passed after every audit and immediately before the upload.
 - D1 contains the pre-existing aggregate rows after migration. Inspect counts
   privately; don't add or use a public read endpoint.
 

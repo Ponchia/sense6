@@ -17,8 +17,22 @@ concurrency:
 
 # Browser-container jobs use the Node 24 runtime bundled with the pinned
 # Playwright image, avoiding a redundant download on every ephemeral runner.
+#
+# Every job below runs on `arc-vps-sense6`, a self-hosted runner inside the
+# operator's netcup Kubernetes cluster, and each one installs and builds
+# candidate code — so an npm lifecycle script from the head revision executes in
+# that cluster. This repository is private today, but branch protection is
+# impossible without GitHub Pro and "make the repository public" is the obvious
+# remedy, which would turn a fork pull request into code execution inside the
+# cluster. Every job therefore carries a head-repository guard, written so that
+# the push, schedule, and workflow_dispatch runs are unaffected.
+# tests/audit-wiring.test.js discovers these jobs from the workflow source and
+# fails if any self-hosted job becomes reachable from a fork pull request.
 jobs:
   route-integrity:
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: arc-vps-sense6
     timeout-minutes: 20
     env:
@@ -52,9 +66,14 @@ jobs:
   # `gh api .../protection` returns 403), so a direct push to main deploys
   # without any pull request gate. Restricting this job to pull requests meant a
   # push shipped with no visual comparison at all; it now runs for a push too,
-  # comparing against the commit that main previously pointed at.
+  # comparing against the commit that main previously pointed at. The guard
+  # keeps that push coverage while excluding a fork pull request, which would
+  # otherwise build head-revision code on the cluster runner.
   visual-regression:
-    if: github.event_name == 'pull_request' || github.event_name == 'push'
+    if: >-
+      github.event_name == 'push' ||
+      (github.event_name == 'pull_request' &&
+      github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: arc-vps-sense6
     timeout-minutes: 20
     env:
@@ -108,10 +127,17 @@ jobs:
           git worktree add --detach "$BASE_WORKTREE" "$BASE_SHA"
           npm ci --prefix "$BASE_WORKTREE"
           npm run build --prefix "$BASE_WORKTREE"
+      # VISUAL_BASE_SITE_DIR lets the suite ask whether the base revision built a
+      # page for a route at all. A route added in this revision has no base
+      # capture worth comparing: the base build serves its 404 page for that
+      # path, so capturing it and then diffing produces a review of a 404 rather
+      # than of the new page. Both steps get the variable so the capture skips
+      # writing that baseline and the comparison skips reading it.
       - name: Capture base revision on this runner
         env:
           HOME: /root
           PLAYWRIGHT_SITE_DIR: ${{ runner.temp }}/sense6-visual-base
+          VISUAL_BASE_SITE_DIR: ${{ runner.temp }}/sense6-visual-base
           VISUAL_BASELINE_CAPTURE: '1'
         run: npm run test:visual:container -- --update-snapshots
       - name: Build the candidate revision
@@ -120,6 +146,7 @@ jobs:
         env:
           HOME: /root
           VISUAL_APPROVED_SNAPSHOTS: ${{ steps.visual-baselines.outputs.approved }}
+          VISUAL_BASE_SITE_DIR: ${{ runner.temp }}/sense6-visual-base
         run: npm run test:visual:container
       # Uploaded unconditionally: an approved visual change passes the job and
       # attaches its before/after/diff images to this report, which is the
