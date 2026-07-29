@@ -1,17 +1,19 @@
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import test from 'node:test';
+import { REPRESENTATIVE_ROUTES } from '../audits/routes.js';
 import primaryConfig from '../playwright.config.js';
 import deployedConfig from '../playwright.deployed.config.js';
 import siteConfig from '../playwright.site.config.js';
 
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
-const workflow = (name) => readFileSync(new URL(`../.github/workflows/${name}`, import.meta.url), 'utf8');
-const allWorkflows = readdirSync(new URL('../.github/workflows/', import.meta.url))
+const WORKFLOW_DIRECTORY = new URL('../.github/workflows/', import.meta.url);
+const workflowNames = readdirSync(WORKFLOW_DIRECTORY)
   .filter((file) => file.endsWith('.yml') || file.endsWith('.yaml'))
-  .map((file) => workflow(file))
-  .join('\n');
+  .sort();
+const workflow = (name) => readFileSync(new URL(name, WORKFLOW_DIRECTORY), 'utf8');
+const allWorkflows = workflowNames.map((file) => workflow(file)).join('\n');
 
 // -----------------------------------------------------------------------------
 // Workflow privilege tripwires.
@@ -26,6 +28,86 @@ const allWorkflows = readdirSync(new URL('../.github/workflows/', import.meta.ur
 // now import the configs and assert the resolved objects.
 // -----------------------------------------------------------------------------
 
+const SELF_HOSTED_RUNNER = 'arc-vps-sense6';
+const REPOSITORY = 'Ponchia/sense6';
+
+/**
+ * One github context per triggering event, enough to resolve every job-level
+ * `if:` in this repository. A path absent from a context resolves to null, which
+ * is what GitHub does for `github.event.pull_request.*` outside a pull request.
+ */
+const EVENT_CONTEXTS = Object.freeze({
+  'fork pull request': {
+    'github.event_name': 'pull_request',
+    'github.repository': REPOSITORY,
+    'github.event.pull_request.head.repo.full_name': 'outsider/sense6',
+    'github.ref': 'refs/pull/99/merge',
+  },
+  'same-repository pull request': {
+    'github.event_name': 'pull_request',
+    'github.repository': REPOSITORY,
+    'github.event.pull_request.head.repo.full_name': REPOSITORY,
+    'github.ref': 'refs/pull/99/merge',
+  },
+  'push to main': {
+    'github.event_name': 'push',
+    'github.repository': REPOSITORY,
+    'github.ref': 'refs/heads/main',
+  },
+  'scheduled run': {
+    'github.event_name': 'schedule',
+    'github.repository': REPOSITORY,
+    'github.ref': 'refs/heads/main',
+  },
+  'manual dispatch': {
+    'github.event_name': 'workflow_dispatch',
+    'github.repository': REPOSITORY,
+    'github.ref': 'refs/heads/main',
+  },
+});
+
+/**
+ * Which self-hosted jobs each event is allowed to start, as `workflow:job`.
+ *
+ * The fork entry is the security property: no job may reach the cluster runner
+ * with head-revision code. The other entries are the other half — a guard that
+ * also switched off the scheduled sweep or the push comparison would be a
+ * regression, not a fix — so this table has to be updated deliberately whenever
+ * a self-hosted job is added, removed, or re-gated.
+ */
+const SELF_HOSTED_REACH = Object.freeze({
+  'fork pull request': [],
+  'same-repository pull request': [
+    'site-audit.yml:route-integrity',
+    'site-audit.yml:visual-regression',
+    'verify.yml:browser',
+    'verify.yml:lighthouse',
+    'verify.yml:release',
+  ],
+  'push to main': [
+    'site-audit.yml:route-integrity',
+    'site-audit.yml:visual-regression',
+    'verify.yml:browser',
+    'verify.yml:lighthouse',
+    'verify.yml:release',
+  ],
+  'scheduled run': [
+    'site-audit.yml:external-links',
+    'site-audit.yml:lighthouse-full-site',
+    'site-audit.yml:passive-security',
+    'site-audit.yml:route-integrity',
+  ],
+  'manual dispatch': [
+    'site-audit.yml:external-links',
+    'site-audit.yml:lighthouse-full-site',
+    'site-audit.yml:passive-security',
+    'site-audit.yml:route-integrity',
+    'verify.yml:browser',
+    'verify.yml:lighthouse',
+    'verify.yml:release',
+  ],
+});
+
 test('pull request CI is an unprivileged verification-only caller', () => {
   const ci = workflow('ci.yml');
 
@@ -36,15 +118,59 @@ test('pull request CI is an unprivileged verification-only caller', () => {
   assert.doesNotMatch(allWorkflows, /pull_request_target/);
 });
 
-test('the self-hosted runner is not reachable from a fork pull request', () => {
-  // `runs-on: arc-vps-sense6` is a runner inside the operator's cluster. The
+test('every self-hosted job is discovered by this model', () => {
+  // The reachability assertions below are only as good as the parser: a job the
+  // parser fails to see is a job whose guard is never checked. Count the runner
+  // declarations in the workflow source and require the model to account for all
+  // of them, so a reformat that defeats the parser fails loudly instead of
+  // quietly reducing the security assertion to an empty set.
+  const declared = allWorkflows.match(/^\s*runs-on: arc-vps-sense6$/gm) ?? [];
+  const modelled = selfHostedJobs();
+  assert.ok(declared.length > 0, 'the guard exists because of this runner');
+  assert.equal(
+    modelled.length,
+    declared.length,
+    `the workflow parser found ${modelled.length} of ${declared.length} arc-vps-sense6 jobs`,
+  );
+});
+
+test('no job reaches the self-hosted runner from a fork pull request', () => {
+  // `runs-on: arc-vps-sense6` is a runner inside the operator's netcup cluster,
+  // and every job that uses it runs `npm ci` and `npm run build` on candidate
+  // code — so an npm lifecycle script from the head revision executes there. The
   // repository is private today, but branch protection is impossible without
-  // GitHub Pro and "make it public" is the obvious remedy — at which point a
-  // missing head-repository guard would hand fork pull requests code execution
-  // in that cluster. This assertion is what keeps the guard in place.
-  const ci = workflow('ci.yml');
-  assert.match(ci, /github\.event\.pull_request\.head\.repo\.full_name == github\.repository/);
-  assert.match(allWorkflows, /runs-on: arc-vps-sense6/, 'the guard exists because of this runner');
+  // GitHub Pro and "make it public" is the obvious remedy, which would turn that
+  // into remote code execution in the cluster.
+  //
+  // This walks the real job graph, including `uses: ./.github/workflows/...`
+  // calls, and resolves each job-level `if:` against a fork pull request
+  // context. It is deliberately not a text match for one guard in one file: a
+  // new job with no guard, or a guard that admits a fork, fails here without
+  // anyone remembering to extend a list.
+  const exposed = reachableSelfHostedJobs('fork pull request');
+  assert.deepEqual(
+    exposed,
+    [],
+    `a fork pull request would build head-revision code on ${SELF_HOSTED_RUNNER} in: ${exposed.join(', ')}`,
+  );
+
+  // The guard's literal text is pinned too, because the walk above proves only
+  // that the current expressions exclude a fork — not that anybody still intends
+  // them to.
+  assert.match(workflow('ci.yml'), /head\.repo\.full_name == github\.repository/);
+  assert.match(workflow('site-audit.yml'), /head\.repo\.full_name == github\.repository/);
+});
+
+test('the fork guard does not disable the trusted runs', () => {
+  // A guard that also stopped the scheduled sweep, the push comparison, or the
+  // same-repository pull request gate would be a regression dressed as a fix.
+  for (const [event, expected] of Object.entries(SELF_HOSTED_REACH)) {
+    assert.deepEqual(
+      reachableSelfHostedJobs(event),
+      expected,
+      `${event} no longer starts the expected set of ${SELF_HOSTED_RUNNER} jobs`,
+    );
+  }
 });
 
 test('the reusable verifier cannot publish pull request previews', () => {
@@ -62,33 +188,75 @@ test('the reusable verifier cannot publish pull request previews', () => {
 
 test('the deployed browser journey is verified before publication, not only after', () => {
   const verify = workflow('verify.yml');
-  const steps = [...verify.matchAll(/^ {6}- name: (.+)$/gm)].map(([, name]) => name);
+  const release = parseWorkflow('verify.yml').jobs.find((job) => job.id === 'release');
+  assert.ok(release, 'verify.yml no longer has a release job');
+  const steps = release.lines.flatMap((line) => line.match(/^ {6}- name: (.+)$/)?.[1] ?? []);
   const index = (needle) => steps.findIndex((name) => name.includes(needle));
 
+  const build = index('build the production artifact');
+  const generate = index('Stamp and checksum');
+  const htmlLinks = index('Validate generated HTML and links');
   const localJourney = index('JavaScript journey against the local artifact');
-  const checksum = index('unchanged since it was checksummed');
+  const siteAudit = index('Audit the production artifact');
+  const check = index('unchanged since it was checksummed');
   const publish = index('Publish the verified production bundle');
   const liveCommit = index('live production commit');
   const liveJourney = index('Verify the deployed JavaScript journey');
 
   for (const [label, position] of Object.entries({
+    build,
+    generate,
+    htmlLinks,
     localJourney,
-    checksum,
+    siteAudit,
+    check,
     publish,
     liveCommit,
     liveJourney,
   })) {
-    assert.notEqual(position, -1, `verify.yml is missing the ${label} step`);
+    assert.notEqual(position, -1, `verify.yml's release job is missing the ${label} step`);
   }
 
   // Runs 29904179754 and 30445054721 published successfully and then failed the
   // journey, leaving a failing build live with re-publishing the same commit as
   // the only remedy. The journey against the local artifact must therefore run
-  // first, and the checksum re-check must sit immediately before the upload so
-  // that it attests something.
+  // before the upload.
   assert.ok(localJourney < publish, 'the local journey must run before the publish step');
-  assert.ok(checksum < publish, 'the artifact checksum must be re-checked before publishing');
-  assert.equal(checksum + 1, publish, 'nothing may run between the checksum check and the upload');
+
+  // The checksum pair attests one property: the bytes that were audited are the
+  // bytes that were published. That needs BOTH halves, and each half is useless
+  // alone.
+  //
+  // Half one — the stamp is taken at the first moment `dist` exists, so every
+  // verification step falls inside the attested window. An earlier revision of
+  // this test asserted only half two, and the job satisfied it by moving the
+  // verification steps ABOVE the stamp: generation was then immediately followed
+  // by the check, which is a comparison of a file with itself and cannot fail.
+  // If you are here because these assertions are in your way, the property to
+  // preserve is "a real step that could mutate dist runs between the two", not
+  // "the two steps are in some order".
+  assert.equal(
+    build + 1,
+    generate,
+    'the checksum must be stamped immediately after the build, so that nothing which follows is ' +
+      'outside the attested window',
+  );
+  for (const [label, position] of Object.entries({ htmlLinks, localJourney, siteAudit })) {
+    assert.ok(
+      generate < position && position < check,
+      `the ${label} step must run between the checksum stamp and the re-check; a re-check with ` +
+        'nothing verified in between attests nothing',
+    );
+  }
+  assert.ok(
+    generate < localJourney && localJourney < siteAudit && siteAudit < check,
+    'required order: stamp the checksum, verify the artifact, then re-check it',
+  );
+
+  // Half two — the re-check is the last thing before the upload, so no step can
+  // slip in and change dist after it was attested and before it shipped.
+  assert.ok(check < publish, 'the artifact checksum must be re-checked before publishing');
+  assert.equal(check + 1, publish, 'nothing may run between the checksum check and the upload');
   assert.ok(publish < liveCommit && liveCommit < liveJourney);
 
   assert.match(verify, /PLAYWRIGHT_DEPLOYED_URL: https:\/\/sense6\.net/);
@@ -115,9 +283,19 @@ test('the Lighthouse budget can stop a deploy', () => {
 
 test('the visual comparison also runs on a direct push to main', () => {
   // Branch protection is impossible on this repository, so a push to main
-  // deploys without any pull request gate at all.
+  // deploys without any pull request gate at all. Asserted through the resolved
+  // `if:` expression rather than its literal text, because the same job also has
+  // to exclude a fork pull request and the two conditions share one expression.
   const siteAudit = workflow('site-audit.yml');
-  assert.match(siteAudit, /if: github\.event_name == 'pull_request' \|\| github\.event_name == 'push'/);
+  const job = parseWorkflow('site-audit.yml').jobs.find((entry) => entry.id === 'visual-regression');
+  assert.ok(job?.if, 'the visual-regression job lost its event guard');
+  for (const event of ['push to main', 'same-repository pull request']) {
+    assert.equal(
+      evaluateExpression(job.if, EVENT_CONTEXTS[event]),
+      true,
+      `the visual comparison must still run for a ${event}`,
+    );
+  }
   assert.match(siteAudit, /audits\/visual-baseline-approvals\.txt/);
   assert.doesNotMatch(
     siteAudit,
@@ -175,10 +353,13 @@ test('the cross-browser matrix runs against the built artifact, not the dev serv
   }
   // Every cross-browser project must point at the artifact server, and the
   // fixture-driven projects at the dev server. The accelerated instrument
-  // fixtures are read behind `import.meta.env.DEV` (src/exams/acutezza.js:1063
-  // and its three siblings), which Vite compiles to false in a production
-  // build, so a fixture-driven suite cannot run against dist until that hook is
-  // visible in the shipped bundle.
+  // fixtures sit behind `import.meta.env.DEV` AND a
+  // `/^(localhost|127\.0\.0\.1)$/` hostname test — `runtimeConfig()` in
+  // src/exams/acutezza.js:1069, src/exams/riflessi.js:1033 and
+  // src/exams/udito.js:1067, and `adaptiveRunEntropy()` in
+  // src/exams/color-blindness.js:738. Vite compiles `import.meta.env.DEV` to
+  // false in a production build, so a fixture-driven suite cannot run against
+  // dist until that hook is visible in the shipped bundle.
   for (const name of ['chromium-smoke', 'firefox', 'webkit']) {
     assert.equal(projects[name].testMatch, '**/cross-browser.spec.js');
     assert.equal(projects[name].use.baseURL, artifact.url);
@@ -193,6 +374,38 @@ test('the cross-browser suite uses no accelerated fixture', () => {
   // against dist, because the fixture hooks are compiled out of production.
   const suite = readFileSync(new URL('../tests/cross-browser.spec.js', import.meta.url), 'utf8');
   assert.doesNotMatch(suite, /__SENSE6_TEST_CONFIG__|__SENSORIA_TEST_CONFIG__/);
+});
+
+test('the visual comparison covers a pinned set of representative routes', () => {
+  // Visual coverage used to be pinned by accident: every covered route had a
+  // committed baseline PNG, so dropping a route meant deleting a binary file and
+  // showing two conspicuous deletions in the diff. The baselines are regenerated
+  // from the base revision now — correctly, they were inert — which left the
+  // route set held by nothing at all. audits/routes.js:REPRESENTATIVE_ROUTES is
+  // one line, and it derives from src/exams/registry.js, so a route could lose
+  // its visual comparison as an invisible side effect of an unrelated change.
+  //
+  // Update this list only when you mean to change what the visual suite covers.
+  assert.deepEqual(
+    [...REPRESENTATIVE_ROUTES],
+    [
+      '/',
+      '/en/',
+      '/en/tetracromia/',
+      '/en/color-blindness/',
+      '/en/riflessi/',
+      '/en/udito/',
+      '/en/acutezza/',
+      '/en/about/',
+      '/en/journal/',
+      '/en/privacy/',
+      '/ar/about/',
+      '/hi/about/',
+      '/ja/about/',
+    ],
+    'the visual comparison route set changed; every exam and utility route needs a desktop and a ' +
+      'mobile comparison, and a removal has to be a deliberate edit here',
+  );
 });
 
 test('the site audit keeps its regenerated visual baselines out of the repository', () => {
@@ -241,4 +454,181 @@ test('the static output check cannot validate a stale build', () => {
 
 function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// -----------------------------------------------------------------------------
+// A small workflow model.
+//
+// A workflow is data, and the questions above are about its job graph: which
+// jobs a given event starts, which of those reach the self-hosted runner, and
+// which reusable workflow they call. There is no YAML parser in this project's
+// dependency set, so this reads the parts of the schema these files actually use
+// and throws on anything it does not recognise — a parse failure has to be loud,
+// because a parser that silently sees no jobs turns a security assertion into an
+// empty set.
+// -----------------------------------------------------------------------------
+
+/** @param {string} source @param {string} key */
+function topLevelSection(source, key) {
+  const lines = source.split('\n');
+  const start = lines.indexOf(`${key}:`);
+  if (start === -1) throw new Error(`workflow has no block-style \`${key}:\` mapping`);
+  const body = [];
+  for (let index = start + 1; index < lines.length && !/^\S/.test(lines[index]); index += 1) {
+    body.push(lines[index]);
+  }
+  return body;
+}
+
+/** @param {string} name */
+function parseWorkflow(name) {
+  const source = workflow(name);
+  const triggers = new Set(
+    topLevelSection(source, 'on').flatMap((line) => line.match(/^ {2}([\w-]+):/)?.[1] ?? []),
+  );
+  if (triggers.size === 0) throw new Error(`${name} declares no recognisable trigger`);
+
+  /** @type {{ id: string, lines: string[] }[]} */
+  const blocks = [];
+  for (const line of topLevelSection(source, 'jobs')) {
+    const header = line.match(/^ {2}([\w-]+):$/);
+    if (header) blocks.push({ id: header[1], lines: [] });
+    else blocks.at(-1)?.lines.push(line);
+  }
+  if (blocks.length === 0) throw new Error(`${name} declares no recognisable job`);
+
+  return {
+    name,
+    triggers,
+    jobs: blocks.map((block) => ({
+      id: block.id,
+      lines: block.lines,
+      runsOn: jobField(block.lines, 'runs-on'),
+      uses: jobField(block.lines, 'uses'),
+      if: jobCondition(block.lines),
+    })),
+  };
+}
+
+/** A job-level key, at four spaces — step-level keys are indented deeper. */
+function jobField(lines, key) {
+  const prefix = `    ${key}: `;
+  const line = lines.find((candidate) => candidate.startsWith(prefix));
+  return line ? line.slice(prefix.length).trim() : null;
+}
+
+/** A job-level `if:`, joining a folded (`>-`) expression into one line. */
+function jobCondition(lines) {
+  const start = lines.findIndex((line) => /^ {4}if:/.test(line));
+  if (start === -1) return null;
+  const parts = [lines[start].replace(/^ {4}if:/, '').trim()];
+  for (let index = start + 1; index < lines.length && /^ {6}\S/.test(lines[index]); index += 1) {
+    parts.push(lines[index].trim());
+  }
+  const folded = parts.join(' ').replace(/^>-?\s*/, '');
+  return folded.replace(/\s+/g, ' ').trim();
+}
+
+function selfHostedJobs() {
+  return workflowNames
+    .flatMap((name) => parseWorkflow(name).jobs.map((job) => ({ ...job, workflow: name })))
+    .filter((job) => job.runsOn === SELF_HOSTED_RUNNER);
+}
+
+/**
+ * Which `workflow:job` identifiers on the self-hosted runner a named event can
+ * start, following `uses: ./.github/workflows/...` into reusable workflows.
+ * @param {string} event a key of EVENT_CONTEXTS
+ */
+function reachableSelfHostedJobs(event) {
+  const context = EVENT_CONTEXTS[event];
+  if (!context) throw new Error(`unknown event ${event}`);
+  const trigger = context['github.event_name'];
+  const reached = new Set();
+
+  /** @param {string} name @param {boolean} called @param {number} depth */
+  const visit = (name, called, depth) => {
+    if (depth > 4) throw new Error(`workflow_call chain from ${name} is suspiciously deep`);
+    const parsed = parseWorkflow(name);
+    if (!called && !parsed.triggers.has(trigger)) return;
+    for (const job of parsed.jobs) {
+      if (job.if && !truthy(evaluateExpression(job.if, context))) continue;
+      if (job.uses) visit(job.uses.replace(/^\.\/\.github\/workflows\//, ''), true, depth + 1);
+      else if (job.runsOn === SELF_HOSTED_RUNNER) reached.add(`${name}:${job.id}`);
+    }
+  };
+
+  for (const name of workflowNames) visit(name, false, 0);
+  return [...reached].sort();
+}
+
+/**
+ * Resolve the subset of the GitHub expression syntax these workflows use:
+ * string literals, `github.*` references, `==`, `!=`, `&&`, `||`, and grouping.
+ * Anything else throws, so an unmodelled expression fails the test rather than
+ * resolving to a comfortable answer.
+ * @param {string} expression @param {Record<string, string>} context
+ */
+function evaluateExpression(expression, context) {
+  const tokenPattern = /'[^']*'|==|!=|\|\||&&|[()]|[\w.-]+/g;
+  const residue = expression.replace(tokenPattern, '').trim();
+  if (residue) throw new Error(`unsupported expression syntax ${JSON.stringify(residue)} in ${expression}`);
+  const state = { tokens: expression.match(tokenPattern) ?? [], index: 0, context };
+  const value = parseDisjunction(state);
+  if (state.index !== state.tokens.length) throw new Error(`trailing tokens in ${expression}`);
+  return value;
+}
+
+// `&&` binds tighter than `||`, and both operands are always parsed before they
+// are combined: short-circuiting the evaluation would also short-circuit the
+// tokens, leaving the tail of the expression unread and reported as a syntax
+// error.
+function parseDisjunction(state) {
+  let value = parseConjunction(state);
+  while (state.tokens[state.index] === '||') {
+    state.index += 1;
+    const right = parseConjunction(state);
+    value = truthy(value) || truthy(right);
+  }
+  return value;
+}
+
+function parseConjunction(state) {
+  let value = parseComparison(state);
+  while (state.tokens[state.index] === '&&') {
+    state.index += 1;
+    const right = parseComparison(state);
+    value = truthy(value) && truthy(right);
+  }
+  return value;
+}
+
+function parseComparison(state) {
+  const left = parseTerm(state);
+  const operator = state.tokens[state.index];
+  if (operator !== '==' && operator !== '!=') return left;
+  state.index += 1;
+  const equal = left === parseTerm(state);
+  return operator === '==' ? equal : !equal;
+}
+
+function parseTerm(state) {
+  const token = state.tokens[state.index];
+  state.index += 1;
+  if (token === '(') {
+    const value = parseDisjunction(state);
+    if (state.tokens[state.index] !== ')') throw new Error('unbalanced parentheses in a job condition');
+    state.index += 1;
+    return value;
+  }
+  if (token?.startsWith("'")) return token.slice(1, -1);
+  if (token === 'true' || token === 'false') return token === 'true';
+  // An absent property of the github context is null, which is how a pull
+  // request property behaves on a push, a schedule, or a manual dispatch.
+  if (token?.startsWith('github.')) return token in state.context ? state.context[token] : null;
+  throw new Error(`unsupported reference ${token}; extend EVENT_CONTEXTS to model it`);
+}
+
+function truthy(value) {
+  return value !== null && value !== false && value !== '' && value !== 0;
 }

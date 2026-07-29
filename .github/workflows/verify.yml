@@ -102,6 +102,18 @@ jobs:
       - name: Verify code and build the production artifact
         run: npm run check:core
 
+      # The checksum is taken here, at the first moment `dist` exists, and is
+      # re-checked in the last step before the upload. Everything in between —
+      # HTML and link validation, the local browser journey, the production-site
+      # audit — therefore runs against bytes that are provably the bytes being
+      # published. Taking it later would shrink the attested window; taking it
+      # immediately before the re-check, as this job used to, would close the
+      # window entirely and make the comparison a tautology.
+      - name: Stamp and checksum the verified artifact
+        run: |
+          node scripts/write-build-metadata.mjs "$GITHUB_SHA"
+          find dist -type f -print0 | sort -z | xargs -0 sha256sum > dist.sha256
+
       - name: Validate generated HTML and links
         run: |
           npm run test:html
@@ -123,15 +135,12 @@ jobs:
       - name: Audit the production artifact
         run: npm run test:site-audit
 
-      - name: Stamp and checksum the verified artifact
-        run: |
-          node scripts/write-build-metadata.mjs "$GITHUB_SHA"
-          find dist -type f -print0 | sort -z | xargs -0 sha256sum > dist.sha256
-
-      # This check sits immediately before the upload rather than immediately
-      # after the checksum was written, so it attests that nothing mutated dist
-      # between verification and publication. Generating and re-checking back to
-      # back, as this job used to, is a tautology that attests nothing.
+      # Real verification steps run between the stamp above and this check, and
+      # this check is the last thing before the upload, so a pass attests that
+      # the audited bytes and the published bytes are the same bytes. Moving the
+      # stamp down next to this step, or inserting any step between this check
+      # and the upload, removes that guarantee; tests/audit-wiring.test.js pins
+      # both halves of the ordering.
       - name: Verify the artifact is unchanged since it was checksummed
         run: sha256sum --check dist.sha256
 
@@ -145,10 +154,14 @@ jobs:
           command: pages deploy dist --project-name=sense6 --branch=main --commit-hash=${{ github.sha }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
-      # smoke-production.mjs now waits for the edge to serve the locally built
-      # asset hashes on three consecutive fetches before returning, so the
-      # journey below no longer races Cloudflare propagation and a red result
-      # means a real regression rather than an unsettled edge.
+      # smoke-production.mjs waits until the edge serves every hashed file this
+      # build produced — each pre-rendered page referencing its own chunks, plus
+      # the chunks no page names — on three consecutive sweeps before returning.
+      # Waiting on the entry chunk alone was not enough: a change confined to a
+      # route chunk leaves the entry hash untouched, so the wait returned
+      # immediately while the edge still served the previous deployment. The
+      # journey below therefore no longer races Cloudflare propagation, and a red
+      # result means a real regression rather than an unsettled edge.
       - name: Verify the live production commit and contract
         if: inputs.publish_production
         run: node scripts/smoke-production.mjs https://sense6.net "${{ github.sha }}"

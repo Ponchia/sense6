@@ -1,4 +1,4 @@
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile, stat } from 'node:fs/promises';
 
 const candidate = process.argv[2] ?? 'https://sense6.net';
 const expectedCommit = process.argv[3];
@@ -15,9 +15,9 @@ if (production.protocol !== 'https:' || production.hostname !== 'sense6.net') {
  * retry-until-green structurally necessary, and therefore made a real
  * regression indistinguishable from propagation noise.
  *
- * Wait for a known condition instead: the deployed HTML must reference the
- * asset hashes built locally, several fetches in a row. Only then is a failing
- * journey unambiguous.
+ * Wait for a known condition instead: the edge must be serving every hashed file
+ * this build produced, several sweeps in a row. Only then is a failing journey
+ * unambiguous.
  */
 if (expectedCommit) await expectCommit(production, expectedCommit);
 await expectAssetPropagation(production);
@@ -66,42 +66,44 @@ async function expectCommit(production, expected) {
 }
 
 /**
- * Require the deployed HTML to reference the locally built asset hashes on
- * `required` consecutive fetches before any further gate runs.
+ * Require the edge to serve every hashed file this build produced, on `required`
+ * consecutive sweeps, before any further gate runs.
+ *
+ * This used to wait on one entry chunk and its stylesheet. An entry hash only
+ * changes when the entry chunk's own content changes, so a change confined to a
+ * route chunk — `src/exams/udito.js` becoming a new `assets/udito-*.js` — left
+ * the waited-on hashes identical to the previous deployment's. The three
+ * consecutive checks then passed instantly against a lagging edge and the wait
+ * attested nothing about the code under test.
+ *
+ * A sweep now covers the whole artifact: each pre-rendered page must reference
+ * the hashed assets that the local build of that page references, and every
+ * hashed file no page names — locale chunks, dynamically imported modules, the
+ * unused font weights — must be served. Only unhashed paths are outside this,
+ * and `/build-meta.json`, the one that matters, has its own gate above.
  * @param {URL} production
- * @param {{ required?: number, attempts?: number, waitMs?: number, probe?: string }} [options]
+ * @param {{ required?: number, attempts?: number, waitMs?: number }} [options]
  */
 async function expectAssetPropagation(production, options = {}) {
-  const { required = 3, attempts = 30, waitMs = 5_000, probe = '/en/tetracromia/' } = options;
-  const expected = await builtAssetPaths();
-  if (expected.length === 0) {
-    throw new Error('The local dist manifest named no entry assets to wait for');
-  }
+  const { required = 3, attempts = 30, waitMs = 5_000 } = options;
+  const { pages, unreferenced, total } = await builtArtifact();
 
   let streak = 0;
   let lastFailure = 'no response';
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    try {
-      const response = await fetch(new URL(`${probe}?propagation=${attempt}`, production), {
-        cache: 'no-store',
-      });
-      const html = response.ok ? await response.text() : '';
-      const missing = expected.filter((asset) => !html.includes(asset));
-      if (response.ok && missing.length === 0) {
-        streak += 1;
-        if (streak >= required) {
-          console.log(
-            `Edge is serving the built assets (${required} consecutive checks): ${expected.join(', ')}`,
-          );
-          return;
-        }
-      } else {
-        streak = 0;
-        lastFailure = response.ok ? `missing ${missing.join(', ')}` : `${probe} returned ${response.status}`;
-      }
-    } catch (error) {
+    const gap = await findPropagationGap(production, pages, unreferenced, attempt);
+    if (gap) {
       streak = 0;
-      lastFailure = error instanceof Error ? error.message : String(error);
+      lastFailure = gap;
+    } else {
+      streak += 1;
+      if (streak >= required) {
+        console.log(
+          `Edge is serving all ${total} hashed assets of this build across ${pages.length} ` +
+            `pre-rendered pages (${required} consecutive sweeps)`,
+        );
+        return;
+      }
     }
     if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, waitMs));
   }
@@ -110,14 +112,87 @@ async function expectAssetPropagation(production, options = {}) {
   );
 }
 
-/** Entry-chunk JavaScript and CSS paths from the local Vite manifest. */
-async function builtAssetPaths() {
-  const manifest = JSON.parse(
-    await readFile(new URL('../dist/.vite/manifest.json', import.meta.url), 'utf8'),
+/**
+ * Describe the first thing the edge is not serving yet, or null when the whole
+ * artifact is live.
+ * @param {URL} production
+ * @param {{ path: string, assets: string[] }[]} pages
+ * @param {string[]} unreferenced
+ * @param {number} attempt
+ */
+async function findPropagationGap(production, pages, unreferenced, attempt) {
+  try {
+    for (const { path, assets } of pages) {
+      const response = await fetch(new URL(`${path}?propagation=${attempt}`, production), {
+        cache: 'no-store',
+      });
+      if (!response.ok) return `${path} returned ${response.status}`;
+      const html = await response.text();
+      const missing = assets.filter((asset) => !html.includes(asset));
+      if (missing.length > 0) return `${path} does not reference ${missing.join(', ')}`;
+    }
+    for (const asset of unreferenced) {
+      const response = await fetch(new URL(asset, production), { method: 'HEAD', cache: 'no-store' });
+      if (!response.ok) return `${asset} returned ${response.status}`;
+    }
+    return null;
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error);
+  }
+}
+
+/**
+ * Every hashed file in the local build, split into the pre-rendered pages that
+ * reference them and the files no page names.
+ */
+async function builtArtifact() {
+  const dist = new URL('../dist/', import.meta.url);
+  const manifest = JSON.parse(await readFile(new URL('.vite/manifest.json', dist), 'utf8'));
+  const hashed = new Set(
+    Object.values(manifest)
+      .flatMap((record) => [record.file, ...(record.css ?? [])])
+      .map((file) => `/${file}`),
   );
-  const entry = Object.values(manifest).find((record) => record.isEntry);
-  if (!entry) throw new Error('Vite manifest has no entry chunk');
-  return [entry.file, ...(entry.css ?? [])].map((file) => `/${file}`);
+  if (hashed.size === 0) throw new Error('The local dist manifest named no built assets to wait for');
+
+  const referenced = new Set();
+  const pages = [];
+  for (const path of await prerenderedRoutes(dist)) {
+    const html = await readFile(new URL(`.${path}index.html`, dist), 'utf8');
+    const references = new Set(html.match(/\/assets\/[\w./-]+/g) ?? []);
+    const assets = [...references].filter((asset) => hashed.has(asset));
+    if (assets.length === 0) throw new Error(`The local build of ${path} references no hashed asset`);
+    for (const asset of assets) referenced.add(asset);
+    pages.push({ path, assets });
+  }
+  return {
+    pages,
+    unreferenced: [...hashed].filter((asset) => !referenced.has(asset)).sort(),
+    total: hashed.size,
+  };
+}
+
+/**
+ * The root page plus every English page in the build.
+ *
+ * The English tree holds one page per exam and utility route, so its HTML names
+ * every hashed asset a page can name; a localized page of the same route loads
+ * the same chunks and adds only a locale chunk, which the unreferenced-asset
+ * sweep covers. Discovering the set from `dist` rather than a list means a new
+ * route is waited on the day it ships.
+ * @param {URL} dist
+ */
+async function prerenderedRoutes(dist) {
+  const entries = await readdir(new URL('en/', dist), { withFileTypes: true });
+  const directories = entries.filter((entry) => entry.isDirectory());
+  const candidates = ['/', '/en/', ...directories.map((entry) => `/en/${entry.name}/`)];
+  const routes = [];
+  for (const path of candidates) {
+    const page = await stat(new URL(`.${path}index.html`, dist)).catch(() => null);
+    if (page?.isFile()) routes.push(path);
+  }
+  if (routes.length < 2) throw new Error(`The local build has no pre-rendered pages under ${dist.pathname}`);
+  return routes;
 }
 
 async function fetchReady(url) {
