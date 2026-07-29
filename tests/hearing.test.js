@@ -583,3 +583,68 @@ test('the default hearing configuration is the published instrument contract', (
     pitchRoveMaxDb: HEARING_DIGITAL_LEVELS.pitchRoveMaxDb,
   });
 });
+
+test('a max-trials track that ends at the ceiling is reported as a technical ceiling', () => {
+  const track = createRangeTrack(18000, {
+    controlAt: [],
+    minTrials: 99,
+    maxTrials: 2,
+    targetReversals: 99,
+    startHz: 18000,
+    maxHz: 18000,
+    initialStepOctaves: 0,
+    fineStepOctaves: 0,
+  });
+  for (let index = 0; index < 2; index += 1) {
+    const trial = nextRangeTrial(track, () => 0);
+    recordRangeResponse(track, trial, trial.toneInterval);
+  }
+  assert.equal(track.complete, true);
+  assert.equal(
+    track.completionReason,
+    'technical-ceiling',
+    'running out of trials at the ceiling is a ceiling result, not a max-trials result',
+  );
+  assert.equal(summarizeRange(track).settled, true);
+  assert.equal(summarizeRange(track).thresholdHz, 18000);
+});
+
+test('the pitch fine factor applies on the move that records the second reversal', () => {
+  const tracks = createPitchTracks({
+    anchorsHz: [500],
+    startPercent: 8,
+    minPercent: 0.01,
+    maxPercent: 100,
+    minTrials: 40,
+    maxTrials: 40,
+    targetReversals: 40,
+    initialFactor: 2,
+    fineFactor: 4,
+  });
+  const step = (correct) => {
+    recordPitchResponse(
+      tracks,
+      {
+        kind: 'pitch',
+        anchorHz: 500,
+        deltaPercent: tracks[0].deltaPercent,
+        higherInterval: 0,
+        roveDb: [0, 0],
+      },
+      correct ? 0 : 1,
+    );
+    return tracks[0].deltaPercent;
+  };
+
+  step(true);
+  assert.equal(step(true), 4, 'coarse factor of 2 while there are no reversals');
+  assert.equal(step(false), 8, 'reversal 1, still the coarse factor');
+  assert.equal(tracks[0].reversals.length, 1);
+
+  step(true);
+  // This move records reversal 2 before choosing the step, so it must already
+  // use the fine factor: 8 / 4, not the coarse 8 / 2.
+  const afterSecondReversal = step(true);
+  assert.equal(tracks[0].reversals.length, 2);
+  assert.equal(afterSecondReversal, 2);
+});

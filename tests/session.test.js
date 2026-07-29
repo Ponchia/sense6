@@ -446,3 +446,19 @@ test('the level-to-delta conversion is phase specific', () => {
   assert.equal(tile, 1.8302705977008213);
   assert.notEqual(field, tile, 'the field and tile references must not collapse together');
 });
+
+test('the ordering ramp starts at a jittered anchor hue, not at the anchor itself', () => {
+  const lab = new ColorLabSession('sequence-shape');
+  while (lab.phase.id !== 'sequence') lab.answerChoice(lab.currentTrial.answer, 100);
+
+  // Round one is anchored at 8 degrees with up to +-4 degrees of jitter. Pinning
+  // the exact ramp catches a sign error in either the anchor or the jitter.
+  assert.deepEqual(
+    lab.currentTrial.colors.map(({ h }) => h),
+    [
+      11.263719411566854, 22.763719411566854, 34.26371941156685, 45.76371941156685, 57.26371941156685,
+      68.76371941156685, 80.26371941156685, 91.76371941156685, 103.26371941156685,
+    ],
+  );
+  assert.ok(Math.abs(lab.currentTrial.colors[0].h - 8) <= 4, 'the start stays within the jitter window');
+});

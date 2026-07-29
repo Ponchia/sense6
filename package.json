@@ -16,7 +16,7 @@
     "lint": "biome check src functions scripts tests audits playwright.config.js playwright.deployed.config.js playwright.site.config.js unlighthouse.config.mjs",
     "test": "node --test tests/*.test.js",
     "test:coverage": "c8 --clean --include='src/lib/*.js' --all --reporter=text --reporter=json-summary --reports-dir=coverage --check-coverage --lines=97 --branches=86 --functions=95 node --test tests/*.test.js && node scripts/check-coverage-report.mjs",
-    "test:static": "node --test tests/static-output.build.js",
+    "test:static": "node scripts/smoke-dist-freshness.mjs && node --test tests/static-output.build.js",
     "test:e2e": "playwright test",
     "test:deployed": "playwright test --config playwright.deployed.config.js",
     "test:deployed:local": "npm run build && npm run test:deployed",

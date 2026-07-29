@@ -551,3 +551,40 @@ test('a partial instrument override merges without dropping its siblings', () =>
   assert.equal(config.signal.scoredTrials, 20);
   assert.equal(DEFAULT_REFLEX_CONFIG.stability.durationMs, 180_000, 'the frozen default is untouched');
 });
+
+test('a percentile outside the unit interval is clamped to the ends of the sample', () => {
+  // The clamp is `min(length - 1, ...)`. Widening it walks off the end of the
+  // array and returns null instead of the slowest response.
+  assert.equal(percentile([1, 2, 3, 4, 5], 1.5), 5);
+  assert.equal(percentile([1, 2, 3, 4, 5], 12), 5);
+  assert.equal(percentile([1, 2, 3, 4, 5], -1), 1);
+});
+
+test('a derived difference needs both of its inputs, not just one', () => {
+  // Each of these has exactly one side of the comparison available, so an
+  // `||` collapsed to `&&` would compute a difference against null.
+  const signalOnly = summarizeRiflessi({
+    signal: [{ outcome: 'correct', rt: 200 }],
+    choice: [{ outcome: 'miss' }],
+    stability: [],
+  });
+  assert.equal(signalOnly.choice.blockDifferenceMs, null, 'no choice median means no block difference');
+
+  const choiceOnly = summarizeRiflessi({
+    signal: [{ outcome: 'miss' }],
+    choice: [{ outcome: 'correct', rt: 300 }],
+    stability: [],
+  });
+  assert.equal(choiceOnly.choice.blockDifferenceMs, null, 'no signal median means no block difference');
+
+  // A single sustained response has a median but no second half, so drift is
+  // unavailable while the slow-tail gap is still computable.
+  const oneSustained = summarizeRiflessi({
+    signal: [],
+    choice: [],
+    stability: [{ outcome: 'correct', rt: 400 }],
+  });
+  assert.equal(oneSustained.stability.medianMs, 400);
+  assert.equal(oneSustained.stability.slowestGapMs, 0);
+  assert.equal(oneSustained.stability.driftMs, null, 'one response cannot show drift');
+});

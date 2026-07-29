@@ -21,7 +21,7 @@ env:
 jobs:
   browser:
     runs-on: arc-vps-sense6
-    timeout-minutes: 30
+    timeout-minutes: 40
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
 
@@ -32,6 +32,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # The browser matrix runs against `dist` served by
+      # scripts/serve-deployed-smoke.mjs, so every project loads the
+      # pre-rendered static pages and the production bundle under an enforced
+      # Content-Security-Policy. See the webServer comment in
+      # playwright.config.js for why the Vite dev server was not a valid target.
       - name: Verify every browser project
         env:
           HOME: /root
@@ -44,10 +49,46 @@ jobs:
           --project=webkit
           --workers=1
 
-  release:
-    needs: browser
+  # Lighthouse budgets (performance 90, accessibility 100, SEO 100) used to live
+  # only in site-audit.yml, which has no `needs` or `workflow_run` relation to
+  # deploy.yml — so a budget failure could not stop a deploy and the two merely
+  # raced. Gating the release job on this makes the budget an actual gate.
+  lighthouse:
     runs-on: arc-vps-sense6
-    timeout-minutes: 30
+    timeout-minutes: 45
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
+    env:
+      FULL_SITE_AUDIT: '0'
+      UNLIGHTHOUSE_OUTPUT_PATH: .unlighthouse
+      UNLIGHTHOUSE_SITE: http://127.0.0.1:4174
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Install dependencies
+        run: npm ci
+      - name: Build and serve the static site
+        run: |
+          npm run build
+          npm run preview -- --port 4174 --strictPort > /tmp/sense6-preview.log 2>&1 &
+          node scripts/wait-for-url.mjs http://127.0.0.1:4174/sitemap.xml
+      - name: Enforce Lighthouse budgets
+        run: npm run audit:lighthouse
+      - name: Upload Lighthouse results
+        if: failure()
+        continue-on-error: true
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unlighthouse-report
+          path: .unlighthouse
+          if-no-files-found: ignore
+          include-hidden-files: true
+          retention-days: 3
+
+  release:
+    needs: [browser, lighthouse]
+    runs-on: arc-vps-sense6
+    timeout-minutes: 40
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
 
@@ -66,16 +107,33 @@ jobs:
           npm run test:html
           npm run test:links
 
+      # tests/deployed/deployed.spec.js holds the only browser-enforced CSP and
+      # hydration assertions in the repository, and it used to run exclusively
+      # after a production publish — never on a pull request, and never before
+      # traffic already had the build. With PLAYWRIGHT_DEPLOYED_URL unset,
+      # playwright.deployed.config.js starts scripts/serve-deployed-smoke.mjs
+      # over the artifact built above, replaying dist/_headers so the policy is
+      # genuinely enforced. This runs for every caller, and a failure stops the
+      # job before anything is published.
+      - name: Verify the JavaScript journey against the local artifact
+        env:
+          HOME: /root
+        run: npm run test:deployed
+
+      - name: Audit the production artifact
+        run: npm run test:site-audit
+
       - name: Stamp and checksum the verified artifact
         run: |
           node scripts/write-build-metadata.mjs "$GITHUB_SHA"
           find dist -type f -print0 | sort -z | xargs -0 sha256sum > dist.sha256
 
-      - name: Verify the artifact checksum
+      # This check sits immediately before the upload rather than immediately
+      # after the checksum was written, so it attests that nothing mutated dist
+      # between verification and publication. Generating and re-checking back to
+      # back, as this job used to, is a tautology that attests nothing.
+      - name: Verify the artifact is unchanged since it was checksummed
         run: sha256sum --check dist.sha256
-
-      - name: Audit the production artifact
-        run: npm run test:site-audit
 
       - name: Publish the verified production bundle
         if: inputs.publish_production
@@ -87,6 +145,10 @@ jobs:
           command: pages deploy dist --project-name=sense6 --branch=main --commit-hash=${{ github.sha }}
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
+      # smoke-production.mjs now waits for the edge to serve the locally built
+      # asset hashes on three consecutive fetches before returning, so the
+      # journey below no longer races Cloudflare propagation and a red result
+      # means a real regression rather than an unsettled edge.
       - name: Verify the live production commit and contract
         if: inputs.publish_production
         run: node scripts/smoke-production.mjs https://sense6.net "${{ github.sha }}"
@@ -98,7 +160,7 @@ jobs:
         run: npm run test:deployed
 
       - name: Preserve deployed-browser failure artifacts
-        if: failure() && inputs.publish_production
+        if: failure()
         continue-on-error: true
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

@@ -1,0 +1,20 @@
+# Intentional visual baseline changes.
+#
+# The visual-regression job compares the candidate revision against a capture of
+# the pull request's base SHA, taken on the same runner and container. A route
+# whose appearance changes on purpose fails that comparison, which is correct —
+# the change still has to be reviewed.
+#
+# Listing a snapshot here does NOT switch the check off. The comparison still
+# runs; when it reports a difference the job attaches the base image, the
+# candidate image, and the pixel diff to the uploaded Playwright report, so the
+# change is reviewed from evidence rather than from a hole in the suite. If the
+# comparison instead finds NO difference, the job fails and tells you to delete
+# the line, so an approval cannot quietly outlive the change it covered.
+#
+# One snapshot per line, exactly as Playwright names it, with a reason:
+#
+#   en-tetracromia-desktop-chromium-linux.png  # new hero layout, PR #58
+#
+# Snapshot names are validated against the representative route list, so a typo
+# fails the job rather than silently approving nothing.

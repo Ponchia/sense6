@@ -42,9 +42,21 @@ export default defineConfig({
       use: { ...devices['Desktop Safari'] },
     },
   ],
+  // The browser matrix must exercise the artifact that ships, not the Vite dev
+  // server. `vite.config.js` has no SPA-fallback override, so under `npm run
+  // dev` a request for `/en/tetracromia/` fell through to the raw root
+  // `index.html` and the pre-rendered pages produced by
+  // `scripts/generate-static-pages.mjs` were never loaded by a browser —
+  // leaving the static-HTML-to-hydration contract, which broke in production
+  // twice in eight days, with no cross-browser coverage at all.
+  //
+  // `scripts/serve-deployed-smoke.mjs` serves `dist` and replays `dist/_headers`,
+  // so the suite now runs against the real pre-rendered HTML, the real hashed
+  // bundles, the real 404 page, and an enforced Content-Security-Policy.
   webServer: {
-    command: `npm run dev -- --port ${port} --strictPort`,
+    command: `npm run build && node scripts/serve-deployed-smoke.mjs ${port}`,
     url: baseURL,
     reuseExistingServer: false,
+    timeout: 180_000,
   },
 });

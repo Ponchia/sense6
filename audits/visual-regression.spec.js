@@ -1,3 +1,4 @@
+import { readFile } from 'node:fs/promises';
 import { expect, test } from '@playwright/test';
 import { REPRESENTATIVE_ROUTES } from './routes.js';
 
@@ -45,12 +46,65 @@ for (const route of REPRESENTATIVE_ROUTES) {
   });
 }
 
+/**
+ * Compare the candidate against the base-revision capture.
+ *
+ * For an approved snapshot the comparison still runs. Previously this branch
+ * took a screenshot, discarded the buffer, and returned with no assertion at
+ * all, so listing a snapshot turned its check off entirely — and because the
+ * workflow derived the approved set from `git diff` over the committed
+ * baselines, changing a baseline was the same thing as disabling its check.
+ * PR #58 touched six baselines and silently no-opped six of twenty-six
+ * comparisons, including both root snapshots covering the root-gateway rewrite.
+ *
+ * Now an approval produces evidence instead of a hole: the difference is
+ * captured, the base, candidate, and diff images are attached to the report,
+ * and the test passes with an annotation. An approval that no longer
+ * corresponds to a real difference fails, so it cannot rot into a permanent
+ * blind spot.
+ */
 async function compareScreenshot(page, name) {
-  if (approvedSnapshots.has(name.replace(/\.png$/, '-chromium-linux.png'))) {
-    await page.screenshot(screenshotOptions());
+  const snapshotName = name.replace(/\.png$/, '-chromium-linux.png');
+  if (!approvedSnapshots.has(snapshotName)) {
+    await expect(page).toHaveScreenshot(name, screenshotOptions());
     return;
   }
-  await expect(page).toHaveScreenshot(name, screenshotOptions());
+
+  const testInfo = test.info();
+  const baselinePath = testInfo.snapshotPath(name);
+  const baseline = await readFile(baselinePath).catch(() => null);
+
+  let difference = null;
+  try {
+    await expect(page).toHaveScreenshot(name, screenshotOptions());
+  } catch (error) {
+    difference = error instanceof Error ? error.message : String(error);
+  }
+
+  if (!difference) {
+    throw new Error(
+      `${snapshotName} is listed in audits/visual-baseline-approvals.txt but is identical to the ` +
+        'base revision. Delete the line: a stale approval silently disables this comparison for ' +
+        'every future change to this route.',
+    );
+  }
+
+  if (baseline)
+    await testInfo.attach(`${snapshotName} (base revision)`, { body: baseline, contentType: 'image/png' });
+  await testInfo.attach(`${snapshotName} (candidate)`, {
+    body: await page.screenshot(screenshotOptions()),
+    contentType: 'image/png',
+  });
+  for (const suffix of ['diff', 'actual', 'expected']) {
+    const artifact = testInfo.outputPath(name.replace(/\.png$/, `-${suffix}.png`));
+    const body = await readFile(artifact).catch(() => null);
+    if (body) await testInfo.attach(`${snapshotName} (${suffix})`, { body, contentType: 'image/png' });
+  }
+
+  testInfo.annotations.push({
+    type: 'approved-visual-change',
+    description: `${snapshotName} differs from the base revision; review the attached images. ${difference.split('\n')[0]}`,
+  });
 }
 
 async function settlePage(page) {
