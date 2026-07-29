@@ -8,11 +8,35 @@
  * therefore describe these as display-relative directions, never as exact cone
  * excitations.
  *
+ * Luminance:
+ * Target and field are matched on the L+M cone sum, not on the photopic sRGB Y
+ * coefficients. A cone model implies its own luminance channel, and for this
+ * matrix that channel is L+M; the sRGB Y weights describe the CIE standard
+ * observer instead, and differ from the normalised L+M weights by +10.4%,
+ * -2.3%, and -7.8% per channel. Matching Y left a 1.3%-2.5% residual in L+M
+ * across the adaptive range — a mean brightness step readable by the very
+ * channel the stimulus is supposed to exclude.
+ *
+ * Boundary (deliberate, not a defect):
+ * Only the S (tritan) axis is simultaneously a confusion line and an isoluminant
+ * direction, because S does not contribute to L+M. Protan and deutan confusion
+ * lines hold M,S and L,S constant respectively, and L+M necessarily varies along
+ * them. Re-scaling to equal L+M therefore multiplies every cone excitation by a
+ * common factor, which a dichromat of the matching type perceives as a small
+ * uniform intensity step (~4.8% protan, ~8.5% deutan at the starting level). No
+ * scalar can remove both residuals at once: the protanope sees nothing only when
+ * the factor is exactly 1, and L+M matches only when it is not. The residual is
+ * deliberately confined to the pure-intensity direction because that is exactly
+ * the subspace `jitterDotColor` masks — it is suppressed by luminance noise, not
+ * eliminated. Product copy must not claim these stimuli are invisible to
+ * dichromats.
+ *
  * Background:
  * - IEC 61966-2-1 sRGB: https://webstore.iec.ch/en/publication/6169
  * - sRGB transfer and primary definitions: https://www.w3.org/TR/css-color-4/#color-conversion-code
  * - Dichromat simulation model: https://doi.org/10.1364/JOSAA.14.002647
  * - Anomalous-trichromacy model: https://doi.org/10.1109/TVCG.2009.113
+ * - Luminance noise masking residual luminance cues: https://doi.org/10.1016/0042-6989(94)90203-8
  */
 
 /** @typedef {() => number} RandomSource */
@@ -23,7 +47,7 @@
 /** @typedef {'floor' | 'ceiling'} AxisLimit */
 /** @typedef {readonly [number, number, number]} RgbVector */
 /** @typedef {{ label: string, description: string, background: RgbVector }} AxisConfig */
-/** @typedef {{ field: RgbVector, target: RgbVector, fieldLinear: RgbVector, targetLinear: RgbVector }} TargetPair */
+/** @typedef {{ field: RgbVector, target: RgbVector, fieldLinear: RgbVector, targetLinear: RgbVector, appliedStrength: number }} TargetPair */
 /** @typedef {{ forcedColors: boolean, theme: string, dpr: number, orientation: string, viewportWidth: number, viewportHeight: number }} DisplayEnvironment */
 /** @typedef {{ strength: number, correct: boolean }} AxisPresentation */
 /** @typedef {{ strength: number, step: number, correctStreak: number, lastDirection: StaircaseDirection | null, reversals: number[], presentations: AxisPresentation[], boundaryMisses: number, finished: boolean, limit: AxisLimit | null }} AxisState */
@@ -46,8 +70,18 @@ const LMS_TO_RGB = [
   [0.02980165, -0.19318073, 1.16364789],
 ];
 
-/** @type {RgbVector} */
-const LINEAR_SRGB_LUMINANCE = [0.2126, 0.7152, 0.0722];
+/**
+ * Weights of the L+M cone sum in linear sRGB, i.e. the luminance channel this
+ * module's own cone model implies. See the header note on why the photopic sRGB
+ * Y weights are the wrong match for stimuli placed in this LMS space.
+ *
+ * @type {RgbVector}
+ */
+const CONE_LUMINANCE_WEIGHTS = [
+  RGB_TO_LMS[0][0] + RGB_TO_LMS[1][0],
+  RGB_TO_LMS[0][1] + RGB_TO_LMS[1][1],
+  RGB_TO_LMS[0][2] + RGB_TO_LMS[1][2],
+];
 
 /** @param {number} value @param {number} minimum @param {number} maximum */
 function clamp(value, minimum, maximum) {
@@ -189,9 +223,30 @@ export function lmsOf(linearRgb) {
 }
 
 /**
+ * Luminance of a linear-sRGB colour in this module's cone model: the L+M sum.
+ *
+ * @param {RgbVector} linearRgb
+ */
+export function coneLuminance(linearRgb) {
+  return dotProduct(CONE_LUMINANCE_WEIGHTS, linearRgb);
+}
+
+/** @param {RgbVector} channels */
+function withinUnitCube(channels) {
+  return channels.every((channel) => channel >= 0 && channel <= 1);
+}
+
+/**
  * Return a field/target pair separated along one fixed display-model direction.
  * Both values are retained in linear sRGB so luminance noise can be applied
  * before encoding for canvas.
+ *
+ * The pair is matched on `coneLuminance`, so the separation carries no mean
+ * brightness step in the observer's own luminance channel. `appliedStrength`
+ * reports the separation actually rendered: at the gamut edge the requested
+ * separation is reduced rather than clamped per channel, because clamping would
+ * both tilt the confusion direction and undo the luminance match applied before
+ * it.
  *
  * @param {RgbVector} backgroundLinear
  * @param {TrialType} type
@@ -200,22 +255,38 @@ export function lmsOf(linearRgb) {
  */
 export function makeTargetPair(backgroundLinear, type, strength) {
   const direction = CONFUSION_DIRECTIONS[type] ?? CONFUSION_DIRECTIONS.deutan;
-  /** @type {[number, number, number]} */
-  const directedTarget = [
-    clamp01(backgroundLinear[0] + direction[0] * strength),
-    clamp01(backgroundLinear[1] + direction[1] * strength),
-    clamp01(backgroundLinear[2] + direction[2] * strength),
-  ];
-  const fieldLuminance = dotProduct(LINEAR_SRGB_LUMINANCE, backgroundLinear);
-  const targetLuminance = dotProduct(LINEAR_SRGB_LUMINANCE, directedTarget);
-  const luminanceScale = targetLuminance > 0 ? fieldLuminance / targetLuminance : 1;
-  /** @type {[number, number, number]} */
-  const targetLinear = [
-    clamp01(directedTarget[0] * luminanceScale),
-    clamp01(directedTarget[1] * luminanceScale),
-    clamp01(directedTarget[2] * luminanceScale),
-  ];
+  const fieldLuminance = coneLuminance(backgroundLinear);
+
+  /** @param {number} offset @returns {[number, number, number]} */
+  const equiluminantTarget = (offset) => {
+    /** @type {[number, number, number]} */
+    const directed = [
+      backgroundLinear[0] + direction[0] * offset,
+      backgroundLinear[1] + direction[1] * offset,
+      backgroundLinear[2] + direction[2] * offset,
+    ];
+    const directedLuminance = coneLuminance(directed);
+    const scale = directedLuminance > 0 ? fieldLuminance / directedLuminance : 1;
+    return [directed[0] * scale, directed[1] * scale, directed[2] * scale];
+  };
+
+  let appliedStrength = strength;
+  let targetLinear = equiluminantTarget(appliedStrength);
+
+  if (!withinUnitCube(targetLinear)) {
+    let displayable = 0;
+    let clipped = strength;
+    for (let iteration = 0; iteration < 24; iteration += 1) {
+      const candidate = (displayable + clipped) / 2;
+      if (withinUnitCube(equiluminantTarget(candidate))) displayable = candidate;
+      else clipped = candidate;
+    }
+    appliedStrength = displayable;
+    targetLinear = equiluminantTarget(displayable);
+  }
+
   return {
+    appliedStrength,
     field: [
       linearToSrgb(backgroundLinear[0]),
       linearToSrgb(backgroundLinear[1]),

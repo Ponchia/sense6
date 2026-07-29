@@ -436,8 +436,10 @@ comparators unless they describe the exact shipped component. Add:
 - [Levitt (1971)](https://doi.org/10.1121/1.1912375) and
   [García-Pérez (1998)](https://pubmed.ncbi.nlm.nih.gov/9797963/) for adaptive
   method claims;
-- work on luminance artefacts in pseudoisochromatic stimuli, including
-  [Linhares et al.](https://doi.org/10.1111/j.1475-1313.2008.00628.x);
+- work on luminance artefacts in pseudoisochromatic stimuli, namely
+  [Regan, Reffin and Mollon (1994)](<https://doi.org/10.1016/0042-6989(94)90203-8>),
+  which introduces the luminance noise that makes residual luminance cues
+  unusable and removes the need to define equiluminance per observer;
 - CCT repeatability evidence and calibrated-versus-home-display evidence before
   claiming longitudinal precision; and
 - a current review of acquired colour-vision deficiency if the safety copy

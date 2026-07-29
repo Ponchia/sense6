@@ -75,15 +75,41 @@ export function toRgbCss(lightness, chroma, hue) {
 }
 
 /**
- * Return the W3C ΔEOK distance, expressed on a legible 0–100 scale.
+ * Factor applied to ΔEOK before it is stored or rendered.
+ *
+ * Spec ΔEOK is a small number: a just-noticeable difference is around 0.02, so
+ * threshold values land near 0.01 and read as `0.010` once rounded for display.
+ * Scaling by 100 keeps three significant digits in a result card.
+ *
+ * The consequence is that the number shown in the UI is *not* the value defined
+ * by CSS Color 4, which the same page cites as its method source. Anything that
+ * renders a scaled value must say so in the label; a bare "ΔEOK 0.975" is a
+ * factual error against the cited spec, which reports 0.00975.
+ */
+export const DELTA_EOK_DISPLAY_SCALE = 100;
+
+/**
+ * Return the ΔEOK colour difference exactly as W3C CSS Color 4 defines it.
+ *
+ * @param {OklchColor} first
+ * @param {OklchColor} second
+ */
+export function deltaEokSpec(first, second) {
+  const [l1, a1, b1] = oklchToOklab(first.l, first.c, first.h);
+  const [l2, a2, b2] = oklchToOklab(second.l, second.c, second.h);
+  return Math.hypot(l1 - l2, a1 - a2, b1 - b2);
+}
+
+/**
+ * Return ΔEOK on the display scale — `deltaEokSpec` times
+ * `DELTA_EOK_DISPLAY_SCALE`. This is the value stored in results and shown to
+ * the user, so its label must carry the unit rather than claim a bare ΔEOK.
  *
  * @param {OklchColor} first
  * @param {OklchColor} second
  */
 export function deltaEok(first, second) {
-  const [l1, a1, b1] = oklchToOklab(first.l, first.c, first.h);
-  const [l2, a2, b2] = oklchToOklab(second.l, second.c, second.h);
-  return Math.hypot(l1 - l2, a1 - a2, b1 - b2) * 100;
+  return deltaEokSpec(first, second) * DELTA_EOK_DISPLAY_SCALE;
 }
 
 /** @param {number} first @param {number} second */
