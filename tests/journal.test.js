@@ -448,7 +448,7 @@ test('Acutezza comparisons require a common completed eye and preserve useful sh
     reasons: ['changed:completedEyes'],
   });
   assert.deepEqual(measurementChanges(leftOnly, full), [
-    { id: 'left-high', delta: 1, unit: 'arcmin', uncertainty: null, bounded: false },
+    { id: 'left-high', delta: 1, unit: 'arcmin', bounded: false },
   ]);
 });
 
@@ -540,11 +540,11 @@ test('the journal labels enriched setup evidence in every supported language', a
   }
 });
 
-test('measurement changes combine explicit uncertainty and do not relabel model intervals', () => {
+test('measurement changes report bounded deltas and never relabel model intervals', () => {
   const older = entry({
     id: 'before',
     measurements: [
-      { id: 'score', value: 10, unit: 'ms', uncertainty: 2 },
+      { id: 'score', value: 10, unit: 'ms' },
       { id: 'interval', value: 5, unit: 'x', lower: 3, upper: 7 },
       { id: 'missing', value: null, unit: 'x' },
     ],
@@ -552,25 +552,25 @@ test('measurement changes combine explicit uncertainty and do not relabel model 
   const newer = entry({
     id: 'after',
     measurements: [
-      { id: 'score', value: 13, unit: 'ms', uncertainty: 3, bound: 'lower' },
+      { id: 'score', value: 13, unit: 'ms', bound: 'lower' },
       { id: 'interval', value: 7, unit: 'x', lower: 6, upper: 8 },
       { id: 'new', value: 1, unit: 'x' },
     ],
   });
   const changes = measurementChanges(newer, older);
   assert.equal(changes.length, 2);
+  // A `bound` marks the delta as a floor/ceiling, not a point estimate.
   assert.deepEqual(changes[0], {
     id: 'score',
     delta: 3,
     unit: 'ms',
-    uncertainty: Math.sqrt(13),
     bounded: true,
   });
+  // A model interval (lower/upper) must never be promoted into an uncertainty claim.
   assert.deepEqual(changes[1], {
     id: 'interval',
     delta: 2,
     unit: 'x',
-    uncertainty: null,
     bounded: false,
   });
   assert.deepEqual(

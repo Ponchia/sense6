@@ -365,8 +365,15 @@ test('a converged track at the technical ceiling is reported as such, not as con
   assert.equal(track.complete, true);
   assert.equal(track.completionReason, 'technical-ceiling');
   assert.equal(summarizeRange(track).atCeiling, true);
-  assert.equal(summarizeRange(track).settled, true);
-  assert.equal(summarizeRange(track).thresholdHz, 18000);
+  // Walking straight up to the rendering ceiling is not convergence: the
+  // staircase never turned around, so there is no settled boundary to publish.
+  assert.equal(
+    summarizeRange(track).settled,
+    false,
+    'a ceiling reached with zero reversals is not a settled boundary',
+  );
+  assert.equal(summarizeRange(track).reversals, 0);
+  assert.equal(summarizeRange(track).thresholdHz, null);
 });
 
 test('ceiling evidence needs both recent records correct and both at the ceiling', () => {
@@ -605,8 +612,12 @@ test('a max-trials track that ends at the ceiling is reported as a technical cei
     'technical-ceiling',
     'running out of trials at the ceiling is a ceiling result, not a max-trials result',
   );
-  assert.equal(summarizeRange(track).settled, true);
-  assert.equal(summarizeRange(track).thresholdHz, 18000);
+  assert.equal(
+    summarizeRange(track).settled,
+    false,
+    'exhausting trials at the ceiling without a reversal is not settled',
+  );
+  assert.equal(summarizeRange(track).thresholdHz, null);
 });
 
 test('the pitch fine factor applies on the move that records the second reversal', () => {

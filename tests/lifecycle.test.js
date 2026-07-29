@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createExamLifecycle, disposeActiveExamLifecycles } from '../src/lib/lifecycle.js';
+import { createExamLifecycle } from '../src/lib/lifecycle.js';
+import { disposeActiveMounts } from '../src/lib/mount-registry.js';
 import { allowsNavigation } from '../src/lib/navigation.js';
 
 test('a new owner mount disposes the previous mount exactly once', () => {
@@ -55,8 +56,8 @@ test('all partial exam mounts can be retired after a route commit failure', () =
     first.onCleanup(() => cleanups++);
     second.onCleanup(() => cleanups++);
 
-    disposeActiveExamLifecycles();
-    disposeActiveExamLifecycles();
+    disposeActiveMounts();
+    disposeActiveMounts();
 
     assert.equal(first.signal.aborted, true);
     assert.equal(second.signal.aborted, true);
