@@ -9,6 +9,28 @@ import { DEFAULT_LOCALE, LOCALES, loadMessages, localeMetadata, resolveLocale } 
 import { preparePrivacyCopy, privacyCopy } from '../src/privacy.js';
 import { STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
 
+/**
+ * Per-locale ratchet on source phrases that are still shown in English. Each
+ * entry is the exact current count: translating one more phrase requires
+ * lowering the number here, and leaving one untranslated fails.
+ */
+const UNTRANSLATED_CEILINGS = Object.freeze({
+  fr: 15,
+  it: 7,
+  de: 6,
+  es: 4,
+  pt: 4,
+  'pt-br': 4,
+  ar: 1,
+  ja: 1,
+  ko: 1,
+  hi: 1,
+  'zh-hans': 1,
+});
+
+/** The English catalogue may grow but never shrink below its current size. */
+const ENGLISH_KEY_FLOOR = 826;
+
 test('the supported global locale set has complete catalog keys', async () => {
   assert.equal(DEFAULT_LOCALE, 'en');
   assert.deepEqual(
@@ -19,16 +41,30 @@ test('the supported global locale set has complete catalog keys', async () => {
     await Promise.all(LOCALES.map(async ({ code }) => [code, await loadMessages(code)])),
   );
   const englishKeys = [...catalogs.en.keys()];
-  assert.ok(englishKeys.length >= 500);
+  // Ratchets, not budgets. The English catalogue floor was 500 against an
+  // actual 826, and the untranslated ceiling was 25 against a worst case of 15,
+  // so both allowed a large regression to pass unnoticed. They are now set at
+  // the measured values: coverage can only improve, and improving it requires
+  // moving the number here in the same commit.
+  assert.ok(
+    englishKeys.length >= ENGLISH_KEY_FLOOR,
+    `the English catalogue shrank to ${englishKeys.length} keys; the floor is ${ENGLISH_KEY_FLOOR}`,
+  );
   for (const { code } of LOCALES) {
     const module = await import(`../src/locales/${code}.js`);
     assert.equal(module.MESSAGE_COUNT, catalogs[code].size, `${code} contains duplicate source phrases`);
     assert.equal(catalogs[code].size, englishKeys.length);
     if (code !== DEFAULT_LOCALE) {
       const untranslated = [...catalogs[code]].filter(([source, value]) => source === value);
+      const ceiling = UNTRANSLATED_CEILINGS[code] ?? 0;
       assert.ok(
-        untranslated.length <= 25,
-        `${code} leaves ${untranslated.length} source phrases untranslated`,
+        untranslated.length <= ceiling,
+        `${code} leaves ${untranslated.length} source phrases untranslated; the ceiling is ${ceiling}`,
+      );
+      assert.ok(
+        untranslated.length >= ceiling,
+        `${code} now leaves only ${untranslated.length} untranslated; lower its UNTRANSLATED_CEILINGS ` +
+          `entry from ${ceiling} to ${untranslated.length} so the improvement cannot regress`,
       );
     }
     for (const key of englishKeys) {

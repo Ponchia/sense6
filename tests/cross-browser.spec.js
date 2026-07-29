@@ -1,7 +1,53 @@
 import { expect, test } from '@playwright/test';
 
+/**
+ * The cross-browser matrix.
+ *
+ * This file is the only suite Firefox and WebKit run, so what it covers is the
+ * whole of their coverage. Three of the five tests self-skipped outside chromium
+ * with a bare note naming the chromium smoke path, leaving the real matrix undeclared
+ * and, at two executed tests, considerably narrower than it looked.
+ *
+ * The split is now explicit and justified per test:
+ *
+ *   EVERY BROWSER - anything whose failure mode is engine-specific: the
+ *   static-HTML-to-hydration handover (which broke in production twice in eight
+ *   days), a complete instrument journey, and viewport invalidation.
+ *
+ *   CHROMIUM ONLY - assertions about computed layout values, or that depend on
+ *   overriding a DOM property in a way WebKit and Firefox implement
+ *   differently. Running those elsewhere tests the harness, not the product.
+ *
+ * `chromiumOnly` names the reason in the skip, so the matrix stays legible.
+ */
+const chromiumOnly = (testInfo, reason) =>
+  test.skip(testInfo.project.name !== 'chromium-smoke', `chromium-only: ${reason}`);
+
+test('every browser loads the pre-rendered page and hands it over to the bundle', async ({ page }) => {
+  // The suite runs against `dist` served by scripts/serve-deployed-smoke.mjs, so
+  // this is the real pre-rendered document, the real hashed bundle, and the real
+  // Content-Security-Policy. Under the Vite dev server this route fell back to
+  // the raw root index.html and the handover was never exercised at all.
+  await page.addInitScript(() => {
+    window.__sense6CspViolations = [];
+    document.addEventListener('securitypolicyviolation', (event) => {
+      window.__sense6CspViolations.push(`${event.violatedDirective}: ${event.blockedURI}`);
+    });
+  });
+
+  const response = await page.goto('/en/tetracromia/');
+  expect(response?.status()).toBe(200);
+
+  // Server-rendered content is present, then the bundle takes over and removes it.
+  await expect(page.locator('main h1')).toBeVisible();
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'tetracromia');
+  await expect(page.locator('#app > .static-entry')).toHaveCount(0);
+
+  expect(await page.evaluate(() => window.__sense6CspViolations)).toEqual([]);
+});
+
 test('the gallery opens a localized experiment with route CSS', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'chromium-smoke', 'Chromium smoke path');
+  chromiumOnly(testInfo, 'asserts a computed CSS value, which differs by engine');
   await gotoHydrated(page, '/en/');
   await page
     .getByRole('link', { name: /Tetracromia/i })
@@ -14,7 +60,7 @@ test('the gallery opens a localized experiment with route CSS', async ({ page },
 });
 
 test('the Tetracromia setup reaches an enabled measured choice', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'chromium-smoke', 'Chromium smoke path');
+  chromiumOnly(testInfo, 'covered end to end for every browser by the complete journey below');
   await gotoHydrated(page, '/en/tetracromia/');
   await page.locator('[data-action="setup"]').first().click();
   await expect(page.locator('[data-action="start"]')).toBeDisabled();
@@ -40,7 +86,11 @@ test('a complete Screen Colour Lab journey reaches separate observations', async
 });
 
 test('completed results survive a throwing localStorage getter', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'chromium-smoke', 'Chromium smoke path');
+  chromiumOnly(testInfo, 'redefines window.localStorage, which WebKit and Firefox handle differently');
+  // The same 29-trial journey as the test above, which already budgets 60s.
+  // This one inherited the 30s default and failed at a different step on each
+  // run under load — the signature of a timeout, not a defect.
+  test.setTimeout(60_000);
   const pageErrors = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
   await page.addInitScript(() => {
