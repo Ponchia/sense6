@@ -68,10 +68,7 @@ const PRACTICE_TARGETS = [
 let state = null;
 
 export function mount(context) {
-  const lifecycle = createExamLifecycle(MOUNT_OWNER, {
-    bodyClassesToRelease: ['lab-mode', 'cb-active'],
-  });
-  document.body.classList.add('cb-active');
+  const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClasses: ['lab-mode', 'cb-active'] });
   const mountState = {
     app: context.app,
     announcer: context.announcer,

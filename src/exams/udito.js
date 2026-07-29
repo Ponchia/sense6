@@ -49,9 +49,7 @@ const RUNNER_PHASES = new Set([
 let state = null;
 
 export function mount(context) {
-  const lifecycle = createExamLifecycle(MOUNT_OWNER, {
-    bodyClassesToRelease: ['lab-mode', 'au-running'],
-  });
+  const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClasses: ['lab-mode', 'au-running'] });
   const config = runtimeConfig();
   const mountState = {
     app: context.app,

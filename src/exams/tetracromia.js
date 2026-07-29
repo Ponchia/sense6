@@ -25,7 +25,7 @@ const RAPID_TOUCH_COMMIT_MS = 600;
 let state = null;
 
 export function mount(context) {
-  const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClassesToRelease: ['lab-mode'] });
+  const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClasses: ['lab-mode'] });
   const mountState = {
     app: context.app,
     announcer: context.announcer,

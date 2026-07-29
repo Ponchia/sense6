@@ -69,7 +69,7 @@ let state = null;
 
 export function mount(context) {
   const lifecycle = createExamLifecycle(MOUNT_OWNER, {
-    bodyClassesToRelease: ['ac-active', 'lab-mode', 'ac-running'],
+    bodyClasses: ['ac-active', 'lab-mode', 'ac-running'],
   });
   const mountState = {
     app: context.app,
@@ -94,7 +94,6 @@ export function mount(context) {
     forcedColorsRetry: null,
   };
   state = mountState;
-  document.body.classList.add('ac-active');
   wireEvents(lifecycle.signal);
   const themeObserver = new MutationObserver(() => {
     if (isCurrentMount(state, mountState)) themeChanged();

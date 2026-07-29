@@ -45,15 +45,17 @@ export function isCurrentMount(current, mountState) {
 /**
  * Own one exam mount and guarantee idempotent, exclusive cleanup.
  *
- * `bodyClassesToRelease` only removes: an exam adds its own body classes when
- * a screen needs them, and the lifecycle guarantees they are gone after
- * disposal.
+ * `bodyClasses` are owned for the whole mount: the lifecycle adds them here and
+ * removes them on disposal. Previously it only removed, so every caller still
+ * had to add the same classes by hand and the option name described half its
+ * behaviour.
  * @param {symbol} owner
- * @param {{ bodyClassesToRelease?: string[] }} [options]
+ * @param {{ bodyClasses?: string[] }} [options]
  * @returns {ExamLifecycle}
  */
-export function createExamLifecycle(owner, { bodyClassesToRelease = [] } = {}) {
+export function createExamLifecycle(owner, { bodyClasses = [] } = {}) {
   activeMount(owner)?.dispose();
+  if (bodyClasses.length) document.body.classList.add?.(...bodyClasses);
   const controller = new AbortController();
   /** @type {Array<() => void>} */
   const cleanups = [];
@@ -143,7 +145,7 @@ export function createExamLifecycle(owner, { bodyClassesToRelease = [] } = {}) {
       globalThis.removeEventListener?.('beforeunload', preventActiveUnload);
       updateShellControls(false);
       document.body.classList.remove('measurement-active');
-      if (bodyClassesToRelease.length) document.body.classList.remove(...bodyClassesToRelease);
+      if (bodyClasses.length) document.body.classList.remove(...bodyClasses);
       clearActiveMount(owner, lifecycle);
     },
   });
