@@ -40,6 +40,7 @@ export const EXAMS = Object.freeze([
   exam({
     id: 'color-blindness',
     name: 'Daltonia',
+    discoveryName: 'Daltonia — Colour Discrimination Lab',
     tagline: 'Adaptive browser colour-vision experiment',
     blurb:
       'Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.',
@@ -63,6 +64,7 @@ export const EXAMS = Object.freeze([
   exam({
     id: 'riflessi',
     name: 'Riflessi',
+    discoveryName: 'Riflessi — Reaction Time Lab',
     tagline: 'Response speed, choice task & consistency',
     blurb:
       'Three instruments keep simple response, a choice task, and within-run stability as separate observations.',
@@ -86,6 +88,7 @@ export const EXAMS = Object.freeze([
   exam({
     id: 'udito',
     name: 'Udito',
+    discoveryName: 'Udito — Hearing Range & Pitch Lab',
     tagline: 'Headphone confidence, audibility & pitch',
     blurb:
       'Three listening instruments map this setup without pretending an uncalibrated browser is an audiometer.',
@@ -109,6 +112,7 @@ export const EXAMS = Object.freeze([
   exam({
     id: 'acutezza',
     name: 'Acutezza',
+    discoveryName: 'Acutezza — Visual Sharpness Lab',
     tagline: 'Calibrated sharpness & nominal contrast',
     blurb:
       'Two per-eye conditions describe angular detail and nominal low-contrast cost without making a clinical claim.',

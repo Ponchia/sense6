@@ -37,6 +37,13 @@ const SOURCES = Object.freeze([
   'Related instrument',
   'Sense6 validation',
   'Share result',
+  // Discovery identities: brand plus an honest, searchable descriptor of what
+  // the experiment actually observes. Every static <h1>, breadcrumb, and
+  // gallery card reads from these, so they must exist in every locale.
+  'Daltonia — Colour Discrimination Lab',
+  'Riflessi — Reaction Time Lab',
+  'Udito — Hearing Range & Pitch Lab',
+  'Acutezza — Visual Sharpness Lab',
 ]);
 
 /** @type {Readonly<Record<LocaleCode, readonly string[]>>} */
@@ -71,6 +78,10 @@ const TRANSLATIONS = Object.freeze({
     'Strumento correlato',
     'Validazione Sense6',
     'Condividi il risultato',
+    'Daltonia — Laboratorio di discriminazione del colore',
+    'Riflessi — Laboratorio del tempo di reazione',
+    'Udito — Laboratorio di gamma udibile e altezza dei suoni',
+    'Acutezza — Laboratorio di nitidezza visiva',
   ]),
   de: Object.freeze([
     'Bildschirm-Farblabor',
@@ -101,6 +112,10 @@ const TRANSLATIONS = Object.freeze({
     'Verwandtes Instrument',
     'Sense6-Validierung',
     'Ergebnis teilen',
+    'Daltonia — Labor für Farbunterscheidung',
+    'Riflessi — Labor für Reaktionszeit',
+    'Udito — Labor für Hörbereich und Tonhöhe',
+    'Acutezza — Labor für Sehschärfe',
   ]),
   fr: Object.freeze([
     'Laboratoire couleur sur écran',
@@ -131,6 +146,10 @@ const TRANSLATIONS = Object.freeze({
     'Instrument associé',
     'Validation de Sense6',
     'Partager le résultat',
+    'Daltonia — Laboratoire de discrimination des couleurs',
+    'Riflessi — Laboratoire de temps de réaction',
+    'Udito — Laboratoire de plage audible et de hauteur tonale',
+    'Acutezza — Laboratoire de netteté visuelle',
   ]),
   es: Object.freeze([
     'Laboratorio de color en pantalla',
@@ -161,6 +180,10 @@ const TRANSLATIONS = Object.freeze({
     'Instrumento relacionado',
     'Validación de Sense6',
     'Compartir el resultado',
+    'Daltonia — Laboratorio de discriminación del color',
+    'Riflessi — Laboratorio de tiempo de reacción',
+    'Udito — Laboratorio de rango audible y tono',
+    'Acutezza — Laboratorio de nitidez visual',
   ]),
   pt: Object.freeze([
     'Laboratório de cor no ecrã',
@@ -191,6 +214,10 @@ const TRANSLATIONS = Object.freeze({
     'Instrumento relacionado',
     'Validação do Sense6',
     'Partilhar o resultado',
+    'Daltonia — Laboratório de discriminação de cor',
+    'Riflessi — Laboratório de tempo de reação',
+    'Udito — Laboratório de gama audível e altura tonal',
+    'Acutezza — Laboratório de nitidez visual',
   ]),
   'pt-br': Object.freeze([
     'Laboratório de cor na tela',
@@ -221,6 +248,10 @@ const TRANSLATIONS = Object.freeze({
     'Instrumento relacionado',
     'Validação do Sense6',
     'Compartilhar o resultado',
+    'Daltonia — Laboratório de discriminação de cor',
+    'Riflessi — Laboratório de tempo de reação',
+    'Udito — Laboratório de faixa audível e altura tonal',
+    'Acutezza — Laboratório de nitidez visual',
   ]),
   ar: Object.freeze([
     'مختبر ألوان الشاشة',
@@ -251,6 +282,10 @@ const TRANSLATIONS = Object.freeze({
     'أداة ذات صلة',
     'تحقق Sense6',
     'مشاركة النتيجة',
+    'Daltonia — مختبر تمييز الألوان',
+    'Riflessi — مختبر زمن رد الفعل',
+    'Udito — مختبر المدى المسموع ودرجة الصوت',
+    'Acutezza — مختبر الحدة البصرية',
   ]),
   ja: Object.freeze([
     '画面カラーラボ',
@@ -281,6 +316,10 @@ const TRANSLATIONS = Object.freeze({
     '関連する測定機器',
     'Sense6 の検証',
     '結果を共有',
+    'Daltonia — 色弁別ラボ',
+    'Riflessi — 反応時間ラボ',
+    'Udito — 可聴範囲・音高ラボ',
+    'Acutezza — 視認精度ラボ',
   ]),
   ko: Object.freeze([
     '화면 색상 실험실',
@@ -311,6 +350,10 @@ const TRANSLATIONS = Object.freeze({
     '관련 도구',
     'Sense6 검증',
     '결과 공유',
+    'Daltonia — 색 변별 실험실',
+    'Riflessi — 반응 시간 실험실',
+    'Udito — 가청 범위 및 음높이 실험실',
+    'Acutezza — 시각 선명도 실험실',
   ]),
   hi: Object.freeze([
     'स्क्रीन रंग प्रयोगशाला',
@@ -341,6 +384,10 @@ const TRANSLATIONS = Object.freeze({
     'संबंधित उपकरण',
     'Sense6 सत्यापन',
     'परिणाम साझा करें',
+    'Daltonia — रंग विभेदन प्रयोगशाला',
+    'Riflessi — प्रतिक्रिया समय प्रयोगशाला',
+    'Udito — श्रवण परास और स्वरमान प्रयोगशाला',
+    'Acutezza — दृश्य तीक्ष्णता प्रयोगशाला',
   ]),
   'zh-hans': Object.freeze([
     '屏幕色彩实验室',
@@ -371,6 +418,10 @@ const TRANSLATIONS = Object.freeze({
     '相关工具',
     'Sense6 验证',
     '分享结果',
+    'Daltonia — 色彩辨别实验室',
+    'Riflessi — 反应时间实验室',
+    'Udito — 可听范围与音高实验室',
+    'Acutezza — 视敏度实验室',
   ]),
 });
 
