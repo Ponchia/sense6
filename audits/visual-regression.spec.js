@@ -82,6 +82,15 @@ async function compareScreenshot(page, name) {
   const testInfo = test.info();
   const baselinePath = testInfo.snapshotPath(name);
   const baseline = await readFile(baselinePath).catch(() => null);
+  if (!baseline) {
+    // Without a base capture there is nothing to compare against, and
+    // `toHaveScreenshot` would write the candidate and report a difference —
+    // which this branch would then accept as an approved change. Refuse.
+    throw new Error(
+      `${snapshotName} is approved, but no base-revision capture exists at ${baselinePath}. ` +
+        'Run the base capture step before comparing.',
+    );
+  }
 
   let difference = null;
   try {
@@ -98,8 +107,7 @@ async function compareScreenshot(page, name) {
     );
   }
 
-  if (baseline)
-    await testInfo.attach(`${snapshotName} (base revision)`, { body: baseline, contentType: 'image/png' });
+  await testInfo.attach(`${snapshotName} (base revision)`, { body: baseline, contentType: 'image/png' });
   await testInfo.attach(`${snapshotName} (candidate)`, {
     body: await page.screenshot(screenshotOptions()),
     contentType: 'image/png',

@@ -87,6 +87,10 @@ test('a complete Screen Colour Lab journey reaches separate observations', async
 
 test('completed results survive a throwing localStorage getter', async ({ page }, testInfo) => {
   chromiumOnly(testInfo, 'redefines window.localStorage, which WebKit and Firefox handle differently');
+  // The same 29-trial journey as the test above, which already budgets 60s.
+  // This one inherited the 30s default and failed at a different step on each
+  // run under load — the signature of a timeout, not a defect.
+  test.setTimeout(60_000);
   const pageErrors = [];
   page.on('pageerror', (error) => pageErrors.push(error.message));
   await page.addInitScript(() => {
