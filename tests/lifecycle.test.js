@@ -252,3 +252,38 @@ test('present resets scroll and moves focus to the new screen heading', () => {
     delete globalThis.document;
   }
 });
+
+test('an active measurement warns before the page unloads', () => {
+  const listeners = new Map();
+  globalThis.document = { body: { classList: { add() {}, remove() {}, toggle() {} } } };
+  globalThis.addEventListener = (type, listener) => listeners.set(type, listener);
+  globalThis.removeEventListener = (type) => listeners.delete(type);
+  try {
+    const lifecycle = createExamLifecycle(Symbol('exam'));
+    const beforeUnload = listeners.get('beforeunload');
+    assert.equal(typeof beforeUnload, 'function');
+
+    const idle = { defaultPrevented: false, preventDefault() {}, returnValue: undefined };
+    beforeUnload(idle);
+    assert.equal(idle.returnValue, undefined);
+
+    lifecycle.setActive(true);
+    let prevented = false;
+    const active = {
+      preventDefault: () => {
+        prevented = true;
+      },
+      returnValue: undefined,
+    };
+    beforeUnload(active);
+    assert.equal(prevented, true);
+    assert.equal(active.returnValue, '');
+
+    lifecycle.dispose();
+    assert.equal(listeners.has('beforeunload'), false);
+  } finally {
+    delete globalThis.addEventListener;
+    delete globalThis.removeEventListener;
+    delete globalThis.document;
+  }
+});

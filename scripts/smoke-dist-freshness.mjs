@@ -20,6 +20,15 @@ const dist = resolve(repository, 'dist');
 /** Directories and files whose contents are compiled into `dist`. */
 const INPUTS = ['src', 'public', 'index.html', 'vite.config.js', 'scripts/generate-static-pages.mjs'];
 
+/**
+ * Build *output* that happens to live under an input directory.
+ *
+ * `src/content-fingerprints.json` is written by `generate-static-pages.mjs`
+ * after the pages it fingerprints, so it is always newer than `dist` and would
+ * report the freshest possible build as stale.
+ */
+const GENERATED = new Set([resolve(repository, 'src/content-fingerprints.json')]);
+
 /** Tolerate a checkout that stamps every file with the same second. */
 const TOLERANCE_MS = 2_000;
 
@@ -38,6 +47,7 @@ for (const input of INPUTS) {
   const target = resolve(repository, input);
   const files = await walk(target).catch(() => []);
   for (const file of files) {
+    if (GENERATED.has(file)) continue;
     const { mtimeMs } = await stat(file);
     if (mtimeMs > oldestArtifact + TOLERANCE_MS) {
       stale.push({ path: relative(repository, file), ageMs: mtimeMs - oldestArtifact });

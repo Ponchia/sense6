@@ -36,7 +36,7 @@ const MODULE_FLOORS = Object.freeze({
   'hearing-audio.js': { lines: 100, branches: 96, functions: 100 },
   'hearing.js': { lines: 100, branches: 94, functions: 100 },
   'journal.js': { lines: 97, branches: 80, functions: 97 },
-  'lifecycle.js': { lines: 97, branches: 78, functions: 87 },
+  'lifecycle.js': { lines: 100, branches: 87, functions: 100 },
   'mount-registry.js': { lines: 100, branches: 100, functions: 100 },
   'navigation.js': { lines: 100, branches: 100, functions: 100 },
   'optotypes.js': { lines: 100, branches: 87, functions: 100 },
