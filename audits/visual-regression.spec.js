@@ -23,6 +23,15 @@ for (const snapshot of approvedSnapshots) {
 
 for (const route of REPRESENTATIVE_ROUTES) {
   test(`${route} matches the visual baseline`, async ({ page }) => {
+    // KNOWN INERT. src/exams/color-blindness.js:800 reads this seed behind
+    // `import.meta.env.DEV`, which Vite compiles to `false` in a production
+    // build — and this suite runs against `npm run preview`, a production
+    // build. `__SENSE6_TEST_CONFIG__` does not appear anywhere in
+    // dist/assets/*.js, so the Daltonia seed has never taken effect here and
+    // /en/color-blindness/ is captured with a fresh random seed on every run.
+    // The line is kept because it states the intent and starts working the
+    // moment the source gate admits a production-visible test hook; until then
+    // the determinism this suite claims for that route does not exist.
     await page.addInitScript(() => {
       window.__SENSE6_TEST_CONFIG__ = { daltonia: { seed: 'visual-regression' } };
     });

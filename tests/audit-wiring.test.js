@@ -145,14 +145,20 @@ test('the deployed browser configuration refuses any host but production', () =>
   assert.match(deployedConfig.use.baseURL, /^http:\/\/127\.0\.0\.1:\d+$/);
 });
 
-test('the browser matrix runs against the built artifact, not the dev server', () => {
+test('the cross-browser matrix runs against the built artifact, not the dev server', () => {
   // `vite.config.js` has no SPA-fallback override, so under `npm run dev` every
   // localized route fell back to the raw root index.html and no browser ever
-  // loaded a pre-rendered static page.
-  assert.match(primaryConfig.webServer.command, /serve-deployed-smoke\.mjs/);
-  assert.match(primaryConfig.webServer.command, /npm run build/);
-  assert.doesNotMatch(primaryConfig.webServer.command, /npm run dev/);
-  assert.equal(primaryConfig.webServer.reuseExistingServer, false);
+  // loaded a pre-rendered static page. Firefox and WebKit run nothing else, so
+  // that was the whole of their coverage.
+  assert.ok(Array.isArray(primaryConfig.webServer), 'the matrix needs a dev and an artifact server');
+  const [dev, artifact] = primaryConfig.webServer;
+  assert.match(dev.command, /npm run dev/);
+  assert.match(artifact.command, /npm run build/);
+  assert.match(artifact.command, /serve-deployed-smoke\.mjs/);
+  assert.notEqual(dev.url, artifact.url, 'the two servers must not share a port');
+  for (const server of primaryConfig.webServer) {
+    assert.equal(server.reuseExistingServer, false);
+  }
   assert.equal(primaryConfig.forbidOnly, true);
   assert.equal(primaryConfig.retries, 0);
 
@@ -167,9 +173,26 @@ test('the browser matrix runs against the built artifact, not the dev server', (
   for (const name of ['chromium', 'mobile']) {
     assert.deepEqual(projects[name].testIgnore, ['**/cross-browser.spec.js', '**/deployed/**']);
   }
+  // Every cross-browser project must point at the artifact server, and the
+  // fixture-driven projects at the dev server. The accelerated instrument
+  // fixtures are read behind `import.meta.env.DEV` (src/exams/acutezza.js:1063
+  // and its three siblings), which Vite compiles to false in a production
+  // build, so a fixture-driven suite cannot run against dist until that hook is
+  // visible in the shipped bundle.
   for (const name of ['chromium-smoke', 'firefox', 'webkit']) {
     assert.equal(projects[name].testMatch, '**/cross-browser.spec.js');
+    assert.equal(projects[name].use.baseURL, artifact.url);
   }
+  for (const name of ['chromium', 'mobile']) {
+    assert.equal(projects[name].use.baseURL, dev.url);
+  }
+});
+
+test('the cross-browser suite uses no accelerated fixture', () => {
+  // If it ever did, it would silently fall back to the full-length protocol
+  // against dist, because the fixture hooks are compiled out of production.
+  const suite = readFileSync(new URL('../tests/cross-browser.spec.js', import.meta.url), 'utf8');
+  assert.doesNotMatch(suite, /__SENSE6_TEST_CONFIG__|__SENSORIA_TEST_CONFIG__/);
 });
 
 test('the site audit keeps its regenerated visual baselines out of the repository', () => {
