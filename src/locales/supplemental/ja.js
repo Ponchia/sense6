@@ -77,8 +77,6 @@ export const journal = Object.freeze({
   notComparable: '比較不可',
   noPrevious: 'この測定項目には以前の記録がありません。',
   change: '変化',
-  uncertainty: '合成不確実性',
-  noUncertainty: '不確実性区間の情報なし',
   bounded: '一方または両方の値が測定限界値です',
   lowerBound: '下限値',
   upperBound: '上限値',

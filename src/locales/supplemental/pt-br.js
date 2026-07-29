@@ -78,8 +78,6 @@ export const journal = Object.freeze({
   notComparable: 'Não comparável',
   noPrevious: 'Não há uma sessão anterior para este instrumento.',
   change: 'Variação',
-  uncertainty: 'incerteza combinada',
-  noUncertainty: 'nenhum intervalo de incerteza fornecido',
   bounded: 'um ou ambos os valores são limites da medição',
   lowerBound: 'limite inferior',
   upperBound: 'limite superior',

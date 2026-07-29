@@ -77,8 +77,6 @@ export const journal = Object.freeze({
   notComparable: 'तुलना योग्य नहीं',
   noPrevious: 'इस उपकरण के लिए कोई पिछला सत्र नहीं है।',
   change: 'बदलाव',
-  uncertainty: 'संयुक्त अनिश्चितता',
-  noUncertainty: 'अनिश्चितता की कोई सीमा नहीं दी गई',
   bounded: 'एक या दोनों मान माप की सीमाएँ हैं',
   lowerBound: 'निचली सीमा',
   upperBound: 'ऊपरी सीमा',

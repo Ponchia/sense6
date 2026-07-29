@@ -188,9 +188,13 @@ export function summarizeRange(track) {
   const reversalMedian = median(reversalWindow);
   const atCeiling = hasTechnicalCeilingEvidence(track);
   const completionReason = track.completionReason ?? 'incomplete';
+  // A completion reason is never evidence on its own. A track that walks
+  // straight up to the rendering ceiling completes as `technical-ceiling` with
+  // zero reversals, and publishing that as a settled boundary reported a
+  // "≥ 18000 Hz" upper limit from a staircase that never turned around.
   const settled =
-    completionReason === 'technical-ceiling' ||
-    (completionReason === 'converged' && reversalWindow.length > 0);
+    reversalWindow.length > 0 &&
+    (completionReason === 'technical-ceiling' || completionReason === 'converged');
   const thresholdHz =
     settled && (atCeiling || reversalMedian !== null)
       ? atCeiling

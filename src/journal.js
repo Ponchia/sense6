@@ -172,7 +172,7 @@ function entryMarkup(entry, entries, exams, copy, locale, t) {
 function measurementMarkup(measurement, changes, copy, t) {
   const change = changes.find((candidate) => candidate.id === measurement.id);
   const interval = intervalLabel(measurement, copy);
-  return `<div><dt>${escapeHtml(journalMetricLabel(measurement.id, t))}</dt><dd><strong>${escapeHtml(formatMeasurement(measurement))}</strong>${interval ? `<small>${escapeHtml(interval)}</small>` : ''}${change ? `<small>${escapeHtml(copy.change)} ${signed(change.delta)} ${escapeHtml(change.unit)} · ${change.uncertainty === null ? escapeHtml(copy.noUncertainty) : `±${round(change.uncertainty)} ${escapeHtml(change.unit)} ${escapeHtml(copy.uncertainty)}`}${change.bounded ? ` · ${escapeHtml(copy.bounded)}` : ''}</small>` : ''}</dd></div>`;
+  return `<div><dt>${escapeHtml(journalMetricLabel(measurement.id, t))}</dt><dd><strong>${escapeHtml(formatMeasurement(measurement))}</strong>${interval ? `<small>${escapeHtml(interval)}</small>` : ''}${change ? `<small>${escapeHtml(copy.change)} ${signed(change.delta)} ${escapeHtml(change.unit)}${change.bounded ? ` · ${escapeHtml(copy.bounded)}` : ''}</small>` : ''}</dd></div>`;
 }
 
 function filterOptions(exams, copy, selected) {
@@ -257,8 +257,6 @@ function reasonLabel(reason, copy) {
 function intervalLabel(measurement, copy) {
   if (Number.isFinite(measurement.lower) && Number.isFinite(measurement.upper))
     return `${round(measurement.lower)}–${round(measurement.upper)} ${measurement.unit} · ${copy.modelInterval}`;
-  if (Number.isFinite(measurement.uncertainty))
-    return `±${round(measurement.uncertainty)} ${measurement.unit}`;
   if (measurement.bound) return measurement.bound === 'lower' ? copy.lowerBound : copy.upperBound;
   return '';
 }

@@ -200,7 +200,13 @@ export class HearingAudio {
     if (this.context) {
       this.context.removeEventListener?.('statechange', this.handleContextStateChange);
       this.context.removeEventListener?.('sinkchange', this.handleSinkChange);
-      if (this.context.state !== 'closed') await this.context.close();
+      if (this.context.state !== 'closed') {
+        try {
+          await this.context.close();
+        } catch {
+          // A context that is already closing cannot be closed a second time.
+        }
+      }
     }
     this.context = null;
     this.master = null;

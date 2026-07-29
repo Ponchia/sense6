@@ -12,15 +12,19 @@ import {
   rgbCss,
   summarizeAdaptiveRun,
 } from '../lib/daltonism.js';
-import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
-import { createExamLifecycle } from '../lib/lifecycle.js';
+import { captureDisplayPassport, saveJournalRun } from '../lib/journal.js';
+import {
+  createExamLifecycle,
+  forcedColorsActive,
+  isCurrentMount,
+  watchForcedColors,
+} from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
 import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
-import { renderMethodSteps, renderResearchSection } from './landing.js';
 import { protocolPassport } from './protocols.js';
-import { sourcesFor } from './sources.js';
+import { colorBlindnessIntroMarkup } from './views/color-blindness-intro.js';
 
 const RESULT_STORE = createResultStore({
   key: 'sense6:daltonia:last',
@@ -60,27 +64,11 @@ const PRACTICE_TARGETS = [
     background: [0.27, 0.32, 0.18],
   },
 ];
-const METHOD_STEPS = [
-  {
-    title: 'Practice first',
-    body: 'Two clear targets teach the C-gap interaction with immediate feedback before the exploratory track.',
-  },
-  {
-    title: 'Luminance noise',
-    body: 'Target and field are luminance-matched in linear sRGB and share the same dot-level brightness variation.',
-  },
-  {
-    title: 'Three staircases',
-    body: 'Directions become harder after correct responses. “No gap visible” counts as a miss and makes that display direction easier.',
-  },
-];
-const RESEARCH_SOURCES = sourcesFor('color-blindness');
 
 let state = null;
 
 export function mount(context) {
   const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClasses: ['lab-mode', 'cb-active'] });
-  document.body.classList.add('cb-active');
   const mountState = {
     app: context.app,
     announcer: context.announcer,
@@ -97,18 +85,44 @@ export function mount(context) {
     dprGuardCleanup: () => {},
     responseOpen: false,
     renderToken: 0,
+    stageFrame: 0,
+    announcementFrame: 0,
   };
   state = mountState;
   wireEvents(lifecycle.signal);
   renderIntro();
 
   lifecycle.onCleanup(() => {
+    cancelPendingFrames(mountState);
     mountState.dprGuardCleanup();
     mountState.active = false;
     mountState.phase = 'intro';
     if (state === mountState) state = null;
   });
   return lifecycle.dispose;
+}
+
+/**
+ * Drop every deferred callback this mount still owns. Disposal runs in the
+ * same frame as a pending callback, so an uncancelled frame would otherwise
+ * dereference the module state this mount just released.
+ */
+function cancelPendingFrames(mountState) {
+  cancelAnimationFrame(mountState.stageFrame);
+  cancelAnimationFrame(mountState.announcementFrame);
+  mountState.stageFrame = 0;
+  mountState.announcementFrame = 0;
+}
+
+/** Paint the freshly rendered screen only while this mount still owns it. */
+function scheduleStageFrame(callback) {
+  const mountState = state;
+  cancelAnimationFrame(mountState.stageFrame);
+  mountState.stageFrame = requestAnimationFrame(() => {
+    mountState.stageFrame = 0;
+    if (!isCurrentMount(state, mountState)) return;
+    callback(mountState);
+  });
 }
 
 function renderIntro() {
@@ -121,100 +135,10 @@ function renderIntro() {
 
   const previous = loadLast();
 
-  state.app.innerHTML = `
-    <div class="cb-intro">
-      <section class="cb-intro__hero ui-container ui-container--wide">
-        <button class="back-link exam-back" type="button" data-action="gallery">
-          <span aria-hidden="true">←</span> ${m('nav.allTests')}
-        </button>
-        <div class="cb-hero">
-        <div class="cb-hero__copy">
-          <p class="ui-eyebrow">Colour vision / adaptive experiment / about 3 minutes</p>
-          <h1>Find the gap <em>in the dots</em>.</h1>
-          <p class="cb-lede">
-            A C-shaped target becomes harder to separate from its field. Three independent
-            staircases record where each short display-relative track ends during this run.
-          </p>
-          <div class="ui-cluster cb-hero__actions">
-            <button class="ui-button ui-button--lg" type="button" data-action="cb-setup">
-              Start the experiment <span aria-hidden="true">→</span>
-            </button>
-            <a class="ui-link ui-link--cta" href="#cb-how" data-action="cb-how">How it works</a>
-          </div>
-          <p class="hero__limit">
-            <span aria-hidden="true">◇</span>
-            Experimental and unvalidated. This is not a screening result or diagnosis.
-          </p>
-          ${
-            previous
-              ? '<p class="previous-score">Last run on this browser: <strong>exploratory adaptive levels recorded</strong></p>'
-              : ''
-          }
-        </div>
-        <div class="cb-hero__plate" aria-hidden="true">
-          <canvas data-preview-target></canvas>
-        </div>
-        </div>
-      </section>
+  state.app.innerHTML = colorBlindnessIntroMarkup(previous, m);
 
-      <div class="cb-signal-strip" aria-hidden="true">
-        ${Array.from({ length: 36 }, (_, index) => `<i style="--dot:${index};--band:${index % 3}"></i>`).join(
-          '',
-        )}
-      </div>
-
-      <section class="cb-explain section" id="cb-how">
-        <div class="ui-container ui-container--wide">
-          <div class="section-heading">
-            <div>
-              <p class="ui-eyebrow">Three display directions</p>
-              <h2>An adaptive task, not a plate score.</h2>
-            </div>
-            <p>The design borrows established psychophysical techniques without claiming their clinical validation.</p>
-          </div>
-          <div class="cb-axis-display" aria-hidden="true">
-            <div class="cb-axis-display__card cb-axis-display__card--l"><span>L</span><i></i><i></i><i></i></div>
-            <div class="cb-axis-display__card cb-axis-display__card--m"><span>M</span><i></i><i></i><i></i></div>
-            <div class="cb-axis-display__card cb-axis-display__card--s"><span>S</span><i></i><i></i><i></i></div>
-          </div>
-        </div>
-      </section>
-
-      <section class="method section cb-boundary">
-        <div class="ui-container ui-container--wide method__layout">
-          <div class="method__intro">
-            <p class="ui-eyebrow">${m('section.methodLimits')}</p>
-            <h2>Run-relative output</h2>
-            <p>You receive ending adaptive levels and track evidence, not cone thresholds, a normal/deficient label, or a clinical score.</p>
-          </div>
-          ${renderMethodSteps(METHOD_STEPS)}
-        </div>
-      </section>
-
-      ${renderResearchSection({
-        className: 'cb-research',
-        titleId: 'cb-research-title',
-        title: 'What informed Daltonia.',
-        description:
-          'These sources inform the stimulus model and task design. They do not validate this implementation.',
-        label: m('section.researchTrail'),
-        sources: RESEARCH_SOURCES,
-      })}
-
-      <section class="closing-cta cb-closing ui-container ui-container--wide">
-        <div>
-          <p class="ui-eyebrow">Colour vision / adaptive experiment / about 3 minutes</p>
-          <h2>Adaptive browser colour-vision experiment</h2>
-        </div>
-        <button class="ui-button ui-button--lg" type="button" data-action="cb-setup-closing">
-          ${m('action.openTest')} <span aria-hidden="true">→</span>
-        </button>
-      </section>
-    </div>
-  `;
-
-  requestAnimationFrame(() => {
-    const canvas = state.app.querySelector('[data-preview-target]');
+  scheduleStageFrame((mountState) => {
+    const canvas = mountState.app.querySelector('[data-preview-target]');
     if (canvas) drawTarget(canvas, DEMO_TARGET, 'preview');
   });
 }
@@ -333,12 +257,12 @@ function renderPractice() {
     </section>
   `;
 
-  requestAnimationFrame(() => {
-    const canvas = state.app.querySelector('[data-target]');
+  scheduleStageFrame((mountState) => {
+    const canvas = mountState.app.querySelector('[data-target]');
     if (canvas) drawTarget(canvas, trial, trial.id);
     const focusTarget = correct
-      ? state.app.querySelector('[data-action="cb-practice-next"]')
-      : state.app.querySelector('[data-trial-focus]');
+      ? mountState.app.querySelector('[data-action="cb-practice-next"]')
+      : mountState.app.querySelector('[data-trial-focus]');
     focusTarget?.focus({ preventScroll: true });
   });
 }
@@ -446,17 +370,19 @@ function renderTrial() {
     </section>
   `;
 
-  requestAnimationFrame(() => {
-    if (state.renderToken !== renderToken || !state.active) return;
-    const canvas = state.app.querySelector('[data-target]');
+  scheduleStageFrame((mountState) => {
+    if (mountState.renderToken !== renderToken || !mountState.active) return;
+    const canvas = mountState.app.querySelector('[data-target]');
     if (canvas) drawTarget(canvas, trial, `run-${trial.id}`);
-    requestAnimationFrame(() => {
-      if (state.renderToken !== renderToken || !state.active) return;
-      state.responseOpen = true;
-      state.app.querySelectorAll('[data-orientation]').forEach((button) => {
+    // Open responses one frame after the stimulus is painted so an early key
+    // press cannot be recorded against a target the person has not seen.
+    scheduleStageFrame(() => {
+      if (mountState.renderToken !== renderToken || !mountState.active) return;
+      mountState.responseOpen = true;
+      mountState.app.querySelectorAll('[data-orientation]').forEach((button) => {
         button.disabled = false;
       });
-      state.app.querySelector('[data-trial-focus]')?.focus({ preventScroll: true });
+      mountState.app.querySelector('[data-trial-focus]')?.focus({ preventScroll: true });
     });
   });
 }
@@ -554,15 +480,21 @@ function renderResults() {
   `;
 
   const lastResultSaved = saveLast(result);
-  const journalSaved = saveJournalResult(result);
-  const storageOk = lastResultSaved && journalSaved;
+  const journalOutcome = saveJournalResult(result);
+  const storageOk = lastResultSaved && journalOutcome === 'saved';
   const persistence = state.app.querySelector('[data-cb-persistence]');
   if (storageOk) persistence?.remove();
   else if (persistence) {
     persistence.outerHTML = `<div class="cb-save-warning ui-alert ui-alert--warning" role="alert">
       <div class="ui-alert__body">
         <strong class="ui-alert__title">${t('This result was not saved')}</strong>
-        <p>${t('Browser storage is unavailable. Copy the run summary before leaving this page.')}</p>
+        <p>${
+          journalOutcome === 'invalid'
+            ? t(
+                'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
+              )
+            : t('Browser storage is unavailable. Copy the run summary before leaving this page.')
+        }</p>
       </div>
     </div>`;
   }
@@ -700,10 +632,19 @@ function samplesLandoltC(x, y, size, orientation) {
   return Math.abs(delta) > 0.36;
 }
 
+/**
+ * Re-announce through the shell-global live region. The region outlives this
+ * mount, so a frame that survives disposal would overwrite whatever the next
+ * route already announced.
+ */
 function announce(message) {
-  const mountedAnnouncer = state.announcer;
+  const mountState = state;
+  const mountedAnnouncer = mountState.announcer;
+  cancelAnimationFrame(mountState.announcementFrame);
   mountedAnnouncer.textContent = '';
-  requestAnimationFrame(() => {
+  mountState.announcementFrame = requestAnimationFrame(() => {
+    mountState.announcementFrame = 0;
+    if (!isCurrentMount(state, mountState)) return;
     mountedAnnouncer.textContent = t(message);
   });
 }
@@ -746,9 +687,10 @@ function saveLast(result) {
   });
 }
 
+/** @returns {import('../lib/journal.js').JournalSaveOutcome} */
 function saveJournalResult(result) {
   const measurement = state.measurementEnvironment;
-  const entry = createJournalEntry({
+  return saveJournalRun({
     examId: 'color-blindness',
     locale: state.locale,
     quality: result.controlOk ? 'usable' : result.controlStatus === 'caution' ? 'caution' : 'limited',
@@ -789,11 +731,6 @@ function saveJournalResult(result) {
           ? ['exploratory-display-direction-levels', 'one-task-control-missed']
           : ['task-controls-limited'],
   });
-  return entry ? appendJournalEntry(entry) : false;
-}
-
-function forcedColorsActive() {
-  return window.matchMedia?.('(forced-colors: active)').matches === true;
 }
 
 function adaptiveRunEntropy() {
@@ -968,13 +905,8 @@ function wireEvents(signal) {
     },
     { signal },
   );
-  const forcedColors = window.matchMedia?.('(forced-colors: active)');
-  forcedColors?.addEventListener(
-    'change',
-    () => {
-      updateSetupEligibility();
-      validateMeasurementEnvironment();
-    },
-    { signal },
-  );
+  watchForcedColors(() => {
+    updateSetupEligibility();
+    validateMeasurementEnvironment();
+  }, signal);
 }

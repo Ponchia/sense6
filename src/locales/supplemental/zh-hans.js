@@ -72,8 +72,6 @@ export const journal = Object.freeze({
   notComparable: '不可比较',
   noPrevious: '此测量项目没有更早的记录。',
   change: '变化',
-  uncertainty: '合并不确定度',
-  noUncertainty: '未提供不确定区间',
   bounded: '一个或两个数值为测量边界',
   lowerBound: '下限',
   upperBound: '上限',

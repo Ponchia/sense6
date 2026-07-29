@@ -1187,6 +1187,10 @@ const rows = [
     'Sair desta sessão visual calibrada? O resultado incompleto não será guardado.',
   ],
   ['{eye} — {instrument}', '{eye} — {instrument}'],
+  [
+    'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
+    'Esta sessão não correspondia ao formato de registo do diário, por isso não foi guardada. Copie o resumo para o manter.',
+  ],
 ];
 
 const catalogRows = [...rows, .../** @type {Array<[string, string]>} */ (copyRows)];

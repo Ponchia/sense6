@@ -1157,6 +1157,10 @@ const rows = [
     'Leave this calibrated vision session? Your unfinished result will not be saved.',
   ],
   ['{eye} — {instrument}', '{eye} — {instrument}'],
+  [
+    'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
+    'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
+  ],
 ];
 
 const catalogRows = [...rows, .../** @type {Array<[string, string]>} */ (copyRows)];
