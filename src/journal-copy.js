@@ -63,8 +63,7 @@ const COPY = Object.freeze({
       protocol: 'Protocol identity and version.',
       setup: 'Setup passport.',
       quality: 'Quality rating and evidence.',
-      measurements:
-        'Measurement identifiers, values, units, bounds, model intervals, and explicit uncertainty.',
+      measurements: 'Measurement identifiers, values, units, bounds, and model intervals.',
       notes: 'Run notes.',
       idPurpose:
         'The identifiers support local deduplication. They are not account identifiers or network identity.',
@@ -124,8 +123,7 @@ const COPY = Object.freeze({
       protocol: 'Identità e versione del protocollo.',
       setup: 'Passaporto della configurazione.',
       quality: 'Valutazione ed elementi della qualità.',
-      measurements:
-        'Identificatori, valori, unità, limiti, intervalli del modello e incertezza esplicita delle misurazioni.',
+      measurements: 'Identificatori, valori, unità, limiti e intervalli del modello delle misurazioni.',
       notes: 'Note della sessione.',
       idPurpose: 'Gli identificatori servono alla deduplicazione locale. Non identificano account o rete.',
     }),
@@ -184,8 +182,7 @@ const COPY = Object.freeze({
       protocol: 'Protokollidentität und -version.',
       setup: 'Einrichtungspass.',
       quality: 'Qualitätsbewertung und -nachweise.',
-      measurements:
-        'Messkennungen, Werte, Einheiten, Grenzen, Modellintervalle und ausdrückliche Unsicherheit.',
+      measurements: 'Messkennungen, Werte, Einheiten, Grenzen und Modellintervalle.',
       notes: 'Durchlaufnotizen.',
       idPurpose:
         'Die Kennungen dienen der lokalen Deduplizierung. Sie sind keine Konto- oder Netzwerkidentität.',
@@ -245,8 +242,7 @@ const COPY = Object.freeze({
       protocol: 'Identité et version du protocole.',
       setup: 'Passeport de configuration.',
       quality: 'Évaluation et éléments de qualité.',
-      measurements:
-        'Identifiants, valeurs, unités, limites, intervalles de modèle et incertitude explicite des mesures.',
+      measurements: 'Identifiants, valeurs, unités, limites et intervalles de modèle des mesures.',
       notes: 'Notes de session.',
       idPurpose:
         'Les identifiants servent à la déduplication locale. Ils ne sont ni des identifiants de compte ni une identité réseau.',
@@ -306,8 +302,7 @@ const COPY = Object.freeze({
       protocol: 'Identidad y versión del protocolo.',
       setup: 'Pasaporte de configuración.',
       quality: 'Calificación y pruebas de calidad.',
-      measurements:
-        'Identificadores, valores, unidades, límites, intervalos de modelo e incertidumbre explícita de las mediciones.',
+      measurements: 'Identificadores, valores, unidades, límites e intervalos de modelo de las mediciones.',
       notes: 'Notas de la sesión.',
       idPurpose:
         'Los identificadores permiten la deduplicación local. No son identificadores de cuenta ni identidad de red.',
@@ -367,8 +362,7 @@ const COPY = Object.freeze({
       protocol: 'Identidade e versão do protocolo.',
       setup: 'Passaporte da configuração.',
       quality: 'Classificação e evidência de qualidade.',
-      measurements:
-        'Identificadores, valores, unidades, limites, intervalos do modelo e incerteza explícita das medições.',
+      measurements: 'Identificadores, valores, unidades, limites e intervalos do modelo das medições.',
       notes: 'Notas da sessão.',
       idPurpose:
         'Os identificadores servem para deduplicação local. Não são identificadores de conta nem identidade de rede.',

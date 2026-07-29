@@ -364,16 +364,17 @@ test('a converged track at the technical ceiling is reported as such, not as con
   }
   assert.equal(track.complete, true);
   assert.equal(track.completionReason, 'technical-ceiling');
-  assert.equal(summarizeRange(track).atCeiling, true);
-  // Walking straight up to the rendering ceiling is not convergence: the
-  // staircase never turned around, so there is no settled boundary to publish.
-  assert.equal(
-    summarizeRange(track).settled,
-    false,
-    'a ceiling reached with zero reversals is not a settled boundary',
-  );
-  assert.equal(summarizeRange(track).reversals, 0);
-  assert.equal(summarizeRange(track).thresholdHz, null);
+  const summary = summarizeRange(track);
+  assert.equal(summary.atCeiling, true);
+  // Walking straight up to the rendering ceiling is not convergence, and the
+  // reason label says so. It is still usable evidence: the boundary is at or
+  // above `maxHz`, reported as a lower bound. A staircase pinned at `maxHz`
+  // cannot bank a reversal, so requiring one here would ask for unobtainable
+  // evidence rather than raise the standard.
+  assert.equal(summary.settled, true, 'ceiling evidence bounds the run on its own');
+  assert.equal(summary.reversals, 0, 'the absence of convergence stays visible');
+  assert.equal(summary.thresholdHz, 18000, 'the ceiling is published as the lower bound');
+  assert.equal(summary.reversalRangeHz, null, 'no reversals means no reversal range');
 });
 
 test('ceiling evidence needs both recent records correct and both at the ceiling', () => {
@@ -410,23 +411,119 @@ test('ceiling evidence needs both recent records correct and both at the ceiling
   );
   assert.equal(build([{ correct: true, frequencyHz: 8000 }]), false, 'one record is not enough');
   assert.equal(build([]), false);
+
+  // The 0.1%-of-maxHz tolerance is exclusive. At maxHz 8000 that boundary is
+  // exactly 8 Hz, so pin both sides of it: the tolerance exists to absorb the
+  // rounding of a clamped geometric step, not to widen what counts as "at the
+  // ceiling".
+  assert.equal(
+    build([
+      { correct: true, frequencyHz: 8000 },
+      { correct: true, frequencyHz: 8007.9 },
+    ]),
+    true,
+    'just inside 0.1% of maxHz still counts as the ceiling',
+  );
+  assert.equal(
+    build([
+      { correct: true, frequencyHz: 8000 },
+      { correct: true, frequencyHz: 8008 },
+    ]),
+    false,
+    'exactly 0.1% away is outside the tolerance',
+  );
 });
 
-test('a settled range needs a converged reason and at least one reversal', () => {
-  const build = (completionReason, reversals) => {
+test('a settled range needs a completing reason plus reversal or ceiling evidence', () => {
+  const build = (completionReason, reversals, records = []) => {
     const track = createRangeTrack(8000, { controlAt: [] });
     track.complete = true;
     track.completionReason = completionReason;
     track.reversals = reversals;
+    track.records = records;
     return summarizeRange(track);
   };
+  const ceilingRecords = [
+    { correct: true, frequencyHz: 8000 },
+    { correct: true, frequencyHz: 8000 },
+  ];
 
+  // A completing reason is necessary but never sufficient on its own.
   assert.equal(build('converged', [7000, 7200]).settled, true);
-  assert.equal(build('converged', []).settled, false, 'converged with no reversals is not settled');
   assert.equal(build('max-trials', [7000, 7200]).settled, false);
   assert.equal(build('incomplete', [7000, 7200]).settled, false);
   assert.equal(build('max-trials', [7000, 7200]).thresholdHz, null);
   assert.equal(build('converged', [7000, 7200]).thresholdHz, 7100);
+
+  // Reversals and ceiling evidence are two independent sufficient classes.
+  // Either one bounds the run; neither present leaves it unsettled.
+  assert.equal(build('converged', []).settled, false, 'no reversals and no ceiling evidence is not settled');
+  assert.equal(build('converged', []).thresholdHz, null);
+  assert.equal(
+    build('technical-ceiling', [], ceilingRecords).settled,
+    true,
+    'ceiling evidence alone settles the run as a lower bound',
+  );
+  assert.equal(build('technical-ceiling', [], ceilingRecords).thresholdHz, 8000);
+  assert.equal(
+    build('incomplete', [], ceilingRecords).settled,
+    false,
+    'ceiling evidence on a track that never completed is still not settled',
+  );
+  // Ceiling evidence outranks the reversal median: the run is bounded from
+  // below by the device, not estimated at the reversal midpoint.
+  assert.equal(build('technical-ceiling', [7000, 7200], ceilingRecords).thresholdHz, 8000);
+});
+
+test('a flawless ceiling run reports at least as much as a one-error ceiling run', () => {
+  // The property this pins: honest reporting must be monotone in performance.
+  // A listener who never missed a trial must never be told less than one who
+  // missed one. A staircase pinned at `maxHz` cannot produce a reversal, so a
+  // reversal requirement inverted this ordering — the flawless run lost both
+  // its bound and its `settled` flag while the one-error run kept them.
+  const drive = (missAt) => {
+    const track = createRangeTrack(18000, { controlAt: [] });
+    const misses = new Set(missAt);
+    let guard = 0;
+    while (!track.complete && guard < 500) {
+      const trial = nextRangeTrial(track, () => 0);
+      const answer = misses.has(track.records.length) ? (trial.toneInterval + 1) % 3 : trial.toneInterval;
+      recordRangeResponse(track, trial, answer);
+      guard += 1;
+    }
+    return summarizeRange(track);
+  };
+
+  const flawless = drive([]);
+  assert.equal(flawless.atCeiling, true, 'a flawless listener reaches the device ceiling');
+  assert.equal(flawless.reversals, 0, 'and cannot bank a reversal there');
+  assert.equal(flawless.settled, true);
+  assert.equal(flawless.thresholdHz, 18000);
+
+  /** How much a run is willing to publish about itself. */
+  const disclosed = (summary) => Number(summary.settled) + Number(summary.thresholdHz !== null);
+
+  for (let missAt = 0; missAt < 8; missAt += 1) {
+    const lapsed = drive([missAt]);
+    assert.ok(
+      disclosed(flawless) >= disclosed(lapsed),
+      `a flawless run disclosed ${disclosed(flawless)} but a run missing trial ${missAt} disclosed ${disclosed(lapsed)}`,
+    );
+    assert.ok(
+      lapsed.thresholdHz === null || flawless.thresholdHz >= lapsed.thresholdHz,
+      `a flawless run bounded at ${flawless.thresholdHz} Hz but a run missing trial ${missAt} bounded higher at ${lapsed.thresholdHz} Hz`,
+    );
+  }
+
+  // The specific inversion that shipped: a single early miss banks one
+  // reversal and used to be the only way to earn a published bound.
+  for (const missAt of [0, 1]) {
+    const lapsed = drive([missAt]);
+    assert.equal(lapsed.atCeiling, true, `miss at ${missAt} still ends at the ceiling`);
+    assert.equal(lapsed.reversals, 1);
+    assert.equal(lapsed.settled, true);
+    assert.equal(disclosed(flawless), disclosed(lapsed), 'both are bounded by the same ceiling');
+  }
 });
 
 test('the reversal range is reported from two reversals onward and rounds to 100 Hz', () => {
@@ -614,10 +711,118 @@ test('a max-trials track that ends at the ceiling is reported as a technical cei
   );
   assert.equal(
     summarizeRange(track).settled,
-    false,
-    'exhausting trials at the ceiling without a reversal is not settled',
+    true,
+    'ceiling evidence bounds the run even when the trial budget ran out',
   );
-  assert.equal(summarizeRange(track).thresholdHz, null);
+  assert.equal(summarizeRange(track).thresholdHz, 18000, 'reported as a lower bound');
+  assert.equal(summarizeRange(track).reversals, 0);
+});
+
+test('exhausting the trial budget below the ceiling is not settled', () => {
+  const track = createRangeTrack(8000, {
+    controlAt: [],
+    startHz: 6000,
+    maxHz: 8000,
+    minTrials: 99,
+    maxTrials: 4,
+    targetReversals: 99,
+    initialStepOctaves: 0,
+    fineStepOctaves: 0,
+  });
+  for (let index = 0; index < 4; index += 1) {
+    const trial = nextRangeTrial(track, () => 0);
+    recordRangeResponse(track, trial, (trial.toneInterval + 1) % 3);
+  }
+  const summary = summarizeRange(track);
+  assert.equal(summary.completionReason, 'max-trials');
+  assert.equal(summary.atCeiling, false, 'the track never reached the device ceiling');
+  assert.equal(summary.settled, false, 'no reversals and no ceiling evidence bounds nothing');
+  assert.equal(summary.thresholdHz, null);
+});
+
+/*
+ * Termination is a behaviour, not a flag. `nextPitchTrial` only stops serving
+ * because `recordPitchResponse` marks a track complete, so asserting the
+ * completion reason alone leaves the exit path untested: dropping
+ * `track.complete = true` from the max-trials branch left an unbounded pitch
+ * staircase and a self-contradictory public state (`completionReason:
+ * 'max-trials'` while `complete: false`) that the whole unit suite passed.
+ * These two tests assert the loop actually exits, and that it exits because the
+ * module stopped serving rather than because the safety cap was reached.
+ */
+test('the pitch staircase stops serving trials when the trial budget runs out', () => {
+  const tracks = createPitchTracks({ anchorsHz: [500], minTrials: 99, maxTrials: 6, targetReversals: 99 });
+  const CAP = 200;
+  let served = 0;
+  // Always correct, so the staircase only ever steps down and banks no
+  // reversals: convergence can never fire and max-trials is the only exit.
+  let trial = nextPitchTrial(tracks, () => 0);
+  while (trial && served < CAP) {
+    recordPitchResponse(tracks, trial, trial.higherInterval);
+    served += 1;
+    trial = nextPitchTrial(tracks, () => 0);
+  }
+
+  assert.equal(trial, null, 'the staircase must stop serving trials, not run to the safety cap');
+  assert.ok(served < CAP, `served ${served} trials without terminating`);
+  assert.equal(served, 6, 'exactly maxTrials trials are served');
+  assert.equal(tracks[0].reversals.length, 0, 'no reversals, so this is the max-trials path');
+  assert.equal(tracks[0].complete, true, 'a track out of trials must mark itself complete');
+  assert.equal(tracks[0].completionReason, 'max-trials');
+  assert.equal(summarizePitch(tracks)[0].settled, false, 'and it is not a settled result');
+});
+
+test('the pitch staircase stops serving trials once every track converges', () => {
+  const tracks = createPitchTracks({
+    anchorsHz: [500, 2000],
+    minTrials: 2,
+    maxTrials: 99,
+    targetReversals: 1,
+  });
+  const CAP = 400;
+  let served = 0;
+  // Two correct then one wrong, counted per track rather than globally, because
+  // the two anchors are interleaved. Two correct steps down, the wrong answer
+  // steps back up, and that direction change banks the reversal convergence
+  // needs — so convergence is the exit here, not the trial budget.
+  let trial = nextPitchTrial(tracks, () => 0);
+  while (trial && served < CAP) {
+    const track = tracks.find((entry) => entry.anchorHz === trial.anchorHz);
+    const wrong = track.records.length % 3 === 2;
+    recordPitchResponse(tracks, trial, wrong ? (trial.higherInterval + 1) % 2 : trial.higherInterval);
+    served += 1;
+    trial = nextPitchTrial(tracks, () => 0);
+  }
+
+  assert.equal(trial, null, 'the staircase must stop serving trials, not run to the safety cap');
+  assert.ok(served < CAP, `served ${served} trials without terminating`);
+  for (const track of tracks) {
+    assert.equal(track.complete, true, `the ${track.anchorHz} Hz track must mark itself complete`);
+    assert.equal(track.completionReason, 'converged');
+    assert.ok(track.records.length < 99, 'convergence, not the trial budget, ended the track');
+  }
+});
+
+test('the range staircase stops serving trials once the track completes', () => {
+  const track = createRangeTrack(18000, { controlAt: [], minTrials: 2, maxTrials: 6, targetReversals: 99 });
+  const CAP = 200;
+  let served = 0;
+  while (!track.complete && served < CAP) {
+    const trial = nextRangeTrial(track, () => 0);
+    recordRangeResponse(track, trial, trial.toneInterval);
+    served += 1;
+  }
+
+  assert.ok(served < CAP, `served ${served} trials without completing`);
+  assert.equal(served, 6, 'exactly maxTrials trials are served');
+  assert.equal(track.complete, true);
+});
+
+test('a track that never completed is never settled', () => {
+  const summary = summarizeRange(createRangeTrack(18000));
+  assert.equal(summary.completionReason, 'incomplete');
+  assert.equal(summary.settled, false);
+  assert.equal(summary.thresholdHz, null);
 });
 
 test('the pitch fine factor applies on the move that records the second reversal', () => {

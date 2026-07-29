@@ -19,7 +19,7 @@ export const privacy = Object.freeze({
       title: 'O que permanece no seu navegador',
       paragraphs: [
         'As respostas, medições e resultados dos testes são processados no seu navegador e não são enviados ao Sense6. O idioma e o tema escolhidos, resumos dos resultados mais recentes ou melhores e o diário privado de várias sessões podem ser salvos no armazenamento local do navegador.',
-        'Você pode excluir uma entrada do diário, limpar o diário inteiro ou remover todas as informações apagando os dados do site sense6.net no seu navegador. Copiar, importar e exportar só funciona quando você escolhe. Uma exportação canônica contém o nome e a versão do esquema, horário da exportação, identificadores da sessão e do experimento, horários exatos, idioma registrado, identidade e versão do protocolo, passaporte de configuração, classificação e evidências de qualidade, identificadores, valores, unidades, limites, intervalos do modelo e incerteza explícita das medições, além das notas da sessão. Os identificadores permitem a deduplicação local; não são identificadores de conta nem identidade de rede.',
+        'Você pode excluir uma entrada do diário, limpar o diário inteiro ou remover todas as informações apagando os dados do site sense6.net no seu navegador. Copiar, importar e exportar só funciona quando você escolhe. Uma exportação canônica contém o nome e a versão do esquema, horário da exportação, identificadores da sessão e do experimento, horários exatos, idioma registrado, identidade e versão do protocolo, passaporte de configuração, classificação e evidências de qualidade, identificadores, valores, unidades, limites e intervalos do modelo das medições, além das notas da sessão. Os identificadores permitem a deduplicação local; não são identificadores de conta nem identidade de rede.',
       ],
     },
     {
@@ -107,8 +107,7 @@ export const journal = Object.freeze({
     protocol: 'Identidade e versão do protocolo.',
     setup: 'Passaporte de configuração.',
     quality: 'Classificação e evidências de qualidade.',
-    measurements:
-      'Identificadores, valores, unidades, limites, intervalos do modelo e incerteza explícita das medições.',
+    measurements: 'Identificadores, valores, unidades, limites e intervalos do modelo das medições.',
     notes: 'Notas da sessão.',
     idPurpose:
       'Os identificadores permitem a deduplicação local. Não são identificadores de conta nem identidade de rede.',

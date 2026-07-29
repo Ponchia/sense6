@@ -368,7 +368,7 @@ function journalMarkup(copy, locale) {
       .map((item) => `<li>${escapeHtml(item)}</li>`)
       .join('')}</ul><p>${escapeHtml(copy.empty)}</p></aside>
     <section><h2>${escapeHtml(copy.setup)}</h2><p>${escapeHtml(copy.reasonSetup)} ${escapeHtml(copy.reasonMinor)}</p></section>
-    <section><h2>${escapeHtml(copy.measurements)}</h2><p>${escapeHtml(copy.comparable)} · ${escapeHtml(copy.caution)} · ${escapeHtml(copy.notComparable)}. ${escapeHtml(copy.modelInterval)}; ${escapeHtml(copy.noUncertainty)}; ${escapeHtml(copy.bounded)}.</p></section>
+    <section><h2>${escapeHtml(copy.measurements)}</h2><p>${escapeHtml(copy.comparable)} · ${escapeHtml(copy.caution)} · ${escapeHtml(copy.notComparable)}. ${escapeHtml(copy.modelInterval)}; ${escapeHtml(copy.bounded)}.</p></section>
   </article>`;
 }
 

@@ -90,13 +90,19 @@ test('the full adaptive range stays in gamut and produces visible easy targets',
  * step between target and field is not a rounding detail — it is an alternative
  * route to the answer that needs no colour discrimination at all.
  *
- * The relevant luminance channel is the one this module's own cone model
- * implies, L+M, not the photopic sRGB Y coefficients: those describe a
- * different observer. Matching Y instead left up to 2.5% of L+M contrast in the
- * stimulus. The dot ring carries ~217 target and ~685 field dots under +/-18%
- * per-dot luminance jitter, so the standard error of the ring-mean difference is
- * about 0.81%; a 2.5% residual sits ~3 sigma above that noise and is therefore
- * usable. Nothing asserted this, which is why it shipped.
+ * The module matches on L+M because that is the basis its stimulus directions
+ * are defined in, so the match and the directions stay self-consistent. L+M is
+ * not a more correct luminance channel than sRGB Y — Y is itself a weighting of
+ * this same matrix's L and M rows (0.361, 0.639), so the choice is a
+ * consistency argument, not a physiological one. See the Luminance note in
+ * src/lib/daltonism.js.
+ *
+ * What matters here is that the criterion is met exactly. Matching Y instead
+ * left a 0.24%-2.47% residual in L+M across the adaptive range. The dot ring
+ * carries ~217 target and ~685 field dots under +/-18% per-dot luminance
+ * jitter, so the standard error of the ring-mean difference is about 0.81%: a
+ * 2.47% residual sits ~3 sigma above that noise and is therefore usable.
+ * Nothing asserted this, which is why it shipped.
  */
 test('target and field match on L+M cone luminance across the whole adaptive range', () => {
   const RING_MEAN_NOISE = 0.0081;
@@ -154,23 +160,60 @@ test('the tritan axis needs no luminance correction at all', () => {
 });
 
 /*
- * Documented, deliberate limitation. Equal L+M is reached by scaling every cone
- * excitation by a common factor, and a dichromat of the matching type reads that
- * factor as a small uniform intensity step. No scalar removes it: a protanope
- * sees nothing only when the factor is exactly 1, and L+M matches only when it
- * is not. The residual is confined to the pure-intensity direction because that
- * is the subspace the per-dot luminance jitter masks. This test pins the size of
- * that known residual so a later change cannot quietly inflate it.
+ * Documented, deliberate limitation, and the real limitation of the experiment.
+ * Equal L+M is reached by scaling every cone excitation by a common factor, and
+ * a dichromat of the matching type reads that factor as a uniform intensity
+ * step. No scalar removes it: a protanope sees nothing only when the factor is
+ * exactly 1, and L+M matches only when it is not. Every fixed luminance
+ * weighting only redistributes the residual between the protan and deutan axes
+ * — matching sRGB Y put it at -5.57% protan / -10.99% deutan at maximum
+ * strength, matching L+M puts it at -7.50% / -8.74%.
+ *
+ * At ~0.81% ring-mean noise these are 9.3 and 10.8 sigma, so the per-dot jitter
+ * masks the step only for a non-ideal spatial integrator; it does not remove it.
+ *
+ * A single loose bound cannot police this: the previous `< 0.09` guard sat above
+ * the protan value under either weighting, so it could not have caught a protan
+ * regression. The bounds below are per-axis and pinned just outside the measured
+ * values, so any drift in the cone matrix, the direction basis, or the luminance
+ * criterion has to be re-derived and re-documented rather than absorbed.
  */
 test('the unavoidable dichromat intensity residual stays within its documented bound', () => {
-  const untouchedCone = { protan: 1, deutan: 0 };
-  for (const [type, cone] of Object.entries(untouchedCone)) {
-    const pair = makeTargetPair(AXIS_CONFIGS[type].background, type, ADAPTIVE_CONFIG.maximumStrength);
+  /**
+   * Per-axis measured residual at each strength, as a signed fraction. The
+   * untouched cone is the one the confusion direction holds constant, so its
+   * ratio is exactly the common-mode intensity step the dichromat perceives.
+   */
+  const expected = [
+    { type: 'protan', cone: 1, strength: ADAPTIVE_CONFIG.initialStrength, residual: -0.048243 },
+    { type: 'protan', cone: 1, strength: ADAPTIVE_CONFIG.maximumStrength, residual: -0.075018 },
+    { type: 'deutan', cone: 0, strength: ADAPTIVE_CONFIG.initialStrength, residual: -0.056475 },
+    { type: 'deutan', cone: 0, strength: ADAPTIVE_CONFIG.maximumStrength, residual: -0.087399 },
+  ];
+
+  for (const { type, cone, strength, residual } of expected) {
+    const pair = makeTargetPair(AXIS_CONFIGS[type].background, type, strength);
     const ratio = lmsOf(pair.targetLinear)[cone] / lmsOf(pair.fieldLinear)[cone];
-    assert.ok(Math.abs(ratio - 1) > 0.01, `${type} residual vanished; the direction basis probably changed`);
     assert.ok(
-      Math.abs(ratio - 1) < 0.09,
-      `${type} common-mode residual grew to ${((ratio - 1) * 100).toFixed(2)}%`,
+      Math.abs(ratio - 1 - residual) < 0.0005,
+      `${type} @${strength} residual moved to ${((ratio - 1) * 100).toFixed(3)}%, documented ${(residual * 100).toFixed(3)}%`,
+    );
+  }
+
+  // The step is pure intensity: the two cones the direction does not target move
+  // by the same factor. This was equally true of the sRGB Y match, so it is a
+  // property of the confusion-direction basis rather than of the L+M choice.
+  for (const type of ['protan', 'deutan']) {
+    const pair = makeTargetPair(AXIS_CONFIGS[type].background, type, ADAPTIVE_CONFIG.maximumStrength);
+    const target = lmsOf(pair.targetLinear);
+    const field = lmsOf(pair.fieldLinear);
+    const ratios = [0, 1, 2].map((cone) => target[cone] / field[cone]);
+    const untouched = type === 'protan' ? [1, 2] : [0, 2];
+    // 1e-7 is the rounding of the eight-decimal inverse matrix, far below any
+    // real chromatic leak (the targeted cone moves by ~7e-2).
+    assert.ok(
+      Math.abs(ratios[untouched[0]] - ratios[untouched[1]]) < 1e-7,
+      `${type} residual is not a pure intensity step: ratios ${ratios.join(', ')}`,
     );
   }
 });

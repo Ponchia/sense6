@@ -87,9 +87,13 @@ export const EXAM_SOURCES = Object.freeze({
     // listed under its own id and role. As the Cambridge Colour Test it is a
     // comparator instrument; as the source of the luminance-noise method it is
     // the boundary on what a browser colour stimulus can isolate. Protan and
-    // deutan confusion lines are not isoluminant, so a residual luminance cue
-    // is inherent and is masked by noise rather than removed — see the boundary
-    // note in src/lib/daltonism.js.
+    // deutan confusion lines are not isoluminant, so a residual luminance cue is
+    // inherent: a dichromat of the matching type sees a uniform intensity step
+    // of roughly 5%-9%, several times the ring-mean dot noise. The noise masks
+    // it for a non-ideal spatial integrator; it does not remove it, and no
+    // luminance weighting can. The CCT's own remedy — randomizing target and
+    // field mean luminance per trial — is not implemented here. See the
+    // Luminance and Boundary notes in src/lib/daltonism.js.
     source(
       'regan-luminance-noise',
       'boundary',

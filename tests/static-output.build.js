@@ -531,6 +531,59 @@ test('the entry bundle stays route-split and within its documented budget', asyn
   assert.ok(Math.max(...headers.split('\n').map((line) => line.length)) <= 2_000);
 });
 
+/*
+ * A deleted copy key that the static generator still interpolates renders as the
+ * literal string "undefined" in the crawlable HTML. Hydration overwrites it, so
+ * it is invisible to every browser-driven check and visible only to crawlers,
+ * no-JS visitors, and AI or social scrapers. `generate-static-pages.mjs` shipped
+ * `escapeHtml(copy.noUncertainty)` after `noUncertainty` was removed from every
+ * catalog, putting "undefined" into all 12 /journal/ pages, and build,
+ * locales:check, test:static, test:html (vnu) and test:links all passed it: the
+ * gates checked that copy was present, never what it said.
+ *
+ * This guard closes the class, not just the instance. It reads rendered text
+ * only, because the tokens are legitimate elsewhere:
+ *   - <script> blocks carry JSON-LD and the bundled app, where `undefined` and
+ *     `NaN` are ordinary JavaScript and valid JSON values;
+ *   - <style> blocks can contain them inside selectors or custom properties;
+ *   - attributes and URLs (hrefs, srcs, integrity hashes, base64 data URIs) can
+ *     contain the sequences incidentally.
+ * So both element types are removed wholesale, then all remaining tags are
+ * stripped, which discards every attribute value with them. What is left is what
+ * a reader or a crawler actually reads.
+ */
+test('no generated page renders undefined, NaN, or a stringified object as text', async () => {
+  const entries = await readdir(DIST, { recursive: true, withFileTypes: true });
+  const pages = entries
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.html'))
+    .map((entry) => `${entry.parentPath}/${entry.name}`);
+  assert.ok(pages.length >= 12, `expected the built locale pages, found ${pages.length}`);
+
+  // `undefined` and `NaN` are bounded as whole words so that copy or an
+  // identifier merely containing them cannot trip the gate.
+  const forbidden = [/\bundefined\b/, /\bNaN\b/, /\[object [A-Z]\w*\]/];
+  const offenders = [];
+  for (const page of pages) {
+    const html = await readFile(page, 'utf8');
+    const text = decodeEntities(
+      stripTags(
+        html
+          .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ' ')
+          .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ' '),
+      ),
+    );
+    for (const pattern of forbidden) {
+      const found = text.match(pattern);
+      if (!found) continue;
+      const at = text.indexOf(found[0]);
+      offenders.push(
+        `${page.replace(/^.*\/dist\//, 'dist/')}: ...${text.slice(Math.max(0, at - 70), at + 40)}...`,
+      );
+    }
+  }
+  assert.deepEqual(offenders, [], `unrendered values reached the crawlable HTML:\n${offenders.join('\n')}`);
+});
+
 async function sumSizes(files) {
   let total = 0;
   for (const file of files) total += (await stat(new URL(`assets/${file}`, DIST))).size;

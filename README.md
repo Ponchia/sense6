@@ -273,6 +273,30 @@ Run unit tests with enforced coverage for shared storage and lifecycle code:
 npm run test:coverage
 ```
 
+Coverage says a line ran; it does not say anything asserted its result. Check
+that the shared `src/lib` modules are actually pinned by mutating one operator
+or literal at a time and re-running the unit suite:
+
+```sh
+node scripts/mutation-check.mjs                     # every src/lib module
+node scripts/mutation-check.mjs src/lib/hearing.js  # one module
+node scripts/mutation-check.mjs --list src/lib/hearing.js
+```
+
+A mutant reported as `KILLED` is a line the suite genuinely checks. A `SURVIVED`
+mutant is a line the suite executes without asserting anything about it, and it
+is either a missing assertion or an equivalent mutant whose change cannot alter
+observable behaviour. That distinction needs per-mutant evidence: read the
+reported line, decide which it is, and add a test if it is the first. `TIMEOUT`
+means the mutant made the suite hang, which usually means the mutated line was a
+loop's only exit — real, but better replaced by a test that fails fast.
+
+The harness edits files in place and restores them afterwards, so it refuses to
+run against a target with uncommitted changes; `git checkout -- <file>` is always
+a valid recovery. It is a reporting tool and never sets a failing exit code, and
+it is deliberately not part of `check:core` because a full sweep re-runs the
+suite once per mutant.
+
 Build the production bundle:
 
 ```sh
