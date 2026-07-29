@@ -342,6 +342,35 @@ test('close detaches both context listeners and skips closing twice', async () =
   });
 });
 
+test('a context that rejects close is still released instead of stranding the engine', async () => {
+  await withAudio(async () => {
+    const audio = new HearingAudio(CONFIG);
+    const context = await audio.init();
+    // Safari rejects `close()` on a context that is already closing. The engine
+    // must absorb that rejection: the caller is tearing a mount down and has
+    // nothing left to retry with.
+    let closeAttempts = 0;
+    context.close = async () => {
+      closeAttempts += 1;
+      throw new DOMException('The AudioContext is closing', 'InvalidStateError');
+    };
+
+    await audio.close();
+
+    assert.equal(closeAttempts, 1, 'close must still be attempted once');
+    assert.equal(audio.context, null, 'a rejected close must not strand the context reference');
+    assert.equal(audio.master, null);
+    assert.equal(audio.state, 'closed');
+    assert.equal(context.listeners.get('statechange').length, 0);
+    assert.equal(context.listeners.get('sinkchange').length, 0);
+
+    // The engine is reusable afterwards, which is only true if teardown finished.
+    const second = await audio.init();
+    assert.notEqual(second, context);
+    assert.equal(audio.state, 'running');
+  });
+});
+
 test('suspend stops playback and only suspends a running context', async () => {
   await withAudio(async () => {
     const audio = new HearingAudio(CONFIG);

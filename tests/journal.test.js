@@ -4,6 +4,7 @@ import { protocolPassport } from '../src/exams/protocols.js';
 import { journalCopy, journalSetupLabel, prepareJournalCopy } from '../src/journal-copy.js';
 import {
   appendJournalEntry,
+  buildJournalEntry,
   captureDisplayPassport,
   clearJournal,
   compareJournalEntries,
@@ -18,6 +19,7 @@ import {
   previewJournalImport,
   readJournalState,
   removeJournalEntry,
+  saveJournalRun,
 } from '../src/lib/journal.js';
 import { LOCALE_CODES } from '../src/locale-metadata.js';
 
@@ -608,6 +610,204 @@ test('journal entries are canonical and every export schema field has localized 
     assert.deepEqual(Object.keys(journalCopy(locale).exportDisclosure), JOURNAL_DISCLOSURE_KEYS);
   }
 });
+
+test('a refused entry names the exact field that failed, not a generic rejection', () => {
+  /** @type {[string, Record<string, unknown>][]} */
+  const cases = [
+    ['examId', { examId: 'not-an-exam' }],
+    ['examId', { examId: 42 }],
+    ['id', { id: '' }],
+    ['id', { id: 'x'.repeat(129) }],
+    ['id', { id: 17 }],
+    ['recordedAt', { recordedAt: 'not-a-date' }],
+    ['recordedAt', { recordedAt: '2026-01-01T00:00:00.000Z-and-then-some-trailing-text' }],
+    ['locale', { locale: 'zh-tw' }],
+    ['quality', { quality: 'excellent' }],
+    ['protocol', { protocol: {} }],
+    ['protocol', { protocol: 'tetracromia-v1' }],
+    ['setup', { setup: { bad_key: true } }],
+    ['setup', { setup: null }],
+    ['qualityEvidence', { qualityEvidence: { 'Bad Key': 1 } }],
+    ['qualityEvidence', { qualityEvidence: [] }],
+    ['measurements', { measurements: [] }],
+    ['measurements', { measurements: 'score=10' }],
+    ['measurements.length', { measurements: manyMeasurements(25) }],
+    [
+      'measurements[1]',
+      {
+        measurements: [
+          { id: 'first', value: 1, unit: 'x' },
+          { id: 'bad id', value: 1, unit: 'x' },
+        ],
+      },
+    ],
+    ['notes', { notes: Array.from({ length: 13 }, (_, index) => `note-${index}`) }],
+    ['notes', { notes: ['x'.repeat(101)] }],
+    ['notes', { notes: [42] }],
+  ];
+
+  for (const [expected, override] of cases) {
+    const built = buildJournalEntry({ ...entry(), ...override });
+    assert.equal(built.entry, null, `${JSON.stringify(override)} must not produce an entry`);
+    assert.equal(built.reason, expected, `wrong field named for ${JSON.stringify(override)}`);
+    // The public wrapper keeps its old contract on top of the same check.
+    assert.equal(createJournalEntry({ ...entry(), ...override }), null);
+  }
+
+  // The 24-measurement cap is a boundary, not an approximation.
+  assert.equal(buildJournalEntry({ ...entry(), measurements: manyMeasurements(24) }).reason, null);
+  assert.equal(buildJournalEntry({ ...entry(), notes: Array.from({ length: 12 }, () => 'ok') }).reason, null);
+  assert.equal(buildJournalEntry({ ...entry(), notes: ['x'.repeat(100)] }).reason, null);
+});
+
+test('an Acutezza entry whose declared eyes contradict its measurements is refused by name', () => {
+  const oneEye = acutezzaEntry({ id: 'variant-mismatch', eyes: ['left'], values: { left: 3 } });
+  assert.equal(buildJournalEntry(oneEye).reason, null);
+
+  const wrongVariant = {
+    ...oneEye,
+    setup: { ...oneEye.setup, completionVariant: 'both-eyes' },
+  };
+  assert.equal(buildJournalEntry(wrongVariant).reason, 'completedEyes');
+
+  const { completionVariant: _variant, ...withoutVariant } = oneEye.setup;
+  assert.equal(buildJournalEntry({ ...oneEye, setup: withoutVariant }).reason, 'completedEyes');
+
+  const unparseableEyes = {
+    ...oneEye,
+    setup: { ...oneEye.setup, completedEyes: 'left,left' },
+  };
+  assert.equal(buildJournalEntry(unparseableEyes).reason, 'completedEyes');
+
+  const unmeasuredEye = {
+    ...oneEye,
+    setup: { ...oneEye.setup, completedEyes: 'right' },
+  };
+  assert.equal(buildJournalEntry(unmeasuredEye).reason, 'completedEyes');
+});
+
+test('buildJournalEntry derives every field the caller may omit', () => {
+  const before = Date.now();
+  const built = buildJournalEntry({
+    examId: 'tetracromia',
+    locale: 'en',
+    quality: 'usable',
+    setup: { display: '100x100@1', viewport: '800x600', gamut: 'srgb' },
+    measurements: [{ id: 'score', value: 10, unit: '/100' }],
+  });
+
+  assert.equal(built.reason, null);
+  const entryValue = /** @type {NonNullable<typeof built.entry>} */ (built.entry);
+  assert.deepEqual(Object.keys(entryValue), JOURNAL_EXPORT_SCHEMA.entry);
+  assert.deepEqual(entryValue.protocol, protocolPassport('tetracromia'));
+  assert.deepEqual(entryValue.qualityEvidence, {});
+  assert.deepEqual(entryValue.notes, []);
+  assert.match(entryValue.id, /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+  const recordedAt = Date.parse(entryValue.recordedAt);
+  assert.equal(entryValue.recordedAt, new Date(recordedAt).toISOString());
+  assert.ok(recordedAt >= before - 1000 && recordedAt <= Date.now() + 1000);
+
+  // A caller may hand over a Date or epoch milliseconds; both normalize to ISO.
+  assert.equal(
+    buildJournalEntry({ ...entry(), recordedAt: new Date('2026-02-03T04:05:06.000Z') }).entry?.recordedAt,
+    '2026-02-03T04:05:06.000Z',
+  );
+  assert.equal(
+    buildJournalEntry({ ...entry(), recordedAt: Date.UTC(2026, 1, 3, 4, 5, 6) }).entry?.recordedAt,
+    '2026-02-03T04:05:06.000Z',
+  );
+});
+
+test('a browser without randomUUID still produces an acceptable entry identifier', () => {
+  const descriptor = /** @type {PropertyDescriptor} */ (
+    Object.getOwnPropertyDescriptor(globalThis, 'crypto')
+  );
+  Object.defineProperty(globalThis, 'crypto', { configurable: true, value: undefined });
+  try {
+    const generated = buildJournalEntry({ ...entry(), id: undefined }).entry?.id ?? '';
+    const parts = /^run-(\d+)-([a-z0-9]+)$/.exec(generated);
+    assert.ok(parts, `fallback identifier has an unexpected shape: ${generated}`);
+    assert.ok(Math.abs(Number(parts[1]) - Date.now()) < 10_000, 'the fallback id carries a real timestamp');
+    assert.ok(generated.length <= 128, 'a generated id must satisfy the schema it is built for');
+  } finally {
+    Object.defineProperty(globalThis, 'crypto', descriptor);
+  }
+});
+
+test('saveJournalRun separates a rejected run from a browser that refuses storage', () => {
+  const storage = memoryStorage();
+  assert.equal(saveJournalRun(entry({ id: 'accepted' }), storage), 'saved');
+  assert.deepEqual(
+    loadJournal(storage).map(({ id }) => id),
+    ['accepted'],
+  );
+
+  // A schema failure is a defect in the run, and it is reported as such.
+  const reports = [];
+  const originalError = console.error;
+  console.error = (...args) => reports.push(args);
+  try {
+    assert.equal(saveJournalRun({ ...entry({ id: 'rejected' }), quality: 'excellent' }, storage), 'invalid');
+  } finally {
+    console.error = originalError;
+  }
+  assert.equal(reports.length, 1, 'a refused run must be reported exactly once');
+  assert.equal(
+    reports[0][0],
+    'Sense6 rejected a tetracromia journal entry: quality failed validation.',
+    'the log must name the instrument and the failing field',
+  );
+  assert.equal(reports[0][1].id, 'rejected', 'the refused value is logged for diagnosis');
+  assert.deepEqual(
+    loadJournal(storage).map(({ id }) => id),
+    ['accepted'],
+    'a refused run must not be stored',
+  );
+
+  // A storage failure is a browser problem, and it must not be logged as a
+  // validation defect nor reported to the user as one.
+  const silenced = [];
+  console.error = (...args) => silenced.push(args);
+  try {
+    assert.equal(saveJournalRun(entry({ id: 'unstorable' }), null), 'storage-unavailable');
+    const futureSchema = memoryStorage({
+      'sense6:journal': JSON.stringify({ format: 'sense6-journal', schemaVersion: 99, entries: [] }),
+    });
+    assert.equal(saveJournalRun(entry({ id: 'newer-schema-present' }), futureSchema), 'storage-unavailable');
+    assert.equal(
+      saveJournalRun(entry({ id: 'write-denied' }), {
+        getItem: () => null,
+        setItem() {
+          throw new Error('quota exceeded');
+        },
+      }),
+      'storage-unavailable',
+    );
+  } finally {
+    console.error = originalError;
+  }
+  assert.deepEqual(silenced, [], 'a storage failure is not a validation failure');
+});
+
+test('stored entries that are not records or not known instruments are refused on read', () => {
+  // `journalEntryViolation` guards reads as well as writes: these two shapes are
+  // only reachable from stored or imported data, never from a live run.
+  const target = memoryStorage();
+  assert.deepEqual(importJournal(exportWith([null]), target), { ok: false, reason: 'invalid' });
+  assert.deepEqual(importJournal(exportWith([{ ...entry(), examId: 'not-an-exam' }]), target), {
+    ok: false,
+    reason: 'invalid',
+  });
+  assert.deepEqual(loadJournal(target), [], 'nothing may be written by a refused import');
+});
+
+function manyMeasurements(count) {
+  return Array.from({ length: count }, (_, index) => ({
+    id: `measure-${index}`,
+    value: index,
+    unit: 'x',
+  }));
+}
 
 function entry(overrides = {}) {
   return {
