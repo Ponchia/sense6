@@ -17,12 +17,12 @@
   "/ar/acutezza/": {
     "key": "exams.acutezza",
     "date": "2026-07-29",
-    "hash": "7cf6dcc735e8b54989ee3948410d6389"
+    "hash": "6718a0546698081c4162fc2d32b292a3"
   },
   "/ar/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-07-29",
-    "hash": "0e631567a4e629e9421d37ed92ed7f4f"
+    "hash": "a7a8ab165e32add9a0f167237ffd4ad4"
   },
   "/ar/riflessi/": {
     "key": "exams.riflessi",
@@ -52,12 +52,12 @@
   "/de/acutezza/": {
     "key": "exams.acutezza",
     "date": "2026-07-29",
-    "hash": "b613e4e764a74a12e22890b5e88dc842"
+    "hash": "24bcdae650f802da4b169198d16f80e3"
   },
   "/de/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-07-29",
-    "hash": "a26fd819f6be7c6953ddd036cd2a0871"
+    "hash": "5804c3ab2253e9a0151a8c3c5333e4ae"
   },
   "/de/riflessi/": {
     "key": "exams.riflessi",
@@ -87,12 +87,12 @@
   "/en/acutezza/": {
     "key": "exams.acutezza",
     "date": "2026-07-29",
-    "hash": "946758d827a198401c444036bab1fd55"
+    "hash": "5c801eb6e83df9e0cff4f6469fec667e"
   },
   "/en/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-07-29",
-    "hash": "874f9507fbaf64ec264a38a8905d435e"
+    "hash": "f65c6edeee9c58a073e1703f7805f23a"
   },
   "/en/riflessi/": {
     "key": "exams.riflessi",
@@ -122,12 +122,12 @@
   "/es/acutezza/": {
     "key": "exams.acutezza",
     "date": "2026-07-29",
-    "hash": "b815457b6dd494b39099f51cda6aadf2"
+    "hash": "c74e4e19caa6e8eef1237842649992a0"
   },
   "/es/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-07-29",
-    "hash": "6f913f0e4bc19fad493d597f4ff0ddc0"
+    "hash": "f31da8522f045aa44511fc1701d2efc8"
   },
   "/es/riflessi/": {
     "key": "exams.riflessi",
@@ -157,12 +157,12 @@
   "/fr/acutezza/": {
     "key": "exams.acutezza",
     "date": "2026-07-29",
-    "hash": "628c00b379c1b7c837cd0b584f7bd96b"
+    "hash": "33d837356c3fd0c20aaa85057b0c56d6"
   },
   "/fr/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-07-29",
-    "hash": "13004d9bbc72b93bbc55eff527f7f4f5"
+    "hash": "04e1e4302d25f24e45a951d07dc37d63"
   },
   "/fr/riflessi/": {
     "key": "exams.riflessi",
@@ -192,12 +192,12 @@
   "/hi/acutezza/": {
     "key": "exams.acutezza",
     "date": "2026-07-29",
-    "hash": "c8cbb8bf91d68c1bc90afca01dbb47b6"
+    "hash": "7bc198b45e0ca4d788a01ce24ac9b1d6"
   },
   "/hi/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-07-29",
-    "hash": "5b172ccfaebdb7717108e3c5946cbfd6"
+    "hash": "b308afdacc46cd1980efcdd852b447db"
   },
   "/hi/riflessi/": {
     "key": "exams.riflessi",
@@ -227,12 +227,12 @@
   "/it/acutezza/": {
     "key": "exams.acutezza",
     "date": "2026-07-29",
-    "hash": "4943723069da264adbe7f8a40701fbe1"
+    "hash": "eabed45eabe110349d37c60ab98b76da"
   },
   "/it/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-07-29",
-    "hash": "5577d959b56676bccfce21f6473af9cf"
+    "hash": "e6c826cab52d54a20dc4df6385d31b58"
   },
   "/it/riflessi/": {
     "key": "exams.riflessi",
@@ -262,12 +262,12 @@
   "/ja/acutezza/": {
     "key": "exams.acutezza",
     "date": "2026-07-29",
-    "hash": "87543b67a985743ffa159e387982ab28"
+    "hash": "5db6870aaded760f270cd76f283e4ca3"
   },
   "/ja/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-07-29",
-    "hash": "449e7863632debec92e55c42be70f082"
+    "hash": "0bc009cffdfd929597653b26aa807fb0"
   },
   "/ja/riflessi/": {
     "key": "exams.riflessi",
@@ -297,12 +297,12 @@
   "/ko/acutezza/": {
     "key": "exams.acutezza",
     "date": "2026-07-29",
-    "hash": "54653160964e97b2447d82b0a1f8d319"
+    "hash": "c0a0d87461c6ac88019676b10c8036f1"
   },
   "/ko/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-07-29",
-    "hash": "a8c8793b09a82a4f4ea3e667557b8585"
+    "hash": "0cf0b8675c7d84f16b83be7454337989"
   },
   "/ko/riflessi/": {
     "key": "exams.riflessi",
@@ -332,12 +332,12 @@
   "/pt-br/acutezza/": {
     "key": "exams.acutezza",
     "date": "2026-07-29",
-    "hash": "cc0fdd4ae134440d4019aeeb30cff954"
+    "hash": "47c6cd632e29625f317182900461d91c"
   },
   "/pt-br/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-07-29",
-    "hash": "e6f3d955489fa30dc45e2e93521be1f1"
+    "hash": "d74528b3ea7201a0b3b05a1d6c07bbf8"
   },
   "/pt-br/riflessi/": {
     "key": "exams.riflessi",
@@ -367,12 +367,12 @@
   "/pt/acutezza/": {
     "key": "exams.acutezza",
     "date": "2026-07-29",
-    "hash": "2c89419a464c48ca86605bef8cc9b721"
+    "hash": "1722c8db468c4f3320d9535b881fa857"
   },
   "/pt/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-07-29",
-    "hash": "b54056aee88f0c64666b31c86e77d9b5"
+    "hash": "6cd8879864bd730c8ee503712acd29b6"
   },
   "/pt/riflessi/": {
     "key": "exams.riflessi",
@@ -402,12 +402,12 @@
   "/zh-hans/acutezza/": {
     "key": "exams.acutezza",
     "date": "2026-07-29",
-    "hash": "462623e5a3edd51ea22d181b0cfbafa3"
+    "hash": "55b307154da631686d2feb1570e62400"
   },
   "/zh-hans/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-07-29",
-    "hash": "18c5d8811f892f0826b760c13d4c6266"
+    "hash": "40f8fa44280895f2cd3d79948dc69f8f"
   },
   "/zh-hans/riflessi/": {
     "key": "exams.riflessi",
