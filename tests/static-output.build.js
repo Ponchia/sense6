@@ -7,10 +7,12 @@ import {
   measureActiveRouteGraph,
   measureInitialLocaleGraph,
 } from '../scripts/vite-manifest.mjs';
+import { CONTENT_DATES, examContentDate } from '../src/content-dates.js';
 import { CRAWLER_POLICY } from '../src/crawler-policy.js';
 import { EXAMS } from '../src/exams/registry.js';
-import { LOCALES } from '../src/locales.js';
+import { LOCALES, loadMessages } from '../src/locales.js';
 import { routePath, UTILITY_ROUTES } from '../src/routes.js';
+import { STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
 
 const DIST = new URL('../dist/', import.meta.url);
 const expectedPaths = [
@@ -124,7 +126,7 @@ test('experiment discovery pages expose useful copy, related routes, images, and
       data['@graph'].map((entry) => entry['@type']),
       ['WebApplication', 'BreadcrumbList'],
     );
-    assert.equal(data['@graph'][0].dateModified, '2026-07-22');
+    assert.equal(data['@graph'][0].dateModified, examContentDate(definition.id));
     assert.equal(data['@graph'][0].creator.name, 'Zeno');
     assert.equal(data['@graph'][0].creator.url, undefined);
     assert.equal(data['@graph'][0].image, `https://sense6.net/social/${definition.id}.png`);
@@ -141,6 +143,24 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
     (match) => match[1],
   );
   assert.deepEqual(sitemapPaths, expectedPaths);
+  const sitemapDates = new Map(
+    [
+      ...sitemap.matchAll(
+        /<url><loc>https:\/\/sense6\.net([^<]*)<\/loc>(?:<lastmod>([^<]+)<\/lastmod>)?<\/url>/g,
+      ),
+    ].map((match) => [match[1], match[2]]),
+  );
+  const expectedDates = new Map([
+    ['/', CONTENT_DATES.site],
+    ...LOCALES.flatMap(({ code }) => [
+      [routePath(code), CONTENT_DATES.site],
+      ...EXAMS.map(({ route }) => [routePath(code, route), examContentDate(route)]),
+      [routePath(code, 'about'), CONTENT_DATES.about],
+    ]),
+  ]);
+  for (const path of expectedPaths) {
+    assert.equal(sitemapDates.get(path), expectedDates.get(path), `${path} has a stale content date`);
+  }
   const lastModified = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((match) => match[1]);
   assert.equal(lastModified.length, 1 + LOCALES.length * (EXAMS.length + 2));
   for (const date of lastModified) {
@@ -172,8 +192,11 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   assert.match(llms, /not validated, certified, diagnostic, or intended to become a medical product/);
   assert.match(llms, /\[About Sense6 and its methodology\]\(https:\/\/sense6\.net\/en\/about\/\)/);
   assert.match(llms, /\[Private measurement journal\]\(https:\/\/sense6\.net\/en\/journal\/\)/);
-  for (const { name, route } of EXAMS) {
-    assert.match(llms, new RegExp(`\\[${escapeRegex(name)}\\]\\(https://sense6\\.net/en/${route}/\\)`));
+  for (const { discoveryName, name, route } of EXAMS) {
+    assert.match(
+      llms,
+      new RegExp(`\\[${escapeRegex(discoveryName ?? name)}\\]\\(https://sense6\\.net/en/${route}/\\)`),
+    );
   }
 
   const notFound = await readFile(new URL('404.html', DIST), 'utf8');
@@ -215,7 +238,41 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
     aboutJson['@graph'].map((entry) => entry['@type']),
     ['AboutPage', 'WebSite', 'Person'],
   );
-  assert.equal(aboutJson['@graph'][0].dateModified, '2026-07-19');
+  assert.equal(aboutJson['@graph'][0].dateModified, CONTENT_DATES.about);
+});
+
+test('Tetracromia answers search intent consistently in every supported language', async () => {
+  const definition = EXAMS.find(({ id }) => id === 'tetracromia');
+  const searchIntent = STATIC_SEARCH_INTENT_COPY.tetracromia;
+  assert.ok(definition?.discoveryName);
+  assert.ok(searchIntent);
+
+  for (const { code } of LOCALES) {
+    const messages = await loadMessages(code);
+    const html = await readFile(new URL(`${code}/tetracromia/index.html`, DIST), 'utf8');
+    const identity = messages.get(definition.discoveryName);
+    const intentHeading = messages.get(searchIntent.heading);
+    const intentExplanation = messages.get(searchIntent.paragraphs[0]);
+    const limit = messages.get(definition.limit);
+    for (const [label, value] of [
+      ['identity', identity],
+      ['intent heading', intentHeading],
+      ['intent explanation', intentExplanation],
+      ['non-clinical limit', limit],
+    ]) {
+      assert.ok(value, `${code} is missing its Tetracromia ${label}`);
+      assert.ok(html.includes(escapeHtml(value)), `${code} does not render its Tetracromia ${label}`);
+    }
+
+    const data = JSON.parse(html.match(/<script type="application\/ld\+json">(.+)<\/script>/)?.[1] ?? '{}');
+    assert.equal(data['@graph'][0].name, identity);
+    assert.equal(data['@graph'][1].itemListElement[1].name, identity);
+    assert.equal(data['@graph'][0].dateModified, CONTENT_DATES.exams.tetracromia);
+    if (code !== 'en') {
+      assert.notEqual(intentHeading, searchIntent.heading);
+      assert.notEqual(limit, definition.limit);
+    }
+  }
 });
 
 test('static pages preload only the active route and requested supplemental locale graph', async () => {
@@ -368,6 +425,10 @@ function stripTags(html) {
 
 function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function escapeHtml(value) {
+  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 }
 
 function modulePreloadHrefs(html) {

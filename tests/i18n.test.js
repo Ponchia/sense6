@@ -7,6 +7,7 @@ import { journalCopy, journalSetupLabel, prepareJournalCopy } from '../src/journ
 import { journalRecoveryCopy } from '../src/journal-recovery-copy.js';
 import { DEFAULT_LOCALE, LOCALES, loadMessages, localeMetadata, resolveLocale } from '../src/locales.js';
 import { preparePrivacyCopy, privacyCopy } from '../src/privacy.js';
+import { STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
 
 test('the supported global locale set has complete catalog keys', async () => {
   assert.equal(DEFAULT_LOCALE, 'en');
@@ -186,12 +187,21 @@ test('the About page has complete, dedicated copy for every locale', () => {
 
 test('every registry field used by static pages is explicitly localized', async () => {
   const sources = EXAMS.flatMap((exam) => [
+    ...(exam.discoveryName ? [exam.discoveryName] : []),
     exam.tagline,
     exam.blurb,
     exam.category,
     ...exam.facts,
     exam.pageTitle,
     exam.limit,
+    ...exam.discovery.paragraphs,
+    ...(STATIC_SEARCH_INTENT_COPY[exam.id]
+      ? [
+          STATIC_SEARCH_INTENT_COPY[exam.id].eyebrow,
+          STATIC_SEARCH_INTENT_COPY[exam.id].heading,
+          ...STATIC_SEARCH_INTENT_COPY[exam.id].paragraphs,
+        ]
+      : []),
   ]).concat([
     '≈ {minutes} min',
     'Open test',

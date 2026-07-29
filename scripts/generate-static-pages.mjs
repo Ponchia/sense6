@@ -1,7 +1,8 @@
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { ABOUT_DATE_MODIFIED, aboutCopy, aboutMarkup } from '../src/about.js';
+import { aboutCopy, aboutMarkup } from '../src/about.js';
+import { CONTENT_DATES, examContentDate } from '../src/content-dates.js';
 import { CRAWLER_POLICY, renderRobots } from '../src/crawler-policy.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { SOURCE_ROLE_LABELS, sourcesFor } from '../src/exams/sources.js';
@@ -11,14 +12,10 @@ import { interpolateMessage } from '../src/i18n.js';
 import { journalCopy, prepareJournalCopy } from '../src/journal-copy.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
 import { preparePrivacyCopy, privacyCopy, privacyMarkup } from '../src/privacy.js';
+import { ROOT_GATEWAY, rootGatewayMarkup } from '../src/root-gateway.js';
 import { createRouteMetadata, SITE_ORIGIN, UTILITY_ROUTES } from '../src/routes.js';
-import {
-  aboutData,
-  examData,
-  SITE_DATE_MODIFIED,
-  webpageData,
-  websiteData,
-} from './static-structured-data.mjs';
+import { STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
+import { aboutData, examData, webpageData, websiteData } from './static-structured-data.mjs';
 import { activeRouteModuleFiles } from './vite-manifest.mjs';
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -28,7 +25,7 @@ const template = await readFile(join(DIST, 'index.html'), 'utf8');
 const builtAssets = await readdir(join(DIST, 'assets'));
 const routeStyles = indexRouteStyles(builtAssets);
 const criticalDisplayFont = findCriticalDisplayFont(builtAssets);
-const canonicalPaths = [{ path: '/', lastModified: SITE_DATE_MODIFIED }];
+const canonicalPaths = [{ path: '/', lastModified: CONTENT_DATES.site }];
 const examById = new Map(EXAMS.map((definition) => [definition.id, definition]));
 const catalogs = new Map(
   await Promise.all(LOCALES.map(async ({ code }) => [code, await loadMessages(code)])),
@@ -40,12 +37,11 @@ await writePage('index.html', {
   direction: 'ltr',
   route: '',
   path: '/',
-  title: 'Sense6 — choose your language',
-  description:
-    'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
+  title: ROOT_GATEWAY.title,
+  description: ROOT_GATEWAY.description,
   socialImage: '/social/sense6.png',
-  socialImageAlt: 'Sense6 browser perception experiments',
-  main: rootMarkup(),
+  socialImageAlt: ROOT_GATEWAY.socialImageAlt,
+  main: rootGatewayMarkup(LOCALES),
   stylesheet: routeStyles.get('gallery'),
   alternates: galleryAlternates(),
   structuredData: websiteData('en'),
@@ -57,7 +53,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
   const translate = (source, values = {}) =>
     interpolateMessage(messages.get(source) ?? source, values, locale);
   const galleryPath = `/${locale}/`;
-  canonicalPaths.push({ path: galleryPath, lastModified: SITE_DATE_MODIFIED });
+  canonicalPaths.push({ path: galleryPath, lastModified: CONTENT_DATES.site });
   await writePage(`${locale}/index.html`, {
     locale,
     languageTag,
@@ -91,7 +87,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
 
   for (const definition of EXAMS) {
     const path = `/${locale}/${definition.route}/`;
-    canonicalPaths.push({ path, lastModified: SITE_DATE_MODIFIED });
+    canonicalPaths.push({ path, lastModified: examContentDate(definition.id) });
     await writePage(`${locale}/${definition.route}/index.html`, {
       locale,
       languageTag,
@@ -101,7 +97,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
       title: translate(definition.pageTitle),
       description: translate(definition.blurb),
       socialImage: `/social/${definition.id}.png`,
-      socialImageAlt: `${definition.name} — ${translate(definition.tagline)}`,
+      socialImageAlt: `${translate(definition.discoveryName ?? definition.name)} — ${translate(definition.tagline)}`,
       main: examMarkup(definition, locale, translate),
       stylesheet: routeStyles.get(definition.id),
       alternates: pageAlternates(definition.route),
@@ -111,7 +107,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
 
   const about = aboutCopy(locale);
   const aboutPath = `/${locale}/about/`;
-  canonicalPaths.push({ path: aboutPath, lastModified: ABOUT_DATE_MODIFIED });
+  canonicalPaths.push({ path: aboutPath, lastModified: CONTENT_DATES.about });
   await writePage(`${locale}/about/index.html`, {
     locale,
     languageTag,
@@ -301,20 +297,8 @@ function localizeShell(html, locale) {
   );
 }
 
-function rootMarkup() {
-  return `<section class="static-entry ui-container ui-container--wide">
-    <p class="ui-eyebrow">Sense6</p>
-    <h1>Measure what your senses notice.</h1>
-    <p>Choose your language to read about private, device-relative perception experiments and open a test.</p>
-    <p><strong>Experimental perception tests for curiosity and fun—not medical tests or diagnoses.</strong></p>
-    <nav class="static-language-list" aria-label="Language">${LOCALES.map(
-      ({ code, languageTag, direction, label }) =>
-        `<a href="/${code}/" hreflang="${languageTag}" lang="${languageTag}" dir="${direction}">${label}</a>`,
-    ).join('')}</nav>
-  </section>`;
-}
-
 function examMarkup(definition, locale, tr) {
+  const discoveryName = tr(definition.discoveryName ?? definition.name);
   const related = definition.discovery.related.map((id) => {
     const entry = examById.get(id);
     if (!entry) throw new Error(`Unknown related experiment: ${id}`);
@@ -324,18 +308,19 @@ function examMarkup(definition, locale, tr) {
     <a class="back-link" data-sense6-route="" href="/${locale}/"><span aria-hidden="true">←</span> ${escapeHtml(tr('All tests'))}</a>
     <header>
       <p class="ui-eyebrow">${escapeHtml(tr(definition.category))} · ${escapeHtml(tr('≈ {minutes} min', { minutes: definition.durationMinutes }))}</p>
-      <h1>${escapeHtml(definition.name)} — ${escapeHtml(tr(definition.tagline))}</h1>
+      <h1>${escapeHtml(discoveryName)}</h1>
       <p>${escapeHtml(tr(definition.blurb))}</p>
       <a class="ui-button" href="#interactive-test">${escapeHtml(tr('Open test'))}</a>
     </header>
     <figure class="static-preview">
-      <img src="/social/${definition.id}.svg" width="1200" height="630" alt="${escapeAttribute(`${definition.name} — ${tr(definition.tagline)}`)}" loading="lazy">
+      <img src="/social/${definition.id}.svg" width="1200" height="630" alt="${escapeAttribute(`${discoveryName} — ${tr(definition.tagline)}`)}" loading="lazy">
     </figure>
     <section>
       <h2>${escapeHtml(tr('What this test includes'))}</h2>
       ${definition.discovery.paragraphs.map((paragraph) => `<p>${escapeHtml(tr(paragraph))}</p>`).join('')}
       <ul>${definition.facts.map((fact) => `<li>${escapeHtml(tr(fact))}</li>`).join('')}</ul>
     </section>
+    ${searchIntentMarkup(STATIC_SEARCH_INTENT_COPY[definition.id], tr)}
     <section>
       <h2>${escapeHtml(tr('Method and limits'))}</h2>
       <p>${escapeHtml(tr(definition.limit))}</p>
@@ -354,13 +339,22 @@ function examMarkup(definition, locale, tr) {
       <div class="static-page-grid">${related
         .map(
           (entry) => `<article class="ui-card">
-            <h3><a data-sense6-route="${entry.route}" href="/${locale}/${entry.route}/">${escapeHtml(entry.name)} — ${escapeHtml(tr(entry.tagline))}</a></h3>
+            <h3><a data-sense6-route="${entry.route}" href="/${locale}/${entry.route}/">${escapeHtml(tr(entry.discoveryName ?? entry.name))} — ${escapeHtml(tr(entry.tagline))}</a></h3>
             <p>${escapeHtml(tr(entry.blurb))}</p>
           </article>`,
         )
         .join('')}</div>
     </section>
   </article>`;
+}
+
+function searchIntentMarkup(searchIntent, tr) {
+  if (!searchIntent) return '';
+  return `<section class="static-search-intent">
+      <p class="ui-eyebrow">${escapeHtml(tr(searchIntent.eyebrow))}</p>
+      <h2>${escapeHtml(tr(searchIntent.heading))}</h2>
+      ${searchIntent.paragraphs.map((paragraph) => `<p>${escapeHtml(tr(paragraph))}</p>`).join('')}
+    </section>`;
 }
 
 function journalMarkup(copy, locale) {
@@ -422,10 +416,10 @@ async function writeDiscoveryFiles() {
   await writeFile(join(DIST, 'robots.txt'), renderRobots(ORIGIN));
   const llms = `# Sense6\n\nSense6 is a privacy-first collection of experimental, device-relative browser perception tests made for curiosity and fun. It is not validated, certified, diagnostic, or intended to become a medical product. Answers and results stay in the browser; the service stores only anonymous daily activity totals.\n\n## Main pages\n\n- [English test gallery](${ORIGIN}/en/)\n- [About Sense6 and its methodology](${ORIGIN}/en/about/)\n- [Private measurement journal](${ORIGIN}/en/journal/)\n- [Privacy notice](${ORIGIN}/en/privacy/)\n\n## Crawler policy\n\n${CRAWLER_POLICY.intent} The policy was reviewed on ${CRAWLER_POLICY.reviewedAt} and must be reviewed again by ${CRAWLER_POLICY.reviewBy}. robots.txt is advisory; llms.txt is a discovery aid, not an access-control mechanism.\n\n## Experiments\n\n${EXAMS.map(
     (definition) =>
-      `- [${definition.name}](${ORIGIN}/en/${definition.route}/): ${definition.blurb} ${definition.limit}`,
+      `- [${definition.discoveryName ?? definition.name}](${ORIGIN}/en/${definition.route}/): ${definition.blurb} ${definition.limit}`,
   ).join(
     '\n',
-  )}\n\n## Research sources\n\n${EXAMS.flatMap((definition) => sourcesFor(definition.id).map(({ label, href, role }) => `- ${definition.name} (${sourceRoleLabel(role)}): [${label}](${href})`)).join('\n')}\n`;
+  )}\n\n## Research sources\n\n${EXAMS.flatMap((definition) => sourcesFor(definition.id).map(({ label, href, role }) => `- ${definition.discoveryName ?? definition.name} (${sourceRoleLabel(role)}): [${label}](${href})`)).join('\n')}\n`;
   await writeFile(join(DIST, 'llms.txt'), llms);
 }
 

@@ -58,7 +58,9 @@ async function settlePage(page) {
   if (process.env.VISUAL_BASELINE_CAPTURE !== '1') {
     await page.locator('#app[data-sense6-hydrated]').waitFor();
   }
-  await page.waitForFunction(() => !document.querySelector('#app > .static-entry'));
+  if (new URL(page.url()).pathname !== '/') {
+    await page.waitForFunction(() => !document.querySelector('#app > .static-entry'));
+  }
   await page.evaluate(async () => document.fonts?.ready);
 }
 

@@ -100,7 +100,7 @@ function liveCard(meta, localeHref, m, t) {
             <span class="ui-eyebrow">${t(meta.category)}</span>
             <span class="ui-tag">${t('≈ {minutes} min', { minutes: meta.durationMinutes })}</span>
           </div>
-          <h3>${meta.name}</h3>
+          <h3>${t(meta.discoveryName ?? meta.name)}</h3>
           <p class="exam-card__tagline">${t(meta.tagline)}</p>
           <p class="exam-card__blurb">${t(meta.blurb)}</p>
           <ul class="exam-card__facts" aria-label="${m('gallery.testIncludes')}">

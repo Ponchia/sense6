@@ -18,7 +18,7 @@ export function tetracromiaHomeMarkup(phases, _translate, message, colorCss) {
           <span aria-hidden="true">←</span> ${message('nav.allTests')}
         </button>
         <p class="ui-eyebrow">Screen Colour Lab / 29 blocks / about 4 minutes</p>
-        <h1>Notice colour in <em>three different ways</em>.</h1>
+        <h1><span>Tetracromia —</span> <span>Notice colour in</span> <em>three different ways</em>.</h1>
         <p class="tetracromia-hero__lede">
           Tetracromia is a short recreational experiment: 14 tile choices, 12 dot-field choices,
           and 3 ordering arcs. Each observation stays separate.

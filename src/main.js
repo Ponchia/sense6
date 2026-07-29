@@ -5,6 +5,7 @@ import './styles.css';
 import { EXAM_BY_ID, EXAMS, loadExam } from './exams/registry.js';
 import { getLocale, initializeI18n, localeHref, localizedRoot, m, setLocale, t } from './i18n.js';
 import { disposeActiveMounts } from './lib/mount-registry.js';
+import { LOCALES } from './locales.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from './metrics.js';
 import { currentLocation, currentRoute, navigate, startRouter } from './router.js';
 import { applyRouteMetadata, createRouteMetadata, STATIC_ADOPTED_ROUTES } from './routes.js';
@@ -15,13 +16,23 @@ const app = localizedRoot(appElement);
 const announcer = document.querySelector('#announcer');
 const gamutChip = document.querySelector('#gamut-chip');
 const initialLocation = currentLocation();
+const isRootGateway = !initialLocation.legacy && !initialLocation.locale && !initialLocation.route;
 
 await initializeI18n({
-  initialLocale: initialLocation.locale,
-  onLocaleChange: async (nextLocale) => navigate(currentRoute(), nextLocale),
+  initialLocale: isRootGateway ? 'en' : initialLocation.locale,
+  onLocaleChange: async (nextLocale) => {
+    if (isRootGateway) {
+      window.location.assign(localeHref('', nextLocale));
+      return;
+    }
+    navigate(currentRoute(), nextLocale);
+  },
 });
 
-if (initialLocation.legacy || !initialLocation.canonical || initialLocation.locale !== getLocale()) {
+if (
+  !isRootGateway &&
+  (initialLocation.legacy || !initialLocation.canonical || initialLocation.locale !== getLocale())
+) {
   navigate(initialLocation.route, getLocale(), { replace: true });
 }
 
@@ -49,8 +60,25 @@ function context() {
   };
 }
 
-startRouter(renderRoute);
-void renderRoute(currentLocation());
+if (isRootGateway) {
+  if (!appElement.firstElementChild) {
+    const { ROOT_GATEWAY, rootGatewayMarkup } = await import('./root-gateway.js');
+    app.innerHTML = rootGatewayMarkup(LOCALES);
+    applyRouteMetadata(
+      createRouteMetadata({
+        locale: 'en',
+        path: '/',
+        title: ROOT_GATEWAY.title,
+        description: ROOT_GATEWAY.description,
+        socialImageAlt: ROOT_GATEWAY.socialImageAlt,
+      }),
+    );
+  }
+  appElement.dataset.sense6Hydrated = 'language';
+} else {
+  startRouter(renderRoute);
+  void renderRoute(currentLocation());
+}
 
 async function renderRoute({ route, locale }) {
   const token = ++renderToken;
@@ -120,7 +148,7 @@ async function renderRoute({ route, locale }) {
         title: t(definition.pageTitle),
         description: t(definition.blurb),
         socialImage: `/social/${definition.id}.png`,
-        socialImageAlt: `${definition.name} — ${t(definition.tagline)}`,
+        socialImageAlt: `${t(definition.discoveryName ?? definition.name)} — ${t(definition.tagline)}`,
       });
     } else if (route) {
       navigate('', getLocale(), { replace: true });

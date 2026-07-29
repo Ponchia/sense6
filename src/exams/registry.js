@@ -9,7 +9,7 @@ import { EXAM_IDS as CONTRACT_IDS, examContract } from './contracts.js';
 /** @typedef {import('./module-contract.js').ExamMountContext} ExamMountContext */
 /** @typedef {{ mount: (context: ExamMountContext) => (() => void) }} ExamModule */
 /** @typedef {{ paragraphs: string[], related: ExamId[] }} DiscoveryCopy */
-/** @typedef {{ id: ExamId, name: string, tagline: string, blurb: string, accent: string, durationMinutes: number, glyph: string, category: string, facts: string[], pageTitle: string, limit: string, discovery: DiscoveryCopy, load: () => Promise<ExamModule> }} ExamDefinition */
+/** @typedef {{ id: ExamId, name: string, discoveryName?: string, tagline: string, blurb: string, accent: string, durationMinutes: number, glyph: string, category: string, facts: string[], pageTitle: string, limit: string, discovery: DiscoveryCopy, load: () => Promise<ExamModule> }} ExamDefinition */
 /** @typedef {Readonly<Omit<ExamDefinition, 'facts' | 'discovery'> & { route: ExamId, metricTest: string, contract: Readonly<ExamContract>, facts: readonly string[], discovery: Readonly<{ paragraphs: readonly string[], related: readonly ExamId[] }> }>} RegisteredExam */
 
 /** @type {readonly RegisteredExam[]} */
@@ -17,6 +17,7 @@ export const EXAMS = Object.freeze([
   exam({
     id: 'tetracromia',
     name: 'Screen Colour Lab',
+    discoveryName: 'Tetracromia — Screen Colour Lab',
     tagline: 'Three short colour observations',
     blurb:
       'Tetracromia is a recreational screen-colour lab with three separate, short-run observations and no overall score.',
@@ -31,7 +32,6 @@ export const EXAMS = Object.freeze([
       paragraphs: [
         'Three observations from one short screen-colour run.',
         'No names, no account, no result upload. Your session stays in this browser.',
-        'Consumer displays mix three primaries. Confirming functional tetrachromacy requires spectral stimuli that can separate a fourth response, specialized hardware, genetics, and controlled conditions. Tetracromia measures ordinary on-screen color discrimination instead—and says exactly that.',
       ],
       related: ['color-blindness', 'acutezza'],
     },

@@ -10,6 +10,7 @@
 
 const SOURCES = Object.freeze([
   'Screen Colour Lab',
+  'Tetracromia — Screen Colour Lab',
   'Three short colour observations',
   'Tetracromia is a recreational screen-colour lab with three separate, short-run observations and no overall score.',
   'Fixed 29-block dose',
@@ -43,6 +44,7 @@ const TRANSLATIONS = Object.freeze({
   en: SOURCES,
   it: Object.freeze([
     'Laboratorio colore su schermo',
+    'Tetracromia — Laboratorio colore su schermo',
     'Tre brevi osservazioni del colore',
     'Tetracromia è un laboratorio ricreativo del colore su schermo con tre osservazioni brevi e separate, senza punteggio complessivo.',
     'Dose fissa di 29 blocchi',
@@ -72,6 +74,7 @@ const TRANSLATIONS = Object.freeze({
   ]),
   de: Object.freeze([
     'Bildschirm-Farblabor',
+    'Tetracromia — Bildschirm-Farblabor',
     'Drei kurze Farbbeobachtungen',
     'Tetracromia ist ein spielerisches Bildschirm-Farblabor mit drei getrennten Kurzbeobachtungen und ohne Gesamtwert.',
     'Feste Dosis von 29 Blöcken',
@@ -101,6 +104,7 @@ const TRANSLATIONS = Object.freeze({
   ]),
   fr: Object.freeze([
     'Laboratoire couleur sur écran',
+    'Tetracromia — Laboratoire couleur sur écran',
     'Trois brèves observations des couleurs',
     'Tetracromia est un laboratoire ludique de couleur sur écran avec trois observations brèves et séparées, sans score global.',
     'Dose fixe de 29 blocs',
@@ -130,6 +134,7 @@ const TRANSLATIONS = Object.freeze({
   ]),
   es: Object.freeze([
     'Laboratorio de color en pantalla',
+    'Tetracromia — Laboratorio de color en pantalla',
     'Tres observaciones breves del color',
     'Tetracromia es un laboratorio recreativo de color en pantalla con tres observaciones breves y separadas, sin puntuación global.',
     'Dosis fija de 29 bloques',
@@ -159,6 +164,7 @@ const TRANSLATIONS = Object.freeze({
   ]),
   pt: Object.freeze([
     'Laboratório de cor no ecrã',
+    'Tetracromia — Laboratório de cor no ecrã',
     'Três observações breves de cor',
     'Tetracromia é um laboratório recreativo de cor no ecrã com três observações breves e separadas, sem pontuação global.',
     'Dose fixa de 29 blocos',
@@ -188,6 +194,7 @@ const TRANSLATIONS = Object.freeze({
   ]),
   'pt-br': Object.freeze([
     'Laboratório de cor na tela',
+    'Tetracromia — Laboratório de cor na tela',
     'Três observações breves de cor',
     'Tetracromia é um laboratório recreativo de cor na tela com três observações breves e separadas, sem pontuação geral.',
     'Dose fixa de 29 blocos',
@@ -217,6 +224,7 @@ const TRANSLATIONS = Object.freeze({
   ]),
   ar: Object.freeze([
     'مختبر ألوان الشاشة',
+    'مختبر ألوان الشاشة — Tetracromia',
     'ثلاث ملاحظات لونية قصيرة',
     'Tetracromia مختبر ترفيهي لألوان الشاشة يقدّم ثلاث ملاحظات قصيرة ومنفصلة من دون نتيجة إجمالية.',
     'جرعة ثابتة من 29 كتلة',
@@ -246,6 +254,7 @@ const TRANSLATIONS = Object.freeze({
   ]),
   ja: Object.freeze([
     '画面カラーラボ',
+    'Tetracromia — 画面カラーラボ',
     '3つの短い色の観察',
     'Tetracromia は、3つの独立した短時間の観察を行う娯楽目的の画面カラーラボです。総合スコアはありません。',
     '29ブロック固定',
@@ -275,6 +284,7 @@ const TRANSLATIONS = Object.freeze({
   ]),
   ko: Object.freeze([
     '화면 색상 실험실',
+    'Tetracromia — 화면 색상 실험실',
     '세 가지 짧은 색상 관찰',
     'Tetracromia는 서로 분리된 세 가지 짧은 관찰을 제공하는 오락용 화면 색상 실험실이며 종합 점수는 없습니다.',
     '고정 29블록 구성',
@@ -304,6 +314,7 @@ const TRANSLATIONS = Object.freeze({
   ]),
   hi: Object.freeze([
     'स्क्रीन रंग प्रयोगशाला',
+    'Tetracromia — स्क्रीन रंग प्रयोगशाला',
     'रंग के तीन छोटे अवलोकन',
     'Tetracromia मनोरंजन के लिए स्क्रीन रंग प्रयोगशाला है, जिसमें तीन अलग छोटे अवलोकन हैं और कोई समग्र स्कोर नहीं है।',
     '29 ब्लॉक की निश्चित मात्रा',
@@ -333,6 +344,7 @@ const TRANSLATIONS = Object.freeze({
   ]),
   'zh-hans': Object.freeze([
     '屏幕色彩实验室',
+    'Tetracromia — 屏幕色彩实验室',
     '三项简短的色彩观察',
     'Tetracromia 是一项娱乐性的屏幕色彩实验，包含三项相互独立的短时观察，不提供总分。',
     '固定 29 个区块',
