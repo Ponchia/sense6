@@ -1,7 +1,5 @@
 import { EXAMS } from './exams/registry.js';
 
-export const ABOUT_DATE_MODIFIED = '2026-07-19';
-
 const ABOUT_COPY = Object.freeze({
   en: copy({
     pageTitle: 'About Sense6 — experimental browser perception lab',

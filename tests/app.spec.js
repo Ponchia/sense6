@@ -3,12 +3,12 @@ import { expect, test } from '@playwright/test';
 import { aboutCopy } from '../src/about.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { LANDING_COPY_SOURCES, SETUP_COPY_SOURCES } from '../src/locales/landing-copy.js';
-import { LOCALES, loadMessages, localeMetadata } from '../src/locales.js';
+import { LOCALES, loadMessages } from '../src/locales.js';
 import { preparePrivacyCopy, privacyCopy } from '../src/privacy.js';
 import { expectInVisualViewport, expectNoHorizontalOverflow } from './helpers/browser.js';
 
 test('the gallery lists exams, is accessible, and routes into one', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/en/');
   await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
   await expect(page.locator('.brand')).toHaveText('Sense6');
   await expect(page.locator('.brand')).not.toContainText('Perception lab');
@@ -60,6 +60,22 @@ test('the gallery lists exams, is accessible, and routes into one', async ({ pag
   await page.locator('.exam-card__link[href="/en/color-blindness/"]').click();
   await expect(page).toHaveURL(/\/en\/color-blindness\/$/);
   await expect(page.getByRole('heading', { name: /Find the gap in the dots/i })).toBeVisible();
+});
+
+test('the root remains a self-canonical language gateway after JavaScript starts', async ({ page }) => {
+  await page.goto('/');
+
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveTitle('Sense6 — choose your language');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://sense6.net/');
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute('content', 'https://sense6.net/');
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'language');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('.static-language-list a')).toHaveCount(LOCALES.length);
+
+  await page.locator('[data-locale-select]').selectOption('fr');
+  await expect(page).toHaveURL(/\/fr\/$/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
 });
 
 test('SPA navigation commits complete canonical and social metadata for each active route', async ({
@@ -514,8 +530,9 @@ test('every live exam has a localized entry point in every language', async ({ p
       await page.goto(`/${code}/${route}/`);
       await expect(page.locator('html')).toHaveAttribute('lang', languageTag);
       const expected = headingSources[route].map((source) => escapeRegex(messages.get(source))).join('\\s*');
+      const prefix = route === 'tetracromia' ? 'Tetracromia\\s+—\\s+' : '';
       const suffix = ['tetracromia', 'color-blindness'].includes(route) ? '\\.' : '';
-      await expect(page.locator('main h1')).toHaveText(new RegExp(`^${expected}${suffix}$`, 'u'));
+      await expect(page.locator('main h1')).toHaveText(new RegExp(`^${prefix}${expected}${suffix}$`, 'u'));
       await expect(page.locator('[data-locale-select]')).toHaveValue(code);
 
       const rendered = await renderedTextNodes(page);
@@ -599,7 +616,7 @@ test('Arabic uses RTL reading order without reversing physical response directio
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
-test('the first visit follows a supported browser language', async ({ browser }) => {
+test('the root gateway does not rewrite its canonical for the browser language', async ({ browser }) => {
   const port = process.env.PLAYWRIGHT_PORT ?? '4173';
   const context = await browser.newContext({
     locale: 'fr-FR',
@@ -607,28 +624,11 @@ test('the first visit follows a supported browser language', async ({ browser })
   });
   const page = await context.newPage();
   await page.goto('/');
-  await expect(page).toHaveURL(/\/fr\/$/);
-  await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
-  await expect(
-    page.getByRole('heading', { name: /Commencez par ce que vous souhaitez découvrir/i }),
-  ).toBeVisible();
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://sense6.net/');
+  await expect(page.locator('.static-language-list a[hreflang="fr"]')).toHaveAttribute('href', '/fr/');
   await context.close();
-
-  for (const [browserLocale, route] of [
-    ['pt-BR', 'pt-br'],
-    ['zh-CN', 'zh-hans'],
-    ['ar-EG', 'ar'],
-  ]) {
-    const regionalContext = await browser.newContext({
-      locale: browserLocale,
-      baseURL: `http://127.0.0.1:${port}`,
-    });
-    const regionalPage = await regionalContext.newPage();
-    await regionalPage.goto('/');
-    await expect(regionalPage).toHaveURL(new RegExp(`/${route}/$`));
-    await expect(regionalPage.locator('html')).toHaveAttribute('lang', localeMetadata(route).languageTag);
-    await regionalContext.close();
-  }
 });
 
 test('long German labels remain inside the mobile viewport', async ({ page }, testInfo) => {

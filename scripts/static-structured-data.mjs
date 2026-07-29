@@ -1,9 +1,7 @@
-import { ABOUT_DATE_MODIFIED } from '../src/about.js';
+import { CONTENT_DATES, examContentDate } from '../src/content-dates.js';
 import { sourcesFor } from '../src/exams/sources.js';
 import { LOCALES } from '../src/locales.js';
 import { SITE_ORIGIN } from '../src/routes.js';
-
-export const SITE_DATE_MODIFIED = '2026-07-22';
 
 const ORIGIN = SITE_ORIGIN;
 
@@ -21,7 +19,7 @@ export function websiteData(
     inLanguage: locale,
     description,
     image: `${ORIGIN}/social/sense6.png`,
-    dateModified: SITE_DATE_MODIFIED,
+    dateModified: CONTENT_DATES.site,
     creator: creatorData(),
   };
 }
@@ -37,7 +35,7 @@ export function aboutData(copy, locale, path) {
         name: copy.pageTitle,
         description: copy.description,
         inLanguage: locale,
-        dateModified: ABOUT_DATE_MODIFIED,
+        dateModified: CONTENT_DATES.about,
         about: { '@id': `${ORIGIN}/#website` },
         mainEntity: { '@id': `${ORIGIN}/#website` },
       },
@@ -58,20 +56,21 @@ export function aboutData(copy, locale, path) {
 
 export function examData(definition, locale, path, tr) {
   const url = `${ORIGIN}${path}`;
+  const discoveryName = tr(definition.discoveryName ?? definition.name);
   return {
     '@context': 'https://schema.org',
     '@graph': [
       {
         '@type': 'WebApplication',
         '@id': `${url}#application`,
-        name: definition.name,
+        name: discoveryName,
         url,
         description: tr(definition.blurb),
         applicationCategory: 'EducationalApplication',
         isAccessibleForFree: true,
         inLanguage: locale,
         image: `${ORIGIN}/social/${definition.id}.png`,
-        dateModified: SITE_DATE_MODIFIED,
+        dateModified: examContentDate(definition.id),
         creator: creatorData(),
         isPartOf: {
           '@type': 'WebSite',
@@ -91,7 +90,7 @@ export function examData(definition, locale, path, tr) {
             name: tr('All tests'),
             item: `${ORIGIN}/${path.split('/')[1]}/`,
           },
-          { '@type': 'ListItem', position: 2, name: definition.name, item: url },
+          { '@type': 'ListItem', position: 2, name: discoveryName, item: url },
         ],
       },
     ],
