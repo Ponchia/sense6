@@ -2,8 +2,8 @@ import { toast } from '@ponchia/ui/behaviors';
 import '../styles/riflessi-landing.css';
 import '../styles/riflessi.css';
 import { m, t } from '../i18n.js';
-import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
-import { createExamLifecycle } from '../lib/lifecycle.js';
+import { captureDisplayPassport, saveJournalRun } from '../lib/journal.js';
+import { createExamLifecycle, isCurrentMount } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
 import {
   createChoiceSchedule,
@@ -15,59 +15,24 @@ import {
 import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
-import { renderInstrumentList, renderMethodSteps, renderResearchSection } from './landing.js';
 import { protocolPassport } from './protocols.js';
-import { sourcesFor } from './sources.js';
+import { RIFLESSI_INSTRUMENTS, riflessiIntroMarkup } from './views/riflessi-intro.js';
+import { applyScopeSelection, scopeOptionMarkup } from './views/scope-picker.js';
 
 const STORAGE_KEY = 'sense6:riflessi:last';
 const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isLatestRiflessiResult });
 const MOUNT_OWNER = Symbol('riflessi');
-const INSTRUMENTS = {
-  signal: {
-    number: '01',
-    name: 'Segnale',
-    eyebrow: 'Simple visual response',
-    title: 'One signal. One action.',
-    body: 'Wait while the chamber is quiet, then respond as soon as the central mark appears. Random waits make anticipation visible.',
-    note: '8 practice responses, then 20 measured signals and 2 no-signal checks.',
-  },
-  choice: {
-    number: '02',
-    name: 'Scelta',
-    eyebrow: 'Two-choice response',
-    title: 'See a side. Choose it.',
-    body: 'A left or right arrow appears. Respond on the matching side. The block median can be described alongside Segnale, with fixed-order and motor differences left explicit.',
-    note: '8 practice choices, then 32 balanced measured choices.',
-  },
-  stability: {
-    number: '03',
-    name: 'Tenuta',
-    eyebrow: 'Sustained response',
-    title: 'Keep the response steady.',
-    body: 'For three minutes, respond to the same simple signal across longer, irregular waits. The pattern within this run matters more than one fastest press.',
-    note: 'A custom 3-minute sustained-response block. It is not the validated PVT-B protocol and has no clinical lapse metric.',
-  },
-};
-const METHOD_STEPS = [
-  {
-    title: 'Simple and choice response',
-    body: 'A transparent reaction-time task with practice, randomized intervals, and separate simple and choice measures.',
-  },
-  {
-    title: 'Custom sustained block',
-    body: 'A three-minute sequence describes changes within this run. PVT-B is a comparator, not validation of this different event schedule.',
-  },
-  {
-    title: 'Browser timing reality',
-    body: 'Browser experiments can be precise enough for many effects, while input hardware and presentation still add latency.',
-  },
-];
-const RESEARCH_SOURCES = sourcesFor('riflessi');
+// A press only counts while the trial itself is in one of these phases. The
+// `rx-running` body class is presentation and must never gate measurement.
+const RESPONSE_PHASES = new Set(['waiting', 'catch', 'live']);
+const RUNNER_PHASES = new Set(['waiting', 'catch', 'live', 'feedback']);
 
 let state = null;
 
 export function mount(context) {
-  const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClasses: ['lab-mode', 'rx-running'] });
+  const lifecycle = createExamLifecycle(MOUNT_OWNER, {
+    bodyClassesToRelease: ['lab-mode', 'rx-running'],
+  });
   const mountState = {
     app: context.app,
     announcer: context.announcer,
@@ -82,6 +47,7 @@ export function mount(context) {
     deadlineId: 0,
     clockId: 0,
     frameId: 0,
+    cadenceFrameId: 0,
     activeTrial: null,
     trialState: 'idle',
     onsetAt: 0,
@@ -107,100 +73,8 @@ function renderIntro() {
   document.title = t('Response speed and consistency — Riflessi | Sense6');
   const previous = loadLast();
 
-  state.app.innerHTML = `
-    <div class="rx-intro">
-      <section class="rx-intro__hero ui-container ui-container--wide">
-        <button class="back-link exam-back" type="button" data-action="rx-home">
-          <span aria-hidden="true">←</span> ${m('nav.allTests')}
-        </button>
-        <div class="rx-hero">
-        <div class="rx-hero__copy">
-          <p class="ui-eyebrow">Response lab / three instruments / about 7 minutes</p>
-          <h1 tabindex="-1" data-rx-screen-title>Notice the signal.<br><em>Measure the response.</em></h1>
-          <p class="rx-lede">
-            Riflessi separates simple response speed, the extra cost of choosing, and how
-            responses change across a sustained run. It reports this device and this session—nothing broader.
-          </p>
-          <div class="ui-cluster rx-hero__actions">
-            <button class="ui-button ui-button--lg" type="button" data-action="rx-setup">
-              Prepare the lab <span aria-hidden="true">→</span>
-            </button>
-            <a class="ui-link ui-link--cta" href="#rx-method" data-action="rx-method">${m('action.seeMethod')}</a>
-          </div>
-          <p class="hero__limit"><span aria-hidden="true">◇</span> Browser and device latency remain in every measurement.</p>
-          ${
-            previous
-              ? `<p class="previous-score">Last run on this browser: <strong>${previous.inputMode === 'pointer' ? 'touch / pointer' : 'keyboard'} input</strong></p>`
-              : ''
-          }
-        </div>
-        <div class="rx-hero__instrument" aria-hidden="true">
-          <div class="rx-scope">
-            <span class="rx-scope__ring"></span>
-            <span class="rx-scope__signal"></span>
-            <span class="rx-scope__sweep"></span>
-          </div>
-          <div class="rx-hero__readout"><span>Signal</span><strong>ready</strong><i></i></div>
-        </div>
-        </div>
-      </section>
-
-      <div class="rx-signal-strip" aria-hidden="true">
-        ${Array.from({ length: 48 }, (_, index) => `<i style="--tick:${index}"></i>`).join('')}
-      </div>
-
-      <section class="rx-method section" id="rx-method" aria-labelledby="rx-method-title">
-        <div class="ui-container ui-container--wide">
-          <div class="section-heading">
-            <div>
-              <p class="ui-eyebrow">${m('section.methodLimits')}</p>
-              <h2 id="rx-method-title">Three questions, kept separate.</h2>
-            </div>
-            <p>No percentile, “brain age,” or reflex rating. Each instrument answers a narrower question.</p>
-          </div>
-          ${renderInstrumentList(INSTRUMENTS, { classPrefix: 'rx', visual: instrumentVisual })}
-        </div>
-      </section>
-
-      <section class="method section rx-boundary">
-        <div class="ui-container ui-container--wide method__layout">
-          <div class="method__intro">
-            <p class="ui-eyebrow">${m('section.methodLimits')}</p>
-            <h2>Browser and device latency remain in every measurement.</h2>
-            <p>Compare only on the same device and input. Not a clinical or population score.</p>
-          </div>
-          ${renderMethodSteps(METHOD_STEPS)}
-        </div>
-      </section>
-
-      ${renderResearchSection({
-        className: 'rx-research',
-        titleId: 'rx-research-title',
-        title: 'What informed Riflessi.',
-        description:
-          'Established task structures inform the design. They do not validate an uncontrolled browser as a clinical instrument.',
-        label: m('section.researchTrail'),
-        sources: RESEARCH_SOURCES,
-      })}
-
-      <section class="closing-cta rx-closing ui-container ui-container--wide">
-        <div>
-          <p class="ui-eyebrow">Response lab / three instruments / about 7 minutes</p>
-          <h2>Response speed, choice task &amp; consistency</h2>
-        </div>
-        <button class="ui-button ui-button--lg" type="button" data-action="rx-setup-closing">
-          ${m('action.openTest')} <span aria-hidden="true">→</span>
-        </button>
-      </section>
-    </div>
-  `;
+  state.app.innerHTML = riflessiIntroMarkup(previous, m);
   resetScreen();
-}
-
-function instrumentVisual(id) {
-  if (id === 'signal') return '<i class="rx-visual-signal"></i><span></span>';
-  if (id === 'choice') return '<i>←</i><span></span><i>→</i>';
-  return Array.from({ length: 12 }, (_, index) => `<i style="--bar:${index}"></i>`).join('');
 }
 
 function renderSetup() {
@@ -278,18 +152,20 @@ function selectMode(mode) {
 
 /** @param {'signal' | 'signal-choice' | 'complete'} id @param {string} label @param {string} duration */
 function scopeButton(id, label, duration) {
-  const selected = state.selectedScope === id;
-  return `<button class="rx-mode ${selected ? 'is-selected' : ''}" type="button" data-action="rx-scope" data-scope="${id}" aria-pressed="${selected}"><strong>${label}</strong><small>${duration}</small></button>`;
+  return scopeOptionMarkup({
+    action: 'rx-scope',
+    className: 'rx-mode',
+    id,
+    selected: state.selectedScope === id,
+    label,
+    detail: duration,
+  });
 }
 
 /** @param {'signal' | 'signal-choice' | 'complete'} scope */
 function selectScope(scope) {
   state.selectedScope = scope;
-  for (const button of state.app.querySelectorAll('[data-action="rx-scope"]')) {
-    const selected = button.dataset.scope === scope;
-    button.classList.toggle('is-selected', selected);
-    button.setAttribute('aria-pressed', String(selected));
-  }
+  applyScopeSelection(state.app, 'rx-scope', scope);
 }
 
 function startSession() {
@@ -329,7 +205,7 @@ function renderInstrumentBrief(instrument) {
   stopClocks();
   state.session.instrument = instrument;
   state.session.block = null;
-  const info = INSTRUMENTS[instrument];
+  const info = RIFLESSI_INSTRUMENTS[instrument];
   document.body.classList.add('lab-mode');
   document.body.classList.remove('rx-running');
   document.title = `${t(info.name)} — Riflessi | Sense6`;
@@ -415,7 +291,7 @@ function makeSchedule(instrument, practice) {
 function renderRunner() {
   stopClocks();
   document.body.classList.add('lab-mode', 'rx-running');
-  const info = INSTRUMENTS[state.session.instrument];
+  const info = RIFLESSI_INSTRUMENTS[state.session.instrument];
   const choice = state.session.instrument === 'choice';
   const stability = state.session.instrument === 'stability';
 
@@ -496,13 +372,18 @@ function prepareTrial(trial, responseTimeoutMs) {
   }
   updateRunnerProgress();
   state.expectedOnsetAt = performance.now() + trial.waitMs;
+  const mountState = state;
   state.timeoutId = window.setTimeout(() => {
+    if (!isCurrentMount(state, mountState)) return;
     if (trial.kind === 'catch') {
-      state.trialState = 'catch';
-      state.timeoutId = window.setTimeout(() => recordOutcome('catch-correct'), responseTimeoutMs);
+      mountState.trialState = 'catch';
+      mountState.timeoutId = window.setTimeout(() => recordOutcome('catch-correct'), responseTimeoutMs);
       return;
     }
-    state.frameId = requestAnimationFrame((timestamp) => revealSignal(timestamp, responseTimeoutMs));
+    mountState.frameId = requestAnimationFrame((timestamp) => {
+      mountState.frameId = 0;
+      if (isCurrentMount(state, mountState)) revealSignal(timestamp, responseTimeoutMs);
+    });
   }, trial.waitMs);
 }
 
@@ -528,7 +409,7 @@ function revealSignal(timestamp, responseTimeoutMs) {
 }
 
 function handleResponse(response, event) {
-  if (!state.session || !document.body.classList.contains('rx-running')) return;
+  if (!state.session || !RESPONSE_PHASES.has(state.trialState)) return;
   if (state.session.inputMode === 'keyboard' && event.type === 'pointerdown') return;
   if (state.session.inputMode === 'pointer' && event.type === 'keydown') return;
 
@@ -607,7 +488,7 @@ function finishBlock() {
 }
 
 function renderPracticeComplete() {
-  const info = INSTRUMENTS[state.session.instrument];
+  const info = RIFLESSI_INSTRUMENTS[state.session.instrument];
   state.app.innerHTML = `
     <section class="rx-transition ui-container">
       <span class="rx-transition__mark" aria-hidden="true">✓</span>
@@ -638,12 +519,12 @@ function finishCurrentInstrument() {
   const total = state.session.records[completed].length;
   state.app.innerHTML = `
     <section class="rx-transition ui-container">
-      <span class="rx-transition__mark" aria-hidden="true">${INSTRUMENTS[completed].number}</span>
+      <span class="rx-transition__mark" aria-hidden="true">${RIFLESSI_INSTRUMENTS[completed].number}</span>
       <p class="ui-eyebrow">Instrument complete</p>
-      <h1 tabindex="-1" data-rx-screen-title>Measurement recorded: ${INSTRUMENTS[completed].name}.</h1>
+      <h1 tabindex="-1" data-rx-screen-title>Measurement recorded: ${RIFLESSI_INSTRUMENTS[completed].name}.</h1>
       <p>${valid} clean response${valid === 1 ? '' : 's'} captured across ${total} measured event${total === 1 ? '' : 's'}. Interpretation waits until the selected scope is complete. Take a short break now if needed, without changing device or input.</p>
       <button class="ui-button ui-button--lg" type="button" data-action="rx-next-stage" data-next="${next}">
-        Continue to ${INSTRUMENTS[next].name} <span aria-hidden="true">→</span>
+        Continue to ${RIFLESSI_INSTRUMENTS[next].name} <span aria-hidden="true">→</span>
       </button>
     </section>
   `;
@@ -657,7 +538,6 @@ function renderResults() {
   document.body.classList.add('lab-mode');
   document.body.classList.remove('rx-running');
   document.title = t('Your response observations — Riflessi | Sense6');
-  const expectedStability = state.config.stability.durationMs < 10_000 ? 1 : 6;
   const includesChoice = state.session.scope !== 'signal';
   const includesStability = state.session.scope === 'complete';
   const result = summarizeRiflessi(state.session.records, {
@@ -665,7 +545,7 @@ function renderResults() {
     signalScheduled: state.config.signal.scoredTrials + state.config.signal.catchTrials,
     catches: state.config.signal.catchTrials,
     choice: includesChoice ? state.config.choice.scoredTrials : 0,
-    stability: includesStability ? expectedStability : 0,
+    stability: includesStability ? requiredStabilityResponses() : 0,
     interruptions: state.session.diagnostics.interruptions,
   });
   const timing = timingHealth(state.session.diagnostics);
@@ -733,10 +613,11 @@ function renderResults() {
   `;
 
   const lastResultSaved = saveLast(stored);
-  const journalSaved = saveJournalResult(result, timing);
+  const journalOutcome = saveJournalResult(result, timing);
+  const journalSaved = journalOutcome === 'saved';
   const persistence = state.app.querySelector('[data-rx-persistence]');
   if (lastResultSaved && journalSaved) persistence?.remove();
-  else if (persistence) persistence.outerHTML = persistenceStatus(lastResultSaved, journalSaved);
+  else if (persistence) persistence.outerHTML = persistenceStatus(lastResultSaved, journalOutcome);
   const actions = state.app.querySelector('.rx-results__actions');
   if (actions) {
     actions.innerHTML =
@@ -753,9 +634,16 @@ function metricCard(index, label, value, unit, copy) {
   </article>`;
 }
 
-function persistenceStatus(lastResultSaved, journalSaved) {
-  if (lastResultSaved && journalSaved) return '';
-  return `<div class="ui-alert ui-alert--danger rx-persistence-status" data-rx-persistence-status role="alert"><strong class="ui-alert__title">${t('The result is ready, but this browser did not allow local storage.')}</strong></div>`;
+/** @param {boolean} lastResultSaved @param {import('../lib/journal.js').JournalSaveOutcome} journalOutcome */
+function persistenceStatus(lastResultSaved, journalOutcome) {
+  if (lastResultSaved && journalOutcome === 'saved') return '';
+  const message =
+    journalOutcome === 'invalid'
+      ? t(
+          'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
+        )
+      : t('The result is ready, but this browser did not allow local storage.');
+  return `<div class="ui-alert ui-alert--danger rx-persistence-status" data-rx-persistence-status role="alert"><strong class="ui-alert__title">${message}</strong></div>`;
 }
 
 /** @param {'signal' | 'signal-choice' | 'complete'} scope */
@@ -827,8 +715,7 @@ function formatClock(milliseconds) {
 }
 
 function pauseRun() {
-  if (!state.session || !document.body.classList.contains('rx-running') || state.trialState === 'paused')
-    return;
+  if (!state.session || !RUNNER_PHASES.has(state.trialState)) return;
   clearTrialClocks();
   if (state.session.instrument === 'stability') {
     window.clearTimeout(state.deadlineId);
@@ -877,22 +764,30 @@ function resumeRun() {
   }
 }
 
+/*
+ * The setup-screen cadence sampler owns its own frame slot. Sharing one with
+ * the trial-onset frame let a starting trial cancel the sampler, and a running
+ * sampler survive a trial teardown.
+ */
 function measureFrameCadence() {
+  const mountState = state;
   const intervals = [];
   let previous = 0;
   const sample = (timestamp) => {
-    if (!state.app.querySelector('[data-rx-cadence]')) return;
+    mountState.cadenceFrameId = 0;
+    if (!isCurrentMount(state, mountState)) return;
+    if (!mountState.app.querySelector('[data-rx-cadence]')) return;
     if (previous) intervals.push(timestamp - previous);
     previous = timestamp;
     if (intervals.length < 45) {
-      state.frameId = requestAnimationFrame(sample);
+      mountState.cadenceFrameId = requestAnimationFrame(sample);
       return;
     }
     const sorted = [...intervals].sort((left, right) => left - right);
     const frameMs = sorted[Math.floor(sorted.length / 2)];
     const dropped = intervals.filter((value) => value > frameMs * 1.8).length;
-    const output = state.app.querySelector('[data-rx-cadence]');
-    const note = state.app.querySelector('[data-rx-cadence-note]');
+    const output = mountState.app.querySelector('[data-rx-cadence]');
+    const note = mountState.app.querySelector('[data-rx-cadence-note]');
     if (output) {
       output.textContent = `≈ ${frameMs.toFixed(1)} ms / frame`;
       output.dataset.frameMs = String(frameMs);
@@ -903,7 +798,19 @@ function measureFrameCadence() {
         ? t('{count} long frame intervals observed in the sample.', { count: dropped })
         : t('The setup sample was steady.');
   };
-  state.frameId = requestAnimationFrame(sample);
+  mountState.cadenceFrameId = requestAnimationFrame(sample);
+}
+
+/**
+ * Expect the clean responses the configured sustained block can actually
+ * schedule. Each cycle costs one randomized wait, one response window, and one
+ * feedback pause; budgeting the slowest response keeps the expectation
+ * reachable, and the same 80% floor as the other blocks then applies.
+ */
+function requiredStabilityResponses() {
+  const { durationMs, minWaitMs, maxWaitMs, responseTimeoutMs } = state.config.stability;
+  const cycleMs = (minWaitMs + maxWaitMs) / 2 + responseTimeoutMs + state.config.feedbackMs;
+  return Math.max(1, Math.ceil(Math.floor(durationMs / cycleMs) * 0.8));
 }
 
 function timingHealth(diagnostics) {
@@ -978,14 +885,10 @@ async function copyResults() {
       route: 'riflessi',
       locale: mountState.locale,
     });
-    if (outcome === 'copied' && isCurrentMount(mountState)) toast(t('Result summary copied.'));
+    if (outcome === 'copied' && isCurrentMount(state, mountState)) toast(t('Result summary copied.'));
   } catch {
-    if (isCurrentMount(mountState)) toast(t('Copy was unavailable in this browser.'));
+    if (isCurrentMount(state, mountState)) toast(t('Copy was unavailable in this browser.'));
   }
-}
-
-function isCurrentMount(mountState) {
-  return state === mountState && !mountState.lifecycle.signal.aborted;
 }
 
 function wireEvents(signal) {
@@ -1111,8 +1014,10 @@ function eventTimestamp(event) {
 
 function stopClocks() {
   clearTrialClocks();
+  cancelAnimationFrame(state.cadenceFrameId);
   window.clearTimeout(state.deadlineId);
   window.clearInterval(state.clockId);
+  state.cadenceFrameId = 0;
   state.deadlineId = 0;
   state.clockId = 0;
   state.trialState = 'idle';
@@ -1137,6 +1042,7 @@ function saveLast(result) {
   return RESULT_STORE.save(result);
 }
 
+/** @returns {import('../lib/journal.js').JournalSaveOutcome} */
 function saveJournalResult(result, timing) {
   const profileId =
     state.session.scope === 'signal'
@@ -1144,7 +1050,7 @@ function saveJournalResult(result, timing) {
       : state.session.scope === 'signal-choice'
         ? 'signal-choice'
         : 'complete';
-  const entry = createJournalEntry({
+  return saveJournalRun({
     examId: 'riflessi',
     locale: state.locale,
     quality: result.usable ? 'usable' : 'limited',
@@ -1187,7 +1093,6 @@ function saveJournalResult(result, timing) {
     ],
     notes: result.usable ? ['device-relative-custom-tasks'] : ['limited-run', ...result.qualityReasons],
   });
-  return Boolean(entry && appendJournalEntry(entry));
 }
 
 function loadLast() {

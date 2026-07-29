@@ -1205,6 +1205,10 @@ const rows = [
     'Quitter cette session visuelle étalonnée ? Votre résultat incomplet ne sera pas enregistré.',
   ],
   ['{eye} — {instrument}', '{eye} — {instrument}'],
+  [
+    'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
+    'Cette session ne correspondait pas au format d’entrée du journal et n’a donc pas été enregistrée. Copiez le résumé pour le conserver.',
+  ],
 ];
 
 const catalogRows = [...rows, .../** @type {Array<[string, string]>} */ (copyRows)];

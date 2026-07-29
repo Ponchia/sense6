@@ -1052,6 +1052,10 @@ const rows = [
     '要离开本次校准视觉测量吗？未完成的结果将不会保存。',
   ],
   ['{eye} — {instrument}', '{eye} — {instrument}'],
+  [
+    'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
+    '本次运行不符合日志记录格式，因此未被保存。请复制摘要以便留存。',
+  ],
 ];
 
 const catalogRows = [...rows, .../** @type {Array<[string, string]>} */ (copyRows)];

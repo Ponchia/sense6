@@ -16,13 +16,14 @@ import {
   summarizeRange,
 } from '../lib/hearing.js';
 import { HearingAudio } from '../lib/hearing-audio.js';
-import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
-import { createExamLifecycle } from '../lib/lifecycle.js';
+import { captureDisplayPassport, saveJournalRun } from '../lib/journal.js';
+import { createExamLifecycle, isCurrentMount } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
 import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 import { protocolPassport } from './protocols.js';
+import { applyScopeSelection, scopeOptionMarkup } from './views/scope-picker.js';
 import { UDITO_INSTRUMENTS, uditoIntroMarkup } from './views/udito-intro.js';
 
 const STORAGE_KEY = 'sense6:udito:last';
@@ -37,11 +38,20 @@ const TRIAL_PHASES = Object.freeze({
   paused: 'paused',
 });
 const INSTRUMENTS = UDITO_INSTRUMENTS;
+// A presentation is in flight. The `au-running` body class is styling only and
+// must never decide whether a response or an interruption is recorded.
+const RUNNER_PHASES = new Set([
+  TRIAL_PHASES.playing,
+  TRIAL_PHASES.awaitingResponse,
+  TRIAL_PHASES.committedFeedback,
+]);
 
 let state = null;
 
 export function mount(context) {
-  const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClasses: ['lab-mode', 'au-running'] });
+  const lifecycle = createExamLifecycle(MOUNT_OWNER, {
+    bodyClassesToRelease: ['lab-mode', 'au-running'],
+  });
   const config = runtimeConfig();
   const mountState = {
     app: context.app,
@@ -79,7 +89,9 @@ export function mount(context) {
       mountState.audio.onStateChange = null;
       mountState.audio.onOutputChange = null;
     }
-    mountState.audio?.close();
+    // close() rejects when the context is already closing; an unhandled
+    // rejection during unmount would surface as a page-level error.
+    void mountState.audio?.close().catch(() => {});
     mountState.audio = null;
     mountState.session = null;
     if (state === mountState) state = null;
@@ -90,6 +102,7 @@ export function mount(context) {
 function renderIntro() {
   state.lifecycle.setActive(false);
   stopPlayback();
+  state.trialPhase = TRIAL_PHASES.idle;
   state.session = null;
   state.referencePlayed = false;
   state.anchorsPlayed = false;
@@ -102,6 +115,7 @@ function renderIntro() {
 function renderSetup() {
   state.lifecycle.setActive(false);
   stopPlayback();
+  state.trialPhase = TRIAL_PHASES.idle;
   state.referencePlayed = false;
   state.anchorsPlayed = false;
   document.body.classList.add('lab-mode');
@@ -201,7 +215,7 @@ async function playReference() {
     button.textContent = t('Play reference again');
     toast(t('The reference sound did not complete.'));
   } finally {
-    if (isCurrentMount(mountState) && mountState.app.contains(button)) button.disabled = false;
+    if (isCurrentMount(state, mountState) && mountState.app.contains(button)) button.disabled = false;
   }
 }
 
@@ -243,25 +257,27 @@ async function playAudibilityAnchors() {
     if (!isCurrentPlayback(mountState, operation)) return;
     status.textContent = 'Anchor playback did not complete. Check the audio route and try again.';
   } finally {
-    if (isCurrentMount(mountState) && mountState.app.contains(button)) button.disabled = false;
+    if (isCurrentMount(state, mountState) && mountState.app.contains(button)) button.disabled = false;
     if (isCurrentPlayback(mountState, operation)) updateSetupGate();
   }
 }
 
 /** @param {'focused' | 'standard'} id @param {string} label @param {string} detail */
 function audioScopeButton(id, label, detail) {
-  const selected = state.selectedScope === id;
-  return `<button class="au-scope-option ${selected ? 'is-selected' : ''}" type="button" data-action="au-scope" data-scope="${id}" aria-pressed="${selected}"><strong>${t(label)}</strong><small>${t(detail)}</small></button>`;
+  return scopeOptionMarkup({
+    action: 'au-scope',
+    className: 'au-scope-option',
+    id,
+    selected: state.selectedScope === id,
+    label: t(label),
+    detail: t(detail),
+  });
 }
 
 /** @param {'focused' | 'standard'} scope */
 function selectAudioScope(scope) {
   state.selectedScope = scope;
-  for (const button of state.app.querySelectorAll('[data-action="au-scope"]')) {
-    const selected = button.dataset.scope === scope;
-    button.classList.toggle('is-selected', selected);
-    button.setAttribute('aria-pressed', String(selected));
-  }
+  applyScopeSelection(state.app, 'au-scope', scope);
 }
 
 function updateSetupGate() {
@@ -291,13 +307,11 @@ function startSession() {
     connection: state.app.querySelector('[data-au-connection]')?.value ?? 'other',
     scope: state.selectedScope,
     sampleRate: state.audio.sampleRate,
-    anchorsConfirmed: true,
     volumeConsistent: null,
     headphoneRecords: [],
     rangeTrack: createRangeTrack(maxHz, state.config.range),
     pitchTracks: createPitchTracks(state.config.pitch),
     interruptions: 0,
-    outputChanges: 0,
     committedTrialIds: new Set(),
   };
   renderBrief('headphones');
@@ -306,6 +320,7 @@ function startSession() {
 function renderBrief(instrument) {
   state.lifecycle.setActive(true, t('Leave this listening run? Your progress will be lost.'));
   stopPlayback();
+  state.trialPhase = TRIAL_PHASES.idle;
   state.session.instrument = instrument;
   const info = INSTRUMENTS[instrument];
   const instrumentTotal = state.session.scope === 'focused' ? '02' : '03';
@@ -443,11 +458,10 @@ async function playTrial() {
   }
   if (!isCurrentPlayback(mountState, operation)) return;
   if (!completed) {
-    if (mountState.session && document.body.classList.contains('au-running'))
-      pauseRun('Audio playback did not complete.');
+    pauseRun('Audio playback did not complete.');
     return;
   }
-  if (!mountState.session || !document.body.classList.contains('au-running')) return;
+  if (!mountState.session || mountState.trialPhase !== TRIAL_PHASES.playing) return;
   clearIntervalHighlights();
   mountState.trialPhase = TRIAL_PHASES.awaitingResponse;
   if (runner) runner.dataset.trialPhase = mountState.trialPhase;
@@ -607,7 +621,6 @@ function renderResults() {
     controlsOkay &&
     settled &&
     interruptionFree &&
-    state.session.anchorsConfirmed &&
     state.session.volumeConsistent === true;
   const setupQuality = usable ? 'Setup checks coherent' : 'Interpret with caution';
   const result = {
@@ -639,11 +652,12 @@ function renderResults() {
       <div class="ui-cluster au-results__actions"></div>
     </section>`;
   saveLast({ setupQuality, sampleRate: state.session.sampleRate, recordedAt: Date.now() });
-  const journalSaved = saveJournalResult(result);
-  state.session.journalSaved = journalSaved;
+  const journalOutcome = saveJournalResult(result);
+  const journalSaved = journalOutcome === 'saved';
+  const journalNote = journalStatusNote(journalOutcome);
   const persistence = state.app.querySelector('[data-au-persistence]');
   if (persistence) {
-    persistence.outerHTML = `<div class="ui-alert ${journalSaved ? 'ui-alert--success' : 'ui-alert--danger'}" data-au-journal-status role="${journalSaved ? 'status' : 'alert'}"><strong class="ui-alert__title">${t(journalSaved ? 'Saved to the private journal on this device.' : 'Journal entry not saved.')}</strong><p class="ui-alert__body">${t(journalSaved ? 'The structured run context is available for later same-setup comparison.' : 'The result remains available here and can still be copied, but it was not added to the private journal.')}</p></div>`;
+    persistence.outerHTML = `<div class="ui-alert ${journalSaved ? 'ui-alert--success' : 'ui-alert--danger'}" data-au-journal-status role="${journalSaved ? 'status' : 'alert'}"><strong class="ui-alert__title">${t(journalSaved ? 'Saved to the private journal on this device.' : 'Journal entry not saved.')}</strong><p class="ui-alert__body">${journalNote}</p></div>`;
   }
   const actions = state.app.querySelector('.au-results__actions');
   if (actions) {
@@ -655,6 +669,19 @@ function renderResults() {
       ? 'Udito results ready. {quality}. Saved to the private journal.'
       : 'Udito results ready. {quality}. The journal entry was not saved.',
     { quality: t(setupQuality) },
+  );
+}
+
+/** @param {import('../lib/journal.js').JournalSaveOutcome} outcome */
+function journalStatusNote(outcome) {
+  if (outcome === 'saved')
+    return t('The structured run context is available for later same-setup comparison.');
+  if (outcome === 'invalid')
+    return t(
+      'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
+    );
+  return t(
+    'The result remains available here and can still be copied, but it was not added to the private journal.',
   );
 }
 
@@ -731,7 +758,6 @@ function formatControlAccuracy(range) {
 
 function resultCautionReasons({ headphones, range, pitch }) {
   const reasons = [];
-  if (!state.session.anchorsConfirmed) reasons.push('Audibility anchors were not confirmed');
   if (state.session.volumeConsistent !== true) reasons.push('Device volume changed or was uncertain');
   if (!headphones.headphoneLike)
     reasons.push(`Cuffie found ${headphones.correct}/${headphones.trials} quiet targets`);
@@ -755,7 +781,7 @@ function resultCautionReasons({ headphones, range, pitch }) {
 }
 
 function pauseRun(message = 'This playback was interrupted.', { setupRequired = false } = {}) {
-  if (!state.session || !document.body.classList.contains('au-running')) return;
+  if (!runnerActive()) return;
   const pausedFrom = state.trialPhase;
   stopPlayback();
   state.pausePromise = state.audio?.suspend().catch(() => {}) ?? Promise.resolve();
@@ -810,9 +836,7 @@ function handleAudioStateChange(contextState) {
       'Audio output paused or changed. Play the maximum-level reference again before beginning.',
     );
   }
-  if (document.body.classList.contains('au-running')) {
-    pauseRun('The audio context stopped before the presentation completed.');
-  }
+  pauseRun('The audio context stopped before the presentation completed.');
 }
 
 function handleOutputDeviceChange() {
@@ -822,23 +846,15 @@ function handleOutputDeviceChange() {
       'The available audio outputs changed. Confirm the route and play the maximum-level reference again.',
     );
   }
-  if (state.session?.result) return;
-  if (state.session && document.body.classList.contains('au-running')) {
-    state.session.outputChanges += 1;
+  if (!state.session || state.session.result) return;
+  if (runnerActive()) {
     pauseRun('The available audio output changed.', { setupRequired: true });
-  } else if (state.session && state.app.querySelector('[data-au-paused]')) {
-    state.session.outputChanges += 1;
-    renderSetup();
-    invalidateReference(
-      'The available audio outputs changed. Confirm the route and play the maximum-level reference again.',
-    );
-  } else if (state.session) {
-    state.session.outputChanges += 1;
-    renderSetup();
-    invalidateReference(
-      'The available audio outputs changed. Confirm the route and play the maximum-level reference again.',
-    );
+    return;
   }
+  renderSetup();
+  invalidateReference(
+    'The available audio outputs changed. Confirm the route and play the maximum-level reference again.',
+  );
 }
 
 async function copyResults() {
@@ -892,10 +908,10 @@ async function copyResults() {
       route: 'udito',
       locale: mountState.locale,
     });
-    if (!isCurrentMount(mountState)) return;
+    if (!isCurrentMount(state, mountState)) return;
     if (outcome === 'copied') toast(t('Result summary copied.'));
   } catch {
-    if (!isCurrentMount(mountState)) return;
+    if (!isCurrentMount(state, mountState)) return;
     toast(t('Copy was unavailable in this browser.'));
   }
 }
@@ -918,12 +934,13 @@ function beginPlaybackOperation(mountState) {
   return mountState.playbackOperation;
 }
 
-function isCurrentMount(mountState) {
-  return state === mountState && !mountState.lifecycle.signal.aborted;
+/** @param {typeof state} mountState */
+function runnerActive(mountState = state) {
+  return Boolean(mountState?.session) && RUNNER_PHASES.has(mountState.trialPhase);
 }
 
 function isCurrentPlayback(mountState, operation) {
-  return isCurrentMount(mountState) && mountState.playbackOperation === operation;
+  return isCurrentMount(state, mountState) && mountState.playbackOperation === operation;
 }
 
 function wireEvents(signal) {
@@ -1016,7 +1033,7 @@ function wireEvents(signal) {
       if (
         event.key === 'Escape' &&
         state.session &&
-        (document.body.classList.contains('au-running') || state.app.querySelector('[data-au-paused]'))
+        (runnerActive() || state.trialPhase === TRIAL_PHASES.paused)
       ) {
         event.preventDefault();
         stopSafely();
@@ -1062,6 +1079,7 @@ function saveLast(result) {
   }
 }
 
+/** @returns {import('../lib/journal.js').JournalSaveOutcome} */
 function saveJournalResult(result) {
   const rangeMeasurement = {
     id: 'range-hz',
@@ -1069,7 +1087,7 @@ function saveJournalResult(result) {
     unit: 'Hz',
     ...(result.range.atCeiling && result.range.settled ? { bound: 'lower' } : {}),
   };
-  const entry = createJournalEntry({
+  return saveJournalRun({
     examId: 'udito',
     locale: state.locale,
     quality: result.usable ? 'usable' : 'caution',
@@ -1081,7 +1099,6 @@ function saveJournalResult(result) {
       sampleRate: state.session.sampleRate,
       interruptions: state.session.interruptions,
       selfReportedVolumeConsistent: state.session.volumeConsistent,
-      audibilityAnchorsConfirmed: state.session.anchorsConfirmed,
       portataControlAccuracy: result.range.controlAccuracyPercent,
       portataControlTrials: result.range.controlTrials,
       portataExpectedControls: result.range.expectedControls,
@@ -1104,7 +1121,6 @@ function saveJournalResult(result) {
       pitch2000Reversals: result.pitch.find((pitch) => pitch.anchorHz === 2000)?.reversals ?? 0,
       interruptions: state.session.interruptions,
       volumeConsistent: state.session.volumeConsistent,
-      anchorsConfirmed: state.session.anchorsConfirmed,
     },
     measurements: [
       {
@@ -1123,7 +1139,6 @@ function saveJournalResult(result) {
       ? ['volume-self-reported-not-verified', 'device-relative-not-audiometry']
       : ['setup-check-limited', 'volume-self-reported-not-verified', ...result.cautionReasons],
   });
-  return Boolean(entry && appendJournalEntry(entry));
 }
 
 function loadLast() {

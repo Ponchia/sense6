@@ -23,8 +23,13 @@ import {
   captureDisplayGeometry as captureGeometry,
   displayGeometryMatches as geometryMatches,
 } from '../lib/display-geometry.js';
-import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
-import { createExamLifecycle } from '../lib/lifecycle.js';
+import { captureDisplayPassport, saveJournalRun } from '../lib/journal.js';
+import {
+  createExamLifecycle,
+  forcedColorsActive,
+  isCurrentMount,
+  watchForcedColors,
+} from '../lib/lifecycle.js';
 import { drawLandoltRing } from '../lib/optotypes.js';
 import { seededRandom } from '../lib/random.js';
 import { shareOrCopyResult } from '../lib/result-sharing.js';
@@ -45,9 +50,9 @@ import {
   formatArcmin,
   formatBoundedAcuity,
 } from './views/acutezza-results.js';
+import { applyScopeSelection, scopeOptionMarkup } from './views/scope-picker.js';
 
 const STORAGE_KEY = 'sense6:acutezza:last';
-const FORCED_COLORS_QUERY = '(forced-colors: active)';
 const LEGACY_RESULT_STORE = createResultStore({
   key: STORAGE_KEY,
   version: 1,
@@ -64,7 +69,7 @@ let state = null;
 
 export function mount(context) {
   const lifecycle = createExamLifecycle(MOUNT_OWNER, {
-    bodyClasses: ['ac-active', 'lab-mode', 'ac-running'],
+    bodyClassesToRelease: ['ac-active', 'lab-mode', 'ac-running'],
   });
   const mountState = {
     app: context.app,
@@ -92,7 +97,7 @@ export function mount(context) {
   document.body.classList.add('ac-active');
   wireEvents(lifecycle.signal);
   const themeObserver = new MutationObserver(() => {
-    if (isCurrentMount(mountState)) themeChanged();
+    if (isCurrentMount(state, mountState)) themeChanged();
   });
   themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   renderIntro();
@@ -134,18 +139,20 @@ function renderPreparation() {
 
 /** @param {'focused' | 'standard'} id @param {string} label @param {string} detail */
 function acuityScopeButton(id, label, detail) {
-  const selected = state.selectedScope === id;
-  return `<button class="ac-scope-option ${selected ? 'is-selected' : ''}" type="button" data-action="ac-scope" data-scope="${id}" aria-pressed="${selected}"><strong>${label}</strong><small>${detail}</small></button>`;
+  return scopeOptionMarkup({
+    action: 'ac-scope',
+    className: 'ac-scope-option',
+    id,
+    selected: state.selectedScope === id,
+    label,
+    detail,
+  });
 }
 
 /** @param {'focused' | 'standard'} scope */
 function selectAcuityScope(scope) {
   state.selectedScope = scope;
-  for (const button of state.app.querySelectorAll('[data-action="ac-scope"]')) {
-    const selected = button.dataset.scope === scope;
-    button.classList.toggle('is-selected', selected);
-    button.setAttribute('aria-pressed', String(selected));
-  }
+  applyScopeSelection(state.app, 'ac-scope', scope);
 }
 
 function beginCalibration() {
@@ -235,7 +242,7 @@ function renderBlindSpotCalibration({ recheck = false } = {}) {
 }
 
 function checkSweepSpace(mountState) {
-  if (!isCurrentMount(mountState)) return;
+  if (!isCurrentMount(state, mountState)) return;
   mountState.sweepCheckFrame = 0;
   const field = mountState.app.querySelector('[data-ac-sweep-field]');
   if (!field || !mountState.session?.sweep) return;
@@ -269,7 +276,7 @@ function startSweep() {
     'The dot is moving. Keep looking at the square.',
   );
   const animate = (now) => {
-    if (!isCurrentMount(mountState) || !mountState.session?.sweep) return;
+    if (!isCurrentMount(state, mountState) || !mountState.session?.sweep) return;
     const progress = Math.min(1, (now - mountState.sweepStartedAt) / mountState.config.calibration.sweepMs);
     const offset =
       mountState.sweepGeometry.startOffset +
@@ -706,7 +713,6 @@ function renderResults() {
       : 'Run unusable';
   state.session.result = { setupQuality, usable, strongest, bounded, controlCorrect, controlCount };
   const completion = acutezzaCompletion();
-  state.session.journalSaved = true;
   document.title = t('Your calibrated sharpness observations — Acutezza | Sense6');
   renderScreen(
     acutezzaResultsMarkup({
@@ -719,7 +725,7 @@ function renderResults() {
     }),
   );
   const latestResultSaved = saveLast({ setupQuality, completion, recordedAt: Date.now() });
-  const journalSaved = saveJournalResult({
+  const journalOutcome = saveJournalResult({
     setupQuality,
     usable,
     strongest,
@@ -728,13 +734,19 @@ function renderResults() {
     controlCount,
     completion,
   });
-  state.session.journalSaved = journalSaved;
+  const journalSaved = journalOutcome === 'saved';
   if (!latestResultSaved || !journalSaved) {
+    const message =
+      journalOutcome === 'invalid'
+        ? t(
+            'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
+          )
+        : t('The result is ready, but this browser did not allow local storage.');
     state.app
       .querySelector('.ac-eye-results')
       ?.insertAdjacentHTML(
         'beforebegin',
-        `<div class="ui-alert ui-alert--danger" data-ac-journal-status role="alert"><strong class="ui-alert__title">${t('The result is ready, but this browser did not allow local storage.')}</strong></div>`,
+        `<div class="ui-alert ui-alert--danger" data-ac-journal-status role="alert"><strong class="ui-alert__title">${message}</strong></div>`,
       );
   }
   const actions = state.app.querySelector('.ac-results__actions');
@@ -756,14 +768,17 @@ async function copyResults() {
       route: 'acutezza',
       locale: state.locale,
     });
-    if (isCurrentMount(mountState) && outcome === 'copied') toast(t('Result summary copied.'));
+    if (isCurrentMount(state, mountState) && outcome === 'copied') toast(t('Result summary copied.'));
   } catch {
-    if (isCurrentMount(mountState)) toast(t('Copy was unavailable in this browser.'));
+    if (isCurrentMount(state, mountState)) toast(t('Copy was unavailable in this browser.'));
   }
 }
 
 function pauseRun() {
-  if (!state.session?.currentEye || !document.body.classList.contains('ac-running')) return;
+  // A target is only in flight while a response is open or its feedback pause
+  // is still pending. The `ac-running` body class is presentation; gating on it
+  // also counted interruptions from transition and blocked screens.
+  if (!state.session?.currentEye || !(state.responseOpen || state.pendingAdvance)) return;
   clearTimeout(state.feedbackTimer);
   state.feedbackTimer = 0;
   state.responseOpen = false;
@@ -790,7 +805,7 @@ function geometryChanged() {
   if (!hasGeometryCheckpoint()) return;
   const mountState = state;
   state.geometryTimer = window.setTimeout(() => {
-    if (!isCurrentMount(mountState)) return;
+    if (!isCurrentMount(state, mountState)) return;
     ensureGeometry('Browser zoom, viewport size, pixel ratio, or orientation changed during the run.');
   }, 120);
 }
@@ -834,10 +849,6 @@ function renderCalibrationInvalid(reason) {
 
 function checkpointGeometry() {
   if (state.session?.calibration) state.session.calibration.geometry = captureGeometry();
-}
-
-function forcedColorsActive() {
-  return Boolean(window.matchMedia?.(FORCED_COLORS_QUERY).matches);
 }
 
 function guardForcedColors(retry) {
@@ -968,7 +979,7 @@ function wireEvents(signal) {
   window.addEventListener('resize', geometryChanged, { signal });
   window.addEventListener('orientationchange', geometryChanged, { signal });
   window.visualViewport?.addEventListener('resize', geometryChanged, { signal });
-  window.matchMedia?.(FORCED_COLORS_QUERY).addEventListener('change', forcedColorsChanged, { signal });
+  watchForcedColors(forcedColorsChanged, signal);
 }
 
 function clearSweep() {
@@ -994,7 +1005,7 @@ function clearRuntime() {
 }
 
 function advanceCommittedTrial(mountState) {
-  if (!isCurrentMount(mountState) || !state.pendingAdvance || !state.session?.currentEye) return;
+  if (!isCurrentMount(state, mountState) || !state.pendingAdvance || !state.session?.currentEye) return;
   clearTimeout(state.feedbackTimer);
   state.feedbackTimer = 0;
   state.pendingAdvance = false;
@@ -1005,10 +1016,6 @@ function advanceCommittedTrial(mountState) {
 function withTrialIdentity(trial) {
   state.trialSequence += 1;
   return { ...trial, id: `acutezza-${state.trialSequence}`, responseCommitted: false };
-}
-
-function isCurrentMount(mountState) {
-  return state === mountState && !mountState.lifecycle.signal.aborted;
 }
 
 function maximumAcuityCanvasBox() {
@@ -1075,6 +1082,7 @@ function saveLast(result) {
   return saved;
 }
 
+/** @returns {import('../lib/journal.js').JournalSaveOutcome} */
 function saveJournalResult({
   setupQuality,
   usable,
@@ -1092,7 +1100,7 @@ function saveJournalResult({
       ...(eye.low ? [{ id: `${prefix}-contrast-cost`, value: eye.contrastCostPercent, unit: '%' }] : []),
     ];
   });
-  const entry = createJournalEntry({
+  return saveJournalRun({
     examId: 'acutezza',
     locale: state.locale,
     quality: strongest ? 'usable' : usable ? 'caution' : 'limited',
@@ -1132,7 +1140,6 @@ function saveJournalResult({
       ...(state.session.distanceRecheckPassed === true ? ['second-eye-distance-recheck-passed'] : []),
     ],
   });
-  return Boolean(entry && appendJournalEntry(entry));
 }
 
 function acutezzaCompletion() {

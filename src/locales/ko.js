@@ -1142,6 +1142,10 @@ const rows = [
     '이 보정된 시각 세션을 나가시겠어요? 완료되지 않은 결과는 저장되지 않습니다.',
   ],
   ['{eye} — {instrument}', '{eye} — {instrument}'],
+  [
+    'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
+    '이 실행은 기록 형식과 일치하지 않아 저장되지 않았습니다. 요약을 복사해 보관하세요.',
+  ],
 ];
 
 const catalogRows = [...rows, .../** @type {Array<[string, string]>} */ (copyRows)];

@@ -78,8 +78,6 @@ export const journal = Object.freeze({
   notComparable: '비교할 수 없음',
   noPrevious: '이 도구의 이전 회차가 없습니다.',
   change: '변화',
-  uncertainty: '결합 불확도',
-  noUncertainty: '제공된 불확도 구간 없음',
   bounded: '한 값 또는 두 값 모두 측정 경곗값임',
   lowerBound: '하한',
   upperBound: '상한',

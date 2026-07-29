@@ -1196,6 +1196,10 @@ const rows = [
     'Diese kalibrierte Sehsitzung verlassen? Ihr unvollständiges Ergebnis wird nicht gespeichert.',
   ],
   ['{eye} — {instrument}', '{eye} — {instrument}'],
+  [
+    'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
+    'Dieser Durchlauf entsprach nicht dem Format eines Journaleintrags und wurde daher nicht gespeichert. Kopieren Sie die Zusammenfassung, um sie zu behalten.',
+  ],
 ];
 
 const catalogRows = [...rows, .../** @type {Array<[string, string]>} */ (copyRows)];

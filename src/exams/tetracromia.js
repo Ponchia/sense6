@@ -3,8 +3,13 @@ import '../styles/tetracromia-landing.css';
 import '../styles/tetracromia.css';
 import { formatNumber, m, t } from '../i18n.js';
 import { toRgbCss } from '../lib/color.js';
-import { appendJournalEntry, captureDisplayPassport, createJournalEntry } from '../lib/journal.js';
-import { createExamLifecycle } from '../lib/lifecycle.js';
+import { captureDisplayPassport, saveJournalRun } from '../lib/journal.js';
+import {
+  createExamLifecycle,
+  forcedColorsActive,
+  isCurrentMount,
+  watchForcedColors,
+} from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
 import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
 import { ColorLabSession, PHASES } from '../lib/session.js';
@@ -20,7 +25,7 @@ const RAPID_TOUCH_COMMIT_MS = 600;
 let state = null;
 
 export function mount(context) {
-  const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClasses: ['lab-mode'] });
+  const lifecycle = createExamLifecycle(MOUNT_OWNER, { bodyClassesToRelease: ['lab-mode'] });
   const mountState = {
     app: context.app,
     announcer: context.announcer,
@@ -360,7 +365,7 @@ function armResponseGate(restoreFocusSelector) {
       document.querySelectorAll('[data-choice], [data-action="submit-sequence"]').forEach((button) => {
         button.disabled = false;
       });
-      scheduleFieldRedraw();
+      guardVisualEnvironment();
       if (restoreFocusSelector) {
         document.querySelector(restoreFocusSelector)?.focus({ preventScroll: true });
       }
@@ -396,7 +401,12 @@ function positionLabTransition() {
   });
 }
 
-function scheduleFieldRedraw() {
+/**
+ * Stop the run when the display it was calibrated against changes. This never
+ * repaints anything: a resized or rescaled viewport invalidates the measured
+ * stimulus, so the only honest response is to end the run before saving.
+ */
+function guardVisualEnvironment() {
   if (!state?.labActive || !state.measurementEnvironment) return;
   if (visualEnvironmentChanged(state.measurementEnvironment, captureVisualEnvironment())) {
     invalidateVisualRun(
@@ -635,11 +645,18 @@ function renderResults() {
     </section>
   `;
 
-  const journalSaved = saveJournalResult(result);
+  const journalOutcome = saveJournalResult(result);
+  const journalSaved = journalOutcome === 'saved';
   const persistence = state.app.querySelector('[data-tetracromia-persistence]');
   if (journalSaved) persistence?.remove();
   else if (persistence) {
-    persistence.outerHTML = `<div class="ui-alert ui-alert--danger tetracromia-journal-status" data-tetracromia-journal-status role="alert"><strong class="ui-alert__title">${t('The result is ready, but this browser did not allow local storage.')}</strong></div>`;
+    persistence.outerHTML = `<div class="ui-alert ui-alert--danger tetracromia-journal-status" data-tetracromia-journal-status role="alert"><strong class="ui-alert__title">${
+      journalOutcome === 'invalid'
+        ? t(
+            'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
+          )
+        : t('The result is ready, but this browser did not allow local storage.')
+    }</strong></div>`;
   }
   state.app
     .querySelector('[data-tetracromia-result-actions]')
@@ -673,8 +690,9 @@ function formatDuration(milliseconds) {
   return `${Math.floor(seconds / 60)}m ${String(seconds % 60).padStart(2, '0')}s`;
 }
 
+/** @returns {import('../lib/journal.js').JournalSaveOutcome} */
 function saveJournalResult(result) {
-  const entry = createJournalEntry({
+  return saveJournalRun({
     examId: 'tetracromia',
     locale: state.locale,
     quality: 'caution',
@@ -695,7 +713,6 @@ function saveJournalResult(result) {
     ],
     notes: ['short-exploratory-protocol', 'not-a-stable-threshold'],
   });
-  return Boolean(entry && appendJournalEntry(entry));
 }
 
 async function copyResults() {
@@ -722,14 +739,10 @@ function announce(message) {
   cancelAnimationFrame(mountedState.announcementFrame);
   mountedAnnouncer.textContent = '';
   mountedState.announcementFrame = requestAnimationFrame(() => {
-    if (state !== mountedState) return;
+    if (!isCurrentMount(state, mountedState)) return;
     mountedState.announcementFrame = 0;
     mountedAnnouncer.textContent = t(message);
   });
-}
-
-function forcedColorsActive() {
-  return window.matchMedia?.('(forced-colors: active)').matches === true;
 }
 
 function updateSetupEligibility() {
@@ -787,11 +800,9 @@ function wireEvents(signal) {
   document.addEventListener('pointermove', onSequencePointerMove, { signal });
   document.addEventListener('pointerup', onSequencePointerUp, { signal });
   document.addEventListener('pointercancel', onSequencePointerCancel, { signal });
-  window.addEventListener('resize', scheduleFieldRedraw, { signal });
+  window.addEventListener('resize', guardVisualEnvironment, { signal });
   document.addEventListener('visibilitychange', handleVisibilityChange, { signal });
-  window
-    .matchMedia?.('(forced-colors: active)')
-    .addEventListener('change', handleForcedColorsChange, { signal });
+  watchForcedColors(handleForcedColorsChange, signal);
 }
 
 function handleSetupChange(event) {

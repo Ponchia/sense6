@@ -1139,6 +1139,10 @@ const rows = [
     'هل تريد مغادرة جلسة الرؤية المُعايرة هذه؟ لن تُحفظ نتيجتك غير المكتملة.',
   ],
   ['{eye} — {instrument}', '{eye} — {instrument}'],
+  [
+    'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
+    'لم تطابق هذه الجلسة تنسيق سجل المفكرة، لذلك لم يتم حفظها. انسخ الملخص للاحتفاظ به.',
+  ],
 ];
 
 const catalogRows = [...rows, .../** @type {Array<[string, string]>} */ (copyRows)];

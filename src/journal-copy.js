@@ -5,7 +5,7 @@ import {
 } from './locales/supplemental.js';
 
 /** @typedef {{ schema: string, exportTime: string, identifiers: string, timestamps: string, locale: string, protocol: string, setup: string, quality: string, measurements: string, notes: string, idPurpose: string }} JournalDisclosure */
-/** @typedef {{ title: string, eyebrow: string, intro: string, privacy: string, emptyTitle: string, empty: string, filter: string, all: string, export: string, import: string, deleteAll: string, deleteOne: string, back: string, setup: string, measurements: string, latest: string, compare: string, comparable: string, caution: string, notComparable: string, noPrevious: string, change: string, uncertainty: string, noUncertainty: string, bounded: string, lowerBound: string, upperBound: string, yes: string, no: string, importSuccess: string, importFailure: string, storageFailure: string, confirmAll: string, confirmOne: string, entries: string, reasonInstrument: string, reasonProtocol: string, reasonSetup: string, reasonVolume: string, reasonLimited: string, reasonMinor: string, modelInterval: string, importPreview: string, exportDisclosure: Readonly<JournalDisclosure> }} JournalCopy */
+/** @typedef {{ title: string, eyebrow: string, intro: string, privacy: string, emptyTitle: string, empty: string, filter: string, all: string, export: string, import: string, deleteAll: string, deleteOne: string, back: string, setup: string, measurements: string, latest: string, compare: string, comparable: string, caution: string, notComparable: string, noPrevious: string, change: string, bounded: string, lowerBound: string, upperBound: string, yes: string, no: string, importSuccess: string, importFailure: string, storageFailure: string, confirmAll: string, confirmOne: string, entries: string, reasonInstrument: string, reasonProtocol: string, reasonSetup: string, reasonVolume: string, reasonLimited: string, reasonMinor: string, modelInterval: string, importPreview: string, exportDisclosure: Readonly<JournalDisclosure> }} JournalCopy */
 
 /** @type {Readonly<Record<string, Readonly<JournalCopy>>>} */
 const COPY = Object.freeze({
@@ -34,8 +34,6 @@ const COPY = Object.freeze({
     notComparable: 'Not comparable',
     noPrevious: 'No earlier run for this instrument.',
     change: 'Change',
-    uncertainty: 'combined uncertainty',
-    noUncertainty: 'no uncertainty interval supplied',
     bounded: 'one or both values are measurement bounds',
     lowerBound: 'lower bound',
     upperBound: 'upper bound',
@@ -97,8 +95,6 @@ const COPY = Object.freeze({
     notComparable: 'Non confrontabile',
     noPrevious: 'Nessuna sessione precedente per questo strumento.',
     change: 'Variazione',
-    uncertainty: 'incertezza combinata',
-    noUncertainty: 'nessun intervallo di incertezza disponibile',
     bounded: 'uno o entrambi i valori sono limiti di misura',
     lowerBound: 'limite inferiore',
     upperBound: 'limite superiore',
@@ -159,8 +155,6 @@ const COPY = Object.freeze({
     notComparable: 'Nicht vergleichbar',
     noPrevious: 'Kein früherer Durchlauf für dieses Instrument.',
     change: 'Änderung',
-    uncertainty: 'kombinierte Unsicherheit',
-    noUncertainty: 'kein Unsicherheitsintervall vorhanden',
     bounded: 'ein oder beide Werte sind Messgrenzen',
     lowerBound: 'Untergrenze',
     upperBound: 'Obergrenze',
@@ -222,8 +216,6 @@ const COPY = Object.freeze({
     notComparable: 'Non comparable',
     noPrevious: 'Aucune session antérieure pour cet instrument.',
     change: 'Évolution',
-    uncertainty: 'incertitude combinée',
-    noUncertainty: 'aucun intervalle d’incertitude fourni',
     bounded: 'une ou deux valeurs sont des limites de mesure',
     lowerBound: 'limite inférieure',
     upperBound: 'limite supérieure',
@@ -285,8 +277,6 @@ const COPY = Object.freeze({
     notComparable: 'No comparable',
     noPrevious: 'No hay una sesión anterior para este instrumento.',
     change: 'Cambio',
-    uncertainty: 'incertidumbre combinada',
-    noUncertainty: 'no se proporcionó un intervalo de incertidumbre',
     bounded: 'uno o ambos valores son límites de medición',
     lowerBound: 'límite inferior',
     upperBound: 'límite superior',
@@ -348,8 +338,6 @@ const COPY = Object.freeze({
     notComparable: 'Não comparável',
     noPrevious: 'Não existe uma sessão anterior para este instrumento.',
     change: 'Alteração',
-    uncertainty: 'incerteza combinada',
-    noUncertainty: 'sem intervalo de incerteza fornecido',
     bounded: 'um ou ambos os valores são limites de medição',
     lowerBound: 'limite inferior',
     upperBound: 'limite superior',

@@ -1148,6 +1148,10 @@ const rows = [
     'この較正済み視覚セッションから退出しますか？未完了の結果は保存されません。',
   ],
   ['{eye} — {instrument}', '{eye} — {instrument}'],
+  [
+    'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
+    'この実行は記録の形式に一致しなかったため保存されませんでした。概要をコピーして保存してください。',
+  ],
 ];
 
 const catalogRows = [...rows, .../** @type {Array<[string, string]>} */ (copyRows)];

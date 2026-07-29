@@ -77,8 +77,6 @@ export const journal = Object.freeze({
   notComparable: 'غير قابل للمقارنة',
   noPrevious: 'لا توجد جولة سابقة لهذه الأداة.',
   change: 'التغيّر',
-  uncertainty: 'عدم اليقين المجمّع',
-  noUncertainty: 'لم يُقدَّم نطاق لعدم اليقين',
   bounded: 'إحدى القيمتين أو كلتاهما حدّ للقياس',
   lowerBound: 'الحد الأدنى',
   upperBound: 'الحد الأعلى',
