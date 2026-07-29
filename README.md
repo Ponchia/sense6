@@ -334,7 +334,7 @@ publication. Both the client and Pages Function accept metrics only on
 protected preview prerequisite and activation constraints appear below and in
 the release runbook.
 
-The initial English route budget is at most 110 kB of raw JavaScript across the
+The initial English route budget is at most 112 kB of raw JavaScript across the
 complete transitive graph recorded in Vite's manifest, not only the entry
 chunk. Entry CSS is limited to 125 kB raw, every route stylesheet to 40 kB raw,
 and entry plus the largest route stylesheet to 150 kB raw. The gallery and

@@ -7,14 +7,30 @@ import {
   measureActiveRouteGraph,
   measureInitialLocaleGraph,
 } from '../scripts/vite-manifest.mjs';
+import { aboutMarkup } from '../src/about.js';
 import { CONTENT_DATES, examContentDate } from '../src/content-dates.js';
 import { CRAWLER_POLICY } from '../src/crawler-policy.js';
 import { EXAMS } from '../src/exams/registry.js';
+import { galleryMarkup } from '../src/gallery-markup.js';
+import { messageSource } from '../src/i18n/message-ids.js';
+import { interpolateMessage } from '../src/i18n.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
 import { routePath, UTILITY_ROUTES } from '../src/routes.js';
 import { STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
 
 const DIST = new URL('../dist/', import.meta.url);
+/**
+ * The descriptor half of every discovery identity. A bare brand noun is not a
+ * heading anyone searches for, and PR #58 shipped four of them because the
+ * only assertion here was that an <h1> element existed.
+ */
+const DISCOVERY_NAMES = Object.freeze({
+  tetracromia: 'Tetracromia — Screen Colour Lab',
+  'color-blindness': 'Daltonia — Colour Discrimination Lab',
+  riflessi: 'Riflessi — Reaction Time Lab',
+  udito: 'Udito — Hearing Range & Pitch Lab',
+  acutezza: 'Acutezza — Visual Sharpness Lab',
+});
 const expectedPaths = [
   '/',
   ...LOCALES.flatMap(({ code }) => [
@@ -32,7 +48,9 @@ test('every canonical route has substantive, localized raw HTML', async () => {
     const locale = path.split('/').filter(Boolean)[0] ?? 'en';
     const metadata = LOCALES.find(({ code }) => code === locale) ?? LOCALES[0];
     assert.match(html, new RegExp(`<html lang="${metadata.languageTag}" dir="${metadata.direction}"`), path);
-    assert.match(html, /<h1[ >]/, path);
+    assert.equal((html.match(/<h1[ >]/g) ?? []).length, 1, `${path} needs exactly one top-level heading`);
+    const heading = headingText(html);
+    assert.ok(heading.length >= 8, `${path} heading "${heading}" is too thin to describe the page`);
     assert.match(html, /<meta name="description" content="[^"].+">/, path);
     assert.match(
       html,
@@ -79,6 +97,13 @@ test('every canonical route has substantive, localized raw HTML', async () => {
     }
     const title = html.match(/<title>([^<]+)<\/title>/)?.[1];
     assert.ok(title, `${path} needs a title`);
+    const description = decodeEntities(html.match(/<meta name="description" content="([^"]+)">/)?.[1] ?? '');
+    // Thresholds sit just under the shortest legitimate CJK copy: they catch a
+    // heading, title, or description collapsing to a bare label, not verbosity.
+    assert.ok(title.length >= 15, `${path} title "${title}" is degenerate`);
+    assert.ok(description.length >= 30, `${path} description "${description}" is degenerate`);
+    assert.notEqual(description, decodeEntities(title), `${path} repeats its title as its description`);
+    assert.notEqual(description, heading, `${path} repeats its heading as its description`);
     const localizedTitle = `${locale}:${title}`;
     if (path !== '/') assert.ok(!titles.has(localizedTitle), `duplicate title within ${locale}: ${title}`);
     titles.add(localizedTitle);
@@ -130,6 +155,99 @@ test('experiment discovery pages expose useful copy, related routes, images, and
     assert.equal(data['@graph'][0].creator.name, 'Zeno');
     assert.equal(data['@graph'][0].creator.url, undefined);
     assert.equal(data['@graph'][0].image, `https://sense6.net/social/${definition.id}.png`);
+  }
+});
+
+test('every experiment heading names the brand and what it observes, in every language', async () => {
+  assert.deepEqual(
+    EXAMS.map(({ id, discoveryName }) => [id, discoveryName]),
+    Object.entries(DISCOVERY_NAMES),
+    'every experiment needs a discovery identity, not a bare brand noun',
+  );
+
+  for (const { code } of LOCALES) {
+    const messages = await loadMessages(code);
+    for (const definition of EXAMS) {
+      const expected = messages.get(definition.discoveryName);
+      assert.ok(expected, `${code} is missing the ${definition.id} discovery identity`);
+      const html = await readFile(new URL(`${code}/${definition.route}/index.html`, DIST), 'utf8');
+      const heading = headingText(html);
+      assert.equal(heading, expected, `${code}/${definition.route} renders the wrong heading`);
+      assert.notEqual(
+        heading,
+        messages.get(definition.name) ?? definition.name,
+        `${code}/${definition.route} fell back to the bare brand noun`,
+      );
+      assert.ok(
+        heading.length > (messages.get(definition.name) ?? definition.name).length,
+        `${code}/${definition.route} heading "${heading}" adds no descriptor`,
+      );
+      if (code !== 'en') {
+        assert.notEqual(heading, definition.discoveryName, `${code} left the identity untranslated`);
+      }
+    }
+  }
+});
+
+test('the shared gallery and About renderers are exactly what shipped in every locale', async () => {
+  for (const { code: locale } of LOCALES) {
+    const messages = await loadMessages(locale);
+    const translate = (source, values = {}) =>
+      interpolateMessage(messages.get(source) ?? source, values, locale);
+    const gallery = galleryMarkup({
+      exams: EXAMS,
+      locale,
+      localeHref: (route) => `/${locale}/${route ? `${route}/` : ''}`,
+      m: (id) => translate(messageSource(id)),
+      t: translate,
+    });
+    const galleryHtml = await readFile(new URL(`${locale}/index.html`, DIST), 'utf8');
+    assert.ok(
+      galleryHtml.includes(gallery),
+      `${locale} gallery diverges from the renderer the runtime adopts`,
+    );
+    for (const definition of EXAMS) {
+      assert.ok(
+        gallery.includes(escapeHtml(translate(definition.limit))),
+        `${locale} gallery card for ${definition.id} omits its interpretation limit`,
+      );
+    }
+
+    const aboutHtml = await readFile(new URL(`${locale}/about/index.html`, DIST), 'utf8');
+    assert.ok(
+      aboutHtml.includes(aboutMarkup(locale, translate)),
+      `${locale} About page diverges from the renderer the runtime adopts`,
+    );
+    for (const definition of EXAMS) {
+      const identity = messages.get(definition.discoveryName);
+      assert.ok(
+        aboutHtml.includes(escapeHtml(identity)),
+        `${locale} About page omits the localized ${definition.id} identity`,
+      );
+      if (locale !== 'en') {
+        assert.ok(
+          !aboutHtml.includes(`>${definition.name}<`),
+          `${locale} About page ships the untranslated ${definition.id} name`,
+        );
+      }
+    }
+  }
+});
+
+test('the site root states its safety boundary in every language without leaving /', async () => {
+  const html = await readFile(new URL('index.html', DIST), 'utf8');
+  const boundary = messageSource('boundary.recreational');
+  assert.match(html, /<link rel="canonical" href="https:\/\/sense6\.net\/">/);
+  assert.equal((html.match(/rel="alternate" hreflang=/g) ?? []).length, LOCALES.length + 1);
+  for (const { code, languageTag } of LOCALES) {
+    const messages = await loadMessages(code);
+    const translated = messages.get(boundary);
+    assert.ok(translated, `${code} is missing the recreational boundary`);
+    assert.ok(
+      html.includes(`<li lang="${languageTag}"`),
+      `the language gateway omits the ${code} boundary block`,
+    );
+    assert.ok(html.includes(escapeHtml(translated)), `the language gateway omits the ${code} boundary`);
   }
 });
 
@@ -359,7 +477,10 @@ test('Cloudflare headers and function routes stay fail-closed', async () => {
 });
 
 test('the entry bundle stays route-split and within its documented budget', async () => {
-  const INITIAL_JS_BUDGET = 110_000;
+  // 112 kB, not 110 kB: the eagerly loaded English catalog carries every
+  // localized source string, so honest discovery identities and the gallery
+  // interpretation limits are paid for here. README documents the same number.
+  const INITIAL_JS_BUDGET = 112_000;
   const ENTRY_CSS_BUDGET = 125_000;
   const ROUTE_CSS_BUDGET = 40_000;
   const COMBINED_CSS_BUDGET = 150_000;
@@ -427,8 +548,28 @@ function escapeRegex(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+/** Mirrors the escaping the static generator applies to every rendered string. */
 function escapeHtml(value) {
-  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function decodeEntities(value) {
+  return value
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>')
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#39;', "'")
+    .replaceAll('&amp;', '&');
+}
+
+/** The crawlable heading exactly as a reader sees it, markup and entities resolved. */
+function headingText(html) {
+  return decodeEntities(stripTags(html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/)?.[1] ?? ''));
 }
 
 function modulePreloadHrefs(html) {
