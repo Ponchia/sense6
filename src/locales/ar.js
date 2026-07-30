@@ -76,7 +76,7 @@ const rows = [
   ['Volume safety contract', 'تعليمات سلامة مستوى الصوت'],
   ['No hearing label', 'لا تصنيف للسمع'],
   ['3 instruments', '3 أدوات'],
-  ['Calibrated sharpness experiment', 'تجربة حدّة بصرية مُعايرة'],
+  ['Calibrated sharpness experiment', 'تجربة حدة مُعايرة'],
   ['Physical screen calibration', 'معايرة الأبعاد الفعلية للشاشة'],
   ['No clinical label', 'لا تصنيف سريري'],
   ['Calibrate the screen.', 'عاير الشاشة.'],

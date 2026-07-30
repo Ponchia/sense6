@@ -9,7 +9,7 @@
   ["Fixed 29-block dose", "29 ब्लॉक की निश्चित मात्रा"],
   ["3 separate observations", "3 अलग अवलोकन"],
   ["Screen Colour Lab — Tetracromia | Sense6", "स्क्रीन रंग प्रयोगशाला — Tetracromia | Sense6"],
-  ["Calibrated sharpness & nominal contrast", "कैलिब्रेट की गई तीक्ष्णता और नाममात्र कंट्रास्ट"],
+  ["Calibrated sharpness & nominal contrast", "कैलिब्रेट की गई स्पष्टता और नाममात्र कंट्रास्ट"],
   [
     "Two per-eye conditions describe angular detail and nominal low-contrast cost without making a clinical claim.",
     "हर आँख की दो स्थितियाँ कोणीय विवरण और नाममात्र कम-कंट्रास्ट के प्रभाव का वर्णन करती हैं, कोई चिकित्सीय दावा नहीं करतीं।"
@@ -30,7 +30,7 @@
   ["Complete set", "पूरा सेट"],
   ["Riflessi — device-relative response observations", "Riflessi — डिवाइस-सापेक्ष प्रतिक्रिया अवलोकन"],
   ["Udito — device-relative listening observations", "Udito — डिवाइस-सापेक्ष सुनने के अवलोकन"],
-  ["Acutezza — calibrated sharpness observations", "Acutezza — कैलिब्रेट किए गए तीक्ष्णता अवलोकन"],
+  ["Acutezza — calibrated sharpness observations", "Acutezza — कैलिब्रेट की गई स्पष्टता के अवलोकन"],
   [
     "The setup checks and adaptive tracks produced coherent run-level observations.",
     "सेटअप जाँच और अनुकूली ट्रैक ने इस सत्र के लिए सुसंगत अवलोकन दिए।"
@@ -42,7 +42,7 @@
   ["Daltonia — Colour Discrimination Lab", "Daltonia — रंग विभेदन प्रयोगशाला"],
   ["Riflessi — Reaction Time Lab", "Riflessi — प्रतिक्रिया समय प्रयोगशाला"],
   ["Udito — Hearing Range & Pitch Lab", "Udito — श्रवण परास और स्वरमान प्रयोगशाला"],
-  ["Acutezza — Visual Sharpness Lab", "Acutezza — दृश्य तीक्ष्णता प्रयोगशाला"],
+  ["Acutezza — Visual Sharpness Lab", "Acutezza — दृश्य स्पष्टता प्रयोगशाला"],
   ["How much do you want to run?", "आप परीक्षण कितनी गहराई तक करना चाहते हैं?"],
   ["about 2 minutes", "लगभग 2 मिनट"],
   ["about 4 minutes", "लगभग 4 मिनट"],

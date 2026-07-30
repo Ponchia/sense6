@@ -57,6 +57,9 @@ export function aboutData(copy, locale, path) {
 export function examData(definition, locale, path, tr) {
   const url = `${ORIGIN}${path}`;
   const discoveryName = tr(definition.discoveryName ?? definition.name);
+  // A breadcrumb is a position label, not a second heading: the crumb keeps the
+  // short localized `name` while WebApplication.name carries the full identity.
+  const crumb = tr(definition.name);
   return {
     '@context': 'https://schema.org',
     '@graph': [
@@ -90,7 +93,7 @@ export function examData(definition, locale, path, tr) {
             name: tr('All tests'),
             item: `${ORIGIN}/${path.split('/')[1]}/`,
           },
-          { '@type': 'ListItem', position: 2, name: discoveryName, item: url },
+          { '@type': 'ListItem', position: 2, name: crumb, item: url },
         ],
       },
     ],

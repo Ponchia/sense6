@@ -259,8 +259,8 @@
   ],
   ["I heard all three anchors comfortably without changing volume.", "音量を変えずに、3つの確認音をすべて快適に聞けました。"],
   ["Choose this run's scope", "今回の実行範囲を選択"],
-  ["Focused Sharpness", "視認細度のみ"],
+  ["Focused Sharpness", "視認精度のみ"],
   ["24 interactions per eye", "片眼につき24操作"],
-  ["Sharpness + nominal contrast", "視認細度 + 公称コントラスト"],
+  ["Sharpness + nominal contrast", "視認精度 + 公称コントラスト"],
   ["44 interactions per eye", "片眼につき44操作"]
 ]

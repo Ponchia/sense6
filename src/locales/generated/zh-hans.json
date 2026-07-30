@@ -9,7 +9,7 @@
   ["Fixed 29-block dose", "固定 29 个区块"],
   ["3 separate observations", "3 项独立观察"],
   ["Screen Colour Lab — Tetracromia | Sense6", "屏幕色彩实验室 — Tetracromia | Sense6"],
-  ["Calibrated sharpness & nominal contrast", "校准后的视敏度与标称对比度"],
+  ["Calibrated sharpness & nominal contrast", "校准后的清晰度与标称对比度"],
   [
     "Two per-eye conditions describe angular detail and nominal low-contrast cost without making a clinical claim.",
     "每只眼睛采用两种条件来描述角度细节和标称低对比度的影响，不作临床结论。"
@@ -30,7 +30,7 @@
   ["Complete set", "完整组合"],
   ["Riflessi — device-relative response observations", "Riflessi — 与设备相关的反应观察"],
   ["Udito — device-relative listening observations", "Udito — 与设备相关的听觉观察"],
-  ["Acutezza — calibrated sharpness observations", "Acutezza — 校准后的敏锐度观察"],
+  ["Acutezza — calibrated sharpness observations", "Acutezza — 校准后的清晰度观察"],
   [
     "The setup checks and adaptive tracks produced coherent run-level observations.",
     "设置检查和自适应轨迹为本次运行产生了相互一致的观察。"
@@ -42,7 +42,7 @@
   ["Daltonia — Colour Discrimination Lab", "Daltonia — 色彩辨别实验室"],
   ["Riflessi — Reaction Time Lab", "Riflessi — 反应时间实验室"],
   ["Udito — Hearing Range & Pitch Lab", "Udito — 可听范围与音高实验室"],
-  ["Acutezza — Visual Sharpness Lab", "Acutezza — 视敏度实验室"],
+  ["Acutezza — Visual Sharpness Lab", "Acutezza — 视觉清晰度实验室"],
   ["How much do you want to run?", "你希望测试进行到什么程度？"],
   ["about 2 minutes", "约2分钟"],
   ["about 4 minutes", "约4分钟"],

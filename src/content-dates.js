@@ -9,13 +9,13 @@
  */
 export const CONTENT_DATES = Object.freeze({
   site: '2026-07-30',
-  about: '2026-07-29',
+  about: '2026-07-30',
   exams: Object.freeze({
-    tetracromia: '2026-07-29',
-    'color-blindness': '2026-07-29',
-    riflessi: '2026-07-29',
-    udito: '2026-07-29',
-    acutezza: '2026-07-29',
+    tetracromia: '2026-07-30',
+    'color-blindness': '2026-07-30',
+    riflessi: '2026-07-30',
+    udito: '2026-07-30',
+    acutezza: '2026-07-30',
   }),
 });
 

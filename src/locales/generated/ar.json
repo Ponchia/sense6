@@ -1,6 +1,6 @@
 [
   ["Screen Colour Lab", "مختبر ألوان الشاشة"],
-  ["Tetracromia — Screen Colour Lab", "مختبر ألوان الشاشة — Tetracromia"],
+  ["Tetracromia — Screen Colour Lab", "Tetracromia — مختبر ألوان الشاشة"],
   ["Three short colour observations", "ثلاث ملاحظات لونية قصيرة"],
   [
     "Tetracromia is a recreational screen-colour lab with three separate, short-run observations and no overall score.",
@@ -42,7 +42,7 @@
   ["Daltonia — Colour Discrimination Lab", "Daltonia — مختبر تمييز الألوان"],
   ["Riflessi — Reaction Time Lab", "Riflessi — مختبر زمن رد الفعل"],
   ["Udito — Hearing Range & Pitch Lab", "Udito — مختبر المدى المسموع ودرجة الصوت"],
-  ["Acutezza — Visual Sharpness Lab", "Acutezza — مختبر الحدة البصرية"],
+  ["Acutezza — Visual Sharpness Lab", "Acutezza — مختبر حدة التفاصيل"],
   ["How much do you want to run?", "ما مدى عمق الاختبار الذي تريده؟"],
   ["about 2 minutes", "نحو دقيقتين"],
   ["about 4 minutes", "نحو 4 دقائق"],
@@ -280,8 +280,8 @@
     "سمعت المراجع الثلاثة براحة ومن دون تغيير مستوى الصوت."
   ],
   ["Choose this run's scope", "اختر نطاق هذه الجولة"],
-  ["Focused Sharpness", "حدة البصر فقط"],
+  ["Focused Sharpness", "الحدة فقط"],
   ["24 interactions per eye", "24 تفاعلًا لكل عين"],
-  ["Sharpness + nominal contrast", "حدة البصر + تباين اسمي"],
+  ["Sharpness + nominal contrast", "الحدة + تباين اسمي"],
   ["44 interactions per eye", "44 تفاعلًا لكل عين"]
 ]

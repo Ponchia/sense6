@@ -98,7 +98,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
       title: translate(definition.pageTitle),
       description: translate(definition.blurb),
       socialImage: `/social/${definition.id}.png`,
-      socialImageAlt: `${translate(definition.discoveryName ?? definition.name)} — ${translate(definition.tagline)}`,
+      socialImageAlt: translate(definition.discoveryName ?? definition.name),
       main: examMarkup(definition, locale, translate),
       stylesheet: routeStyles.get(definition.id),
       alternates: pageAlternates(definition.route),
@@ -300,6 +300,18 @@ function localizeShell(html, locale) {
   );
 }
 
+/*
+ * One descriptor per identity string.
+ *
+ * `discoveryName` already carries brand plus descriptor, so the tagline that
+ * used to be appended to the bare `name` now produces three descriptors in one
+ * string ("Acutezza — Visual Sharpness Lab — Calibrated sharpness & nominal
+ * contrast"). The localized `discoveryName` therefore stands alone wherever an
+ * experiment labels itself: the <h1>, the social and figure alt text, the
+ * related-experiment link, WebApplication.name, and llms.txt. The tagline stays
+ * a separate element on gallery cards; the breadcrumb crumb uses the short
+ * `name` (see scripts/static-structured-data.mjs).
+ */
 function examMarkup(definition, locale, tr) {
   const discoveryName = tr(definition.discoveryName ?? definition.name);
   const related = definition.discovery.related.map((id) => {
@@ -316,7 +328,7 @@ function examMarkup(definition, locale, tr) {
       <a class="ui-button" href="#interactive-test">${escapeHtml(tr('Open test'))}</a>
     </header>
     <figure class="static-preview">
-      <img src="/social/${definition.id}.svg" width="1200" height="630" alt="${escapeAttribute(`${discoveryName} — ${tr(definition.tagline)}`)}" loading="lazy">
+      <img src="/social/${definition.id}.svg" width="1200" height="630" alt="${escapeAttribute(discoveryName)}" loading="lazy">
     </figure>
     <section>
       <h2>${escapeHtml(tr('What this test includes'))}</h2>
@@ -342,7 +354,7 @@ function examMarkup(definition, locale, tr) {
       <div class="static-page-grid">${related
         .map(
           (entry) => `<article class="ui-card">
-            <h3><a data-sense6-route="${entry.route}" href="/${locale}/${entry.route}/">${escapeHtml(tr(entry.discoveryName ?? entry.name))} — ${escapeHtml(tr(entry.tagline))}</a></h3>
+            <h3><a data-sense6-route="${entry.route}" href="/${locale}/${entry.route}/">${escapeHtml(tr(entry.discoveryName ?? entry.name))}</a></h3>
             <p>${escapeHtml(tr(entry.blurb))}</p>
           </article>`,
         )
