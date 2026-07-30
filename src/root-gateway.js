@@ -24,16 +24,15 @@ export function rootGatewayMarkup(locales, translate = (_code, source) => source
     <p class="ui-eyebrow">Sense6</p>
     <h1>Measure what your senses notice.</h1>
     <p>Choose your language to read about private, device-relative perception experiments and open a test.</p>
-    <p><strong>${escapeHtml(BOUNDARY)}</strong></p>
     <nav class="static-language-list" aria-label="Language">${locales
       .map(
         ({ code, languageTag, direction, label }) =>
           `<a href="/${code}/" hreflang="${languageTag}" lang="${languageTag}" dir="${direction}">${label}</a>`,
       )
       .join('')}</nav>
-    <section aria-labelledby="root-boundary-title">
+    <section class="static-boundary" aria-labelledby="root-boundary-title">
       <h2 id="root-boundary-title">${escapeHtml(ROOT_GATEWAY.boundaryTitle)}</h2>
-      <ul>${locales
+      <ul class="static-boundary-list">${locales
         .map(
           ({ code, languageTag, direction, label }) =>
             `<li lang="${languageTag}" dir="${direction}"><strong>${escapeHtml(label)}</strong> — ${escapeHtml(translate(code, BOUNDARY))}</li>`,
