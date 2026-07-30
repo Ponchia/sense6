@@ -221,6 +221,66 @@ test('the About page has complete, dedicated copy for every locale', () => {
   }
 });
 
+/**
+ * The clinical visual-acuity term in each locale.
+ *
+ * English says "sharpness", never "acuity", because Acutezza measures nothing
+ * clinically and must not imply it does. That distinction is invisible to a
+ * translator working row by row: fr/es/pt/ko kept it, de/ar/hi/zh-hans each
+ * reached for the term an optometrist uses and silently re-clinicalised the
+ * experiment's own name. Product copy may say sharpness or clarity; naming the
+ * clinical measure is what this forbids. The About page and the safety notices
+ * are exempt by construction — they are not in CLINICAL_SCOPE below, because
+ * they exist to disclaim exactly these terms.
+ */
+const CLINICAL_ACUITY_TERMS = Object.freeze({
+  en: ['acuity'],
+  it: ['acuità'],
+  de: ['Sehschärfe', 'Visus'],
+  fr: ['acuité'],
+  es: ['agudeza'],
+  pt: ['acuidade'],
+  'pt-br': ['acuidade'],
+  ar: ['الحدة البصرية', 'حدة البصر', 'حدّة بصرية', 'حدة بصرية'],
+  ja: ['視力'],
+  ko: ['시력'],
+  hi: ['दृश्य तीक्ष्णता', 'दृष्टि तीक्ष्णता'],
+  'zh-hans': ['视敏度', '视力'],
+});
+
+test('no locale names the clinical acuity measure in Acutezza product copy', async () => {
+  const acutezza = EXAMS.find(({ id }) => id === 'acutezza');
+  assert.ok(acutezza?.discoveryName, 'Acutezza needs a discovery identity to check');
+  // `acutezza.name` is the bare brand noun and is deliberately not translated.
+  const scope = [
+    acutezza.discoveryName,
+    acutezza.tagline,
+    acutezza.blurb,
+    acutezza.category,
+    acutezza.pageTitle,
+    'Acutezza — calibrated sharpness observations',
+    'High-contrast sharpness',
+    'Focused Sharpness',
+    'Sharpness + nominal contrast',
+  ];
+
+  for (const { code } of LOCALES) {
+    const messages = await loadMessages(code);
+    const terms = CLINICAL_ACUITY_TERMS[code];
+    assert.ok(terms, `${code} has no declared clinical acuity term`);
+    for (const source of scope) {
+      const translated = messages.get(source);
+      assert.ok(translated, `${code} is missing: ${source}`);
+      for (const term of terms) {
+        assert.ok(
+          !translated.toLowerCase().includes(term.toLowerCase()),
+          `${code} renders the clinical term "${term}" in Acutezza copy: "${translated}" (${source})`,
+        );
+      }
+    }
+  }
+});
+
 test('every registry field used by static pages is explicitly localized', async () => {
   const sources = EXAMS.flatMap((exam) => [
     ...(exam.discoveryName ? [exam.discoveryName] : []),

@@ -530,6 +530,39 @@
   max-inline-size: 36rem;
 }
 
+/* The interpretation limit is a caveat, not a third selling paragraph. It used
+   to reuse .exam-card__blurb with no rules of its own, so it inherited body
+   copy and read as more marketing. Exam pages mark the same sentence with
+   .hero__limit — mono face plus an accent ◇ — so the card gets that affordance
+   here. Deliberately NOT smaller: it was measured at 12.5px / 5.60:1 light /
+   6.52:1 dark, larger than most of the page, and shrinking a caveat to signal
+   "caveat" is the failure this fixes. Size and colour are inherited unchanged;
+   only the face and the marker are new. */
+.exam-card__limit {
+  align-items: baseline;
+  color: var(--text-dim);
+  display: flex;
+  font-family: var(--mono);
+  gap: 0.45rem;
+  line-height: 1.6;
+  margin: 0.35rem 0 0;
+  max-inline-size: 36rem;
+}
+
+/* The marker carries its own class rather than being selected as a bare
+   `span`: .sense-mark__core strong span above is more specific and would then
+   be flagged as descending specificity. */
+.exam-card__limit-mark {
+  color: var(--accent-text);
+  flex: none;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.exam-card__limit small {
+  min-inline-size: 0;
+}
+
 .exam-card__facts {
   display: flex;
   flex-wrap: wrap;

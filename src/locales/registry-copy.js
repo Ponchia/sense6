@@ -38,8 +38,21 @@ const SOURCES = Object.freeze([
   'Sense6 validation',
   'Share result',
   // Discovery identities: brand plus an honest, searchable descriptor of what
-  // the experiment actually observes. Every static <h1>, breadcrumb, and
-  // gallery card reads from these, so they must exist in every locale.
+  // the experiment actually observes. Every static <h1>, WebApplication name,
+  // and gallery card reads from these, so they must exist in every locale.
+  //
+  // The identity is a single descriptor. It is never concatenated with the
+  // tagline — see scripts/generate-static-pages.mjs and src/main.js, which both
+  // pass it through alone.
+  //
+  // Acutezza deliberately says "sharpness", not "acuity": naming the clinical
+  // measure would imply one. Four locales lost that distinction by translating
+  // the descriptor with the term an optometrist uses (de Sehschärfe,
+  // ar الحدة البصرية, hi दृश्य तीक्ष्णता, zh-hans 视敏度), so a locale is now free
+  // to say "sharpness/clarity" but not "acuity" anywhere in Acutezza's product
+  // copy. tests/i18n.test.js enforces that per locale; the About page and the
+  // safety notices still name the clinical measure, because they exist to
+  // disclaim it.
   'Daltonia — Colour Discrimination Lab',
   'Riflessi — Reaction Time Lab',
   'Udito — Hearing Range & Pitch Lab',
@@ -91,7 +104,7 @@ const TRANSLATIONS = Object.freeze({
     'Feste Dosis von 29 Blöcken',
     '3 getrennte Beobachtungen',
     'Bildschirm-Farblabor — Tetracromia | Sense6',
-    'Kalibrierte Sehschärfe und Nennkontrast',
+    'Kalibrierte Schärfe und Nennkontrast',
     'Zwei Bedingungen pro Auge beschreiben Winkeldetails und den nominellen Niedrigkontrast-Effekt, ohne klinische Aussage.',
     '2 Bedingungen pro Auge',
     'Adaptive Stufen',
@@ -115,7 +128,7 @@ const TRANSLATIONS = Object.freeze({
     'Daltonia — Labor für Farbunterscheidung',
     'Riflessi — Labor für Reaktionszeit',
     'Udito — Labor für Hörbereich und Tonhöhe',
-    'Acutezza — Labor für Sehschärfe',
+    'Acutezza — Labor für visuelle Schärfe',
   ]),
   fr: Object.freeze([
     'Laboratoire couleur sur écran',
@@ -255,7 +268,7 @@ const TRANSLATIONS = Object.freeze({
   ]),
   ar: Object.freeze([
     'مختبر ألوان الشاشة',
-    'مختبر ألوان الشاشة — Tetracromia',
+    'Tetracromia — مختبر ألوان الشاشة',
     'ثلاث ملاحظات لونية قصيرة',
     'Tetracromia مختبر ترفيهي لألوان الشاشة يقدّم ثلاث ملاحظات قصيرة ومنفصلة من دون نتيجة إجمالية.',
     'جرعة ثابتة من 29 كتلة',
@@ -285,7 +298,7 @@ const TRANSLATIONS = Object.freeze({
     'Daltonia — مختبر تمييز الألوان',
     'Riflessi — مختبر زمن رد الفعل',
     'Udito — مختبر المدى المسموع ودرجة الصوت',
-    'Acutezza — مختبر الحدة البصرية',
+    'Acutezza — مختبر حدة التفاصيل',
   ]),
   ja: Object.freeze([
     '画面カラーラボ',
@@ -363,7 +376,7 @@ const TRANSLATIONS = Object.freeze({
     '29 ब्लॉक की निश्चित मात्रा',
     '3 अलग अवलोकन',
     'स्क्रीन रंग प्रयोगशाला — Tetracromia | Sense6',
-    'कैलिब्रेट की गई तीक्ष्णता और नाममात्र कंट्रास्ट',
+    'कैलिब्रेट की गई स्पष्टता और नाममात्र कंट्रास्ट',
     'हर आँख की दो स्थितियाँ कोणीय विवरण और नाममात्र कम-कंट्रास्ट के प्रभाव का वर्णन करती हैं, कोई चिकित्सीय दावा नहीं करतीं।',
     'प्रति आँख 2 स्थितियाँ',
     'अनुकूली स्तर',
@@ -378,7 +391,7 @@ const TRANSLATIONS = Object.freeze({
     'पूरा सेट',
     'Riflessi — डिवाइस-सापेक्ष प्रतिक्रिया अवलोकन',
     'Udito — डिवाइस-सापेक्ष सुनने के अवलोकन',
-    'Acutezza — कैलिब्रेट किए गए तीक्ष्णता अवलोकन',
+    'Acutezza — कैलिब्रेट की गई स्पष्टता के अवलोकन',
     'सेटअप जाँच और अनुकूली ट्रैक ने इस सत्र के लिए सुसंगत अवलोकन दिए।',
     'विधि स्रोत',
     'संबंधित उपकरण',
@@ -387,7 +400,7 @@ const TRANSLATIONS = Object.freeze({
     'Daltonia — रंग विभेदन प्रयोगशाला',
     'Riflessi — प्रतिक्रिया समय प्रयोगशाला',
     'Udito — श्रवण परास और स्वरमान प्रयोगशाला',
-    'Acutezza — दृश्य तीक्ष्णता प्रयोगशाला',
+    'Acutezza — दृश्य स्पष्टता प्रयोगशाला',
   ]),
   'zh-hans': Object.freeze([
     '屏幕色彩实验室',
@@ -397,7 +410,7 @@ const TRANSLATIONS = Object.freeze({
     '固定 29 个区块',
     '3 项独立观察',
     '屏幕色彩实验室 — Tetracromia | Sense6',
-    '校准后的视敏度与标称对比度',
+    '校准后的清晰度与标称对比度',
     '每只眼睛采用两种条件来描述角度细节和标称低对比度的影响，不作临床结论。',
     '每眼 2 种条件',
     '自适应水平',
@@ -412,7 +425,7 @@ const TRANSLATIONS = Object.freeze({
     '完整组合',
     'Riflessi — 与设备相关的反应观察',
     'Udito — 与设备相关的听觉观察',
-    'Acutezza — 校准后的敏锐度观察',
+    'Acutezza — 校准后的清晰度观察',
     '设置检查和自适应轨迹为本次运行产生了相互一致的观察。',
     '方法来源',
     '相关工具',
@@ -421,7 +434,7 @@ const TRANSLATIONS = Object.freeze({
     'Daltonia — 色彩辨别实验室',
     'Riflessi — 反应时间实验室',
     'Udito — 可听范围与音高实验室',
-    'Acutezza — 视敏度实验室',
+    'Acutezza — 视觉清晰度实验室',
   ]),
 });
 

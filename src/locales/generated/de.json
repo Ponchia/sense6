@@ -9,7 +9,7 @@
   ["Fixed 29-block dose", "Feste Dosis von 29 Blöcken"],
   ["3 separate observations", "3 getrennte Beobachtungen"],
   ["Screen Colour Lab — Tetracromia | Sense6", "Bildschirm-Farblabor — Tetracromia | Sense6"],
-  ["Calibrated sharpness & nominal contrast", "Kalibrierte Sehschärfe und Nennkontrast"],
+  ["Calibrated sharpness & nominal contrast", "Kalibrierte Schärfe und Nennkontrast"],
   [
     "Two per-eye conditions describe angular detail and nominal low-contrast cost without making a clinical claim.",
     "Zwei Bedingungen pro Auge beschreiben Winkeldetails und den nominellen Niedrigkontrast-Effekt, ohne klinische Aussage."
@@ -45,7 +45,7 @@
   ["Daltonia — Colour Discrimination Lab", "Daltonia — Labor für Farbunterscheidung"],
   ["Riflessi — Reaction Time Lab", "Riflessi — Labor für Reaktionszeit"],
   ["Udito — Hearing Range & Pitch Lab", "Udito — Labor für Hörbereich und Tonhöhe"],
-  ["Acutezza — Visual Sharpness Lab", "Acutezza — Labor für Sehschärfe"],
+  ["Acutezza — Visual Sharpness Lab", "Acutezza — Labor für visuelle Schärfe"],
   ["How much do you want to run?", "Wie umfangreich soll der Durchlauf sein?"],
   ["about 2 minutes", "etwa 2 Minuten"],
   ["about 4 minutes", "etwa 4 Minuten"],
@@ -289,8 +289,8 @@
     "Ich habe alle drei Referenzen angenehm gehört, ohne die Lautstärke zu ändern."
   ],
   ["Choose this run's scope", "Umfang dieses Durchlaufs wählen"],
-  ["Focused Sharpness", "Nur Sehschärfe"],
+  ["Focused Sharpness", "Nur Schärfe"],
   ["24 interactions per eye", "24 Aufgaben je Auge"],
-  ["Sharpness + nominal contrast", "Sehschärfe + Nennkontrast"],
+  ["Sharpness + nominal contrast", "Schärfe + Nennkontrast"],
   ["44 interactions per eye", "44 Aufgaben je Auge"]
 ]

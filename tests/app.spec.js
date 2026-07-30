@@ -118,7 +118,9 @@ test('SPA navigation commits complete canonical and social metadata for each act
     description: acutezza.blurb,
     path: '/en/acutezza/',
     image: '/social/acutezza.png',
-    imageAlt: `${acutezza.discoveryName ?? acutezza.name} — ${acutezza.tagline}`,
+    // The identity alone. Concatenating the tagline produced three descriptors
+    // in one alt string, and the static build must agree with this exactly.
+    imageAlt: acutezza.discoveryName ?? acutezza.name,
   });
 });
 

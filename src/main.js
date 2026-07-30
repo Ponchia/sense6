@@ -148,7 +148,9 @@ async function renderRoute({ route, locale }) {
         title: t(definition.pageTitle),
         description: t(definition.blurb),
         socialImage: `/social/${definition.id}.png`,
-        socialImageAlt: `${t(definition.discoveryName ?? definition.name)} — ${t(definition.tagline)}`,
+        // Identical to the static build's alt (scripts/generate-static-pages.mjs):
+        // the identity alone, never the identity plus the tagline.
+        socialImageAlt: t(definition.discoveryName ?? definition.name),
       });
     } else if (route) {
       navigate('', getLocale(), { replace: true });

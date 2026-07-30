@@ -189,6 +189,61 @@ test('every experiment heading names the brand and what it observes, in every la
   }
 });
 
+/*
+ * `discoveryName` already carries brand plus descriptor. It replaced `name`
+ * inside strings that were ALREADY concatenated with the tagline, so alt text,
+ * related-experiment links, and the breadcrumb each shipped three descriptors in
+ * one string. One descriptor per string, in every locale, on every surface.
+ */
+test('an identity is never glued to its tagline, and the breadcrumb stays short', async () => {
+  for (const { code } of LOCALES) {
+    const messages = await loadMessages(code);
+    for (const definition of EXAMS) {
+      const html = await readFile(new URL(`${code}/${definition.route}/index.html`, DIST), 'utf8');
+      const identity = messages.get(definition.discoveryName);
+      const tagline = messages.get(definition.tagline);
+      assert.ok(identity && tagline, `${code} is missing ${definition.id} identity copy`);
+      assert.ok(
+        !html.includes(escapeHtml(`${identity} — ${tagline}`)),
+        `${code}/${definition.route} renders "${identity} — ${tagline}" as one string`,
+      );
+
+      for (const attribute of [
+        /<meta property="og:image:alt" content="([^"]*)">/,
+        /<meta name="twitter:image:alt" content="([^"]*)">/,
+        /<img src="\/social\/[^"]+\.svg"[^>]*\salt="([^"]*)"/,
+      ]) {
+        const rendered = decodeEntities(html.match(attribute)?.[1] ?? '');
+        assert.equal(rendered, identity, `${code}/${definition.route} alt text is not the bare identity`);
+      }
+
+      for (const related of definition.discovery.related) {
+        const entry = EXAMS.find(({ id }) => id === related);
+        const pattern = new RegExp(
+          `<h3><a data-sense6-route="${escapeRegex(related)}" href="/${escapeRegex(code)}/${escapeRegex(related)}/">([^<]*)</a></h3>`,
+        );
+        const label = decodeEntities(html.match(pattern)?.[1] ?? '');
+        assert.equal(
+          label,
+          messages.get(entry.discoveryName),
+          `${code}/${definition.route} related card for ${related} is not the bare identity`,
+        );
+      }
+
+      const data = JSON.parse(html.match(/<script type="application\/ld\+json">(.+)<\/script>/)?.[1] ?? '{}');
+      const crumb = data['@graph'][1].itemListElement[1];
+      // A bare brand noun ("Acutezza") has no catalog row and stays as written.
+      const shortName = messages.get(definition.name) ?? definition.name;
+      assert.equal(data['@graph'][0].name, identity, `${code}/${definition.route} application name`);
+      assert.equal(crumb.name, shortName, `${code}/${definition.route} breadcrumb`);
+      assert.ok(
+        crumb.name.length < identity.length,
+        `${code}/${definition.route} breadcrumb "${crumb.name}" is not shorter than the identity`,
+      );
+    }
+  }
+});
+
 test('the shared gallery and About renderers are exactly what shipped in every locale', async () => {
   for (const { code: locale } of LOCALES) {
     const messages = await loadMessages(locale);
@@ -384,7 +439,7 @@ test('Tetracromia answers search intent consistently in every supported language
 
     const data = JSON.parse(html.match(/<script type="application\/ld\+json">(.+)<\/script>/)?.[1] ?? '{}');
     assert.equal(data['@graph'][0].name, identity);
-    assert.equal(data['@graph'][1].itemListElement[1].name, identity);
+    assert.equal(data['@graph'][1].itemListElement[1].name, messages.get(definition.name) ?? definition.name);
     assert.equal(data['@graph'][0].dateModified, CONTENT_DATES.exams.tetracromia);
     if (code !== 'en') {
       assert.notEqual(intentHeading, searchIntent.heading);
