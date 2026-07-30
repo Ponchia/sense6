@@ -188,9 +188,22 @@ export function summarizeRange(track) {
   const reversalMedian = median(reversalWindow);
   const atCeiling = hasTechnicalCeilingEvidence(track);
   const completionReason = track.completionReason ?? 'incomplete';
+  // A completion reason is never evidence on its own, but there are two
+  // independent classes of evidence that a run bounded this listener:
+  //   * a reversal window — the staircase turned around, so the median of that
+  //     window is a two-sided estimate of the boundary;
+  //   * `atCeiling` — the last two scored trials were correct at the device's
+  //     rendering ceiling, so the boundary is at or above it.
+  // Requiring a reversal in both cases demands physically unobtainable
+  // evidence: a staircase pinned at `maxHz` has no higher frequency left to
+  // fail at, so it can never bank a reversal. Under that rule a flawless
+  // listener reported strictly less than one who missed a trial. A
+  // ceiling-bounded run is a usable result, published as a LOWER bound
+  // ("≥ 18000 Hz") rather than erased — its non-convergence stays explicit in
+  // `reversals: 0` and the `technical-ceiling` completion reason.
   const settled =
-    completionReason === 'technical-ceiling' ||
-    (completionReason === 'converged' && reversalWindow.length > 0);
+    (reversalWindow.length > 0 || atCeiling) &&
+    (completionReason === 'technical-ceiling' || completionReason === 'converged');
   const thresholdHz =
     settled && (atCeiling || reversalMedian !== null)
       ? atCeiling

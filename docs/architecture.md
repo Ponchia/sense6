@@ -22,7 +22,8 @@ or result uploads. The design favors:
 - a small runtime with no app framework.
 
 Consumer devices remain uncalibrated. Architecture can preserve setup evidence
-and uncertainty, but it can't turn a browser task into a clinical instrument.
+and measurement bounds, but it can't turn a browser task into a clinical
+instrument.
 
 ## System context
 
@@ -111,8 +112,13 @@ only when the person explicitly saves them.
 Journal imports first validate and canonicalize the file, then show additions,
 duplicates, discarded additions, existing-entry evictions, and the resulting
 total. The journal writes only after explicit confirmation of that preview.
-Displayed model intervals remain descriptive output; only explicit uncertainty
-fields can contribute to a subsequent-run combined uncertainty.
+Displayed model intervals remain descriptive output. A journal entry records a
+value, a unit, an optional model interval, and an optional measurement bound —
+never a combinable uncertainty. No Sense6 instrument can produce one: the
+Acutezza posterior interval deliberately excludes the geometry systematics that
+a screen-relative setup contributes, so presenting it as uncertainty would
+publish a falsely narrow number. A run-to-run change therefore reports the
+difference and whether either value is a bound, and nothing more.
 
 ## Extension seams
 

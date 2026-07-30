@@ -1,7 +1,14 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { circularHueDistance, deltaEok, oklchToSrgb, toRgbCss } from '../src/lib/color.js';
+import {
+  circularHueDistance,
+  DELTA_EOK_DISPLAY_SCALE,
+  deltaEok,
+  deltaEokSpec,
+  oklchToSrgb,
+  toRgbCss,
+} from '../src/lib/color.js';
 
 test('OKLCH conversion stays in displayable sRGB across the hue circle', () => {
   for (let hue = 0; hue < 360; hue += 3) {
@@ -24,6 +31,22 @@ test('ΔEOK is symmetric, zero for the same color, and grows with hue separation
   assert.equal(deltaEok(base, base), 0);
   assert.equal(deltaEok(base, near), deltaEok(near, base));
   assert.ok(deltaEok(base, far) > deltaEok(base, near));
+});
+
+/*
+ * The page cites W3C CSS Color 4 as its method source and then shows a value
+ * scaled by 100, so the two numbers must stay explicitly distinguishable in
+ * code. A reader who compares a displayed 0.975 against the spec finds 0.00975.
+ */
+test('the displayed ΔEOK is a scaled value, not the value CSS Color 4 defines', () => {
+  const base = { l: 0.67, c: 0.105, h: 20 };
+  const target = { ...base, h: 24 };
+
+  const spec = deltaEokSpec(base, target);
+  assert.ok(spec > 0.001 && spec < 0.05, `spec ΔEOK should be a small number, got ${spec}`);
+  assert.equal(deltaEok(base, target), spec * DELTA_EOK_DISPLAY_SCALE);
+  assert.equal(DELTA_EOK_DISPLAY_SCALE, 100);
+  assert.equal(deltaEokSpec(base, base), 0);
 });
 
 test('circular hue distance crosses the 360-degree seam correctly', () => {

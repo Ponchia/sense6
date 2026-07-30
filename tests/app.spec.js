@@ -118,7 +118,7 @@ test('SPA navigation commits complete canonical and social metadata for each act
     description: acutezza.blurb,
     path: '/en/acutezza/',
     image: '/social/acutezza.png',
-    imageAlt: `${acutezza.name} — ${acutezza.tagline}`,
+    imageAlt: `${acutezza.discoveryName ?? acutezza.name} — ${acutezza.tagline}`,
   });
 });
 

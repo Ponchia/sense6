@@ -27,7 +27,7 @@ export const EXAM_PROTOCOLS = Object.freeze({
     methodVersion: 'daltonia-display-directions-v3',
     profileId: 'exploratory-adaptive',
     configDigest: '3axis-12max-3control-2practice',
-    stimulusVersion: 'hpe-srgb-noise-v2',
+    stimulusVersion: 'hpe-srgb-noise-v3',
     estimator: 'recent reversal or presentation level by display direction',
     stoppingRule: '2-down/1-up; fixed cap; declared floor and ceiling',
     responsePolicy: 'validated four-way/no-gap response after first paint',

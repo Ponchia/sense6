@@ -17,6 +17,14 @@ export default defineConfig({
   expect: { timeout: 5_000 },
   reporter: [['list'], ['html', { open: 'never', outputFolder: 'playwright-report/site-audit' }]],
   outputDir: 'test-results/site-audit',
+  // Visual baselines are regenerated from the pull request's base SHA on the
+  // same runner and container before every comparison, so a committed copy is
+  // overwritten before it is ever read. They used to be committed anyway — 7.1 MB
+  // whose only functional effect was that touching one removed its check from
+  // the suite. They now live in the already-ignored test-results tree, which is
+  // where a regenerated artifact belongs.
+  snapshotPathTemplate:
+    '{testDir}/../test-results/visual-baselines/{arg}{-projectName}{-snapshotSuffix}{ext}',
   workers: process.env.CI ? 4 : undefined,
   use: {
     ...devices['Desktop Chrome'],

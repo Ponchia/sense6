@@ -15,6 +15,7 @@ import { preparePrivacyCopy, privacyCopy, privacyMarkup } from '../src/privacy.j
 import { ROOT_GATEWAY, rootGatewayMarkup } from '../src/root-gateway.js';
 import { createRouteMetadata, SITE_ORIGIN, UTILITY_ROUTES } from '../src/routes.js';
 import { STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
+import { recordContentFingerprint, verifyContentFingerprints } from './content-fingerprints.mjs';
 import { aboutData, examData, webpageData, websiteData } from './static-structured-data.mjs';
 import { activeRouteModuleFiles } from './vite-manifest.mjs';
 
@@ -41,7 +42,7 @@ await writePage('index.html', {
   description: ROOT_GATEWAY.description,
   socialImage: '/social/sense6.png',
   socialImageAlt: ROOT_GATEWAY.socialImageAlt,
-  main: rootGatewayMarkup(LOCALES),
+  main: rootGatewayMarkup(LOCALES, (code, source) => catalogs.get(code)?.get(source) ?? source),
   stylesheet: routeStyles.get('gallery'),
   alternates: galleryAlternates(),
   structuredData: websiteData('en'),
@@ -118,7 +119,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     description: about.description,
     socialImage: '/social/sense6.png',
     socialImageAlt: about.description,
-    main: aboutMarkup(locale),
+    main: aboutMarkup(locale, translate),
     stylesheet: routeStyles.get('about'),
     alternates: pageAlternates('about'),
     structuredData: aboutData(about, languageTag, aboutPath),
@@ -167,10 +168,12 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
 
 await write404();
 await writeDiscoveryFiles();
+console.log(`Public-content freshness gate · ${await verifyContentFingerprints()} dated routes`);
 
 async function writePage(relativePath, page) {
   const json = JSON.stringify(page.structuredData);
   const metadata = createRouteMetadata(page);
+  recordContentFingerprint({ ...metadata, main: page.main });
   let html = localizeShell(template, page.locale);
   const routeFiles =
     page.preloadModules === false ? [] : await activeRouteModuleFiles(page.locale, page.route);
@@ -365,7 +368,7 @@ function journalMarkup(copy, locale) {
       .map((item) => `<li>${escapeHtml(item)}</li>`)
       .join('')}</ul><p>${escapeHtml(copy.empty)}</p></aside>
     <section><h2>${escapeHtml(copy.setup)}</h2><p>${escapeHtml(copy.reasonSetup)} ${escapeHtml(copy.reasonMinor)}</p></section>
-    <section><h2>${escapeHtml(copy.measurements)}</h2><p>${escapeHtml(copy.comparable)} · ${escapeHtml(copy.caution)} · ${escapeHtml(copy.notComparable)}. ${escapeHtml(copy.modelInterval)}; ${escapeHtml(copy.noUncertainty)}; ${escapeHtml(copy.bounded)}.</p></section>
+    <section><h2>${escapeHtml(copy.measurements)}</h2><p>${escapeHtml(copy.comparable)} · ${escapeHtml(copy.caution)} · ${escapeHtml(copy.notComparable)}. ${escapeHtml(copy.modelInterval)}; ${escapeHtml(copy.bounded)}.</p></section>
   </article>`;
 }
 

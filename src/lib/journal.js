@@ -42,7 +42,13 @@ export const JOURNAL_EXPORT_SCHEMA = Object.freeze({
     'notes',
   ]),
   protocol: PROTOCOL_FIELDS,
-  measurement: Object.freeze(['id', 'value', 'unit', 'lower', 'upper', 'uncertainty', 'bound']),
+  // No experiment emits a combinable uncertainty: the acuity posterior publishes
+  // a descriptive `lower`/`upper` model interval that deliberately excludes
+  // geometry systematics, and every other instrument reports a bound or nothing.
+  // Reading an older export that still carries an `uncertainty` field stays
+  // safe — unknown measurement fields are ignored and dropped on import — so
+  // removing it needs no schema version bump.
+  measurement: Object.freeze(['id', 'value', 'unit', 'lower', 'upper', 'bound']),
 });
 
 /** @type {Readonly<Record<string, Readonly<Record<string, string>>>>} */
@@ -72,7 +78,6 @@ const JOURNAL_FIELD_DISCLOSURES = Object.freeze({
     unit: 'measurements',
     lower: 'measurements',
     upper: 'measurements',
-    uncertainty: 'measurements',
     bound: 'measurements',
   }),
 });
@@ -106,9 +111,11 @@ for (const disclosed of Object.values(JOURNAL_FIELD_DISCLOSURES).flatMap((scope)
 }
 
 /** @typedef {{ getItem: (key: string) => string | null, setItem: (key: string, value: string) => void, removeItem?: (key: string) => void }} JournalStorage */
-/** @typedef {{ id: string, value: number | null, unit: string, lower?: number, upper?: number, uncertainty?: number, bound?: 'lower' | 'upper' }} JournalMeasurement */
+/** @typedef {{ id: string, value: number | null, unit: string, lower?: number, upper?: number, bound?: 'lower' | 'upper' }} JournalMeasurement */
+/** @typedef {'saved' | 'invalid' | 'storage-unavailable'} JournalSaveOutcome */
 /** @typedef {import('../exams/protocols.js').ProtocolPassport} ProtocolPassport */
 /** @typedef {{ id: string, examId: string, recordedAt: string, locale: string, quality: 'usable' | 'caution' | 'limited', protocol: ProtocolPassport, setup: Record<string, string | number | boolean | null>, qualityEvidence: Record<string, string | number | boolean | null>, measurements: JournalMeasurement[], notes: string[] }} JournalEntry */
+/** @typedef {Omit<JournalEntry, 'id' | 'recordedAt' | 'notes' | 'protocol' | 'qualityEvidence'> & { id?: string, recordedAt?: string | number | Date, notes?: string[], protocol?: ProtocolPassport, qualityEvidence?: Record<string, string | number | boolean | null> }} JournalEntryInput */
 /** @typedef {'inaccessible' | 'malformed' | 'oversized' | 'future-schema' | 'empty' | 'ready'} JournalReadStatus */
 /** @typedef {{ status: JournalReadStatus, entries: JournalEntry[], raw: string | null, writable: boolean }} JournalReadState */
 /** @typedef {{ ok: true, additions: number, duplicates: number, discarded: number, evicted: number, total: number }} ImportSummary */
@@ -117,12 +124,25 @@ for (const disclosed of Object.values(JOURNAL_FIELD_DISCLOSURES).flatMap((scope)
 
 /**
  * Create a portable, language-neutral journal entry.
- * @param {Omit<JournalEntry, 'id' | 'recordedAt' | 'notes' | 'protocol' | 'qualityEvidence'> & { id?: string, recordedAt?: string | number | Date, notes?: string[], protocol?: ProtocolPassport, qualityEvidence?: Record<string, string | number | boolean | null> }} value
+ * @param {JournalEntryInput} value
  * @returns {JournalEntry | null}
  */
 export function createJournalEntry(value) {
-  if (!isExamId(value.examId)) return null;
-  const entry = {
+  return buildJournalEntry(value).entry;
+}
+
+/**
+ * Build a journal entry and name the first schema violation when one exists.
+ *
+ * A rejected entry and a failed write are different problems: the first is a
+ * defect in the experiment that produced the run, the second is a browser that
+ * refuses local storage. Callers must not report them with the same message.
+ * @param {JournalEntryInput} value
+ * @returns {{ entry: JournalEntry, reason: null } | { entry: null, reason: string }}
+ */
+export function buildJournalEntry(value) {
+  if (!isExamId(value.examId)) return { entry: null, reason: 'examId' };
+  const candidate = {
     id: value.id ?? createId(),
     examId: value.examId,
     recordedAt: toIsoDate(value.recordedAt ?? new Date()),
@@ -134,7 +154,28 @@ export function createJournalEntry(value) {
     measurements: value.measurements,
     notes: value.notes ?? [],
   };
-  return isJournalEntry(entry) ? canonicalJournalEntry(entry) : null;
+  const reason = journalEntryViolation(candidate);
+  if (reason !== null) return { entry: null, reason };
+  const entry = canonicalJournalEntry(candidate);
+  return entry === null ? { entry: null, reason: 'canonical' } : { entry, reason: null };
+}
+
+/**
+ * Record one finished run and report which of the two failure modes occurred.
+ * @param {JournalEntryInput} value
+ * @param {JournalStorage} [storage]
+ * @returns {JournalSaveOutcome}
+ */
+export function saveJournalRun(value, storage) {
+  const built = buildJournalEntry(value);
+  if (built.entry === null) {
+    console.error(
+      `Sense6 rejected a ${String(value.examId)} journal entry: ${built.reason} failed validation.`,
+      value,
+    );
+    return 'invalid';
+  }
+  return appendJournalEntry(built.entry, storage) ? 'saved' : 'storage-unavailable';
 }
 
 /** @param {JournalStorage} [storage] @returns {JournalEntry[]} */
@@ -329,6 +370,9 @@ export function compareJournalEntries(newer, older) {
 /**
  * Calculate changes for measurements present in both entries. Positive means
  * the newer numeric value is larger; interpretation remains instrument-specific.
+ *
+ * A change carries no uncertainty. No instrument publishes a combinable
+ * uncertainty, and a displayed model interval must never be relabelled as one.
  * @param {JournalEntry} newer
  * @param {JournalEntry} older
  */
@@ -344,13 +388,11 @@ export function measurementChanges(newer, older) {
       !Number.isFinite(before.value)
     )
       return [];
-    const uncertainty = combinedUncertainty(measurement, before);
     return [
       {
         id: measurement.id,
         delta: /** @type {number} */ (measurement.value) - /** @type {number} */ (before.value),
         unit: measurement.unit,
-        uncertainty,
         bounded: Boolean(measurement.bound || before.bound),
       },
     ];
@@ -441,31 +483,34 @@ function readJournal(storage) {
 
 /** @param {unknown} value @returns {value is JournalEntry} */
 function isJournalEntry(value) {
-  if (!isRecord(value)) return false;
-  return (
-    typeof value.id === 'string' &&
-    value.id.length > 0 &&
-    value.id.length <= 128 &&
-    typeof value.examId === 'string' &&
-    isExamId(value.examId) &&
-    typeof value.recordedAt === 'string' &&
-    isIsoDate(value.recordedAt) &&
-    typeof value.locale === 'string' &&
-    LOCALE_CODES.has(value.locale) &&
-    typeof value.quality === 'string' &&
-    QUALITY.has(value.quality) &&
-    validProtocol(value.protocol) &&
-    validSetup(value.setup) &&
-    validEvidence(value.qualityEvidence) &&
-    Array.isArray(value.measurements) &&
-    value.measurements.length > 0 &&
-    value.measurements.length <= 24 &&
-    value.measurements.every(isMeasurement) &&
-    Array.isArray(value.notes) &&
-    value.notes.length <= MAX_NOTES &&
-    value.notes.every((note) => typeof note === 'string' && note.length <= 100) &&
-    validInstrumentEntry(value)
-  );
+  return journalEntryViolation(value) === null;
+}
+
+/**
+ * Name the first failing constraint, or null when the entry is valid.
+ * Keeping the reason lets a caller log why a run was refused instead of
+ * silently reporting it as a storage problem.
+ * @param {unknown} value
+ * @returns {string | null}
+ */
+function journalEntryViolation(value) {
+  if (!isRecord(value)) return 'entry';
+  if (typeof value.id !== 'string' || value.id.length === 0 || value.id.length > 128) return 'id';
+  if (typeof value.examId !== 'string' || !isExamId(value.examId)) return 'examId';
+  if (typeof value.recordedAt !== 'string' || !isIsoDate(value.recordedAt)) return 'recordedAt';
+  if (typeof value.locale !== 'string' || !LOCALE_CODES.has(value.locale)) return 'locale';
+  if (typeof value.quality !== 'string' || !QUALITY.has(value.quality)) return 'quality';
+  if (!validProtocol(value.protocol)) return 'protocol';
+  if (!validSetup(value.setup)) return 'setup';
+  if (!validEvidence(value.qualityEvidence)) return 'qualityEvidence';
+  if (!Array.isArray(value.measurements) || value.measurements.length === 0) return 'measurements';
+  if (value.measurements.length > 24) return 'measurements.length';
+  const invalid = value.measurements.findIndex((measurement) => !isMeasurement(measurement));
+  if (invalid !== -1) return `measurements[${invalid}]`;
+  if (!Array.isArray(value.notes) || value.notes.length > MAX_NOTES) return 'notes';
+  if (!value.notes.every((note) => typeof note === 'string' && note.length <= 100)) return 'notes';
+  if (!validInstrumentEntry(value)) return 'completedEyes';
+  return null;
 }
 
 /** @param {Record<string, unknown>} value */
@@ -506,7 +551,6 @@ function isMeasurement(value) {
     value.unit.length <= 24 &&
     optionalFinite(value.lower) &&
     optionalFinite(value.upper) &&
-    optionalFinite(value.uncertainty) &&
     (value.bound === undefined || (typeof value.bound === 'string' && BOUNDS.has(value.bound))) &&
     !(
       typeof value.lower === 'number' &&
@@ -649,7 +693,6 @@ function canonicalMeasurement(value) {
   const measurement = { id: value.id, value: value.value, unit: value.unit };
   if (value.lower !== undefined) measurement.lower = value.lower;
   if (value.upper !== undefined) measurement.upper = value.upper;
-  if (value.uncertainty !== undefined) measurement.uncertainty = value.uncertainty;
   if (value.bound !== undefined) measurement.bound = value.bound;
   return measurement;
 }
@@ -697,19 +740,6 @@ function setupDifferenceRatio(newer, older, field) {
   return newerValue > 0 && olderValue > 0
     ? Math.abs(newerValue - olderValue) / olderValue
     : Number.POSITIVE_INFINITY;
-}
-
-/** @param {JournalMeasurement} measurement @param {JournalMeasurement} previous */
-function combinedUncertainty(measurement, previous) {
-  const current = measurementUncertainty(measurement);
-  const before = measurementUncertainty(previous);
-  return current === null || before === null ? null : Math.sqrt(current ** 2 + before ** 2);
-}
-
-/** @param {JournalMeasurement} measurement */
-function measurementUncertainty(measurement) {
-  if (Number.isFinite(measurement.uncertainty)) return /** @type {number} */ (measurement.uncertainty);
-  return null;
 }
 
 /** @param {JournalEntry[]} entries */

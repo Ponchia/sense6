@@ -8,11 +8,85 @@
  * therefore describe these as display-relative directions, never as exact cone
  * excitations.
  *
+ * Luminance:
+ * Target and field are matched on the L+M cone sum rather than on the photopic
+ * sRGB Y coefficients. The reason is self-consistency, not a claim that L+M is
+ * the observer's luminance channel — it is not, and the earlier claim that this
+ * matrix implies L+M while Y "describes a different observer" is false:
+ *   - `RGB_TO_LMS` is white-normalised, not V(lambda)-normalised. Its rows sum
+ *     to 1.000001, 0.999968 and 0.999764, so it carries no luminance scaling of
+ *     its own from which an implied luminance channel could follow.
+ *   - sRGB Y lies in the span of this matrix's own L and M rows:
+ *     Y = 0.360771*L + 0.639248*M reproduces the Y blue weight (0.0722) to
+ *     within 1.3e-6. Y is therefore not a different observer but a different
+ *     weighting of the same two cones — and it is the CIE photopic one.
+ *   - Equal-weight L+M is an ad-hoc choice. Cone-fundamental luminance is
+ *     roughly 1.98*Lbar + Mbar (Smith-Pokorny), even further from 50:50.
+ * The change therefore did one thing: reweight the luminance channel from
+ * (0.361, 0.639) to (0.500, 0.500). It is kept because the stimulus directions
+ * are defined in this same white-normalised cone basis, so matching in that
+ * basis keeps the construction and its matching criterion internally coherent —
+ * one basis defines both what "along a confusion line" and what "equal
+ * luminance" mean here. That is a consistency argument, not a claim of greater
+ * physiological accuracy.
+ *
+ * What the reweighting cost and bought, in the dichromat intensity residual
+ * described under Boundary below. Protan got worse, deutan got better, and
+ * neither ends below the noise floor:
+ *   protan, starting strength 0.20:  -3.55% -> -4.82%   (4.4 -> 5.9 sigma)
+ *   protan, maximum strength 0.32:   -5.57% -> -7.50%   (6.9 -> 9.3 sigma)
+ *   deutan, starting strength 0.20:  -7.16% -> -5.65%   (8.8 -> 7.0 sigma)
+ *   deutan, maximum strength 0.32:  -10.99% -> -8.74%  (13.6 -> 10.8 sigma)
+ * The defect the change removed is smaller than either side of that trade:
+ * matching Y left a 0.24%-2.47% residual in the L+M channel across the adaptive
+ * range (1.33% at the starting strength, which is where the previously quoted
+ * "1.3%" came from — it is not the floor), i.e. at most about 3 sigma.
+ * Sigma throughout is the ring-mean standard error of `jitterDotColor`'s
+ * per-dot +/-18% uniform luminance jitter averaged over the ~200 dots of one
+ * Landolt ring: 0.81% of mean luminance. Simulating the actual dot lattice puts
+ * it slightly lower (0.70% unweighted, 0.75% weighted by dot area), so the
+ * sigma figures above are, if anything, conservative. The conclusion does not
+ * turn on the exact value: every residual listed is several times the noise
+ * under any of these estimates.
+ *
+ * Boundary (deliberate, not a defect):
+ * Only the S (tritan) axis is simultaneously a confusion line and an isoluminant
+ * direction, because S does not contribute to L+M. Protan and deutan confusion
+ * lines hold M,S and L,S constant respectively, and L+M necessarily varies along
+ * them. Re-scaling to equal L+M therefore multiplies every cone excitation by a
+ * common factor, which a dichromat of the matching type perceives as a uniform
+ * intensity step: -4.82% protan and -5.65% deutan at the starting strength,
+ * -7.50% and -8.74% at the maximum. No scalar can remove both residuals at
+ * once: the protanope sees nothing only when the factor is exactly 1, and L+M
+ * matches only when it is not. This residual is the real limitation of the
+ * experiment. It is irreducible under any single fixed luminance weighting —
+ * every choice, Y included, only redistributes it between the protan and deutan
+ * axes.
+ *
+ * The residual lies in the pure-intensity subspace that `jitterDotColor`
+ * perturbs. That was equally true of the Y match (-3.55% was just as purely an
+ * intensity step as -4.82%), so it is a property of the confusion-direction
+ * basis and not something this change achieved. Nor does the noise remove the
+ * cue: a 4.8%-8.7% step is several times the ring-mean noise, and an ideal
+ * spatial integrator would still read it. It is masked in practice only to the
+ * degree that a real observer is a non-ideal integrator of a noisy dot field,
+ * which is the mechanism the Regan/Reffin/Mollon Cambridge Colour Test relies on
+ * and why that citation is apt. Product copy must not claim these stimuli are
+ * invisible to dichromats.
+ *
+ * Outstanding follow-up:
+ * The Cambridge Colour Test's actual remedy is not the dot noise alone but
+ * randomizing the mean luminance of target and field on every trial, so that no
+ * fixed intensity step is available for an observer to learn or accumulate
+ * across trials. That would remove the residual as a usable cue instead of
+ * relying on masking. It is not implemented here.
+ *
  * Background:
  * - IEC 61966-2-1 sRGB: https://webstore.iec.ch/en/publication/6169
  * - sRGB transfer and primary definitions: https://www.w3.org/TR/css-color-4/#color-conversion-code
  * - Dichromat simulation model: https://doi.org/10.1364/JOSAA.14.002647
  * - Anomalous-trichromacy model: https://doi.org/10.1109/TVCG.2009.113
+ * - Luminance noise masking residual luminance cues: https://doi.org/10.1016/0042-6989(94)90203-8
  */
 
 /** @typedef {() => number} RandomSource */
@@ -23,7 +97,7 @@
 /** @typedef {'floor' | 'ceiling'} AxisLimit */
 /** @typedef {readonly [number, number, number]} RgbVector */
 /** @typedef {{ label: string, description: string, background: RgbVector }} AxisConfig */
-/** @typedef {{ field: RgbVector, target: RgbVector, fieldLinear: RgbVector, targetLinear: RgbVector }} TargetPair */
+/** @typedef {{ field: RgbVector, target: RgbVector, fieldLinear: RgbVector, targetLinear: RgbVector, appliedStrength: number }} TargetPair */
 /** @typedef {{ forcedColors: boolean, theme: string, dpr: number, orientation: string, viewportWidth: number, viewportHeight: number }} DisplayEnvironment */
 /** @typedef {{ strength: number, correct: boolean }} AxisPresentation */
 /** @typedef {{ strength: number, step: number, correctStreak: number, lastDirection: StaircaseDirection | null, reversals: number[], presentations: AxisPresentation[], boundaryMisses: number, finished: boolean, limit: AxisLimit | null }} AxisState */
@@ -46,8 +120,19 @@ const LMS_TO_RGB = [
   [0.02980165, -0.19318073, 1.16364789],
 ];
 
-/** @type {RgbVector} */
-const LINEAR_SRGB_LUMINANCE = [0.2126, 0.7152, 0.0722];
+/**
+ * Weights of the L+M cone sum in linear sRGB: the luminance criterion this
+ * module matches on, chosen to sit in the same cone basis as the stimulus
+ * directions. Not a photopic luminance function — sRGB Y is itself a weighting
+ * of these same L and M rows (0.361, 0.639). See the header note on Luminance.
+ *
+ * @type {RgbVector}
+ */
+const CONE_LUMINANCE_WEIGHTS = [
+  RGB_TO_LMS[0][0] + RGB_TO_LMS[1][0],
+  RGB_TO_LMS[0][1] + RGB_TO_LMS[1][1],
+  RGB_TO_LMS[0][2] + RGB_TO_LMS[1][2],
+];
 
 /** @param {number} value @param {number} minimum @param {number} maximum */
 function clamp(value, minimum, maximum) {
@@ -189,9 +274,35 @@ export function lmsOf(linearRgb) {
 }
 
 /**
+ * The L+M cone sum of a linear-sRGB colour, used as this module's luminance
+ * matching criterion. See the header note on Luminance for why this weighting
+ * is a consistency choice rather than a photopic one.
+ *
+ * @param {RgbVector} linearRgb
+ */
+export function coneLuminance(linearRgb) {
+  return dotProduct(CONE_LUMINANCE_WEIGHTS, linearRgb);
+}
+
+/** @param {RgbVector} channels */
+function withinUnitCube(channels) {
+  return channels.every((channel) => channel >= 0 && channel <= 1);
+}
+
+/**
  * Return a field/target pair separated along one fixed display-model direction.
  * Both values are retained in linear sRGB so luminance noise can be applied
  * before encoding for canvas.
+ *
+ * The pair is matched on `coneLuminance`, so the separation carries no mean
+ * brightness step in the L+M channel the stimulus directions are defined
+ * against. A dichromat still sees a uniform intensity step on the protan and
+ * deutan axes; see the header note on Boundary for its size and why no
+ * luminance weighting removes it. `appliedStrength`
+ * reports the separation actually rendered: at the gamut edge the requested
+ * separation is reduced rather than clamped per channel, because clamping would
+ * both tilt the confusion direction and undo the luminance match applied before
+ * it.
  *
  * @param {RgbVector} backgroundLinear
  * @param {TrialType} type
@@ -200,22 +311,38 @@ export function lmsOf(linearRgb) {
  */
 export function makeTargetPair(backgroundLinear, type, strength) {
   const direction = CONFUSION_DIRECTIONS[type] ?? CONFUSION_DIRECTIONS.deutan;
-  /** @type {[number, number, number]} */
-  const directedTarget = [
-    clamp01(backgroundLinear[0] + direction[0] * strength),
-    clamp01(backgroundLinear[1] + direction[1] * strength),
-    clamp01(backgroundLinear[2] + direction[2] * strength),
-  ];
-  const fieldLuminance = dotProduct(LINEAR_SRGB_LUMINANCE, backgroundLinear);
-  const targetLuminance = dotProduct(LINEAR_SRGB_LUMINANCE, directedTarget);
-  const luminanceScale = targetLuminance > 0 ? fieldLuminance / targetLuminance : 1;
-  /** @type {[number, number, number]} */
-  const targetLinear = [
-    clamp01(directedTarget[0] * luminanceScale),
-    clamp01(directedTarget[1] * luminanceScale),
-    clamp01(directedTarget[2] * luminanceScale),
-  ];
+  const fieldLuminance = coneLuminance(backgroundLinear);
+
+  /** @param {number} offset @returns {[number, number, number]} */
+  const equiluminantTarget = (offset) => {
+    /** @type {[number, number, number]} */
+    const directed = [
+      backgroundLinear[0] + direction[0] * offset,
+      backgroundLinear[1] + direction[1] * offset,
+      backgroundLinear[2] + direction[2] * offset,
+    ];
+    const directedLuminance = coneLuminance(directed);
+    const scale = directedLuminance > 0 ? fieldLuminance / directedLuminance : 1;
+    return [directed[0] * scale, directed[1] * scale, directed[2] * scale];
+  };
+
+  let appliedStrength = strength;
+  let targetLinear = equiluminantTarget(appliedStrength);
+
+  if (!withinUnitCube(targetLinear)) {
+    let displayable = 0;
+    let clipped = strength;
+    for (let iteration = 0; iteration < 24; iteration += 1) {
+      const candidate = (displayable + clipped) / 2;
+      if (withinUnitCube(equiluminantTarget(candidate))) displayable = candidate;
+      else clipped = candidate;
+    }
+    appliedStrength = displayable;
+    targetLinear = equiluminantTarget(displayable);
+  }
+
   return {
+    appliedStrength,
     field: [
       linearToSrgb(backgroundLinear[0]),
       linearToSrgb(backgroundLinear[1]),

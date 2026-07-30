@@ -8,6 +8,16 @@ const port = Number(process.argv[2] ?? 4175);
 if (!Number.isInteger(port) || port < 1 || port > 65_535) throw new Error(`Invalid port: ${port}`);
 
 const root = resolve(fileURLToPath(new URL('../dist/', import.meta.url)));
+
+// Refuse to serve a half-built or missing dist. Playwright reports a server
+// that starts but cannot serve as a wall of unrelated test timeouts, so the
+// diagnosis has to happen here.
+for (const required of ['index.html', '404.html', '_headers', 'en/index.html']) {
+  if (!(await isFile(resolve(root, required)))) {
+    throw new Error(`dist/${required} is missing. Run \`npm run build\` before starting this server.`);
+  }
+}
+
 const headerRules = parseHeaderRules(await readFile(resolve(root, '_headers'), 'utf8'));
 const contentTypes = new Map([
   ['.css', 'text/css; charset=utf-8'],
@@ -42,8 +52,18 @@ const server = createServer(async (request, response) => {
       ...headersFor(pathname, headerRules),
     };
     response.writeHead(statusCode, headers);
-    if (request.method === 'HEAD') response.end();
-    else createReadStream(file).pipe(response);
+    if (request.method === 'HEAD') {
+      response.end();
+      return;
+    }
+    // An unhandled stream 'error' event takes the whole process down, so a
+    // missing dist/404.html turned one bad request into a dead server and every
+    // subsequent test into an unexplained timeout. Fail the request instead.
+    const stream = createReadStream(file);
+    stream.on('error', (streamError) => {
+      response.destroy(streamError instanceof Error ? streamError : new Error(String(streamError)));
+    });
+    stream.pipe(response);
   } catch (error) {
     response.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
     response.end(error instanceof Error ? error.message : String(error));

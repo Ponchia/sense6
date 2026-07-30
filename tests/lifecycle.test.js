@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createExamLifecycle, disposeActiveExamLifecycles } from '../src/lib/lifecycle.js';
+import {
+  createExamLifecycle,
+  forcedColorsActive,
+  isCurrentMount,
+  watchForcedColors,
+} from '../src/lib/lifecycle.js';
+import { disposeActiveMounts } from '../src/lib/mount-registry.js';
 import { allowsNavigation } from '../src/lib/navigation.js';
 
 test('a new owner mount disposes the previous mount exactly once', () => {
@@ -55,8 +61,8 @@ test('all partial exam mounts can be retired after a route commit failure', () =
     first.onCleanup(() => cleanups++);
     second.onCleanup(() => cleanups++);
 
-    disposeActiveExamLifecycles();
-    disposeActiveExamLifecycles();
+    disposeActiveMounts();
+    disposeActiveMounts();
 
     assert.equal(first.signal.aborted, true);
     assert.equal(second.signal.aborted, true);
@@ -101,6 +107,121 @@ test('active measurements guard navigation and release the shell on completion',
   }
 });
 
+test('the lifecycle owns its body classes for the whole mount, not only at teardown', () => {
+  const events = [];
+  globalThis.document = {
+    body: {
+      classList: {
+        add: (...classes) => events.push(['add', ...classes]),
+        remove: (...classes) => events.push(['remove', ...classes]),
+        toggle() {},
+      },
+    },
+  };
+  try {
+    const lifecycle = createExamLifecycle(Symbol('exam'), { bodyClasses: ['udito-route', 'lab-mode'] });
+    assert.deepEqual(
+      events,
+      [['add', 'udito-route', 'lab-mode']],
+      'the classes must be applied at creation, not left to the caller',
+    );
+
+    lifecycle.dispose();
+    assert.deepEqual(events, [
+      ['add', 'udito-route', 'lab-mode'],
+      ['remove', 'measurement-active'],
+      ['remove', 'udito-route', 'lab-mode'],
+    ]);
+
+    // A mount that declares no classes must touch neither add nor remove.
+    events.length = 0;
+    createExamLifecycle(Symbol('bare')).dispose();
+    assert.deepEqual(events, [['remove', 'measurement-active']]);
+  } finally {
+    delete globalThis.document;
+  }
+});
+
+test('forced-colors detection asks the platform for a definite match', () => {
+  const queries = [];
+  try {
+    globalThis.window = {
+      matchMedia: (query) => {
+        queries.push(query);
+        return { matches: true };
+      },
+    };
+    assert.equal(forcedColorsActive(), true);
+    assert.deepEqual(queries, ['(forced-colors: active)'], 'any other query answers a different question');
+
+    globalThis.window = { matchMedia: () => ({ matches: false }) };
+    assert.equal(forcedColorsActive(), false);
+
+    // `matches` is required to be exactly true: a truthy stand-in is not a match.
+    globalThis.window = { matchMedia: () => ({ matches: 'active' }) };
+    assert.equal(forcedColorsActive(), false);
+
+    // A platform without media queries cannot be overriding colours.
+    globalThis.window = {};
+    assert.equal(forcedColorsActive(), false);
+  } finally {
+    delete globalThis.window;
+  }
+});
+
+test('a forced-colors watcher is scoped to the mount that registered it', () => {
+  const registrations = [];
+  const controller = new AbortController();
+  const onChange = () => {};
+  try {
+    globalThis.window = {
+      matchMedia: (query) => ({
+        addEventListener: (type, listener, options) => registrations.push({ query, type, listener, options }),
+      }),
+    };
+    watchForcedColors(onChange, controller.signal);
+    assert.equal(registrations.length, 1);
+    assert.equal(registrations[0].query, '(forced-colors: active)');
+    assert.equal(registrations[0].type, 'change');
+    assert.equal(registrations[0].listener, onChange);
+    assert.equal(
+      registrations[0].options.signal,
+      controller.signal,
+      'the listener must be released with the mount, not leaked across routes',
+    );
+
+    // A platform without media queries registers nothing and must not throw.
+    globalThis.window = {};
+    watchForcedColors(onChange, controller.signal);
+    assert.equal(registrations.length, 1);
+  } finally {
+    delete globalThis.window;
+  }
+});
+
+test('a captured mount is current only while it is both the active mount and undisposed', () => {
+  globalThis.document = { body: { classList: { add() {}, remove() {}, toggle() {} } } };
+  try {
+    const mount = { lifecycle: createExamLifecycle(Symbol('exam')) };
+    const other = { lifecycle: createExamLifecycle(Symbol('other')) };
+
+    assert.equal(isCurrentMount(mount, mount), true);
+    assert.equal(isCurrentMount(other, mount), false, 'a different mount is driving the module now');
+    assert.equal(isCurrentMount(null, mount), false, 'nothing is mounted');
+
+    // Identity alone is not enough: disposal happens in the same frame as a
+    // pending callback, so an aborted signal must retire the captured mount.
+    mount.lifecycle.dispose();
+    assert.equal(isCurrentMount(mount, mount), false);
+    assert.equal(isCurrentMount(other, other), true, 'an unrelated mount stays current');
+
+    other.lifecycle.dispose();
+    assert.equal(isCurrentMount(other, other), false);
+  } finally {
+    delete globalThis.document;
+  }
+});
+
 test('present resets scroll and moves focus to the new screen heading', () => {
   const calls = [];
   const heading = {
@@ -128,6 +249,41 @@ test('present resets scroll and moves focus to the new screen heading', () => {
   } finally {
     delete globalThis.requestAnimationFrame;
     delete globalThis.window;
+    delete globalThis.document;
+  }
+});
+
+test('an active measurement warns before the page unloads', () => {
+  const listeners = new Map();
+  globalThis.document = { body: { classList: { add() {}, remove() {}, toggle() {} } } };
+  globalThis.addEventListener = (type, listener) => listeners.set(type, listener);
+  globalThis.removeEventListener = (type) => listeners.delete(type);
+  try {
+    const lifecycle = createExamLifecycle(Symbol('exam'));
+    const beforeUnload = listeners.get('beforeunload');
+    assert.equal(typeof beforeUnload, 'function');
+
+    const idle = { defaultPrevented: false, preventDefault() {}, returnValue: undefined };
+    beforeUnload(idle);
+    assert.equal(idle.returnValue, undefined);
+
+    lifecycle.setActive(true);
+    let prevented = false;
+    const active = {
+      preventDefault: () => {
+        prevented = true;
+      },
+      returnValue: undefined,
+    };
+    beforeUnload(active);
+    assert.equal(prevented, true);
+    assert.equal(active.returnValue, '');
+
+    lifecycle.dispose();
+    assert.equal(listeners.has('beforeunload'), false);
+  } finally {
+    delete globalThis.addEventListener;
+    delete globalThis.removeEventListener;
     delete globalThis.document;
   }
 });

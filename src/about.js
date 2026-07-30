@@ -996,9 +996,9 @@ const ABOUT_COPY = Object.freeze({
 });
 
 export function renderAbout(context) {
-  const { app, locale, localeHref } = context;
+  const { app, locale, localeHref, t } = context;
   if (!app.querySelector(`:scope > [data-sense6-view="about"][data-sense6-locale="${locale}"]`)) {
-    app.innerHTML = aboutMarkup(locale, localeHref);
+    app.innerHTML = aboutMarkup(locale, t, localeHref);
   }
   return () => {};
 }
@@ -1008,8 +1008,20 @@ export function aboutCopy(locale) {
   return ABOUT_COPY[locale] ?? ABOUT_COPY.en;
 }
 
-/** @param {string} locale @param {(route: string) => string} [hrefFor] */
-export function aboutMarkup(locale, hrefFor = (route) => `/${locale}/${route ? `${route}/` : ''}`) {
+/**
+ * The static build and the runtime share this renderer so the crawled About
+ * page is byte-identical to the adopted one. That only holds while both pass
+ * the same translator, so experiment identities resolve through `translate`
+ * instead of falling back to the English registry literal.
+ * @param {string} locale
+ * @param {(source: string) => string} [translate]
+ * @param {(route: string) => string} [hrefFor]
+ */
+export function aboutMarkup(
+  locale,
+  translate = (source) => source,
+  hrefFor = (route) => `/${locale}/${route ? `${route}/` : ''}`,
+) {
   const page = aboutCopy(locale);
   return `<article class="about-view ui-container ui-container--wide" data-sense6-view="about" data-sense6-locale="${locale}">
     <a class="back-link about-view__back" data-sense6-route="" href="${escapeAttribute(hrefFor(''))}"><span aria-hidden="true">←</span> ${escapeHtml(page.back)}</a>
@@ -1031,7 +1043,7 @@ export function aboutMarkup(locale, hrefFor = (route) => `/${locale}/${route ? `
       ${sectionMarkup('01', page.whyTitle, page.why, page, hrefFor)}
       ${sectionMarkup('02', page.howTitle, page.how, page, hrefFor)}
       <section class="about-section" aria-labelledby="about-experiments-title"><span class="about-section__number" aria-hidden="true">03</span><div><h2 id="about-experiments-title">${escapeHtml(page.experimentsTitle)}</h2><p>${escapeHtml(page.experimentsIntro)}</p><div class="about-experiments">${EXAMS.map(
-        (exam) => experimentMarkup(exam, page, hrefFor),
+        (exam) => experimentMarkup(exam, page, hrefFor, translate),
       ).join('')}</div></div></section>
       ${sectionMarkup('04', page.qualityTitle, page.quality, page, hrefFor)}
       ${sectionMarkup('05', page.maintainerTitle, page.maintainer, page, hrefFor)}
@@ -1039,7 +1051,7 @@ export function aboutMarkup(locale, hrefFor = (route) => `/${locale}/${route ? `
       ${sectionMarkup('07', page.changesTitle, page.changes, page, hrefFor)}
       <section class="about-section" aria-labelledby="about-research-title"><span class="about-section__number" aria-hidden="true">08</span><div><h2 id="about-research-title">${escapeHtml(page.researchTitle)}</h2><p>${escapeHtml(page.researchIntro)}</p><ul class="about-research">${EXAMS.map(
         (exam) =>
-          `<li><a data-sense6-route="${escapeAttribute(exam.route)}" href="${escapeAttribute(hrefFor(exam.route))}"><strong>${escapeHtml(exam.name)}</strong><span>${escapeHtml(page.openExperiment)} →</span></a></li>`,
+          `<li><a data-sense6-route="${escapeAttribute(exam.route)}" href="${escapeAttribute(hrefFor(exam.route))}"><strong>${escapeHtml(discoveryName(exam, translate))}</strong><span>${escapeHtml(page.openExperiment)} →</span></a></li>`,
       ).join('')}</ul></div></section>
     </div>
   </article>`;
@@ -1051,9 +1063,13 @@ function sectionMarkup(number, title, paragraphs, page, hrefFor) {
     .join('')}</div></section>`;
 }
 
-function experimentMarkup(exam, page, hrefFor) {
+function discoveryName(exam, translate) {
+  return translate(exam.discoveryName ?? exam.name);
+}
+
+function experimentMarkup(exam, page, hrefFor, translate) {
   const boundary = page.experiments[exam.id];
-  return `<article class="about-experiment ui-card" style="--experiment-accent:${escapeAttribute(exam.accent)}"><div class="about-experiment__signal" aria-hidden="true"><span>${escapeHtml(exam.glyph)}</span><i></i></div><div class="about-experiment__copy"><h3><a data-sense6-route="${escapeAttribute(exam.route)}" href="${escapeAttribute(hrefFor(exam.route))}">${escapeHtml(exam.name)}</a></h3><dl><div><dt>${escapeHtml(page.exploresLabel)}</dt><dd>${escapeHtml(boundary[0])}</dd></div><div><dt>${escapeHtml(page.cannotLabel)}</dt><dd>${escapeHtml(boundary[1])}</dd></div></dl></div></article>`;
+  return `<article class="about-experiment ui-card" style="--experiment-accent:${escapeAttribute(exam.accent)}"><div class="about-experiment__signal" aria-hidden="true"><span>${escapeHtml(exam.glyph)}</span><i></i></div><div class="about-experiment__copy"><h3><a data-sense6-route="${escapeAttribute(exam.route)}" href="${escapeAttribute(hrefFor(exam.route))}">${escapeHtml(discoveryName(exam, translate))}</a></h3><dl><div><dt>${escapeHtml(page.exploresLabel)}</dt><dd>${escapeHtml(boundary[0])}</dd></div><div><dt>${escapeHtml(page.cannotLabel)}</dt><dd>${escapeHtml(boundary[1])}</dd></div></dl></div></article>`;
 }
 
 function aboutHtml(text, page, hrefFor) {

@@ -1124,6 +1124,10 @@ const rows = [
     'क्या आप इस कैलिब्रेटेड दृष्टि सत्र से बाहर निकलना चाहते हैं? आपका अधूरा परिणाम सहेजा नहीं जाएगा।',
   ],
   ['{eye} — {instrument}', '{eye} — {instrument}'],
+  [
+    'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
+    'यह सत्र जर्नल रिकॉर्ड के प्रारूप से मेल नहीं खाता, इसलिए इसे सहेजा नहीं गया। सारांश कॉपी करके रखें।',
+  ],
 ];
 
 const catalogRows = [...rows, .../** @type {Array<[string, string]>} */ (copyRows)];

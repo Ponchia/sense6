@@ -1,21 +1,61 @@
-import { activeMount, clearActiveMount, disposeActiveMounts, registerActiveMount } from './mount-registry.js';
+import { activeMount, clearActiveMount, registerActiveMount } from './mount-registry.js';
 import { setNavigationGuard } from './navigation.js';
 
 /** @typedef {{ signal: AbortSignal, onCleanup: (callback: (() => void)) => (() => void), setActive: (active: boolean, message?: string) => void, present: (root?: ParentNode, options?: { focus?: string | false, scroll?: boolean }) => void, dispose: () => void }} ExamLifecycle */
 
-/** Dispose every active exam mount after a route commit fails before returning its cleanup. */
-export function disposeActiveExamLifecycles() {
-  disposeActiveMounts();
+const FORCED_COLORS_QUERY = '(forced-colors: active)';
+
+/**
+ * Report whether the platform is overriding presented colours right now.
+ *
+ * Forced-colors and high-contrast modes replace the exact colours, grays, and
+ * contrast an experiment presents, so a colour, contrast, or optotype task
+ * must refuse to measure while one is active.
+ */
+export function forcedColorsActive() {
+  return window.matchMedia?.(FORCED_COLORS_QUERY).matches === true;
+}
+
+/**
+ * Observe forced-colors changes for the lifetime of one mount.
+ * @param {() => void} onChange
+ * @param {AbortSignal} signal
+ * @returns {void}
+ */
+export function watchForcedColors(onChange, signal) {
+  window.matchMedia?.(FORCED_COLORS_QUERY).addEventListener('change', onChange, { signal });
+}
+
+/**
+ * Report whether a captured mount is still the one its module is driving.
+ *
+ * Every deferred callback — animation frames, timers, awaited clipboard or
+ * audio work — must check this before touching mount state or the shared
+ * shell. Disposal happens synchronously in the same frame as a pending
+ * callback, so an unguarded callback reads state the mount already released.
+ * @template {{ lifecycle: ExamLifecycle }} MountState
+ * @param {MountState | null} current
+ * @param {MountState} mountState
+ * @returns {boolean}
+ */
+export function isCurrentMount(current, mountState) {
+  return current === mountState && !mountState.lifecycle.signal.aborted;
 }
 
 /**
  * Own one exam mount and guarantee idempotent, exclusive cleanup.
+ *
+ * `bodyClasses` are owned for the whole mount: the lifecycle adds them here and
+ * removes them on disposal. Previously it only removed, so every caller still
+ * had to add the same classes by hand and the option name described half its
+ * behaviour.
  * @param {symbol} owner
  * @param {{ bodyClasses?: string[] }} [options]
  * @returns {ExamLifecycle}
  */
 export function createExamLifecycle(owner, { bodyClasses = [] } = {}) {
   activeMount(owner)?.dispose();
+  if (bodyClasses.length) document.body.classList.add?.(...bodyClasses);
   const controller = new AbortController();
   /** @type {Array<() => void>} */
   const cleanups = [];
