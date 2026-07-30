@@ -19,18 +19,20 @@
 # Snapshot names are validated against the representative route list, so a typo
 # fails the job rather than silently approving nothing.
 
-root-desktop-chromium-linux.png               # root now states the non-medical boundary in all 12 languages, PR #59
-en-desktop-chromium-linux.png                 # gallery cards gained each experiment's limit and the descriptive identity, PR #59
-en-color-blindness-mobile-chromium-linux.png  # Daltonia heading restored to a descriptive identity, PR #59
-en-acutezza-mobile-chromium-linux.png         # Acutezza heading restored to a descriptive identity, PR #59
-en-about-desktop-chromium-linux.png           # About renders localized experiment identities, PR #59
-ar-about-desktop-chromium-linux.png           # About renders localized experiment identities, PR #59
-hi-about-desktop-chromium-linux.png           # About renders localized experiment identities, PR #59
-ja-about-mobile-chromium-linux.png            # About renders localized experiment identities, PR #59
-en-journal-mobile-chromium-linux.png          # journal comparison copy drops the uncertainty clause that had no producer, PR #59
-en-privacy-mobile-chromium-linux.png          # privacy export disclosure corrected to the fields actually exported, PR #59
-root-mobile-chromium-linux.png                  # root now states the non-medical boundary in all 12 languages, PR #59
-en-mobile-chromium-linux.png                    # gallery cards gained each experiment's limit and the descriptive identity, PR #59
-en-about-mobile-chromium-linux.png              # About renders localized experiment identities, PR #59
-ar-about-mobile-chromium-linux.png              # About renders localized experiment identities, PR #59
-hi-about-mobile-chromium-linux.png              # About renders localized experiment identities, PR #59
+root-desktop-chromium-linux.png                # root now states the non-medical boundary in all 12 languages, PR #59
+en-desktop-chromium-linux.png                  # gallery cards gained each experiment's limit and the descriptive identity, PR #59
+en-color-blindness-mobile-chromium-linux.png   # Daltonia heading restored to a descriptive identity, PR #59
+en-acutezza-mobile-chromium-linux.png          # Acutezza heading restored to a descriptive identity, PR #59
+en-about-desktop-chromium-linux.png            # About renders localized experiment identities, PR #59
+hi-about-desktop-chromium-linux.png            # About renders localized experiment identities, PR #59
+ja-about-mobile-chromium-linux.png             # About renders localized experiment identities, PR #59
+en-journal-mobile-chromium-linux.png           # journal comparison copy drops the uncertainty clause that had no producer, PR #59
+en-privacy-mobile-chromium-linux.png           # privacy export disclosure corrected to the fields actually exported, PR #59
+root-mobile-chromium-linux.png                 # root now states the non-medical boundary in all 12 languages, PR #59
+en-mobile-chromium-linux.png                   # gallery cards gained each experiment's limit and the descriptive identity, PR #59
+en-about-mobile-chromium-linux.png             # About renders localized experiment identities, PR #59
+ar-about-mobile-chromium-linux.png             # About renders localized experiment identities, PR #59
+hi-about-mobile-chromium-linux.png             # About renders localized experiment identities, PR #59
+en-color-blindness-desktop-chromium-linux.png  # Daltonia heading restored to a descriptive identity, PR #59
+en-acutezza-desktop-chromium-linux.png         # Acutezza heading restored to a descriptive identity, PR #59
+en-privacy-desktop-chromium-linux.png          # privacy export disclosure corrected to the fields actually exported, PR #59
