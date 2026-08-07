@@ -28,3 +28,14 @@
 # branch's base already contains PR #59 — CI will name it and it must be deleted.
 en-desktop-chromium-linux.png                   # gallery caveat now uses the mono face and diamond marker, PR #60
 en-mobile-chromium-linux.png                    # gallery caveat now uses the mono face and diamond marker, PR #60
+
+# Daltonia's limit line now names the test it disclaims ("This is not a colour
+# blindness test: …"), which is 34 characters longer and wraps to one extra row.
+# The page grows 1280x3202 -> 1280x3210; the diff is that row and the reflow
+# below it. Udito's and Acutezza's limit lines grew too but still fit their
+# existing rows, so their baselines are untouched. Mobile is declared with
+# desktop because the narrower viewport wraps at least as eagerly, and the
+# desktop mismatch hides the mobile comparison until desktop is approved — if
+# mobile turns out identical, CI will say so and this line comes out. PR #64.
+en-color-blindness-desktop-chromium-linux.png   # limit line names "colour blindness test", PR #64
+en-color-blindness-mobile-chromium-linux.png    # limit line names "colour blindness test", PR #64
