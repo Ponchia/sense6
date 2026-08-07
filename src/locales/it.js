@@ -80,8 +80,8 @@ const rows = [
   ['Resolve the opening.', 'Risolvi l’apertura.'],
   ['Prepare the vision lab', 'Prepara il laboratorio visivo'],
   [
-    'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
-    'Nessuna etichetta 20/20, diagnosi, rilevazione dell’astigmatismo o prescrizione.',
+    'This is not a visual acuity test: no 20/20 label, diagnosis, astigmatism detection, or prescription.',
+    'Non è un test dell’acuità visiva: nessuna etichetta 20/20, diagnosi, rilevazione dell’astigmatismo o prescrizione.',
   ],
   ['Gap angle', 'Angolo dell’apertura'],
   ['calibrated', 'calibrato'],
@@ -335,8 +335,8 @@ const rows = [
   ['Prepare the sound lab', 'Prepara il laboratorio audio'],
   ['See the method', 'Vedi il metodo'],
   [
-    'No dB HL, hearing age, diagnosis, or population score.',
-    'Nessun dB HL, età uditiva, diagnosi o punteggio di popolazione.',
+    'This is not a clinical hearing test: no dB HL, hearing age, diagnosis, or population score.',
+    'Non è un test dell’udito clinico: nessun dB HL, età uditiva, diagnosi o punteggio di popolazione.',
   ],
   ['Output', 'Uscita'],
   ['Method and limits', 'Metodo e limiti'],
@@ -722,7 +722,7 @@ const rows = [
   ],
   [
     'Daltonia has no clinical norms and has not been validated against an anomaloscope, CAD, Cambridge Colour Test, or a diagnosed cohort. These values cannot confirm or rule out a colour-vision deficiency. Compare repeat runs only on the same display and setup.',
-    'Daltonia non ha norme cliniche e non è stato convalidato rispetto a un anomaloscopio, CAD, Cambridge Colour Test o una coorte diagnosticata. Questi valori non possono confermare né escludere una carenza della visione cromatica. Confronta le sessioni ripetute solo sullo stesso schermo e con la stessa configurazione.',
+    'Daltonia non ha norme cliniche e non è stato convalidato rispetto a un anomaloscopio, CAD, Cambridge Colour Test o una coorte diagnosticata. Questi valori non possono confermare né escludere una carenza della visione dei colori (daltonismo). Confronta le sessioni ripetute solo sullo stesso schermo e con la stessa configurazione.',
   ],
   ['Copy run summary', 'Copia il riepilogo della sessione'],
   ['display relative', 'relativo allo schermo'],
@@ -773,8 +773,8 @@ const rows = [
     'Un bersaglio a forma di C diventa sempre più difficile da distinguere dal campo. Tre scale indipendenti stimano il più piccolo cambiamento cromatico che riesci a seguire in ogni direzione relativa allo schermo durante questa sessione.',
   ],
   [
-    'Experimental and unvalidated. This is not a screening result or diagnosis.',
-    'Sperimentale e non convalidato. Non è un risultato di screening né una diagnosi.',
+    'Experimental and unvalidated. This is not a colour blindness test: it is not a screening result or diagnosis.',
+    'Sperimentale e non convalidato. Non è un test del daltonismo: non è un risultato di screening né una diagnosi.',
   ],
   ['Last run on this browser:', 'Ultima sessione in questo browser:'],
   ['An adaptive task, not a plate score.', 'Un compito adattivo, non il punteggio di una tavola.'],

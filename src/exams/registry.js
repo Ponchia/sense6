@@ -50,7 +50,8 @@ export const EXAMS = Object.freeze([
     category: 'Colour-vision experiment',
     facts: ['Adaptive levels', '3 display directions', 'Run-relative result'],
     pageTitle: 'Experimental colour-vision check — Daltonia | Sense6',
-    limit: 'Experimental and unvalidated. This is not a screening result or diagnosis.',
+    limit:
+      'Experimental and unvalidated. This is not a colour blindness test: it is not a screening result or diagnosis.',
     discovery: {
       paragraphs: [
         'A C-shaped target becomes harder to separate from its field. Three independent staircases estimate the smallest colour shift you follow in each display-relative direction during this run.',
@@ -98,7 +99,7 @@ export const EXAMS = Object.freeze([
     category: 'Listening experiment',
     facts: ['3 instruments', 'Volume safety contract', 'No hearing label'],
     pageTitle: 'Device-relative hearing lab — Udito | Sense6',
-    limit: 'No dB HL, hearing age, diagnosis, or population score.',
+    limit: 'This is not a clinical hearing test: no dB HL, hearing age, diagnosis, or population score.',
     discovery: {
       paragraphs: [
         'Udito checks headphone-like presentation, maps an upper audibility boundary, and estimates pitch discrimination at two frequencies. Every result belongs to this device, volume, room, and run.',
@@ -122,7 +123,8 @@ export const EXAMS = Object.freeze([
     category: 'Calibrated sharpness experiment',
     facts: ['Physical screen calibration', '2 per-eye conditions', 'No clinical label'],
     pageTitle: 'Calibrated sharpness experiment — Acutezza | Sense6',
-    limit: 'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
+    limit:
+      'This is not a visual acuity test: no 20/20 label, diagnosis, astigmatism detection, or prescription.',
     discovery: {
       paragraphs: [
         'Use a laptop, tablet, or monitor without glare. Reset browser zoom, keep brightness comfortable, and leave the display still after calibration.',

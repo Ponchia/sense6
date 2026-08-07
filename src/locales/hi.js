@@ -80,8 +80,8 @@ const rows = [
   ['Resolve the opening.', 'खुले भाग की दिशा पहचानें।'],
   ['Prepare the vision lab', 'दृष्टि प्रयोगशाला तैयार करें'],
   [
-    'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
-    'यह 20/20 का लेबल, निदान, एस्टिग्मैटिज़्म की पहचान या चश्मे का नुस्खा नहीं देता।',
+    'This is not a visual acuity test: no 20/20 label, diagnosis, astigmatism detection, or prescription.',
+    'यह दृश्य तीक्ष्णता परीक्षण नहीं है: यह 20/20 का लेबल, निदान, एस्टिग्मैटिज़्म की पहचान या चश्मे का नुस्खा नहीं देता।',
   ],
   ['Gap angle', 'गैप कोण'],
   ['calibrated', 'कैलिब्रेटेड'],
@@ -317,8 +317,8 @@ const rows = [
   ['Prepare the sound lab', 'ध्वनि प्रयोगशाला तैयार करें'],
   ['See the method', 'विधि देखें'],
   [
-    'No dB HL, hearing age, diagnosis, or population score.',
-    'यह dB HL, श्रवण आयु, निदान या जनसंख्या-आधारित स्कोर नहीं देता।',
+    'This is not a clinical hearing test: no dB HL, hearing age, diagnosis, or population score.',
+    'यह नैदानिक श्रवण परीक्षण नहीं है: यह dB HL, श्रवण आयु, निदान या जनसंख्या-आधारित स्कोर नहीं देता।',
   ],
   ['Output', 'आउटपुट'],
   ['Method and limits', 'विधि और सीमाएँ'],
@@ -743,8 +743,8 @@ const rows = [
     'सी-आकार के लक्ष्य को अपने क्षेत्र से अलग करना कठिन हो जाता है। तीन स्वतंत्र सीढ़ियाँ इस रन के दौरान प्रत्येक प्रदर्शन-सापेक्ष दिशा में आपके द्वारा अनुसरण किए जाने वाले सबसे छोटे रंग बदलाव का अनुमान लगाती हैं।',
   ],
   [
-    'Experimental and unvalidated. This is not a screening result or diagnosis.',
-    'यह प्रायोगिक और अप्रमाणित है। यह स्क्रीनिंग का परिणाम या निदान नहीं है।',
+    'Experimental and unvalidated. This is not a colour blindness test: it is not a screening result or diagnosis.',
+    'यह प्रायोगिक और अप्रमाणित है। यह वर्णान्धता परीक्षण नहीं है: यह स्क्रीनिंग का परिणाम या निदान नहीं है।',
   ],
   ['Last run on this browser:', 'इस ब्राउज़र पर अंतिम रन:'],
   ['An adaptive task, not a plate score.', 'एक अनुकूली कार्य, प्लेट स्कोर नहीं।'],
