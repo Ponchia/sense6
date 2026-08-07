@@ -83,8 +83,8 @@ const rows = [
   ['Resolve the opening.', 'حدّد اتجاه الفتحة.'],
   ['Prepare the vision lab', 'تحضير معمل الرؤية'],
   [
-    'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
-    'لا يمنح تصنيف 20/20، ولا تشخيصًا، ولا يكشف اللابؤرية، ولا يقدّم وصفة طبية.',
+    'This is not a visual acuity test: no 20/20 label, diagnosis, astigmatism detection, or prescription.',
+    'هذا ليس اختبار حدة البصر: لا يمنح تصنيف 20/20، ولا تشخيصًا، ولا يكشف اللابؤرية، ولا يقدّم وصفة طبية.',
   ],
   ['Gap angle', 'زاوية الفجوة'],
   ['calibrated', 'مُعاير'],
@@ -320,8 +320,8 @@ const rows = [
   ['Prepare the sound lab', 'تحضير معمل الصوت'],
   ['See the method', 'انظر الطريقة'],
   [
-    'No dB HL, hearing age, diagnosis, or population score.',
-    'لا قياس بوحدة dB HL، ولا تقدير لعمر السمع، ولا تشخيص، ولا مقارنة بسكان مرجعيين.',
+    'This is not a clinical hearing test: no dB HL, hearing age, diagnosis, or population score.',
+    'هذا ليس اختبار سمع سريريًا: لا قياس بوحدة dB HL، ولا تقدير لعمر السمع، ولا تشخيص، ولا مقارنة بسكان مرجعيين.',
   ],
   ['Output', 'الإخراج'],
   ['Method and limits', 'الطريقة والحدود'],
@@ -743,8 +743,8 @@ const rows = [
     'يصبح من الصعب فصل الهدف على شكل C عن مجاله. تقوم ثلاثة سلالم مستقلة بتقدير أصغر تحول لوني تتبعه في كل اتجاه نسبي للعرض أثناء هذا التشغيل.',
   ],
   [
-    'Experimental and unvalidated. This is not a screening result or diagnosis.',
-    'تجريبي ولم تُتحقق صلاحيته. هذه ليست نتيجة فحص تحرٍّ ولا تشخيصًا.',
+    'Experimental and unvalidated. This is not a colour blindness test: it is not a screening result or diagnosis.',
+    'تجريبي ولم تُتحقق صلاحيته. هذا ليس اختبار عمى الألوان: ليست نتيجة فحص تحرٍّ ولا تشخيصًا.',
   ],
   ['Last run on this browser:', 'آخر جولة في هذا المتصفح:'],
   ['An adaptive task, not a plate score.', 'مهمة تكيفية، وليست نتيجة لوحة.'],

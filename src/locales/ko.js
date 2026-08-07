@@ -80,8 +80,8 @@ const rows = [
   ['Resolve the opening.', '고리의 틈 방향을 구별하세요.'],
   ['Prepare the vision lab', '비전랩 준비'],
   [
-    'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
-    '20/20 판정, 진단, 난시 검출 또는 처방을 제공하지 않습니다.',
+    'This is not a visual acuity test: no 20/20 label, diagnosis, astigmatism detection, or prescription.',
+    '시력 검사가 아닙니다. 20/20 판정, 진단, 난시 검출 또는 처방을 제공하지 않습니다.',
   ],
   ['Gap angle', '간격 각도'],
   ['calibrated', '보정된'],
@@ -323,8 +323,8 @@ const rows = [
   ['Prepare the sound lab', '음향 연구실 준비'],
   ['See the method', '방법 보기'],
   [
-    'No dB HL, hearing age, diagnosis, or population score.',
-    'dB HL, 청력 나이, 진단 또는 인구 집단 기준 점수를 제공하지 않습니다.',
+    'This is not a clinical hearing test: no dB HL, hearing age, diagnosis, or population score.',
+    '임상 청력 검사가 아닙니다. dB HL, 청력 나이, 진단 또는 인구 집단 기준 점수를 제공하지 않습니다.',
   ],
   ['Output', '출력'],
   ['Method and limits', '방법 및 한계'],
@@ -746,8 +746,8 @@ const rows = [
     'C자형 표적은 해당 필드에서 분리하기가 더 어려워집니다. 세 개의 독립적인 계단은 이번 회차 중에 각 디스플레이 기준 방향에서 따르는 가장 작은 색상 변화를 추정합니다.',
   ],
   [
-    'Experimental and unvalidated. This is not a screening result or diagnosis.',
-    '실험적이며 검증되지 않았습니다. 선별검사 결과나 진단이 아닙니다.',
+    'Experimental and unvalidated. This is not a colour blindness test: it is not a screening result or diagnosis.',
+    '실험적이며 검증되지 않았습니다. 색맹 테스트가 아니며 선별검사 결과나 진단이 아닙니다.',
   ],
   ['Last run on this browser:', '이 브라우저에서 마지막 회차:'],
   ['An adaptive task, not a plate score.', '플레이트 점수가 아닌 적응형 작업입니다.'],

@@ -80,8 +80,8 @@ const rows = [
   ['Resolve the opening.', 'Resolve the opening.'],
   ['Prepare the vision lab', 'Prepare the vision lab'],
   [
-    'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
-    'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
+    'This is not a visual acuity test: no 20/20 label, diagnosis, astigmatism detection, or prescription.',
+    'This is not a visual acuity test: no 20/20 label, diagnosis, astigmatism detection, or prescription.',
   ],
   ['Gap angle', 'Gap angle'],
   ['calibrated', 'calibrated'],
@@ -326,8 +326,8 @@ const rows = [
   ['Prepare the sound lab', 'Prepare the sound lab'],
   ['See the method', 'See the method'],
   [
-    'No dB HL, hearing age, diagnosis, or population score.',
-    'No dB HL, hearing age, diagnosis, or population score.',
+    'This is not a clinical hearing test: no dB HL, hearing age, diagnosis, or population score.',
+    'This is not a clinical hearing test: no dB HL, hearing age, diagnosis, or population score.',
   ],
   ['Output', 'Output'],
   ['Method and limits', 'Method and limits'],
@@ -752,8 +752,8 @@ const rows = [
     'A C-shaped target becomes harder to separate from its field. Three independent staircases estimate the smallest colour shift you follow in each display-relative direction during this run.',
   ],
   [
-    'Experimental and unvalidated. This is not a screening result or diagnosis.',
-    'Experimental and unvalidated. This is not a screening result or diagnosis.',
+    'Experimental and unvalidated. This is not a colour blindness test: it is not a screening result or diagnosis.',
+    'Experimental and unvalidated. This is not a colour blindness test: it is not a screening result or diagnosis.',
   ],
   ['Last run on this browser:', 'Last run on this browser:'],
   ['An adaptive task, not a plate score.', 'An adaptive task, not a plate score.'],

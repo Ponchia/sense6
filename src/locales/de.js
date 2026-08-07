@@ -83,8 +83,8 @@ const rows = [
   ['Resolve the opening.', 'Erkennen Sie die Öffnung.'],
   ['Prepare the vision lab', 'Sehlabor vorbereiten'],
   [
-    'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
-    'Keine 20/20-Bewertung, Diagnose, Astigmatismuserkennung oder Verordnung.',
+    'This is not a visual acuity test: no 20/20 label, diagnosis, astigmatism detection, or prescription.',
+    'Dies ist kein Sehschärfe-Test: keine 20/20-Bewertung, Diagnose, Astigmatismuserkennung oder Verordnung.',
   ],
   ['Gap angle', 'Öffnungswinkel'],
   ['calibrated', 'kalibriert'],
@@ -332,8 +332,8 @@ const rows = [
   ['Prepare the sound lab', 'Hörlabor vorbereiten'],
   ['See the method', 'Methode ansehen'],
   [
-    'No dB HL, hearing age, diagnosis, or population score.',
-    'Keine dB HL, kein Höralter, keine Diagnose und kein Bevölkerungswert.',
+    'This is not a clinical hearing test: no dB HL, hearing age, diagnosis, or population score.',
+    'Dies ist kein klinischer Hörtest: keine dB HL, kein Höralter, keine Diagnose und kein Bevölkerungswert.',
   ],
   ['Output', 'Ausgabe'],
   ['Method and limits', 'Methode und Grenzen'],
@@ -770,8 +770,8 @@ const rows = [
     'Ein C-förmiges Ziel wird zunehmend schwerer vom Feld zu unterscheiden. Drei unabhängige Treppen schätzen die kleinste Farbverschiebung, die Sie in jeder bildschirmbezogenen Richtung dieses Durchlaufs erkennen.',
   ],
   [
-    'Experimental and unvalidated. This is not a screening result or diagnosis.',
-    'Experimentell und nicht validiert. Dies ist weder ein Screening-Ergebnis noch eine Diagnose.',
+    'Experimental and unvalidated. This is not a colour blindness test: it is not a screening result or diagnosis.',
+    'Experimentell und nicht validiert. Dies ist kein Farbenblindheitstest: weder ein Screening-Ergebnis noch eine Diagnose.',
   ],
   ['Last run on this browser:', 'Letzter Durchlauf in diesem Browser:'],
   ['An adaptive task, not a plate score.', 'Eine adaptive Aufgabe, kein Farbtafelwert.'],
