@@ -80,8 +80,8 @@ const rows = [
   ['Resolve the opening.', 'Distingue la abertura.'],
   ['Prepare the vision lab', 'Preparar el laboratorio visual'],
   [
-    'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
-    'Sin etiqueta 20/20, diagnóstico, detección de astigmatismo ni prescripción.',
+    'This is not a visual acuity test: no 20/20 label, diagnosis, astigmatism detection, or prescription.',
+    'No es un test de agudeza visual: sin etiqueta 20/20, diagnóstico, detección de astigmatismo ni prescripción.',
   ],
   ['Gap angle', 'Ángulo de la abertura'],
   ['calibrated', 'calibrado'],
@@ -338,8 +338,8 @@ const rows = [
   ['Prepare the sound lab', 'Preparar el laboratorio auditivo'],
   ['See the method', 'Ver el método'],
   [
-    'No dB HL, hearing age, diagnosis, or population score.',
-    'Sin dB HL, edad auditiva, diagnóstico ni puntuación poblacional.',
+    'This is not a clinical hearing test: no dB HL, hearing age, diagnosis, or population score.',
+    'No es un test de audición clínico: sin dB HL, edad auditiva, diagnóstico ni puntuación poblacional.',
   ],
   ['Output', 'Salida'],
   ['Method and limits', 'Método y límites'],
@@ -607,7 +607,7 @@ const rows = [
   ['Lock this order', 'Confirmar este orden'],
   [
     'This is not a medical test and cannot confirm tetrachromacy.',
-    'No es una prueba médica y no puede confirmar la tetracromía.',
+    'No es una prueba médica y no puede confirmar el tetracromatismo (tetracromía).',
   ],
   ['Lab progress', 'Progreso del laboratorio'],
   [
@@ -725,7 +725,7 @@ const rows = [
   ],
   [
     'Daltonia has no clinical norms and has not been validated against an anomaloscope, CAD, Cambridge Colour Test, or a diagnosed cohort. These values cannot confirm or rule out a colour-vision deficiency. Compare repeat runs only on the same display and setup.',
-    'Daltonia no tiene normas clínicas y no se ha validado frente a anomaloscopio, CAD, Cambridge Colour Test ni una cohorte diagnosticada. Estos valores no pueden confirmar ni descartar una deficiencia de visión cromática. Compara repeticiones solo en la misma pantalla y configuración.',
+    'Daltonia no tiene normas clínicas y no se ha validado frente a anomaloscopio, CAD, Cambridge Colour Test ni una cohorte diagnosticada. Estos valores no pueden confirmar ni descartar una deficiencia de la visión del color (daltonismo). Compara repeticiones solo en la misma pantalla y configuración.',
   ],
   ['Copy run summary', 'Copiar el resumen de la sesión'],
   ['display relative', 'relativo a la pantalla'],
@@ -776,8 +776,8 @@ const rows = [
     'Un objetivo en forma de C se vuelve cada vez más difícil de distinguir del campo. Tres escaleras independientes estiman el menor cambio cromático que sigues en cada dirección relativa a la pantalla durante esta sesión.',
   ],
   [
-    'Experimental and unvalidated. This is not a screening result or diagnosis.',
-    'Experimental y sin validar. No es un resultado de cribado ni un diagnóstico.',
+    'Experimental and unvalidated. This is not a colour blindness test: it is not a screening result or diagnosis.',
+    'Experimental y sin validar. No es un test de daltonismo: no es un resultado de cribado ni un diagnóstico.',
   ],
   ['Last run on this browser:', 'Última sesión en este navegador:'],
   ['An adaptive task, not a plate score.', 'Una tarea adaptativa, no la puntuación de una lámina.'],

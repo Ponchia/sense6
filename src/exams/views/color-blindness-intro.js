@@ -46,7 +46,7 @@ export function colorBlindnessIntroMarkup(previous, message) {
           </div>
           <p class="hero__limit">
             <span aria-hidden="true">◇</span>
-            Experimental and unvalidated. This is not a screening result or diagnosis.
+            Experimental and unvalidated. This is not a colour blindness test: it is not a screening result or diagnosis.
           </p>
           ${
             previous

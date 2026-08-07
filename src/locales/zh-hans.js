@@ -80,8 +80,8 @@ const rows = [
   ['Resolve the opening.', '辨认缺口。'],
   ['Prepare the vision lab', '准备视觉实验室'],
   [
-    'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
-    '不提供 20/20 判定、诊断、散光检测或处方。',
+    'This is not a visual acuity test: no 20/20 label, diagnosis, astigmatism detection, or prescription.',
+    '这不是视力测试：不提供 20/20 判定、诊断、散光检测或处方。',
   ],
   ['Gap angle', '缺口角度'],
   ['calibrated', '已校准'],
@@ -310,7 +310,10 @@ const rows = [
   ],
   ['Prepare the sound lab', '准备听觉实验室'],
   ['See the method', '查看方法'],
-  ['No dB HL, hearing age, diagnosis, or population score.', '不提供 dB HL、听力年龄、诊断或人群分数。'],
+  [
+    'This is not a clinical hearing test: no dB HL, hearing age, diagnosis, or population score.',
+    '这不是临床听力测试：不提供 dB HL、听力年龄、诊断或人群分数。',
+  ],
   ['Output', '输出'],
   ['Method and limits', '方法与局限'],
   ['Three questions. No synthetic score.', '三个问题。不合成总分。'],
@@ -710,8 +713,8 @@ const rows = [
     'C 形视标会越来越难与背景分开。三条独立阶梯法会估算本次测量中，你在每个显示器相对方向上能分辨的最小颜色变化。',
   ],
   [
-    'Experimental and unvalidated. This is not a screening result or diagnosis.',
-    '这是未经验证的实验，不是筛查结果或诊断。',
+    'Experimental and unvalidated. This is not a colour blindness test: it is not a screening result or diagnosis.',
+    '这是未经验证的实验，不是色盲测试，也不是筛查结果或诊断。',
   ],
   ['Last run on this browser:', '此浏览器上的上次测量：'],
   ['An adaptive task, not a plate score.', '这是自适应任务，不是色觉图版分数。'],

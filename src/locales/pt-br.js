@@ -80,8 +80,8 @@ const rows = [
   ['Resolve the opening.', 'Distinga a abertura.'],
   ['Prepare the vision lab', 'Preparar o laboratório visual'],
   [
-    'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
-    'Sem rótulo 20/20, diagnóstico, detecção de astigmatismo ou prescrição.',
+    'This is not a visual acuity test: no 20/20 label, diagnosis, astigmatism detection, or prescription.',
+    'Não é um teste de acuidade visual: sem rótulo 20/20, diagnóstico, detecção de astigmatismo ou prescrição.',
   ],
   ['Gap angle', 'Ângulo da abertura'],
   ['calibrated', 'calibrado'],
@@ -332,8 +332,8 @@ const rows = [
   ['Prepare the sound lab', 'Preparar o laboratório auditivo'],
   ['See the method', 'Ver o método'],
   [
-    'No dB HL, hearing age, diagnosis, or population score.',
-    'Sem dB HL, idade auditiva, diagnóstico ou pontuação populacional.',
+    'This is not a clinical hearing test: no dB HL, hearing age, diagnosis, or population score.',
+    'Não é um teste de audição clínico: sem dB HL, idade auditiva, diagnóstico ou pontuação populacional.',
   ],
   ['Output', 'Saída'],
   ['Method and limits', 'Método e limites'],
@@ -713,7 +713,7 @@ const rows = [
   ],
   [
     'Daltonia has no clinical norms and has not been validated against an anomaloscope, CAD, Cambridge Colour Test, or a diagnosed cohort. These values cannot confirm or rule out a colour-vision deficiency. Compare repeat runs only on the same display and setup.',
-    'O Daltonia não tem normas clínicas e não foi validado em comparação com um anomaloscópio, CAD, Cambridge Colour Test ou uma coorte diagnosticada. Estes valores não podem confirmar nem excluir uma deficiência da visão cromática. Compare sessões repetidas somente na mesma tela e com a mesma configuração.',
+    'O Daltonia não tem normas clínicas e não foi validado em comparação com um anomaloscópio, CAD, Cambridge Colour Test ou uma coorte diagnosticada. Estes valores não podem confirmar nem excluir uma deficiência da visão das cores (daltonismo). Compare sessões repetidas somente na mesma tela e com a mesma configuração.',
   ],
   ['Copy run summary', 'Copiar o resumo da sessão'],
   ['display relative', 'relativo à tela'],
@@ -764,8 +764,8 @@ const rows = [
     'Um alvo em forma de C fica cada vez mais difícil de distinguir do campo. Três procedimentos em escada independentes estimam a menor alteração cromática que você consegue acompanhar em cada direção relativa à tela durante esta sessão.',
   ],
   [
-    'Experimental and unvalidated. This is not a screening result or diagnosis.',
-    'Experimental e não validado. Não é um resultado de triagem nem um diagnóstico.',
+    'Experimental and unvalidated. This is not a colour blindness test: it is not a screening result or diagnosis.',
+    'Experimental e não validado. Não é um teste de daltonismo: não é um resultado de triagem nem um diagnóstico.',
   ],
   ['Last run on this browser:', 'Última sessão neste navegador:'],
   ['An adaptive task, not a plate score.', 'Uma tarefa adaptativa, não a pontuação de uma placa.'],

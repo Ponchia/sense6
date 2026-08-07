@@ -80,8 +80,8 @@ const rows = [
   ['Resolve the opening.', '切れ目を見分ける。'],
   ['Prepare the vision lab', '視覚ラボの準備'],
   [
-    'No 20/20 label, diagnosis, astigmatism detection, or prescription.',
-    '20/20相当という判定、診断、乱視の検出、処方は行いません。',
+    'This is not a visual acuity test: no 20/20 label, diagnosis, astigmatism detection, or prescription.',
+    'これは視力検査ではありません。20/20相当という判定、診断、乱視の検出、処方は行いません。',
   ],
   ['Gap angle', '切れ目の角度'],
   ['calibrated', '較正済み'],
@@ -320,8 +320,8 @@ const rows = [
   ['Prepare the sound lab', '聴取ラボの準備'],
   ['See the method', '測定方法を見る'],
   [
-    'No dB HL, hearing age, diagnosis, or population score.',
-    'dB HL、聴力年齢、診断、集団内スコアは示しません。',
+    'This is not a clinical hearing test: no dB HL, hearing age, diagnosis, or population score.',
+    'これは臨床的な聴力検査ではありません。dB HL、聴力年齢、診断、集団内スコアは示しません。',
   ],
   ['Output', '出力'],
   ['Method and limits', '方法と限界'],
@@ -749,8 +749,8 @@ const rows = [
     'C字形の視標が、次第に背景から見分けにくくなります。3本の独立した階段法で、今回の測定中に、ディスプレイ相対の各方向で見分けられる最小の色変化を推定します。',
   ],
   [
-    'Experimental and unvalidated. This is not a screening result or diagnosis.',
-    '実験段階で未検証です。スクリーニング結果でも診断でもありません。',
+    'Experimental and unvalidated. This is not a colour blindness test: it is not a screening result or diagnosis.',
+    '実験段階で未検証です。これは色覚検査ではありません。スクリーニング結果でも診断でもありません。',
   ],
   ['Last run on this browser:', 'このブラウザでの前回の測定：'],
   ['An adaptive task, not a plate score.', 'プレート式スコアではなく、適応型課題です。'],
