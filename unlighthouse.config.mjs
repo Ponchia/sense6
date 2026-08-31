@@ -1,8 +1,8 @@
 import { chromium } from '@playwright/test';
-import { REPRESENTATIVE_ROUTES, SITE_ROUTES } from './audits/routes.js';
+import { SEARCH_REPRESENTATIVE_ROUTES, SEARCH_ROUTES } from './audits/routes.js';
 
 const site = process.env.UNLIGHTHOUSE_SITE ?? 'http://127.0.0.1:4174';
-const routes = process.env.FULL_SITE_AUDIT === '1' ? SITE_ROUTES : REPRESENTATIVE_ROUTES;
+const routes = process.env.FULL_SITE_AUDIT === '1' ? SEARCH_ROUTES : SEARCH_REPRESENTATIVE_ROUTES;
 
 export default {
   site,

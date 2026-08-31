@@ -105,6 +105,7 @@ async function renderRoute({ route, locale }) {
         title: `${copy.title} | Sense6`,
         description: copy.intro,
         socialImageAlt: copy.intro,
+        indexable: false,
       });
     } else if (route === 'about') {
       const [{ aboutCopy, renderAbout }] = await Promise.all([
@@ -136,6 +137,7 @@ async function renderRoute({ route, locale }) {
         title: `${copy.title} | Sense6`,
         description: copy.intro,
         socialImageAlt: copy.intro,
+        indexable: false,
       });
     } else if (EXAM_BY_ID.has(route)) {
       const definition = EXAM_BY_ID.get(route);

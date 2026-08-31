@@ -1037,23 +1037,9 @@ a:focus-visible {
   padding: 0.7rem 1rem;
 }
 
-/* The root gateway states the non-medical boundary once per language, because it
-   is self-canonical and cannot inherit one locale's catalog. Unstyled this became
-   a browser-default disc list: 40px of inherited padding, and an RTL item whose
-   marker jumped to the opposite margin and broke the column. Markers off, text
-   aligned to each item's own start edge. */
-.static-boundary-list {
-  display: grid;
-  gap: 0.4rem;
-  list-style: none;
-  margin: 0;
-  padding-inline-start: 0;
-}
-
-.static-boundary-list li {
+.static-boundary {
   color: var(--text-soft);
   font-size: var(--text-sm);
-  text-align: start;
 }
 
 /* Arabic and the added Asian scripts need native shaping and metrics rather
