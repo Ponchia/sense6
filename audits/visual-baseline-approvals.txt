@@ -18,6 +18,3 @@
 #
 # Snapshot names are validated against the representative route list, so a typo
 # fails the job rather than silently approving nothing.
-
-root-mobile-chromium-linux.png  # simplify the x-default gateway to one concise boundary
-en-mobile-chromium-linux.png  # let gallery cards lead with purpose instead of repeated caveats
