@@ -294,6 +294,14 @@ test('the visual comparison gates pull requests and direct pushes', () => {
   );
 });
 
+test('successful unchanged visual checks do not consume artifact storage', () => {
+  const verify = workflow('verify.yml');
+
+  assert.match(verify, /if: failure\(\) \|\| steps\.visual-baselines\.outputs\.approved != ''/);
+  assert.doesNotMatch(allWorkflows, /actions\/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02/);
+  assert.match(allWorkflows, /actions\/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7\.0\.1/);
+});
+
 test('the deployed browser configuration refuses any host but production', () => {
   assert.equal(deployedConfig.workers, 1);
   assert.equal(deployedConfig.fullyParallel, false);
