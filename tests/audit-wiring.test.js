@@ -78,19 +78,12 @@ const EVENT_CONTEXTS = Object.freeze({
 const SELF_HOSTED_REACH = Object.freeze({
   'fork pull request': [],
   'same-repository pull request': [
-    'site-audit.yml:route-integrity',
-    'site-audit.yml:visual-regression',
     'verify.yml:browser',
     'verify.yml:lighthouse',
     'verify.yml:release',
+    'verify.yml:visual',
   ],
-  'push to main': [
-    'site-audit.yml:route-integrity',
-    'site-audit.yml:visual-regression',
-    'verify.yml:browser',
-    'verify.yml:lighthouse',
-    'verify.yml:release',
-  ],
+  'push to main': ['verify.yml:browser', 'verify.yml:lighthouse', 'verify.yml:release', 'verify.yml:visual'],
   'scheduled run': [
     'site-audit.yml:external-links',
     'site-audit.yml:lighthouse-full-site',
@@ -105,6 +98,7 @@ const SELF_HOSTED_REACH = Object.freeze({
     'verify.yml:browser',
     'verify.yml:lighthouse',
     'verify.yml:release',
+    'verify.yml:visual',
   ],
 });
 
@@ -158,7 +152,6 @@ test('no job reaches the self-hosted runner from a fork pull request', () => {
   // that the current expressions exclude a fork — not that anybody still intends
   // them to.
   assert.match(workflow('ci.yml'), /head\.repo\.full_name == github\.repository/);
-  assert.match(workflow('site-audit.yml'), /head\.repo\.full_name == github\.repository/);
 });
 
 test('the fork guard does not disable the trusted runs', () => {
@@ -273,7 +266,7 @@ test('the Lighthouse budget can stop a deploy', () => {
   // publish and the two jobs merely raced.
   assert.match(verify, /^ {2}lighthouse:$/m);
   assert.match(verify, /npm run audit:lighthouse/);
-  assert.match(verify, /needs: \[browser, lighthouse\]/);
+  assert.match(verify, /needs: \[browser, lighthouse, visual\]/);
   assert.doesNotMatch(
     siteAudit,
     /^ {2}lighthouse:$/m,
@@ -281,27 +274,32 @@ test('the Lighthouse budget can stop a deploy', () => {
   );
 });
 
-test('the visual comparison also runs on a direct push to main', () => {
-  // Branch protection is impossible on this repository, so a push to main
-  // deploys without any pull request gate at all. Asserted through the resolved
-  // `if:` expression rather than its literal text, because the same job also has
-  // to exclude a fork pull request and the two conditions share one expression.
-  const siteAudit = workflow('site-audit.yml');
-  const job = parseWorkflow('site-audit.yml').jobs.find((entry) => entry.id === 'visual-regression');
-  assert.ok(job?.if, 'the visual-regression job lost its event guard');
+test('the visual comparison gates pull requests and direct pushes', () => {
+  // The comparison used to race the deployment from site-audit.yml, so a red
+  // result could arrive after production had already published. It now belongs
+  // to the reusable verifier and is a hard release dependency.
+  const verify = workflow('verify.yml');
   for (const event of ['push to main', 'same-repository pull request']) {
-    assert.equal(
-      evaluateExpression(job.if, EVENT_CONTEXTS[event]),
-      true,
-      `the visual comparison must still run for a ${event}`,
+    assert.ok(
+      reachableSelfHostedJobs(event).includes('verify.yml:visual'),
+      `the visual comparison must run for a ${event}`,
     );
   }
-  assert.match(siteAudit, /audits\/visual-baseline-approvals\.txt/);
+  assert.match(verify, /needs: \[browser, lighthouse, visual\]/);
+  assert.match(verify, /audits\/visual-baseline-approvals\.txt/);
   assert.doesNotMatch(
-    siteAudit,
+    verify,
     /git diff --name-only .*visual-regression\.spec\.js-snapshots/,
     'approvals must not be derived from the baselines they approve',
   );
+});
+
+test('successful unchanged visual checks do not consume artifact storage', () => {
+  const verify = workflow('verify.yml');
+
+  assert.match(verify, /if: failure\(\) \|\| steps\.visual-baselines\.outputs\.approved != ''/);
+  assert.doesNotMatch(allWorkflows, /actions\/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02/);
+  assert.match(allWorkflows, /actions\/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7\.0\.1/);
 });
 
 test('the deployed browser configuration refuses any host but production', () => {
