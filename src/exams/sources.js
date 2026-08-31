@@ -31,7 +31,7 @@ export const EXAM_SOURCES = Object.freeze({
       'regan-cct',
       'comparator',
       'Regan, Reffin, and Mollon (1994): Cambridge Colour Test',
-      'https://vision.psychol.cam.ac.uk/jdmollon/papers/ReganReffinMollonCambridgeColourTest.pdf',
+      'https://doi.org/10.1016/0042-6989(94)90203-8',
     ),
     source(
       'levitt-staircase',
@@ -43,7 +43,7 @@ export const EXAM_SOURCES = Object.freeze({
       'jordan-mollon-rgb',
       'boundary',
       'Jordan and Mollon (2019): tetrachromacy and ordinary RGB displays',
-      'https://vision.psychol.cam.ac.uk/jdmollon/papers/JordanMollon2019Tetrachromacy.pdf',
+      'https://doi.org/10.1016/j.cobeha.2019.08.002',
     ),
     source(
       'xrite-fm100',
@@ -69,7 +69,7 @@ export const EXAM_SOURCES = Object.freeze({
       'regan-cct',
       'comparator',
       'Regan, Reffin, and Mollon (1994): Cambridge Colour Test',
-      'https://vision.psychol.cam.ac.uk/jdmollon/papers/ReganReffinMollonCambridgeColourTest.pdf',
+      'https://doi.org/10.1016/0042-6989(94)90203-8',
     ),
     source(
       'levitt-staircase',

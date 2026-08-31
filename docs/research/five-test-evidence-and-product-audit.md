@@ -280,7 +280,7 @@ select confidence that the protocol has not earned.
 
 Keep [Jordan et al. (2010)](https://doi.org/10.1167/10.8.12) as a functional
 tetrachromacy study, not browser validation. Add
-[Jordan and Mollon (2019)](https://vision.psychol.cam.ac.uk/jdmollon/papers/JordanMollon2019Tetrachromacy.pdf)
+[Jordan and Mollon (2019)](https://doi.org/10.1016/j.cobeha.2019.08.002)
 as the strongest direct ordinary-RGB boundary.
 
 The implementation calculates ΔEOK, consistent with
@@ -290,7 +290,7 @@ shipped-method list unless production changes to ΔE00.
 
 Add these sources before making stronger method claims:
 
-- [Regan, Reffin, and Mollon (1994)](https://vision.psychol.cam.ac.uk/jdmollon/papers/ReganReffinMollonCambridgeColourTest.pdf)
+- [Regan, Reffin, and Mollon (1994)](https://doi.org/10.1016/0042-6989(94)90203-8)
   for the actual Cambridge Colour Test stimulus, geometry, luminance noise, and
   adaptive boundary;
 - [Levitt (1971)](https://doi.org/10.1121/1.1912375),
