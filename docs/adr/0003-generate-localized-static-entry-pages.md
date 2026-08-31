@@ -30,10 +30,11 @@ content and allow the static and interactive views to drift.
   the selected route with the interactive experiment.
 - Give every page a unique title and description, self-canonical URL,
   reciprocal `hreflang` links, and structured data that describes only what the
-  page actually provides.
-- Generate an exact sitemap, a documented crawler policy, an optional
-  `llms.txt` discovery summary, and a script-free 404 page from the same route
-  set.
+  page actually provides. Keep journal and privacy available as localized user
+  tools while marking them `noindex`.
+- Generate an exact sitemap from the indexable root, gallery, experiment, and
+  About routes, plus a documented crawler policy, an optional `llms.txt`
+  discovery summary, and a script-free 404 page.
 - Preserve historic hash links by replacing them with their canonical paths in
   the browser. Don't list legacy URLs in discovery artifacts.
 - Verify route content, metadata, internal links, security headers, discovery

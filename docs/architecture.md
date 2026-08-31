@@ -44,7 +44,7 @@ instrument.
 
 | Boundary | Source | Responsibility |
 | --- | --- | --- |
-| Shell and router | `src/main.js`, `src/router.js`, `src/routes.js` | Resolve locale-aware routes, commit canonical and social metadata with one view, and dispose the previous view |
+| Shell and router | `src/main.js`, `src/router.js`, `src/routes.js` | Resolve locale-aware routes, commit canonical, social, and robots metadata with one view, and dispose the previous view |
 | Service contracts | `src/exams/contracts.js` | Define experiment identity, metric names, and journal-comparison policy |
 | Presentation registry | `src/exams/registry.js` | Define gallery and static-page metadata plus lazy experiment loaders |
 | Protocol passports | `src/exams/protocols.js` | Freeze method versions, selectable profiles, schedule digests, stopping rules, and interpretation boundaries |
@@ -86,7 +86,10 @@ load on their own route where practical.
 
 `src/routes.js` creates one route metadata record for the static generator and
 the runtime router. A successful navigation commits the title, description,
-canonical URL, Open Graph fields, and Twitter fields with the mounted view. The
+canonical URL, Open Graph fields, Twitter fields, and indexability with the
+mounted view. Journal and privacy are useful application routes but not search
+landing pages, so they carry `noindex` and are absent from the sitemap; navigating
+back to a gallery, experiment, or About page removes that robots directive. The
 generated 404 removes canonical and social identity because it does not
 represent a real route.
 

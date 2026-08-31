@@ -108,6 +108,7 @@ test('SPA navigation commits complete canonical and social metadata for each act
     description: privacy.intro,
     path: '/en/privacy/',
     image: '/social/sense6.png',
+    indexable: false,
   });
 
   await page.locator('.brand').click();
@@ -141,7 +142,10 @@ test('regional language-tag paths redirect to canonical locale routes', async ({
   }
 });
 
-async function expectRouteMetadata(page, { title, description, path, image, imageAlt = description }) {
+async function expectRouteMetadata(
+  page,
+  { title, description, path, image, imageAlt = description, indexable = true },
+) {
   const canonical = `https://sense6.net${path}`;
   await expect(page).toHaveTitle(title);
   await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', description);
@@ -161,6 +165,11 @@ async function expectRouteMetadata(page, { title, description, path, image, imag
     `https://sense6.net${image}`,
   );
   await expect(page.locator('meta[name="twitter:image:alt"]')).toHaveAttribute('content', imageAlt);
+  if (indexable) {
+    await expect(page.locator('meta[name="robots"]')).toHaveCount(0);
+  } else {
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+  }
 }
 
 test('language routes translate, persist, and remain accessible', async ({ page }) => {

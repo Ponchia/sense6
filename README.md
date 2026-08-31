@@ -219,8 +219,11 @@ galleries, all 60 exam routes, all twelve About routes, all twelve journal
 routes, and all twelve privacy routes. Each route contains useful content
 without JavaScript, a unique title and description, a canonical URL, reciprocal
 `hreflang` links, truthful structured data, research links, and real internal
-links. The build also
-creates an exact sitemap, `robots.txt`, an optional `llms.txt` discovery
+links. Journal and privacy remain reachable user tools but carry `noindex` and
+stay out of the sitemap; the 85 root, gallery, experiment, and About pages form
+the search-indexable set. English experiment pages add original query-led
+explainers without silently copying unreviewed English prose into other locales.
+The build also creates an exact sitemap, `robots.txt`, an optional `llms.txt` discovery
 summary, and a script-free `404.html` so unknown paths don't become indexable
 soft-404 responses.
 
