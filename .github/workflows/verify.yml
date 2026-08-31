@@ -49,6 +49,18 @@ jobs:
           --project=webkit
           --workers=1
 
+      - name: Preserve browser-matrix failure artifacts
+        if: failure()
+        continue-on-error: true
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: browser-matrix-report-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: ignore
+          retention-days: 3
+
   # Lighthouse budgets (performance 90, accessibility 100, SEO 100) used to live
   # only in site-audit.yml, which has no `needs` or `workflow_run` relation to
   # deploy.yml — so a budget failure could not stop a deploy and the two merely
