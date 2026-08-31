@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import test from 'node:test';
-import { REPRESENTATIVE_ROUTES } from '../audits/routes.js';
+import {
+  REPRESENTATIVE_ROUTES,
+  SEARCH_REPRESENTATIVE_ROUTES,
+  SEARCH_ROUTES,
+  SITE_ROUTES,
+} from '../audits/routes.js';
 import primaryConfig from '../playwright.config.js';
 import deployedConfig from '../playwright.deployed.config.js';
 import siteConfig from '../playwright.site.config.js';
@@ -404,6 +409,15 @@ test('the visual comparison covers a pinned set of representative routes', () =>
     'the visual comparison route set changed; every exam and utility route needs a desktop and a ' +
       'mobile comparison, and a removal has to be a deliberate edit here',
   );
+});
+
+test('Lighthouse audits the indexable route set instead of penalizing deliberate noindex pages', () => {
+  assert.equal(SITE_ROUTES.length, 109);
+  assert.equal(SEARCH_ROUTES.length, 85);
+  assert.ok(SEARCH_ROUTES.every((route) => !/\/(?:journal|privacy)\/$/.test(route)));
+  assert.ok(SEARCH_REPRESENTATIVE_ROUTES.every((route) => SEARCH_ROUTES.includes(route)));
+  assert.ok(!SEARCH_REPRESENTATIVE_ROUTES.includes('/en/journal/'));
+  assert.ok(!SEARCH_REPRESENTATIVE_ROUTES.includes('/en/privacy/'));
 });
 
 test('the site audit keeps its regenerated visual baselines out of the repository', () => {
