@@ -19,7 +19,5 @@
 # Snapshot names are validated against the representative route list, so a typo
 # fails the job rather than silently approving nothing.
 
-root-desktop-chromium-linux.png  # simplify the x-default gateway to one concise boundary
 root-mobile-chromium-linux.png  # simplify the x-default gateway to one concise boundary
-en-desktop-chromium-linux.png  # let gallery cards lead with purpose instead of repeated caveats
 en-mobile-chromium-linux.png  # let gallery cards lead with purpose instead of repeated caveats
