@@ -14,7 +14,7 @@ import { LOCALES, loadMessages } from '../src/locales.js';
 import { preparePrivacyCopy, privacyCopy, privacyMarkup } from '../src/privacy.js';
 import { ROOT_GATEWAY, rootGatewayMarkup } from '../src/root-gateway.js';
 import { createRouteMetadata, SITE_ORIGIN, UTILITY_ROUTES } from '../src/routes.js';
-import { STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
+import { ENGLISH_EXPLAINER_COPY, STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
 import { recordContentFingerprint, verifyContentFingerprints } from './content-fingerprints.mjs';
 import { aboutData, examData, webpageData, websiteData } from './static-structured-data.mjs';
 import { activeRouteModuleFiles } from './vite-manifest.mjs';
@@ -42,7 +42,7 @@ await writePage('index.html', {
   description: ROOT_GATEWAY.description,
   socialImage: '/social/sense6.png',
   socialImageAlt: ROOT_GATEWAY.socialImageAlt,
-  main: rootGatewayMarkup(LOCALES, (code, source) => catalogs.get(code)?.get(source) ?? source),
+  main: rootGatewayMarkup(LOCALES),
   stylesheet: routeStyles.get('gallery'),
   alternates: galleryAlternates(),
   structuredData: websiteData('en'),
@@ -128,7 +128,6 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
   await prepareJournalCopy(locale);
   const journal = journalCopy(locale);
   const journalPath = `/${locale}/journal/`;
-  canonicalPaths.push({ path: journalPath });
   await writePage(`${locale}/journal/index.html`, {
     locale,
     languageTag,
@@ -143,12 +142,12 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     stylesheet: routeStyles.get('journal'),
     alternates: pageAlternates('journal'),
     structuredData: webpageData(`${journal.title} | Sense6`, journal.intro, languageTag, journalPath),
+    indexable: false,
   });
 
   await preparePrivacyCopy(locale);
   const copy = privacyCopy(locale);
   const privacyPath = `/${locale}/privacy/`;
-  canonicalPaths.push({ path: privacyPath });
   await writePage(`${locale}/privacy/index.html`, {
     locale,
     languageTag,
@@ -163,6 +162,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     stylesheet: routeStyles.get('privacy'),
     alternates: pageAlternates('privacy'),
     structuredData: webpageData(`${copy.title} | Sense6`, copy.intro, languageTag, privacyPath),
+    indexable: false,
   });
 }
 
@@ -207,7 +207,7 @@ async function writePage(relativePath, page) {
   html = replaceChecked(
     html,
     '</head>',
-    `    ${displayFontPreload(page.locale)}${modulePreloads}<link rel="stylesheet" crossorigin href="/assets/${page.stylesheet}">\n    ${page.alternates}\n    <script type="application/ld+json">${json}</script>\n  </head>`,
+    `    ${metadata.indexable ? '' : '<meta name="robots" content="noindex">\n    '}${displayFontPreload(page.locale)}${modulePreloads}<link rel="stylesheet" crossorigin href="/assets/${page.stylesheet}">\n    ${page.alternates}\n    <script type="application/ld+json">${json}</script>\n  </head>`,
     'head insertion point',
   );
   html = replaceChecked(
@@ -335,6 +335,7 @@ function examMarkup(definition, locale, tr) {
       ${definition.discovery.paragraphs.map((paragraph) => `<p>${escapeHtml(tr(paragraph))}</p>`).join('')}
       <ul>${definition.facts.map((fact) => `<li>${escapeHtml(tr(fact))}</li>`).join('')}</ul>
     </section>
+    ${searchIntentMarkup(ENGLISH_EXPLAINER_COPY[definition.id], (source) => source, locale === 'en')}
     ${searchIntentMarkup(STATIC_SEARCH_INTENT_COPY[definition.id], tr)}
     <section>
       <h2>${escapeHtml(tr('Method and limits'))}</h2>
@@ -363,8 +364,8 @@ function examMarkup(definition, locale, tr) {
   </article>`;
 }
 
-function searchIntentMarkup(searchIntent, tr) {
-  if (!searchIntent) return '';
+function searchIntentMarkup(searchIntent, tr, enabled = true) {
+  if (!searchIntent || !enabled) return '';
   return `<section class="static-search-intent">
       <p class="ui-eyebrow">${escapeHtml(tr(searchIntent.eyebrow))}</p>
       <h2>${escapeHtml(tr(searchIntent.heading))}</h2>

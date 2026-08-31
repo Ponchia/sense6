@@ -40,26 +40,11 @@ test('Tetracromia hero selectors are route-namespaced', () => {
   assert.doesNotMatch(globalCss, /(^|[,{]\s*)\.hero(?:\s|[,{.:>])/m);
 });
 
-/*
- * .exam-card__limit shipped as a class name with no rules at all: it reused
- * .exam-card__blurb, so each experiment's interpretation limit inherited body
- * copy and read as a third marketing paragraph, while the same sentence on exam
- * pages gets .hero__limit's mono face and accent ◇ marker. A caveat needs a
- * caveat affordance, and a class the gallery renders needs an owner.
- */
-test('the gallery interpretation limit is styled as a caveat, not as blurb copy', () => {
-  assert.match(galleryMarkupSource, /class="exam-card__limit"/);
-  assert.doesNotMatch(
-    galleryMarkupSource,
-    /class="[^"]*exam-card__blurb[^"]*exam-card__limit/,
-    'the limit must not reuse blurb styling',
-  );
-  assert.match(galleryCss, /\.exam-card__limit\s*{[^}]*font-family:\s*var\(--mono\)/);
-  assert.match(galleryCss, /\.exam-card__limit-mark\s*{[^}]*color:\s*var\(--accent-text\)/);
-  assert.match(galleryMarkupSource, /class="exam-card__limit-mark" aria-hidden="true"/);
-  // Honest metrics, larger than most of the page: the caveat reads as a caveat
-  // through face and marker, never by shrinking below the inherited size.
-  assert.doesNotMatch(galleryCss, /\.exam-card__limit\s*(?:>\s*small\s*)?{[^}]*font-size/);
+test('gallery cards lead with what each experiment does instead of repeating caveats', () => {
+  assert.doesNotMatch(galleryMarkupSource, /exam-card__limit/);
+  assert.doesNotMatch(galleryCss, /\.exam-card__limit/);
+  assert.match(galleryMarkupSource, /class="exam-card__tagline"/);
+  assert.match(galleryMarkupSource, /class="exam-card__blurb"/);
 });
 
 function escapeRegex(value) {

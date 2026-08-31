@@ -1,25 +1,20 @@
-import { messageSource } from './i18n/message-ids.js';
-
 export const ROOT_GATEWAY = Object.freeze({
   title: 'Sense6 — choose your language',
   description:
     'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
   socialImageAlt: 'Sense6 browser perception experiments',
-  boundaryTitle: 'Experimental, not medical — in every language',
+  boundary:
+    'Experimental, device-relative perception exercises for curiosity—not medical tests or diagnoses.',
 });
-
-const BOUNDARY = messageSource('boundary.recreational');
 
 /**
  * The site root is a self-canonical language gateway: it never navigates to a
- * locale, so it cannot inherit one locale's catalog. The safety boundary is
- * therefore rendered once per language at build time, next to that language's
- * own entry link, instead of being detected or redirected to.
+ * locale, so it cannot inherit one locale's catalog. Keep this gateway focused
+ * on choosing a language; localized claims belong on the linked locale pages.
  *
  * @param {readonly { code: string, languageTag: string, direction: string, label: string }[]} locales
- * @param {(code: string, source: string) => string} [translate] build-time catalog lookup
  */
-export function rootGatewayMarkup(locales, translate = (_code, source) => source) {
+export function rootGatewayMarkup(locales) {
   return `<section class="static-entry ui-container ui-container--wide">
     <p class="ui-eyebrow">Sense6</p>
     <h1>Measure what your senses notice.</h1>
@@ -30,15 +25,7 @@ export function rootGatewayMarkup(locales, translate = (_code, source) => source
           `<a href="/${code}/" hreflang="${languageTag}" lang="${languageTag}" dir="${direction}">${label}</a>`,
       )
       .join('')}</nav>
-    <section class="static-boundary" aria-labelledby="root-boundary-title">
-      <h2 id="root-boundary-title">${escapeHtml(ROOT_GATEWAY.boundaryTitle)}</h2>
-      <ul class="static-boundary-list">${locales
-        .map(
-          ({ code, languageTag, direction, label }) =>
-            `<li lang="${languageTag}" dir="${direction}"><strong>${escapeHtml(label)}</strong> — ${escapeHtml(translate(code, BOUNDARY))}</li>`,
-        )
-        .join('')}</ul>
-    </section>
+    <p class="static-boundary"><strong>${escapeHtml(ROOT_GATEWAY.boundary)}</strong></p>
   </section>`;
 }
 

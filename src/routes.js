@@ -1,8 +1,9 @@
 export const UTILITY_ROUTES = Object.freeze(['about', 'journal', 'privacy']);
+export const NON_INDEXABLE_ROUTES = Object.freeze(['journal', 'privacy']);
 export const STATIC_ADOPTED_ROUTES = Object.freeze(['', 'about', 'privacy']);
 export const SITE_ORIGIN = 'https://sense6.net';
 
-/** @typedef {{ locale: string, route: string, path: string, title: string, description: string, canonical: string, socialImage: string, socialImageAlt: string }} RouteMetadata */
+/** @typedef {{ locale: string, route: string, path: string, title: string, description: string, canonical: string, socialImage: string, socialImageAlt: string, indexable: boolean }} RouteMetadata */
 
 /** @param {string} locale @param {string} route */
 export function routePath(locale, route = '') {
@@ -11,7 +12,7 @@ export function routePath(locale, route = '') {
 
 /**
  * Build the canonical identity shared by static output and runtime navigation.
- * @param {{ locale: string, route?: string, path?: string, title: string, description: string, socialImage?: string, socialImageAlt?: string }} value
+ * @param {{ locale: string, route?: string, path?: string, title: string, description: string, socialImage?: string, socialImageAlt?: string, indexable?: boolean }} value
  * @returns {Readonly<RouteMetadata>}
  */
 export function createRouteMetadata({
@@ -22,6 +23,7 @@ export function createRouteMetadata({
   description,
   socialImage = '/social/sense6.png',
   socialImageAlt = description,
+  indexable = true,
 }) {
   return Object.freeze({
     locale,
@@ -32,6 +34,7 @@ export function createRouteMetadata({
     canonical: new URL(path, SITE_ORIGIN).href,
     socialImage: new URL(socialImage, SITE_ORIGIN).href,
     socialImageAlt,
+    indexable,
   });
 }
 
@@ -51,6 +54,19 @@ export function applyRouteMetadata(metadata, root = document) {
   const canonical = root.querySelector('link[rel="canonical"]');
   if (!(canonical instanceof HTMLLinkElement)) throw new Error('Canonical link is unavailable');
   canonical.href = metadata.canonical;
+  applyRobotsMetadata(root, metadata.indexable);
+}
+
+function applyRobotsMetadata(root, indexable) {
+  const current = root.querySelector('meta[name="robots"]');
+  if (indexable) {
+    current?.remove();
+    return;
+  }
+  const meta = current ?? root.createElement('meta');
+  meta.setAttribute('name', 'robots');
+  meta.setAttribute('content', 'noindex');
+  if (!current) root.head.append(meta);
 }
 
 function setMeta(root, attribute, key, value) {

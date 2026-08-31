@@ -21,6 +21,7 @@ test('route metadata derives one canonical and social identity record', () => {
       canonical: 'https://sense6.net/it/acutezza/',
       socialImage: 'https://sense6.net/social/acutezza.png',
       socialImageAlt: 'Anteprima Acutezza',
+      indexable: true,
     },
   );
 });

@@ -106,7 +106,6 @@ function liveCard(meta, localeHref, m, t) {
           <ul class="exam-card__facts" aria-label="${m('gallery.testIncludes')}">
             ${meta.facts.map((fact) => `<li>${t(fact)}</li>`).join('')}
           </ul>
-          <p class="exam-card__limit"><span class="exam-card__limit-mark" aria-hidden="true">◇</span> <small>${t(meta.limit)}</small></p>
           <span class="exam-card__cta">${m('action.openTest')} <span aria-hidden="true">→</span></span>
         </div>
       </a>

@@ -219,8 +219,11 @@ galleries, all 60 exam routes, all twelve About routes, all twelve journal
 routes, and all twelve privacy routes. Each route contains useful content
 without JavaScript, a unique title and description, a canonical URL, reciprocal
 `hreflang` links, truthful structured data, research links, and real internal
-links. The build also
-creates an exact sitemap, `robots.txt`, an optional `llms.txt` discovery
+links. Journal and privacy remain reachable user tools but carry `noindex` and
+stay out of the sitemap; the 85 root, gallery, experiment, and About pages form
+the search-indexable set. English experiment pages add original query-led
+explainers without silently copying unreviewed English prose into other locales.
+The build also creates an exact sitemap, `robots.txt`, an optional `llms.txt` discovery
 summary, and a script-free `404.html` so unknown paths don't become indexable
 soft-404 responses.
 
@@ -336,9 +339,9 @@ npm run check:release
 contracts, coverage, the production build, static output, security policy, and
 bundle budgets. `check` adds the browser matrix. `check:release` adds checks
 against the exact generated site. Every pull request and push also runs the
-container visual comparison and representative-route Lighthouse budgets in the
-same dependency graph as release, so either can stop publication. The complete
-localized-route Lighthouse sweep, external-link crawl, and passive ZAP scan
+container visual comparison and indexable representative-route Lighthouse budgets
+in the same dependency graph as release, so either can stop publication. The complete
+85-page indexable-route Lighthouse sweep, external-link crawl, and passive ZAP scan
 remain scheduled or operator-run audits. The external-link job uses bounded
 retries and per-host concurrency for transient publisher failures. The passive
 scan fails on unreviewed ZAP alerts and records accepted static-site findings in

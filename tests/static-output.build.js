@@ -15,8 +15,8 @@ import { galleryMarkup } from '../src/gallery-markup.js';
 import { messageSource } from '../src/i18n/message-ids.js';
 import { interpolateMessage } from '../src/i18n.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
-import { routePath, UTILITY_ROUTES } from '../src/routes.js';
-import { STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
+import { NON_INDEXABLE_ROUTES, routePath, UTILITY_ROUTES } from '../src/routes.js';
+import { ENGLISH_EXPLAINER_COPY, STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
 
 const DIST = new URL('../dist/', import.meta.url);
 /**
@@ -37,6 +37,14 @@ const expectedPaths = [
     routePath(code),
     ...EXAMS.map(({ route }) => routePath(code, route)),
     ...UTILITY_ROUTES.map((route) => routePath(code, route)),
+  ]),
+];
+const expectedSitemapPaths = [
+  '/',
+  ...LOCALES.flatMap(({ code }) => [
+    routePath(code),
+    ...EXAMS.map(({ route }) => routePath(code, route)),
+    routePath(code, 'about'),
   ]),
 ];
 
@@ -65,6 +73,12 @@ test('every canonical route has substantive, localized raw HTML', async () => {
     );
     assert.equal((html.match(/rel="alternate" hreflang=/g) ?? []).length, LOCALES.length + 1, path);
     assert.match(html, /<script type="application\/ld\+json">.+<\/script>/, path);
+    const route = path.split('/').filter(Boolean)[1] ?? '';
+    if (NON_INDEXABLE_ROUTES.includes(route)) {
+      assert.match(html, /<meta name="robots" content="noindex">/, path);
+    } else {
+      assert.doesNotMatch(html, /<meta name="robots" content="noindex">/, path);
+    }
     const displayFontPreload =
       /<link rel="preload" href="\/assets\/doto-800-[^"]+\.woff2" as="font" type="font\/woff2" crossorigin media="not \(prefers-reduced-data: reduce\)">/;
     if (['ar', 'hi', 'ja', 'ko', 'zh-hans'].includes(locale)) {
@@ -156,6 +170,27 @@ test('experiment discovery pages expose useful copy, related routes, images, and
     assert.equal(data['@graph'][0].creator.url, undefined);
     assert.equal(data['@graph'][0].image, `https://sense6.net/social/${definition.id}.png`);
   }
+});
+
+test('English experiment pages add original query-led explanation without leaking it into translations', async () => {
+  for (const definition of EXAMS) {
+    const explainer = ENGLISH_EXPLAINER_COPY[definition.id];
+    const english = await readFile(new URL(`en/${definition.route}/index.html`, DIST), 'utf8');
+    const italian = await readFile(new URL(`it/${definition.route}/index.html`, DIST), 'utf8');
+    assert.ok(english.includes(escapeHtml(explainer.eyebrow)), `${definition.id} omits its explainer label`);
+    assert.ok(
+      english.includes(escapeHtml(explainer.heading)),
+      `${definition.id} omits its explainer heading`,
+    );
+    for (const paragraph of explainer.paragraphs) {
+      assert.ok(english.includes(escapeHtml(paragraph)), `${definition.id} omits explainer copy`);
+      assert.ok(!italian.includes(escapeHtml(paragraph)), `${definition.id} leaked English into Italian`);
+    }
+  }
+  const acutezza = await readFile(new URL('en/acutezza/index.html', DIST), 'utf8');
+  assert.match(acutezza, /visual acuity/i);
+  assert.match(acutezza, /contrast sensitivity/i);
+  assert.match(acutezza, /rather than a Snellen or 20\/20 result/i);
 });
 
 test('every experiment heading names the brand and what it observes, in every language', async () => {
@@ -263,8 +298,8 @@ test('the shared gallery and About renderers are exactly what shipped in every l
     );
     for (const definition of EXAMS) {
       assert.ok(
-        gallery.includes(escapeHtml(translate(definition.limit))),
-        `${locale} gallery card for ${definition.id} omits its interpretation limit`,
+        !gallery.includes(escapeHtml(translate(definition.limit))),
+        `${locale} gallery card for ${definition.id} repeats its interpretation limit`,
       );
     }
 
@@ -289,20 +324,14 @@ test('the shared gallery and About renderers are exactly what shipped in every l
   }
 });
 
-test('the site root states its safety boundary in every language without leaving /', async () => {
+test('the site root stays a concise x-default language gateway', async () => {
   const html = await readFile(new URL('index.html', DIST), 'utf8');
-  const boundary = messageSource('boundary.recreational');
   assert.match(html, /<link rel="canonical" href="https:\/\/sense6\.net\/">/);
   assert.equal((html.match(/rel="alternate" hreflang=/g) ?? []).length, LOCALES.length + 1);
+  assert.match(html, /Experimental, device-relative perception exercises for curiosity/);
+  assert.doesNotMatch(html, /static-boundary-list/);
   for (const { code, languageTag } of LOCALES) {
-    const messages = await loadMessages(code);
-    const translated = messages.get(boundary);
-    assert.ok(translated, `${code} is missing the recreational boundary`);
-    assert.ok(
-      html.includes(`<li lang="${languageTag}"`),
-      `the language gateway omits the ${code} boundary block`,
-    );
-    assert.ok(html.includes(escapeHtml(translated)), `the language gateway omits the ${code} boundary`);
+    assert.ok(html.includes(`href="/${code}/" hreflang="${languageTag}"`), `missing ${code} entry`);
   }
 });
 
@@ -315,7 +344,7 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   const sitemapPaths = [...sitemap.matchAll(/<loc>https:\/\/sense6\.net([^<]*)<\/loc>/g)].map(
     (match) => match[1],
   );
-  assert.deepEqual(sitemapPaths, expectedPaths);
+  assert.deepEqual(sitemapPaths, expectedSitemapPaths);
   const sitemapDates = new Map(
     [
       ...sitemap.matchAll(
@@ -331,7 +360,7 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
       [routePath(code, 'about'), CONTENT_DATES.about],
     ]),
   ]);
-  for (const path of expectedPaths) {
+  for (const path of expectedSitemapPaths) {
     assert.equal(sitemapDates.get(path), expectedDates.get(path), `${path} has a stale content date`);
   }
   const lastModified = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((match) => match[1]);
@@ -380,11 +409,15 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   assert.doesNotMatch(notFound, /name="twitter:/);
 
   const privacy = await readFile(new URL('en/privacy/index.html', DIST), 'utf8');
+  assert.match(privacy, /<meta name="robots" content="noindex">/);
+  assert.ok(!sitemapPaths.includes('/en/privacy/'));
   assert.match(privacy, /<!--email_off--><a href="mailto:privacy@sense6\.net">/);
   assert.match(privacy, /href="mailto:privacy@sense6\.net"/);
   assert.match(privacy, /href="https:\/\/www\.cloudflare\.com\/privacypolicy\/"/);
 
   const journal = await readFile(new URL('en/journal/index.html', DIST), 'utf8');
+  assert.match(journal, /<meta name="robots" content="noindex">/);
+  assert.ok(!sitemapPaths.includes('/en/journal/'));
   assert.match(journal, /Your private measurement journal/);
   assert.match(journal, /Entries, setup passports, comparisons, imports, and exports stay on this device/);
 
