@@ -307,6 +307,14 @@ test('successful unchanged visual checks do not consume artifact storage', () =>
   assert.match(allWorkflows, /actions\/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7\.0\.1/);
 });
 
+test('browser-matrix failures preserve uniquely named diagnostics', () => {
+  const verify = workflow('verify.yml');
+
+  assert.match(verify, /name: Preserve browser-matrix failure artifacts\n\s+if: failure\(\)/);
+  assert.match(verify, /browser-matrix-report-\$\{\{ github\.run_id \}\}-\$\{\{ github\.run_attempt \}\}/);
+  assert.match(verify, /playwright-report\n\s+test-results/);
+});
+
 test('the deployed browser configuration refuses any host but production', () => {
   assert.equal(deployedConfig.workers, 1);
   assert.equal(deployedConfig.fullyParallel, false);
