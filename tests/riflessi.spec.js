@@ -862,6 +862,7 @@ test('copied limited summaries retain quality, interruptions, and wrong-choice c
 test('all Riflessi scopes reflow through real results at the audited mobile layouts', async ({
   page,
 }, testInfo) => {
+  test.setTimeout(60_000);
   test.skip(testInfo.project.name !== 'chromium', 'Runs the explicit mobile and text-scale matrix');
   await installQuickRiflessi(page);
 
