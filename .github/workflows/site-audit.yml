@@ -1,9 +1,6 @@
 name: Site audit
 
 on:
-  pull_request:
-  push:
-    branches: [main]
   workflow_dispatch:
   schedule:
     - cron: '23 3 * * 1'
@@ -12,27 +9,18 @@ permissions:
   contents: read
 
 concurrency:
-  group: site-audit-${{ github.event.pull_request.number || github.ref }}
+  group: site-audit-${{ github.ref }}
   cancel-in-progress: true
 
 # Browser-container jobs use the Node 24 runtime bundled with the pinned
 # Playwright image, avoiding a redundant download on every ephemeral runner.
 #
-# Every job below runs on `arc-vps-sense6`, a self-hosted runner inside the
-# operator's netcup Kubernetes cluster, and each one installs and builds
-# candidate code — so an npm lifecycle script from the head revision executes in
-# that cluster. This repository is private today, but branch protection is
-# impossible without GitHub Pro and "make the repository public" is the obvious
-# remedy, which would turn a fork pull request into code execution inside the
-# cluster. Every job therefore carries a head-repository guard, written so that
-# the push, schedule, and workflow_dispatch runs are unaffected.
-# tests/audit-wiring.test.js discovers these jobs from the workflow source and
-# fails if any self-hosted job becomes reachable from a fork pull request.
+# This workflow owns the expensive whole-site and external-production sweeps.
+# Pull requests and pushes use verify.yml instead, so their visual, browser,
+# Lighthouse, and release gates form one dependency graph rather than racing a
+# second workflow for the same runner scale set.
 jobs:
   route-integrity:
-    if: >-
-      github.event_name != 'pull_request' ||
-      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: arc-vps-sense6
     timeout-minutes: 20
     env:
@@ -62,110 +50,10 @@ jobs:
           if-no-files-found: ignore
           retention-days: 3
 
-  # Branch protection is impossible on this repository (private, no GitHub Pro:
-  # `gh api .../protection` returns 403), so a direct push to main deploys
-  # without any pull request gate. Restricting this job to pull requests meant a
-  # push shipped with no visual comparison at all; it now runs for a push too,
-  # comparing against the commit that main previously pointed at. The guard
-  # keeps that push coverage while excluding a fork pull request, which would
-  # otherwise build head-revision code on the cluster runner.
-  visual-regression:
-    if: >-
-      github.event_name == 'push' ||
-      (github.event_name == 'pull_request' &&
-      github.event.pull_request.head.repo.full_name == github.repository)
-    runs-on: arc-vps-sense6
-    timeout-minutes: 20
-    env:
-      PUPPETEER_SKIP_DOWNLOAD: 'true'
-    container:
-      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          fetch-depth: 0
-      - name: Install dependencies
-        run: npm ci
-      - name: Resolve the revision to compare against
-        id: base
-        env:
-          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          PUSH_BEFORE_SHA: ${{ github.event.before }}
-        run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          base="$PR_BASE_SHA"
-          if [ -z "$base" ]; then base="$PUSH_BEFORE_SHA"; fi
-          # A new branch or a force push reports an all-zero "before" SHA, and a
-          # squashed history may not contain it at all. Fall back to the first
-          # parent so the comparison still has a real revision to build.
-          case "$base" in
-            ''|0000000000000000000000000000000000000000) base="$(git rev-parse HEAD^)" ;;
-          esac
-          if ! git cat-file -e "$base^{commit}" 2>/dev/null; then base="$(git rev-parse HEAD^)"; fi
-          echo "sha=$base" >> "$GITHUB_OUTPUT"
-          echo "Comparing against $base"
-      # Approvals are declared explicitly in a reviewed file. They used to be
-      # derived from `git diff` over the committed baselines, which meant that
-      # touching a baseline removed its comparison from the suite: PR #58 changed
-      # six baselines and silently no-opped six of twenty-six checks. An approved
-      # snapshot is now still compared; the difference is attached to the report
-      # as reviewable evidence, and an approval that matches nothing fails.
-      - name: Read the declared visual baseline approvals
-        id: visual-baselines
-        run: |
-          approved="$(sed -e 's/#.*//' -e 's/[[:space:]]//g' audits/visual-baseline-approvals.txt \
-            | grep -v '^$' | paste -sd, - || true)"
-          echo "approved=$approved" >> "$GITHUB_OUTPUT"
-          echo "Approved baselines: ${approved:-<none>}"
-      - name: Check out and build the base revision
-        env:
-          BASE_SHA: ${{ steps.base.outputs.sha }}
-          BASE_WORKTREE: ${{ runner.temp }}/sense6-visual-base
-        run: |
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git worktree add --detach "$BASE_WORKTREE" "$BASE_SHA"
-          npm ci --prefix "$BASE_WORKTREE"
-          npm run build --prefix "$BASE_WORKTREE"
-      # VISUAL_BASE_SITE_DIR lets the suite ask whether the base revision built a
-      # page for a route at all. A route added in this revision has no base
-      # capture worth comparing: the base build serves its 404 page for that
-      # path, so capturing it and then diffing produces a review of a 404 rather
-      # than of the new page. Both steps get the variable so the capture skips
-      # writing that baseline and the comparison skips reading it.
-      - name: Capture base revision on this runner
-        env:
-          HOME: /root
-          PLAYWRIGHT_SITE_DIR: ${{ runner.temp }}/sense6-visual-base
-          VISUAL_BASE_SITE_DIR: ${{ runner.temp }}/sense6-visual-base
-          VISUAL_BASELINE_CAPTURE: '1'
-        run: npm run test:visual:container -- --update-snapshots
-      - name: Build the candidate revision
-        run: npm run build
-      - name: Compare the candidate with the base revision
-        env:
-          HOME: /root
-          VISUAL_APPROVED_SNAPSHOTS: ${{ steps.visual-baselines.outputs.approved }}
-          VISUAL_BASE_SITE_DIR: ${{ runner.temp }}/sense6-visual-base
-        run: npm run test:visual:container
-      # Uploaded unconditionally: an approved visual change passes the job and
-      # attaches its before/after/diff images to this report, which is the
-      # evidence a reviewer needs.
-      - name: Upload the visual comparison report
-        if: always()
-        continue-on-error: true
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: visual-regression-playwright-report
-          path: playwright-report/site-audit
-          if-no-files-found: ignore
-          retention-days: 14
-
   # The pull request and push Lighthouse budget now runs inside verify.yml, where
   # the release job needs it and a budget failure can actually stop a deploy.
   # What remains here is the scheduled full-site sweep over every route.
   lighthouse-full-site:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: arc-vps-sense6
     timeout-minutes: 45
     container:
@@ -198,7 +86,6 @@ jobs:
           retention-days: 3
 
   external-links:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: arc-vps-sense6
     timeout-minutes: 15
     env:
@@ -228,7 +115,6 @@ jobs:
           lycheeVersion: v0.24.2
 
   passive-security:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: arc-vps-sense6
     timeout-minutes: 15
     steps:

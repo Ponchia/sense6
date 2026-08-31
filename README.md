@@ -335,22 +335,25 @@ npm run check:release
 `check:core` covers lint, the typed-JavaScript and locale ratchets, Bronto UI
 contracts, coverage, the production build, static output, security policy, and
 bundle budgets. `check` adds the browser matrix. `check:release` adds checks
-against the exact generated site. Container visual regression, Lighthouse,
-external-link, and passive ZAP scans remain scheduled or operator-run audits;
-they aren't silently treated as part of the per-commit release gate. The
-external-link job uses bounded retries and per-host concurrency for transient
-publisher failures. The passive scan fails on unreviewed ZAP alerts and records
-accepted static-site findings in `.zap-rules.tsv`; it prints the result directly
-instead of depending on account-wide artifact storage.
+against the exact generated site. Every pull request and push also runs the
+container visual comparison and representative-route Lighthouse budgets in the
+same dependency graph as release, so either can stop publication. The complete
+localized-route Lighthouse sweep, external-link crawl, and passive ZAP scan
+remain scheduled or operator-run audits. The external-link job uses bounded
+retries and per-host concurrency for transient publisher failures. The passive
+scan fails on unreviewed ZAP alerts and records accepted static-site findings in
+`.zap-rules.tsv`; it prints the result directly instead of depending on
+account-wide artifact storage.
 
 ## Deploy
 
 Every push to `main` runs the complete lint, locale, unit, build, browser,
-responsive, accessibility, static-output, and bundle-budget gate. Verification
-builds `dist/` once, stamps `build-meta.json` with the workflow commit, writes a
-file-by-file SHA-256 manifest, verifies it, and runs the production site audit.
-After the browser matrix passes, the same release job deploys that working tree
-without rebuilding production output or depending on external artifact storage.
+visual, responsive, accessibility, static-output, and bundle-budget gate. The
+release job builds `dist/` once, stamps `build-meta.json` with the workflow
+commit, writes a file-by-file SHA-256 manifest, verifies it, and runs the
+production site audit. After the browser, visual, and Lighthouse gates pass,
+that release job deploys the checked working tree without rebuilding production
+output or depending on external artifact storage.
 
 Pull requests run that gate without deployment credentials or preview
 publication. Both the client and Pages Function accept metrics only on

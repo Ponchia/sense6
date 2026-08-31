@@ -85,8 +85,81 @@ jobs:
           include-hidden-files: true
           retention-days: 3
 
+  # Keep the visual comparison in the same reusable graph as release. It used
+  # to run in site-audit.yml, where a push started a second workflow that raced
+  # this one and could not stop publication even if the comparison failed.
+  visual:
+    runs-on: arc-vps-sense6
+    timeout-minutes: 20
+    container:
+      image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+      - name: Install dependencies
+        run: npm ci
+      - name: Resolve the revision to compare against
+        id: base
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          base="$PR_BASE_SHA"
+          if [ -z "$base" ]; then base="$PUSH_BEFORE_SHA"; fi
+          # A manual run, new branch, or force push may not provide a usable
+          # base. Fall back to the first parent so the comparison stays real.
+          case "$base" in
+            ''|0000000000000000000000000000000000000000) base="$(git rev-parse HEAD^)" ;;
+          esac
+          if ! git cat-file -e "$base^{commit}" 2>/dev/null; then base="$(git rev-parse HEAD^)"; fi
+          echo "sha=$base" >> "$GITHUB_OUTPUT"
+          echo "Comparing against $base"
+      - name: Read the declared visual baseline approvals
+        id: visual-baselines
+        run: |
+          approved="$(sed -e 's/#.*//' -e 's/[[:space:]]//g' audits/visual-baseline-approvals.txt \
+            | grep -v '^$' | paste -sd, - || true)"
+          echo "approved=$approved" >> "$GITHUB_OUTPUT"
+          echo "Approved baselines: ${approved:-<none>}"
+      - name: Check out and build the base revision
+        env:
+          BASE_SHA: ${{ steps.base.outputs.sha }}
+          BASE_WORKTREE: ${{ runner.temp }}/sense6-visual-base
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git worktree add --detach "$BASE_WORKTREE" "$BASE_SHA"
+          npm ci --prefix "$BASE_WORKTREE"
+          npm run build --prefix "$BASE_WORKTREE"
+      - name: Capture base revision on this runner
+        env:
+          HOME: /root
+          PLAYWRIGHT_SITE_DIR: ${{ runner.temp }}/sense6-visual-base
+          VISUAL_BASE_SITE_DIR: ${{ runner.temp }}/sense6-visual-base
+          VISUAL_BASELINE_CAPTURE: '1'
+        run: npm run test:visual:container -- --update-snapshots
+      - name: Build the candidate revision
+        run: npm run build
+      - name: Compare the candidate with the base revision
+        env:
+          HOME: /root
+          VISUAL_APPROVED_SNAPSHOTS: ${{ steps.visual-baselines.outputs.approved }}
+          VISUAL_BASE_SITE_DIR: ${{ runner.temp }}/sense6-visual-base
+        run: npm run test:visual:container
+      - name: Upload the visual comparison report
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: visual-regression-playwright-report
+          path: playwright-report/site-audit
+          if-no-files-found: ignore
+          retention-days: 14
+
   release:
-    needs: [browser, lighthouse]
+    needs: [browser, lighthouse, visual]
     runs-on: arc-vps-sense6
     timeout-minutes: 40
     container:

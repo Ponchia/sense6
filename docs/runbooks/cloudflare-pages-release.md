@@ -64,11 +64,12 @@ publication is currently disabled.
    intended production database. Confirm the zone rate-limit rule still matches
    only `POST /api/metric` with the documented 10 requests per 10 seconds and a
    10-second block.
-5. Push the pull-request branch. Wait for the reusable browser matrix and
-   release job. The release job builds once, stamps `dist.sha256` over that
-   build, runs the core, HTML, link, browser-journey, and production-site audits
-   against it, and re-checks the checksum as its last act before publication —
-   without deployment credentials on a pull request.
+5. Push the pull-request branch. Wait for the reusable browser, visual,
+   Lighthouse, and release jobs. The release job builds once, stamps
+   `dist.sha256` over that build, runs the core, HTML, link, browser-journey,
+   and production-site audits against it, and re-checks the checksum as its
+   last act before publication — without deployment credentials on a pull
+   request.
 
    Read the checksum for what it attests: the bytes that were audited are the
    bytes that were uploaded. It is not evidence of the artifact's provenance, it
