@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { aboutCopy, aboutMarkup } from '../src/about.js';
+import { EXAM_METADATA, examDescriptionSource } from '../src/exams/metadata.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { MESSAGE_SOURCES, messageSource } from '../src/i18n/message-ids.js';
 import { journalCopy, journalSetupLabel, prepareJournalCopy } from '../src/journal-copy.js';
@@ -76,6 +77,25 @@ test('the supported global locale set has complete catalog keys', async () => {
         [...key.matchAll(/\{([^}]+)\}/g)].map((match) => match[1]).sort(),
         `${code} placeholders differ for ${key}`,
       );
+    }
+  }
+});
+
+test('richer English metadata never leaks into untranslated experiment routes', () => {
+  assert.deepEqual(
+    Object.keys(EXAM_METADATA),
+    EXAMS.map(({ id }) => id),
+  );
+  for (const exam of EXAMS) {
+    const { metaDescription } = EXAM_METADATA[exam.id];
+    assert.ok(metaDescription.length >= 140, `${exam.id} metadata is still too terse`);
+    assert.ok(metaDescription.length <= 160, `${exam.id} metadata exceeds the snippet budget`);
+    assert.equal(examDescriptionSource(exam, 'en'), metaDescription);
+    assert.notEqual(metaDescription, exam.blurb);
+
+    for (const { code } of LOCALES) {
+      const source = examDescriptionSource(exam, code);
+      assert.equal(source, code === 'en' ? metaDescription : exam.blurb);
     }
   }
 });
@@ -263,6 +283,14 @@ test('no locale names the clinical acuity measure in Acutezza product copy', asy
     'Focused Sharpness',
     'Sharpness + nominal contrast',
   ];
+
+  const acutezzaMetadata = EXAM_METADATA.acutezza.metaDescription;
+  for (const term of CLINICAL_ACUITY_TERMS.en) {
+    assert.ok(
+      !acutezzaMetadata.toLowerCase().includes(term.toLowerCase()),
+      `English metadata renders the clinical term "${term}": "${acutezzaMetadata}"`,
+    );
+  }
 
   for (const { code } of LOCALES) {
     const messages = await loadMessages(code);

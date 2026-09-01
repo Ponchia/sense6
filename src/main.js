@@ -141,14 +141,17 @@ async function renderRoute({ route, locale }) {
       });
     } else if (EXAM_BY_ID.has(route)) {
       const definition = EXAM_BY_ID.get(route);
-      const exam = await loadExam(route);
+      const [exam, { examDescriptionSource }] = await Promise.all([
+        loadExam(route),
+        import('./exams/metadata.js'),
+      ]);
       if (token !== renderToken || !exam) return;
       mountRoute = () => exam.mount(context());
       metadata = createRouteMetadata({
         locale,
         route,
         title: t(definition.pageTitle),
-        description: t(definition.blurb),
+        description: t(examDescriptionSource(definition, locale)),
         socialImage: `/social/${definition.id}.png`,
         // Identical to the static build's alt (scripts/generate-static-pages.mjs):
         // the identity alone, never the identity plus the tagline.
