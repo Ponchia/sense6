@@ -10,6 +10,7 @@ import {
 import { aboutMarkup } from '../src/about.js';
 import { CONTENT_DATES, examContentDate } from '../src/content-dates.js';
 import { CRAWLER_POLICY } from '../src/crawler-policy.js';
+import { examDescriptionSource } from '../src/exams/metadata.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { galleryMarkup } from '../src/gallery-markup.js';
 import { messageSource } from '../src/i18n/message-ids.js';
@@ -169,6 +170,39 @@ test('experiment discovery pages expose useful copy, related routes, images, and
     assert.equal(data['@graph'][0].creator.name, 'Zeno');
     assert.equal(data['@graph'][0].creator.url, undefined);
     assert.equal(data['@graph'][0].image, `https://sense6.net/social/${definition.id}.png`);
+  }
+});
+
+test('experiment metadata is richer in English without leaking into localized routes or cards', async () => {
+  const englishGallery = await readFile(new URL('en/index.html', DIST), 'utf8');
+  const italianMessages = await loadMessages('it');
+
+  for (const definition of EXAMS) {
+    const english = await readFile(new URL(`en/${definition.route}/index.html`, DIST), 'utf8');
+    const italian = await readFile(new URL(`it/${definition.route}/index.html`, DIST), 'utf8');
+    const englishDescription = decodeEntities(
+      english.match(/<meta name="description" content="([^"]+)">/)?.[1] ?? '',
+    );
+    const italianDescription = decodeEntities(
+      italian.match(/<meta name="description" content="([^"]+)">/)?.[1] ?? '',
+    );
+    const expectedEnglish = examDescriptionSource(definition, 'en');
+    const italianBlurb = italianMessages.get(definition.blurb);
+    assert.equal(englishDescription, expectedEnglish);
+    assert.equal(italianDescription, italianBlurb);
+    assert.notEqual(italianDescription, expectedEnglish);
+    assert.ok(englishGallery.includes(escapeHtml(definition.blurb)));
+    assert.ok(!englishGallery.includes(escapeHtml(expectedEnglish)));
+
+    for (const html of [english, italian]) {
+      const description = decodeEntities(
+        html.match(/<meta name="description" content="([^"]+)">/)?.[1] ?? '',
+      );
+      assert.ok(html.includes(`<meta property="og:description" content="${escapeHtml(description)}">`));
+      assert.ok(html.includes(`<meta name="twitter:description" content="${escapeHtml(description)}">`));
+      const data = JSON.parse(html.match(/<script type="application\/ld\+json">(.+)<\/script>/)?.[1] ?? '{}');
+      assert.equal(data['@graph'][0].description, description);
+    }
   }
 });
 

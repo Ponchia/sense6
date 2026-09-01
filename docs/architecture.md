@@ -46,7 +46,7 @@ instrument.
 | --- | --- | --- |
 | Shell and router | `src/main.js`, `src/router.js`, `src/routes.js` | Resolve locale-aware routes, commit canonical, social, and robots metadata with one view, and dispose the previous view |
 | Service contracts | `src/exams/contracts.js` | Define experiment identity, metric names, and journal-comparison policy |
-| Presentation registry | `src/exams/registry.js` | Define gallery and static-page metadata plus lazy experiment loaders |
+| Presentation metadata | `src/exams/registry.js`, `src/exams/metadata.js` | Define concise gallery copy, experiment-only discovery descriptions with locale-safe fallback, and lazy experiment loaders |
 | Protocol passports | `src/exams/protocols.js` | Freeze method versions, selectable profiles, schedule digests, stopping rules, and interpretation boundaries |
 | Evidence ledger | `src/exams/sources.js` | Classify canonical sources as method, boundary, comparator, or exact Sense6 validation evidence |
 | Experiment controllers | `src/exams/*.js`, `src/exams/*.d.ts` | Coordinate setup, response handling, phase changes, and results for one experiment; declarations define their checked public mount boundary |

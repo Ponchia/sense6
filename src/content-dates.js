@@ -11,11 +11,11 @@ export const CONTENT_DATES = Object.freeze({
   site: '2026-08-31',
   about: '2026-07-30',
   exams: Object.freeze({
-    tetracromia: '2026-08-31',
-    'color-blindness': '2026-08-31',
-    riflessi: '2026-08-31',
-    udito: '2026-08-31',
-    acutezza: '2026-08-31',
+    tetracromia: '2026-09-01',
+    'color-blindness': '2026-09-01',
+    riflessi: '2026-09-01',
+    udito: '2026-09-01',
+    acutezza: '2026-09-01',
   }),
 });
 

@@ -54,7 +54,7 @@ export function aboutData(copy, locale, path) {
   };
 }
 
-export function examData(definition, locale, path, tr) {
+export function examData(definition, locale, path, tr, description) {
   const url = `${ORIGIN}${path}`;
   const discoveryName = tr(definition.discoveryName ?? definition.name);
   // A breadcrumb is a position label, not a second heading: the crumb keeps the
@@ -68,7 +68,7 @@ export function examData(definition, locale, path, tr) {
         '@id': `${url}#application`,
         name: discoveryName,
         url,
-        description: tr(definition.blurb),
+        description,
         applicationCategory: 'EducationalApplication',
         isAccessibleForFree: true,
         inLanguage: locale,
