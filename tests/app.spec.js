@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { aboutCopy } from '../src/about.js';
+import { examDescriptionSource } from '../src/exams/metadata.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { LANDING_COPY_SOURCES, SETUP_COPY_SOURCES } from '../src/locales/landing-copy.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
@@ -116,7 +117,7 @@ test('SPA navigation commits complete canonical and social metadata for each act
   await page.locator('.exam-card__link[href="/en/acutezza/"]').click();
   await expectRouteMetadata(page, {
     title: acutezza.pageTitle,
-    description: acutezza.blurb,
+    description: examDescriptionSource(acutezza, 'en'),
     path: '/en/acutezza/',
     image: '/social/acutezza.png',
     // The identity alone. Concatenating the tagline produced three descriptors

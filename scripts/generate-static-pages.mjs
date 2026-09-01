@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { aboutCopy, aboutMarkup } from '../src/about.js';
 import { CONTENT_DATES, examContentDate } from '../src/content-dates.js';
 import { CRAWLER_POLICY, renderRobots } from '../src/crawler-policy.js';
+import { examDescriptionSource } from '../src/exams/metadata.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { SOURCE_ROLE_LABELS, sourcesFor } from '../src/exams/sources.js';
 import { galleryMarkup } from '../src/gallery-markup.js';
@@ -88,6 +89,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
 
   for (const definition of EXAMS) {
     const path = `/${locale}/${definition.route}/`;
+    const description = translate(examDescriptionSource(definition, locale));
     canonicalPaths.push({ path, lastModified: examContentDate(definition.id) });
     await writePage(`${locale}/${definition.route}/index.html`, {
       locale,
@@ -96,13 +98,13 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
       route: definition.route,
       path,
       title: translate(definition.pageTitle),
-      description: translate(definition.blurb),
+      description,
       socialImage: `/social/${definition.id}.png`,
       socialImageAlt: translate(definition.discoveryName ?? definition.name),
       main: examMarkup(definition, locale, translate),
       stylesheet: routeStyles.get(definition.id),
       alternates: pageAlternates(definition.route),
-      structuredData: examData(definition, languageTag, path, translate),
+      structuredData: examData(definition, languageTag, path, translate, description),
     });
   }
 

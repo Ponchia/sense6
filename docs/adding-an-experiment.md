@@ -42,10 +42,15 @@ that production can emit while preserving existing aggregate rows.
 
 ## 2. Register presentation metadata
 
-Add one frozen entry to `src/exams/registry.js`. Include the route, public
-name, localized source phrases, duration, limit, and lazy loader.
-Static generation, gallery cards, route lookup, and metadata consume this
-registry.
+Add one frozen entry to `src/exams/registry.js`. Include the route, public name,
+concise visible blurb, localized source phrases, duration, limit, and lazy
+loader. Add its English metadata-specific description to
+`src/exams/metadata.js`; keeping that copy in an experiment-only module avoids
+charging the gallery's initial bundle for route metadata. Static generation,
+gallery cards, route lookup, and metadata consume these sources. Until a
+dedicated metadata description has reviewed translations, non-English routes
+fall back to the localized visible blurb; never leak the English metadata copy
+into them.
 
 Add the experiment's canonical sources to `src/exams/sources.js`. Give every
 source one honest role: `method`, `boundary`, `comparator`, or `validation`.
