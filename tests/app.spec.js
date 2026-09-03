@@ -433,7 +433,12 @@ test('the About page explains authorship, methodology, and permanent limits in e
   await expect(page.getByRole('heading', { level: 1, name: aboutCopy('en').title })).toBeVisible();
   await expect(page.getByText('No certification or formal validation is planned.')).toBeVisible();
   await expect(page.getByText(/created and maintained by Zeno\./)).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Zeno', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Zeno', exact: true })).toHaveCount(2);
+  await expect(page.getByRole('link', { name: 'Zeno', exact: true }).first()).toHaveAttribute(
+    'href',
+    'https://github.com/Ponchia',
+  );
+  await expect(page.getByRole('link', { name: 'privacy@sense6.net', exact: true })).toHaveCount(1);
   await expect(page.getByRole('link', { name: 'privacy notice', exact: true })).toBeVisible();
   await expect(page.locator('.about-orbit i')).toHaveCount(6);
   await expect(page.locator('.about-signal > span')).toHaveCount(5);

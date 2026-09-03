@@ -16,5 +16,10 @@
 #
 #   en-tetracromia-desktop-chromium-linux.png  # new hero layout, PR #58
 #
+# The About-page author and corrections links intentionally change these
+# representative localized pages.
+hi-about-desktop-chromium-linux.png  # visible author profile and corrections channel
+hi-about-mobile-chromium-linux.png   # visible author profile and corrections channel
+ja-about-mobile-chromium-linux.png   # visible author profile and corrections channel
 # Snapshot names are validated against the representative route list, so a typo
 # fails the job rather than silently approving nothing.
