@@ -1,4 +1,7 @@
 import { EXAMS } from './exams/registry.js';
+import { CREATOR_PROFILE_URL } from './site-identity.js';
+
+const CONTACT_EMAIL = 'privacy@sense6.net';
 
 const ABOUT_COPY = Object.freeze({
   en: copy({
@@ -80,7 +83,7 @@ const ABOUT_COPY = Object.freeze({
     privacyLabel: 'privacy notice',
     changesTitle: 'Corrections and changes',
     changes: [
-      'Methods and wording may change as the experiments evolve. A content-review date means that the page and its sources were checked for freshness; it is not expert approval. Questions and corrections can be raised through the {profile}.',
+      'Methods and wording may change as the experiments evolve. A content-review date means that the page and its sources were checked for freshness; it is not expert approval. Questions and corrections can be sent to {profile} at {contact}.',
     ],
     researchTitle: 'Follow the research trail',
     researchIntro:
@@ -166,7 +169,7 @@ const ABOUT_COPY = Object.freeze({
     privacyLabel: 'informativa sulla privacy',
     changesTitle: 'Correzioni e modifiche',
     changes: [
-      'Metodi e formulazioni possono cambiare con l’evoluzione degli esperimenti. La data di revisione indica che pagina e fonti sono state controllate per verificarne l’attualità; non è un’approvazione esperta. Domande e correzioni possono essere inviate tramite il {profile}.',
+      'Metodi e formulazioni possono cambiare con l’evoluzione degli esperimenti. La data di revisione indica che pagina e fonti sono state controllate per verificarne l’attualità; non è un’approvazione esperta. Domande e correzioni possono essere inviate a {profile} all’indirizzo {contact}.',
     ],
     researchTitle: 'Segui il percorso di ricerca',
     researchIntro:
@@ -255,7 +258,7 @@ const ABOUT_COPY = Object.freeze({
     privacyLabel: 'Datenschutzhinweis',
     changesTitle: 'Korrekturen und Änderungen',
     changes: [
-      'Methoden und Formulierungen können sich mit den Experimenten ändern. Ein Inhaltsprüfdatum bedeutet, dass Seite und Quellen auf Aktualität geprüft wurden; es ist keine fachliche Freigabe. Fragen und Korrekturen können über das {profile} eingereicht werden.',
+      'Methoden und Formulierungen können sich mit den Experimenten ändern. Ein Inhaltsprüfdatum bedeutet, dass Seite und Quellen auf Aktualität geprüft wurden; es ist keine fachliche Freigabe. Fragen und Korrekturen können über {contact} an {profile} gesendet werden.',
     ],
     researchTitle: 'Der Forschungsspur folgen',
     researchIntro:
@@ -347,7 +350,7 @@ const ABOUT_COPY = Object.freeze({
     privacyLabel: 'notice de confidentialité',
     changesTitle: 'Corrections et modifications',
     changes: [
-      'Les méthodes et formulations peuvent évoluer avec les expériences. Une date de révision indique que la page et ses sources ont été vérifiées pour leur actualité; ce n’est pas une approbation experte. Les questions et corrections peuvent être adressées via le {profile}.',
+      'Les méthodes et formulations peuvent évoluer avec les expériences. Une date de révision indique que la page et ses sources ont été vérifiées pour leur actualité; ce n’est pas une approbation experte. Les questions et corrections peuvent être envoyées à {profile} à l’adresse {contact}.',
     ],
     researchTitle: 'Suivre la piste de recherche',
     researchIntro:
@@ -433,7 +436,7 @@ const ABOUT_COPY = Object.freeze({
     privacyLabel: 'aviso de privacidad',
     changesTitle: 'Correcciones y cambios',
     changes: [
-      'Los métodos y textos pueden cambiar a medida que evolucionan los experimentos. Una fecha de revisión indica que la página y sus fuentes se comprobaron por actualidad; no es una aprobación experta. Las preguntas y correcciones pueden plantearse a través del {profile}.',
+      'Los métodos y textos pueden cambiar a medida que evolucionan los experimentos. Una fecha de revisión indica que la página y sus fuentes se comprobaron por actualidad; no es una aprobación experta. Las preguntas y correcciones pueden enviarse a {profile} a través de {contact}.',
     ],
     researchTitle: 'Sigue el rastro de investigación',
     researchIntro:
@@ -516,7 +519,7 @@ const ABOUT_COPY = Object.freeze({
     privacyLabel: 'aviso de privacidade',
     changesTitle: 'Correções e alterações',
     changes: [
-      'Os métodos e textos podem mudar à medida que as experiências evoluem. Uma data de revisão significa que a página e as fontes foram verificadas quanto à atualidade; não é aprovação especializada. Questões e correções podem ser apresentadas através do {profile}.',
+      'Os métodos e textos podem mudar à medida que as experiências evoluem. Uma data de revisão significa que a página e as fontes foram verificadas quanto à atualidade; não é aprovação especializada. Questões e correções podem ser enviadas a {profile} através de {contact}.',
     ],
     researchTitle: 'Siga o percurso da investigação',
     researchIntro:
@@ -599,7 +602,7 @@ const ABOUT_COPY = Object.freeze({
     privacyLabel: 'aviso de privacidade',
     changesTitle: 'Correções e mudanças',
     changes: [
-      'Métodos e textos podem mudar conforme os experimentos evoluem. Uma data de revisão indica que a página e suas fontes foram verificadas quanto à atualidade; não é uma aprovação especializada. Perguntas e correções podem ser enviadas pelo {profile}.',
+      'Métodos e textos podem mudar conforme os experimentos evoluem. Uma data de revisão indica que a página e suas fontes foram verificadas quanto à atualidade; não é uma aprovação especializada. Perguntas e correções podem ser enviadas a {profile} pelo endereço {contact}.',
     ],
     researchTitle: 'Siga a trilha de pesquisa',
     researchIntro:
@@ -678,7 +681,7 @@ const ABOUT_COPY = Object.freeze({
     privacyLabel: 'إشعار الخصوصية',
     changesTitle: 'التصحيحات والتغييرات',
     changes: [
-      'قد تتغير المناهج والصياغة مع تطور التجارب. يعني تاريخ مراجعة المحتوى أن الصفحة ومصادرها فُحصت للتأكد من حداثتها؛ ولا يعني موافقة خبير. يمكن إرسال الأسئلة والتصحيحات عبر {profile}.',
+      'قد تتغير المناهج والصياغة مع تطور التجارب. يعني تاريخ مراجعة المحتوى أن الصفحة ومصادرها فُحصت للتأكد من حداثتها؛ ولا يعني موافقة خبير. يمكن إرسال الأسئلة والتصحيحات إلى {profile} عبر {contact}.',
     ],
     researchTitle: 'تتبّع المسار البحثي',
     researchIntro: 'تنشر كل تجربة المصادر التي استرشد بها تصميم مهمتها مع حدود تفسيرها الخاصة.',
@@ -757,7 +760,7 @@ const ABOUT_COPY = Object.freeze({
     privacyLabel: 'プライバシー通知',
     changesTitle: '訂正と変更',
     changes: [
-      '実験の発展に伴い、方法や表現は変わることがあります。内容確認日はページと情報源の新しさを確認した日であり、専門家の承認ではありません。質問や訂正は{profile}から送れます。',
+      '実験の発展に伴い、方法や表現は変わることがあります。内容確認日はページと情報源の新しさを確認した日であり、専門家の承認ではありません。質問や訂正は{contact}から{profile}へ送れます。',
     ],
     researchTitle: '研究情報をたどる',
     researchIntro: '各実験は、課題設計の参考にした情報源と、その結果を解釈する際の限界を公開しています。',
@@ -836,7 +839,7 @@ const ABOUT_COPY = Object.freeze({
     privacyLabel: '개인정보 처리 안내',
     changesTitle: '수정과 변경',
     changes: [
-      '실험이 발전하면서 방법과 표현이 바뀔 수 있습니다. 콘텐츠 검토일은 페이지와 출처의 최신성을 확인한 날짜이며 전문가 승인 뜻이 아닙니다. 질문과 수정 제안은 {profile}를 통해 보낼 수 있습니다.',
+      '실험이 발전하면서 방법과 표현이 바뀔 수 있습니다. 콘텐츠 검토일은 페이지와 출처의 최신성을 확인한 날짜이며 전문가 승인 뜻이 아닙니다. 질문과 수정 제안은 {contact}를 통해 {profile}에게 보낼 수 있습니다.',
     ],
     researchTitle: '연구 근거 살펴보기',
     researchIntro: '각 실험은 과제 설계에 참고한 출처와 결과 해석의 구체적인 한계를 공개합니다.',
@@ -913,7 +916,7 @@ const ABOUT_COPY = Object.freeze({
     privacyLabel: 'गोपनीयता सूचना',
     changesTitle: 'सुधार और बदलाव',
     changes: [
-      'प्रयोगों के विकसित होने पर विधियाँ और शब्द बदल सकते हैं। सामग्री समीक्षा की तारीख का अर्थ है कि पृष्ठ और स्रोतों की नवीनता जाँची गई; यह विशेषज्ञ स्वीकृति नहीं है। प्रश्न और सुधार {profile} के माध्यम से भेजे जा सकते हैं।',
+      'प्रयोगों के विकसित होने पर विधियाँ और शब्द बदल सकते हैं। सामग्री समीक्षा की तारीख का अर्थ है कि पृष्ठ और स्रोतों की नवीनता जाँची गई; यह विशेषज्ञ स्वीकृति नहीं है। प्रश्न और सुधार {contact} के माध्यम से {profile} को भेजे जा सकते हैं।',
     ],
     researchTitle: 'शोध की कड़ी देखें',
     researchIntro:
@@ -987,7 +990,7 @@ const ABOUT_COPY = Object.freeze({
     privacyLabel: '隐私声明',
     changesTitle: '修正和变更',
     changes: [
-      '随着实验演进，方法和措辞可能改变。内容复核日期表示页面和资料来源已检查时效性，并不代表专家批准。问题和修正建议可通过 {profile} 提交。',
+      '随着实验演进，方法和措辞可能改变。内容复核日期表示页面和资料来源已检查时效性，并不代表专家批准。问题和修正建议可通过 {contact} 发送给 {profile}。',
     ],
     researchTitle: '查看研究依据',
     researchIntro: '每项实验都会公开影响任务设计的资料来源，以及解读结果时的具体限制。',
@@ -1074,7 +1077,8 @@ function experimentMarkup(exam, page, hrefFor, translate) {
 
 function aboutHtml(text, page, hrefFor) {
   const links = {
-    profile: escapeHtml(page.profileLabel),
+    profile: `<a href="${escapeAttribute(CREATOR_PROFILE_URL)}" rel="me noreferrer">${escapeHtml(page.profileLabel)}</a>`,
+    contact: `<!--email_off--><a href="mailto:${escapeAttribute(CONTACT_EMAIL)}">${escapeHtml(CONTACT_EMAIL)}</a><!--/email_off-->`,
     privacy: `<a data-sense6-route="privacy" href="${escapeAttribute(hrefFor('privacy'))}">${escapeHtml(page.privacyLabel)}</a>`,
   };
   return Object.entries(links).reduce(

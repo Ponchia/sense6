@@ -11,8 +11,8 @@
   },
   "/ar/about/": {
     "key": "about",
-    "date": "2026-07-30",
-    "hash": "35e7d5f927fd55cea2f9e81848cb0b46"
+    "date": "2026-09-03",
+    "hash": "22c31a98c6c134e48dbb5fa736b31327"
   },
   "/ar/acutezza/": {
     "key": "exams.acutezza",
@@ -46,8 +46,8 @@
   },
   "/de/about/": {
     "key": "about",
-    "date": "2026-07-30",
-    "hash": "a01c796104d04235a63177c165c32995"
+    "date": "2026-09-03",
+    "hash": "7108b2b9bb995484a86528f296901e5f"
   },
   "/de/acutezza/": {
     "key": "exams.acutezza",
@@ -81,8 +81,8 @@
   },
   "/en/about/": {
     "key": "about",
-    "date": "2026-07-30",
-    "hash": "bad35248814f2384be354ed3f4d6fd49"
+    "date": "2026-09-03",
+    "hash": "e2363d30d42093597330f140f3502da3"
   },
   "/en/acutezza/": {
     "key": "exams.acutezza",
@@ -116,8 +116,8 @@
   },
   "/es/about/": {
     "key": "about",
-    "date": "2026-07-30",
-    "hash": "4df6a026b07b4de722265b14d0d95dc5"
+    "date": "2026-09-03",
+    "hash": "8d8c3a002626307115b5cc9428c16ec0"
   },
   "/es/acutezza/": {
     "key": "exams.acutezza",
@@ -151,8 +151,8 @@
   },
   "/fr/about/": {
     "key": "about",
-    "date": "2026-07-30",
-    "hash": "f9e59db1155d14f89b57e11262ccb774"
+    "date": "2026-09-03",
+    "hash": "2ba4b324eca88100e72e8a778797c891"
   },
   "/fr/acutezza/": {
     "key": "exams.acutezza",
@@ -186,8 +186,8 @@
   },
   "/hi/about/": {
     "key": "about",
-    "date": "2026-07-30",
-    "hash": "3fc9777a54e035cfe405d0ac187239a2"
+    "date": "2026-09-03",
+    "hash": "5b2f021099377e318999ac3bcf790d40"
   },
   "/hi/acutezza/": {
     "key": "exams.acutezza",
@@ -221,8 +221,8 @@
   },
   "/it/about/": {
     "key": "about",
-    "date": "2026-07-30",
-    "hash": "d7a9797e78f851c88d699db4adf965e5"
+    "date": "2026-09-03",
+    "hash": "6facdd8941e1c83316b8bef66e1d5a0d"
   },
   "/it/acutezza/": {
     "key": "exams.acutezza",
@@ -256,8 +256,8 @@
   },
   "/ja/about/": {
     "key": "about",
-    "date": "2026-07-30",
-    "hash": "6c5d1f35ec75dfe27c277d159f135b8c"
+    "date": "2026-09-03",
+    "hash": "a3641f745ae5e723da8bacd11f89f8ad"
   },
   "/ja/acutezza/": {
     "key": "exams.acutezza",
@@ -291,8 +291,8 @@
   },
   "/ko/about/": {
     "key": "about",
-    "date": "2026-07-30",
-    "hash": "3103d18e85069b7f477a20c395159068"
+    "date": "2026-09-03",
+    "hash": "364f2e381a6db2e1a4d57ae1bfbb42f2"
   },
   "/ko/acutezza/": {
     "key": "exams.acutezza",
@@ -326,8 +326,8 @@
   },
   "/pt-br/about/": {
     "key": "about",
-    "date": "2026-07-30",
-    "hash": "a8fe89730f09f67ccf28c92d5e1448db"
+    "date": "2026-09-03",
+    "hash": "6a640c258d3be779b912528aaa5bdc25"
   },
   "/pt-br/acutezza/": {
     "key": "exams.acutezza",
@@ -361,8 +361,8 @@
   },
   "/pt/about/": {
     "key": "about",
-    "date": "2026-07-30",
-    "hash": "07f97406be7fb10f87b6561f2c6af500"
+    "date": "2026-09-03",
+    "hash": "623a92819afe8f4ea52ed145228b49be"
   },
   "/pt/acutezza/": {
     "key": "exams.acutezza",
@@ -396,8 +396,8 @@
   },
   "/zh-hans/about/": {
     "key": "about",
-    "date": "2026-07-30",
-    "hash": "f339de82292f2a4b4f27a49c1980e9ba"
+    "date": "2026-09-03",
+    "hash": "b0c236c01853c70ddb9e9f9e84399b9e"
   },
   "/zh-hans/acutezza/": {
     "key": "exams.acutezza",
