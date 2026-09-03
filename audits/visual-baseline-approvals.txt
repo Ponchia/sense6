@@ -18,7 +18,6 @@
 #
 # The About-page author and corrections links intentionally change these
 # representative localized pages.
-ar-about-mobile-chromium-linux.png   # visible author profile and corrections channel
 hi-about-desktop-chromium-linux.png  # visible author profile and corrections channel
 hi-about-mobile-chromium-linux.png   # visible author profile and corrections channel
 ja-about-mobile-chromium-linux.png   # visible author profile and corrections channel
