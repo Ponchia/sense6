@@ -18,11 +18,9 @@
 #
 # The About-page author and corrections links intentionally change these
 # representative localized pages.
-ar-about-desktop-chromium-linux.png  # visible author profile and corrections channel
 ar-about-mobile-chromium-linux.png   # visible author profile and corrections channel
 hi-about-desktop-chromium-linux.png  # visible author profile and corrections channel
 hi-about-mobile-chromium-linux.png   # visible author profile and corrections channel
-ja-about-desktop-chromium-linux.png  # visible author profile and corrections channel
 ja-about-mobile-chromium-linux.png   # visible author profile and corrections channel
 # Snapshot names are validated against the representative route list, so a typo
 # fails the job rather than silently approving nothing.
