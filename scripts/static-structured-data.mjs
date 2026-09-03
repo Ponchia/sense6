@@ -2,6 +2,7 @@ import { CONTENT_DATES, examContentDate } from '../src/content-dates.js';
 import { sourcesFor } from '../src/exams/sources.js';
 import { LOCALES } from '../src/locales.js';
 import { SITE_ORIGIN } from '../src/routes.js';
+import { CREATOR_PROFILE_URL } from '../src/site-identity.js';
 
 const ORIGIN = SITE_ORIGIN;
 
@@ -49,7 +50,7 @@ export function aboutData(copy, locale, path) {
         inLanguage: LOCALES.map(({ languageTag }) => languageTag),
         creator: { '@id': `${ORIGIN}/#creator` },
       },
-      creatorData(),
+      creatorData(true),
     ],
   };
 }
@@ -111,10 +112,11 @@ export function webpageData(name, description, locale, path) {
   };
 }
 
-function creatorData() {
+function creatorData(includeProfile = false) {
   return {
     '@type': 'Person',
     '@id': `${ORIGIN}/#creator`,
     name: 'Zeno',
+    ...(includeProfile ? { url: CREATOR_PROFILE_URL, sameAs: [CREATOR_PROFILE_URL] } : {}),
   };
 }
