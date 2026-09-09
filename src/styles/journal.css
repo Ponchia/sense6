@@ -127,7 +127,7 @@
 }
 
 .journal-entry__grid h3 {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 1.35rem;
   margin: 0 0 1rem;
 }
@@ -201,7 +201,7 @@
 }
 
 .journal-empty h2 {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: clamp(2rem, 5vw, 4rem);
   margin-block: 1rem;
 }

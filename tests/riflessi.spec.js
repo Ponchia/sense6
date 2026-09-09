@@ -301,6 +301,12 @@ async function expectScreenToReflow(page, label) {
 
 async function expectRunnerStageToFit(page, label) {
   await expectRunnerToFit(page);
+  const clippedHints = await page
+    .locator('.rx-response-pad span, .rx-choice-zones small')
+    .evaluateAll((hints) =>
+      hints.filter((hint) => hint.scrollWidth > hint.clientWidth + 1).map((hint) => hint.textContent),
+    );
+  expect(clippedHints, `${label}: response hints must remain readable`).toEqual([]);
   const geometry = await page.evaluate(() => {
     const rect = (selector) => {
       const bounds = document.querySelector(selector)?.getBoundingClientRect();
@@ -351,6 +357,12 @@ async function completeScopeWithGeometry(page, scope, label) {
   await expectScreenToReflow(page, `${label} choice brief`);
   await page.getByRole('button', { name: /Start practice/i }).click();
   await expectRunnerStageToFit(page, `${label} choice practice`);
+  if (label.includes('200%')) {
+    await page.screenshot({
+      path: test.info().outputPath('riflessi-large-text.png'),
+      animations: 'disabled',
+    });
+  }
   await respondToChoice(page);
   await respondToChoice(page);
   await expectScreenToReflow(page, `${label} choice practice transition`);

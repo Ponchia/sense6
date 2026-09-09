@@ -62,6 +62,21 @@ body.ac-active {
   text-wrap: balance;
 }
 
+.ac-setup h1,
+.ac-calibration h1,
+.ac-distance-result h1,
+.ac-contrast h1,
+.ac-calibration-summary h1,
+.ac-eye-brief h1,
+.ac-transition h1,
+.ac-between h1,
+.ac-results__hero h1,
+.ac-blocked h1 {
+  font-family: var(--sans);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.12;
+}
+
 .ac-hero h1 {
   font-size: clamp(4rem, 7.5vw, 8rem);
 }
@@ -222,7 +237,7 @@ body.ac-active {
 }
 
 .ac-instrument-list h3 {
-  font-family: var(--display);
+  font-family: var(--sans);
   margin: 0.5rem 0;
 }
 
@@ -366,7 +381,7 @@ body.ac-active {
   text-align: start;
 }
 .ac-scope-option strong {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 1.2rem;
 }
 .ac-scope-option small {
@@ -413,7 +428,7 @@ body.ac-active {
 .ac-setup__rules > strong {
   color: var(--ac-accent-text);
   display: block;
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: clamp(4rem, 8vw, 7rem);
   letter-spacing: -0.07em;
   margin-block: 1.5rem;
@@ -941,7 +956,7 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
   text-transform: uppercase;
 }
 .ac-results__stamp strong {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 2.2rem;
 }
 .ac-eye-results {
@@ -956,7 +971,7 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
   margin-block-end: 1rem;
 }
 .ac-eye-result h2 {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: clamp(1.8rem, 3vw, 2.7rem);
   margin: 0;
 }
@@ -981,7 +996,7 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
 }
 .ac-metric > div span {
   color: var(--ac-accent-text);
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 1.25rem;
 }
 .ac-metric > div p {
@@ -1021,7 +1036,7 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
   padding: clamp(1.5rem, 4vw, 2.5rem);
 }
 .ac-context-grid h2 {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: clamp(1.8rem, 3vw, 2.7rem);
   margin: 0.7rem 0 1.5rem;
 }
@@ -1052,7 +1067,7 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
   padding-block: 2rem;
 }
 .ac-results__safety strong {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: clamp(1.7rem, 3vw, 2.5rem);
 }
 .ac-results__safety p {

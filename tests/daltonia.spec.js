@@ -260,6 +260,26 @@ test('the complete mobile trial is visible and hit-testable at every audited vie
           geometry.filter((entry) => !entry.inside || !entry.hit || !entry.touchTarget),
           `${locale} ${viewport.width}x${viewport.height} ${stage}: ${JSON.stringify(geometry)}`,
         ).toEqual([]);
+        const clippedLabels = await page.locator('.cb-direction small').evaluateAll((labels) =>
+          labels
+            .filter((label) => {
+              const rect = label.getBoundingClientRect();
+              const button = label.closest('button').getBoundingClientRect();
+              return (
+                rect.bottom > button.bottom + 1 ||
+                rect.top < button.top - 1 ||
+                label.scrollWidth > label.clientWidth + 1
+              );
+            })
+            .map((label) => label.textContent),
+        );
+        expect(clippedLabels, `${locale} ${viewport.width}x${viewport.height}: direction labels`).toEqual([]);
+        if (locale === 'de' && viewport.width === 844 && stage === 'practice') {
+          await page.screenshot({
+            path: testInfo.outputPath('daltonia-landscape.png'),
+            animations: 'disabled',
+          });
+        }
         if (stage === 'practice') {
           await page.locator('[data-orientation="right"]').click();
           const advance = page.locator('[data-action="cb-practice-next"]');
