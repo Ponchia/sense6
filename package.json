@@ -37,7 +37,7 @@
     "check:release": "npm run check && npm run test:html && npm run test:links && npm run test:site-audit"
   },
   "dependencies": {
-    "@ponchia/ui": "file:vendor/bronto-release/ponchia-ui-0.11.0.tgz"
+    "@ponchia/ui": "0.11.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
