@@ -62,7 +62,7 @@
 }
 
 .rx-mode strong {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 1.1rem;
 }
 
@@ -678,7 +678,7 @@ html[dir="rtl"] .rx-progress i {
 }
 
 .rx-results__stamp strong {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 2.25rem;
 }
 
@@ -713,7 +713,7 @@ html[dir="rtl"] .rx-progress i {
 
 .rx-metric > div span {
   color: var(--accent-text);
-  font-family: var(--display);
+  font-family: var(--sans);
 }
 
 .rx-metric > div p {
@@ -772,7 +772,7 @@ html[dir="rtl"] .rx-progress i {
 .rx-events h2,
 .rx-timing h2,
 .rx-limit h2 {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: clamp(1.8rem, 3vw, 2.6rem);
   margin: 0.7rem 0;
 }

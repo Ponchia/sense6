@@ -499,7 +499,7 @@
 }
 
 .cb-scorecard__head h2 {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 1.3rem;
   margin: 0;
 }
