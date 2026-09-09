@@ -16,32 +16,3 @@
 #
 #   en-tetracromia-desktop-chromium-linux.png  # new hero layout, PR #58
 #
-# BrontoUI 0.11 changes shared typography, control sizing and radii across
-# these routes; the gallery also adopts sans navigation headings. Comparisons
-# still run and attach base/candidate/diff evidence for review.
-root-desktop-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-root-mobile-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-desktop-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-mobile-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-tetracromia-desktop-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-tetracromia-mobile-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-color-blindness-desktop-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-color-blindness-mobile-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-riflessi-desktop-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-riflessi-mobile-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-udito-desktop-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-udito-mobile-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-acutezza-desktop-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-acutezza-mobile-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-about-desktop-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-about-mobile-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-journal-desktop-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-journal-mobile-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-privacy-desktop-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-en-privacy-mobile-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-ar-about-desktop-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-ar-about-mobile-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-hi-about-desktop-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-hi-about-mobile-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-ja-about-desktop-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
-ja-about-mobile-chromium-linux.png  # BrontoUI 0.11 typography and sizing migration
