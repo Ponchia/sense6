@@ -307,10 +307,10 @@
 
 .cb-direction small {
   color: var(--text-dim);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: var(--text-2xs);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .cb-direction--up {
@@ -678,7 +678,7 @@
   }
 
   .cb-direction small {
-    font-size: 0.55rem;
+    font-size: var(--text-2xs);
     line-height: 1.05;
     max-inline-size: 100%;
     overflow-wrap: anywhere;
@@ -792,7 +792,7 @@
   }
 
   .cb-stage {
-    --cb-compact-answer: min(18vw, 9.5rem);
+    --cb-compact-answer: min(32vw, 16rem);
     --cb-compact-plate: min(24vw, 11rem);
     align-items: center;
     gap: 1rem;
@@ -812,6 +812,17 @@
 
   .cb-prompt {
     font-size: 1.2rem;
+  }
+
+  .cb-direction {
+    aspect-ratio: auto;
+    font-size: 1.2rem;
+    line-height: 1;
+    padding: 0.15rem 0.1rem;
+  }
+
+  .cb-direction small {
+    line-height: 1.05;
   }
 
   .cb-response-set {

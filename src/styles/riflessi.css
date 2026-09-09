@@ -386,21 +386,52 @@ html[dir="rtl"] .rx-progress i {
 }
 
 .rx-chamber {
+  --rx-target-size: min(clamp(9rem, 22vw, 15rem), 45vmin);
   background:
     linear-gradient(var(--line) 1px, transparent 1px),
     linear-gradient(90deg, var(--line) 1px, transparent 1px), var(--panel);
   background-size: 3rem 3rem;
   display: grid;
+  gap: 0.5rem;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
   min-block-size: 0;
   overflow: hidden;
   overscroll-behavior: contain;
+  padding-block: 1.25rem 4rem;
   place-items: center;
   position: relative;
   transition: background-color 100ms ease;
 }
 
-.rx-chamber::before,
-.rx-chamber::after {
+/* Status text owns its natural row. The remaining cell sizes the circle,
+   including when text is enlarged, without covering status or response hints. */
+.rx-stimulus {
+  align-self: stretch;
+  container-type: size;
+  display: grid;
+  justify-self: stretch;
+  min-block-size: 0;
+  place-items: center;
+  position: relative;
+}
+
+/* Reserve both labels together so a signal changes wording, never position. */
+.rx-status-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  inline-size: calc(100% - 2rem);
+  justify-items: center;
+  min-inline-size: 0;
+}
+
+.rx-chamber__status--reserve {
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.rx-stimulus::before,
+.rx-stimulus::after {
   background: var(--line-strong);
   content: "";
   pointer-events: none;
@@ -408,12 +439,12 @@ html[dir="rtl"] .rx-progress i {
   z-index: 1;
 }
 
-.rx-chamber::before {
+.rx-stimulus::before {
   block-size: 1px;
   inline-size: min(48vw, 48svh, 34rem);
 }
 
-.rx-chamber::after {
+.rx-stimulus::after {
   block-size: min(48vw, 48svh, 34rem);
   inline-size: 1px;
 }
@@ -424,16 +455,14 @@ html[dir="rtl"] .rx-progress i {
   color: var(--text-dim);
   font-family: var(--mono);
   font-size: var(--text-xs);
+  grid-area: 1 / 1;
   inline-size: max-content;
-  inset-block-start: 1.25rem;
-  left: 50%;
   letter-spacing: var(--tracking-wide);
-  max-inline-size: calc(100% - 2rem);
+  max-inline-size: 100%;
   padding: 0.5rem 0.75rem;
-  position: absolute;
+  position: relative;
   text-align: center;
   text-transform: uppercase;
-  transform: translateX(-50%);
   white-space: normal;
   z-index: 5;
 }
@@ -444,8 +473,9 @@ html[dir="rtl"] .rx-progress i {
   border: 1px solid var(--line-strong);
   border-radius: 50%;
   display: flex;
-  inline-size: min(clamp(9rem, 22vw, 15rem), 45vmin);
+  inline-size: min(var(--rx-target-size), 100cqw, 100cqh);
   justify-content: center;
+  min-block-size: 0;
   opacity: 0.16;
   position: relative;
   transition: none;
@@ -467,7 +497,7 @@ html[dir="rtl"] .rx-progress i {
   background: #f4b942;
   border-radius: 50%;
   display: flex;
-  inline-size: clamp(2.6rem, 6vw, 4.2rem);
+  inline-size: min(clamp(2.6rem, 6vw, 4.2rem), 60cqw, 60cqh);
   justify-content: center;
 }
 
@@ -481,7 +511,7 @@ html[dir="rtl"] .rx-progress i {
 .rx-arrow {
   color: #f4b942;
   font-family: var(--display);
-  font-size: clamp(5rem, 14vw, 9rem);
+  font-size: min(clamp(5rem, 14vw, 9rem), 75cqw, 75cqh);
   font-weight: 700;
   line-height: 1;
 }
@@ -524,12 +554,12 @@ html[dir="rtl"] .rx-progress i {
 
 .rx-response-pad span {
   bottom: 1rem;
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: var(--text-2xs);
   left: 50%;
-  letter-spacing: var(--tracking-wide);
+  letter-spacing: normal;
   position: absolute;
-  text-transform: uppercase;
+  text-transform: none;
   transform: translateX(-50%);
 }
 
@@ -548,6 +578,7 @@ html[dir="rtl"] .rx-progress i {
   flex-direction: column;
   gap: 0.25rem;
   justify-content: end;
+  min-inline-size: 0;
   padding-block-end: 1rem;
   position: relative;
 }
@@ -562,9 +593,11 @@ html[dir="rtl"] .rx-progress i {
 }
 
 .rx-choice-zones button small {
-  font-family: var(--mono);
-  letter-spacing: var(--tracking-wide);
-  text-transform: uppercase;
+  font-family: var(--sans);
+  letter-spacing: normal;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+  text-transform: none;
 }
 
 .rx-feedback {
@@ -795,6 +828,7 @@ html[dir="rtl"] .rx-progress i {
 .rx-events dt {
   color: var(--text-dim);
   font-size: var(--text-xs);
+  overflow-wrap: anywhere;
 }
 
 .rx-events dd {
@@ -951,11 +985,11 @@ html[dir="rtl"] .rx-progress i {
     display: none;
   }
 
-  .rx-chamber::before {
+  .rx-stimulus::before {
     inline-size: 80vw;
   }
 
-  .rx-chamber::after {
+  .rx-stimulus::after {
     block-size: 80vw;
   }
 
@@ -1001,20 +1035,19 @@ html[dir="rtl"] .rx-progress i {
   }
 
   .rx-chamber__status {
-    inset-block-start: 0.25rem;
     letter-spacing: 0.08em;
     padding: 0.35rem 0.45rem;
+  }
+
+  .rx-chamber {
+    padding-block: 0.25rem 3rem;
   }
 
   .rx-response-pad span {
     bottom: 0.25rem;
     inline-size: max-content;
     max-inline-size: calc(100% - 1rem);
-    white-space: nowrap;
-  }
-
-  .rx-choice-zones small {
-    white-space: nowrap;
+    white-space: normal;
   }
 
   .rx-runner__footer {
@@ -1032,12 +1065,12 @@ html[dir="rtl"] .rx-progress i {
   }
 
   .rx-chamber__status {
-    inset-block-start: 0.5rem;
     padding-block: 0.3rem;
   }
 
-  .rx-target {
-    inline-size: min(clamp(6rem, 22vw, 11rem), 42vmin);
+  .rx-chamber {
+    --rx-target-size: min(clamp(6rem, 22vw, 11rem), 42vmin);
+    padding-block: 0.5rem 3.5rem;
   }
 }
 
