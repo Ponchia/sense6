@@ -87,6 +87,16 @@ test('every canonical route has substantive, localized raw HTML', async () => {
     } else {
       assert.match(html, displayFontPreload, `${path} must preload the above-fold display face`);
     }
+    for (const weight of [400, 700]) {
+      const heroFontPreload = new RegExp(
+        `<link rel="preload" href="/assets/doto-${weight}-[^"]+\\.woff2" as="font"`,
+      );
+      if (route === 'udito' && !['ar', 'hi', 'ja', 'ko', 'zh-hans'].includes(locale)) {
+        assert.match(html, heroFontPreload, `${path} must discover its hydrated hero font before paint`);
+      } else {
+        assert.doesNotMatch(html, heroFontPreload, `${path} must not preload Udito-only hero weights`);
+      }
+    }
     const stylesheet = path.split('/').filter(Boolean)[1] ?? 'gallery';
     assert.match(
       html,
