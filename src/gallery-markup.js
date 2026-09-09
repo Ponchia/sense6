@@ -32,7 +32,7 @@ export function galleryMarkup({ exams, locale, localeHref, m, t }) {
     <section class="gallery-hero ui-container ui-container--wide" data-sense6-view="gallery" data-sense6-locale="${locale}">
       <div class="gallery-hero__copy">
         <p class="ui-eyebrow">Sense6</p>
-        <h1>${t('Measure what your')} <em>${t('senses notice.')}</em></h1>
+        <h1 class="ui-display">${t('Measure what your')} <em>${t('senses notice.')}</em></h1>
         <p class="gallery-hero__lede">
           ${t('Short, careful tests that turn what you notice into honest, device-relative results.')}
           ${t('No account, no answers or results uploaded.')}

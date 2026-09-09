@@ -37,7 +37,7 @@
     "check:release": "npm run check && npm run test:html && npm run test:links && npm run test:site-audit"
   },
   "dependencies": {
-    "@ponchia/ui": "~0.9.0"
+    "@ponchia/ui": "0.11.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",

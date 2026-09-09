@@ -303,9 +303,16 @@ function renderRunner() {
         <button class="rx-runner__stop" type="button" data-action="rx-stop">Stop safely</button>
       </header>
       <div class="rx-chamber" data-rx-chamber data-rx-state="waiting">
-        <div class="rx-chamber__status" data-rx-status>Wait for the signal</div>
-        <div class="rx-target" data-rx-target aria-hidden="true">
-          ${choice ? '<span class="rx-arrow" data-rx-arrow>→</span>' : '<span class="rx-flash"><i></i></span>'}
+        <div class="rx-status-row">
+          <div class="rx-chamber__status" data-rx-status>Wait for the signal</div>
+          <div class="rx-chamber__status rx-chamber__status--reserve" aria-hidden="true">${t('Wait for the signal')}</div>
+          <div class="rx-chamber__status rx-chamber__status--reserve" aria-hidden="true">${t(choice ? 'Choose the matching side' : 'Respond now')}</div>
+        </div>
+        <div class="rx-stimulus">
+          <div class="rx-target" data-rx-target aria-hidden="true">
+            ${choice ? '<span class="rx-arrow" data-rx-arrow>→</span>' : '<span class="rx-flash"><i></i></span>'}
+          </div>
+          <div class="rx-feedback" data-rx-feedback aria-live="polite"></div>
         </div>
         ${
           choice
@@ -317,7 +324,6 @@ function renderRunner() {
                 <span>${state.session.inputMode === 'keyboard' ? 'press space' : 'tap chamber'}</span>
               </button>`
         }
-        <div class="rx-feedback" data-rx-feedback aria-live="polite"></div>
       </div>
       <footer class="rx-runner__footer">
         <span>Respond only after the signal</span><span>${state.session.inputMode === 'pointer' ? 'Touch / pointer' : 'Keyboard'} timing</span>

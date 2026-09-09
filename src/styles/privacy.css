@@ -168,7 +168,7 @@
 }
 
 .privacy-summary h2 {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 1.4rem;
   letter-spacing: -0.02em;
   margin: 0;
@@ -210,7 +210,7 @@
 }
 
 .privacy-section h2 {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: clamp(1.75rem, 3vw, 2.5rem);
   letter-spacing: -0.035em;
   line-height: 1;

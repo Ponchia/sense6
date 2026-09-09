@@ -242,7 +242,7 @@
 }
 
 .test-card h3 {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 2rem;
   letter-spacing: -0.03em;
   margin: 1.5rem 0 0.6rem;

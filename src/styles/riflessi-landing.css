@@ -46,6 +46,15 @@ body.rx-running > .ui-sitefooter {
   text-wrap: balance;
 }
 
+.rx-brief h1,
+.rx-setup h1,
+.rx-results__hero h1,
+.rx-transition h1 {
+  font-family: var(--sans);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.12;
+}
+
 .rx-hero h1 {
   font-size: clamp(4rem, 7.5vw, 8rem);
 }
@@ -307,7 +316,7 @@ body.rx-running > .ui-sitefooter {
 }
 
 .rx-instrument-list h3 {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 2rem;
   margin: 0.35rem 0 0.75rem;
 }

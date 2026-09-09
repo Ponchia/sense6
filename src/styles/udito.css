@@ -67,6 +67,15 @@
   text-wrap: balance;
 }
 
+.au-setup h1,
+.au-brief h1,
+.au-transition h1,
+.au-results__hero h1 {
+  font-family: var(--sans);
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.12;
+}
+
 .au-hero h1 {
   font-size: clamp(4rem, 7.5vw, 8rem);
 }
@@ -334,7 +343,7 @@
 }
 
 .au-instrument-list h3 {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 2rem;
   margin: 0.5rem 0;
 }
@@ -574,7 +583,7 @@
 .au-setup__rules > strong {
   color: var(--accent-text);
   display: block;
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: clamp(4.5rem, 9vw, 8rem);
   letter-spacing: -0.07em;
   line-height: 1;
@@ -773,7 +782,7 @@
 }
 
 .au-listening__status {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: clamp(1.8rem, 4vw, 3.5rem);
   margin: 0;
   min-block-size: 1.2em;
@@ -950,7 +959,7 @@
 }
 
 .au-results__stamp strong {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 2.2rem;
 }
 
@@ -986,7 +995,7 @@
 
 .au-metric > div span {
   color: var(--accent-text);
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: 1.25rem;
 }
 
@@ -1036,7 +1045,7 @@
 }
 
 .au-context-grid > article h2 {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: clamp(1.8rem, 3vw, 2.7rem);
   margin: 0.7rem 0 1.5rem;
 }
@@ -1053,7 +1062,7 @@
 }
 
 .au-results__safety strong {
-  font-family: var(--display);
+  font-family: var(--sans);
   font-size: clamp(1.7rem, 3vw, 2.5rem);
 }
 
