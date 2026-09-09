@@ -26,7 +26,9 @@ const ORIGIN = SITE_ORIGIN;
 const template = await readFile(join(DIST, 'index.html'), 'utf8');
 const builtAssets = await readdir(join(DIST, 'assets'));
 const routeStyles = indexRouteStyles(builtAssets);
-const criticalDisplayFont = findCriticalDisplayFont(builtAssets);
+const criticalDisplayFonts = new Map(
+  [400, 700, 800].map((weight) => [weight, findCriticalDisplayFont(builtAssets, weight)]),
+);
 const canonicalPaths = [{ path: '/', lastModified: CONTENT_DATES.site }];
 const examById = new Map(EXAMS.map((definition) => [definition.id, definition]));
 const catalogs = new Map(
@@ -209,7 +211,7 @@ async function writePage(relativePath, page) {
   html = replaceChecked(
     html,
     '</head>',
-    `    ${metadata.indexable ? '' : '<meta name="robots" content="noindex">\n    '}${displayFontPreload(page.locale)}${modulePreloads}<link rel="stylesheet" crossorigin href="/assets/${page.stylesheet}">\n    ${page.alternates}\n    <script type="application/ld+json">${json}</script>\n  </head>`,
+    `    ${metadata.indexable ? '' : '<meta name="robots" content="noindex">\n    '}${displayFontPreload(page.locale, page.route)}${modulePreloads}<link rel="stylesheet" crossorigin href="/assets/${page.stylesheet}">\n    ${page.alternates}\n    <script type="application/ld+json">${json}</script>\n  </head>`,
     'head insertion point',
   );
   html = replaceChecked(
@@ -223,9 +225,17 @@ async function writePage(relativePath, page) {
   await writeFile(output, html);
 }
 
-function displayFontPreload(locale) {
+function displayFontPreload(locale, route) {
   if (['ar', 'hi', 'ja', 'ko', 'zh-hans'].includes(locale)) return '';
-  return `<link rel="preload" href="/assets/${criticalDisplayFont}" as="font" type="font/woff2" crossorigin media="not (prefers-reduced-data: reduce)">\n    `;
+  // Udito's hydrated hero uses regular and bold Doto, while its static entry
+  // and shell use 800. Discover all three before the hydration/font reflow.
+  const weights = route === 'udito' ? [400, 700, 800] : [800];
+  return weights
+    .map(
+      (weight) =>
+        `<link rel="preload" href="/assets/${criticalDisplayFonts.get(weight)}" as="font" type="font/woff2" crossorigin media="not (prefers-reduced-data: reduce)">\n    `,
+    )
+    .join('');
 }
 
 function indexRouteStyles(assets) {
@@ -242,10 +252,11 @@ function indexRouteStyles(assets) {
   );
 }
 
-function findCriticalDisplayFont(assets) {
-  const matches = assets.filter((asset) => /^doto-800-.+\.woff2$/.test(asset));
+function findCriticalDisplayFont(assets, weight) {
+  const pattern = new RegExp(`^doto-${weight}-.+\\.woff2$`);
+  const matches = assets.filter((asset) => pattern.test(asset));
   if (matches.length !== 1) {
-    throw new Error(`Expected one generated Doto 800 font, found ${matches.length}`);
+    throw new Error(`Expected one generated Doto ${weight} font, found ${matches.length}`);
   }
   return matches[0];
 }
