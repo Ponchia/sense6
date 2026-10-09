@@ -15,6 +15,15 @@ The localized [About page](https://sense6.net/en/about/) explains how the tasks
 work, who maintains them, their privacy boundary, and what each result can and
 cannot describe.
 
+The English [Learn section](https://sense6.net/en/learn/) answers research
+questions beyond the experiments: [tetrachromacy and what an RGB screen can
+establish](https://sense6.net/en/tetrachromacy-guide/), and [reaction-time
+measurement in browsers](https://sense6.net/en/reaction-time-guide/).
+Both have cited sources, an author/review date and a link to a related
+experiment. No translated versions are published until review, so these guides
+do not advertise invented multilingual alternatives. Research informs their
+content but does not validate the Sense6 implementations.
+
 Live exams:
 
 - **Tetracromia / Screen Colour Lab** — three fixed-dose colour observations:

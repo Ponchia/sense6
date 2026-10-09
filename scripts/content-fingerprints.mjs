@@ -78,6 +78,7 @@ function contentDateKey(path) {
   const route = path.split('/').filter(Boolean)[1];
   if (!route) return 'site';
   if (route === 'about') return 'about';
+  if (['learn', 'tetrachromacy-guide', 'reaction-time-guide'].includes(route)) return 'learn';
   return EXAM_IDS.includes(route) ? `exams.${route}` : null;
 }
 
