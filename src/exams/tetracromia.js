@@ -636,6 +636,7 @@ function renderResults() {
             these observations is a population score, diagnosis, clinical screen, or evidence for
             tetrachromacy. A repeat is stored independently—Sense6 never pools runs or keeps a best.
           </p>
+          ${state.locale === 'en' ? '<p class="result-note__learn"><a class="ui-link" data-sense6-route="tetrachromacy-guide" href="/en/tetrachromacy-guide/">Why an RGB screen cannot confirm tetrachromacy →</a></p>' : ''}
         </div>
       </div>
 

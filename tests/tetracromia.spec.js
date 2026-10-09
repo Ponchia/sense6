@@ -274,6 +274,12 @@ test('a complete session produces honest, separate observations @pr-smoke', asyn
 
   const results = await new AxeBuilder({ page }).analyze();
   expect(results.violations).toEqual([]);
+  await expect(page.locator('.result-note__learn a')).toHaveAttribute('href', '/en/tetrachromacy-guide/');
+  await page.locator('.result-note__learn a').click();
+  await expect(page).toHaveURL(/\/en\/tetrachromacy-guide\/$/);
+  await expect(
+    page.getByRole('heading', { level: 1, name: /Can an online test detect tetrachromacy/i }),
+  ).toBeVisible();
 });
 
 test('storage failure leaves a persistent recovery alert instead of claiming the journal is durable', async ({
@@ -704,6 +710,7 @@ test('German landing and results reflow readably across narrow viewports', async
   await expect(page.locator('.results-head')).toContainText('Sitzung abgeschlossen');
   await expect(page.locator('.result-details')).toContainText('Kachelauswahl');
   await expect(page.locator('.result-details')).toContainText('Farbtonreihenfolge');
+  await expect(page.locator('.result-note__learn')).toHaveCount(0);
   await page
     .locator('.result-metric__head > strong')
     .nth(1)
