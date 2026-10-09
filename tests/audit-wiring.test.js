@@ -307,6 +307,40 @@ test('successful unchanged visual checks do not consume artifact storage', () =>
   assert.match(allWorkflows, /actions\/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7\.0\.1/);
 });
 
+test('PR smoke spans every instrument while production runs the full browser matrix', () => {
+  const verify = workflow('verify.yml');
+  assert.match(verify, /name: Verify representative browser journeys for pull requests/);
+  assert.ok(verify.includes('if: $' + '{{ !inputs.publish_production }}'));
+  assert.match(verify, /run: npm run test:pr-smoke/);
+  assert.match(verify, /name: Verify every browser project before production/);
+  assert.ok(verify.includes('if: $' + '{{ inputs.publish_production }}'));
+
+  const smokeCommand = packageJson.scripts['test:pr-smoke'];
+  for (const project of ['chromium', 'mobile', 'chromium-smoke', 'firefox', 'webkit']) {
+    assert.ok(smokeCommand.includes(`--project=${project}`));
+    assert.ok(verify.includes(`--project=${project}`), `production matrix missing ${project}`);
+  }
+  assert.match(smokeCommand, /--grep @pr-smoke/);
+  assert.match(smokeCommand, /--workers=1/);
+  assert.match(verify, /--workers=1/);
+
+  // The fast gate must not silently drop whole instruments or the built-
+  // artifact engine handover. Keep the selected journeys explicit in tests.
+  for (const name of [
+    'app',
+    'tetracromia',
+    'daltonia',
+    'riflessi',
+    'udito',
+    'acutezza',
+    'journal',
+    'cross-browser',
+  ]) {
+    const source = readFileSync(new URL(`${name}.spec.js`, import.meta.url), 'utf8');
+    assert.match(source, /test\('.*@pr-smoke'/, `${name} has no PR smoke journey`);
+  }
+});
+
 test('browser-matrix failures preserve uniquely named diagnostics', () => {
   const verify = workflow('verify.yml');
 

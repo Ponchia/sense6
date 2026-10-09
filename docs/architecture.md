@@ -166,11 +166,16 @@ indexed lookups.
 Values crossing browser and storage boundaries still require runtime
 validation.
 
-CI runs browser projects first, then one release job creates `dist/`, stamps the
-commit in `build-meta.json`, writes and verifies a SHA-256 manifest, and audits
-the production site. When deployment is enabled, that same job publishes its
-verified working tree without rebuilding it. This keeps artifact identity exact
-without depending on account-wide artifact storage.
+CI runs the named representative browser suite for same-repository pull
+requests, covering the five instruments, routing, journal, and artifact
+handover. A push to `main` runs the complete Chromium/mobile/Firefox/WebKit
+matrix before a releasable artifact is created. Visual comparison, Lighthouse
+budgets, and the non-browser release checks remain hard gates in both cases.
+The release job creates `dist/`, stamps the commit in `build-meta.json`,
+writes and verifies a SHA-256 manifest, and audits the built site.
+Only a main-branch release publishes that verified working tree without
+rebuilding it. This keeps artifact identity exact without depending on
+account-wide artifact storage.
 
 After a trusted production publication, one Chromium journey loads the deployed
 JavaScript, enters a real experiment setup, blocks metric POST requests, checks
@@ -230,11 +235,14 @@ Keep those route ownership boundaries when expanding either experiment.
 
 ## Delivery environments
 
-Every pull request passes the browser matrix and complete release gate with
-read-only repository access and without deployment credentials. Pull-request
-preview publication remains disabled until an operator provides an isolated,
-protected preview environment and a default-branch-owned publication workflow
-that never runs pull-request-controlled code.
+Same-repository pull requests run representative browser checks plus the
+complete non-browser, visual, Lighthouse and artifact verification gate, with
+read-only repository access. The complete browser matrix gates production
+`main` only. All jobs run on netcup ARC `arc-vps-sense6` (managed via
+`vps-infra`); fork pull requests cannot reach it.
+Pull-request preview publication remains disabled until an operator provides
+an isolated, protected preview environment and a default-branch-owned
+publication workflow that never runs pull-request-controlled code.
 
 Production remains `https://sense6.net`. Both the client and the Pages Function
 require that exact origin before writing an anonymous metric, so Pages project
