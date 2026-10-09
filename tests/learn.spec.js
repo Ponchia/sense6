@@ -25,7 +25,7 @@ test('the Learn page links to original research guides and returns to the lab @p
   );
   await page.locator('.learn-experiment a').click();
   await expect(page).toHaveURL(/\/en\/tetracromia\/$/);
-  await expect(page.locator('h1')).toContainText('Screen Colour Lab');
+  await expect(page.locator('h1')).toContainText('Tetracromia');
 });
 
 test('reaction guide explains hardware delay without short-circuiting consent @pr-smoke', async ({
