@@ -5,7 +5,12 @@ import { learnMarkup, learnMetadata, learnPage } from '../src/learn.js';
 import { LEARN_ROUTES } from '../src/routes.js';
 
 test('English-only guides have original substantive answers, methods and references', () => {
-  assert.deepEqual(LEARN_ROUTES, ['learn', 'tetrachromacy-guide', 'reaction-time-guide']);
+  assert.deepEqual(LEARN_ROUTES, [
+    'learn',
+    'tetrachromacy-guide',
+    'reaction-time-guide',
+    'color-blindness-guide',
+  ]);
   const descriptions = new Set();
   for (const route of LEARN_ROUTES) {
     const meta = learnMetadata(route);
@@ -40,9 +45,11 @@ test('English-only guides have original substantive answers, methods and referen
 test('independent published research never claims validation of Sense6', () => {
   const tetra = learnPage('tetrachromacy-guide');
   const timing = learnPage('reaction-time-guide');
+  const colourVision = learnPage('color-blindness-guide');
   assert.match(tetra.summary, /No ordinary RGB-screen test can demonstrate/);
   assert.match(timing.summary, /not an instrument-calibrated measurement/);
-  for (const article of [tetra, timing]) {
+  assert.match(colourVision.summary, /cannot, by itself, confirm or rule out/);
+  for (const article of [tetra, timing, colourVision]) {
     assert.equal(article.facts.length, 3);
     assert.ok(article.sections.length >= 4);
     assert.ok(article.sections.every((section) => section.paragraphs.length >= 2));
@@ -57,6 +64,8 @@ test('independent published research never claims validation of Sense6', () => {
   assert.match(tetraHTML, /not a device calibration/);
   assert.match(tetraHTML, /href="\/en\/tetracromia\/"/);
   assert.match(learnMarkup('reaction-time-guide'), /href="\/en\/riflessi\/\?scope=signal"/);
+  assert.match(learnMarkup('color-blindness-guide'), /href="\/en\/color-blindness\/"/);
+  assert.match(learnMarkup('color-blindness-guide'), /National Eye Institute/);
   assert.equal(learnMetadata('wrong-guide'), null);
   assert.throws(() => learnMarkup('wrong-guide'), /Unknown/);
 });

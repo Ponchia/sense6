@@ -206,6 +206,13 @@ test('the Daltonia experiment renders adaptive targets and reports non-clinical 
 
   const resultScan = await new AxeBuilder({ page }).analyze();
   expect(resultScan.violations).toEqual([]);
+  await expect(page.locator('.cb-result-note__learn a')).toHaveAttribute(
+    'href',
+    '/en/color-blindness-guide/',
+  );
+  await page.locator('.cb-result-note__learn a').click();
+  await expect(page).toHaveURL(/\/en\/color-blindness-guide\/$/);
+  await expect(page.getByRole('heading', { level: 1, name: /online colour-blindness test/i })).toBeVisible();
 });
 
 test('Daltonia rejects pre-paint and duplicate measured responses', async ({ page }) => {
@@ -380,6 +387,7 @@ test('real passing results explain adaptive levels and control evidence at every
     '3 von 3 geplanten Kontrollen mit kontrastreicher Lücke wurden richtig beantwortet.',
   );
   await expect(page.locator('.result-note')).toContainText('weder bestätigen noch ausschließen');
+  await expect(page.locator('.cb-result-note__learn')).toHaveCount(0);
 
   const resultScan = await new AxeBuilder({ page }).analyze();
   expect(resultScan.violations).toEqual([]);

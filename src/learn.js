@@ -25,7 +25,7 @@ export function learnMetadata(route) {
 }
 
 /**
- * All three pages use the same renderer for HTML generation and runtime.
+ * All Learn pages use the same renderer for HTML generation and runtime.
  * Static HTML is adopted intact on initial hydration, not swapped or rewritten.
  * @param {{app: HTMLElement, locale: string}} context
  * @param {string} route
@@ -59,7 +59,7 @@ function overviewMarkup() {
         <p class="learn-hero__date">By <a href="${CREATOR_PROFILE_URL}" rel="me noreferrer">Zeno</a> · Reviewed ${esc(page.updated)}</p>
       </header>
       <section aria-labelledby="learn-topics" class="learn-topics">
-        <div class="learn-section-heading"><p class="ui-eyebrow">Start with a question</p><h2 id="learn-topics">Two useful starting points</h2></div>
+        <div class="learn-section-heading"><p class="ui-eyebrow">Start with a question</p><h2 id="learn-topics">Questions worth exploring</h2></div>
         <div class="learn-topic-grid">
           ${Object.entries(content.articles)
             .map(

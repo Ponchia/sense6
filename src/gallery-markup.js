@@ -94,7 +94,7 @@ export function galleryMarkup({ exams, locale, localeHref, m, t }) {
           <p class="ui-eyebrow">Perception, explained</p>
           <h2 id="gallery-learn-heading">Go beyond the test.</h2>
         </div>
-        <p>What can a screen reveal about colour vision? How much of a reaction time belongs to your device? Two research-backed explanations, without diagnosis claims.</p>
+        <p>What can a screen reveal about colour vision? How much of a reaction time belongs to your device? Research-backed explanations, without diagnosis claims.</p>
       </header>
       <div class="gallery-learn__links">
         <a data-sense6-route="tetrachromacy-guide" href="/en/tetrachromacy-guide/">
@@ -105,6 +105,11 @@ export function galleryMarkup({ exams, locale, localeHref, m, t }) {
         <a data-sense6-route="reaction-time-guide" href="/en/reaction-time-guide/">
           <span class="ui-eyebrow">Reaction timing</span>
           <strong>How accurate is a reaction-time test in a browser?</strong>
+          <span class="gallery-learn__arrow" aria-hidden="true">Read →</span>
+        </a>
+        <a data-sense6-route="color-blindness-guide" href="/en/color-blindness-guide/">
+          <span class="ui-eyebrow">Colour-vision differences</span>
+          <strong>What can an online colour-blindness test tell you?</strong>
           <span class="gallery-learn__arrow" aria-hidden="true">Read →</span>
         </a>
       </div>

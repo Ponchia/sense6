@@ -16,3 +16,6 @@
 #
 #   en-tetracromia-desktop-chromium-linux.png  # new hero layout, PR #58
 #
+
+en-desktop-chromium-linux.png  # English gallery gains a third original research guide, laid out as three desktop cards
+en-mobile-chromium-linux.png   # English gallery gains the same third guide in the mobile stack

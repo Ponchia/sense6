@@ -1,5 +1,10 @@
 // The field-guide pages are original English content, not translated routes.
-export const LEARN_ROUTES = Object.freeze(['learn', 'tetrachromacy-guide', 'reaction-time-guide']);
+export const LEARN_ROUTES = Object.freeze([
+  'learn',
+  'tetrachromacy-guide',
+  'reaction-time-guide',
+  'color-blindness-guide',
+]);
 export const UTILITY_ROUTES = Object.freeze(['about', 'journal', 'privacy']);
 export const NON_INDEXABLE_ROUTES = Object.freeze(['journal', 'privacy']);
 export const STATIC_ADOPTED_ROUTES = Object.freeze(['', 'about', 'privacy', ...LEARN_ROUTES]);

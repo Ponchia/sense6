@@ -89,6 +89,7 @@ function routeModuleEntry(route) {
   if (route === 'about') return 'src/about.js';
   if (route === 'journal') return 'src/journal.js';
   if (route === 'privacy') return 'src/privacy.js';
-  if (['learn', 'tetrachromacy-guide', 'reaction-time-guide'].includes(route)) return 'src/learn.js';
+  if (['learn', 'tetrachromacy-guide', 'reaction-time-guide', 'color-blindness-guide'].includes(route))
+    return 'src/learn.js';
   return `src/exams/${route}.js`;
 }
