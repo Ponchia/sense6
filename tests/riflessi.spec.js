@@ -83,6 +83,12 @@ test('Riflessi signal scope ends independently without placeholder instruments @
   expect(copied).not.toContain('Choice median:');
   expect(copied).not.toContain('Sustained median:');
   expect(copied).not.toContain('wrong choices');
+  await expect(page.locator('.rx-limit__learn')).toHaveAttribute('href', '/en/reaction-time-guide/');
+  await page.locator('.rx-limit__learn').click();
+  await expect(page).toHaveURL(/\/en\/reaction-time-guide\/$/);
+  await expect(
+    page.getByRole('heading', { level: 1, name: /How accurate is a reaction-time test/i }),
+  ).toBeVisible();
 });
 
 test('Riflessi keeps storage failure visible and prioritizes copying the unsaved result', async ({
@@ -489,8 +495,9 @@ test('German Riflessi stages localize generated runner labels', async ({ page },
   await respondWithKey(page, 'Space');
 
   await expect(page.locator('.rx-results')).toBeVisible();
-  await expect(page.locator('.rx-results__hero h1')).toContainText('Ihre Reaktion hat');
+  await expect(page.locator('.rx-results__hero h1')).toContainText('Typische Signalreaktion');
   await expect(page.locator('.rx-results__stamp')).toContainText('Durchlauf nutzbar');
+  await expect(page.locator('.rx-limit__learn')).toHaveCount(0);
   await expect(page.locator('.rx-metric')).toContainText('Typische Signalreaktion');
   await expect(page.locator('.rx-metric > p')).toContainText(
     /Median aus 2 sauberen einfachen Reaktionen von 2 geplanten Ereignissen/,

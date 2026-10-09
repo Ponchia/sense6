@@ -850,11 +850,15 @@ html[dir="rtl"] .rx-progress i {
   padding-block: clamp(2rem, 5vw, 3.5rem);
 }
 
-/* biome-ignore lint/style/noDescendingSpecificity: Route splitting preserves this established cascade. */
-.rx-limit p:last-child {
+.rx-limit > p:not(.ui-eyebrow) {
   color: var(--text-dim);
   line-height: 1.7;
   max-inline-size: 60rem;
+}
+
+.rx-limit__learn {
+  display: inline-flex;
+  margin-block-start: 1rem;
 }
 
 @media (max-width: 900px) {

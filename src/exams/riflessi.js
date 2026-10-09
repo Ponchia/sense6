@@ -614,6 +614,7 @@ function renderResults() {
         <p class="ui-eyebrow">How to use this result</p>
         <h2>Compare conditions, not people.</h2>
         <p>Browser, display, keyboard, touchscreen, operating system, posture, and attention all remain in the numbers. Compare repeated runs only on the same device and input. Riflessi does not assess concussion, driving fitness, fatigue, neurological health, or a population percentile.</p>
+        ${state.locale === 'en' ? '<a class="ui-link rx-limit__learn" data-sense6-route="reaction-time-guide" href="/en/reaction-time-guide/">Understand browser reaction timing →</a>' : ''}
       </aside>
 
       <div class="ui-cluster rx-results__actions"></div>
