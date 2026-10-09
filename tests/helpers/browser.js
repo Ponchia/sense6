@@ -144,10 +144,15 @@ const QUICK_ACUTEZZA = {
   },
 };
 
-export async function installQuickRiflessi(page) {
-  await page.addInitScript((configuration) => {
-    window.__SENSE6_TEST_CONFIG__ = configuration;
-  }, QUICK_RIFLESSI);
+export async function installQuickRiflessi(page, { stabilityDurationMs = 550 } = {}) {
+  await page.addInitScript(
+    ({ configuration, stabilityDurationMs }) => {
+      // This configuration is used only in dev-server browser tests.
+      configuration.riflessi.stability.durationMs = stabilityDurationMs;
+      window.__SENSE6_TEST_CONFIG__ = configuration;
+    },
+    { configuration: QUICK_RIFLESSI, stabilityDurationMs },
+  );
 }
 
 export async function installQuickUdito(page) {
