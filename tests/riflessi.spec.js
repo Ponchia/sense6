@@ -382,7 +382,9 @@ async function completeScopeWithGeometry(page, scope, label) {
   await expectScreenToReflow(page, `${label} sustained brief`);
   await page.getByRole('button', { name: /Start the 3-minute run/i }).click();
   await expectRunnerStageToFit(page, `${label} sustained runner`);
-  await respondWithKey(page, 'Space');
+  // The last instrument ends on a timer, even when Playwright is busy.
+  // Its response behaviour has separate tests; here verify the actual result.
+  await expect(page.locator('.rx-results')).toBeVisible();
 }
 
 test('Riflessi completes all three instruments and reports separate device-relative measures', async ({
@@ -445,7 +447,7 @@ test('production-length denominators remain readable on a 320px result screen', 
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'Single-browser long-copy geometry regression');
-  await installQuickRiflessi(page);
+  await installQuickRiflessi(page, { stabilityDurationMs: 2_000 });
   await page.addInitScript(() => {
     window.__SENSE6_TEST_CONFIG__.riflessi.signal.scoredTrials = 20;
     window.__SENSE6_TEST_CONFIG__.riflessi.choice.scoredTrials = 32;
@@ -875,14 +877,18 @@ test('copied limited summaries retain quality, interruptions, and wrong-choice c
   expect(copied).toContain('4 wrong choices');
 });
 
-test('all Riflessi scopes reflow through real results at the audited mobile layouts', async ({
-  page,
-}, testInfo) => {
-  test.setTimeout(60_000);
-  test.skip(testInfo.project.name !== 'chromium', 'Runs the explicit mobile and text-scale matrix');
-  await installQuickRiflessi(page);
-
-  for (const layout of AUDITED_LAYOUTS) {
+// Each viewport owns its deadline and failure trace instead of sharing
+// a single 60-second budget across six complete measurement journeys.
+for (const layout of AUDITED_LAYOUTS) {
+  // Keep one complete, high-zoom geometry journey in the fast PR gate so this
+  // failure mode cannot hide until the full production browser matrix.
+  const smokeTag = layout.textScale ? ' @pr-smoke' : '';
+  test(`Riflessi ${layout.label} reaches measured ${layout.scope} results with readable layout${smokeTag}`, async ({
+    page,
+  }, testInfo) => {
+    test.setTimeout(45_000);
+    test.skip(testInfo.project.name !== 'chromium', 'Runs the explicit mobile and text-scale matrix');
+    await installQuickRiflessi(page, { stabilityDurationMs: 2_000 });
     await page.setViewportSize(layout.viewport);
     await page.goto('/en/riflessi/');
     if (layout.textScale) {
@@ -925,5 +931,5 @@ test('all Riflessi scopes reflow through real results at the audited mobile layo
         hitTest: true,
       });
     }
-  }
-});
+  });
+}
