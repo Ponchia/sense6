@@ -86,6 +86,34 @@ export function galleryMarkup({ exams, locale, localeHref, m, t }) {
     </section>
 
     ${
+      locale === 'en'
+        ? `
+    <section class="gallery-learn ui-container ui-container--wide" aria-labelledby="gallery-learn-heading">
+      <header class="gallery-heading">
+        <div>
+          <p class="ui-eyebrow">Perception, explained</p>
+          <h2 id="gallery-learn-heading">Go beyond the test.</h2>
+        </div>
+        <p>What can a screen reveal about colour vision? How much of a reaction time belongs to your device? Two research-backed explanations, without diagnosis claims.</p>
+      </header>
+      <div class="gallery-learn__links">
+        <a data-sense6-route="tetrachromacy-guide" href="/en/tetrachromacy-guide/">
+          <span class="ui-eyebrow">Colour vision</span>
+          <strong>Can an online test detect tetrachromacy?</strong>
+          <span class="gallery-learn__arrow" aria-hidden="true">Read →</span>
+        </a>
+        <a data-sense6-route="reaction-time-guide" href="/en/reaction-time-guide/">
+          <span class="ui-eyebrow">Reaction timing</span>
+          <strong>How accurate is a reaction-time test in a browser?</strong>
+          <span class="gallery-learn__arrow" aria-hidden="true">Read →</span>
+        </a>
+      </div>
+      <a class="ui-link gallery-learn__all" data-sense6-route="learn" href="/en/learn/">Browse the Learn section →</a>
+    </section>`
+        : ''
+    }
+
+    ${
       PLANNED.length
         ? `<section class="roadmap ui-container ui-container--wide" aria-labelledby="roadmap-title">
             <div class="roadmap__intro"><p class="ui-eyebrow">${t('Next in the lab')}</p><h2 id="roadmap-title">${t('More senses, same standard.')}</h2><p>${t('In development — visible here as direction, not as something you can start yet.')}</p></div>

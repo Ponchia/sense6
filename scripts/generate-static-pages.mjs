@@ -17,6 +17,7 @@ import { ROOT_GATEWAY, rootGatewayMarkup } from '../src/root-gateway.js';
 import { createRouteMetadata, SITE_ORIGIN, UTILITY_ROUTES } from '../src/routes.js';
 import { ENGLISH_EXPLAINER_COPY, STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
 import { recordContentFingerprint, verifyContentFingerprints } from './content-fingerprints.mjs';
+import { writeLearnPages } from './learn-pages.mjs';
 import { aboutData, examData, webpageData, websiteData } from './static-structured-data.mjs';
 import { activeRouteModuleFiles } from './vite-manifest.mjs';
 
@@ -170,6 +171,8 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
   });
 }
 
+await writeLearnPages({ writePage, canonicalPaths, routeStyles });
+
 await write404();
 await writeDiscoveryFiles();
 console.log(`Public-content freshness gate · ${await verifyContentFingerprints()} dated routes`);
@@ -239,7 +242,7 @@ function displayFontPreload(locale, route) {
 }
 
 function indexRouteStyles(assets) {
-  const routeNames = ['gallery', ...EXAMS.map(({ id }) => id), ...UTILITY_ROUTES];
+  const routeNames = ['gallery', 'learn', ...EXAMS.map(({ id }) => id), ...UTILITY_ROUTES];
   return new Map(
     routeNames.map((name) => {
       const pattern = new RegExp(`^${escapeRegExp(name)}-.+\\.css$`);
@@ -443,7 +446,7 @@ async function writeDiscoveryFiles() {
     .join('\n')}\n</urlset>\n`;
   await writeFile(join(DIST, 'sitemap.xml'), sitemap);
   await writeFile(join(DIST, 'robots.txt'), renderRobots(ORIGIN));
-  const llms = `# Sense6\n\nSense6 is a privacy-first collection of experimental, device-relative browser perception tests made for curiosity and fun. It is not validated, certified, diagnostic, or intended to become a medical product. Answers and results stay in the browser; the service stores only anonymous daily activity totals.\n\n## Main pages\n\n- [English test gallery](${ORIGIN}/en/)\n- [About Sense6 and its methodology](${ORIGIN}/en/about/)\n- [Private measurement journal](${ORIGIN}/en/journal/)\n- [Privacy notice](${ORIGIN}/en/privacy/)\n\n## Crawler policy\n\n${CRAWLER_POLICY.intent} The policy was reviewed on ${CRAWLER_POLICY.reviewedAt} and must be reviewed again by ${CRAWLER_POLICY.reviewBy}. robots.txt is advisory; llms.txt is a discovery aid, not an access-control mechanism.\n\n## Experiments\n\n${EXAMS.map(
+  const llms = `# Sense6\n\nSense6 is a privacy-first collection of experimental, device-relative browser perception tests made for curiosity and fun. It is not validated, certified, diagnostic, or intended to become a medical product. Answers and results stay in the browser; the service stores only anonymous daily activity totals.\n\n## Main pages\n\n- [English test gallery](${ORIGIN}/en/)\n- [Perception, explained — Learn](${ORIGIN}/en/learn/)\n- [Can an online test detect tetrachromacy?](${ORIGIN}/en/tetrachromacy-guide/)\n- [How accurate is browser reaction timing?](${ORIGIN}/en/reaction-time-guide/)\n- [About Sense6 and its methodology](${ORIGIN}/en/about/)\n- [Private measurement journal](${ORIGIN}/en/journal/)\n- [Privacy notice](${ORIGIN}/en/privacy/)\n\n## Crawler policy\n\n${CRAWLER_POLICY.intent} The policy was reviewed on ${CRAWLER_POLICY.reviewedAt} and must be reviewed again by ${CRAWLER_POLICY.reviewBy}. robots.txt is advisory; llms.txt is a discovery aid, not an access-control mechanism.\n\n## Experiments\n\n${EXAMS.map(
     (definition) =>
       `- [${definition.discoveryName ?? definition.name}](${ORIGIN}/en/${definition.route}/): ${definition.blurb} ${definition.limit}`,
   ).join(

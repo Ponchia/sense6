@@ -791,3 +791,62 @@
     overflow-wrap: anywhere;
   }
 }
+
+/* Hand-curated English research guides alongside the experiment gallery. */
+.gallery-learn {
+  padding-block: clamp(2.5rem, 6vw, 5rem);
+}
+
+.gallery-learn__links {
+  background: var(--line);
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.gallery-learn__links a {
+  background: var(--panel);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-inline-size: 0;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  text-decoration: none;
+}
+
+.gallery-learn__links a:hover {
+  background: var(--panel-strong);
+}
+
+.gallery-learn__links a:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+.gallery-learn__links strong {
+  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.gallery-learn__arrow {
+  color: var(--accent-text);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  margin-block-start: auto;
+  padding-block-start: 1rem;
+}
+
+.gallery-learn__all {
+  display: inline-flex;
+  margin-block-start: 1.4rem;
+}
+
+@media (max-width: 700px) {
+  .gallery-learn__links {
+    grid-template-columns: 1fr;
+  }
+}

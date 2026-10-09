@@ -161,8 +161,10 @@ independently.
   guidance changes.
 - Keep the About page, `llms.txt`, structured data, README, and experiment limits
   aligned with the permanent experimental boundary.
-- Keep the entry, per-route, and combined bundle budgets green. Split
-  Tetracromia CSS when the global entry approaches its 125 kB ceiling.
+- Keep the broader entry, per-route and combined bundle safety limits green.
+  Optimize or split code when a meaningful dependency, payload or measured
+  performance issue warrants it, rather than for trivial raw-byte changes.
+  Keep Lighthouse LCP, TBT and CLS thresholds strict.
 - Keep cognitive complexity at or below 28 and the large-file ceilings green.
   Extract a focused module instead of raising a ceiling without an explicit
   architecture decision.

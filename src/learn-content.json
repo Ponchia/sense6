@@ -1,0 +1,167 @@
+{
+  "overview": {
+    "title": "Perception, explained.",
+    "metaTitle": "Learn about perception and browser experiments | Sense6",
+    "description": "Short, research-backed explanations of colour vision and reaction time. Understand what a browser experiment can reveal—and what it cannot.",
+    "intro": "Curiosity deserves a useful answer. Explore the research behind colour and reaction timing, then try the related Sense6 experiments with their device limits in view.",
+    "boundary": "Sense6 is a recreational browser lab. These explanations and experiments are not diagnoses, clinical tests or proof of a biological trait.",
+    "updated": "9 October 2026"
+  },
+  "articles": {
+    "tetrachromacy-guide": {
+      "title": "Can an online test detect tetrachromacy?",
+      "eyebrow": "Colour vision · 7-minute read",
+      "metaTitle": "Can an online test detect tetrachromacy? | Sense6",
+      "description": "Why RGB screen tests cannot confirm tetrachromacy, what four-cone vision really means, and what colour-discrimination tasks can tell you instead.",
+      "updated": "9 October 2026",
+      "summary": "No ordinary RGB-screen test can demonstrate that you have four functioning dimensions of colour vision. A screen-controlled exercise can describe differences you distinguished on that screen, under those conditions. Establishing functional tetrachromacy is a different research question.",
+      "facts": [
+        {
+          "head": "The biological question",
+          "detail": "A fourth type of photopigment does not automatically mean four-dimensional colour perception."
+        },
+        {
+          "head": "The display question",
+          "detail": "An ordinary screen mixes three primaries. Its output is limited by the display and its calibration."
+        },
+        {
+          "head": "The Sense6 question",
+          "detail": "Can you discriminate certain colour differences in a short, screen-relative task?"
+        }
+      ],
+      "sections": [
+        {
+          "heading": "What tetrachromacy actually means",
+          "paragraphs": [
+            "Human colour vision typically begins with three classes of cone photoreceptors whose sensitivities overlap across the visible spectrum. Tetrachromacy concerns a possible fourth independent channel of colour discrimination—not simply being especially observant, naming more shades, or having a large vocabulary for colours.",
+            "Genetic variation can create additional cone photopigment classes in some people, especially carriers of certain X-linked colour-vision variants. But the neural visual system must also use that additional signal in a way that changes what a person can distinguish. More photopigments are not, by themselves, proof of a fourth perceptual dimension.",
+            "In their 2010 study, Jordan and colleagues tested candidates with several complementary tasks and genetic analyses. Only one of 24 obligate carriers of deuteranomaly showed tetrachromatic behaviour across their tests. This was careful evidence about particular participants and laboratory stimuli, not an internet screening rule."
+          ]
+        },
+        {
+          "heading": "Why a colourful image on your screen is not a fourth-cone test",
+          "paragraphs": [
+            "Most consumer displays generate visible colours by varying red, green and blue light-producing components. Different numerical RGB values can produce many shades, but the set of stimuli remains constrained by those display primaries, the device gamut, the operating system and the viewer's settings.",
+            "To establish an additional perceptual dimension, researchers need spectral stimuli and comparisons designed to separate responses that normally match for three-cone observers. A still image shown through ordinary RGB channels is not an equivalent instrument. Counting bands in a gradient or seeing a hidden number is not evidence of tetrachromacy.",
+            "The W3C CSS Color specification describes how browsers represent, convert and display colours within colour spaces. That engineering specification is useful for building reproducible on-screen tasks, but it does not calibrate your screen or reveal the biology of your eyes."
+          ]
+        },
+        {
+          "heading": "What a browser colour experiment can genuinely explore",
+          "paragraphs": [
+            "A well-described screen task can still be interesting: it can ask you to locate a colour difference, adjust difficulty after responses and record where an abbreviated track happened to finish. These observations depend on the current display, brightness, colour management, ambient light, fatigue and choices made during that run.",
+            "Sense6's Screen Colour Lab uses three short observations rather than claiming a single number that ranks colour vision. Its results are deliberately separate, local to the browser and not population thresholds. Repeating under similar lighting and screen conditions may tell you about variation in your own experience; it cannot establish an extra cone class.",
+            "If you are curious, try the task as an experiment in what your *screen and setup* let you distinguish. Do not use it to make medical, genetic or diagnostic decisions."
+          ]
+        },
+        {
+          "heading": "A better question to ask",
+          "paragraphs": [
+            "Instead of “Am I a tetrachromat?”, ask “Which colour differences could I reliably distinguish on this display today, and how did my responses change across a repeated task?” That narrower question has an honest answer within a recreational browser lab.",
+            "Further research about functional tetrachromacy would require dedicated stimuli, suitable comparison observers and scientific analysis well beyond an ordinary website. The studies below inform this explanation; none tested or validated the Sense6 implementation."
+          ]
+        }
+      ],
+      "experiment": {
+        "route": "tetracromia",
+        "title": "Try the Screen Colour Lab",
+        "hint": "Three separate screen-relative observations · about 4 minutes · no tetrachromacy diagnosis"
+      },
+      "sources": [
+        {
+          "role": "Primary human vision research",
+          "title": "Jordan, Deeb, Bosten & Mollon (2010) — The dimensionality of color vision in carriers of anomalous trichromacy",
+          "href": "https://doi.org/10.1167/10.8.12"
+        },
+        {
+          "role": "Display engineering standard",
+          "title": "W3C CSS Color Module Level 4 — colour spaces, conversion and colour differences",
+          "href": "https://www.w3.org/TR/css-color-4/"
+        },
+        {
+          "role": "What Sense6 actually implements",
+          "title": "Sense6 Screen Colour Lab — methods, sources and limitations",
+          "href": "/en/tetracromia/"
+        }
+      ]
+    },
+    "reaction-time-guide": {
+      "title": "How accurate is a reaction-time test in a browser?",
+      "eyebrow": "Response timing · 6-minute read",
+      "metaTitle": "How accurate are browser reaction-time tests? | Sense6",
+      "description": "Understand stimulus display delay, keyboard and touch latency, response timing, medians and why two devices may give different reaction-time readings.",
+      "updated": "9 October 2026",
+      "summary": "Browser reaction-time results combine human response with display, software and input-device delays. A carefully designed web task can describe a run, but its milliseconds are not an instrument-calibrated measurement of pure human reflex speed.",
+      "facts": [
+        {
+          "head": "Display",
+          "detail": "A stimulus can be scheduled before its light reaches your eyes."
+        },
+        {
+          "head": "Response",
+          "detail": "Keys, touchscreens and operating systems contribute their own latency."
+        },
+        {
+          "head": "Interpretation",
+          "detail": "Repeated runs on one setup are easier to compare than scores from different devices."
+        }
+      ],
+      "sections": [
+        {
+          "heading": "What happens between a signal and the recorded answer?",
+          "paragraphs": [
+            "Imagine a circle changing colour and you pressing a key as soon as you see it. Several stages sit between the instruction to show the colour and the timestamp the page receives: the browser schedules rendering, the display refreshes, you perceive the change, you decide to respond, and the input hardware and operating system deliver an event.",
+            "A browser can use a monotonic clock and record events consistently within its own execution model. It still does not have a photodiode measuring the exact moment each pixel lit up or an external instrument measuring when your finger moved. The displayed time reflects the entire chain, including parts outside the page's control.",
+            "Touch input and keyboard input can differ. Background tabs, temporary focus loss, power saving, display refresh rate and performance interruptions can introduce additional variation. A result may therefore be useful as an observation without representing a universal biological constant."
+          ]
+        },
+        {
+          "heading": "What timing research tells us—and what it does not",
+          "paragraphs": [
+            "Bridges and colleagues compared the timing performance of multiple laboratory and online experiment tools using external measurement equipment. Anwyl-Irvine and colleagues likewise tested realistic combinations of online platforms, browsers and devices. Both bodies of work show why timing precision and accuracy depend on implementation and environment.",
+            "Those studies do not certify every website that uses browser APIs. In particular, they did not validate the specific stimulus onset, hardware setup or scoring of your current Sense6 session. They support care in reporting timing and checking for interruptions, not the claim that every displayed millisecond equals a calibrated reflex latency."
+          ]
+        },
+        {
+          "heading": "How to read a reaction-time result",
+          "paragraphs": [
+            "A single fastest response can be influenced by anticipation or chance. In a sequence of responses, a median summarizes the centre of the recorded observations without allowing one unusually slow event to dominate it. False starts, missed signals and interruptions matter too: a neat number can conceal a poor-quality run.",
+            "A simple response task and a choice task also ask different things. Reacting when a signal appears is not the same as deciding between left and right responses. Comparing those numbers may be interesting, but it does not isolate one mental process without stronger controls.",
+            "Keep both the observed value and its context: input mode, device, screen, interruptions and how much of the scheduled task was completed. If the conditions changed, any apparent improvement may be partly due to hardware rather than practice."
+          ]
+        },
+        {
+          "heading": "How to make your own comparisons less misleading",
+          "paragraphs": [
+            "Use the same device, input method and similar surroundings when repeating a run. Keep the tab visible, avoid distractions and allow practice to familiarize you with the response. If a run is marked limited or interrupted, treat it as information about that attempt rather than evidence you became slower.",
+            "Sense6 records the protocol scope and relevant setup in its local journal so it can distinguish comparable from incompatible runs. It does not upload individual response times or maintain a global leaderboard. Comparing yourself against an invented “average human score” would be much less defensible.",
+            "Start with the short Segnale scope if you want to see the mechanics. Its result is a browser-and-device-relative response observation—not a neurological assessment or medical clearance."
+          ]
+        }
+      ],
+      "experiment": {
+        "route": "riflessi",
+        "title": "Try the short reaction lab",
+        "href": "/en/riflessi/?scope=signal",
+        "hint": "Existing Segnale scope · about 2 minutes after setup · your responses stay in this browser"
+      },
+      "sources": [
+        {
+          "role": "Independent timing comparison",
+          "title": "Bridges, Pitiot, MacAskill & Peirce (2020) — The timing mega-study",
+          "href": "https://doi.org/10.7717/peerj.9414"
+        },
+        {
+          "role": "Browser/device timing research",
+          "title": "Anwyl-Irvine, Dalmaijer, Hodges & Evershed (2021) — Realistic precision and accuracy of online experiments",
+          "href": "https://doi.org/10.3758/s13428-020-01501-5"
+        },
+        {
+          "role": "What Sense6 actually implements",
+          "title": "Sense6 Riflessi — scopes, timing controls and limitations",
+          "href": "/en/riflessi/"
+        }
+      ]
+    }
+  }
+}
