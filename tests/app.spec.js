@@ -63,6 +63,69 @@ test('the gallery lists exams, is accessible, and routes into one @pr-smoke', as
   await expect(page.getByRole('heading', { name: /Find the gap in the dots/i })).toBeVisible();
 });
 
+test('the featured starter opens the short Riflessi setup without bypassing consent @pr-smoke', async ({
+  page,
+}) => {
+  await page.goto('/en/');
+  const starter = page.locator('[data-sense6-starter="riflessi-signal"]');
+  await expect(starter).toHaveAttribute('href', '/en/riflessi/?scope=signal');
+  await expect(starter).toHaveText(/Try a short reaction test/i);
+  await starter.click();
+  await expect(page).toHaveURL(/\/en\/riflessi\/\?scope=signal$/);
+  await expect(page.locator('[data-rx-scope-picker] [data-scope="signal"]')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(page.locator('[data-rx-scope-picker] [data-scope="complete"]')).toHaveAttribute(
+    'aria-pressed',
+    'false',
+  );
+  await expect(page.locator('[data-rx-consent]')).not.toBeChecked();
+  await expect(page.locator('[data-action="rx-start"]')).toBeDisabled();
+  await expect(page.locator('.rx-runner')).toHaveCount(0);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://sense6.net/en/riflessi/',
+  );
+
+  await page.goto('/en/riflessi/');
+  await expect(page.getByRole('button', { name: /Prepare the lab/i })).toBeVisible();
+  await expect(page.locator('[data-rx-scope-picker]')).toHaveCount(0);
+
+  await page.goto('/it/');
+  await expect(page.locator('[data-sense6-starter="riflessi-signal"]')).toHaveAttribute(
+    'href',
+    '/it/riflessi/?scope=signal',
+  );
+  await page.locator('[data-sense6-starter="riflessi-signal"]').click();
+  await expect(page).toHaveURL(/\/it\/riflessi\/\?scope=signal$/);
+  await expect(page.locator('[data-rx-scope-picker] [data-scope="signal"]')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(page.locator('[data-rx-consent]')).not.toBeChecked();
+});
+
+test('the first experiment action is visible without scrolling at common widths @pr-smoke', async ({
+  page,
+}) => {
+  for (const viewport of [
+    { width: 1280, height: 720 },
+    { width: 390, height: 844 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/en/');
+    await page.evaluate(async () => document.fonts.ready);
+    const starter = page.locator('[data-sense6-starter="riflessi-signal"]');
+    await expect(starter).toBeVisible();
+    const box = await starter.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box.y).toBeGreaterThanOrEqual(0);
+    expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  }
+});
+
 test('the root remains a self-canonical language gateway after JavaScript starts', async ({ page }) => {
   await page.goto('/');
 

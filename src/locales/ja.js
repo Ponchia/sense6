@@ -16,6 +16,7 @@ const rows = [
   ['All tests', 'すべてのテスト'],
   ['About', 'Sense6について'],
   ['How Sense6 works', 'Sense6の仕組み'],
+  ['Try a short reaction test', '短い反応速度テストを試す'],
   ['Source', 'ソース'],
   ['Sense6 — measure what your senses notice', 'Sense6 — 感覚が捉えるものを測る'],
   ['Measure what your', '感覚が捉える'],

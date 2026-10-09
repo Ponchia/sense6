@@ -16,6 +16,7 @@ const rows = [
   ['All tests', '所有测试'],
   ['About', '关于 Sense6'],
   ['How Sense6 works', 'Sense6 的工作原理'],
+  ['Try a short reaction test', '试试简短的反应速度测试'],
   ['Source', '来源'],
   ['Sense6 — measure what your senses notice', 'Sense6 — 测量你的感官所察觉的细节'],
   ['Measure what your', '测量你的感官'],

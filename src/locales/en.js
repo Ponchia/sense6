@@ -16,6 +16,7 @@ const rows = [
   ['All tests', 'All tests'],
   ['About', 'About'],
   ['How Sense6 works', 'How Sense6 works'],
+  ['Try a short reaction test', 'Try a short reaction test'],
   ['Source', 'Source'],
   ['Sense6 — measure what your senses notice', 'Sense6 — measure what your senses notice'],
   ['Measure what your', 'Measure what your'],

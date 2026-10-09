@@ -40,7 +40,10 @@ export function mount(context) {
     session: null,
     config: runtimeConfig(),
     selectedMode: window.matchMedia?.('(pointer: coarse)').matches ? 'pointer' : 'keyboard',
-    selectedScope: 'complete',
+    // A homepage deep link can preselect the existing short scope. The setup
+    // and explicit consent gate remain mandatory; no trial starts on arrival.
+    selectedScope:
+      new URLSearchParams(window.location.search).get('scope') === 'signal' ? 'signal' : 'complete',
     timeoutId: 0,
     deadlineId: 0,
     clockId: 0,
@@ -53,7 +56,8 @@ export function mount(context) {
   };
   state = mountState;
   wireEvents(lifecycle.signal);
-  renderIntro();
+  if (mountState.selectedScope === 'signal') renderSetup();
+  else renderIntro();
 
   lifecycle.onCleanup(() => {
     stopClocks();
