@@ -80,6 +80,7 @@ test('Learn pages are genuinely English-only and share one static/runtime render
   assert.match(english, /data-sense6-route="learn"/);
   assert.match(english, /href="\/en\/tetrachromacy-guide\/"/);
   assert.match(english, /href="\/en\/reaction-time-guide\/"/);
+  assert.match(english, /href="\/en\/color-blindness-guide\/"/);
   assert.doesNotMatch(german, /gallery-learn|href="\/en\/learn\/"/);
   for (const route of LEARN_ROUTES) {
     const html = await readFile(new URL(`en/${route}/index.html`, DIST), 'utf8');

@@ -17,9 +17,10 @@ cannot describe.
 
 The English [Learn section](https://sense6.net/en/learn/) answers research
 questions beyond the experiments: [tetrachromacy and what an RGB screen can
-establish](https://sense6.net/en/tetrachromacy-guide/), and [reaction-time
-measurement in browsers](https://sense6.net/en/reaction-time-guide/).
-Both have cited sources, an author/review date and a link to a related
+establish](https://sense6.net/en/tetrachromacy-guide/), [reaction-time
+measurement in browsers](https://sense6.net/en/reaction-time-guide/), and
+[what an online colour-blindness test can tell you](https://sense6.net/en/color-blindness-guide/).
+Each guide has cited sources, an author/review date and a link to a related
 experiment. No translated versions are published until review, so these guides
 do not advertise invented multilingual alternatives. Research informs their
 content but does not validate the Sense6 implementations.

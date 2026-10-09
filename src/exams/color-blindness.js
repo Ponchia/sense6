@@ -468,6 +468,7 @@ function renderResults() {
             CAD, Cambridge Colour Test, or a diagnosed cohort. These values cannot confirm or rule
             out a colour-vision deficiency. Compare repeat runs only on the same display and setup.
           </p>
+          ${state.locale === 'en' ? '<p class="cb-result-note__learn"><a class="ui-link" data-sense6-route="color-blindness-guide" href="/en/color-blindness-guide/">Understand what an online colour-vision result means →</a></p>' : ''}
         </div>
       </div>
 

@@ -437,6 +437,7 @@ test('the visual comparison covers a pinned set of representative routes', () =>
       '/',
       '/en/',
       '/en/learn/',
+      '/en/color-blindness-guide/',
       '/en/tetracromia/',
       '/en/color-blindness/',
       '/en/riflessi/',
@@ -455,8 +456,8 @@ test('the visual comparison covers a pinned set of representative routes', () =>
 });
 
 test('Lighthouse audits the indexable route set instead of penalizing deliberate noindex pages', () => {
-  assert.equal(SITE_ROUTES.length, 112);
-  assert.equal(SEARCH_ROUTES.length, 88);
+  assert.equal(SITE_ROUTES.length, 113);
+  assert.equal(SEARCH_ROUTES.length, 89);
   assert.ok(SEARCH_ROUTES.every((route) => !/\/(?:journal|privacy)\/$/.test(route)));
   assert.ok(SEARCH_REPRESENTATIVE_ROUTES.every((route) => SEARCH_ROUTES.includes(route)));
   assert.ok(!SEARCH_REPRESENTATIVE_ROUTES.includes('/en/journal/'));

@@ -375,14 +375,24 @@
   margin-block-start: 0.25rem;
 }
 
+.cb-active .results-head {
+  gap: clamp(1rem, 3vw, 2.5rem);
+  padding-block: clamp(1.5rem, 3vw, 3rem) 1.5rem;
+}
+
 .cb-active .results-head > div:first-child {
   min-inline-size: 0;
 }
 
 .cb-active .results-head h1 {
+  font-size: clamp(2.4rem, 5.25vw, 5.1rem);
   hyphens: auto;
   max-inline-size: 100%;
   overflow-wrap: anywhere;
+}
+
+.cb-result-note__learn {
+  margin-block: 1rem 0;
 }
 
 .cb-active .setup-panel #cb-start,
