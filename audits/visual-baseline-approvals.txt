@@ -16,6 +16,3 @@
 #
 #   en-tetracromia-desktop-chromium-linux.png  # new hero layout, PR #58
 #
-
-en-desktop-chromium-linux.png  # English gallery now links original Learn guides after the five experiments
-en-mobile-chromium-linux.png   # same intentional editorial discovery area at mobile width
