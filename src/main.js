@@ -8,7 +8,7 @@ import { disposeActiveMounts } from './lib/mount-registry.js';
 import { LOCALES } from './locales.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from './metrics.js';
 import { currentLocation, currentRoute, navigate, startRouter } from './router.js';
-import { applyRouteMetadata, createRouteMetadata, STATIC_ADOPTED_ROUTES } from './routes.js';
+import { applyRouteMetadata, createRouteMetadata, LEARN_ROUTES, STATIC_ADOPTED_ROUTES } from './routes.js';
 import { renderGallery } from './site.js';
 
 const appElement = document.querySelector('#app');
@@ -25,7 +25,9 @@ await initializeI18n({
       window.location.assign(localeHref('', nextLocale));
       return;
     }
-    navigate(currentRoute(), nextLocale);
+    // No translated guides: language switching leads to that locale's gallery.
+    const route = currentRoute();
+    navigate(LEARN_ROUTES.includes(route) ? '' : route, nextLocale);
   },
 });
 
@@ -89,56 +91,11 @@ async function renderRoute({ route, locale }) {
 
     let mountRoute;
     let metadata;
-    if (route === 'journal') {
-      const [{ renderJournal }, { journalCopy, prepareJournalCopy }] = await Promise.all([
-        import('./journal.js'),
-        import('./journal-copy.js'),
-        import('./styles/journal.css'),
-      ]);
-      await prepareJournalCopy(locale);
-      if (token !== renderToken) return;
-      const copy = journalCopy(locale);
-      mountRoute = () => renderJournal({ ...context(), exams: EXAMS });
-      metadata = createRouteMetadata({
-        locale,
-        route,
-        title: `${copy.title} | Sense6`,
-        description: copy.intro,
-        socialImageAlt: copy.intro,
-        indexable: false,
-      });
-    } else if (route === 'about') {
-      const [{ aboutCopy, renderAbout }] = await Promise.all([
-        import('./about.js'),
-        import('./styles/about.css'),
-      ]);
-      if (token !== renderToken) return;
-      const copy = aboutCopy(locale);
-      mountRoute = () => renderAbout(context());
-      metadata = createRouteMetadata({
-        locale,
-        route,
-        title: copy.pageTitle,
-        description: copy.description,
-        socialImageAlt: copy.description,
-      });
-    } else if (route === 'privacy') {
-      const [{ preparePrivacyCopy, privacyCopy, renderPrivacy }] = await Promise.all([
-        import('./privacy.js'),
-        import('./styles/privacy.css'),
-      ]);
-      await preparePrivacyCopy(locale);
-      if (token !== renderToken) return;
-      const copy = privacyCopy(locale);
-      mountRoute = () => renderPrivacy(context());
-      metadata = createRouteMetadata({
-        locale,
-        route,
-        title: `${copy.title} | Sense6`,
-        description: copy.intro,
-        socialImageAlt: copy.intro,
-        indexable: false,
-      });
+    if (['journal', 'about', 'privacy'].includes(route) || LEARN_ROUTES.includes(route)) {
+      const page = await prepareInformationalRoute(route, locale);
+      if (token !== renderToken || !page) return;
+      mountRoute = page.mountRoute;
+      metadata = page.metadata;
     } else if (EXAM_BY_ID.has(route)) {
       const definition = EXAM_BY_ID.get(route);
       const [exam, { examDescriptionSource }] = await Promise.all([
@@ -193,6 +150,91 @@ async function renderRoute({ route, locale }) {
   } catch (error) {
     if (token === renderToken) await renderRouteLoadFailure(error, route, token);
   }
+}
+
+/**
+ * Keep the route commit state machine small. Editorial and utility views load
+ * lazily, and their markup can be adopted without a flash after hydration.
+ */
+async function prepareInformationalRoute(route, locale) {
+  if (route === 'journal') {
+    const [{ renderJournal }, { journalCopy, prepareJournalCopy }] = await Promise.all([
+      import('./journal.js'),
+      import('./journal-copy.js'),
+      import('./styles/journal.css'),
+    ]);
+    await prepareJournalCopy(locale);
+    const copy = journalCopy(locale);
+    return {
+      mountRoute: () => renderJournal({ ...context(), exams: EXAMS }),
+      metadata: createRouteMetadata({
+        locale,
+        route,
+        title: `${copy.title} | Sense6`,
+        description: copy.intro,
+        socialImageAlt: copy.intro,
+        indexable: false,
+      }),
+    };
+  }
+  if (route === 'about') {
+    const [{ aboutCopy, renderAbout }] = await Promise.all([
+      import('./about.js'),
+      import('./styles/about.css'),
+    ]);
+    const copy = aboutCopy(locale);
+    return {
+      mountRoute: () => renderAbout(context()),
+      metadata: createRouteMetadata({
+        locale,
+        route,
+        title: copy.pageTitle,
+        description: copy.description,
+        socialImageAlt: copy.description,
+      }),
+    };
+  }
+  if (route === 'privacy') {
+    const [{ preparePrivacyCopy, privacyCopy, renderPrivacy }] = await Promise.all([
+      import('./privacy.js'),
+      import('./styles/privacy.css'),
+    ]);
+    await preparePrivacyCopy(locale);
+    const copy = privacyCopy(locale);
+    return {
+      mountRoute: () => renderPrivacy(context()),
+      metadata: createRouteMetadata({
+        locale,
+        route,
+        title: `${copy.title} | Sense6`,
+        description: copy.intro,
+        socialImageAlt: copy.intro,
+        indexable: false,
+      }),
+    };
+  }
+
+  if (locale !== 'en') {
+    // A route without a translated guide must not masquerade as translated.
+    navigate('', locale, { replace: true });
+    return null;
+  }
+  const [{ learnMetadata, renderLearn }] = await Promise.all([
+    import('./learn.js'),
+    import('./styles/learn.css'),
+  ]);
+  const page = learnMetadata(route);
+  if (!page) throw new Error('Unknown Learn guide');
+  return {
+    mountRoute: () => renderLearn(context(), route),
+    metadata: createRouteMetadata({
+      locale,
+      route,
+      title: page.title,
+      description: page.description,
+      socialImageAlt: page.socialImageAlt,
+    }),
+  };
 }
 
 async function routeLocaleAvailable(locale) {

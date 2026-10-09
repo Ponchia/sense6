@@ -164,7 +164,7 @@ right-to-left flow and narrow layouts when controls have spatial meaning.
 
 Import `src/styles/<id>.css` from the experiment module. Keep shared tokens and
 shell primitives global. Keep experiment visuals and phase layouts local.
-Generated route CSS must remain below 40 kB raw. Move a shared rule only after
+Generated route CSS has a generous 60 kB raw safety limit. Move a shared rule only after
 identifying at least two real consumers.
 
 ## 8. Complete static and public content

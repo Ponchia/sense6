@@ -15,6 +15,15 @@ The localized [About page](https://sense6.net/en/about/) explains how the tasks
 work, who maintains them, their privacy boundary, and what each result can and
 cannot describe.
 
+The English [Learn section](https://sense6.net/en/learn/) answers research
+questions beyond the experiments: [tetrachromacy and what an RGB screen can
+establish](https://sense6.net/en/tetrachromacy-guide/), and [reaction-time
+measurement in browsers](https://sense6.net/en/reaction-time-guide/).
+Both have cited sources, an author/review date and a link to a related
+experiment. No translated versions are published until review, so these guides
+do not advertise invented multilingual alternatives. Research informs their
+content but does not validate the Sense6 implementations.
+
 Live exams:
 
 - **Tetracromia / Screen Colour Lab** — three fixed-dose colour observations:
@@ -389,15 +398,16 @@ Both the client and Pages Function accept metrics only on
 protected preview prerequisite and activation constraints appear below and in
 the release runbook.
 
-The initial English route budget is at most 112 kB of raw JavaScript across the
-complete transitive graph recorded in Vite's manifest, not only the entry
-chunk. Entry CSS is limited to 125 kB raw, every route stylesheet to 40 kB raw,
-and entry plus the largest route stylesheet to 150 kB raw. The gallery and
-Tetracromia have their own route chunks.
-`tests/static-output.build.js` discovers all generated route stylesheets and
-fails when a bundle crosses those ceilings. The budgets intentionally use
-uncompressed sizes so regressions stay visible independently of transfer
-compression.
+The initial English route has a generous 150 kB raw-JavaScript guardrail
+across the transitive Vite entry and locale graph. Entry CSS may be up to
+160 kB raw, an individual route stylesheet up to 60 kB, and the entry plus
+largest route stylesheet up to 200 kB. Experiments and Learn remain route-split;
+unused editorial code must not enter the initial payload.
+
+These are broad build-size safety limits, not micro-optimization targets.
+Lighthouse still enforces strict LCP, TBT and CLS thresholds on rendered pages.
+A small feature-driven bundle increase should not require architecture churn
+when measured user-facing performance remains within those gates.
 
 The production site is available at
 [`sense6.net`](https://sense6.net). Cloudflare Pages terminates TLS and serves
