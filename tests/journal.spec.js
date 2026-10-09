@@ -70,7 +70,9 @@ test('the added locales render portable journal entries without fallback or over
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
-test('journal import previews every outcome and writes only after confirmation @pr-smoke', async ({ page }) => {
+test('journal import previews every outcome and writes only after confirmation @pr-smoke', async ({
+  page,
+}) => {
   await page.goto('/en/journal/');
   const before = await page.evaluate(() => localStorage.getItem('sense6:journal'));
   const source = JSON.stringify({
