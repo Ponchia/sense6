@@ -18,6 +18,7 @@
     "test:coverage": "c8 --clean --include='src/lib/*.js' --all --reporter=text --reporter=json-summary --reports-dir=coverage --check-coverage --lines=97 --branches=86 --functions=95 node --test tests/*.test.js && node scripts/check-coverage-report.mjs",
     "test:static": "node scripts/smoke-dist-freshness.mjs && node --test tests/static-output.build.js",
     "test:e2e": "playwright test",
+    "test:pr-smoke": "playwright test --project=chromium --project=mobile --project=chromium-smoke --project=firefox --project=webkit --grep @pr-smoke --workers=1",
     "test:deployed": "playwright test --config playwright.deployed.config.js",
     "test:deployed:local": "npm run build && npm run test:deployed",
     "test:html": "vnu --errors-only --skip-non-html dist",

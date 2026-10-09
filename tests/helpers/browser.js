@@ -98,20 +98,22 @@ const QUICK_RIFLESSI = {
       catchTrials: 0,
       minWaitMs: 12,
       maxWaitMs: 18,
-      responseTimeoutMs: 500,
+      // CI scheduling pauses can exceed 500ms on shared ARC workers.
+      // Only the accelerated fixture changes; production timings do not.
+      responseTimeoutMs: 2000,
     },
     choice: {
       practiceTrials: 2,
       scoredTrials: 4,
       minWaitMs: 12,
       maxWaitMs: 18,
-      responseTimeoutMs: 500,
+      responseTimeoutMs: 2000,
     },
     stability: {
       durationMs: 550,
       minWaitMs: 12,
       maxWaitMs: 18,
-      responseTimeoutMs: 300,
+      responseTimeoutMs: 1500,
     },
   },
 };

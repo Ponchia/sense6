@@ -282,7 +282,7 @@ test('Acutezza calibrates the display and reports separate non-clinical observat
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
-test('Acutezza focused scope omits the nominal-contrast condition', async ({ page }) => {
+test('Acutezza focused scope omits the nominal-contrast condition @pr-smoke', async ({ page }) => {
   await installQuickAcutezza(page);
   await page.goto('/en/acutezza/');
   await completeAcutezzaCalibration(page, { scope: 'focused' });
