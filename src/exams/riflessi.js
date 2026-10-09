@@ -571,10 +571,10 @@ function renderResults() {
       <header class="rx-results__hero">
         <div>
           <p class="ui-eyebrow">Riflessi / this run / this device</p>
-          <h1 tabindex="-1" data-rx-screen-title>Your response has <em>more than one dimension.</em></h1>
+          <h1 tabindex="-1" data-rx-screen-title>${includesChoice ? 'Your response has <em>more than one dimension.</em>' : t('Typical signal response')}</h1>
           <p>${result.usable ? t('The selected instruments captured enough clean responses for separate run-level observations.') : t('Several responses were interrupted or invalid. Treat the numbers as a partial run and repeat under steadier conditions.')}</p>
         </div>
-        <div class="rx-results__stamp ${result.usable ? '' : 'is-limited'}"><span>${result.usable ? 'Run usable' : 'Limited run'}</span><strong>${String(scopeInstrumentCount(state.session.scope)).padStart(2, '0')} / 03</strong></div>
+        <div class="rx-results__stamp ${result.usable ? '' : 'is-limited'}"><span>${t('Typical signal response')}</span><strong>${metric(result.signal.medianMs)}<small> ms</small></strong><span>${t(result.usable ? 'Run usable' : 'Limited run')}</span></div>
       </header>
 
       <div data-rx-persistence></div>
@@ -614,6 +614,7 @@ function renderResults() {
         <p class="ui-eyebrow">How to use this result</p>
         <h2>Compare conditions, not people.</h2>
         <p>Browser, display, keyboard, touchscreen, operating system, posture, and attention all remain in the numbers. Compare repeated runs only on the same device and input. Riflessi does not assess concussion, driving fitness, fatigue, neurological health, or a population percentile.</p>
+        ${state.locale === 'en' ? '<a class="ui-link rx-limit__learn" data-sense6-route="reaction-time-guide" href="/en/reaction-time-guide/">Understand browser reaction timing →</a>' : ''}
       </aside>
 
       <div class="ui-cluster rx-results__actions"></div>
