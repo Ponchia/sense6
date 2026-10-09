@@ -78,7 +78,7 @@ test('the Tetracromia setup reaches an enabled measured choice', async ({ page }
 test('a complete Screen Colour Lab journey reaches separate observations @pr-smoke', async ({ page }) => {
   test.setTimeout(60_000);
   await gotoHydrated(page, '/en/tetracromia/');
-  await page.locator('[data-action="setup"]').first().click();
+  await enterColorLabSetup(page);
   await page.locator('#screen-ready').check();
   await page.locator('[data-action="start"]').click();
   await answerTrials(page, 14);
@@ -108,7 +108,7 @@ test('completed results survive a throwing localStorage getter', async ({ page }
     });
   });
   await gotoHydrated(page, '/en/tetracromia/');
-  await page.locator('[data-action="setup"]').first().click();
+  await enterColorLabSetup(page);
   await page.locator('#screen-ready').check();
   await page.locator('[data-action="start"]').click();
   await answerTrials(page, 14);
@@ -125,7 +125,7 @@ test('completed results survive a throwing localStorage getter', async ({ page }
 
 test('a display resize invalidates an active Screen Colour Lab journey @pr-smoke', async ({ page }) => {
   await gotoHydrated(page, '/en/tetracromia/');
-  await page.locator('[data-action="setup"]').first().click();
+  await enterColorLabSetup(page);
   await page.locator('#screen-ready').check();
   await page.locator('[data-action="start"]').click();
   await expect(page.locator('[data-choice="0"]')).toBeEnabled();
@@ -133,6 +133,27 @@ test('a display resize invalidates an active Screen Colour Lab journey @pr-smoke
   await expect(page.locator('[data-tetracromia-invalidation]')).toContainText(/The display size changed/i);
   await expect(page.locator('[data-action="start"]')).toBeDisabled();
 });
+
+/**
+ * Firefox on an ARC runner can report a successful pointer click during
+ * first-route scroll/layout settling while the intro remains visible.
+ * Retry ONCE through the ordinary keyboard activation path only when
+ * setup did not open; never skip setup, consent, or any measured trial.
+ */
+async function enterColorLabSetup(page) {
+  const start = page.locator('[data-action="setup"]').first();
+  const ready = page.locator('#screen-ready');
+  await expect(start).toBeVisible();
+  await start.click();
+  if ((await ready.count()) === 0 && (await start.isVisible())) {
+    test.info().annotations.push({
+      type: 'setup-click-retry',
+      description: 'Intro persisted after pointer activation; retried the same setup via keyboard.',
+    });
+    await start.press('Enter');
+  }
+  await expect(ready).toBeVisible();
+}
 
 async function gotoHydrated(page, route) {
   await page.goto(route);

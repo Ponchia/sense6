@@ -19,3 +19,5 @@
 
 en-desktop-chromium-linux.png  # English gallery gains a third original research guide, laid out as three desktop cards
 en-mobile-chromium-linux.png   # English gallery gains the same third guide in the mobile stack
+en-learn-desktop-chromium-linux.png  # Three original Learn guides now form an evenly sized desktop row
+en-learn-mobile-chromium-linux.png   # Mobile Learn list gains the third research guide
