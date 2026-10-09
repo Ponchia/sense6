@@ -190,16 +190,18 @@ alerts as failures and keeps reviewed static-site exceptions in
 `.zap-rules.tsv`. It runs the pinned ZAP container directly, so a security
 result does not depend on account-wide artifact storage.
 
-Raw bundle ceilings are:
+Raw bundle safety ceilings are intentionally generous:
 
-- initial JavaScript: 110 kB;
-- entry CSS: 125 kB;
-- each route style sheet: 40 kB; and
-- entry CSS plus the largest route style sheet: 150 kB.
+- initial JavaScript: 150 kB;
+- entry CSS: 160 kB;
+- each route stylesheet: 60 kB; and
+- entry CSS plus the largest route stylesheet: 200 kB.
 
-The static-output test traverses the Vite manifest for the full initial locale
-graph, discovers generated route style sheets instead of keeping a filename
-allowlist, and verifies the Cloudflare headers and function-routing contract.
+These guard against runaway growth rather than forcing refactors for small
+changes. Lighthouse still strictly enforces LCP/TBT/CLS on rendered pages.
+The static-output test traverses the Vite manifest for the initial locale
+graph, verifies lazy route splitting, discovers stylesheets automatically,
+and checks Cloudflare headers and function-routing contracts.
 
 ## Known pressure points
 
