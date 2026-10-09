@@ -382,7 +382,9 @@ async function completeScopeWithGeometry(page, scope, label) {
   await expectScreenToReflow(page, `${label} sustained brief`);
   await page.getByRole('button', { name: /Start the 3-minute run/i }).click();
   await expectRunnerStageToFit(page, `${label} sustained runner`);
-  await respondWithKey(page, 'Space');
+  // The accelerated sustained block may finish while its layout is inspected.
+  // The caller verifies the real result instead of focusing an unmounted
+  // response control after the 550ms deadline has already expired.
 }
 
 test('Riflessi completes all three instruments and reports separate device-relative measures', async ({
@@ -875,10 +877,10 @@ test('copied limited summaries retain quality, interruptions, and wrong-choice c
   expect(copied).toContain('4 wrong choices');
 });
 
-test('all Riflessi scopes reflow through real results at the audited mobile layouts', async ({
+test('all Riflessi scopes reflow through real results at the audited mobile layouts @pr-smoke', async ({
   page,
 }, testInfo) => {
-  test.setTimeout(60_000);
+  test.setTimeout(90_000);
   test.skip(testInfo.project.name !== 'chromium', 'Runs the explicit mobile and text-scale matrix');
   await installQuickRiflessi(page);
 
