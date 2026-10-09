@@ -16,6 +16,7 @@ const rows = [
   ['All tests', '모든 테스트'],
   ['About', 'Sense6 소개'],
   ['How Sense6 works', 'Sense6 작동 방식'],
+  ['Try a short reaction test', '짧은 반응 속도 테스트 해보기'],
   ['Source', '소스 코드'],
   ['Sense6 — measure what your senses notice', 'Sense6 — 감각이 알아차리는 차이를 측정하세요'],
   ['Measure what your', '감각이 알아차리는'],

@@ -40,8 +40,17 @@ export function galleryMarkup({ exams, locale, localeHref, m, t }) {
         <p class="gallery-hero__boundary">
           ${m('boundary.recreational')}
         </p>
+        <div class="gallery-hero__starter">
+          <div class="gallery-hero__starter-copy">
+            <p class="ui-eyebrow">${t('Riflessi — Reaction Time Lab')}</p>
+            <p>${t('about 2 minutes')}</p>
+          </div>
+          <a class="ui-button gallery-hero__starter-link" data-sense6-starter="riflessi-signal" href="${localeHref('riflessi')}?scope=signal">
+            ${t('Try a short reaction test')} <span aria-hidden="true">→</span>
+          </a>
+        </div>
         <div class="gallery-hero__actions">
-          <a class="ui-button" href="#tests">${m('nav.allTests')} <span aria-hidden="true">↓</span></a>
+          <a class="ui-link" href="#tests">${m('nav.allTests')} <span aria-hidden="true">↓</span></a>
           <a class="ui-link gallery-hero__about" data-sense6-route="about" href="${localeHref('about')}">
             ${t('How Sense6 works')} <span aria-hidden="true">→</span>
           </a>

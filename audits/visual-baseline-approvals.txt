@@ -16,3 +16,6 @@
 #
 #   en-tetracromia-desktop-chromium-linux.png  # new hero layout, PR #58
 #
+
+en-desktop-chromium-linux.png  # intentional featured starter action and compact homepage, growth pilot Oct 2026
+en-mobile-chromium-linux.png   # mobile hides decorative wheel to expose the usable starter

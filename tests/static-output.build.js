@@ -49,6 +49,26 @@ const expectedSitemapPaths = [
   ]),
 ];
 
+test('every localized static gallery features the same short Riflessi entry without inventing a new route', async () => {
+  for (const { code } of LOCALES) {
+    const html = await readFile(new URL(`${code}/index.html`, DIST), 'utf8');
+    const messages = await loadMessages(code);
+    const starterCopy = messages.get('Try a short reaction test');
+    assert.ok(starterCopy, `${code} has no translation for the starter`);
+    if (code !== 'en') assert.notEqual(starterCopy, 'Try a short reaction test');
+    assert.ok(html.includes(escapeHtml(starterCopy)), `${code} lacks localized action copy`);
+    assert.ok(
+      html.includes(`href="/${code}/riflessi/?scope=signal"`),
+      `${code} lacks a direct link to the existing signal scope`,
+    );
+    assert.equal(
+      (html.match(/data-sense6-starter="riflessi-signal"/g) ?? []).length,
+      1,
+      `${code} should have one prominent starter action`,
+    );
+  }
+});
+
 test('every canonical route has substantive, localized raw HTML', async () => {
   const headers = await readFile(new URL('_headers', DIST), 'utf8');
   const titles = new Set();
