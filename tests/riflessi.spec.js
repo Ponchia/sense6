@@ -63,9 +63,14 @@ test('Riflessi signal scope ends independently without placeholder instruments @
   );
   for (let trial = 0; trial < total; trial += 1) await respondWithKey(page, 'Space');
 
-  await expect(page.getByRole('heading', { name: /more than one dimension/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Typical signal response' })).toBeVisible();
   await expect(page.locator('.rx-metric')).toHaveCount(1);
-  await expect(page.locator('.rx-results__stamp')).toContainText('01 / 03');
+  await expect(page.locator('.rx-results__stamp')).toContainText('Typical signal response');
+  await expect(page.locator('.rx-results__stamp strong')).toContainText(/ms$/);
+  await expect(page.locator('.rx-results__stamp span').last()).toHaveText(/^(Run usable|Limited run)$/);
+  expect((await page.locator('.rx-results__stamp strong').innerText()).replaceAll(/\s/g, '')).toBe(
+    (await page.locator('.rx-metric strong').first().innerText()).replaceAll(/\s/g, ''),
+  );
   await expect(page.getByText('Choice response', { exact: true })).toHaveCount(0);
   await expect(page.getByText('Wrong choices', { exact: true })).toHaveCount(0);
   await expectJournalEntry(page, 'riflessi');
