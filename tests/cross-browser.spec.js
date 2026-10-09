@@ -23,7 +23,9 @@ import { expect, test } from '@playwright/test';
 const chromiumOnly = (testInfo, reason) =>
   test.skip(testInfo.project.name !== 'chromium-smoke', `chromium-only: ${reason}`);
 
-test('every browser loads the pre-rendered page and hands it over to the bundle', async ({ page }) => {
+test('every browser loads the pre-rendered page and hands it over to the bundle @pr-smoke', async ({
+  page,
+}) => {
   // The suite runs against `dist` served by scripts/serve-deployed-smoke.mjs, so
   // this is the real pre-rendered document, the real hashed bundle, and the real
   // Content-Security-Policy. Under the Vite dev server this route fell back to
@@ -40,7 +42,11 @@ test('every browser loads the pre-rendered page and hands it over to the bundle'
 
   // Server-rendered content is present, then the bundle takes over and removes it.
   await expect(page.locator('main h1')).toBeVisible();
-  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'tetracromia');
+  // WebKit's first launch on a shared ARC runner can take longer than the
+  // default 5 seconds. Still require actual hydration of the production bundle.
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'tetracromia', {
+    timeout: 20_000,
+  });
   await expect(page.locator('#app > .static-entry')).toHaveCount(0);
 
   expect(await page.evaluate(() => window.__sense6CspViolations)).toEqual([]);
@@ -69,7 +75,7 @@ test('the Tetracromia setup reaches an enabled measured choice', async ({ page }
   await expect(page.locator('[data-choice="0"]')).toBeEnabled();
 });
 
-test('a complete Screen Colour Lab journey reaches separate observations', async ({ page }) => {
+test('a complete Screen Colour Lab journey reaches separate observations @pr-smoke', async ({ page }) => {
   test.setTimeout(60_000);
   await gotoHydrated(page, '/en/tetracromia/');
   await page.locator('[data-action="setup"]').first().click();
@@ -117,7 +123,7 @@ test('completed results survive a throwing localStorage getter', async ({ page }
   expect(pageErrors).toEqual([]);
 });
 
-test('a display resize invalidates an active Screen Colour Lab journey', async ({ page }) => {
+test('a display resize invalidates an active Screen Colour Lab journey @pr-smoke', async ({ page }) => {
   await gotoHydrated(page, '/en/tetracromia/');
   await page.locator('[data-action="setup"]').first().click();
   await page.locator('#screen-ready').check();

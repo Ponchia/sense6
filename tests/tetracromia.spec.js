@@ -235,7 +235,7 @@ test('a direct Tetracromia result applies the shared print contract without visi
   await expect(page.locator('.results-view')).toHaveCSS('padding-bottom', '0px');
 });
 
-test('a complete session produces honest, separate observations', async ({ page }) => {
+test('a complete session produces honest, separate observations @pr-smoke', async ({ page }) => {
   await page.goto('/en/tetracromia/');
   await page.getByRole('button', { name: /Begin the color lab/i }).click();
   await page.getByLabel(/I can distinguish the steps/i).check();

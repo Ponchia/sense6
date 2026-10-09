@@ -8,7 +8,7 @@ import { LOCALES, loadMessages } from '../src/locales.js';
 import { preparePrivacyCopy, privacyCopy } from '../src/privacy.js';
 import { expectInVisualViewport, expectNoHorizontalOverflow } from './helpers/browser.js';
 
-test('the gallery lists exams, is accessible, and routes into one', async ({ page }) => {
+test('the gallery lists exams, is accessible, and routes into one @pr-smoke', async ({ page }) => {
   await page.goto('/en/');
   await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
   await expect(page.locator('.brand')).toHaveText('Sense6');
@@ -79,7 +79,7 @@ test('the root remains a self-canonical language gateway after JavaScript starts
   await expect(page.locator('html')).toHaveAttribute('lang', 'fr');
 });
 
-test('SPA navigation commits complete canonical and social metadata for each active route', async ({
+test('SPA navigation commits complete canonical and social metadata for each active route @pr-smoke', async ({
   page,
 }) => {
   await page.goto('/en/');

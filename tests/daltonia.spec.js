@@ -124,7 +124,9 @@ async function trialGeometry(page) {
   });
 }
 
-test('the Daltonia experiment renders adaptive targets and reports non-clinical levels', async ({ page }) => {
+test('the Daltonia experiment renders adaptive targets and reports non-clinical levels @pr-smoke', async ({
+  page,
+}) => {
   await page.goto('/en/color-blindness/');
   await expect(page.getByRole('heading', { name: /Find the gap in the dots/i })).toBeVisible();
   await expect(page.getByText('Three staircases', { exact: true })).toBeVisible();

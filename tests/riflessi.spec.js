@@ -39,7 +39,9 @@ async function prepareRiflessi(page, mode = 'keyboard', scope = 'complete') {
   await page.getByRole('button', { name: /Begin selected scope/i }).click();
 }
 
-test('Riflessi signal scope ends independently without placeholder instruments', async ({ page }) => {
+test('Riflessi signal scope ends independently without placeholder instruments @pr-smoke', async ({
+  page,
+}) => {
   await installQuickRiflessi(page);
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'clipboard', {
@@ -108,7 +110,9 @@ test('Riflessi keeps storage failure visible and prioritizes copying the unsaved
   await expect(page.locator('.rx-results__actions .ui-button').first()).toContainText(/Copy result summary/i);
 });
 
-test('a settled Riflessi share cannot publish feedback after its mount is disposed', async ({ page }) => {
+test('a settled Riflessi share cannot publish feedback after its mount is disposed @pr-smoke', async ({
+  page,
+}) => {
   await installQuickRiflessi(page);
   await page.addInitScript(() => {
     Object.defineProperty(navigator, 'share', {

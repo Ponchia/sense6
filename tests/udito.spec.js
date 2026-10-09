@@ -141,7 +141,7 @@ test('an audio-output change stops an active Udito run at the setup boundary', a
   await expect(page.locator('[data-au-response]')).toHaveCount(0);
 });
 
-test('Udito focused scope ends after Portata and omits pitch placeholders', async ({ page }) => {
+test('Udito focused scope ends after Portata and omits pitch placeholders @pr-smoke', async ({ page }) => {
   await installQuickUdito(page);
   await page.goto('/en/udito/');
   await page.getByRole('button', { name: /Prepare the sound lab/i }).click();

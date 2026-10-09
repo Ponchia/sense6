@@ -319,8 +319,20 @@ Run the browser, accessibility, and responsive checks:
 npm run test:e2e
 ```
 
-The complete suite runs in desktop and mobile Chromium. Focused gallery,
-route-CSS, setup, and first-interaction journeys also run in Firefox and WebKit.
+The full suite runs in desktop and mobile Chromium; the artifact hydration,
+full Screen Colour Lab run, and display-invalidation checks also run in
+Firefox and WebKit.
+
+For a quicker representative browser pass, including all five instruments,
+route navigation, journal import, and the built-artifact handover, run:
+
+```sh
+npm run test:pr-smoke
+```
+
+The named `@pr-smoke` journeys are the browser gate for same-repository pull
+requests. The **complete** multi-browser suite still gates every production
+deployment from `main`; the fast pass does not authorize a publication.
 
 Run every gate:
 
@@ -358,8 +370,15 @@ production site audit. After the browser, visual, and Lighthouse gates pass,
 that release job deploys the checked working tree without rebuilding production
 output or depending on external artifact storage.
 
-Pull requests run that gate without deployment credentials or preview
-publication. Both the client and Pages Function accept metrics only on
+Same-repository pull requests run representative browser journeys, all
+non-browser release checks, visual regression, and Lighthouse budgets without
+deployment credentials or preview publication. A push to `main` runs the
+complete browser matrix as an additional hard prerequisite.
+All jobs use the `arc-vps-sense6` ARC scale set in the netcup cluster,
+managed by `vps-infra/cluster/gha-runner/`, rather than GitHub-hosted
+runners. External fork pull requests are denied access to that scale set.
+
+Both the client and Pages Function accept metrics only on
 `https://sense6.net`; Pages project URLs remain non-production origins. The
 protected preview prerequisite and activation constraints appear below and in
 the release runbook.
@@ -383,7 +402,7 @@ hostname and `www.sense6.net` redirect to the canonical domain through
 Cloudflare Single Redirect rules. Pages `_redirects` files cannot match source
 hostnames, so keep domain-level redirects in the corresponding Cloudflare zone.
 
-Pull requests run that gate with read-only repository access and without
+Pull requests run verification with read-only repository access and without
 deployment credentials. Pull-request preview publication is disabled. To
 activate it, first create and verify an isolated, protected preview environment,
 then add a default-branch-owned workflow that publishes only the verified
