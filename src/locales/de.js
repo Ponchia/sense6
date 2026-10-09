@@ -16,6 +16,7 @@ const rows = [
   ['All tests', 'Alle Tests'],
   ['About', 'Über Sense6'],
   ['How Sense6 works', 'So funktioniert Sense6'],
+  ['Try a short reaction test', 'Probiere einen kurzen Reaktionstest'],
   ['Source', 'Quellcode'],
   ['Sense6 — measure what your senses notice', 'Sense6 — messen, was Ihre Sinne wahrnehmen'],
   ['Measure what your', 'Messen, was Ihre'],

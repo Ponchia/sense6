@@ -33,6 +33,12 @@ Live exams:
   low-contrast conditions. It reports angular-gap estimates with 90% model
   intervals, never 20/20, a diagnosis, astigmatism, or a prescription.
 
+The gallery offers a short Riflessi starter at
+`/{locale}/riflessi/?scope=signal`. This link preselects the existing
+approximately two-minute Segnale scope and opens its normal setup; it never
+starts a timed run or bypasses device/input choice or explicit consent.
+The canonical experiment route and other scopes remain available.
+
 Read the [architecture overview](docs/architecture.md) before changing a
 cross-cutting boundary. To add an experiment, follow the
 [experiment extension guide](docs/adding-an-experiment.md). It covers the
