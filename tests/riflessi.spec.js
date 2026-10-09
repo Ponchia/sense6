@@ -919,9 +919,13 @@ for (const layout of AUDITED_LAYOUTS) {
     await expect(page.locator('.rx-metric')).toHaveCount(
       layout.scope === 'signal' ? 1 : layout.scope === 'signal-choice' ? 3 : 6,
     );
-    await expect(page.locator('.rx-results__stamp')).toContainText(
-      `${layout.scope === 'signal' ? '01' : layout.scope === 'signal-choice' ? '02' : '03'} / 03`,
-    );
+    await expect(page.locator('.rx-results__stamp')).toContainText(/ms/);
+    await expect(page.locator('.rx-results__stamp strong')).toContainText(/ms$/);
+    if (layout.scope === 'signal') {
+      await expect(page.getByRole('heading', { name: 'Typical signal response' })).toBeVisible();
+    } else {
+      await expect(page.getByRole('heading', { name: /more than one dimension/i })).toBeVisible();
+    }
     await expect(page.locator('.rx-limit')).toContainText(/does not assess/i);
     const resultActions = page.locator('.rx-results__actions button');
     for (let index = 0; index < (await resultActions.count()); index += 1) {

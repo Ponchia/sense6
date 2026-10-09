@@ -670,14 +670,14 @@ html[dir="rtl"] .rx-progress i {
   align-items: end;
   border-block-end: 1px solid var(--line);
   display: grid;
-  gap: clamp(2rem, 7vw, 7rem);
+  gap: clamp(1.25rem, 4vw, 3rem);
   grid-template-columns: 1fr auto;
-  padding-block: clamp(3rem, 8vw, 7rem);
+  padding-block: clamp(1.75rem, 4vw, 3.25rem);
 }
 
 .rx-results__hero h1 {
-  font-size: clamp(3.7rem, 7.5vw, 7.5rem);
-  max-inline-size: 12ch;
+  font-size: clamp(2.55rem, 5.5vw, 5.5rem);
+  max-inline-size: 17ch;
 }
 
 .rx-results__hero > div:first-child > p:last-child {
@@ -688,12 +688,14 @@ html[dir="rtl"] .rx-progress i {
 
 .rx-results__stamp {
   align-items: start;
+  gap: 0.5rem;
+  overflow-wrap: anywhere;
   aspect-ratio: 1;
   border: 1px solid var(--success);
   color: var(--success);
   display: flex;
   flex-direction: column;
-  inline-size: clamp(9rem, 15vw, 13rem);
+  inline-size: clamp(10rem, 17vw, 14rem);
   justify-content: space-between;
   padding: 1rem;
 }
@@ -712,7 +714,7 @@ html[dir="rtl"] .rx-progress i {
 
 .rx-results__stamp strong {
   font-family: var(--sans);
-  font-size: 2.25rem;
+  font-size: clamp(1.8rem, 3vw, 2.5rem);
 }
 
 .rx-persistence-status {
@@ -725,7 +727,7 @@ html[dir="rtl"] .rx-progress i {
   display: grid;
   gap: 1px;
   grid-template-columns: repeat(3, 1fr);
-  margin-block: clamp(3rem, 7vw, 5rem);
+  margin-block: clamp(1.5rem, 4vw, 3rem);
 }
 
 .rx-metric {
@@ -901,7 +903,7 @@ html[dir="rtl"] .rx-progress i {
   .rx-brief h1,
   .rx-setup h1,
   .rx-results__hero h1 {
-    font-size: clamp(3.3rem, 15vw, 5.3rem);
+    font-size: clamp(2.45rem, 9vw, 3.6rem);
   }
 
   .rx-hero__actions > *,
