@@ -317,8 +317,8 @@ test('PR smoke spans every instrument while production runs the full browser mat
 
   const smokeCommand = packageJson.scripts['test:pr-smoke'];
   for (const project of ['chromium', 'mobile', 'chromium-smoke', 'firefox', 'webkit']) {
-    assert.ok(smokeCommand.includes('--project=' + project));
-    assert.ok(verify.includes('--project=' + project), 'production matrix missing ' + project);
+    assert.ok(smokeCommand.includes(`--project=${project}`));
+    assert.ok(verify.includes(`--project=${project}`), `production matrix missing ${project}`);
   }
   assert.match(smokeCommand, /--grep @pr-smoke/);
   assert.match(smokeCommand, /--workers=1/);
@@ -327,11 +327,17 @@ test('PR smoke spans every instrument while production runs the full browser mat
   // The fast gate must not silently drop whole instruments or the built-
   // artifact engine handover. Keep the selected journeys explicit in tests.
   for (const name of [
-    'app', 'tetracromia', 'daltonia', 'riflessi', 'udito',
-    'acutezza', 'journal', 'cross-browser',
+    'app',
+    'tetracromia',
+    'daltonia',
+    'riflessi',
+    'udito',
+    'acutezza',
+    'journal',
+    'cross-browser',
   ]) {
-    const source = readFileSync(new URL(name + '.spec.js', import.meta.url), 'utf8');
-    assert.match(source, /test\('.*@pr-smoke'/, name + ' has no PR smoke journey');
+    const source = readFileSync(new URL(`${name}.spec.js`, import.meta.url), 'utf8');
+    assert.match(source, /test\('.*@pr-smoke'/, `${name} has no PR smoke journey`);
   }
 });
 

@@ -23,7 +23,9 @@ import { expect, test } from '@playwright/test';
 const chromiumOnly = (testInfo, reason) =>
   test.skip(testInfo.project.name !== 'chromium-smoke', `chromium-only: ${reason}`);
 
-test('every browser loads the pre-rendered page and hands it over to the bundle @pr-smoke', async ({ page }) => {
+test('every browser loads the pre-rendered page and hands it over to the bundle @pr-smoke', async ({
+  page,
+}) => {
   // The suite runs against `dist` served by scripts/serve-deployed-smoke.mjs, so
   // this is the real pre-rendered document, the real hashed bundle, and the real
   // Content-Security-Policy. Under the Vite dev server this route fell back to
