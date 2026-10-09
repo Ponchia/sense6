@@ -2,8 +2,8 @@
   "overview": {
     "title": "Perception, explained.",
     "metaTitle": "Learn about perception and browser experiments | Sense6",
-    "description": "Short, research-backed explanations of colour vision and reaction time. Understand what a browser experiment can reveal—and what it cannot.",
-    "intro": "Curiosity deserves a useful answer. Explore the research behind colour and reaction timing, then try the related Sense6 experiments with their device limits in view.",
+    "description": "Short, research-backed explanations of colour vision, colour-vision differences and reaction time. Learn what browser experiments can and cannot reveal.",
+    "intro": "Curiosity deserves a useful answer. Explore colour vision and reaction timing, learn how to interpret online tests, and try the related experiments with their device limits in view.",
     "boundary": "Sense6 is a recreational browser lab. These explanations and experiments are not diagnoses, clinical tests or proof of a biological trait.",
     "updated": "9 October 2026"
   },
@@ -160,6 +160,84 @@
           "role": "What Sense6 actually implements",
           "title": "Sense6 Riflessi — scopes, timing controls and limitations",
           "href": "/en/riflessi/"
+        }
+      ]
+    },
+    "color-blindness-guide": {
+      "title": "What can an online colour-blindness test tell you?",
+      "eyebrow": "Colour-vision differences · 6-minute read",
+      "metaTitle": "What Can an Online Colour Blindness Test Tell You? | Sense6",
+      "description": "Learn what online colour-vision tasks can reveal, why screen calibration matters, and how they differ from professional colour-vision testing.",
+      "updated": "9 October 2026",
+      "summary": "An online colour-vision task can show which displayed differences you could distinguish during one run. It cannot, by itself, confirm or rule out a colour-vision deficiency, identify its clinical type, or replace an eye professional's evaluation.",
+      "facts": [
+        {
+          "head": "A display-relative result",
+          "detail": "The colours reaching your eyes depend on the screen, software, brightness, filters and surroundings."
+        },
+        {
+          "head": "Different kinds of tasks",
+          "detail": "Recognising numbers in dot plates, matching lights and finding a gap among dots test related but different abilities."
+        },
+        {
+          "head": "A separate clinical question",
+          "detail": "Only an appropriately administered and interpreted professional assessment can address diagnosis or a clinical classification."
+        }
+      ],
+      "sections": [
+        {
+          "heading": "What is colour-vision deficiency?",
+          "paragraphs": [
+            "Colour-vision deficiency means having difficulty distinguishing some colour differences that many other observers can distinguish. Different types affect different regions or directions of colour perception. It is often inherited, but some acquired eye or health conditions can also affect colour vision.",
+            "The phrase “colour blindness” is familiar, but it can be misleading: most affected people still see many colours. A particular screen result cannot establish whether someone has a deficiency or which biological mechanism might explain it. The National Eye Institute recommends talking to an eye doctor if you or your child are concerned about colour vision.",
+            "A surprising online result is therefore a reason to ask a better question, not a diagnosis. It may reflect an actual perceptual difference, the device and environment, misunderstanding the instructions or ordinary variation between attempts."
+          ]
+        },
+        {
+          "heading": "Why online tests and clinical tests are different",
+          "paragraphs": [
+            "Clinicians may use colour plates made of coloured dots, hue-arrangement tasks and—in selected cases—specialist instruments such as an anomaloscope. These are different instruments with different intended interpretations. In a clinical setting, their administration and results can be checked together by a trained professional.",
+            "A browser cannot assume that its requested colour values are exactly the colours coming from your screen. Display gamut, colour management, brightness, night-light filters, ambient lighting and visual adaptation can all change the stimulus. Photographs or screenshots of printed colour plates add another uncontrolled transformation.",
+            "The National Eye Institute describes professional colour plate, anomaloscope and hue tests. That guidance does not establish that any web page reproducing a similar image has the same diagnostic performance. A result from a consumer screen should not be described as a clinical screening classification."
+          ]
+        },
+        {
+          "heading": "Why noise, gap choices and control trials matter",
+          "paragraphs": [
+            "Some research instruments deliberately mix colour differences with varying dot brightness so that participants cannot solve the task simply by following an obvious luminance edge. In 1994, Regan, Reffin and Mollon described a computer-controlled colour-discrimination method with luminance noise and masking contours. Their laboratory test helped distinguish patterns of colour sensitivity under controlled conditions.",
+            "Daltonia borrows ideas from that family of psychophysical tasks: a C-shaped gap sits inside a field of noisy dots, and three separately sampled display-colour directions adapt during the run. It is not an Ishihara plate, the Cambridge Colour Test, or a certified reproduction of either. A published source about the design principle does not validate the Sense6 task.",
+            "The easiest high-contrast presentations serve as task controls: they help show whether you understood and could perform the gap response. Controls and misses affect how cautiously to read the adaptive results. Passing them does not prove normal colour vision; missing them does not diagnose any deficiency."
+          ]
+        },
+        {
+          "heading": "How to read a Sense6 Daltonia result",
+          "paragraphs": [
+            "Daltonia reports the ending adaptive level of each short, independent on-screen track. Whatever numerical level the task reports, it is not a universal ranking of your eyes: the scale belongs to the stimulus model and current display. A run with few reversals or a boundary reached at the easiest or hardest level is especially limited.",
+            "The result also reports high-contrast control responses, bounds and track evidence. Read that context before comparing runs. If you repeat the task, keep the same device, filters, lighting and approximate viewing conditions, and treat any differences as run observations rather than a stable biological trend.",
+            "Sense6 stores completed runs locally in your browser's journal, with setup information intended to prevent incompatible comparisons. It does not upload your answers or classify you against a population. If a colour-vision concern affects daily life or an occupational decision, seek an appropriate professional assessment instead of relying on a recreational web result."
+          ]
+        }
+      ],
+      "experiment": {
+        "route": "color-blindness",
+        "title": "Explore Daltonia's colour-discrimination task",
+        "hint": "Three separate adaptive display directions · about 3 minutes plus setup · not a diagnosis"
+      },
+      "sources": [
+        {
+          "role": "Clinical testing guidance",
+          "title": "U.S. National Eye Institute — Testing for Color Vision Deficiency",
+          "href": "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/color-blindness/testing-color-vision-deficiency"
+        },
+        {
+          "role": "Independent laboratory method",
+          "title": "Regan, Reffin & Mollon (1994) — Luminance noise and the rapid determination of discrimination ellipses",
+          "href": "https://doi.org/10.1016/0042-6989(94)90203-8"
+        },
+        {
+          "role": "What Sense6 actually implements",
+          "title": "Sense6 Daltonia — adaptive tracks, controls and evidence boundaries",
+          "href": "/en/color-blindness/"
         }
       ]
     }

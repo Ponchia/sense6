@@ -802,7 +802,7 @@
   border: 1px solid var(--line);
   display: grid;
   gap: 1px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .gallery-learn__links a {
@@ -826,7 +826,7 @@
 }
 
 .gallery-learn__links strong {
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
+  font-size: clamp(1.3rem, 2vw, 1.85rem);
   letter-spacing: -0.035em;
   line-height: 1.15;
   text-wrap: balance;
@@ -843,6 +843,12 @@
 .gallery-learn__all {
   display: inline-flex;
   margin-block-start: 1.4rem;
+}
+
+@media (max-width: 1050px) and (min-width: 701px) {
+  .gallery-learn__links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 700px) {

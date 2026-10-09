@@ -7,7 +7,7 @@
   "/ar/": {
     "key": "site",
     "date": "2026-10-09",
-    "hash": "457c6082f4021d33717b109e7c6225e0"
+    "hash": "4319b4155de545303e0341f774405bfe"
   },
   "/ar/about/": {
     "key": "about",
@@ -42,7 +42,7 @@
   "/de/": {
     "key": "site",
     "date": "2026-10-09",
-    "hash": "198e1185160ad3c36009d35d470f64f7"
+    "hash": "b688382965fabfa10f023cd8bc587228"
   },
   "/de/about/": {
     "key": "about",
@@ -77,7 +77,7 @@
   "/en/": {
     "key": "site",
     "date": "2026-10-09",
-    "hash": "3f6b2775f8c816a3b37232a4deddd193"
+    "hash": "bbab41e70465198a0fd2135d61d30664"
   },
   "/en/about/": {
     "key": "about",
@@ -89,15 +89,35 @@
     "date": "2026-09-01",
     "hash": "308e7bf10fcb21d52544675efc924d91"
   },
+  "/en/color-blindness-guide/": {
+    "key": "learn",
+    "date": "2026-10-09",
+    "hash": "d73658aa63dd3fd9d85a11c1e7b125e3"
+  },
   "/en/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-09-01",
     "hash": "f72916a62a87f64d96beaba6f07120f2"
   },
+  "/en/learn/": {
+    "key": "learn",
+    "date": "2026-10-09",
+    "hash": "5ac8b0f5b585ba356f200eb7e650ca4e"
+  },
+  "/en/reaction-time-guide/": {
+    "key": "learn",
+    "date": "2026-10-09",
+    "hash": "1f87df836236c9218b8027b44f7d99d7"
+  },
   "/en/riflessi/": {
     "key": "exams.riflessi",
     "date": "2026-09-01",
     "hash": "1e248606be5a269b28f7c4bf39472ab4"
+  },
+  "/en/tetrachromacy-guide/": {
+    "key": "learn",
+    "date": "2026-10-09",
+    "hash": "4ad9c1191b634ed27871d4ea59d5c6fb"
   },
   "/en/tetracromia/": {
     "key": "exams.tetracromia",
@@ -112,7 +132,7 @@
   "/es/": {
     "key": "site",
     "date": "2026-10-09",
-    "hash": "4e3fdb6460d4b0a7eec34a37b954fe1f"
+    "hash": "a000d088768c68d6ff815ca95d04177b"
   },
   "/es/about/": {
     "key": "about",
@@ -147,7 +167,7 @@
   "/fr/": {
     "key": "site",
     "date": "2026-10-09",
-    "hash": "1a190080b9a5c3dfac2c8be1bb13a55d"
+    "hash": "4abdf870140446cbbb9490f23aee5af4"
   },
   "/fr/about/": {
     "key": "about",
@@ -182,7 +202,7 @@
   "/hi/": {
     "key": "site",
     "date": "2026-10-09",
-    "hash": "9e3cb0244f78acd653d3691df786581c"
+    "hash": "60e202f4079fbd194603b73804196e4c"
   },
   "/hi/about/": {
     "key": "about",
@@ -217,7 +237,7 @@
   "/it/": {
     "key": "site",
     "date": "2026-10-09",
-    "hash": "75491c2f10c687eaf3942ec5a94cdc7d"
+    "hash": "62d022dad47f5c0cd338dd9adfaf89e6"
   },
   "/it/about/": {
     "key": "about",
@@ -252,7 +272,7 @@
   "/ja/": {
     "key": "site",
     "date": "2026-10-09",
-    "hash": "aea585a17794f0c2c7132ed418c4f484"
+    "hash": "2c55231cc01dab67c59ba26a8c230007"
   },
   "/ja/about/": {
     "key": "about",
@@ -287,7 +307,7 @@
   "/ko/": {
     "key": "site",
     "date": "2026-10-09",
-    "hash": "17a6bfe2f88bb1d9f1b79958917c3aab"
+    "hash": "a7e47a0c1e020f8d21381306839d0b92"
   },
   "/ko/about/": {
     "key": "about",
@@ -322,7 +342,7 @@
   "/pt-br/": {
     "key": "site",
     "date": "2026-10-09",
-    "hash": "17f00c4e5ea86ef76aef838285dd3181"
+    "hash": "75df3e4fc0527a7e0bf1f911a399921a"
   },
   "/pt-br/about/": {
     "key": "about",
@@ -357,7 +377,7 @@
   "/pt/": {
     "key": "site",
     "date": "2026-10-09",
-    "hash": "9f74ea34a7d5ef04c4bbad5030706bac"
+    "hash": "3005e0bcde3ae163d7be6eb68f6bbdeb"
   },
   "/pt/about/": {
     "key": "about",
@@ -392,7 +412,7 @@
   "/zh-hans/": {
     "key": "site",
     "date": "2026-10-09",
-    "hash": "2e692263da4bfd23589cbdc7e9f13dce"
+    "hash": "1babcfcfd4a399ebc37d00ed215a68ef"
   },
   "/zh-hans/about/": {
     "key": "about",
