@@ -905,7 +905,10 @@ html[dir="rtl"] .rx-progress i {
 
   .rx-hero h1,
   .rx-brief h1,
-  .rx-setup h1,
+  .rx-setup h1 {
+    font-size: clamp(3.3rem, 15vw, 5.3rem);
+  }
+
   .rx-results__hero h1 {
     font-size: clamp(2.45rem, 9vw, 3.6rem);
   }
