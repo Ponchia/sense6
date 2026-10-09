@@ -369,12 +369,27 @@
   inline-size: 0.65rem;
 }
 
+/* Keep the separate observations closer to the top of the finished run. */
+.results-head {
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  padding-block: clamp(1.5rem, 3vw, 2.75rem) 1.5rem;
+}
+
+.results-head h1 {
+  font-size: clamp(2.5rem, 5vw, 5.25rem);
+  max-inline-size: 15ch;
+}
+
+.result-note__learn {
+  margin-block: 1.2rem 0;
+}
+
 .score-lockup {
   border-inline-start: 1px solid var(--line);
   display: grid;
   grid-template-columns: auto auto;
-  min-inline-size: 16rem;
-  padding-inline-start: 2rem;
+  min-inline-size: 12rem;
+  padding-inline-start: 1.5rem;
 }
 
 .score-lockup > span {
@@ -388,7 +403,7 @@
 
 .score-lockup strong {
   font-family: var(--display);
-  font-size: clamp(5rem, 9vw, 9rem);
+  font-size: clamp(3.25rem, 5vw, 5.25rem);
   letter-spacing: -0.08em;
   line-height: 0.85;
 }
@@ -626,7 +641,7 @@
   }
 
   .score-lockup strong {
-    font-size: clamp(4rem, 18vw, 7rem);
+    font-size: clamp(2.75rem, 13vw, 4.25rem);
   }
 
   .results-head h1 {
