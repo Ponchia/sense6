@@ -23,6 +23,8 @@
 #
 
 en-mobile-chromium-linux.png  # compact visual previews make all five experiments easier to browse on a phone
+en-color-blindness-guide-desktop-chromium-linux.png  # PR #107: section navigator and source links for research-guide reading on desktop
+en-color-blindness-guide-mobile-chromium-linux.png   # PR #107: accessible guide contents and contextual references increase mobile reading depth
 
 en-journal-desktop-chromium-linux.png  # empty private journal adds a discoverable short reaction starter
 en-journal-mobile-chromium-linux.png   # mobile empty journal shows the localized first-run action
