@@ -41,6 +41,7 @@ export function renderJournal(context) {
             <p class="ui-eyebrow">${escapeHtml(copy.eyebrow)}</p>
             <h1>${escapeHtml(copy.title)}</h1>
             <p>${escapeHtml(copy.intro)}</p>
+            ${!recoveryRequired && entries.length === 0 ? `<a class="ui-button journal-empty__starter journal-hero__starter" data-journal-starter href="${escapeAttribute(`${localeHref('riflessi')}?scope=signal`)}">${escapeHtml(t('Try a short reaction test'))} <span aria-hidden="true">→</span></a>` : ''}
           </div>
           <aside class="ui-alert ui-alert--info"><div class="ui-alert__body"><p>${escapeHtml(copy.privacy)}</p><ul class="journal-export-disclosure">${JOURNAL_DISCLOSURE_KEYS.map((key) => `<li>${escapeHtml(copy.exportDisclosure[key])}</li>`).join('')}</ul></div></aside>
         </header>
@@ -60,11 +61,7 @@ export function renderJournal(context) {
             ? ''
             : visible.length
               ? `<div class="journal-list">${visible.map((entry) => entryMarkup(entry, entries, exams, copy, locale, localeHref, t)).join('')}</div>`
-              : emptyMarkup(copy, {
-                  firstRun: entries.length === 0,
-                  starterUrl: `${localeHref('riflessi')}?scope=signal`,
-                  starterText: t('Try a short reaction test'),
-                })
+              : emptyMarkup(copy)
         }
       </article>`;
   }
@@ -205,12 +202,8 @@ function filterOptions(exams, copy, selected, t) {
   ].join('');
 }
 
-function emptyMarkup(copy, { firstRun, starterUrl, starterText }) {
-  return `<section class="journal-empty"><p class="ui-eyebrow">0 ${escapeHtml(copy.entries)}</p><h2>${escapeHtml(copy.emptyTitle)}</h2><p>${escapeHtml(copy.empty)}</p>${
-    firstRun
-      ? `<a class="ui-button journal-empty__starter" data-journal-starter href="${escapeAttribute(starterUrl)}">${escapeHtml(starterText)} <span aria-hidden="true">→</span></a>`
-      : ''
-  }</section>`;
+function emptyMarkup(copy) {
+  return `<section class="journal-empty"><p class="ui-eyebrow">0 ${escapeHtml(copy.entries)}</p><h2>${escapeHtml(copy.emptyTitle)}</h2><p>${escapeHtml(copy.empty)}</p></section>`;
 }
 
 function recoveryMarkup(journal, copy) {
