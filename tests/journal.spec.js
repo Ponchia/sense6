@@ -16,6 +16,50 @@ test.beforeEach(async ({ page }) => {
   }, storedJournal);
 });
 
+test('an empty journal invites a short experiment without bypassing consent @pr-smoke', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('/en/journal/');
+  const emptyJournal = JSON.stringify({ format: 'sense6-journal', schemaVersion: 1, entries: [] });
+  await page.evaluate((data) => {
+    sessionStorage.setItem('sense6:test-journal-override', data);
+  }, emptyJournal);
+  await page.reload();
+
+  await expect(page.locator('[data-journal-entry]')).toHaveCount(0);
+  await expect(page.locator('[data-journal-clear]')).toBeDisabled();
+  await expect(page.locator('[data-journal-export]')).toBeDisabled();
+  await expect(page.locator('[data-journal-import]')).toBeEnabled();
+
+  const starter = page.locator('[data-journal-starter]');
+  await expect(starter).toBeVisible();
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+    )
+    .toBe(true);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await expect(starter).toContainText('Try a short reaction test');
+  await expect(starter).toHaveAttribute('href', '/en/riflessi/?scope=signal');
+  expect(await starter.getAttribute('data-sense6-route')).toBeNull();
+
+  await starter.click();
+  await expect(page).toHaveURL(/\/en\/riflessi\/\?scope=signal$/);
+  await expect(page.locator('[data-rx-scope-picker] [data-scope="signal"]')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(page.locator('[data-rx-consent]')).not.toBeChecked();
+  await expect(page.locator('[data-action="rx-start"]')).toBeDisabled();
+
+  await page.goto('/it/journal/');
+  const italianStarter = page.locator('[data-journal-starter]');
+  await expect(italianStarter).toContainText('Prova un breve test di reazione');
+  await expect(italianStarter).toHaveAttribute('href', '/it/riflessi/?scope=signal');
+  await italianStarter.click();
+  await expect(page).toHaveURL(/\/it\/riflessi\/\?scope=signal$/);
+  await expect(page.locator('[data-rx-consent]')).not.toBeChecked();
+});
+
 test('the local journal compares, filters, exports, and deletes runs accessibly', async ({ page }) => {
   await page.goto('/en/journal/');
   await expect(page.getByRole('heading', { name: 'Your private measurement journal' })).toBeVisible();
@@ -32,6 +76,8 @@ test('the local journal compares, filters, exports, and deletes runs accessibly'
 
   await page.getByLabel('Show instrument').selectOption('udito');
   await expect(page.getByRole('heading', { name: 'No recorded runs yet' })).toBeVisible();
+  await expect(page.locator('[data-journal-starter]')).toHaveCount(0);
+  await expect(page.locator('[data-journal-clear]')).toBeEnabled();
   await page.getByLabel('Show instrument').selectOption('all');
 
   page.once('dialog', (dialog) => dialog.accept());

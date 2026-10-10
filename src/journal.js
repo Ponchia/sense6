@@ -49,12 +49,22 @@ export function renderJournal(context) {
           <div class="ui-cluster">
             <button class="ui-button ui-button--ghost" type="button" data-journal-export${entries.length ? '' : ' disabled'}>${escapeHtml(copy.export)}</button>
             <label class="ui-button ui-button--ghost journal-import"${recoveryRequired ? ' aria-disabled="true"' : ''}>${escapeHtml(copy.import)}<input type="file" accept="application/json,.json" data-journal-import${recoveryRequired ? ' disabled' : ''}></label>
-            <button class="ui-button ui-button--subtle" type="button" data-journal-clear${recoveryRequired ? ' disabled' : ''}>${escapeHtml(copy.deleteAll)}</button>
+            <button class="ui-button ui-button--subtle" type="button" data-journal-clear${recoveryRequired || entries.length === 0 ? ' disabled' : ''}>${escapeHtml(copy.deleteAll)}</button>
           </div>
         </div>
         ${recoveryRequired ? '' : `<p class="journal-count" aria-live="polite">${entries.length} ${escapeHtml(copy.entries)}</p>`}
         <div data-journal-status class="sr-only" aria-live="polite"></div>
-        ${recoveryRequired ? '' : visible.length ? `<div class="journal-list">${visible.map((entry) => entryMarkup(entry, entries, exams, copy, locale, t)).join('')}</div>` : emptyMarkup(copy)}
+        ${
+          recoveryRequired
+            ? ''
+            : visible.length
+              ? `<div class="journal-list">${visible.map((entry) => entryMarkup(entry, entries, exams, copy, locale, t)).join('')}</div>`
+              : emptyMarkup(copy, {
+                  firstRun: entries.length === 0,
+                  starterUrl: `${localeHref('riflessi')}?scope=signal`,
+                  starterText: t('Try a short reaction test'),
+                })
+        }
       </article>`;
   }
 
@@ -185,8 +195,12 @@ function filterOptions(exams, copy, selected) {
   ].join('');
 }
 
-function emptyMarkup(copy) {
-  return `<section class="journal-empty"><p class="ui-eyebrow">0 ${escapeHtml(copy.entries)}</p><h2>${escapeHtml(copy.emptyTitle)}</h2><p>${escapeHtml(copy.empty)}</p></section>`;
+function emptyMarkup(copy, { firstRun, starterUrl, starterText }) {
+  return `<section class="journal-empty"><p class="ui-eyebrow">0 ${escapeHtml(copy.entries)}</p><h2>${escapeHtml(copy.emptyTitle)}</h2><p>${escapeHtml(copy.empty)}</p>${
+    firstRun
+      ? `<a class="ui-button journal-empty__starter" data-journal-starter href="${escapeAttribute(starterUrl)}">${escapeHtml(starterText)} <span aria-hidden="true">→</span></a>`
+      : ''
+  }</section>`;
 }
 
 function recoveryMarkup(journal, copy) {
