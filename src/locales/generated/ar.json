@@ -43,6 +43,10 @@
   ["Riflessi — Reaction Time Lab", "Riflessi — مختبر زمن رد الفعل"],
   ["Udito — Hearing Range & Pitch Lab", "Udito — مختبر المدى المسموع ودرجة الصوت"],
   ["Acutezza — Visual Sharpness Lab", "Acutezza — مختبر حدة التفاصيل"],
+  [
+    "At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.",
+    "كانت هناك قيود في فحص واحد على الأقل من فحوص الإعداد أو الانقطاعات أو مستوى الصوت أو المسار التكيّفي. تظل الملاحظات ظاهرة، لكن يُفضّل تكرار التجربة في ظروف أكثر استقرارًا قبل مقارنتها."
+  ],
   ["How much do you want to run?", "ما مدى عمق الاختبار الذي تريده؟"],
   ["about 2 minutes", "نحو دقيقتين"],
   ["about 4 minutes", "نحو 4 دقائق"],

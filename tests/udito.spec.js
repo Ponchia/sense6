@@ -188,6 +188,47 @@ test('Udito focused scope ends after Portata and omits pitch placeholders @pr-sm
   ).toBeVisible();
 });
 
+test('German focused Udito results keep the heading and caution copy localized @pr-smoke', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'chromium', 'One end-to-end locale contract per PR');
+  await installQuickUdito(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/de/udito/');
+  await page.locator('[data-action="au-setup"]').click();
+  await page.locator('[data-action="au-scope"][data-scope="focused"]').click();
+  await page.locator('[data-action="au-reference"]').click();
+  await expect(page.locator('[data-au-reference-status]')).toContainText(
+    'Referenz nach Audiouhr abgeschlossen',
+  );
+  await page.locator('[data-action="au-anchors"]').click();
+  await page.locator('[data-au-anchors-confirmed]').check();
+  await page.locator('[data-au-consent]').check();
+  await page.locator('[data-action="au-start"]').click();
+  await page.locator('[data-action="au-begin-stage"]').click();
+  await answerCurrentSoundTrial(page);
+  await page.locator('[data-action="au-begin-measured"]').click();
+  await answerCurrentSoundTrial(page);
+  await answerCurrentSoundTrial(page);
+  await page.locator('[data-action="au-next-stage"]').click();
+  await page.locator('[data-action="au-begin-stage"]').click();
+  await answerCurrentSoundTrial(page);
+  await answerCurrentSoundTrial(page);
+  await page.locator('[data-volume-consistent="true"]').click();
+  await expect(page.locator('.au-results__hero h1')).toContainText('Zwei fokussierte Hörmessungen.');
+  await expect(page.locator('.au-results__stamp')).toContainText('Obere Laufgrenze');
+  const explanation = page.locator('.au-results__hero > div:first-child > p:last-child');
+  await expect(explanation).toContainText(/Einrichtungskontrollen|Mindestens eine Prüfung/);
+  await expect(explanation).not.toContainText(
+    /At least one setup check|The setup checks and adaptive tracks/,
+  );
+  await expect
+    .poll(() =>
+      page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+    )
+    .toBe(true);
+});
+
 test('Udito shows a settled upper boundary as a lower bound with its run evidence', async ({
   page,
 }, testInfo) => {
