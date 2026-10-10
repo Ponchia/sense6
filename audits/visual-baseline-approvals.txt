@@ -12,6 +12,11 @@
 # comparison instead finds NO difference, the job fails and tells you to delete
 # the line, so an approval cannot quietly outlive the change it covered.
 #
+# A declaration counts only when introduced or given a *new justification*
+# relative to the comparison base SHA. Inherited approvals from merged PRs are
+# historical records, not permanent exemptions or spurious stale failures.
+# Future changes to the same route must provide an updated reason.
+#
 # One snapshot per line, exactly as Playwright names it, with a reason:
 #
 #   en-tetracromia-desktop-chromium-linux.png  # new hero layout, PR #58

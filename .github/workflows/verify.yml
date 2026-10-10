@@ -139,13 +139,17 @@ jobs:
           if ! git cat-file -e "$base^{commit}" 2>/dev/null; then base="$(git rev-parse HEAD^)"; fi
           echo "sha=$base" >> "$GITHUB_OUTPUT"
           echo "Comparing against $base"
-      - name: Read the declared visual baseline approvals
+      - name: Read the visual approvals introduced by this revision
         id: visual-baselines
+        env:
+          BASE_SHA: ${{ steps.base.outputs.sha }}
         run: |
-          approved="$(sed -e 's/#.*//' -e 's/[[:space:]]//g' audits/visual-baseline-approvals.txt \
-            | grep -v '^$' | paste -sd, - || true)"
+          # Compare audits/visual-baseline-approvals.txt to the base SHA.
+          # Inherited approvals cannot exempt later PRs; only newly declared
+          # or explicitly re-justified snapshots can approve a visible change.
+          approved="$(node scripts/read-visual-approvals.mjs "$BASE_SHA")"
           echo "approved=$approved" >> "$GITHUB_OUTPUT"
-          echo "Approved baselines: ${approved:-<none>}"
+          echo "New visual approvals: ${approved:-<none>}"
       - name: Check out and build the base revision
         env:
           BASE_SHA: ${{ steps.base.outputs.sha }}
