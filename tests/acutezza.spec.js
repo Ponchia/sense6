@@ -239,7 +239,17 @@ test('Acutezza calibrates the display and reports separate non-clinical observat
   await completeAcutezzaEye(page);
   await expect(page.getByRole('heading', { name: /Separate observations/i })).toBeVisible();
   await expect(page.locator('.ac-metric')).toHaveCount(4);
-  await expect(page.locator('.ac-results__stamp')).toContainText('02 / 02');
+  await expect(page.locator('.ac-results__stamp dt')).toHaveText(['Right eye', 'Left eye']);
+  await expect(page.locator('.ac-results__stamp')).toContainText(
+    'Model-based estimates · uncertainty intervals below',
+  );
+  // The immediate summary must reproduce the existing per-eye estimates,
+  // including ≤/≥ device bounds, not calculate a new vision score.
+  for (let index = 0; index < 2; index += 1) {
+    await expect(page.locator('.ac-results__stamp dd').nth(index)).toHaveText(
+      await page.locator('.ac-eye-result').nth(index).locator('.ac-metric > strong').first().innerText(),
+    );
+  }
   await expect(page.getByText(/10% nominal/i)).toBeVisible();
   await expect(page.getByText(/90% model interval/i).first()).toBeVisible();
   await expect(page.getByText(/not an eye examination/i)).toBeVisible();
@@ -294,6 +304,12 @@ test('Acutezza focused scope omits the nominal-contrast condition @pr-smoke', as
 
   await expect(page.getByRole('heading', { name: /Separate observations/i })).toBeVisible();
   await expect(page.locator('.ac-metric')).toHaveCount(2);
+  await expect(page.locator('.ac-results__stamp dt')).toHaveText(['Right eye', 'Left eye']);
+  for (let index = 0; index < 2; index += 1) {
+    await expect(page.locator('.ac-results__stamp dd').nth(index)).toHaveText(
+      await page.locator('.ac-eye-result').nth(index).locator('.ac-metric > strong').first().innerText(),
+    );
+  }
   await expect(page.getByText('Nominal low-contrast angular gap estimate', { exact: true })).toHaveCount(0);
   await expect(page.getByText('Focused Sharpness', { exact: true })).toBeVisible();
   await expectJournalEntry(page, 'acutezza');
@@ -645,6 +661,10 @@ test('Acutezza carries the 20% fallback and unusable controls through results an
   await page.getByRole('button', { name: /Finish with one eye/i }).click();
 
   await expect(page.locator('.ac-results__stamp')).toContainText('Run unusable');
+  await expect(page.locator('.ac-results__stamp dt')).toHaveText(['Right eye']);
+  await expect(page.locator('.ac-results__stamp dd')).toHaveText(
+    await page.locator('.ac-eye-result .ac-metric > strong').first().innerText(),
+  );
   await expect(page.getByText(/20% nominal/i)).toBeVisible();
   const journal = await page.evaluate(() => {
     const entries = JSON.parse(localStorage.getItem('sense6:journal')).entries;
@@ -834,6 +854,12 @@ test('Acutezza completes both scopes through every audited mobile viewport witho
 
       await expect(page.getByRole('heading', { name: /Separate observations/i })).toBeVisible();
       await expect(page.locator('.ac-eye-result')).toHaveCount(2);
+      await expect(page.locator('.ac-results__stamp dd')).toHaveCount(2);
+      for (let index = 0; index < 2; index += 1) {
+        await expect(page.locator('.ac-results__stamp dd').nth(index)).toHaveText(
+          await page.locator('.ac-eye-result').nth(index).locator('.ac-metric > strong').first().innerText(),
+        );
+      }
       const metricCount = scope === 'standard' ? 4 : 2;
       await expect(page.locator('.ac-metric')).toHaveCount(metricCount);
       await expect(page.locator('.ac-metric > strong')).toHaveText(

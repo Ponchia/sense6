@@ -925,12 +925,12 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
 .ac-results__hero {
   align-items: end;
   display: grid;
-  gap: 3rem;
-  grid-template-columns: 1fr auto;
-  margin-block-start: clamp(3rem, 8vw, 7rem);
+  gap: clamp(1.25rem, 3vw, 3rem);
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin-block-start: clamp(1.5rem, 3vw, 3rem);
 }
 .ac-results__hero h1 {
-  font-size: clamp(3.7rem, 7.5vw, 7.5rem);
+  font-size: clamp(2.7rem, 5.5vw, 5.5rem);
 }
 .ac-results__hero > div > p:last-child {
   color: var(--text-dim);
@@ -938,14 +938,12 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
   max-inline-size: 48rem;
 }
 .ac-results__stamp {
-  align-items: center;
-  aspect-ratio: 1;
   border: 1px solid var(--success);
-  display: flex;
-  flex-direction: column;
-  inline-size: 12rem;
-  justify-content: center;
-  text-align: center;
+  display: grid;
+  gap: 0.75rem;
+  inline-size: clamp(14rem, 22vw, 19rem);
+  min-inline-size: 0;
+  padding: clamp(1rem, 2vw, 1.5rem);
 }
 .ac-results__stamp.is-limited {
   border-color: var(--warning);
@@ -955,14 +953,10 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
   font-size: var(--text-xs);
   text-transform: uppercase;
 }
-.ac-results__stamp strong {
-  font-family: var(--sans);
-  font-size: 2.2rem;
-}
 .ac-eye-results {
   display: grid;
   gap: 2.5rem;
-  margin-block: clamp(3rem, 7vw, 5rem);
+  margin-block: clamp(1.75rem, 4vw, 3rem);
 }
 .ac-eye-result > header {
   align-items: end;
@@ -1196,12 +1190,9 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
     grid-template-columns: 1fr;
   }
   .ac-results__stamp {
-    aspect-ratio: auto;
-    flex-direction: row;
-    gap: 1rem;
     inline-size: 100%;
-    padding: 1rem;
   }
+
   .ac-eye-result > header {
     align-items: start;
     display: block;
