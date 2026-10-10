@@ -90,6 +90,10 @@ test('Udito completes three safe-listening instruments and keeps results separat
 
   await expect(page.getByRole('heading', { name: /Three listening measures/i })).toBeVisible();
   await expect(page.locator('.au-metric')).toHaveCount(4);
+  await expect(page.locator('.au-results__stamp')).toContainText('Upper run boundary');
+  await expect(page.locator('.au-results__stamp strong')).toHaveText(
+    await page.locator('.au-metric').nth(1).locator(':scope > strong').innerText(),
+  );
   await expect(page.getByRole('article', { name: /Headphone confidence/i })).toBeVisible();
   await expect(page.getByRole('article', { name: /Upper run boundary/i })).toBeVisible();
   await expect(page.getByRole('article', { name: /Pitch step near 500 Hz/i })).toBeVisible();
@@ -161,7 +165,10 @@ test('Udito focused scope ends after Portata and omits pitch placeholders @pr-sm
   await page.getByRole('button', { name: /Yes, unchanged/i }).click();
 
   await expect(page.getByRole('heading', { name: /Two focused listening measures/i })).toBeVisible();
-  await expect(page.locator('.au-results__stamp strong')).toHaveText('02 / 02');
+  await expect(page.locator('.au-results__stamp')).toContainText('Upper run boundary');
+  await expect(page.locator('.au-results__stamp strong')).toHaveText(
+    await page.locator('.au-metric').nth(1).locator(':scope > strong').innerText(),
+  );
   await expect(page.locator('.au-metric')).toHaveCount(2);
   await expect(page.getByText(/Pitch step near/i)).toHaveCount(0);
   await expectJournalEntry(page, 'udito');
@@ -222,8 +229,9 @@ test('Udito shows a settled upper boundary as a lower bound with its run evidenc
     'Bounded at the technical frequency ceiling · 0 reversals / 2 trials',
   );
   await expect(boundary).toContainText(/personal boundary may be higher/i);
+  await expect(page.locator('.au-results__stamp')).toContainText('Upper run boundary');
   await expect(page.locator('.au-results__stamp')).toContainText('Setup checks coherent');
-  await expect(page.locator('.au-results__stamp strong')).toHaveText('02 / 02');
+  await expect(page.locator('.au-results__stamp strong')).toHaveText('≥ 18,000 Hz');
   await expect(page.getByText('100% (1/1 controls)')).toBeVisible();
 });
 
@@ -693,9 +701,10 @@ test('Udito keeps every mobile scope and stage readable across the required view
       `${label} should show a value, run evidence, and interpretation for every result metric`,
     ).toBe(true);
     await expect(page.locator('.au-results__stamp')).toHaveClass(/is-limited/);
+    await expect(page.locator('.au-results__stamp')).toContainText('Upper run boundary');
     await expect(page.locator('.au-results__stamp')).toContainText('Interpret with caution');
     await expect(page.locator('.au-results__stamp strong')).toHaveText(
-      responsiveCase.scope === 'focused' ? '02 / 02' : '03 / 03',
+      await page.locator('.au-metric').nth(1).locator(':scope > strong').innerText(),
     );
     await expect(page.getByText(/Device-relative, never dB HL/i)).toBeVisible();
   }
