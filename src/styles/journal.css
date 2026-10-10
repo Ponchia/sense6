@@ -194,6 +194,26 @@
   margin-block-end: 0;
 }
 
+/* Saved runs link to their experiment and the corresponding reviewed explanation. */
+.journal-entry__actions {
+  align-items: center;
+  border-block-start: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-block-start: 1.4rem;
+  padding-block-start: 1rem;
+}
+
+.journal-entry__actions a {
+  align-items: center;
+  display: inline-flex;
+  min-block-size: 2.75rem;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  text-underline-offset: 0.2em;
+}
+
 .journal-empty {
   border: 1px dashed var(--line-strong);
   padding: clamp(2rem, 7vw, 6rem);
