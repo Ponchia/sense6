@@ -342,7 +342,15 @@ function translatePersistentShell() {
 /** @param {ParentNode} root */
 function localizeInternalLinks(root) {
   for (const link of root.querySelectorAll?.('a[data-sense6-route]') ?? []) {
-    if (link instanceof HTMLAnchorElement) link.setAttribute('href', localeHref(link.dataset.sense6Route));
+    if (!(link instanceof HTMLAnchorElement)) continue;
+    if (link.hasAttribute('data-sense6-english-only')) {
+      // The guides exist only in English. Keep this a real English link when
+      // switching locales; never create a nonexistent /it/learn/ URL.
+      link.hidden = locale !== DEFAULT_LOCALE;
+      link.setAttribute('href', locale === DEFAULT_LOCALE ? '/en/learn/' : localeHref());
+      continue;
+    }
+    link.setAttribute('href', localeHref(link.dataset.sense6Route));
   }
 }
 

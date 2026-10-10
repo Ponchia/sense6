@@ -75,6 +75,26 @@ test('every localized static gallery features the same short Riflessi entry with
   }
 });
 
+test('every pre-rendered page keeps the Learn footer link English-only', async () => {
+  const root = await readFile(new URL('index.html', DIST), 'utf8');
+  assert.match(root, /data-sense6-route="learn" data-sense6-english-only href="\/en\/learn\/"/);
+  for (const { code } of LOCALES) {
+    const html = await readFile(new URL(`${code}/index.html`, DIST), 'utf8');
+    const link = html.match(
+      /<a data-sense6-route="learn" data-sense6-english-only(?: hidden)? href="([^"]+)" lang="en">Learn<\/a>/,
+    );
+    assert.ok(link, `${code} missing Learn footer navigation`);
+    assert.equal(link[0].includes(' hidden '), code !== 'en', `${code} language visibility`);
+    assert.equal(link[1], code === 'en' ? '/en/learn/' : `/${code}/`, `${code} locale-safe href`);
+    assert.ok(!html.includes(`href="/${code}/learn/"`) || code === 'en', `${code} false translated page`);
+    assert.equal(
+      html.includes('class="ui-link gallery-hero__learn"'),
+      code === 'en',
+      `${code} hero visibility`,
+    );
+  }
+});
+
 test('Learn pages are genuinely English-only and share one static/runtime renderer', async () => {
   const english = await readFile(new URL('en/index.html', DIST), 'utf8');
   const german = await readFile(new URL('de/index.html', DIST), 'utf8');

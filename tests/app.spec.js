@@ -16,7 +16,7 @@ test('the gallery lists exams, is accessible, and routes into one @pr-smoke', as
   await expect(page.locator('.sense-mark')).toHaveText('Sense6');
   await expect(page.locator('.sense-mark__signal')).toHaveCount(6);
   await expect(page.locator('.ui-sitefooter__links > span')).toHaveCount(0);
-  await expect(page.locator('.ui-sitefooter__links > a')).toHaveCount(4);
+  await expect(page.locator('.ui-sitefooter__links > a')).toHaveCount(5);
   await expect(page.locator('.gallery-hero__boundary')).toHaveText(
     'Experimental perception tests for curiosity and fun—not medical tests or diagnoses.',
   );
@@ -61,6 +61,32 @@ test('the gallery lists exams, is accessible, and routes into one @pr-smoke', as
   await page.locator('.exam-card__link[href="/en/color-blindness/"]').click();
   await expect(page).toHaveURL(/\/en\/color-blindness\/$/);
   await expect(page.getByRole('heading', { name: /Find the gap in the dots/i })).toBeVisible();
+});
+
+test('Learn remains reachable throughout English navigation without false translated routes @pr-smoke', async ({
+  page,
+}) => {
+  await page.goto('/en/riflessi/');
+  const englishLearn = page.locator('.ui-sitefooter__links [data-sense6-english-only]');
+  await expect(englishLearn).toHaveText('Learn');
+  await expect(englishLearn).toHaveAttribute('href', '/en/learn/');
+  await expect(englishLearn).toBeVisible();
+  await englishLearn.click();
+  await expect(page).toHaveURL(/\/en\/learn\/$/);
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Perception, explained.');
+  await page.locator('[data-locale-select]').selectOption('it');
+  await expect(page).toHaveURL(/\/it\/$/);
+  await expect(englishLearn).toBeHidden();
+  await expect(englishLearn).toHaveAttribute('href', '/it/');
+  await page.reload();
+  await expect(englishLearn).toBeHidden();
+  await expect(englishLearn).toHaveAttribute('href', '/it/');
+  await page.locator('[data-locale-select]').selectOption('en');
+  await expect(page).toHaveURL(/\/en\/$/);
+  await expect(englishLearn).toBeVisible();
+  await expect(page.locator('.gallery-hero__learn')).toHaveAttribute('href', '/en/learn/');
+  await page.locator('.gallery-hero__learn').click();
+  await expect(page).toHaveURL(/\/en\/learn\/$/);
 });
 
 test('the featured starter opens the short Riflessi setup without bypassing consent @pr-smoke', async ({
