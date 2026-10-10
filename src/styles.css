@@ -176,6 +176,11 @@ a:focus-visible {
   margin-inline-start: auto;
 }
 
+/* Native hidden must win even when the shared UI kit styles footer anchors. */
+.ui-sitefooter__links [data-sense6-english-only][hidden] {
+  display: none;
+}
+
 .brand {
   flex: 0 0 auto;
   font-size: clamp(1.05rem, 3.2vw, 1.3rem);

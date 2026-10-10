@@ -297,6 +297,14 @@ function localizeShell(html, locale) {
     );
   }
   localized = replaceChecked(localized, 'href="/en/"', `href="/${locale}/"`, 'gallery links', 2);
+  if (locale !== 'en') {
+    localized = replaceChecked(
+      localized,
+      'data-sense6-english-only href="/en/learn/"',
+      `data-sense6-english-only hidden href="/${locale}/"`,
+      'English-only research navigation',
+    );
+  }
   for (const route of UTILITY_ROUTES) {
     localized = replaceChecked(
       localized,
