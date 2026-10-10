@@ -1,0 +1,45 @@
+/* The above-fold, per-eye summary is a separate presentation from the measured task UI. */
+
+.ac-results__stamp p,
+.ac-results__stamp dl {
+  margin: 0;
+}
+
+.ac-results__stamp dl {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.ac-results__stamp dl > div {
+  align-items: baseline;
+  border-block-end: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.8rem;
+  justify-content: space-between;
+  padding-block-end: 0.5rem;
+}
+
+.ac-results__stamp dt {
+  color: var(--text-dim);
+  font-size: var(--text-sm);
+}
+
+.ac-results__stamp dd {
+  font-family: var(--sans);
+  font-size: clamp(1.05rem, 1.8vw, 1.35rem);
+  font-weight: 700;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.ac-results__stamp small {
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+
+@media (max-width: 700px) {
+  .ac-results__stamp dl {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr));
+  }
+}
