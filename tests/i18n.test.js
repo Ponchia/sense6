@@ -30,7 +30,7 @@ const UNTRANSLATED_CEILINGS = Object.freeze({
 });
 
 /** The English catalogue may grow but never shrink below its current size. */
-const ENGLISH_KEY_FLOOR = 826;
+const ENGLISH_KEY_FLOOR = 833;
 
 test('the supported global locale set has complete catalog keys', async () => {
   assert.equal(DEFAULT_LOCALE, 'en');
@@ -77,6 +77,24 @@ test('the supported global locale set has complete catalog keys', async () => {
         [...key.matchAll(/\{([^}]+)\}/g)].map((match) => match[1]).sort(),
         `${code} placeholders differ for ${key}`,
       );
+    }
+  }
+});
+
+test('Udito focused-run heading and quality explanation stay localized in all 12 catalogs', async () => {
+  const phrases = [
+    'Two focused listening measures.',
+    'The setup checks and adaptive tracks produced coherent run-level observations.',
+    'At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.',
+  ];
+  for (const { code } of LOCALES) {
+    const catalog = await loadMessages(code);
+    for (const phrase of phrases) {
+      const translation = catalog.get(phrase);
+      assert.ok(translation, `${code} is missing Udito result text: ${phrase}`);
+      if (code !== 'en') {
+        assert.notEqual(translation, phrase, `${code} shows English Udito result text`);
+      }
     }
   }
 });
