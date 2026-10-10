@@ -206,7 +206,16 @@
   margin-block: 1rem;
 }
 
-:where(.journal-empty p:last-child) {
+.journal-empty__starter {
+  display: inline-flex;
+  justify-content: center;
+  margin-block-start: 1.5rem;
+  max-inline-size: 100%;
+  text-align: center;
+  white-space: normal;
+}
+
+:where(.journal-empty > p:not(.ui-eyebrow)) {
   color: var(--text-dim);
 }
 

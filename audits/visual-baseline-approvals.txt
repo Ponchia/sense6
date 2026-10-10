@@ -23,3 +23,6 @@
 #
 
 en-mobile-chromium-linux.png  # compact visual previews make all five experiments easier to browse on a phone
+
+en-journal-desktop-chromium-linux.png  # empty private journal adds a discoverable short reaction starter
+en-journal-mobile-chromium-linux.png   # mobile empty journal shows the localized first-run action
