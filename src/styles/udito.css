@@ -912,7 +912,7 @@
 }
 
 .au-results {
-  padding-block: 2rem clamp(4rem, 8vw, 7rem);
+  padding-block: 1.25rem clamp(4rem, 8vw, 7rem);
 }
 
 .au-results__hero {
@@ -920,17 +920,17 @@
   display: grid;
   gap: clamp(1.5rem, 3.5vw, 3rem);
   grid-template-columns: minmax(0, 1fr) auto;
-  margin-block-start: clamp(1.5rem, 3vw, 2.5rem);
+  margin-block-start: clamp(0.65rem, 1.5vw, 1.25rem);
 }
 
 .au-results__hero h1 {
-  font-size: clamp(2.65rem, 5.2vw, 5.25rem);
-  max-inline-size: 16ch;
+  font-size: clamp(2.4rem, 4.4vw, 4.5rem);
+  max-inline-size: 29ch;
 }
 
 .au-results__hero > div > p:last-child {
   color: var(--text-dim);
-  line-height: 1.65;
+  line-height: 1.55;
   max-inline-size: 45rem;
 }
 
@@ -944,9 +944,9 @@
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-  inline-size: clamp(12rem, 17vw, 15rem);
+  inline-size: clamp(13.5rem, 21vw, 17rem);
   justify-content: center;
-  min-block-size: 10rem;
+  min-block-size: 9rem;
   min-inline-size: 0;
   overflow-wrap: anywhere;
   padding: 1rem 1.15rem;
@@ -977,7 +977,7 @@
   display: grid;
   gap: 1px;
   grid-template-columns: repeat(2, 1fr);
-  margin-block: clamp(1.75rem, 4vw, 3rem);
+  margin-block: clamp(1.25rem, 3vw, 2.5rem);
 }
 
 .au-metric {
@@ -1114,7 +1114,7 @@
   }
 
   .au-results__hero h1 {
-    font-size: clamp(2.2rem, 9vw, 3.45rem);
+    font-size: clamp(2.05rem, 8vw, 3.25rem);
   }
 
   .au-hero__actions > *,
@@ -1243,7 +1243,7 @@
   }
 
   .au-results__hero h1 {
-    font-size: clamp(2.1rem, 10vw, 3rem);
+    font-size: clamp(1.9rem, 9vw, 2.75rem);
   }
 
   .au-setup__rules > strong {
