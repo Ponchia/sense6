@@ -209,13 +209,15 @@ async function writePage(relativePath, page) {
   html = replaceChecked(
     html,
     /<link rel="canonical" href="[^"]+"\s*\/?>/,
-    `<link rel="canonical" href="${metadata.canonical}">`,
-    'canonical link',
+    // Discover self-hosted Doto before the module script, not after it.
+    `<link rel="canonical" href="${metadata.canonical}">
+    ${displayFontPreload(page.locale, page.route)}`,
+    'canonical link and early font preloads',
   );
   html = replaceChecked(
     html,
     '</head>',
-    `    ${metadata.indexable ? '' : '<meta name="robots" content="noindex">\n    '}${displayFontPreload(page.locale, page.route)}${modulePreloads}<link rel="stylesheet" crossorigin href="/assets/${page.stylesheet}">\n    ${page.alternates}\n    <script type="application/ld+json">${json}</script>\n  </head>`,
+    `    ${metadata.indexable ? '' : '<meta name="robots" content="noindex">\n    '}${modulePreloads}<link rel="stylesheet" crossorigin href="/assets/${page.stylesheet}">\n    ${page.alternates}\n    <script type="application/ld+json">${json}</script>\n  </head>`,
     'head insertion point',
   );
   html = replaceChecked(
@@ -237,7 +239,7 @@ function displayFontPreload(locale, route) {
   return weights
     .map(
       (weight) =>
-        `<link rel="preload" href="/assets/${criticalDisplayFonts.get(weight)}" as="font" type="font/woff2" crossorigin media="not (prefers-reduced-data: reduce)">\n    `,
+        `<link rel="preload" href="/assets/${criticalDisplayFonts.get(weight)}" as="font" type="font/woff2" crossorigin>\n    `,
     )
     .join('');
 }
