@@ -8,7 +8,7 @@
  * build when a hash moves while its entry here stands still.
  */
 export const CONTENT_DATES = Object.freeze({
-  site: '2026-10-09',
+  site: '2026-10-10',
   about: '2026-09-03',
   learn: '2026-10-10',
   exams: Object.freeze({

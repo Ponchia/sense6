@@ -16,3 +16,5 @@
 #
 #   en-tetracromia-desktop-chromium-linux.png  # new hero layout, PR #58
 #
+
+en-mobile-chromium-linux.png  # English first-screen Learn navigation adds a visible action
