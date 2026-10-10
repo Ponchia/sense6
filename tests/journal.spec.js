@@ -30,8 +30,17 @@ test('an empty journal invites a short experiment without bypassing consent @pr-
   await expect(page.locator('[data-journal-export]')).toBeDisabled();
   await expect(page.locator('[data-journal-import]')).toBeEnabled();
 
+  await page.setViewportSize({ width: 390, height: 844 });
   const starter = page.locator('[data-journal-starter]');
   await expect(starter).toBeVisible();
+  const starterBox = await starter.boundingBox();
+  expect(starterBox).not.toBeNull();
+  expect(starterBox.y).toBeGreaterThanOrEqual(0);
+  expect(starterBox.y + starterBox.height).toBeLessThanOrEqual(844);
+  expect(await page.evaluate(() => scrollY)).toBe(0);
+  // The privacy/export disclosure is still present, even on an empty journal.
+  await expect(page.locator('.journal-export-disclosure li')).not.toHaveCount(0);
+  await page.setViewportSize({ width: 320, height: 568 });
   await expect
     .poll(() =>
       page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),

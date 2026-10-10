@@ -20,7 +20,7 @@
   text-wrap: balance;
 }
 
-.journal-hero > div > p:last-child {
+.journal-hero > div > p:not(.ui-eyebrow) {
   color: var(--text-soft);
   font-size: 1.1rem;
   line-height: 1.6;
@@ -30,6 +30,10 @@
 .journal-hero .ui-alert {
   margin: 0;
   max-inline-size: none;
+}
+.journal-hero__starter {
+  inline-size: max-content;
+  margin-block-start: 1.25rem;
 }
 
 .journal-toolbar {

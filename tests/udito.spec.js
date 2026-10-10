@@ -8,6 +8,39 @@ import {
   installQuickUdito,
 } from './helpers/browser.js';
 
+test('Udito keeps its safe preparation action in the first mobile screen @pr-smoke', async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    !['chromium', 'mobile'].includes(testInfo.project.name),
+    'Ordinary mobile first-screen geometry is checked on Chromium and emulated mobile',
+  );
+  for (const viewport of [
+    { width: 360, height: 740 },
+    { width: 390, height: 844 },
+    { width: 412, height: 915 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/en/udito/');
+    await page.evaluate(async () => document.fonts.ready);
+    const prepare = page.locator('.au-hero__actions [data-action="au-setup"]');
+    await expect(prepare).toBeVisible();
+    const bounds = await prepare.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds.y, String(viewport.width) + ' first-screen top').toBeGreaterThanOrEqual(0);
+    expect(bounds.y + bounds.height, String(viewport.width) + ' first-screen bottom').toBeLessThanOrEqual(
+      viewport.height - 8,
+    );
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+    );
+    expect(overflow, String(viewport.width) + ' horizontal overflow').toBe(false);
+  }
+  await page.locator('[data-action="au-setup"]').click();
+  await expect(page.locator('[data-au-consent]')).not.toBeChecked();
+  await expect(page.getByRole('button', { name: /Begin selected scope/i })).toBeDisabled();
+});
+
 test('Udito completes three safe-listening instruments and keeps results separate', async ({ page }) => {
   await installQuickUdito(page);
   const metrics = await captureMetrics(page);
