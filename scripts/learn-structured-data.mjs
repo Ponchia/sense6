@@ -1,5 +1,5 @@
 import { CONTENT_DATES } from '../src/content-dates.js';
-import { learnPage } from '../src/learn.js';
+import { learnMetadata, learnPage } from '../src/learn.js';
 import { LEARN_ROUTES, SITE_ORIGIN } from '../src/routes.js';
 import { CREATOR_PROFILE_URL } from '../src/site-identity.js';
 
@@ -44,7 +44,7 @@ export function learnPageData(route) {
             author: learnCreatorData(),
             publisher: { '@type': 'Organization', name: 'Sense6', url: ORIGIN },
             mainEntityOfPage: { '@type': 'WebPage', '@id': `${url}#page`, url },
-            image: `${ORIGIN}/social/sense6.png`,
+            image: new URL(learnMetadata(route).socialImage, ORIGIN).href,
             isAccessibleForFree: true,
             isPartOf: { '@id': `${ORIGIN}/#website` },
             citation: page.sources
