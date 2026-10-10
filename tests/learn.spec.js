@@ -105,6 +105,30 @@ test('hearing and sharpness guides answer their question and link to real experi
   }
 });
 
+test('readers can jump to a topic and trace its background sources without leaving the guide @pr-smoke', async ({
+  page,
+}) => {
+  await page.goto('/en/tetrachromacy-guide/');
+  const contents = page.getByRole('navigation', { name: 'On this page' });
+  await expect(contents).toBeVisible();
+  await expect(contents.getByRole('link')).toHaveCount(5);
+
+  await contents.locator('a[href="#learn-section-2"]').click();
+  await expect(page).toHaveURL(/\/en\/tetrachromacy-guide\/#learn-section-2$/);
+  const screenLimitSection = page.locator('section[aria-labelledby="learn-section-2"]');
+  await expect(screenLimitSection.locator('.learn-section-sources a')).toHaveCount(2);
+  await screenLimitSection.locator('a[href="#learn-source-css-color-4"]').click();
+  await expect(page).toHaveURL(/#learn-source-css-color-4$/);
+
+  const citedSource = page.locator('#learn-source-css-color-4');
+  await expect(citedSource).toBeVisible();
+  await expect(citedSource.getByRole('link')).toHaveAttribute('href', 'https://www.w3.org/TR/css-color-4/');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://sense6.net/en/tetrachromacy-guide/',
+  );
+});
+
 test('English-only guide language switching leads to a real localized route', async ({ page }) => {
   await page.goto('/en/learn/');
   await page.locator('[data-locale-select]').selectOption('it');
