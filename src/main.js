@@ -412,6 +412,9 @@ function detectDisplay() {
 
 function updateShellLinks() {
   for (const link of document.querySelectorAll('a[data-sense6-route]')) {
+    // The persistent EN-only Learn link is already handled by i18n's
+    // localizeInternalLinks. Rewriting it here would create /it/learn/.
+    if (link.hasAttribute('data-sense6-english-only')) continue;
     link.href = localeHref(link.dataset.sense6Route);
   }
 }
