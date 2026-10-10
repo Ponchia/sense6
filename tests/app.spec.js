@@ -152,6 +152,31 @@ test('the first experiment action is visible without scrolling at common widths 
   }
 });
 
+test('mobile gallery previews are compact while all five test choices remain accessible @pr-smoke', async ({
+  page,
+}, testInfo) => {
+  test.skip(testInfo.project.name !== 'mobile', 'The narrow mobile layout needs one mobile run');
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('/en/');
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'gallery');
+  const cards = page.locator('.exam-card');
+  await expect(cards).toHaveCount(5);
+  for (let index = 0; index < 5; index++) {
+    const card = cards.nth(index);
+    const visualHeight = await card
+      .locator('.exam-card__visual')
+      .evaluate((visual) => visual.getBoundingClientRect().height);
+    expect(visualHeight, 'Mobile preview should not dominate the card').toBeLessThanOrEqual(200);
+    expect(visualHeight, 'Mobile previews must remain useful').toBeGreaterThanOrEqual(160);
+    await expect(card.locator('.exam-card__facts li')).toHaveCount(3);
+    const link = card.locator('a.exam-card__link');
+    await expect(link).toHaveAttribute('href', /^\/en\//);
+    await link.scrollIntoViewIfNeeded();
+    await expect(link).toBeVisible();
+  }
+  await expectNoHorizontalOverflow(page, '320px mobile gallery browsing');
+});
+
 test('the root remains a self-canonical language gateway after JavaScript starts', async ({ page }) => {
   await page.goto('/');
 
