@@ -220,14 +220,6 @@
   text-align: center;
 }
 
-.journal-empty__start {
-  justify-content: center;
-  margin-block-start: 1.25rem;
-  max-inline-size: 100%;
-  text-align: center;
-  white-space: normal;
-}
-
 .journal-empty h2 {
   font-family: var(--sans);
   font-size: clamp(2rem, 5vw, 4rem);

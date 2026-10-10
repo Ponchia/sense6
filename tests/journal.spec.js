@@ -132,29 +132,6 @@ test('non-English journals localize the experiment name and return action withou
   await expect(page.locator('html')).toHaveAttribute('lang', 'it');
 });
 
-test('an empty journal offers the existing short, consent-gated experience in the active language @pr-smoke', async ({
-  page,
-}) => {
-  for (const { locale, label } of [
-    { locale: 'en', label: 'Try a short reaction test' },
-    { locale: 'it', label: 'Prova un breve test di reazione' },
-  ]) {
-    await page.goto(`/${locale}/journal/`);
-    await page.locator('[data-journal-filter]').selectOption('udito');
-    const starter = page.locator('[data-journal-short-start]');
-    await expect(starter).toHaveAttribute('href', `/${locale}/riflessi/?scope=signal`);
-    await expect(starter).toContainText(label);
-    await starter.click();
-    await expect(page).toHaveURL(new RegExp(`/${locale}/riflessi/\\?scope=signal$`));
-    await expect(page.locator('[data-rx-scope-picker] [data-scope="signal"]')).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
-    await expect(page.locator('[data-rx-consent]')).not.toBeChecked();
-    await expect(page.locator('[data-action="rx-start"]')).toBeDisabled();
-  }
-});
-
 test('journal data recorded in another locale remains readable through localized controls', async ({
   page,
 }) => {
