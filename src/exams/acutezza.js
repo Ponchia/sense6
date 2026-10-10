@@ -116,7 +116,7 @@ function renderIntro() {
   document.body.classList.remove('lab-mode', 'ac-running');
   document.title = t('Calibrated sharpness experiment — Acutezza | Sense6');
   const previous = loadLast();
-  renderScreen(acutezzaIntroMarkup(previous, m));
+  renderScreen(acutezzaIntroMarkup(previous, m, state.locale));
 }
 
 function renderPreparation() {

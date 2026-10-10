@@ -1,4 +1,5 @@
 import { renderMethodSteps, renderResearchSection } from '../landing.js';
+import { relatedGuideMarkup } from '../related-guide.js';
 import { sourcesFor } from '../sources.js';
 
 const METHOD_STEPS = [
@@ -21,9 +22,10 @@ const RESEARCH_SOURCES = sourcesFor('color-blindness');
 /**
  * @param {unknown} previous
  * @param {(id: import('../../i18n/message-ids.js').MessageId) => string} message
+ * @param {string} [locale]
  * @returns {string}
  */
-export function colorBlindnessIntroMarkup(previous, message) {
+export function colorBlindnessIntroMarkup(previous, message, locale = 'en') {
   return `
     <div class="cb-intro">
       <section class="cb-intro__hero ui-container ui-container--wide">
@@ -103,6 +105,8 @@ export function colorBlindnessIntroMarkup(previous, message) {
         label: message('section.researchTrail'),
         sources: RESEARCH_SOURCES,
       })}
+
+      ${relatedGuideMarkup('color-blindness', locale)}
 
       <section class="closing-cta cb-closing ui-container ui-container--wide">
         <div>

@@ -1,4 +1,5 @@
 import { renderInstrumentList, renderResearchSection } from '../landing.js';
+import { relatedGuideMarkup } from '../related-guide.js';
 import { sourcesFor } from '../sources.js';
 
 export const UDITO_INSTRUMENTS = {
@@ -30,8 +31,9 @@ const RESEARCH_SOURCES = sourcesFor('udito');
 /**
  * @param {{ setupQuality: string } | null} previous
  * @param {(id: import('../../i18n/message-ids.js').MessageId) => string} message
+ * @param {string} [locale]
  */
-export function uditoIntroMarkup(previous, message) {
+export function uditoIntroMarkup(previous, message, locale = 'en') {
   return `
     <div class="au-intro">
       <section class="au-intro__hero ui-container ui-container--wide">
@@ -89,6 +91,8 @@ export function uditoIntroMarkup(previous, message) {
         label: message('section.researchTrail'),
         sources: RESEARCH_SOURCES,
       })}
+
+      ${relatedGuideMarkup('udito', locale)}
 
       <section class="closing-cta au-closing ui-container ui-container--wide">
         <div><p class="ui-eyebrow">Listening lab / three instruments / about 6 minutes</p><h2>Headphone confidence, audibility &amp; pitch</h2></div>
