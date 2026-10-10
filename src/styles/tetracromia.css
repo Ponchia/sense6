@@ -548,7 +548,16 @@
     gap: 3rem;
     grid-template-columns: 1fr;
     min-block-size: 0;
-    padding-block: 4rem 3rem;
+    padding-block: 1.5rem 2rem;
+  }
+
+  .tetracromia-hero h1 {
+    font-size: clamp(2.65rem, 12vw, 3.65rem);
+    margin-block: 0.65rem 1rem;
+  }
+
+  .tetracromia-hero__actions {
+    margin-block-start: 1.25rem;
   }
 
   .tetracromia-hero__actions > * {
