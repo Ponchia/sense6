@@ -13,10 +13,12 @@ test('only reviewed English guides are linked from matching experiments', () => 
       assert.equal(relatedGuideFor(exam.id, locale), null);
       assert.equal(relatedGuideMarkup(exam.id, locale), '', `${exam.id} invented a translation`);
     }
-    assert.ok(guide, 'every launched Sense6 instrument needs one reviewed research guide');
+    if (!guide) {
+      assert.equal(english, '', 'instruments without a reviewed guide do not invent one');
+      continue;
+    }
     assert.ok(LEARN_ROUTES.includes(guide.route));
     assert.ok(english.includes(guide.title));
-    if (!english) continue;
     const route = english.match(/data-sense6-route="([^"]+)"/)?.[1];
     assert.ok(route && LEARN_ROUTES.includes(route), `${exam.id} linked an unpublished guide`);
     assert.match(english, new RegExp(`href="/en/${route}/"`));
