@@ -17,5 +17,13 @@
 #   en-tetracromia-desktop-chromium-linux.png  # new hero layout, PR #58
 #
 
-en-learn-desktop-chromium-linux.png  # Learn index now presents five research-backed guides
-en-learn-mobile-chromium-linux.png   # Same five genuinely authored articles on mobile
+en-tetracromia-desktop-chromium-linux.png  # English colour lab adds a guide beside its research trail
+en-tetracromia-mobile-chromium-linux.png   # Same compact colour research link at mobile width
+en-color-blindness-desktop-chromium-linux.png  # Daltonia links its plain-language colour-vision guide
+en-color-blindness-mobile-chromium-linux.png   # Same Daltonia research link at mobile width
+en-riflessi-desktop-chromium-linux.png  # Reaction lab links its browser timing explanation
+en-riflessi-mobile-chromium-linux.png   # Same reaction guide after the research trail on mobile
+en-udito-desktop-chromium-linux.png  # Udito links the now-published hearing interpretation guide
+en-udito-mobile-chromium-linux.png   # Same hearing research context at mobile width
+en-acutezza-desktop-chromium-linux.png  # Acutezza links the now-published visual-acuity guide
+en-acutezza-mobile-chromium-linux.png   # Same visual sharpness explanation at mobile width

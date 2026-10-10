@@ -47,7 +47,11 @@ export function createRouteMetadata({
   });
 }
 
-/** Apply every route-owned identity field in one committed navigation update. */
+/**
+ * Apply every route-owned identity field in one committed navigation update.
+ * @param {RouteMetadata} metadata
+ * @param {Document} [root]
+ */
 export function applyRouteMetadata(metadata, root = document) {
   root.title = metadata.title;
   setMeta(root, 'name', 'description', metadata.description);
@@ -66,6 +70,7 @@ export function applyRouteMetadata(metadata, root = document) {
   applyRobotsMetadata(root, metadata.indexable);
 }
 
+/** @param {Document} root @param {boolean} indexable */
 function applyRobotsMetadata(root, indexable) {
   const current = root.querySelector('meta[name="robots"]');
   if (indexable) {
@@ -78,6 +83,7 @@ function applyRobotsMetadata(root, indexable) {
   if (!current) root.head.append(meta);
 }
 
+/** @param {Document} root @param {'name' | 'property'} attribute @param {string} key @param {string} value */
 function setMeta(root, attribute, key, value) {
   const meta = root.querySelector(`meta[${attribute}="${key}"]`);
   if (!(meta instanceof HTMLMetaElement)) throw new Error(`Metadata ${key} is unavailable`);

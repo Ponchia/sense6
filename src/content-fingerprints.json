@@ -16,27 +16,27 @@
   },
   "/ar/acutezza/": {
     "key": "exams.acutezza",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "f0f00e2471c1e51acec41a7a8506998e"
   },
   "/ar/color-blindness/": {
     "key": "exams.color-blindness",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "508abebae81210a8178daf83939116c0"
   },
   "/ar/riflessi/": {
     "key": "exams.riflessi",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "fcecf77f865e81fb3da7ba96b0b75682"
   },
   "/ar/tetracromia/": {
     "key": "exams.tetracromia",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "afa37869752dce5dcf07afd2fa859805"
   },
   "/ar/udito/": {
     "key": "exams.udito",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "5b22f76b213b35c91a4ef11be7f4d14b"
   },
   "/de/": {
@@ -51,27 +51,27 @@
   },
   "/de/acutezza/": {
     "key": "exams.acutezza",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "81d67af57de7d913909bdb7c965e214f"
   },
   "/de/color-blindness/": {
     "key": "exams.color-blindness",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "e6dd7270c6a2c17004db6f20aac5dfef"
   },
   "/de/riflessi/": {
     "key": "exams.riflessi",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "9b7a3db84fc24c6abd4b9af74587d910"
   },
   "/de/tetracromia/": {
     "key": "exams.tetracromia",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "a95cca9145778a177e553fc0386f70c9"
   },
   "/de/udito/": {
     "key": "exams.udito",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "70035f4abe018ad4c7acb5175a798c9f"
   },
   "/en/": {
@@ -86,8 +86,8 @@
   },
   "/en/acutezza/": {
     "key": "exams.acutezza",
-    "date": "2026-09-01",
-    "hash": "308e7bf10fcb21d52544675efc924d91"
+    "date": "2026-10-10",
+    "hash": "87285e71553ef82c6c598e43388344bc"
   },
   "/en/color-blindness-guide/": {
     "key": "learn",
@@ -96,8 +96,8 @@
   },
   "/en/color-blindness/": {
     "key": "exams.color-blindness",
-    "date": "2026-09-01",
-    "hash": "f72916a62a87f64d96beaba6f07120f2"
+    "date": "2026-10-10",
+    "hash": "3f844f87501092862f6318d67568c853"
   },
   "/en/hearing-range-guide/": {
     "key": "learn",
@@ -116,8 +116,8 @@
   },
   "/en/riflessi/": {
     "key": "exams.riflessi",
-    "date": "2026-09-01",
-    "hash": "1e248606be5a269b28f7c4bf39472ab4"
+    "date": "2026-10-10",
+    "hash": "9ac6b1de89f7963e2956902147dcf8e1"
   },
   "/en/tetrachromacy-guide/": {
     "key": "learn",
@@ -126,13 +126,13 @@
   },
   "/en/tetracromia/": {
     "key": "exams.tetracromia",
-    "date": "2026-09-01",
-    "hash": "5498e666ea2f9d45d344ee7739d0ade6"
+    "date": "2026-10-10",
+    "hash": "9d4371ed0412960936453430dd57d513"
   },
   "/en/udito/": {
     "key": "exams.udito",
-    "date": "2026-09-01",
-    "hash": "c9375d3a8e549d40517f08970adb5453"
+    "date": "2026-10-10",
+    "hash": "9c605e2d0a347bda0995dd0ef1340bea"
   },
   "/en/visual-acuity-guide/": {
     "key": "learn",
@@ -151,27 +151,27 @@
   },
   "/es/acutezza/": {
     "key": "exams.acutezza",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "2882c20072ef5d54b6895eeaeee36ec8"
   },
   "/es/color-blindness/": {
     "key": "exams.color-blindness",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "56dc64827665750b06075b2a1712a209"
   },
   "/es/riflessi/": {
     "key": "exams.riflessi",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "49aabeb80adaf8fb49c811b5cad94dde"
   },
   "/es/tetracromia/": {
     "key": "exams.tetracromia",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "df948112041779be0450862b2d6e4f86"
   },
   "/es/udito/": {
     "key": "exams.udito",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "9f66e74c5564b753ad7c8a002de8453f"
   },
   "/fr/": {
@@ -186,27 +186,27 @@
   },
   "/fr/acutezza/": {
     "key": "exams.acutezza",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "c296724e22324c05f8671d55de12a4a1"
   },
   "/fr/color-blindness/": {
     "key": "exams.color-blindness",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "839a2b63dd0a95d5a0fad5f9c5577961"
   },
   "/fr/riflessi/": {
     "key": "exams.riflessi",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "ff7b8f9e95001074b741d1765baa0c35"
   },
   "/fr/tetracromia/": {
     "key": "exams.tetracromia",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "5edf48b475dd61586dd05e5e94c89dce"
   },
   "/fr/udito/": {
     "key": "exams.udito",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "212456678a74bb9096efbed0a4354356"
   },
   "/hi/": {
@@ -221,27 +221,27 @@
   },
   "/hi/acutezza/": {
     "key": "exams.acutezza",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "530bcd21f583ec4508070a40204011e3"
   },
   "/hi/color-blindness/": {
     "key": "exams.color-blindness",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "db9a185edc266ad814fc3310e99102e5"
   },
   "/hi/riflessi/": {
     "key": "exams.riflessi",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "2400a3bb18c438ce14574bc447ec11d1"
   },
   "/hi/tetracromia/": {
     "key": "exams.tetracromia",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "182fe3f0a77f5ad7a9b33b52e572e836"
   },
   "/hi/udito/": {
     "key": "exams.udito",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "43e74ae13f7bc3ae6668a7e45ff04cc3"
   },
   "/it/": {
@@ -256,27 +256,27 @@
   },
   "/it/acutezza/": {
     "key": "exams.acutezza",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "ac13694e24046350e5d2bba1d26b57c1"
   },
   "/it/color-blindness/": {
     "key": "exams.color-blindness",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "3af0fe628e1899c328295067cb0983b6"
   },
   "/it/riflessi/": {
     "key": "exams.riflessi",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "9a5a462d4955620db40ee2aab4d37155"
   },
   "/it/tetracromia/": {
     "key": "exams.tetracromia",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "2969ed228756594a6461b4533c392174"
   },
   "/it/udito/": {
     "key": "exams.udito",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "935cd9361e2625621896eb5ea2b807fc"
   },
   "/ja/": {
@@ -291,27 +291,27 @@
   },
   "/ja/acutezza/": {
     "key": "exams.acutezza",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "6fdb150d91dda9ba426bd1642716a29a"
   },
   "/ja/color-blindness/": {
     "key": "exams.color-blindness",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "f9359ea6d65f61ba744b712c46dbc894"
   },
   "/ja/riflessi/": {
     "key": "exams.riflessi",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "cc9b898dc027092aed21603dc52b3514"
   },
   "/ja/tetracromia/": {
     "key": "exams.tetracromia",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "6c844529703787b7207dd175e56ddd77"
   },
   "/ja/udito/": {
     "key": "exams.udito",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "0c9f594a5fc8cbc3d245845dcdbc21e1"
   },
   "/ko/": {
@@ -326,27 +326,27 @@
   },
   "/ko/acutezza/": {
     "key": "exams.acutezza",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "c94a340286c21da1bfd0a5d90cdf5289"
   },
   "/ko/color-blindness/": {
     "key": "exams.color-blindness",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "037f09a38d6efb80d4367356c66f5439"
   },
   "/ko/riflessi/": {
     "key": "exams.riflessi",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "40625f10a78387492c3e58c435be758a"
   },
   "/ko/tetracromia/": {
     "key": "exams.tetracromia",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "b19721d2fe6a3378dc87ef88739daaf8"
   },
   "/ko/udito/": {
     "key": "exams.udito",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "df032b20f0ef46059e944f81f3640b52"
   },
   "/pt-br/": {
@@ -361,27 +361,27 @@
   },
   "/pt-br/acutezza/": {
     "key": "exams.acutezza",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "1b1f0d87d4a018a8a0ff0ac566712ecd"
   },
   "/pt-br/color-blindness/": {
     "key": "exams.color-blindness",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "db5ee1623be707849ceffb3ef1f1485e"
   },
   "/pt-br/riflessi/": {
     "key": "exams.riflessi",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "8df5a98677788c801b20fc8bbfbbf682"
   },
   "/pt-br/tetracromia/": {
     "key": "exams.tetracromia",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "63fb2209746493f5ebe4eee497f30caa"
   },
   "/pt-br/udito/": {
     "key": "exams.udito",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "5dadfad60bc441d226de8b95c84227f8"
   },
   "/pt/": {
@@ -396,27 +396,27 @@
   },
   "/pt/acutezza/": {
     "key": "exams.acutezza",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "df0567be6ea7349a1a70559a9d4af77c"
   },
   "/pt/color-blindness/": {
     "key": "exams.color-blindness",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "59ead6d1890e681ba8b8970efe88a3a9"
   },
   "/pt/riflessi/": {
     "key": "exams.riflessi",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "09c64d475633678d94fa36b849b74719"
   },
   "/pt/tetracromia/": {
     "key": "exams.tetracromia",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "c6e08cd4929fc7ed1ee17e05f8f32e31"
   },
   "/pt/udito/": {
     "key": "exams.udito",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "619ad83737d51d3ee0049041db95e4c0"
   },
   "/zh-hans/": {
@@ -431,27 +431,27 @@
   },
   "/zh-hans/acutezza/": {
     "key": "exams.acutezza",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "85602994e549faf4d9d20daca2e8cfaa"
   },
   "/zh-hans/color-blindness/": {
     "key": "exams.color-blindness",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "1447f53df450d3baeeeffc2aeac6bd35"
   },
   "/zh-hans/riflessi/": {
     "key": "exams.riflessi",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "8adf8078ec4570dd857923f6383cc963"
   },
   "/zh-hans/tetracromia/": {
     "key": "exams.tetracromia",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "7beaab551f2cf90af59ceef2225abfe1"
   },
   "/zh-hans/udito/": {
     "key": "exams.udito",
-    "date": "2026-09-01",
+    "date": "2026-10-10",
     "hash": "5b82b9430831fa7464d269257334f3a3"
   }
 }

@@ -1,4 +1,5 @@
 import { renderInstrumentList, renderMethodSteps, renderResearchSection } from '../landing.js';
+import { relatedGuideMarkup } from '../related-guide.js';
 import { sourcesFor } from '../sources.js';
 
 export const RIFLESSI_INSTRUMENTS = {
@@ -46,9 +47,10 @@ const RESEARCH_SOURCES = sourcesFor('riflessi');
 /**
  * @param {{ inputMode?: unknown } | null} previous
  * @param {(id: import('../../i18n/message-ids.js').MessageId) => string} message
+ * @param {string} [locale]
  * @returns {string}
  */
-export function riflessiIntroMarkup(previous, message) {
+export function riflessiIntroMarkup(previous, message, locale = 'en') {
   return `
     <div class="rx-intro">
       <section class="rx-intro__hero ui-container ui-container--wide">
@@ -124,6 +126,8 @@ export function riflessiIntroMarkup(previous, message) {
         label: message('section.researchTrail'),
         sources: RESEARCH_SOURCES,
       })}
+
+      ${relatedGuideMarkup('riflessi', locale)}
 
       <section class="closing-cta rx-closing ui-container ui-container--wide">
         <div>

@@ -1,3 +1,4 @@
+import { relatedGuideMarkup } from '../related-guide.js';
 /** @typedef {{ id: string, number: string, name: string, trials: number }} Phase */
 
 /**
@@ -5,8 +6,9 @@
  * @param {(source: string) => string} _translate
  * @param {(id: import('../../i18n/message-ids.js').MessageId) => string} message
  * @param {(lightness: number, chroma: number, hue: number) => string} colorCss
+ * @param {string} [locale]
  */
-export function tetracromiaHomeMarkup(phases, _translate, message, colorCss) {
+export function tetracromiaHomeMarkup(phases, _translate, message, colorCss, locale = 'en') {
   const spectrumBars = Array.from({ length: 28 }, (_, index) => {
     const hue = Math.round((index / 28) * 360);
     return `<span style="--bar-color: ${colorCss(0.7, 0.13, hue)}; --bar-delay: ${index * 18}ms"></span>`;
@@ -136,6 +138,8 @@ export function tetracromiaHomeMarkup(phases, _translate, message, colorCss) {
           .join('')}</ul>
       </div>
     </section>
+
+    ${relatedGuideMarkup('tetracromia', locale)}
 
     <section class="closing-cta ui-container ui-container--wide">
       <div>

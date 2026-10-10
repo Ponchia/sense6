@@ -135,7 +135,7 @@ function renderIntro() {
 
   const previous = loadLast();
 
-  state.app.innerHTML = colorBlindnessIntroMarkup(previous, m);
+  state.app.innerHTML = colorBlindnessIntroMarkup(previous, m, state.locale);
 
   scheduleStageFrame((mountState) => {
     const canvas = mountState.app.querySelector('[data-preview-target]');

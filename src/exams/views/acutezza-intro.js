@@ -1,4 +1,5 @@
 import { renderInstrumentList, renderResearchSection } from '../landing.js';
+import { relatedGuideMarkup } from '../related-guide.js';
 import { sourcesFor } from '../sources.js';
 
 export const ACUTEZZA_INSTRUMENTS = {
@@ -23,8 +24,9 @@ const RESEARCH_SOURCES = sourcesFor('acutezza');
 /**
  * @param {{ setupQuality?: unknown } | null} previous
  * @param {(id: import('../../i18n/message-ids.js').MessageId) => string} message
+ * @param {string} [locale]
  */
-export function acutezzaIntroMarkup(previous, message) {
+export function acutezzaIntroMarkup(previous, message, locale = 'en') {
   return `
     <div class="ac-intro">
       <section class="ac-intro__hero ui-container ui-container--wide">
@@ -67,6 +69,8 @@ export function acutezzaIntroMarkup(previous, message) {
         label: message('section.researchTrail'),
         sources: RESEARCH_SOURCES,
       })}
+
+      ${relatedGuideMarkup('acutezza', locale)}
 
       <section class="closing-cta ac-closing ui-container ui-container--wide">
         <div><p class="ui-eyebrow">Vision lab / selectable scope / about 4–8 minutes</p><h2>Calibrated sharpness &amp; nominal contrast</h2></div>

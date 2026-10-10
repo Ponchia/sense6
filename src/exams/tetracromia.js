@@ -81,7 +81,7 @@ function renderHome() {
   document.body.classList.remove('lab-mode');
   document.title = t('Tetracromia — colour discrimination | Sense6');
 
-  state.app.innerHTML = tetracromiaHomeMarkup(PHASES, t, m, toRgbCss);
+  state.app.innerHTML = tetracromiaHomeMarkup(PHASES, t, m, toRgbCss, state.locale);
 }
 
 function renderSetup({ invalidationMessage = '' } = {}) {
