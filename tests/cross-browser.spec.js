@@ -123,6 +123,15 @@ test('completed results survive a throwing localStorage getter', async ({ page }
   expect(pageErrors).toEqual([]);
 });
 
+test('a directly loaded lab accepts the first setup click after hydration @pr-smoke', async ({ page }) => {
+  await gotoHydrated(page, '/en/tetracromia/');
+  // Hydration is a user-ready milestone. The initial page must not be covered
+  // by an entry transition that steals a click immediately after it appears.
+  await page.locator('[data-action="setup"]').first().click();
+  await expect(page.locator('#screen-ready')).toBeVisible();
+  await expect(page.locator('[data-action="start"]')).toBeDisabled();
+});
+
 test('a display resize invalidates an active Screen Colour Lab journey @pr-smoke', async ({ page }) => {
   await gotoHydrated(page, '/en/tetracromia/');
   await enterColorLabSetup(page);

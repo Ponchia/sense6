@@ -8,7 +8,7 @@ import { disposeActiveMounts } from './lib/mount-registry.js';
 import { LOCALES } from './locales.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from './metrics.js';
 import { currentLocation, currentRoute, navigate, startRouter } from './router.js';
-import { applyRouteMetadata, createRouteMetadata, LEARN_ROUTES, STATIC_ADOPTED_ROUTES } from './routes.js';
+import { applyRouteMetadata, createRouteMetadata, LEARN_ROUTES } from './routes.js';
 import { renderGallery } from './site.js';
 
 const appElement = document.querySelector('#app');
@@ -134,8 +134,10 @@ async function renderRoute({ route, locale }) {
     }
 
     const initial = !committedRoute;
-    const adoptsStaticView = STATIC_ADOPTED_ROUTES.includes(route);
-    const animate = initial ? !adoptsStaticView : route !== committedRouteName;
+    // A direct-link visitor should be able to act as soon as the route is
+    // hydrated. Entry animations can intercept the first click on slower
+    // browsers; reserve view transitions for navigation between mounted routes.
+    const animate = !initial && route !== committedRouteName;
     const committed = await commitRoute(mountRoute, {
       animate,
       initial,
