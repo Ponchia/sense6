@@ -18,6 +18,10 @@ test('the Learn page links to original research guides and returns to the lab @p
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'Can an online test detect tetrachromacy?',
   );
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    'content',
+    'https://sense6.net/social/tetracromia.png',
+  );
   await expect(page.locator('.learn-article__body section')).toHaveCount(4);
   await expect(page.locator('.learn-references li')).toHaveCount(3);
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
@@ -35,6 +39,10 @@ test('reaction guide explains hardware delay without short-circuiting consent @p
   await page.goto('/en/reaction-time-guide/');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(
     'How accurate is a reaction-time test in a browser?',
+  );
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    'content',
+    'https://sense6.net/social/riflessi.png',
   );
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',

@@ -22,7 +22,7 @@ export async function writeLearnPages({ writePage, canonicalPaths, routeStyles }
       path,
       title: details.title,
       description: details.description,
-      socialImage: '/social/sense6.png',
+      socialImage: details.socialImage,
       socialImageAlt: details.socialImageAlt,
       main: learnMarkup(route),
       stylesheet,
