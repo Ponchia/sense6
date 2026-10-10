@@ -154,7 +154,10 @@ runs. Each entry contains structured measurements, uncertainty or measurement
 bounds when an instrument provides them, and a setup passport with the
 conditions needed for comparison. Comparisons are instrument-specific and use
 three labels: comparable, comparable with caution, or not comparable. Sense6
-does not convert the five instruments into a suite-wide score.
+does not convert the five instruments into a suite-wide score. A saved entry
+links back to its experiment, and English entries link to the corresponding
+reviewed research explanation. An empty journal offers the existing short
+reaction-time starter. Those links do not store or upload any additional data.
 
 You can delete one entry, delete the complete journal, export a documented JSON
 file, or merge that file back into a browser. Imports are size-limited,

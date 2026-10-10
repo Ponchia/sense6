@@ -86,6 +86,52 @@ test('the local journal compares, filters, exports, and deletes runs accessibly'
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
+test('a saved run offers a working experiment return path and honest research context @pr-smoke', async ({
+  page,
+}) => {
+  await page.goto('/en/journal/');
+  const first = page.locator('[data-journal-entry="latest"]');
+  await expect(first.locator('[data-journal-return]')).toHaveAttribute('href', '/en/tetracromia/');
+  await expect(first.locator('[data-journal-return]')).toHaveAttribute(
+    'aria-label',
+    'Open test: Screen Colour Lab',
+  );
+  await expect(first.locator('[data-journal-guide]')).toHaveAttribute('href', '/en/tetrachromacy-guide/');
+
+  const journal = await page.evaluate(() => localStorage.getItem('sense6:journal'));
+  await first.locator('[data-journal-guide]').click();
+  await expect(page).toHaveURL(/\/en\/tetrachromacy-guide\/$/);
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Can an online test detect tetrachromacy?' }),
+  ).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('sense6:journal'))).toBe(journal);
+
+  await page.goto('/en/journal/');
+  await page.locator('[data-journal-entry="latest"] [data-journal-return]').click();
+  await expect(page).toHaveURL(/\/en\/tetracromia\/$/);
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Tetracromia');
+  expect(await page.evaluate(() => localStorage.getItem('sense6:journal'))).toBe(journal);
+});
+
+test('non-English journals localize the experiment name and return action without English research links', async ({
+  page,
+}) => {
+  await page.goto('/it/journal/');
+  const first = page.locator('[data-journal-entry="latest"]');
+  await expect(first.getByRole('heading', { level: 2 })).toHaveText('Laboratorio colore su schermo');
+  await expect(page.locator('[data-journal-filter] option[value="tetracromia"]')).toHaveText(
+    'Laboratorio colore su schermo',
+  );
+  await expect(first.locator('[data-journal-return]')).toHaveAttribute(
+    'aria-label',
+    'Apri il test: Laboratorio colore su schermo',
+  );
+  await expect(page.locator('[data-journal-guide]')).toHaveCount(0);
+  await first.locator('[data-journal-return]').click();
+  await expect(page).toHaveURL(/\/it\/tetracromia\/$/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'it');
+});
+
 test('journal data recorded in another locale remains readable through localized controls', async ({
   page,
 }) => {
