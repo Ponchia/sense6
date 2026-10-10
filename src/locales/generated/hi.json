@@ -43,6 +43,10 @@
   ["Riflessi — Reaction Time Lab", "Riflessi — प्रतिक्रिया समय प्रयोगशाला"],
   ["Udito — Hearing Range & Pitch Lab", "Udito — श्रवण परास और स्वरमान प्रयोगशाला"],
   ["Acutezza — Visual Sharpness Lab", "Acutezza — दृश्य स्पष्टता प्रयोगशाला"],
+  [
+    "At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.",
+    "सेटअप, व्यवधान, वॉल्यूम या अनुकूली ट्रैक की कम-से-कम एक जाँच सीमित रही। अवलोकन दिखाई देते रहेंगे, लेकिन तुलना से पहले अधिक स्थिर परिस्थितियों में दोबारा परीक्षण करें।"
+  ],
   ["How much do you want to run?", "आप परीक्षण कितनी गहराई तक करना चाहते हैं?"],
   ["about 2 minutes", "लगभग 2 मिनट"],
   ["about 4 minutes", "लगभग 4 मिनट"],

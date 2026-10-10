@@ -43,6 +43,10 @@
   ["Riflessi — Reaction Time Lab", "Riflessi — 반응 시간 실험실"],
   ["Udito — Hearing Range & Pitch Lab", "Udito — 가청 범위 및 음높이 실험실"],
   ["Acutezza — Visual Sharpness Lab", "Acutezza — 시각 선명도 실험실"],
+  [
+    "At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.",
+    "설정, 중단, 음량 또는 적응형 트랙 점검 중 하나 이상에 제한이 있었습니다. 관찰 결과는 계속 표시되지만, 비교하려면 더 안정적인 조건에서 다시 실행하세요."
+  ],
   ["How much do you want to run?", "검사를 어느 정도 깊이 진행할까요?"],
   ["about 2 minutes", "약 2분"],
   ["about 4 minutes", "약 4분"],
