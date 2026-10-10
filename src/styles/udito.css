@@ -1358,3 +1358,8 @@
 .measurement-active .au-intervals > div.is-live {
   transform: none;
 }
+
+/* Only rendered with the reviewed English hearing explainer. */
+.au-results__learn {
+  margin-block: 1.25rem 0;
+}

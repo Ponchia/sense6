@@ -2,10 +2,10 @@
   "overview": {
     "title": "Perception, explained.",
     "metaTitle": "Learn about perception and browser experiments | Sense6",
-    "description": "Short, research-backed explanations of colour vision, colour-vision differences and reaction time. Learn what browser experiments can and cannot reveal.",
-    "intro": "Curiosity deserves a useful answer. Explore colour vision and reaction timing, learn how to interpret online tests, and try the related experiments with their device limits in view.",
+    "description": "Research-backed answers about colour vision, response timing, hearing and visual sharpness—and what uncalibrated browser experiments cannot establish.",
+    "intro": "Explore five questions about what we see, hear and notice. Each explanation connects real research to an interactive Sense6 experiment, with device limits and interpretation boundaries visible.",
     "boundary": "Sense6 is a recreational browser lab. These explanations and experiments are not diagnoses, clinical tests or proof of a biological trait.",
-    "updated": "9 October 2026"
+    "updated": "10 October 2026"
   },
   "articles": {
     "tetrachromacy-guide": {
@@ -83,7 +83,9 @@
           "title": "Sense6 Screen Colour Lab — methods, sources and limitations",
           "href": "/en/tetracromia/"
         }
-      ]
+      ],
+      "publishedDate": "2026-10-09",
+      "dateModified": "2026-10-10"
     },
     "reaction-time-guide": {
       "title": "How accurate is a reaction-time test in a browser?",
@@ -161,7 +163,9 @@
           "title": "Sense6 Riflessi — scopes, timing controls and limitations",
           "href": "/en/riflessi/"
         }
-      ]
+      ],
+      "publishedDate": "2026-10-09",
+      "dateModified": "2026-10-10"
     },
     "color-blindness-guide": {
       "title": "What can an online colour-blindness test tell you?",
@@ -239,7 +243,179 @@
           "title": "Sense6 Daltonia — adaptive tracks, controls and evidence boundaries",
           "href": "/en/color-blindness/"
         }
-      ]
+      ],
+      "publishedDate": "2026-10-09",
+      "dateModified": "2026-10-10"
+    },
+    "hearing-range-guide": {
+      "title": "Can a browser test your hearing range?",
+      "eyebrow": "Hearing and headphones · 5-minute read",
+      "metaTitle": "Can a browser test your hearing range? | Sense6",
+      "description": "What online tone tests can reveal, why headphone volume and calibration matter, and why a frequency result cannot diagnose hearing loss or reveal hearing age.",
+      "updated": "10 October 2026",
+      "publishedDate": "2026-10-10",
+      "summary": "A browser can play tones and record which choices you made on your current headphones and volume setting. It cannot know the sound pressure reaching your ears, so an upper frequency observed online is not an audiogram, a diagnosis of hearing loss, or a measure of 'hearing age'.",
+      "facts": [
+        {
+          "head": "The digital tone",
+          "detail": "The browser controls frequency and digital amplitude, not the calibrated sound level at your eardrum."
+        },
+        {
+          "head": "The listening chain",
+          "detail": "Headphones, fit, volume, room noise and audio processing all affect audibility."
+        },
+        {
+          "head": "The useful result",
+          "detail": "A run-relative observation that you can revisit under similar conditions, with the limits attached."
+        }
+      ],
+      "sections": [
+        {
+          "heading": "A frequency number and a hearing threshold are different",
+          "paragraphs": [
+            "Frequency is the rate of vibration, measured in hertz (Hz). A browser can generate a digital tone at a requested frequency, but hearing that tone also depends on its level and on how that level reaches you. A digital amplitude setting does not tell a website the resulting sound pressure at your eardrum.",
+            "Two people may hear different things with the same laptop, and the same person may get a different result when switching headphones or changing volume. Equal numbers on an operating-system volume slider do not guarantee equal acoustic output across devices. An upper frequency noticed on one setup is therefore not a biological upper limit.",
+            "A clinical audiogram answers a different question: how sensitive someone is to calibrated sounds at selected frequencies, usually expressed in decibels hearing level (dB HL). That measurement requires known transducers, a suitable test environment and established procedures. The American Speech-Language-Hearing Association's guidelines specify those conditions; Sense6 does not reproduce them."
+          ]
+        },
+        {
+          "heading": "Why headphones, volume and room noise matter",
+          "paragraphs": [
+            "Every headphone has its own frequency response. Earbuds may fit or seal differently from over-ear headphones; background sounds can mask quiet tones; and the phone or computer may apply equalization, noise reduction or other audio processing. None of these conditions is reliably calibrated by a normal web page.",
+            "The Web Audio API defines how the browser creates and processes digital sound. Its audio context reports a sample rate, and frequency generation has mathematical limits related to that rate. The specification does not provide a measurement of your headphone's acoustic output at your ears. At high frequencies, headphone response and playback limits can be especially important.",
+            "Turning volume up in search of a higher number is a poor way to learn. Use only a comfortable level, and stop if a sound is uncomfortable. If a task asks you to keep volume unchanged, that instruction protects within-run comparability; it does not make the output clinically calibrated or guarantee that a previous result is comparable on another device."
+          ]
+        },
+        {
+          "heading": "What Udito actually checks",
+          "paragraphs": [
+            "Sense6's Udito is a recreational listening lab. It begins with headphone-like presentation checks, then asks questions about tones in separate tasks. Its frequency-range observation records where its adaptive sequence ended on this setup. A longer scope also includes pitch-difference choices near selected reference frequencies. Those observations are deliberately not combined into a hearing score.",
+            "The task includes known-audibility anchors, control trials and a final check that you did not knowingly change the volume. These make it easier to explain whether a particular run deserves caution. Passing a headphone-like presentation check does not identify the physical device or demonstrate that it is calibrated; failing a check does not diagnose anything either.",
+            "When a result reaches the experiment's technical frequency ceiling, that is a limit of what the software attempted, not the highest frequency your ears could possibly hear. If control trials fail, if you are interrupted, or if you change volume, interpret the visible observations cautiously rather than treating them as a reliable personal boundary."
+          ]
+        },
+        {
+          "heading": "How this differs from a hearing check or audiometry",
+          "paragraphs": [
+            "The World Health Organization's hearWHO app uses digits presented in background noise to provide a hearing check. It has published evidence for that specific task and population, and WHO still says it does not replace professional assessment. A digits-in-noise hearing check and Sense6's browser tone tasks measure different things; validation of the former does not transfer to the latter.",
+            "If you have difficulty following conversations or notice a change in hearing, a qualified hearing-care professional can choose the appropriate assessment. An arbitrary online high-frequency result cannot tell you whether you need hearing aids or whether a hearing change is medically significant.",
+            "For curiosity, the useful question is narrower: which tone choices could you identify today with this equipment, and were the setup checks coherent? Repeat only under comparable, comfortable conditions, retain the uncertainty and use the private journal as a record of those sessions—not as a clinical hearing history."
+          ]
+        }
+      ],
+      "experiment": {
+        "route": "udito",
+        "title": "Try the Udito listening lab",
+        "hint": "Focused or Standard listening observations · comfortable unchanged volume · no hearing diagnosis"
+      },
+      "sources": [
+        {
+          "role": "Professional audiometry procedures",
+          "title": "ASHA (2005) — Guidelines for Manual Pure-Tone Threshold Audiometry",
+          "href": "https://www.asha.org/policy/GL2005-00014/"
+        },
+        {
+          "role": "Browser audio-engineering standard",
+          "title": "W3C Web Audio API — audio context, sample rate and output processing",
+          "href": "https://www.w3.org/TR/webaudio-1.0/"
+        },
+        {
+          "role": "Comparison with a distinct hearing check",
+          "title": "World Health Organization — Hearing checks and the hearWHO app",
+          "href": "https://www.who.int/news-room/questions-and-answers/item/deafness-and-hearing-loss-hearing-checks-and-the-hearwho-app"
+        },
+        {
+          "role": "What Sense6 implements",
+          "title": "Sense6 Udito — headphone-like check, tone tasks and interpretation limits",
+          "href": "/en/udito/"
+        }
+      ],
+      "dateModified": "2026-10-10"
+    },
+    "visual-acuity-guide": {
+      "title": "Can an online visual-acuity test replace an eye exam?",
+      "eyebrow": "Visual sharpness and screens · 5-minute read",
+      "metaTitle": "Can an online visual-acuity test replace an eye exam? | Sense6",
+      "description": "Why screen size, viewing distance and contrast affect online sharpness tasks, and how self-measured acuity observations differ from a professional eye examination.",
+      "updated": "10 October 2026",
+      "publishedDate": "2026-10-10",
+      "summary": "No. A screen-based task can describe which small shapes you identified on a particular display at a stated distance. It cannot establish eye health, prescribe lenses, or substitute for a comprehensive examination. Screen calibration and viewing conditions determine how the result should be read.",
+      "facts": [
+        {
+          "head": "Size on the retina",
+          "detail": "A target's visual angle depends on its physical size and your distance from the display."
+        },
+        {
+          "head": "Conditions",
+          "detail": "Screen scaling, viewing distance, contrast, correction and lighting can change your choices."
+        },
+        {
+          "head": "What remains unknown",
+          "detail": "A sharpness estimate does not examine the retina, eye pressure, visual fields or disease."
+        }
+      ],
+      "sections": [
+        {
+          "heading": "Why a target on a screen needs a distance",
+          "paragraphs": [
+            "An eye-chart symbol has a physical size. What matters for recognizing its detail is also the angle it occupies from the viewer's eye. Move closer to the same symbol and its angular size changes, even though its pixels have not. A browser-based sharpness task must therefore connect on-screen size to a viewing distance rather than treating a pixel count as vision.",
+            "Pixels reported by a browser are not necessarily physical dots on the panel. Display density, page zoom, operating-system scaling and browser rendering influence how CSS dimensions appear. An on-screen card-size check can help estimate physical scale, while a viewing-distance step helps estimate the resulting visual angle. Both depend on what the participant actually does.",
+            "The ISO 8596 visual-acuity standard specifies Landolt-ring optotypes and their presentation for particular distance-vision certification or licensing purposes. It explicitly does not claim to be a standard for clinical measurements. Sense6's self-administered display task is not an ISO-certified acuity test and does not inherit any standard's intended use."
+          ]
+        },
+        {
+          "heading": "A sharpness result describes a particular task",
+          "paragraphs": [
+            "Many visual-sharpness tasks ask which way a gap faces in a small broken ring. The response depends on the size of that gap, the rendered contrast, the display, focus, attention and the viewing setup. Getting several directions correct says something about those stimuli; it does not reveal a glasses prescription or an eye disease.",
+            "A short adaptive sequence can estimate where the person's responses changed during that run. When software reports a model interval, it describes variation under the assumptions of its scoring model. It is not a promise that the screen's scale, the viewing distance or the participant's setup were measured with the same certainty.",
+            "A technical display floor or ceiling is another important limit: some gaps cannot become physically smaller on a given screen, and others may exceed the task's chosen range. Results near those boundaries should be labelled as bounded observations rather than presented as exact human visual thresholds."
+          ]
+        },
+        {
+          "heading": "What Acutezza can record—and what it deliberately cannot",
+          "paragraphs": [
+            "Sense6's Acutezza asks for directional choices on a calibrated-as-possible display setup, with checks for scale and viewing distance. Its Focused scope measures a high-contrast sharpness condition. The longer Standard scope adds a nominal low-contrast condition, which must be interpreted separately. Results are recorded per eye, never as one overall vision grade.",
+            "The session remembers whether its scale and distance were measured or assumed, whether task controls were answered coherently, whether the display environment changed, and whether each estimate met a software bound. Those details are part of the result, not technical clutter: without them a small number could appear more certain than it is.",
+            "Do not turn an Acutezza result into a '20/20' claim, an astigmatism axis, lens strength, driving eligibility or confirmation of eye health. A weaker or stronger observation may reflect lighting, distance, correction, focus, fatigue or the display just as much as differences in the task."
+          ]
+        },
+        {
+          "heading": "What a comprehensive examination adds",
+          "paragraphs": [
+            "Visual acuity is only one part of an eye examination. The U.S. National Eye Institute explains that a dilated exam can also check visual fields, eye-muscle function, pupil response and eye pressure, and examine structures such as the retina and optic nerve. A web page that displays letters or gaps cannot perform those assessments.",
+            "If your vision changes or you have symptoms, use an eye-care professional rather than relying on a repeated online task. In particular, sudden vision loss, severe pain, new flashes or floaters, or a curtain over the field of view warrant prompt professional assessment. A recreational score should never be used to delay care.",
+            "For personal curiosity, repeat the same task only with similar correction, room lighting, screen size and measured distance. Keep left and right eyes separate, note any caution flags, and compare only compatible runs in your private journal. The useful conclusion is about the task you performed—not a diagnosis."
+          ]
+        }
+      ],
+      "experiment": {
+        "route": "acutezza",
+        "title": "Try the Acutezza sharpness lab",
+        "hint": "Separate observations for each eye · screen-size and viewing-distance checks · no vision screening"
+      },
+      "sources": [
+        {
+          "role": "Visual-acuity optotype and presentation standard",
+          "title": "ISO 8596:2017 — Standard and clinical optotypes and their presentation (scope and limits)",
+          "href": "https://www.iso.org/standard/69042.html"
+        },
+        {
+          "role": "Eye health and professional assessment",
+          "title": "U.S. National Eye Institute — Get a Dilated Eye Exam",
+          "href": "https://www.nei.nih.gov/eye-health-information/healthy-vision/finding-eye-doctor/get-dilated-eye-exam"
+        },
+        {
+          "role": "Web layout measurement model",
+          "title": "W3C CSS Values and Units Level 4 — the reference pixel",
+          "href": "https://www.w3.org/TR/css-values-4/#absolute-lengths"
+        },
+        {
+          "role": "What Sense6 implements",
+          "title": "Sense6 Acutezza — setup, independent eye conditions and measured limitations",
+          "href": "/en/acutezza/"
+        }
+      ],
+      "dateModified": "2026-10-10"
     }
   }
 }

@@ -4,6 +4,8 @@ export const LEARN_ROUTES = Object.freeze([
   'tetrachromacy-guide',
   'reaction-time-guide',
   'color-blindness-guide',
+  'hearing-range-guide',
+  'visual-acuity-guide',
 ]);
 export const UTILITY_ROUTES = Object.freeze(['about', 'journal', 'privacy']);
 export const NON_INDEXABLE_ROUTES = Object.freeze(['journal', 'privacy']);

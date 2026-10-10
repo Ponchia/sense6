@@ -715,6 +715,7 @@ function renderResults() {
   document.title = t('Your calibrated sharpness observations — Acutezza | Sense6');
   renderScreen(
     acutezzaResultsMarkup({
+      locale: state.locale,
       session: state.session,
       strongest,
       usable,

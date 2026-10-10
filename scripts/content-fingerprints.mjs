@@ -21,6 +21,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CONTENT_DATES } from '../src/content-dates.js';
 import { EXAM_IDS } from '../src/exams/contracts.js';
+import { LEARN_ROUTES } from '../src/routes.js';
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const MANIFEST = join(ROOT, 'src/content-fingerprints.json');
@@ -78,8 +79,7 @@ function contentDateKey(path) {
   const route = path.split('/').filter(Boolean)[1];
   if (!route) return 'site';
   if (route === 'about') return 'about';
-  if (['learn', 'tetrachromacy-guide', 'reaction-time-guide', 'color-blindness-guide'].includes(route))
-    return 'learn';
+  if (LEARN_ROUTES.includes(route)) return 'learn';
   return EXAM_IDS.includes(route) ? `exams.${route}` : null;
 }
 

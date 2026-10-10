@@ -1280,3 +1280,8 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
     transform: none;
   }
 }
+
+/* Only rendered with the reviewed English visual-acuity explainer. */
+.ac-results__learn {
+  margin-block: 1.25rem 0;
+}

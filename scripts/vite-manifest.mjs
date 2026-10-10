@@ -1,4 +1,5 @@
 import { readFile, stat } from 'node:fs/promises';
+import { LEARN_ROUTES } from '../src/routes.js';
 
 const SUPPLEMENTAL_LOCALES = new Set(['ar', 'hi', 'ja', 'ko', 'pt-br', 'zh-hans']);
 
@@ -89,7 +90,6 @@ function routeModuleEntry(route) {
   if (route === 'about') return 'src/about.js';
   if (route === 'journal') return 'src/journal.js';
   if (route === 'privacy') return 'src/privacy.js';
-  if (['learn', 'tetrachromacy-guide', 'reaction-time-guide', 'color-blindness-guide'].includes(route))
-    return 'src/learn.js';
+  if (LEARN_ROUTES.includes(route)) return 'src/learn.js';
   return `src/exams/${route}.js`;
 }
