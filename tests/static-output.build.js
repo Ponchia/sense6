@@ -105,6 +105,17 @@ test('Learn pages are genuinely English-only and share one static/runtime render
   assert.doesNotMatch(german, /gallery-learn|href="\/en\/learn\/"/);
   for (const route of LEARN_ROUTES) {
     const html = await readFile(new URL(`en/${route}/index.html`, DIST), 'utf8');
+    const socialImage = learnMetadata(route).socialImage;
+    for (const element of ['<meta property="og:image"', '<meta name="twitter:image"']) {
+      assert.ok(
+        html.includes(`${element} content="https://sense6.net${socialImage}">`),
+        `${route} has a stale or mismatched sharing preview`,
+      );
+    }
+    assert.ok(
+      (await stat(new URL(socialImage.slice(1), DIST))).size > 1000,
+      `${route} social image is missing from the production artifact`,
+    );
     assert.ok(html.includes(learnMarkup(route)), `${route} raw and hydrated content differ`);
     assert.doesNotMatch(html, /rel="alternate" hreflang=/, `${route} invented translations`);
     assert.match(html, /href="\/en\/"/, `${route} missing back-link to experiments`);

@@ -234,6 +234,7 @@ async function prepareInformationalRoute(route, locale) {
       route,
       title: page.title,
       description: page.description,
+      socialImage: page.socialImage,
       socialImageAlt: page.socialImageAlt,
     }),
   };

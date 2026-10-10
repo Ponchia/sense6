@@ -18,7 +18,11 @@ export function learnMetadata(route) {
   return {
     title: page.metaTitle,
     description: page.description,
-    socialImageAlt: page.description,
+    // Each article reuses the existing 1200x630 card for its related
+    // instrument; the Learn index retains the generic Sense6 preview.
+    socialImage: route === 'learn' ? '/social/sense6.png' : `/social/${page.experiment.route}.png`,
+    socialImageAlt:
+      route === 'learn' ? page.description : `Sense6 experiment artwork: ${page.experiment.title}`,
     dateModified: route === 'learn' ? CONTENT_DATES.learn : page.dateModified,
     references: route === 'learn' ? [] : page.sources,
   };

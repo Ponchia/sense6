@@ -20,6 +20,13 @@ test('English-only guides have original substantive answers, methods and referen
     const html = learnMarkup(route);
     assert.equal(meta.title, content.metaTitle);
     assert.equal(meta.description, content.description);
+    const expectedImage =
+      route === 'learn' ? '/social/sense6.png' : `/social/${content.experiment.route}.png`;
+    assert.equal(meta.socialImage, expectedImage);
+    assert.equal(
+      meta.socialImageAlt,
+      route === 'learn' ? content.description : `Sense6 experiment artwork: ${content.experiment.title}`,
+    );
     assert.match(html, /data-sense6-view="learn"/);
     assert.match(html, new RegExp(`data-sense6-route="${route}"`));
     assert.equal((html.match(/<h1[ >]/g) ?? []).length, 1);
@@ -39,6 +46,7 @@ test('English-only guides have original substantive answers, methods and referen
     assert.equal(record.datePublished, route === 'learn' ? undefined : content.publishedDate);
     assert.equal(record.dateModified, meta.dateModified);
     assert.equal(record.author.name, 'Zeno');
+    assert.equal(record.image, route === 'learn' ? undefined : `https://sense6.net${expectedImage}`);
     assert.equal(schema['@graph'][1]['@type'], 'BreadcrumbList');
     assert.equal(schema['@graph'][1].itemListElement.length, route === 'learn' ? 2 : 3);
   }
