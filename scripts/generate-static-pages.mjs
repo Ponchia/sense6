@@ -336,6 +336,7 @@ function examMarkup(definition, locale, tr) {
     if (!entry) throw new Error(`Unknown related experiment: ${id}`);
     return entry;
   });
+  const relatedGuide = relatedGuideMarkup(definition.id, locale);
   return `<article class="static-entry ui-container ui-container--wide" id="interactive-test">
     <a class="back-link" data-sense6-route="" href="/${locale}/"><span aria-hidden="true">←</span> ${escapeHtml(tr('All tests'))}</a>
     <header>
@@ -367,8 +368,7 @@ function examMarkup(definition, locale, tr) {
         )
         .join('')}</ul>
     </section>
-    ${relatedGuideMarkup(definition.id, locale)}
-    <section>
+    ${relatedGuide ? `${relatedGuide}\n    ` : ''}<section>
       <h2>${escapeHtml(tr('Start with what you want to learn.'))}</h2>
       <div class="static-page-grid">${related
         .map(
