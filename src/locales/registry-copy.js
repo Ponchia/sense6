@@ -57,6 +57,7 @@ const SOURCES = Object.freeze([
   'Riflessi — Reaction Time Lab',
   'Udito — Hearing Range & Pitch Lab',
   'Acutezza — Visual Sharpness Lab',
+  'At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.',
 ]);
 
 /** @type {Readonly<Record<LocaleCode, readonly string[]>>} */
@@ -95,6 +96,7 @@ const TRANSLATIONS = Object.freeze({
     'Riflessi — Laboratorio del tempo di reazione',
     'Udito — Laboratorio di gamma udibile e altezza dei suoni',
     'Acutezza — Laboratorio di nitidezza visiva',
+    'Almeno uno dei controlli della configurazione, delle interruzioni, del volume o del percorso adattivo ha avuto limitazioni. Le osservazioni restano visibili, ma è meglio ripetere la prova in condizioni più stabili prima di confrontarle.',
   ]),
   de: Object.freeze([
     'Bildschirm-Farblabor',
@@ -129,6 +131,7 @@ const TRANSLATIONS = Object.freeze({
     'Riflessi — Labor für Reaktionszeit',
     'Udito — Labor für Hörbereich und Tonhöhe',
     'Acutezza — Labor für visuelle Schärfe',
+    'Mindestens eine Prüfung der Einrichtung, der Unterbrechungen, der Lautstärke oder eines adaptiven Durchlaufs war eingeschränkt. Die Beobachtungen bleiben sichtbar; für Vergleiche ist ein erneuter Versuch unter stabileren Bedingungen sinnvoll.',
   ]),
   fr: Object.freeze([
     'Laboratoire couleur sur écran',
@@ -163,6 +166,7 @@ const TRANSLATIONS = Object.freeze({
     'Riflessi — Laboratoire de temps de réaction',
     'Udito — Laboratoire de plage audible et de hauteur tonale',
     'Acutezza — Laboratoire de netteté visuelle',
+    'Au moins un contrôle de configuration, des interruptions, du volume ou du parcours adaptatif a présenté des limites. Les observations restent visibles, mais une nouvelle tentative dans des conditions plus stables est préférable avant toute comparaison.',
   ]),
   es: Object.freeze([
     'Laboratorio de color en pantalla',
@@ -197,6 +201,7 @@ const TRANSLATIONS = Object.freeze({
     'Riflessi — Laboratorio de tiempo de reacción',
     'Udito — Laboratorio de rango audible y tono',
     'Acutezza — Laboratorio de nitidez visual',
+    'Al menos una comprobación de la configuración, las interrupciones, el volumen o el recorrido adaptativo tuvo limitaciones. Las observaciones siguen visibles, pero conviene repetir la prueba en condiciones más estables antes de compararlas.',
   ]),
   pt: Object.freeze([
     'Laboratório de cor no ecrã',
@@ -231,6 +236,7 @@ const TRANSLATIONS = Object.freeze({
     'Riflessi — Laboratório de tempo de reação',
     'Udito — Laboratório de gama audível e altura tonal',
     'Acutezza — Laboratório de nitidez visual',
+    'Pelo menos uma verificação da configuração, das interrupções, do volume ou do percurso adaptativo apresentou limitações. As observações continuam visíveis, mas convém repetir o teste em condições mais estáveis antes de as comparar.',
   ]),
   'pt-br': Object.freeze([
     'Laboratório de cor na tela',
@@ -265,6 +271,7 @@ const TRANSLATIONS = Object.freeze({
     'Riflessi — Laboratório de tempo de reação',
     'Udito — Laboratório de faixa audível e altura tonal',
     'Acutezza — Laboratório de nitidez visual',
+    'Pelo menos uma verificação da configuração, das interrupções, do volume ou do percurso adaptativo teve limitações. As observações continuam visíveis, mas é melhor repetir o teste em condições mais estáveis antes de compará-las.',
   ]),
   ar: Object.freeze([
     'مختبر ألوان الشاشة',
@@ -299,6 +306,7 @@ const TRANSLATIONS = Object.freeze({
     'Riflessi — مختبر زمن رد الفعل',
     'Udito — مختبر المدى المسموع ودرجة الصوت',
     'Acutezza — مختبر حدة التفاصيل',
+    'كانت هناك قيود في فحص واحد على الأقل من فحوص الإعداد أو الانقطاعات أو مستوى الصوت أو المسار التكيّفي. تظل الملاحظات ظاهرة، لكن يُفضّل تكرار التجربة في ظروف أكثر استقرارًا قبل مقارنتها.',
   ]),
   ja: Object.freeze([
     '画面カラーラボ',
@@ -333,6 +341,7 @@ const TRANSLATIONS = Object.freeze({
     'Riflessi — 反応時間ラボ',
     'Udito — 可聴範囲・音高ラボ',
     'Acutezza — 視認精度ラボ',
+    '設定、中断、音量、適応トラックのいずれかの確認に制約がありました。観察結果は表示されますが、比較する前に、より安定した条件で再実施してください。',
   ]),
   ko: Object.freeze([
     '화면 색상 실험실',
@@ -367,6 +376,7 @@ const TRANSLATIONS = Object.freeze({
     'Riflessi — 반응 시간 실험실',
     'Udito — 가청 범위 및 음높이 실험실',
     'Acutezza — 시각 선명도 실험실',
+    '설정, 중단, 음량 또는 적응형 트랙 점검 중 하나 이상에 제한이 있었습니다. 관찰 결과는 계속 표시되지만, 비교하려면 더 안정적인 조건에서 다시 실행하세요.',
   ]),
   hi: Object.freeze([
     'स्क्रीन रंग प्रयोगशाला',
@@ -401,6 +411,7 @@ const TRANSLATIONS = Object.freeze({
     'Riflessi — प्रतिक्रिया समय प्रयोगशाला',
     'Udito — श्रवण परास और स्वरमान प्रयोगशाला',
     'Acutezza — दृश्य स्पष्टता प्रयोगशाला',
+    'सेटअप, व्यवधान, वॉल्यूम या अनुकूली ट्रैक की कम-से-कम एक जाँच सीमित रही। अवलोकन दिखाई देते रहेंगे, लेकिन तुलना से पहले अधिक स्थिर परिस्थितियों में दोबारा परीक्षण करें।',
   ]),
   'zh-hans': Object.freeze([
     '屏幕色彩实验室',
@@ -435,6 +446,7 @@ const TRANSLATIONS = Object.freeze({
     'Riflessi — 反应时间实验室',
     'Udito — 可听范围与音高实验室',
     'Acutezza — 视觉清晰度实验室',
+    '设置、中断、音量或自适应轨迹的检查中至少有一项受到限制。观察结果仍会显示，但比较前应在更稳定的条件下重新测试。',
   ]),
 });
 

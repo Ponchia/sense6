@@ -49,6 +49,10 @@
   ["Riflessi — Reaction Time Lab", "Riflessi — Laboratoire de temps de réaction"],
   ["Udito — Hearing Range & Pitch Lab", "Udito — Laboratoire de plage audible et de hauteur tonale"],
   ["Acutezza — Visual Sharpness Lab", "Acutezza — Laboratoire de netteté visuelle"],
+  [
+    "At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.",
+    "Au moins un contrôle de configuration, des interruptions, du volume ou du parcours adaptatif a présenté des limites. Les observations restent visibles, mais une nouvelle tentative dans des conditions plus stables est préférable avant toute comparaison."
+  ],
   ["How much do you want to run?", "Quelle doit être la profondeur de la session ?"],
   ["about 2 minutes", "environ 2 minutes"],
   ["about 4 minutes", "environ 4 minutes"],

@@ -912,24 +912,25 @@
 }
 
 .au-results {
-  padding-block: 2rem clamp(4rem, 8vw, 7rem);
+  padding-block: 1.25rem clamp(4rem, 8vw, 7rem);
 }
 
 .au-results__hero {
   align-items: end;
   display: grid;
-  gap: 3rem;
-  grid-template-columns: 1fr auto;
-  margin-block-start: clamp(3rem, 8vw, 7rem);
+  gap: clamp(1.5rem, 3.5vw, 3rem);
+  grid-template-columns: minmax(0, 1fr) auto;
+  margin-block-start: clamp(0.65rem, 1.5vw, 1.25rem);
 }
 
 .au-results__hero h1 {
-  font-size: clamp(3.7rem, 7.5vw, 7.5rem);
+  font-size: clamp(2.4rem, 4.4vw, 4.5rem);
+  max-inline-size: 29ch;
 }
 
 .au-results__hero > div > p:last-child {
   color: var(--text-dim);
-  line-height: 1.65;
+  line-height: 1.55;
   max-inline-size: 45rem;
 }
 
@@ -938,14 +939,18 @@
 }
 
 .au-results__stamp {
-  align-items: center;
-  aspect-ratio: 1;
+  align-items: flex-start;
   border: 1px solid var(--success);
   display: flex;
   flex-direction: column;
-  inline-size: 12rem;
+  gap: 0.65rem;
+  inline-size: clamp(13.5rem, 21vw, 17rem);
   justify-content: center;
-  text-align: center;
+  min-block-size: 9rem;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  padding: 1rem 1.15rem;
+  text-align: start;
 }
 
 .au-results__stamp.is-limited {
@@ -960,7 +965,10 @@
 
 .au-results__stamp strong {
   font-family: var(--sans);
-  font-size: 2.2rem;
+  font-size: clamp(1.5rem, 2.65vw, 2.25rem);
+  line-height: 1.15;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
 }
 
 .au-result-grid {
@@ -969,7 +977,7 @@
   display: grid;
   gap: 1px;
   grid-template-columns: repeat(2, 1fr);
-  margin-block: clamp(3rem, 7vw, 5rem);
+  margin-block: clamp(1.25rem, 3vw, 2.5rem);
 }
 
 .au-metric {
@@ -1105,6 +1113,10 @@
     font-size: clamp(3.2rem, 15vw, 5.2rem);
   }
 
+  .au-results__hero h1 {
+    font-size: clamp(2.05rem, 8vw, 3.25rem);
+  }
+
   .au-hero__actions > *,
   .au-results__actions > * {
     inline-size: 100%;
@@ -1201,10 +1213,11 @@
   }
 
   .au-results__stamp {
-    aspect-ratio: auto;
-    flex-direction: row;
-    gap: 1rem;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
     inline-size: 100%;
+    min-block-size: 0;
     padding: 1rem;
   }
 
@@ -1227,6 +1240,10 @@
   .au-transition h1,
   .au-results__hero h1 {
     font-size: clamp(2rem, 14vw, 3.2rem);
+  }
+
+  .au-results__hero h1 {
+    font-size: clamp(1.9rem, 9vw, 2.75rem);
   }
 
   .au-setup__rules > strong {

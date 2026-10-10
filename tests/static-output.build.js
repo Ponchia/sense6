@@ -138,6 +138,39 @@ test('Learn pages are genuinely English-only and share one static/runtime render
   }
 });
 
+/** Keep font-loading assertions separate from the already substantial SEO test. */
+function assertCriticalDisplayFontPreloads(html, path, locale, route) {
+  const usesNativeMetrics = ['ar', 'hi', 'ja', 'ko', 'zh-hans'].includes(locale);
+  const entryScript = html.indexOf('<script type="module"');
+  const displayFontPreload =
+    /<link rel="preload" href="\/assets\/doto-800-[^"]+\.woff2" as="font" type="font\/woff2" crossorigin>/;
+  if (usesNativeMetrics) {
+    assert.doesNotMatch(html, displayFontPreload, `${path} uses native script metrics instead of Doto`);
+  } else {
+    assert.match(html, displayFontPreload, `${path} must preload the above-fold display face`);
+    const fontOffset = html.indexOf('<link rel="preload" href="/assets/doto-800-');
+    assert.ok(
+      fontOffset >= 0 && fontOffset < entryScript,
+      `${path} must discover Doto 800 before application JavaScript`,
+    );
+  }
+  for (const weight of [400, 700]) {
+    const heroFontPreload = new RegExp(
+      `<link rel="preload" href="/assets/doto-${weight}-[^"]+\\.woff2" as="font"`,
+    );
+    if (route === 'udito' && !usesNativeMetrics) {
+      assert.match(html, heroFontPreload, `${path} must discover its hydrated hero font before paint`);
+      const fontOffset = html.indexOf(`/assets/doto-${weight}-`);
+      assert.ok(
+        fontOffset >= 0 && fontOffset < entryScript,
+        `${path} must discover Doto ${weight} before application JavaScript`,
+      );
+    } else {
+      assert.doesNotMatch(html, heroFontPreload, `${path} must not preload Udito-only hero weights`);
+    }
+  }
+}
+
 test('every canonical route has substantive, localized raw HTML', async () => {
   const headers = await readFile(new URL('_headers', DIST), 'utf8');
   const titles = new Set();
@@ -174,23 +207,7 @@ test('every canonical route has substantive, localized raw HTML', async () => {
     } else {
       assert.doesNotMatch(html, /<meta name="robots" content="noindex">/, path);
     }
-    const displayFontPreload =
-      /<link rel="preload" href="\/assets\/doto-800-[^"]+\.woff2" as="font" type="font\/woff2" crossorigin media="not \(prefers-reduced-data: reduce\)">/;
-    if (['ar', 'hi', 'ja', 'ko', 'zh-hans'].includes(locale)) {
-      assert.doesNotMatch(html, displayFontPreload, `${path} uses native script metrics instead of Doto`);
-    } else {
-      assert.match(html, displayFontPreload, `${path} must preload the above-fold display face`);
-    }
-    for (const weight of [400, 700]) {
-      const heroFontPreload = new RegExp(
-        `<link rel="preload" href="/assets/doto-${weight}-[^"]+\\.woff2" as="font"`,
-      );
-      if (route === 'udito' && !['ar', 'hi', 'ja', 'ko', 'zh-hans'].includes(locale)) {
-        assert.match(html, heroFontPreload, `${path} must discover its hydrated hero font before paint`);
-      } else {
-        assert.doesNotMatch(html, heroFontPreload, `${path} must not preload Udito-only hero weights`);
-      }
-    }
+    assertCriticalDisplayFontPreloads(html, path, locale, route);
     const stylesheet = englishGuide ? 'learn' : route || 'gallery';
     assert.match(
       html,

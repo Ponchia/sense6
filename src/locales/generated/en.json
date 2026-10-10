@@ -46,6 +46,10 @@
   ["Riflessi — Reaction Time Lab", "Riflessi — Reaction Time Lab"],
   ["Udito — Hearing Range & Pitch Lab", "Udito — Hearing Range & Pitch Lab"],
   ["Acutezza — Visual Sharpness Lab", "Acutezza — Visual Sharpness Lab"],
+  [
+    "At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.",
+    "At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat."
+  ],
   ["How much do you want to run?", "How much do you want to run?"],
   ["about 2 minutes", "about 2 minutes"],
   ["about 4 minutes", "about 4 minutes"],
