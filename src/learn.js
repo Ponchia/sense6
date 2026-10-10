@@ -1,8 +1,8 @@
+import { CONTENT_DATES } from './content-dates.js';
 import content from './learn-content.json' with { type: 'json' };
 import { LEARN_ROUTES } from './routes.js';
 import { CREATOR_PROFILE_URL } from './site-identity.js';
 
-const reviewDate = '2026-10-09';
 const byline = 'Zeno';
 
 /** @param {string} route */
@@ -19,7 +19,7 @@ export function learnMetadata(route) {
     title: page.metaTitle,
     description: page.description,
     socialImageAlt: page.description,
-    dateModified: reviewDate,
+    dateModified: route === 'learn' ? CONTENT_DATES.learn : page.dateModified,
     references: route === 'learn' ? [] : page.sources,
   };
 }
@@ -85,7 +85,14 @@ function overviewMarkup() {
 
 /** @param {string} route @param {(typeof content.articles)['tetrachromacy-guide']} article */
 function articleMarkup(route, article) {
-  const other = Object.entries(content.articles).find(([id]) => id !== route);
+  const relatedRoute = {
+    'tetrachromacy-guide': 'color-blindness-guide',
+    'color-blindness-guide': 'tetrachromacy-guide',
+    'reaction-time-guide': 'hearing-range-guide',
+    'hearing-range-guide': 'visual-acuity-guide',
+    'visual-acuity-guide': 'hearing-range-guide',
+  }[route];
+  const relatedArticle = content.articles[relatedRoute];
   const experimentPath = article.experiment.href || `/en/${article.experiment.route}/`;
   return `
     <article class="learn-view learn-article ui-container ui-container--wide" data-sense6-view="learn" data-sense6-route="${route}">
@@ -94,7 +101,7 @@ function articleMarkup(route, article) {
         <p class="ui-eyebrow">${esc(article.eyebrow)}</p>
         <h1>${esc(article.title)}</h1>
         <p class="learn-hero__lede">${esc(article.description)}</p>
-        <p class="learn-hero__date">By <a href="${CREATOR_PROFILE_URL}" rel="me noreferrer">${byline}</a> · Reviewed <time datetime="${reviewDate}">${esc(article.updated)}</time></p>
+        <p class="learn-hero__date">By <a href="${CREATOR_PROFILE_URL}" rel="me noreferrer">${byline}</a> · Reviewed <time datetime="${article.publishedDate}">${esc(article.updated)}</time></p>
       </header>
       <section class="learn-answer" aria-labelledby="answer-title">
         <p class="ui-eyebrow" id="answer-title">The short answer</p>
@@ -141,7 +148,7 @@ function articleMarkup(route, article) {
         <p>Browser experiments cannot reveal the biological or clinical status of your senses. Answers and measurements stay on your device. No paper cited here has validated this particular Sense6 implementation.</p>
       </aside>
       <nav class="learn-further" aria-label="Keep exploring">
-        <div><span class="ui-eyebrow">Another question</span><a data-sense6-route="${other[0]}" href="/en/${other[0]}/">${esc(other[1].title)} →</a></div>
+        <div><span class="ui-eyebrow">Another question</span><a data-sense6-route="${relatedRoute}" href="/en/${relatedRoute}/">${esc(relatedArticle.title)} →</a></div>
         <a data-sense6-route="learn" href="/en/learn/">← All research guides</a>
       </nav>
     </article>

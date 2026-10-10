@@ -19,7 +19,9 @@ The English [Learn section](https://sense6.net/en/learn/) answers research
 questions beyond the experiments: [tetrachromacy and what an RGB screen can
 establish](https://sense6.net/en/tetrachromacy-guide/), [reaction-time
 measurement in browsers](https://sense6.net/en/reaction-time-guide/), and
-[what an online colour-blindness test can tell you](https://sense6.net/en/color-blindness-guide/).
+[what an online colour-blindness test can tell you](https://sense6.net/en/color-blindness-guide/),
+[what a browser hearing-range observation can mean](https://sense6.net/en/hearing-range-guide/),
+and [why screen-based acuity cannot replace an eye examination](https://sense6.net/en/visual-acuity-guide/).
 Each guide has cited sources, an author/review date and a link to a related
 experiment. No translated versions are published until review, so these guides
 do not advertise invented multilingual alternatives. Research informs their

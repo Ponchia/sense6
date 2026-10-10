@@ -15,7 +15,7 @@ import { EXAMS } from '../src/exams/registry.js';
 import { galleryMarkup } from '../src/gallery-markup.js';
 import { messageSource } from '../src/i18n/message-ids.js';
 import { interpolateMessage } from '../src/i18n.js';
-import { learnMarkup } from '../src/learn.js';
+import { learnMarkup, learnMetadata, learnPage } from '../src/learn.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
 import { LEARN_ROUTES, NON_INDEXABLE_ROUTES, routePath, UTILITY_ROUTES } from '../src/routes.js';
 import { ENGLISH_EXPLAINER_COPY, STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
@@ -93,10 +93,13 @@ test('Learn pages are genuinely English-only and share one static/runtime render
     assert.match(html, /href="https:\/\/github\.com\/Ponchia"/, `${route} missing real author`);
     const data = JSON.parse(html.match(/<script type="application\/ld\+json">(.+)<\/script>/)?.[1] ?? '{}');
     assert.equal(data['@graph'][0]['@type'], route === 'learn' ? 'CollectionPage' : 'Article');
-    assert.equal(data['@graph'][0].dateModified, CONTENT_DATES.learn);
+    assert.equal(data['@graph'][0].dateModified, learnMetadata(route).dateModified);
     assert.equal(data['@graph'][0].author.name, 'Zeno');
     if (route !== 'learn') {
-      assert.equal(data['@graph'][0].citation.length, 2);
+      assert.equal(
+        data['@graph'][0].citation.length,
+        learnPage(route).sources.filter(({ href }) => href.startsWith('https://')).length,
+      );
       assert.match(html, /not a device calibration or research measurement/);
       assert.match(html, /do not validate the assembled Sense6 browser protocol/);
     }
@@ -467,7 +470,7 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   );
   const expectedDates = new Map([
     ['/', CONTENT_DATES.site],
-    ...LEARN_ROUTES.map((route) => [routePath('en', route), CONTENT_DATES.learn]),
+    ...LEARN_ROUTES.map((route) => [routePath('en', route), learnMetadata(route).dateModified]),
     ...LOCALES.flatMap(({ code }) => [
       [routePath(code), CONTENT_DATES.site],
       ...EXAMS.map(({ route }) => [routePath(code, route), examContentDate(route)]),
@@ -482,6 +485,11 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   for (const date of lastModified) {
     assert.match(date, /^\d{4}-\d{2}-\d{2}$/);
     assert.ok(Date.parse(`${date}T00:00:00Z`) <= Date.now(), `future sitemap date: ${date}`);
+  }
+
+  const llmsIndex = await readFile(new URL('llms.txt', DIST), 'utf8');
+  for (const route of LEARN_ROUTES) {
+    assert.ok(llmsIndex.includes(`https://sense6.net/en/${route}/`), `Text-discovery index omits ${route}`);
   }
 
   const robots = await readFile(new URL('robots.txt', DIST), 'utf8');

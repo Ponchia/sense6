@@ -1,5 +1,4 @@
-import { CONTENT_DATES } from '../src/content-dates.js';
-import { learnMarkup, learnMetadata } from '../src/learn.js';
+import { learnMarkup, learnMetadata, learnPage } from '../src/learn.js';
 import { LEARN_ROUTES } from '../src/routes.js';
 import { learnPageData } from './learn-structured-data.mjs';
 
@@ -14,7 +13,7 @@ export async function writeLearnPages({ writePage, canonicalPaths, routeStyles }
   for (const route of LEARN_ROUTES) {
     const details = learnMetadata(route);
     const path = `/en/${route}/`;
-    canonicalPaths.push({ path, lastModified: CONTENT_DATES.learn });
+    canonicalPaths.push({ path, lastModified: details.dateModified });
     await writePage(`en/${route}/index.html`, {
       locale: 'en',
       languageTag: 'en',
@@ -31,4 +30,12 @@ export async function writeLearnPages({ writePage, canonicalPaths, routeStyles }
       structuredData: learnPageData(route),
     });
   }
+}
+
+/** Include every original English Learn guide in the crawler text index. */
+export function learnDiscoveryLinks(origin) {
+  return LEARN_ROUTES.map((route) => {
+    const label = route === 'learn' ? 'Perception, explained — Learn' : learnPage(route).title;
+    return `- [${label}](${origin}/en/${route}/)`;
+  }).join('\n');
 }

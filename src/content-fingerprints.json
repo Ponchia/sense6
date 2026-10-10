@@ -91,7 +91,7 @@
   },
   "/en/color-blindness-guide/": {
     "key": "learn",
-    "date": "2026-10-09",
+    "date": "2026-10-10",
     "hash": "d73658aa63dd3fd9d85a11c1e7b125e3"
   },
   "/en/color-blindness/": {
@@ -99,15 +99,20 @@
     "date": "2026-09-01",
     "hash": "f72916a62a87f64d96beaba6f07120f2"
   },
+  "/en/hearing-range-guide/": {
+    "key": "learn",
+    "date": "2026-10-10",
+    "hash": "c997fa2c64ee0b4c0e635616fb8440cf"
+  },
   "/en/learn/": {
     "key": "learn",
-    "date": "2026-10-09",
-    "hash": "5ac8b0f5b585ba356f200eb7e650ca4e"
+    "date": "2026-10-10",
+    "hash": "23e3ecf70096974913530bd86e2cccc7"
   },
   "/en/reaction-time-guide/": {
     "key": "learn",
-    "date": "2026-10-09",
-    "hash": "1f87df836236c9218b8027b44f7d99d7"
+    "date": "2026-10-10",
+    "hash": "6a5e5528e3732c594d62abd87850756e"
   },
   "/en/riflessi/": {
     "key": "exams.riflessi",
@@ -116,8 +121,8 @@
   },
   "/en/tetrachromacy-guide/": {
     "key": "learn",
-    "date": "2026-10-09",
-    "hash": "4ad9c1191b634ed27871d4ea59d5c6fb"
+    "date": "2026-10-10",
+    "hash": "5c57c0bda18b36dbd604f2a258b6c272"
   },
   "/en/tetracromia/": {
     "key": "exams.tetracromia",
@@ -128,6 +133,11 @@
     "key": "exams.udito",
     "date": "2026-09-01",
     "hash": "c9375d3a8e549d40517f08970adb5453"
+  },
+  "/en/visual-acuity-guide/": {
+    "key": "learn",
+    "date": "2026-10-10",
+    "hash": "215e2a12e0202129ac29a0d14b1fd69a"
   },
   "/es/": {
     "key": "site",
