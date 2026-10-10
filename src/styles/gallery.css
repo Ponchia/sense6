@@ -746,18 +746,40 @@
 
   .exam-card__link {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(15rem, auto) 1fr;
+    grid-template-rows: minmax(11rem, auto) 1fr;
   }
 
   .exam-grid > .exam-card:last-child:nth-child(odd) .exam-card__link {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(15rem, auto) 1fr;
+    grid-template-rows: minmax(11rem, auto) 1fr;
   }
 
   .exam-card__visual {
     border-block-end: 1px solid var(--line);
     border-inline-end: 0;
-    min-block-size: 15rem;
+    min-block-size: 11rem;
+  }
+
+  /* Give the five choices room to breathe without a 240px poster per card. */
+  .exam-card__body {
+    gap: 0.55rem;
+    padding: 1.1rem;
+  }
+
+  .exam-card__glyph {
+    font-size: 1.1rem;
+    inline-size: 2.7rem;
+    inset-block-start: 0.7rem;
+    inset-inline-start: 0.7rem;
+  }
+
+  .exam-card .mini-plate,
+  .exam-card .mini-reflex {
+    inline-size: min(55%, 9.5rem);
+  }
+
+  .exam-card .mini-audio {
+    block-size: 8rem;
   }
 
   .exam-grid > .exam-card:last-child:nth-child(odd) .exam-card__visual {

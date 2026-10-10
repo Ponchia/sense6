@@ -22,4 +22,4 @@
 #   en-tetracromia-desktop-chromium-linux.png  # new hero layout, PR #58
 #
 
-en-mobile-chromium-linux.png  # English first-screen Learn navigation adds a visible action
+en-mobile-chromium-linux.png  # compact visual previews make all five experiments easier to browse on a phone
