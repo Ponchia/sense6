@@ -1,3 +1,4 @@
+import './related-guide.build.js';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readdir, readFile, stat } from 'node:fs/promises';

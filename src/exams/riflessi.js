@@ -75,7 +75,7 @@ function renderIntro() {
   document.title = t('Response speed and consistency — Riflessi | Sense6');
   const previous = loadLast();
 
-  state.app.innerHTML = riflessiIntroMarkup(previous, m);
+  state.app.innerHTML = riflessiIntroMarkup(previous, m, state.locale);
   resetScreen();
 }
 

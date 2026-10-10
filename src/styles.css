@@ -1111,3 +1111,23 @@ html[dir="rtl"] :is(input[type="number"], output, code, kbd, samp) {
     transform: translateX(-0.25rem) scaleX(-1);
   }
 }
+/* Direct, source-backed reading path from each experiment's research trail. */
+.experiment-guide-link {
+  align-items: center;
+  border-block: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.5rem;
+  justify-content: space-between;
+  padding-block: clamp(1.1rem, 2vw, 1.7rem);
+}
+
+.experiment-guide-link .ui-eyebrow {
+  margin: 0;
+}
+
+.experiment-guide-link .ui-link {
+  max-inline-size: 45rem;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}

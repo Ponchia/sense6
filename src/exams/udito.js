@@ -106,7 +106,7 @@ function renderIntro() {
   state.anchorsPlayed = false;
   document.body.classList.remove('lab-mode', 'au-running');
   document.title = t('Device-relative hearing lab — Udito | Sense6');
-  state.app.innerHTML = uditoIntroMarkup(loadLast(), m);
+  state.app.innerHTML = uditoIntroMarkup(loadLast(), m, state.locale);
   focusStage('h1', 'Udito listening lab ready.');
 }
 

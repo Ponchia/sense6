@@ -6,6 +6,7 @@ import { CONTENT_DATES, examContentDate } from '../src/content-dates.js';
 import { CRAWLER_POLICY, renderRobots } from '../src/crawler-policy.js';
 import { examDescriptionSource } from '../src/exams/metadata.js';
 import { EXAMS } from '../src/exams/registry.js';
+import { relatedGuideMarkup } from '../src/exams/related-guide.js';
 import { SOURCE_ROLE_LABELS, sourcesFor } from '../src/exams/sources.js';
 import { galleryMarkup } from '../src/gallery-markup.js';
 import { messageSource } from '../src/i18n/message-ids.js';
@@ -335,6 +336,7 @@ function examMarkup(definition, locale, tr) {
     if (!entry) throw new Error(`Unknown related experiment: ${id}`);
     return entry;
   });
+  const relatedGuide = relatedGuideMarkup(definition.id, locale);
   return `<article class="static-entry ui-container ui-container--wide" id="interactive-test">
     <a class="back-link" data-sense6-route="" href="/${locale}/"><span aria-hidden="true">←</span> ${escapeHtml(tr('All tests'))}</a>
     <header>
@@ -366,7 +368,7 @@ function examMarkup(definition, locale, tr) {
         )
         .join('')}</ul>
     </section>
-    <section>
+    ${relatedGuide ? `${relatedGuide}\n    ` : ''}<section>
       <h2>${escapeHtml(tr('Start with what you want to learn.'))}</h2>
       <div class="static-page-grid">${related
         .map(
