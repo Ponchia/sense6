@@ -40,6 +40,8 @@ export const SEARCH_REPRESENTATIVE_ROUTES = Object.freeze([
   '/en/learn/',
   '/en/tetrachromacy-guide/',
   '/en/color-blindness-guide/',
+  '/en/hearing-range-guide/',
+  '/en/visual-acuity-guide/',
   ...EXAMS.map(({ route }) => routePath('en', route)),
   '/en/about/',
   '/ar/about/',

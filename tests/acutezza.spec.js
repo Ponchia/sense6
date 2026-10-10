@@ -305,6 +305,15 @@ test('Acutezza focused scope omits the nominal-contrast condition @pr-smoke', as
       }),
     )
     .toBe('focused');
+  await expect(page.locator('.ac-results__learn a')).toHaveAttribute('href', '/en/visual-acuity-guide/');
+  await page.locator('.ac-results__learn a').click();
+  await expect(page).toHaveURL(/\/en\/visual-acuity-guide\/$/);
+  await expect(
+    page.getByRole('heading', {
+      level: 1,
+      name: 'Can an online visual-acuity test replace an eye exam?',
+    }),
+  ).toBeVisible();
 });
 
 test('Acutezza migrates its legacy latest result into the strict versioned shape', async ({

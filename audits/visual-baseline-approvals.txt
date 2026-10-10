@@ -16,3 +16,6 @@
 #
 #   en-tetracromia-desktop-chromium-linux.png  # new hero layout, PR #58
 #
+
+en-learn-desktop-chromium-linux.png  # Learn index now presents five research-backed guides
+en-learn-mobile-chromium-linux.png   # Same five genuinely authored articles on mobile

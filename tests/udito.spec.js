@@ -173,6 +173,12 @@ test('Udito focused scope ends after Portata and omits pitch placeholders @pr-sm
       }),
     )
     .toBe('focused');
+  await expect(page.locator('.au-results__learn a')).toHaveAttribute('href', '/en/hearing-range-guide/');
+  await page.locator('.au-results__learn a').click();
+  await expect(page).toHaveURL(/\/en\/hearing-range-guide\/$/);
+  await expect(
+    page.getByRole('heading', { level: 1, name: 'Can a browser test your hearing range?' }),
+  ).toBeVisible();
 });
 
 test('Udito shows a settled upper boundary as a lower bound with its run evidence', async ({
