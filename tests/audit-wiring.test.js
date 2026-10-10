@@ -292,6 +292,8 @@ test('the visual comparison gates pull requests and direct pushes', () => {
   }
   assert.match(verify, /needs: \[browser, lighthouse, visual\]/);
   assert.match(verify, /audits\/visual-baseline-approvals\.txt/);
+  assert.match(verify, /scripts\/read-visual-approvals\.mjs/);
+  assert.match(verify, /name: Read the visual approvals introduced by this revision/);
   assert.doesNotMatch(
     verify,
     /git diff --name-only .*visual-regression\.spec\.js-snapshots/,
