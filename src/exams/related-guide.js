@@ -29,14 +29,25 @@ const RELATED = Object.freeze({
 });
 
 /**
- * Keep the pre-rendered HTML and hydrated introductions aligned.
+ * Look up an existing, reviewed article for the experiment and active locale.
+ * English is currently the only published Learn language.
+ * @param {import('./contracts.js').ExamId} examId
+ * @param {string} locale
+ */
+export function relatedGuideFor(examId, locale) {
+  if (locale !== 'en') return null;
+  const guide = RELATED[examId];
+  return guide && LEARN_ROUTES.includes(guide.route) ? guide : null;
+}
+
+/**
+ * Render a link to the same reviewed guide for the experiment landing.
  * @param {import('./contracts.js').ExamId} examId
  * @param {string} locale
  */
 export function relatedGuideMarkup(examId, locale) {
-  if (locale !== 'en') return '';
-  const guide = RELATED[examId];
-  if (!guide || !LEARN_ROUTES.includes(guide.route)) return '';
+  const guide = relatedGuideFor(examId, locale);
+  if (!guide) return '';
   return `<aside class="experiment-guide-link ui-container ui-container--wide" aria-label="Related research explanation">
     <p class="ui-eyebrow">Research, explained</p>
     <a class="ui-link" data-sense6-route="${guide.route}" href="/en/${guide.route}/">${guide.title} →</a>
