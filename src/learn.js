@@ -1,5 +1,6 @@
 import { CONTENT_DATES } from './content-dates.js';
 import content from './learn-content.json' with { type: 'json' };
+import { activateTimingIllustration, timingIllustrationMarkup } from './learn-timing-illustration.js';
 import { LEARN_ROUTES } from './routes.js';
 import { CREATOR_PROFILE_URL } from './site-identity.js';
 
@@ -41,7 +42,7 @@ export function renderLearn(context, route) {
   if (!context.app.querySelector(`:scope > [data-sense6-view="learn"][data-sense6-route="${route}"]`)) {
     context.app.innerHTML = learnMarkup(route);
   }
-  return () => {};
+  return route === 'reaction-time-guide' ? activateTimingIllustration(context.app) : () => {};
 }
 
 /** @param {string} route */
@@ -105,7 +106,7 @@ function articleMarkup(route, article) {
         <p class="ui-eyebrow">${esc(article.eyebrow)}</p>
         <h1>${esc(article.title)}</h1>
         <p class="learn-hero__lede">${esc(article.description)}</p>
-        <p class="learn-hero__date">By <a href="${CREATOR_PROFILE_URL}" rel="me noreferrer">${byline}</a> · Reviewed <time datetime="${article.publishedDate}">${esc(article.updated)}</time></p>
+        <p class="learn-hero__date">By <a href="${CREATOR_PROFILE_URL}" rel="me noreferrer">${byline}</a> · Reviewed <time datetime="${article.dateModified}">${esc(article.updated)}</time></p>
       </header>
       <section class="learn-answer" aria-labelledby="answer-title">
         <p class="ui-eyebrow" id="answer-title">The short answer</p>
@@ -131,6 +132,7 @@ function articleMarkup(route, article) {
         <ol>${article.facts.map((fact, i) => `<li><span class="learn-model__num" aria-hidden="true">0${i + 1}</span><strong>${esc(fact.head)}</strong><p>${esc(fact.detail)}</p></li>`).join('')}</ol>
         <figcaption>A way to think about the problem · not a device calibration or research measurement.</figcaption>
       </figure>
+      ${route === 'reaction-time-guide' ? timingIllustrationMarkup() : ''}
       <div class="learn-article__columns">
         <div class="learn-article__body">
           ${article.sections

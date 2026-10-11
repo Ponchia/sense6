@@ -116,6 +116,13 @@ test('Learn pages are genuinely English-only and share one static/runtime render
       (await stat(new URL(socialImage.slice(1), DIST))).size > 1000,
       `${route} social image is missing from the production artifact`,
     );
+    assert.match(
+      html,
+      route === 'learn'
+        ? /<meta property="og:type" content="website"/
+        : /<meta property="og:type" content="article"/,
+      `${route} Open Graph content type`,
+    );
     assert.ok(html.includes(learnMarkup(route)), `${route} raw and hydrated content differ`);
     assert.doesNotMatch(html, /rel="alternate" hreflang=/, `${route} invented translations`);
     assert.match(html, /href="\/en\/"/, `${route} missing back-link to experiments`);
