@@ -56,17 +56,26 @@ function frenchFixture() {
   };
 }
 
-test('publication defaults to six English routes across twelve supported locales', async () => {
-  assert.deepEqual(await validateLearnPublication(), ['en']);
-  assert.deepEqual(LEARN_PUBLISHED_LOCALES, ['en']);
+test('published Learn locales are complete; other supported locales do not expose unfinished guides', async () => {
+  assert.deepEqual(await validateLearnPublication(), LEARN_PUBLISHED_LOCALES);
+  assert.deepEqual(LEARN_PUBLISHED_LOCALES, ['en', 'it', 'es']);
   assert.equal(LOCALES.length, 12);
-  for (const { code } of LOCALES.filter(({ code }) => code !== 'en')) {
-    assert.equal(isLearnPublished(code), false);
+  for (const code of LEARN_PUBLISHED_LOCALES) {
+    await prepareLearnLocale(code);
+    const catalog = learnCatalog(code);
+    assert.ok(catalog.content.articles['reaction-time-guide'].sections.length >= 4);
+    assert.match(learnMarkup('learn', code), new RegExp(`data-learn-locale="${code}"`));
+  }
+  for (const { code } of LOCALES.filter(({ code }) => !isLearnPublished(code))) {
     await assert.rejects(prepareLearnLocale(code), /Unpublished/);
     assert.throws(() => learnCatalog(code), /unavailable/);
     assert.throws(() => learnMarkup('learn', code), /unavailable/);
   }
-  assert.deepEqual(learnAlternates('learn'), []);
+  const alternatives = learnAlternates('learn');
+  assert.equal(alternatives.length, LEARN_PUBLISHED_LOCALES.length);
+  for (const code of LEARN_PUBLISHED_LOCALES) {
+    assert.ok(alternatives.some(({ href }) => href === `https://sense6.net/${code}/learn/`));
+  }
 });
 
 test('full catalog gate rejects missing text, source drift, placeholders and review claims', () => {
@@ -218,10 +227,15 @@ test('isolated activation exercises generation, loader, references and reciproca
         cp(new URL(`../scripts/${name}`, import.meta.url), join(root, 'scripts', name)),
       ),
     );
+    // The fixture tests an independent two-language universe; it must not
+    // inherit the real production catalogs as unlisted draft files.
+    for (const locale of LEARN_PUBLISHED_LOCALES.filter((code) => code !== 'en')) {
+      await rm(join(root, 'src/learn-locales', `${locale}.json`));
+    }
     await writeFile(join(root, 'src/learn-locales/fr.json'), JSON.stringify(frenchFixture()));
     await writeFile(
       join(root, 'src/learn-locales/published.json'),
-      JSON.stringify({ en: { label: 'Learn' }, fr: { label: 'Comprendre' } }),
+      JSON.stringify({ en: { label: 'Learn' }, fr: { label: 'Comprendre', publishedAt: '2026-10-11' } }),
     );
     const run = `
       import {writeLearnPages, learnDiscoveryLinks} from './scripts/learn-pages.mjs';

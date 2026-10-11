@@ -1,5 +1,6 @@
 import { learnMetadata, learnPage } from './learn.js';
 import { learnCatalog } from './learn-catalog.js';
+import { learnPublicationDate } from './learn-publication.js';
 import { localeMetadata } from './locale-metadata.js';
 import { LEARN_ROUTES, SITE_ORIGIN } from './routes.js';
 import { CREATOR_PROFILE_URL } from './site-identity.js';
@@ -41,7 +42,8 @@ export function learnPageData(route, locale = 'en') {
             headline: page.title,
             description: page.description,
             inLanguage: localeMetadata(locale).languageTag,
-            datePublished: page.publishedDate,
+            // Translation first-publication dates differ from their English source.
+            datePublished: locale === 'en' ? page.publishedDate : learnPublicationDate(locale),
             dateModified: page.dateModified,
             author: learnCreatorData(),
             publisher: { '@type': 'Organization', name: 'Sense6', url: ORIGIN },

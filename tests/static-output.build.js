@@ -17,6 +17,13 @@ import { galleryMarkup } from '../src/gallery-markup.js';
 import { messageSource } from '../src/i18n/message-ids.js';
 import { interpolateMessage } from '../src/i18n.js';
 import { learnMarkup, learnMetadata, learnPage } from '../src/learn.js';
+import { learnCatalog, prepareLearnLocale } from '../src/learn-catalog.js';
+import {
+  isLearnPublished,
+  LEARN_PUBLISHED_LOCALES,
+  learnAlternates,
+  learnPublicationDate,
+} from '../src/learn-publication.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
 import { LEARN_ROUTES, NON_INDEXABLE_ROUTES, routePath, UTILITY_ROUTES } from '../src/routes.js';
 import { ENGLISH_EXPLAINER_COPY, STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
@@ -36,7 +43,7 @@ const DISCOVERY_NAMES = Object.freeze({
 });
 const expectedPaths = [
   '/',
-  ...LEARN_ROUTES.map((route) => routePath('en', route)),
+  ...LEARN_PUBLISHED_LOCALES.flatMap((locale) => LEARN_ROUTES.map((route) => routePath(locale, route))),
   ...LOCALES.flatMap(({ code }) => [
     routePath(code),
     ...EXAMS.map(({ route }) => routePath(code, route)),
@@ -52,7 +59,7 @@ const expectedSitemapPaths = [
   ]),
   // Static generator deliberately appends original English Learn pages after
   // its localized experiment and About pages. Sitemaps have no priority order.
-  ...LEARN_ROUTES.map((route) => routePath('en', route)),
+  ...LEARN_PUBLISHED_LOCALES.flatMap((locale) => LEARN_ROUTES.map((route) => routePath(locale, route))),
 ];
 
 test('every localized static gallery features the same short Riflessi entry without inventing a new route', async () => {
@@ -75,76 +82,106 @@ test('every localized static gallery features the same short Riflessi entry with
   }
 });
 
-test('every pre-rendered page keeps the Learn footer link English-only', async () => {
+test('the footer and gallery expose only actually published Learn locales', async () => {
   const root = await readFile(new URL('index.html', DIST), 'utf8');
   assert.match(root, /data-sense6-route="learn" data-sense6-english-only href="\/en\/learn\/"/);
   for (const { code } of LOCALES) {
+    const published = isLearnPublished(code);
+    if (published) await prepareLearnLocale(code);
     const html = await readFile(new URL(`${code}/index.html`, DIST), 'utf8');
-    const link = html.match(
-      /<a data-sense6-route="learn" data-sense6-english-only(?: hidden)? href="([^"]+)" lang="en">Learn<\/a>/,
-    );
-    assert.ok(link, `${code} missing Learn footer navigation`);
-    assert.equal(link[0].includes(' hidden '), code !== 'en', `${code} language visibility`);
-    assert.equal(link[1], code === 'en' ? '/en/learn/' : `/${code}/`, `${code} locale-safe href`);
-    assert.ok(!html.includes(`href="/${code}/learn/"`) || code === 'en', `${code} false translated page`);
-    assert.equal(
-      html.includes('class="ui-link gallery-hero__learn"'),
-      code === 'en',
-      `${code} hero visibility`,
-    );
+    const links = [
+      ...html.matchAll(
+        /<a data-sense6-route="learn" data-sense6-english-only(?: hidden)? href="([^"]+)" lang="([^"]+)">([^<]*)<\/a>/g,
+      ),
+    ];
+    assert.equal(links.length, 1, `${code} should have exactly one Learn footer link`);
+    const link = links[0];
+    assert.equal(link[0].includes(' hidden '), !published, `${code} footer visibility`);
+    assert.equal(link[1], published ? `/${code}/learn/` : `/${code}/`, `${code} locale-safe href`);
+    assert.equal(link[2], published ? code : 'en', `${code} footer language`);
+    assert.equal(link[3], published ? learnCatalog(code).ui.Learn : 'Learn', `${code} footer text`);
+    assert.equal(html.includes('class="gallery-learn '), published, `${code} gallery Learn preview`);
+    if (!published) {
+      assert.ok(!html.includes(`href="/${code}/learn/"`), `${code} phantom translation`);
+    }
+    assert.equal(html.includes('class="ui-link gallery-hero__learn"'), code === 'en');
   }
 });
 
-test('Learn pages are genuinely English-only and share one static/runtime renderer', async () => {
-  const english = await readFile(new URL('en/index.html', DIST), 'utf8');
-  const german = await readFile(new URL('de/index.html', DIST), 'utf8');
-  assert.match(english, /data-sense6-route="learn"/);
-  assert.match(english, /href="\/en\/tetrachromacy-guide\/"/);
-  assert.match(english, /href="\/en\/reaction-time-guide\/"/);
-  assert.match(english, /href="\/en\/color-blindness-guide\/"/);
-  assert.doesNotMatch(german, /gallery-learn|href="\/en\/learn\/"/);
-  for (const route of LEARN_ROUTES) {
-    const html = await readFile(new URL(`en/${route}/index.html`, DIST), 'utf8');
-    const socialImage = learnMetadata(route).socialImage;
-    for (const element of ['<meta property="og:image"', '<meta name="twitter:image"']) {
-      assert.ok(
-        html.includes(`${element} content="https://sense6.net${socialImage}">`),
-        `${route} has a stale or mismatched sharing preview`,
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: A release-level assertion intentionally follows all published languages, metadata and source boundaries.
+test('all published Learn pages have full text, metadata and reciprocal alternatives', async () => {
+  for (const locale of LEARN_PUBLISHED_LOCALES) {
+    await prepareLearnLocale(locale);
+    const gallery = await readFile(new URL(`${locale}/index.html`, DIST), 'utf8');
+    assert.match(gallery, /data-sense6-route="learn"/);
+    for (const route of LEARN_ROUTES) {
+      const html = await readFile(new URL(`${locale}/${route}/index.html`, DIST), 'utf8');
+      const socialImage = learnMetadata(route, locale).socialImage;
+      const content = learnPage(route, locale);
+      for (const element of ['<meta property="og:image"', '<meta name="twitter:image"']) {
+        assert.ok(html.includes(`${element} content="https://sense6.net${socialImage}">`));
+      }
+      assert.ok((await stat(new URL(socialImage.slice(1), DIST))).size > 1000);
+      assert.match(
+        html,
+        route === 'learn'
+          ? /<meta property="og:type" content="website"/
+          : /<meta property="og:type" content="article"/,
       );
-    }
-    assert.ok(
-      (await stat(new URL(socialImage.slice(1), DIST))).size > 1000,
-      `${route} social image is missing from the production artifact`,
-    );
-    assert.match(
-      html,
-      route === 'learn'
-        ? /<meta property="og:type" content="website"/
-        : /<meta property="og:type" content="article"/,
-      `${route} Open Graph content type`,
-    );
-    assert.ok(html.includes(learnMarkup(route)), `${route} raw and hydrated content differ`);
-    assert.doesNotMatch(html, /rel="alternate" hreflang=/, `${route} invented translations`);
-    assert.match(html, /href="\/en\/"/, `${route} missing back-link to experiments`);
-    if (route !== 'learn') {
-      assert.ok(html.includes('href="/en/learn/"'), 'Articles need an index back-link');
-    }
-    assert.match(html, /href="https:\/\/github\.com\/Ponchia"/, `${route} missing real author`);
-    const data = JSON.parse(html.match(/<script type="application\/ld\+json">(.+)<\/script>/)?.[1] ?? '{}');
-    assert.equal(data['@graph'][0]['@type'], route === 'learn' ? 'CollectionPage' : 'Article');
-    assert.equal(data['@graph'][0].dateModified, learnMetadata(route).dateModified);
-    assert.equal(data['@graph'][0].author.name, 'Zeno');
-    if (route !== 'learn') {
-      assert.equal(
-        data['@graph'][0].citation.length,
-        learnPage(route).sources.filter(({ href }) => href.startsWith('https://')).length,
-      );
-      assert.match(html, /not a clinical or diagnostic test/);
-      assert.match(html, /None validates the Sense6 protocol/);
-      if (route === 'reaction-time-guide') {
-        assert.match(html, /not a latency measurement, calibration or correction formula/);
+      assert.ok(html.includes(learnMarkup(route, locale)), `${locale}/${route} differs on hydration`);
+      assert.ok(html.includes(`href="/${locale}/"`), `${locale}/${route} must link to gallery`);
+      assert.ok(html.includes('href="https://github.com/Ponchia"'), 'real author link is absent');
+      const canonical = `https://sense6.net/${locale}/${route}/`;
+      assert.ok(html.includes(`<link rel="canonical" href="${canonical}">`));
+      assert.equal((html.match(/rel="alternate" hreflang=/g) ?? []).length, learnAlternates(route).length);
+      for (const alternative of learnAlternates(route)) {
+        assert.ok(html.includes(`hreflang="${alternative.languageTag}" href="${alternative.href}"`));
+      }
+      const data = JSON.parse(html.match(/<script type="application\/ld\+json">(.+)<\/script>/)?.[1] ?? '{}');
+      const record = data['@graph'][0];
+      assert.equal(record['@type'], route === 'learn' ? 'CollectionPage' : 'Article');
+      assert.equal(record.url, canonical);
+      assert.equal(record.dateModified, learnMetadata(route, locale).dateModified);
+      if (route !== 'learn') {
+        assert.equal(
+          record.datePublished,
+          locale === 'en' ? content.publishedDate : learnPublicationDate(locale),
+          'Article datePublished must reflect that language edition, not English history',
+        );
+      }
+      assert.equal(record.author.name, 'Zeno');
+      assert.equal(record.inLanguage, LOCALES.find(({ code }) => code === locale).languageTag);
+      if (route !== 'learn') {
+        assert.equal(
+          record.citation.length,
+          content.sources.filter(({ href }) => href.startsWith('https://')).length,
+        );
+        assert.ok(
+          html.includes(
+            learnCatalog(locale).ui[
+              'Sense6 is a recreational browser lab, not a clinical or diagnostic test. Answers and measurements stay on your device.'
+            ],
+          ),
+        );
+        assert.ok(
+          html.includes(
+            learnCatalog(locale).ui[
+              'Research papers address the scientific question; standards describe equipment or browser behaviour. The Sense6 link documents the task implemented here. None validates the Sense6 protocol.'
+            ],
+          ),
+        );
+        if (route === 'reaction-time-guide') {
+          assert.ok(
+            html.includes(
+              learnCatalog(locale).ui['not a latency measurement, calibration or correction formula'],
+            ),
+          );
+        }
       }
     }
+  }
+  for (const { code } of LOCALES.filter(({ code }) => !isLearnPublished(code))) {
+    await assert.rejects(stat(new URL(`${code}/learn/index.html`, DIST)), /ENOENT/);
   }
 });
 
@@ -188,7 +225,7 @@ test('every canonical route has substantive, localized raw HTML', async () => {
     const html = await readFile(new URL(path === '/' ? 'index.html' : `.${path}index.html`, DIST), 'utf8');
     const locale = path.split('/').filter(Boolean)[0] ?? 'en';
     const route = path.split('/').filter(Boolean)[1] ?? '';
-    const englishGuide = LEARN_ROUTES.includes(route);
+    const publishedGuide = LEARN_ROUTES.includes(route);
     const metadata = LOCALES.find(({ code }) => code === locale) ?? LOCALES[0];
     assert.match(html, new RegExp(`<html lang="${metadata.languageTag}" dir="${metadata.direction}"`), path);
     assert.equal((html.match(/<h1[ >]/g) ?? []).length, 1, `${path} needs exactly one top-level heading`);
@@ -208,7 +245,7 @@ test('every canonical route has substantive, localized raw HTML', async () => {
     );
     assert.equal(
       (html.match(/rel="alternate" hreflang=/g) ?? []).length,
-      englishGuide ? 0 : LOCALES.length + 1,
+      publishedGuide ? learnAlternates(route).length : LOCALES.length + 1,
       path,
     );
     assert.match(html, /<script type="application\/ld\+json">.+<\/script>/, path);
@@ -218,7 +255,7 @@ test('every canonical route has substantive, localized raw HTML', async () => {
       assert.doesNotMatch(html, /<meta name="robots" content="noindex">/, path);
     }
     assertCriticalDisplayFontPreloads(html, path, locale, route);
-    const stylesheet = englishGuide ? 'learn' : route || 'gallery';
+    const stylesheet = publishedGuide ? 'learn' : route || 'gallery';
     assert.match(
       html,
       new RegExp(`<link rel="stylesheet" crossorigin href="/assets/${escapeRegex(stylesheet)}-[^"]+\\.css">`),
@@ -449,12 +486,14 @@ test('the shared gallery and About renderers are exactly what shipped in every l
     const messages = await loadMessages(locale);
     const translate = (source, values = {}) =>
       interpolateMessage(messages.get(source) ?? source, values, locale);
+    if (isLearnPublished(locale)) await prepareLearnLocale(locale);
     const gallery = galleryMarkup({
       exams: EXAMS,
       locale,
       localeHref: (route) => `/${locale}/${route ? `${route}/` : ''}`,
       m: (id) => translate(messageSource(id)),
       t: translate,
+      learnInfo: isLearnPublished(locale) && locale !== 'en' ? learnCatalog(locale) : null,
     });
     const galleryHtml = await readFile(new URL(`${locale}/index.html`, DIST), 'utf8');
     assert.ok(
@@ -529,7 +568,9 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   );
   const expectedDates = new Map([
     ['/', CONTENT_DATES.site],
-    ...LEARN_ROUTES.map((route) => [routePath('en', route), learnMetadata(route).dateModified]),
+    ...LEARN_PUBLISHED_LOCALES.flatMap((locale) =>
+      LEARN_ROUTES.map((route) => [routePath(locale, route), learnMetadata(route, locale).dateModified]),
+    ),
     ...LOCALES.flatMap(({ code }) => [
       [routePath(code), CONTENT_DATES.site],
       ...EXAMS.map(({ route }) => [routePath(code, route), examContentDate(route)]),
@@ -540,15 +581,23 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
     assert.equal(sitemapDates.get(path), expectedDates.get(path), `${path} has a stale content date`);
   }
   const lastModified = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((match) => match[1]);
-  assert.equal(lastModified.length, 1 + LEARN_ROUTES.length + LOCALES.length * (EXAMS.length + 2));
+  assert.equal(
+    lastModified.length,
+    1 + LEARN_PUBLISHED_LOCALES.length * LEARN_ROUTES.length + LOCALES.length * (EXAMS.length + 2),
+  );
   for (const date of lastModified) {
     assert.match(date, /^\d{4}-\d{2}-\d{2}$/);
     assert.ok(Date.parse(`${date}T00:00:00Z`) <= Date.now(), `future sitemap date: ${date}`);
   }
 
   const llmsIndex = await readFile(new URL('llms.txt', DIST), 'utf8');
-  for (const route of LEARN_ROUTES) {
-    assert.ok(llmsIndex.includes(`https://sense6.net/en/${route}/`), `Text-discovery index omits ${route}`);
+  for (const locale of LEARN_PUBLISHED_LOCALES) {
+    for (const route of LEARN_ROUTES) {
+      assert.ok(
+        llmsIndex.includes(`https://sense6.net/${locale}/${route}/`),
+        `Text-discovery index omits ${locale}/${route}`,
+      );
+    }
   }
 
   const robots = await readFile(new URL('robots.txt', DIST), 'utf8');

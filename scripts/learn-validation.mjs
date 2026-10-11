@@ -3,7 +3,11 @@ import { readdir, readFile } from 'node:fs/promises';
 import { CONTENT_DATES } from '../src/content-dates.js';
 import english from '../src/learn-content.json' with { type: 'json' };
 import englishUI from '../src/learn-locales/en-ui.json' with { type: 'json' };
-import { LEARN_PUBLISHED_LOCALES, learnNavigationLabel } from '../src/learn-publication.js';
+import {
+  LEARN_PUBLISHED_LOCALES,
+  learnNavigationLabel,
+  learnPublicationDate,
+} from '../src/learn-publication.js';
 import { LOCALE_CODES } from '../src/locale-metadata.js';
 import { LEARN_ROUTES } from '../src/routes.js';
 
@@ -179,6 +183,10 @@ export async function validateLearnPublication(
     requireValue(
       catalog.ui.Learn === learnNavigationLabel(locale),
       'Manifest navigation label differs from translated UI',
+    );
+    requireValue(
+      learnPublicationDate(locale) <= catalog.reviewedDate,
+      'Translated edition cannot have been reviewed before its publication date',
     );
   }
   return LEARN_PUBLISHED_LOCALES;

@@ -1,3 +1,13 @@
 {
-  "en": { "label": "Learn" }
+  "en": {
+    "label": "Learn"
+  },
+  "it": {
+    "label": "Approfondisci",
+    "publishedAt": "2026-10-11"
+  },
+  "es": {
+    "label": "Aprender",
+    "publishedAt": "2026-10-11"
+  }
 }

@@ -1,0 +1,443 @@
+{
+  "locale": "es",
+  "sourceHash": "fcbf2bc35a6e120630e2234706fe70e1be11a658636ca9bf6185cb62df28a997",
+  "reviewedDate": "2026-10-11",
+  "review": {
+    "reviewer": "OpenAI GPT-6 — AI-assisted editorial and terminology review (not a native human review)",
+    "complete": true,
+    "boundariesPreserved": true,
+    "protocolsUnchanged": true,
+    "referencesPreserved": true
+  },
+  "content": {
+    "overview": {
+      "title": "La percepción, explicada.",
+      "metaTitle": "Percepción y experimentos en el navegador | Sense6",
+      "description": "Cinco guías sobre visión del color, tiempo de reacción, audición y agudeza visual, con fuentes científicas y explicaciones prácticas de los límites de las pruebas en el navegador.",
+      "intro": "Un degradado de color, un tiempo de reacción en milisegundos, un tono que apenas oyes: todo parece dar una respuesta sencilla sobre tus sentidos. Estas cinco guías explican qué se pone a prueba, cómo influye el equipo en el resultado y qué aporta la investigación. Cada una enlaza a un experimento de Sense6 que puedes probar.",
+      "boundary": "Sense6 es un laboratorio recreativo en el navegador. Sus experimentos no cuentan con validación clínica y no permiten diagnosticar una afección ni determinar un rasgo biológico.",
+      "updated": "11 de octubre de 2026"
+    },
+    "articles": {
+      "tetrachromacy-guide": {
+        "title": "¿Puede una prueba en línea detectar la tetracromacia?",
+        "eyebrow": "Visión del color · 4 minutos de lectura",
+        "metaTitle": "¿Puede una prueba en línea detectar la tetracromacia? | Sense6",
+        "description": "Qué supondría una señal adicional de los conos, por qué contar franjas en un degradado no permite demostrarla y qué registra realmente el Laboratorio de color en pantalla.",
+        "updated": "11 de octubre de 2026",
+        "summary": "Ninguna prueba en una pantalla RGB convencional puede demostrar una tetracromacia funcional. Distinguir pequeñas diferencias de color en una pantalla es una tarea distinta de demostrar que una persona utiliza una cuarta señal independiente para ver los colores.",
+        "sections": [
+          {
+            "heading": "Un fotopigmento adicional no basta",
+            "paragraphs": [
+              "En la mayoría de las personas, la visión del color parte de tres clases de conos fotorreceptores, cuyas sensibilidades a la luz se solapan. La tetracromacia funcional añadiría una dimensión independiente a la discriminación del color. No significa simplemente percibir más matices o conocer más nombres de colores.",
+              "Algunas variaciones hereditarias pueden dar lugar a una clase adicional de fotopigmento en los conos, especialmente en personas portadoras de ciertas variantes de la visión del color ligadas al cromosoma X. Para que esa señal adicional influya en la percepción, el sistema visual debe utilizarla para distinguir colores que, de otro modo, parecerían iguales. La presencia de cuatro fotopigmentos no resuelve por sí sola la cuestión.",
+              "Jordan y sus colegas combinaron tareas de igualación y discriminación de colores con análisis genéticos en su estudio de 2010. Sus pruebas se basaban en estímulos diseñados para ese fin y en comparaciones entre observadores. Era un estudio de la visión funcional del color, no una receta para identificar personas tetracrómatas a partir de una imagen colorida."
+            ],
+            "sourceIds": ["jordan-2010"]
+          },
+          {
+            "heading": "Un degradado sigue procediendo de tres colores primarios de la pantalla",
+            "paragraphs": [
+              "Una pantalla RGB convencional mezcla la luz de sus componentes rojo, verde y azul. Al variar sus intensidades se obtienen muchos colores, pero disponer de más matices no añade otro primario independiente. Una pantalla de amplia gama cromática puede ampliar los colores disponibles sin convertir una imagen de tres primarios en una prueba de la función de un cuarto tipo de cono.",
+              "Contar franjas en un degradado indica qué límites percibiste en esa imagen. No permite saber si intervino una cuarta señal de los conos. Incluso una tarea de color exigente necesita estímulos diseñados para diferenciar las igualaciones de color basadas en tres tipos de conos de una posible discriminación basada en cuatro antes de poder estudiar la tetracromacia.",
+              "La especificación CSS Color explica cómo describen y convierten los colores los navegadores. Es una referencia técnica para los valores que se muestran; no mide la luz que emite tu pantalla. Los ajustes de brillo, los filtros de color y la iluminación de la habitación también forman parte de las condiciones de observación."
+            ],
+            "sourceIds": ["css-color-4", "jordan-2010"]
+          },
+          {
+            "heading": "Tres tareas en el Laboratorio de color en pantalla",
+            "paragraphs": [
+              "Sense6 te pide que elijas una casilla diferente, selecciones un campo de puntos diferente y ordenes una secuencia de tonos de color. Cada tarea exige algo distinto de tu atención. Encontrar la casilla que destaca requiere una comparación local; ordenar una fila exige comparar varios colores entre sí.",
+              "En las tareas de casillas y campos de puntos, los aciertos reducen la diferencia y los errores la aumentan. El resultado muestra el nivel en el que terminó cada breve secuencia adaptativa, junto con el número de respuestas y el intervalo presentado. El nivel final no es un umbral estable: unas pocas elecciones al final aún pueden desplazarlo.",
+              "La ordenación de tonos tiene su propio resultado. Sense6 lo mantiene separado de los dos niveles adaptativos, en lugar de promediar tareas distintas para obtener una puntuación de visión del color. Los tres resultados describen tus elecciones entre colores que este navegador representa en esta pantalla."
+            ],
+            "sourceIds": ["sense6-tetracromia", "css-color-4"]
+          },
+          {
+            "heading": "Cómo interpretar una repetición",
+            "paragraphs": [
+              "Si repites el experimento, procura mantener la misma pantalla y unas condiciones de brillo e iluminación similares. Anota cualquier cambio de filtro o pantalla antes de interpretar una variación del resultado. El diario privado conserva cada intento por separado; no los agrupa ni guarda únicamente el mejor.",
+              "Repetirlo puede ayudarte a examinar cómo variaron tus elecciones en condiciones similares. No permite responder a la pregunta de laboratorio sobre una dimensión perceptiva adicional. Para eso se necesita evidencia de discriminación del color en condiciones controladas, con estímulos espectrales adecuados y otros observadores con los que comparar."
+            ],
+            "sourceIds": ["jordan-2010", "sense6-tetracromia"]
+          }
+        ],
+        "experiment": {
+          "route": "tetracromia",
+          "title": "Prueba el Laboratorio de color en pantalla",
+          "hint": "Tres observaciones independientes relativas a la pantalla · unos 4 minutos · sin diagnóstico de tetracromacia"
+        },
+        "sources": [
+          {
+            "role": "Investigación primaria sobre la visión humana",
+            "title": "Jordan, Deeb, Bosten & Mollon (2010) — The dimensionality of color vision in carriers of anomalous trichromacy",
+            "href": "https://doi.org/10.1167/10.8.12",
+            "id": "jordan-2010"
+          },
+          {
+            "role": "Norma técnica sobre representación del color",
+            "title": "W3C CSS Color Module Level 4 — espacios de color, conversión y diferencias de color",
+            "href": "https://www.w3.org/TR/css-color-4/",
+            "id": "css-color-4"
+          },
+          {
+            "role": "Qué implementa realmente Sense6",
+            "title": "Laboratorio de color en pantalla de Sense6 — métodos, fuentes y limitaciones",
+            "href": "/en/tetracromia/",
+            "id": "sense6-tetracromia"
+          }
+        ],
+        "publishedDate": "2026-10-09",
+        "dateModified": "2026-10-11"
+      },
+      "reaction-time-guide": {
+        "title": "¿Qué exactitud tiene una prueba de tiempo de reacción en el navegador?",
+        "eyebrow": "Tiempo de respuesta · 4 minutos de lectura",
+        "metaTitle": "¿Qué exactitud tienen las pruebas de tiempo de reacción en el navegador? | Sense6",
+        "description": "Dónde intervienen los retardos de la pantalla y del dispositivo de entrada, cómo interpretar una mediana y qué condiciones conviene mantener al repetir Riflessi.",
+        "updated": "11 de octubre de 2026",
+        "summary": "El tiempo de reacción que registra un navegador incluye los retardos de la pantalla y del dispositivo de entrada, además de tu respuesta. No es una medición de la rapidez de los reflejos humanos calibrada con instrumentos. Usar el mismo equipo facilita la interpretación de las repeticiones, pero no elimina esos retardos.",
+        "sections": [
+          {
+            "heading": "Del cambio de color a la pulsación de una tecla",
+            "paragraphs": [
+              "Imagina que un círculo cambia de color y pulsas una tecla cuando lo ves. Primero, la página programa el cambio. Después, la pantalla lo muestra, tú respondes y el teclado y el sistema operativo envían un evento al navegador. El intervalo registrado abarca partes de esta cadena que la página no puede medir por separado.",
+              "El retardo de la pantalla se produce antes de que la señal visible llegue a ti. El del teclado ocurre después de que pulses la tecla, antes de que la respuesta llegue al programa. Un reloj preciso en el navegador no puede identificar por sí solo ninguno de esos dos instantes físicos. Haría falta equipo externo, como un sensor de luz y un sistema para medir la respuesta física.",
+              "Pasar de una tecla a una pantalla táctil cambia tanto tu forma de responder como el dispositivo de entrada. Si cambia el tiempo registrado, el resultado por sí solo no permite saber cuánto se debe a tu movimiento y cuánto al dispositivo. La ilustración de esta página separa retardos hipotéticos para explicar esa diferencia; no mide los tuyos."
+            ],
+            "sourceIds": ["bridges-2020", "anwyl-irvine-2021"]
+          },
+          {
+            "heading": "Exactitud y consistencia son cosas distintas",
+            "paragraphs": [
+              "Un equipo puede añadir un retardo bastante constante y aun así dar lecturas muy próximas entre sí. Esas lecturas pueden ser precisas sin reflejar con exactitud el intervalo físico. Los retardos variables plantean otro problema: añaden dispersión, que puede ocultar pequeñas diferencias entre sesiones.",
+              "Bridges y sus colegas evaluaron herramientas de experimentación de laboratorio y en línea con equipos externos de medición temporal. Anwyl-Irvine y sus colegas estudiaron combinaciones de navegadores y dispositivos, incluidas respuestas con teclados de consumo. Sus hallazgos se refieren al software y al equipo evaluados. No establecen un desfase universal de los navegadores ni una corrección que puedas aplicar a Sense6."
+            ],
+            "sourceIds": ["bridges-2020", "anwyl-irvine-2021"]
+          },
+          {
+            "heading": "Interpreta la sesión, no solo la respuesta más rápida",
+            "paragraphs": [
+              "Riflessi muestra la mediana de las respuestas válidas y su dispersión. La mediana es el valor central de los tiempos registrados, de modo que una respuesta excepcionalmente lenta influye menos que en la media. Aun así, necesita contexto: una mediana aparentemente regular puede proceder de una sesión con señales sin respuesta o muchas respuestas excluidas.",
+              "Revisa el número de eventos programados y válidos, las respuestas anticipadas y las notas de interrupción. Pulsar antes de la señal es anticiparse, no responder correctamente más rápido. Si la pestaña pierde el foco o cambias de pestaña, el intento puede verse alterado; el experimento se pausa y descarta el evento interrumpido en lugar de tratarlo como una respuesta normal.",
+              "La modalidad breve Segnale pide responder a una sola señal. Scelta añade una elección entre izquierda y derecha. La modalidad completa incluye también un bloque de respuesta sostenida. El tiempo de elección incluye decidir qué respuesta dar, por lo que no debe compararse con un tiempo de respuesta simple como si ambos midieran la misma tarea."
+            ],
+            "sourceIds": ["sense6-riflessi"]
+          },
+          {
+            "heading": "Repetir Riflessi con el mismo equipo",
+            "paragraphs": [
+              "Usa el mismo dispositivo y método de entrada, mantén visible la pestaña y completa la práctica antes de la sesión de medición. Si cambias de teclado o pantalla, anótalo. Unas condiciones similares reducen la ambigüedad; no garantizan que cada diferencia se deba a la práctica o a la atención.",
+              "El diario local registra la modalidad y la configuración junto con los resultados. Compara sesiones compatibles y observa la dispersión y el número de eventos, además de la mediana. Una sesión limitada o interrumpida puede decir más sobre ese intento que sobre un cambio en tu velocidad de respuesta.",
+              "El enlace abre Segnale con sus pasos habituales de configuración y consentimiento. Tus tiempos de respuesta permanecen en este navegador. Sense6 no ofrece una clasificación mundial ni una interpretación clínica del resultado."
+            ],
+            "sourceIds": ["sense6-riflessi", "anwyl-irvine-2021"]
+          }
+        ],
+        "experiment": {
+          "route": "riflessi",
+          "title": "Prueba el experimento breve de reacción",
+          "href": "/en/riflessi/?scope=signal",
+          "hint": "Modalidad Segnale ya disponible · unos 2 minutos tras la configuración · tus respuestas permanecen en este navegador"
+        },
+        "sources": [
+          {
+            "role": "Comparación independiente de la medición temporal",
+            "title": "Bridges, Pitiot, MacAskill & Peirce (2020) — The timing mega-study",
+            "href": "https://doi.org/10.7717/peerj.9414",
+            "id": "bridges-2020"
+          },
+          {
+            "role": "Investigación sobre tiempos en navegadores y dispositivos",
+            "title": "Anwyl-Irvine, Dalmaijer, Hodges & Evershed (2021) — Realistic precision and accuracy of online experiments",
+            "href": "https://doi.org/10.3758/s13428-020-01501-5",
+            "id": "anwyl-irvine-2021"
+          },
+          {
+            "role": "Qué implementa realmente Sense6",
+            "title": "Sense6 Riflessi — modalidades, controles de tiempo y limitaciones",
+            "href": "/en/riflessi/",
+            "id": "sense6-riflessi"
+          }
+        ],
+        "publishedDate": "2026-10-09",
+        "dateModified": "2026-10-11"
+      },
+      "color-blindness-guide": {
+        "title": "¿Qué puede decirte una prueba de daltonismo en línea?",
+        "eyebrow": "Diferencias en la visión del color · 4 minutos de lectura",
+        "metaTitle": "¿Qué puede decirte una prueba de daltonismo en línea? | Sense6",
+        "description": "En qué se diferencian las láminas de puntos de las tareas de localizar una abertura entre ruido visual, cómo puede dar pistas el brillo y cómo interpretar las secuencias independientes de color en pantalla de Daltonia.",
+        "updated": "11 de octubre de 2026",
+        "summary": "Una tarea en línea puede registrar qué diferencias de color distinguiste en la pantalla. Por sí sola, no puede confirmar ni descartar una deficiencia de la visión del color. Tanto la pantalla como el diseño de la tarea influyen en el significado del resultado.",
+        "sections": [
+          {
+            "heading": "El daltonismo no suele significar una ausencia de color",
+            "paragraphs": [
+              "Las deficiencias de la visión del color afectan a la capacidad de distinguir determinadas diferencias cromáticas. La mayoría de las personas con daltonismo siguen viendo muchos colores. La dificultad es selectiva, no una incapacidad general para ver el color.",
+              "Una evaluación profesional puede utilizar láminas de puntos con figuras ocultas, tareas de ordenación de tonos o un anomaloscopio, que pide al observador igualar luces. Estas tareas plantean comparaciones diferentes. El National Eye Institute explica sus usos; un resultado en línea no puede aportar la interpretación clínica de una evaluación realizada en las condiciones adecuadas."
+            ],
+            "sourceIds": ["nei-colour-vision"]
+          },
+          {
+            "heading": "El brillo puede revelar la respuesta",
+            "paragraphs": [
+              "Una figura de color puede destacar porque es más luminosa que el fondo, incluso cuando cuesta percibir la diferencia cromática prevista. Una tarea diseñada para estudiar la discriminación del color debe tener en cuenta esa pista alternativa.",
+              "Las láminas de puntos impresas dependen de sus colores y de las condiciones de observación. Una fotografía o captura de pantalla introduce otros cambios antes de que la imagen llegue a tu pantalla. El brillo de la pantalla, los filtros de luz nocturna y la iluminación de la habitación pueden alterar aún más lo que ves. Reconocer un número en esa imagen no equivale a realizar la prueba original en las condiciones especificadas.",
+              "El método de laboratorio de Regan, Reffin y Mollon variaba la luminancia de los puntos y enmascaraba los contornos para reducir la utilidad de las pistas de brillo y forma. Este método sirve de referencia para las tareas de discriminación con ruido de puntos. No demuestra que todas las adaptaciones para navegador aíslen el color de la misma manera."
+            ],
+            "sourceIds": ["nei-colour-vision", "regan-1994"]
+          },
+          {
+            "heading": "Daltonia te pide localizar una abertura",
+            "paragraphs": [
+              "En Daltonia, la tarea de Sense6, aparece una figura en forma de C entre puntos que generan ruido visual. Eliges la dirección de su abertura o indicas que no ves ninguna. La sesión explora por separado tres direcciones en el espacio de color de la pantalla y ajusta la dificultad de cada secuencia según tus elecciones.",
+              "El ruido de puntos pretende reducir las pistas de brillo, pero no garantiza que la figura solo pueda distinguirse por su color. Pueden persistir diferencias residuales de luminancia. Daltonia es una tarea propia para pantalla, no una lámina de Ishihara ni una reproducción certificada del Cambridge Colour Test.",
+              "Las presentaciones de control con alto contraste comprueban si puedes indicar la dirección de la abertura cuando la figura se ve con más facilidad. Fallar una puede reflejar dificultad con la tarea o un intento poco fiable. Acertarlas ayuda a interpretar esa sesión; no clasifica tu visión del color."
+            ],
+            "sourceIds": ["regan-1994", "sense6-daltonia"]
+          },
+          {
+            "heading": "Qué significan los tres niveles finales",
+            "paragraphs": [
+              "Cada resultado adaptativo corresponde a una dirección en el modelo de color de pantalla del programa. Un nivel no mide la sensibilidad de los conos ni sitúa tus ojos en una clasificación universal. Los tres valores deben mantenerse separados: promediarlos ocultaría qué comparaciones de color en pantalla resultaron difíciles.",
+              "Consulta las respuestas de control y los datos de cada secuencia junto con los niveles. Una inversión es un cambio de dirección de la secuencia adaptativa cuando las respuestas pasan de aciertos a errores o viceversa. Una secuencia breve con pocas inversiones aporta poca evidencia sobre el nivel en el que se estabiliza el rendimiento. Alcanzar el nivel más fácil o más difícil permitido también deja un límite, en lugar de un umbral exacto.",
+              "Para repetir, mantén unas condiciones similares de pantalla, filtros e iluminación, y una posición de observación parecida. El diario privado guarda las sesiones con su configuración y método para poder identificar intentos incompatibles. Si distinguir colores te causa dificultades en la vida cotidiana o afecta a un requisito laboral, consulta a un profesional de la salud visual; Daltonia no puede resolver esa cuestión."
+            ],
+            "sourceIds": ["sense6-daltonia"]
+          }
+        ],
+        "experiment": {
+          "route": "color-blindness",
+          "title": "Explora la tarea de discriminación del color de Daltonia",
+          "hint": "Tres direcciones adaptativas independientes en pantalla · unos 3 minutos más la configuración · no ofrece un diagnóstico"
+        },
+        "sources": [
+          {
+            "role": "Orientación sobre pruebas clínicas",
+            "title": "National Eye Institute de Estados Unidos — Pruebas para detectar deficiencias de la visión del color",
+            "href": "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/color-blindness/testing-color-vision-deficiency",
+            "id": "nei-colour-vision"
+          },
+          {
+            "role": "Método de laboratorio independiente",
+            "title": "Regan, Reffin & Mollon (1994) — Luminance noise and the rapid determination of discrimination ellipses",
+            "href": "https://doi.org/10.1016/0042-6989(94)90203-8",
+            "id": "regan-1994"
+          },
+          {
+            "role": "Qué implementa realmente Sense6",
+            "title": "Sense6 Daltonia — secuencias adaptativas, controles y límites de la evidencia",
+            "href": "/en/color-blindness/",
+            "id": "sense6-daltonia"
+          }
+        ],
+        "publishedDate": "2026-10-09",
+        "dateModified": "2026-10-11"
+      },
+      "hearing-range-guide": {
+        "title": "¿Puede un navegador evaluar tu rango auditivo?",
+        "eyebrow": "Audición y auriculares · 4 minutos de lectura",
+        "metaTitle": "¿Puede un navegador evaluar tu rango auditivo? | Sense6",
+        "description": "Por qué la frecuencia de un tono no indica su nivel en tus oídos, qué permiten comprobar los pasos de configuración de Udito y en qué se diferencian sus resultados de una audiometría.",
+        "updated": "11 de octubre de 2026",
+        "publishedDate": "2026-10-10",
+        "summary": "Un navegador puede generar tonos, pero no conocer su presión sonora en tus oídos. La frecuencia más alta que percibes con un equipo concreto no es un audiograma, un diagnóstico de pérdida auditiva ni una medida de la edad de tu audición.",
+        "sections": [
+          {
+            "heading": "La frecuencia solo cuenta una parte",
+            "paragraphs": [
+              "La frecuencia, medida en hercios (Hz), describe la rapidez con la que vibra un sonido. Que puedas oír un tono también depende de su nivel. Un navegador puede fijar una frecuencia y una amplitud digitales, pero la salida real de los auriculares depende de todo lo que hay entre esa señal y tus oídos.",
+              "Una misma posición del control de volumen no produce la misma presión sonora con dos auriculares distintos. Cambiar su ajuste también puede modificar el sonido que te llega. Si dejas de oír un tono tras cambiar de auriculares, eso por sí solo no demuestra un cambio en tu audición.",
+              "La audiometría tonal clínica mide la sensibilidad a sonidos calibrados en determinadas frecuencias, habitualmente expresada en decibelios de nivel auditivo (dB HL). La American Speech-Language-Hearing Association especifica requisitos de calibración del equipo, transductores y entorno de prueba. Un tono del navegador cuyo nivel acústico se desconoce no puede proporcionar esa medición."
+            ],
+            "sourceIds": ["asha-audiometry"]
+          },
+          {
+            "heading": "El navegador no mide tus auriculares",
+            "paragraphs": [
+              "La especificación Web Audio describe la generación y el procesamiento de sonido digital. El contexto de audio informa de una frecuencia de muestreo, que impone un límite matemático a la generación de frecuencias. No informa de la respuesta acústica de tus auriculares. Un tono presente en el programa puede reproducirse mal en el equipo de audio.",
+              "La respuesta de los auriculares varía con la frecuencia. El ruido de fondo puede enmascarar un tono tenue, mientras que el procesamiento de audio o un cambio en el sellado de un auricular intraaural pueden alterar su audibilidad. Estos efectos importan al interpretar un resultado de alta frecuencia; el navegador no dispone de un micrófono calibrado en tu oído para distinguirlos.",
+              "Elige un volumen cómodo y detente si un sonido te resulta molesto. No subas el volumen para intentar oír una frecuencia más alta. Mantener el volumen facilita comparar las elecciones dentro de una sesión, pero no calibra la salida ni garantiza un nivel sonoro seguro en todos los dispositivos."
+            ],
+            "sourceIds": ["w3c-web-audio", "asha-audiometry"]
+          },
+          {
+            "heading": "Qué comprueba Udito antes de mostrar un resultado",
+            "paragraphs": [
+              "Udito comienza con comprobaciones de presentación destinadas a obtener indicios de una escucha similar a la que se realiza con auriculares. Superarlas no identifica el dispositivo físico ni mide su salida. La configuración también te pide confirmar que oyes unos tonos de referencia antes de continuar.",
+              "La modalidad Focused sigue después una secuencia adaptativa de frecuencias e informa del límite superior alcanzado en la sesión. Standard añade tareas independientes de discriminación de tono cerca de determinadas frecuencias de referencia. Detectar una pequeña diferencia de tono y oír un tono de alta frecuencia son tareas distintas, por lo que sus resultados no se combinan en una puntuación auditiva.",
+              "El resultado incluye las respuestas de control, las interrupciones y tu confirmación final de que no cambiaste el volumen. Lee los motivos de cautela antes de comparar intentos. Si la secuencia de frecuencias alcanza el máximo del programa, el resultado indica que la tarea se detuvo allí. No determina la frecuencia más alta que podrías oír.",
+              "Si quieres comparar sesiones, repite con los mismos auriculares, conexión y ajuste de volumen cómodo. El diario privado conserva la tarea y la configuración en cada entrada. Un cambio de equipo puede impedir la comparación entre dos sesiones que, por lo demás, son similares."
+            ],
+            "sourceIds": ["sense6-udito"]
+          },
+          {
+            "heading": "Cada comprobación auditiva tiene su propio método",
+            "paragraphs": [
+              "La aplicación hearWHO de la OMS pide identificar cifras pronunciadas con ruido de fondo. La evidencia que respalda esa comprobación auditiva corresponde a su método de reconocimiento de cifras en ruido; no valida las tareas con tonos de Udito. La OMS también indica que hearWHO no sustituye la consulta a un profesional sanitario.",
+              "La dificultad para seguir conversaciones o un cambio en la audición merecen una evaluación profesional adecuada. Un resultado recreativo de frecuencia no puede determinar si necesitas audífonos. Udito permite examinar tus elecciones de escucha con un equipo conocido; no sirve como registro de umbrales auditivos clínicos."
+            ],
+            "sourceIds": ["who-hearwho", "asha-audiometry"]
+          }
+        ],
+        "experiment": {
+          "route": "udito",
+          "title": "Prueba el laboratorio de escucha Udito",
+          "hint": "Observaciones de escucha en Focused o Standard · volumen cómodo y sin cambios · sin diagnóstico auditivo"
+        },
+        "sources": [
+          {
+            "role": "Procedimientos profesionales de audiometría",
+            "title": "ASHA (2005) — Guidelines for Manual Pure-Tone Threshold Audiometry",
+            "href": "https://www.asha.org/policy/GL2005-00014/",
+            "id": "asha-audiometry"
+          },
+          {
+            "role": "Norma técnica sobre audio en el navegador",
+            "title": "W3C Web Audio API — contexto de audio, frecuencia de muestreo y procesamiento de salida",
+            "href": "https://www.w3.org/TR/webaudio-1.0/",
+            "id": "w3c-web-audio"
+          },
+          {
+            "role": "Comparación con una comprobación auditiva de otro tipo",
+            "title": "Organización Mundial de la Salud — Comprobaciones auditivas y aplicación hearWHO",
+            "href": "https://www.who.int/news-room/questions-and-answers/item/deafness-and-hearing-loss-hearing-checks-and-the-hearwho-app",
+            "id": "who-hearwho"
+          },
+          {
+            "role": "Qué implementa Sense6",
+            "title": "Sense6 Udito — comprobación de escucha similar a la de auriculares, tareas con tonos y límites de interpretación",
+            "href": "/en/udito/",
+            "id": "sense6-udito"
+          }
+        ],
+        "dateModified": "2026-10-11"
+      },
+      "visual-acuity-guide": {
+        "title": "¿Puede una prueba de agudeza visual en línea sustituir una exploración ocular?",
+        "eyebrow": "Agudeza visual y pantallas · 4 minutos de lectura",
+        "metaTitle": "¿Puede una prueba de agudeza visual en línea sustituir una exploración ocular? | Sense6",
+        "description": "Cómo influyen el tamaño del píxel y la distancia de observación en una figura pequeña, qué abarca el intervalo del modelo de Acutezza y por qué la agudeza visual es solo una parte de la exploración ocular.",
+        "updated": "11 de octubre de 2026",
+        "publishedDate": "2026-10-10",
+        "summary": "No. Una tarea en pantalla puede registrar qué figuras pequeñas identificaste a una distancia indicada. No puede determinar la salud de tus ojos, proporcionar una graduación ni sustituir una exploración ocular. Su estimación también depende de la exactitud con la que se hayan establecido la escala de la pantalla y la distancia de observación.",
+        "sections": [
+          {
+            "heading": "Los píxeles necesitan un tamaño físico y una distancia de observación",
+            "paragraphs": [
+              "Si te acercas a un anillo pequeño en una pantalla, su abertura abarca un ángulo mayor en tu ojo. El número de píxeles no ha cambiado, pero la tarea visual sí. Por eso, una estimación de agudeza necesita tanto el tamaño físico de la figura como la distancia desde la que la observas.",
+              "Un píxel CSS es una unidad de maquetación del navegador, no necesariamente un punto físico del panel. El zoom de la página y el escalado del sistema operativo afectan al tamaño representado. Un anillo con las mismas dimensiones CSS puede ocupar un espacio físico distinto en otra pantalla; igualar el número de píxeles no basta para que las condiciones de observación sean equivalentes.",
+              "La norma ISO 8596 describe la presentación de anillos de Landolt para certificar la visión de lejos o conceder licencias. Su ámbito declarado excluye la medición clínica. Aporta una referencia para el diseño del anillo, no una certificación de la tarea autoadministrada de Sense6."
+            ],
+            "sourceIds": ["iso-8596", "css-reference-pixel"]
+          },
+          {
+            "heading": "Identificar una abertura es una tarea concreta",
+            "paragraphs": [
+              "Un anillo de Landolt es un círculo abierto cuya abertura puede orientarse en distintas direcciones. Elegir la dirección exige resolver ese detalle con el tamaño y el contraste que se muestran. La tarea es más limitada que evaluar tu visión en condiciones cotidianas y no proporciona una graduación para lentes.",
+              "Acutezza utiliza una secuencia breve de respuestas para estimar el detalle angular que puedes resolver. El intervalo que se muestra describe la incertidumbre dentro del modelo de puntuación. No incluye todos los posibles errores al ajustar la escala con una tarjeta, medir la distancia de observación o representar la imagen en pantalla. Un intervalo estrecho puede corresponder a una configuración medida solo de forma aproximada.",
+              "La pantalla también limita el tamaño mínimo de una abertura. Si se alcanza el mínimo o el máximo del programa, el resultado queda limitado por las figuras disponibles. Lee la indicación de límite antes de interpretar la estimación mostrada como el límite exacto del detalle que puedes resolver."
+            ],
+            "sourceIds": ["iso-8596", "sense6-acutezza"]
+          },
+          {
+            "heading": "Mantén separados los resultados de cada ojo y contraste",
+            "paragraphs": [
+              "Acutezza te pide comprobar la escala en pantalla con una tarjeta física y establecer una distancia de observación. Importa cómo se obtuvo esa configuración: una distancia medida no aporta la misma información que una supuesta. Moverte durante la tarea también puede cambiar el ángulo visual una vez terminada la configuración.",
+              "La modalidad Focused utiliza una figura de alto contraste. Standard añade una condición de bajo contraste nominal cuando la configuración lo permite. «Nominal» se refiere al contraste que se pretende representar: Sense6 no mide la luz que emite la pantalla. La estimación obtenida con la figura de menor contraste requiere su propia interpretación.",
+              "Los resultados se mantienen separados para cada ojo y condición. La sesión registra la información de escala y distancia, las respuestas de control, los cambios de pantalla y los límites alcanzados. Esos detalles explican qué intervino en la estimación. Son especialmente útiles si una condición quedó incompleta o una comprobación de la configuración exigía cautela.",
+              "Para repetir, mantén la misma corrección visual y una iluminación similar, utiliza la misma pantalla y vuelve a comprobar la distancia. Compara condiciones compatibles en el diario local. Acutezza no convierte las estimaciones en una afirmación de visión 20/20, un eje de astigmatismo, una aptitud para conducir ni una calificación global de la visión."
+            ],
+            "sourceIds": ["sense6-acutezza"]
+          },
+          {
+            "heading": "Una exploración ocular va más allá de la agudeza visual",
+            "paragraphs": [
+              "El National Eye Institute describe una exploración ocular con dilatación pupilar que incluye agudeza visual, campos visuales, función de los músculos oculares, respuesta de las pupilas y presión intraocular, además de examinar el interior del ojo. Distinguir una abertura pequeña en pantalla no permite revisar la retina ni el nervio óptico.",
+              "Si tu visión cambia o tienes síntomas, acude a un profesional de la salud visual. La pérdida súbita de visión, el dolor intenso, la aparición de destellos o moscas volantes, o una cortina sobre el campo visual requieren atención profesional sin demora. Un buen resultado en una tarea del navegador nunca debe utilizarse para retrasar la atención."
+            ],
+            "sourceIds": ["nei-eye-exam"]
+          }
+        ],
+        "experiment": {
+          "route": "acutezza",
+          "title": "Prueba el laboratorio de agudeza visual Acutezza",
+          "hint": "Observaciones independientes para cada ojo · comprobaciones de tamaño en pantalla y distancia de observación · no es un cribado visual"
+        },
+        "sources": [
+          {
+            "role": "Norma sobre optotipos de agudeza visual y su presentación",
+            "title": "ISO 8596:2017 — norma de anillos de Landolt y su ámbito de aplicación (a través del Instituto Sueco de Normalización)",
+            "href": "https://www.sis.se/en/produkter/health-care-technology/medical-equipment/ophthalmic-equipment/iso-85962017/",
+            "id": "iso-8596"
+          },
+          {
+            "role": "Salud ocular y evaluación profesional",
+            "title": "National Eye Institute de Estados Unidos — Exploración ocular con dilatación pupilar",
+            "href": "https://www.nei.nih.gov/eye-health-information/healthy-vision/finding-eye-doctor/get-dilated-eye-exam",
+            "id": "nei-eye-exam"
+          },
+          {
+            "role": "Modelo de medición para la maquetación web",
+            "title": "W3C CSS Values and Units Level 4 — el píxel de referencia",
+            "href": "https://www.w3.org/TR/css-values-4/#absolute-lengths",
+            "id": "css-reference-pixel"
+          },
+          {
+            "role": "Qué implementa Sense6",
+            "title": "Sense6 Acutezza — configuración, condiciones independientes para cada ojo y limitaciones de la medición",
+            "href": "/en/acutezza/",
+            "id": "sense6-acutezza"
+          }
+        ],
+        "dateModified": "2026-10-11"
+      }
+    }
+  },
+  "ui": {
+    ". Browser scheduling, timestamps, display refresh and hardware processing vary in real life, sometimes differently from trial to trial.": ". En la práctica, la planificación del navegador, las marcas de tiempo, la actualización de pantalla y el procesamiento del hardware varían, incluso entre intentos.",
+    "248 of 320 milliseconds": "248 de 320 milisegundos",
+    "All experiments": "Todos los experimentos",
+    "Another question": "Otra pregunta",
+    "Breadcrumb": "Ruta de navegación",
+    "By": "Por",
+    "Display contribution": "Contribución de la pantalla",
+    "Each lab explains its setup and records results in your browser. Choose a short scope to see how the task works; return to a guide when you want to understand its result.": "Cada experimento explica cómo prepararse y guarda los resultados en el navegador. Elige la versión breve para probar la tarea y vuelve a la guía si quieres entender mejor el resultado.",
+    "Explore all five experiments →": "Explora los cinco experimentos →",
+    "Explore experiments": "Explorar los experimentos",
+    "Fictional response": "Respuesta hipotética",
+    "Hypothetical display delay": "Retardo hipotético de pantalla",
+    "Hypothetical input delay": "Retardo hipotético de entrada",
+    "Illustrative interval": "Intervalo ilustrativo",
+    "Illustrative interval out of 320 milliseconds": "Intervalo ilustrativo de un máximo de 320 milisegundos",
+    "Imagine a person who responds in the same": "Imagina a una persona que reacciona siempre en",
+    "In this guide": "En esta guía",
+    "Input contribution": "Contribución del dispositivo de entrada",
+    "Interactive explanation · hypothetical values": "Ejemplo interactivo · valores hipotéticos",
+    "Interpretation boundary": "Límites de interpretación",
+    "Interpretation limits": "Límites de interpretación",
+    "Keep exploring": "Sigue explorando",
+    "Learn": "Aprender",
+    "On this page": "En esta página",
+    "Open the experiment →": "Abrir el experimento →",
+    "Research guides": "Guías para comprender",
+    "Research papers address the scientific question; standards describe equipment or browser behaviour. The Sense6 link documents the task implemented here. None validates the Sense6 protocol.": "Los estudios citados abordan las cuestiones científicas; las normas describen los equipos y el funcionamiento del navegador. El enlace a Sense6 documenta la tarea implementada aquí. Ninguna de estas fuentes valida el protocolo de Sense6.",
+    "Reviewed": "Actualizado el",
+    "Sense6 experiment artwork:": "Ilustración del experimento Sense6:",
+    "Sense6 is a recreational browser lab, not a clinical or diagnostic test. Answers and measurements stay on your device.": "Sense6 es un laboratorio recreativo en el navegador, no una prueba clínica ni diagnóstica. Las respuestas y las mediciones permanecen en tu dispositivo.",
+    "Short answer": "Respuesta breve",
+    "Source": "Fuente",
+    "Sources": "Fuentes",
+    "Sources and their roles": "Fuentes y su función",
+    "This is an arithmetic teaching example,": "Es un ejemplo aritmético con fines didácticos,",
+    "Time between an action and its arrival at the browser event handler.": "Tiempo entre la acción del usuario y la recepción del evento por parte del navegador.",
+    "Time between asking the browser to show a stimulus and the display actually showing it.": "Tiempo entre la orden del navegador de mostrar un estímulo y su aparición efectiva en pantalla.",
+    "Try an experiment": "Prueba un experimento",
+    "What can be hiding inside a browser reaction time?": "¿Qué incluye un tiempo de reacción registrado en el navegador?",
+    "not a latency measurement, calibration or correction formula": "no una medición de latencia, una calibración ni una fórmula de corrección",
+    "← All research guides": "← Todas las guías",
+    "each time. Move the illustrative display and input delays to see how a browser-observed interval could differ even though that person's response stays unchanged.": "cada vez. Ajusta los retardos hipotéticos de la pantalla y del dispositivo de entrada: verás cómo puede cambiar el tiempo registrado por el navegador aunque la respuesta de esa persona no varíe."
+  }
+}

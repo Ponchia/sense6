@@ -16,6 +16,8 @@ decisions or research for operating instructions.
   bounded decomposition backlog.
 - [Cloudflare Pages release](runbooks/cloudflare-pages-release.md) is the
   operational procedure for migrations, preview, production, and rollback.
+- [Learn locale publication](../src/learn-locales/README.md) records translation
+  validation, review provenance, source freshness and reciprocal SEO metadata.
 
 The repository [README](../README.md) remains the public product and developer
 entry point. The [changelog](../CHANGELOG.md) records released and unreleased
