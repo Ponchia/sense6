@@ -122,7 +122,7 @@ test('a saved run offers a working experiment return path and honest research co
   expect(await page.evaluate(() => localStorage.getItem('sense6:journal'))).toBe(journal);
 });
 
-test('non-English journals localize the experiment name and return action without English research links', async ({
+test('non-English journals return to experiments and their real localized research guides', async ({
   page,
 }) => {
   await page.goto('/it/journal/');
@@ -135,8 +135,14 @@ test('non-English journals localize the experiment name and return action withou
     'aria-label',
     'Apri il test: Laboratorio colore su schermo',
   );
-  await expect(page.locator('[data-journal-guide]')).toHaveCount(0);
-  await first.locator('[data-journal-return]').click();
+  const guide = first.locator('[data-journal-guide]');
+  await expect(guide).toHaveAttribute('href', '/it/tetrachromacy-guide/');
+  await expect(guide).toContainText('Un test online può rilevare la tetracromia?');
+  await guide.click();
+  await expect(page).toHaveURL(/\/it\/tetrachromacy-guide\/$/);
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'tetrachromacy-guide');
+  await page.goto('/it/journal/');
+  await page.locator('[data-journal-entry="latest"] [data-journal-return]').click();
   await expect(page).toHaveURL(/\/it\/tetracromia\/$/);
   await expect(page.locator('html')).toHaveAttribute('lang', 'it');
 });

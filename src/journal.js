@@ -179,7 +179,7 @@ function entryMarkup(entry, entries, exams, copy, locale, localeHref, t) {
       definition
         ? `<div class="journal-entry__actions">
       <a class="ui-link" data-sense6-route="${escapeAttribute(entry.examId)}" data-journal-return href="${escapeAttribute(localeHref(entry.examId))}" aria-label="${escapeAttribute(`${t('Open test')}: ${t(definition.name)}`)}">${escapeHtml(t('Open test'))} <span aria-hidden="true">→</span></a>
-      ${relatedGuide ? `<a class="ui-link" data-sense6-route="${relatedGuide.route}" data-journal-guide href="/en/${relatedGuide.route}/">${escapeHtml(relatedGuide.title)} <span aria-hidden="true">→</span></a>` : ''}
+      ${relatedGuide ? `<a class="ui-link" data-sense6-route="${relatedGuide.route}" data-journal-guide href="${escapeAttribute(relatedGuide.href)}">${escapeHtml(relatedGuide.title)} <span aria-hidden="true">→</span></a>` : ''}
     </div>`
         : ''
     }

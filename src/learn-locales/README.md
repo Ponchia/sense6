@@ -91,9 +91,15 @@ existing gallery. An unavailable catalog throws rather than silently rendering
 English. Hreflang is absent in the English-only baseline and includes only
 published locales once a second complete translation exists. Runtime navigation
 updates canonical, social metadata and Learn JSON-LD together and removes stale
-Article claims when leaving Learn. Guide links already present in English
-experiment/result views remain unchanged; adding translated experiment result
-copy is outside this architecture change.
+Article claims when leaving Learn. All five experiment entry points, result
+interpretation panels and private journal entries link to the corresponding
+research guide in the active language. Their shared link identity is held in
+[related-guide.js](../exams/related-guide.js) and the small
+[title index](../exams/related-guide-titles.json), avoiding eager loading of
+whole research catalogs inside experiment bundles. The title index is checked
+against every published article in `tests/related-guide.test.js`; any source
+title change must update both to keep contextual links accurate. The links do
+not affect test dose, consent, scoring or retained measurements.
 
 ## What validation proves
 
