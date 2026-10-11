@@ -2,8 +2,8 @@
 
 Only locales in [published.json](published.json) have public Learn pages. The
 current manifest contains English, Italian, Spanish, German, French, European
-Portuguese, Brazilian Portuguese and Arabic: 48 Learn pages among 133
-canonical sitemap URLs. The initial English-only baseline had 91. Supporting a language in the experiment UI does not publish a
+Portuguese, Brazilian Portuguese, Arabic, Japanese, Korean, Hindi and Simplified
+Chinese: 72 Learn pages among 157 canonical sitemap URLs. The initial English-only baseline had 91. Supporting a language in the experiment UI does not publish a
 Learn translation. Canonical locale codes come from
 [locale-metadata.js](../locale-metadata.js): `en`, `it`, `de`, `fr`, `es`, `pt`,
 `pt-br`, `ar`, `ja`, `ko`, `hi`, and `zh-hans`. Portuguese variants have separate

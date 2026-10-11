@@ -347,6 +347,134 @@ test('Arabic Learn is fully translated, accessible and right-to-left @pr-smoke',
   await expect(page).toHaveURL(/\/ar\/riflessi\/[?]scope=signal$/);
 });
 
+test('Japanese, Korean, Hindi and Chinese Learn editions remain usable on small phones @pr-smoke', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  for (const [locale, languageTag] of [
+    ['ja', 'ja'],
+    ['ko', 'ko'],
+    ['hi', 'hi'],
+    ['zh-hans', 'zh-Hans'],
+  ]) {
+    await page.goto(`/${locale}/learn/`);
+    await expect(page.locator('html')).toHaveAttribute('lang', languageTag);
+    await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'learn');
+    await expect(page.locator('.learn-topic')).toHaveCount(5);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await page.locator('.learn-topic [data-sense6-route="reaction-time-guide"]').click();
+    await expect(page).toHaveURL(new RegExp(`/${locale}/reaction-time-guide/$`));
+    await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'reaction-time-guide');
+    await expect(page.locator('html')).toHaveAttribute('lang', languageTag);
+    await expect(page.locator('.learn-article__body section')).toHaveCount(4);
+    expect(await page.locator('.learn-references li').count()).toBeGreaterThanOrEqual(3);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      `https://sense6.net/${locale}/reaction-time-guide/`,
+    );
+    await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(LEARN_PUBLISHED_LOCALES.length);
+    const article = await page
+      .locator('script[type="application/ld+json"]')
+      .evaluateAll((scripts) =>
+        scripts
+          .flatMap((script) => JSON.parse(script.textContent)['@graph'] ?? [])
+          .find((item) => item['@type'] === 'Article'),
+      );
+    expect(article.inLanguage).toBe(languageTag);
+    expect(article.datePublished).toBe('2026-10-11');
+    await expect(page.locator('[data-learn-timing] [data-timing-display]')).toBeEnabled();
+    await expect(page.locator('[data-learn-timing] [data-timing-total]')).toHaveText('248 ms');
+    const bounds = await page.evaluate(() => ({
+      viewport: document.documentElement.clientWidth,
+      content: document.documentElement.scrollWidth,
+    }));
+    expect(bounds.content, `${locale} Learn must fit a 320px viewport`).toBe(bounds.viewport);
+    await expect(page.locator('.learn-answer [data-learn-early-experiment]')).toHaveAttribute(
+      'href',
+      `/${locale}/riflessi/?scope=signal`,
+    );
+    await page.locator('.learn-answer [data-learn-early-experiment]').click();
+    await expect(page).toHaveURL(new RegExp(`/${locale}/riflessi/[?]scope=signal$`));
+    await expect(page.locator('[data-rx-consent]')).not.toBeChecked();
+  }
+});
+
+test('Japanese, Korean, Hindi and Chinese Learn guides remain readable on mobile @pr-smoke', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  for (const [locale, languageTag] of [
+    ['ja', 'ja'],
+    ['ko', 'ko'],
+    ['hi', 'hi'],
+    ['zh-hans', 'zh-Hans'],
+  ]) {
+    await page.goto(`/${locale}/`);
+    await expect(page.locator('html')).toHaveAttribute('lang', languageTag);
+    const heroLearn = page.locator('.gallery-hero__learn');
+    await expect(heroLearn).toBeVisible();
+    await expect(heroLearn).toHaveAttribute('href', `/${locale}/learn/`);
+    await heroLearn.click();
+    await expect(page).toHaveURL(new RegExp(`/${locale}/learn/$`));
+    await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'learn');
+    await expect(page.locator('.learn-topic')).toHaveCount(5);
+    await expect(page.locator('.learn-hero h1')).not.toHaveText('Perception, explained.');
+    await page.locator('.learn-topic [data-sense6-route="color-blindness-guide"]').click();
+    await expect(page).toHaveURL(new RegExp(`/${locale}/color-blindness-guide/$`));
+    await expect(page.locator('.learn-article__body section')).toHaveCount(4);
+    await expect(page.locator('.learn-references li')).toHaveCount(3);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      `https://sense6.net/${locale}/color-blindness-guide/`,
+    );
+    await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(LEARN_PUBLISHED_LOCALES.length);
+    const schema = await page
+      .locator('script[type="application/ld+json"]')
+      .evaluateAll((scripts) =>
+        scripts
+          .flatMap((script) => JSON.parse(script.textContent)['@graph'] ?? [])
+          .find((entry) => entry['@type'] === 'Article'),
+      );
+    expect(schema.inLanguage).toBe(languageTag);
+    expect(schema.datePublished).toBe('2026-10-11');
+    expect(schema.citation.length).toBeGreaterThanOrEqual(2);
+    await expect(page.locator('.learn-answer [data-learn-early-experiment]')).toHaveAttribute(
+      'href',
+      `/${locale}/color-blindness/`,
+    );
+    const dimensions = await page.evaluate(() => ({
+      viewport: document.documentElement.clientWidth,
+      content: document.documentElement.scrollWidth,
+    }));
+    expect(dimensions.content, `${locale} must not overflow a narrow viewport`).toBe(dimensions.viewport);
+    const accessibility = await new AxeBuilder({ page }).analyze();
+    expect(accessibility.violations, `${locale} accessibility`).toEqual([]);
+    await page.locator('.learn-answer [data-learn-early-experiment]').click();
+    await expect(page).toHaveURL(new RegExp(`/${locale}/color-blindness/$`));
+  }
+});
+
+test('switching among all twelve published languages keeps the current research guide @pr-smoke', async ({
+  page,
+}, testInfo) => {
+  test.skip(
+    testInfo.project.name !== 'chromium',
+    'The mobile path is exercised in the locale-specific smoke suite',
+  );
+  await page.goto('/en/tetrachromacy-guide/');
+  for (const { code, languageTag } of LOCALES) {
+    await page.locator('[data-locale-select]').selectOption(code);
+    await expect(page).toHaveURL(new RegExp(`/${code}/tetrachromacy-guide/$`));
+    await expect(page.locator('html')).toHaveAttribute('lang', languageTag);
+    await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'tetrachromacy-guide');
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      `https://sense6.net/${code}/tetrachromacy-guide/`,
+    );
+    await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(LOCALES.length);
+  }
+});
+
 test('all Learn pages remain readable and accessible at a narrow viewport', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'Full Learn page accessibility covered in Chromium');
   await page.setViewportSize({ width: 320, height: 568 });
