@@ -305,6 +305,19 @@ test('the visual comparison gates pull requests and direct pushes', () => {
   );
 });
 
+test('visual-approved diffs preserve evidence with bounded artifact retention', () => {
+  const verify = workflow('verify.yml');
+  const visual = readFileSync(new URL('../audits/visual-regression.spec.js', import.meta.url), 'utf8');
+  assert.match(verify, /if: failure\(\) \|\| steps\.visual-baselines\.outputs\.approved != ''/);
+  assert.match(verify, /name: visual-regression-playwright-report[\s\S]*?retention-days: 7/);
+  for (const label of ['base revision', 'candidate', 'diff']) {
+    assert.ok(visual.includes(`(${label})`), `missing ${label} review image`);
+  }
+  assert.doesNotMatch(visual, /\['diff', 'actual', 'expected'\]/);
+  assert.match(visual, /if \(!diff\)\s*\{\s*throw new Error/);
+  assert.match(visual, /The approved change cannot be reviewed without the difference image/);
+});
+
 test('successful unchanged visual checks do not consume artifact storage', () => {
   const verify = workflow('verify.yml');
 

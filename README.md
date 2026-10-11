@@ -396,6 +396,13 @@ scan fails on unreviewed ZAP alerts and records accepted static-site findings in
 `.zap-rules.tsv`; it prints the result directly instead of depending on
 account-wide artifact storage.
 
+Visual regression remains a hard release gate. Approved changes preserve their
+base, candidate and pixel-diff screenshots together in a seven-day Playwright
+report. Failed comparisons still upload diagnostics; successful unchanged
+comparisons upload nothing. The shorter retention and removal of duplicate
+expected/actual attachments reduce shared GitHub Actions artifact usage without
+deleting historical records. GitHub usage changes can take hours to recalculate.
+
 ## Deploy
 
 Every push to `main` runs the complete lint, locale, unit, build, browser,
