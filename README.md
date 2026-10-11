@@ -388,9 +388,10 @@ contracts, coverage, the production build, static output, security policy, and
 bundle budgets. `check` adds the browser matrix. `check:release` adds checks
 against the exact generated site. Every pull request and push also runs the
 container visual comparison and indexable representative-route Lighthouse budgets
-in the same dependency graph as release, so either can stop publication. The complete
-85-page indexable-route Lighthouse sweep, external-link crawl, and passive ZAP scan
-remain scheduled or operator-run audits. The external-link job uses bounded
+in the same dependency graph as release, so either can stop publication. The scheduled full indexable-route Lighthouse sweep follows the current
+canonical route registry (157 URLs today) rather than a fixed historical count;
+the external-link crawl and passive ZAP scan remain scheduled or operator-run
+audits. The external-link job uses bounded
 retries and per-host concurrency for transient publisher failures. The passive
 scan fails on unreviewed ZAP alerts and records accepted static-site findings in
 `.zap-rules.tsv`; it prints the result directly instead of depending on
