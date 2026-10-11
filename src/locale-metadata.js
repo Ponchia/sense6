@@ -45,6 +45,32 @@ export const LOCALES = Object.freeze([
   },
 ]);
 
+/** @type {Readonly<Record<LocaleCode, string>>} */
+const OPEN_GRAPH_LOCALES = Object.freeze({
+  en: 'en_US',
+  it: 'it_IT',
+  de: 'de_DE',
+  fr: 'fr_FR',
+  es: 'es_ES',
+  pt: 'pt_PT',
+  'pt-br': 'pt_BR',
+  ar: 'ar_AR',
+  ja: 'ja_JP',
+  ko: 'ko_KR',
+  hi: 'hi_IN',
+  'zh-hans': 'zh_CN',
+});
+
+/**
+ * Open Graph uses language_COUNTRY rather than BCP 47 hreflang identifiers.
+ * Social preview language is separate from regional authorship and canonical
+ * language alternates. Unknown locales reuse the English preview.
+ * @param {string} locale
+ */
+export function openGraphLocale(locale) {
+  return OPEN_GRAPH_LOCALES[localeMetadata(locale).code];
+}
+
 /** @type {LocaleCode} */
 export const DEFAULT_LOCALE = 'en';
 /** @type {ReadonlySet<string>} */

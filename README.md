@@ -33,7 +33,9 @@ measurement in browsers](https://sense6.net/en/reaction-time-guide/), and
 and [why screen-based acuity cannot replace an eye examination](https://sense6.net/en/visual-acuity-guide/).
 Each guide has cited sources, an author/review date and a link to a related
 experiment. Only complete catalogs in the publication manifest enter the sitemap and
-reciprocal language links. Other locales lead to their existing test gallery,
+reciprocal language links. Shared previews now identify the active language
+with Open Graph locale metadata without changing canonical search URLs.
+Other locales lead to their existing test gallery,
 not English guides under false translated URLs. These new editions have
 AI-assisted editorial review, not certified or native human review. Research
 informs the guides but does not validate the Sense6 implementations.
