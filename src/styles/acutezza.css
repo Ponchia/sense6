@@ -1095,6 +1095,22 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
 }
 
 @media (max-width: 700px) {
+  /* Keep the safe preparation action in the first mobile screen.
+     This applies to the landing only; calibration and measured views keep
+     their full-size instruction and target geometry. */
+  .ac-intro__hero {
+    padding-block-start: 0.75rem;
+  }
+
+  .ac-intro .ac-hero h1 {
+    font-size: clamp(2.5rem, 10vw, 3.5rem);
+    margin-block: 0.6rem 0.85rem;
+  }
+
+  .ac-intro .ac-hero__actions {
+    margin-block-start: 1rem;
+  }
+
   .ac-active .ui-siteheader {
     flex-wrap: nowrap;
     min-inline-size: 0;
@@ -1113,6 +1129,8 @@ body.ac-running > :where(.ui-skiplink, .site-chrome, .ui-sitefooter) {
   }
   .ac-hero {
     min-block-size: 0;
+    gap: 1.5rem;
+    padding-block: 0.75rem 1.5rem;
   }
   .ac-scope-picker {
     grid-template-columns: 1fr;
