@@ -1,0 +1,443 @@
+{
+  "locale": "de",
+  "sourceHash": "fcbf2bc35a6e120630e2234706fe70e1be11a658636ca9bf6185cb62df28a997",
+  "reviewedDate": "2026-10-11",
+  "review": {
+    "reviewer": "AI-assisted translation and source-consistency review (no native-language human or clinical certification)",
+    "complete": true,
+    "boundariesPreserved": true,
+    "protocolsUnchanged": true,
+    "referencesPreserved": true
+  },
+  "content": {
+    "overview": {
+      "title": "Wahrnehmung verstehen.",
+      "metaTitle": "Wahrnehmung und Browserexperimente verstehen | Sense6",
+      "description": "Fünf Artikel zu Farbsehen, Reaktionszeit, Hören und Sehschärfe – mit Forschungsquellen und verständlichen Erklärungen zu den Grenzen von Browsertests.",
+      "intro": "Ein Farbverlauf, eine Reaktionszeit in Millisekunden, ein kaum hörbarer Ton: All das scheint eine einfache Antwort über unsere Sinne zu liefern. Diese fünf Artikel erklären, was die Aufgaben untersuchen, wie die Geräte das Ergebnis beeinflussen und welche Rolle die Forschung spielt. Jeder Artikel verlinkt ein Sense6-Experiment zum Ausprobieren.",
+      "boundary": "Sense6 ist ein Browserlabor zum Erkunden der Wahrnehmung. Seine Experimente sind nicht klinisch validiert und können weder Erkrankungen diagnostizieren noch biologische Merkmale nachweisen.",
+      "updated": "11. Oktober 2026"
+    },
+    "articles": {
+      "tetrachromacy-guide": {
+        "title": "Kann ein Onlinetest Tetrachromatie nachweisen?",
+        "eyebrow": "Farbsehen · 4 Minuten Lesezeit",
+        "metaTitle": "Kann ein Onlinetest Tetrachromatie nachweisen? | Sense6",
+        "description": "Was ein zusätzliches Zapfensignal bedeuten würde, warum das Zählen von Streifen in einem Farbverlauf es nicht nachweist und was das Screen Colour Lab tatsächlich erfasst.",
+        "updated": "11. Oktober 2026",
+        "summary": "Kein gewöhnlicher Test auf einem RGB-Bildschirm kann funktionelle Tetrachromatie nachweisen. Kleine Farbunterschiede auf einem Bildschirm zu erkennen ist eine andere Aufgabe, als zu zeigen, dass jemand ein viertes unabhängiges Signal für das Farbsehen nutzt.",
+        "sections": [
+          {
+            "heading": "Ein zusätzliches Sehpigment ist nur ein Teil der Erklärung",
+            "paragraphs": [
+              "Das menschliche Farbsehen beruht meist auf drei Klassen von Zapfenfotorezeptoren, deren Lichtempfindlichkeiten sich überlappen. Funktionelle Tetrachromatie würde eine unabhängige Dimension der Farbunterscheidung hinzufügen. Sie bedeutet nicht einfach, mehr Farbtöne zu bemerken oder mehr Farbnamen zu kennen.",
+              "Manche erblichen Varianten können eine zusätzliche Klasse von Sehpigmenten in den Zapfen hervorbringen, insbesondere bei Trägerinnen bestimmter X-chromosomal vererbter Farbsehvarianten. Damit dieses zusätzliche Signal die Wahrnehmung beeinflusst, muss das Sehsystem damit Farben unterscheiden, die sonst gleich erscheinen würden. Vier Sehpigmente allein klären diese Frage nicht.",
+              "Jordan und Kollegen kombinierten in ihrer Studie von 2010 Farbabgleichs- und Unterscheidungsaufgaben mit genetischen Analysen. Ihre Befunde beruhten auf eigens entwickelten Reizen und Vergleichen zwischen Beobachtenden. Die Studie untersuchte funktionelles Farbsehen; sie lieferte keine Anleitung, um Tetrachromatie anhand eines bunten Bildes zu erkennen."
+            ],
+            "sourceIds": ["jordan-2010"]
+          },
+          {
+            "heading": "Auch ein Farbverlauf entsteht aus drei Bildschirmprimärfarben",
+            "paragraphs": [
+              "Ein gewöhnlicher RGB-Bildschirm mischt Licht aus roten, grünen und blauen Komponenten. Unterschiedliche Intensitäten erzeugen viele Farben, aber zusätzliche Farbtöne schaffen keine weitere unabhängige Primärfarbe. Ein Bildschirm mit großem Farbumfang kann mehr Farben darstellen, ohne ein Bild aus drei Primärfarben zu einem Test für ein viertes Zapfensignal zu machen.",
+              "Wer Streifen in einem Farbverlauf zählt, erfasst die Grenzen, die in diesem Bild aufgefallen sind. Daraus lässt sich nicht erkennen, ob ein viertes Zapfensignal beteiligt war. Auch eine anspruchsvolle Farbaufgabe kann Tetrachromatie nur untersuchen, wenn ihre Reize gezielt zwischen Farbübereinstimmungen für drei Zapfenklassen und möglicher Unterscheidung durch vier Zapfenklassen trennen.",
+              "Die Spezifikation CSS Color erklärt, wie Browser Farben beschreiben und umrechnen. Sie ist eine technische Referenz für die dargestellten Werte, misst aber nicht das Licht des Bildschirms. Helligkeitseinstellungen, Farbfilter und Raumbeleuchtung gehören weiterhin zu den Betrachtungsbedingungen."
+            ],
+            "sourceIds": ["css-color-4", "jordan-2010"]
+          },
+          {
+            "heading": "Drei Aufgaben im Screen Colour Lab",
+            "paragraphs": [
+              "Bei Sense6 wählst du ein abweichendes Farbfeld und ein abweichendes Punktfeld aus und ordnest eine Folge von Farbtönen. Diese Aufgaben stellen unterschiedliche Anforderungen an deine Aufmerksamkeit. Ein abweichendes Farbfeld zu finden verlangt einen lokalen Vergleich; eine Reihe zu ordnen erfordert den Vergleich mehrerer Farben untereinander.",
+              "Bei den Farb- und Punktfeldern verkleinern richtige Antworten den Unterschied, falsche Antworten vergrößern ihn. Das Ergebnis zeigt, auf welchem Niveau jede kurze adaptive Folge endete, zusammen mit den Antwortzahlen und dem gezeigten Wertebereich. Das Endniveau ist keine stabile Schwelle: Schon wenige späte Antworten können es noch verschieben.",
+              "Die Farbtonsortierung hat ein eigenes Ergebnis. Sense6 hält es getrennt von den beiden adaptiven Niveaus, statt unterschiedliche Aufgaben zu einem Farbsehwert zu mitteln. Alle drei beschreiben deine Entscheidungen zwischen Farben, die dieser Browser auf diesem Bildschirm darstellt."
+            ],
+            "sourceIds": ["sense6-tetracromia", "css-color-4"]
+          },
+          {
+            "heading": "Eine Wiederholung einordnen",
+            "paragraphs": [
+              "Halte Bildschirm, Helligkeit und Beleuchtung bei einer Wiederholung möglichst ähnlich. Notiere einen Filterwechsel oder einen anderen Bildschirm, bevor du eine Ergebnisänderung deutest. Das private Journal hält Durchläufe getrennt; es fasst sie weder zusammen noch speichert es nur den besten.",
+              "Eine Wiederholung kann zeigen, wie sich deine Entscheidungen unter ähnlichen Bedingungen verändert haben. Die Laborfrage nach einer zusätzlichen Wahrnehmungsdimension beantwortet sie nicht. Dafür braucht es kontrollierte Farbunterscheidungsaufgaben mit geeigneten spektralen Reizen und Vergleichspersonen."
+            ],
+            "sourceIds": ["jordan-2010", "sense6-tetracromia"]
+          }
+        ],
+        "experiment": {
+          "route": "tetracromia",
+          "title": "Das Screen Colour Lab ausprobieren",
+          "hint": "Drei getrennte, bildschirmabhängige Beobachtungen · etwa 4 Minuten · keine Tetrachromatie-Diagnose"
+        },
+        "sources": [
+          {
+            "role": "Primärforschung zum menschlichen Sehen",
+            "title": "Jordan, Deeb, Bosten & Mollon (2010) — The dimensionality of color vision in carriers of anomalous trichromacy",
+            "href": "https://doi.org/10.1167/10.8.12",
+            "id": "jordan-2010"
+          },
+          {
+            "role": "Technischer Standard zur Farbdarstellung",
+            "title": "W3C CSS Color Module Level 4 — Farbräume, Umrechnung und Farbunterschiede",
+            "href": "https://www.w3.org/TR/css-color-4/",
+            "id": "css-color-4"
+          },
+          {
+            "role": "Was Sense6 tatsächlich umsetzt",
+            "title": "Sense6 Screen Colour Lab — Methoden, Quellen und Grenzen",
+            "href": "/en/tetracromia/",
+            "id": "sense6-tetracromia"
+          }
+        ],
+        "publishedDate": "2026-10-09",
+        "dateModified": "2026-10-11"
+      },
+      "reaction-time-guide": {
+        "title": "Wie genau ist ein Reaktionszeittest im Browser?",
+        "eyebrow": "Reaktionszeiten · 4 Minuten Lesezeit",
+        "metaTitle": "Wie genau sind Reaktionszeittests im Browser? | Sense6",
+        "description": "Wo Bildschirm und Eingabegerät die gemessene Reaktionszeit verzögern, wie du einen Median liest und welche Bedingungen bei Wiederholungen von Riflessi gleich bleiben sollten.",
+        "updated": "11. Oktober 2026",
+        "summary": "Eine Reaktionszeit im Browser enthält neben deiner Reaktion auch Verzögerungen durch Bildschirm und Eingabegerät. Sie ist keine mit Messgeräten kalibrierte Messung menschlicher Reflexgeschwindigkeit. Derselbe Aufbau erleichtert die Einordnung von Wiederholungen, beseitigt diese Verzögerungen aber nicht.",
+        "sections": [
+          {
+            "heading": "Vom Farbwechsel zum Tastendruck",
+            "paragraphs": [
+              "Stell dir vor, ein Kreis wechselt seine Farbe und du drückst eine Taste, sobald du es siehst. Zuerst plant die Seite den Wechsel. Dann zeigt ihn der Bildschirm an, du reagierst, und Tastatur und Betriebssystem melden ein Ereignis an den Browser. Das erfasste Zeitintervall umfasst Teile dieser Kette, die die Seite nicht einzeln messen kann.",
+              "Die Bildschirmverzögerung liegt vor dem Moment, in dem das sichtbare Signal dich erreicht. Die Tastaturverzögerung liegt nach deinem Tastendruck, bevor die Antwort in der Software ankommt. Eine präzise Browseruhr kann keinen dieser physischen Zeitpunkte allein bestimmen. Dafür wären externe Geräte nötig, etwa ein Lichtsensor und eine Möglichkeit, die physische Reaktion zu messen.",
+              "Der Wechsel von einer Taste zu einem Touchscreen verändert sowohl die Art deiner Reaktion als auch die Eingabehardware. Ändert sich die gemessene Zeit, lässt das Ergebnis allein nicht erkennen, welcher Anteil auf deine Bewegung und welcher auf das Gerät entfällt. Die Abbildung auf dieser Seite zeigt angenommene Verzögerungen getrennt, um diesen Unterschied zu erklären; deine Verzögerungen misst sie nicht."
+            ],
+            "sourceIds": ["bridges-2020", "anwyl-irvine-2021"]
+          },
+          {
+            "heading": "Genauigkeit und Gleichmäßigkeit sind verschieden",
+            "paragraphs": [
+              "Ein Aufbau kann eine recht gleichmäßige Verzögerung hinzufügen und trotzdem eng beieinanderliegende Messwerte liefern. Diese können präzise sein, ohne das physische Zeitintervall genau abzubilden. Schwankende Verzögerungen verursachen ein anderes Problem: Sie erhöhen die Streuung und können kleine Unterschiede zwischen Durchläufen verdecken.",
+              "Bridges und Kollegen prüften Labor- und Onlinewerkzeuge für Experimente mit externen Zeitmessgeräten. Anwyl-Irvine und Kollegen untersuchten Kombinationen aus Browsern und Geräten, auch Antworten über handelsübliche Tastaturen. Ihre Befunde gelten für die untersuchte Software und Ausrüstung. Sie liefern weder einen universellen Browser-Zeitversatz noch eine Korrektur, die sich auf Sense6 anwenden ließe."
+            ],
+            "sourceIds": ["bridges-2020", "anwyl-irvine-2021"]
+          },
+          {
+            "heading": "Den ganzen Durchlauf lesen, nicht nur die schnellste Antwort",
+            "paragraphs": [
+              "Riflessi zeigt den Median der gültigen Antworten und ihre Streuung. Der Median ist der mittlere Wert der sortierten Messwerte; eine ungewöhnlich langsame Antwort beeinflusst ihn weniger als einen Mittelwert. Dennoch braucht er Kontext: Ein unauffälliger Median kann aus einem Durchlauf mit verpassten Signalen oder vielen ausgeschlossenen Antworten stammen.",
+              "Prüfe die Zahl der geplanten und gültigen Ereignisse, die Fehlstarts und die Hinweise auf Unterbrechungen. Ein Tastendruck vor dem Signal ist eine vorweggenommene Antwort, keine besonders schnelle richtige Reaktion. Verliert die Seite den Fokus oder wechselst du den Tab, kann das einen Versuch stören. Das Experiment pausiert und verwirft das unterbrochene Ereignis, statt es als gewöhnliche Antwort zu behandeln.",
+              "Die kurze Variante Segnale verlangt eine Reaktion auf ein einzelnes Signal. Scelta ergänzt eine Links-oder-rechts-Entscheidung. Die vollständige Variante enthält außerdem einen Block mit fortlaufenden Reaktionen. Eine Wahlreaktionszeit umfasst auch die Entscheidung, welche Antwort zu geben ist. Sie sollte daher nicht mit einer einfachen Reaktionszeit verglichen werden, als wäre es dieselbe Aufgabe."
+            ],
+            "sourceIds": ["sense6-riflessi"]
+          },
+          {
+            "heading": "Riflessi mit demselben Aufbau wiederholen",
+            "paragraphs": [
+              "Nutze dasselbe Gerät und dieselbe gewählte Eingabemethode, halte den Tab sichtbar und absolviere die Übung vor dem gemessenen Durchlauf. Notiere einen Wechsel der Tastatur oder des Bildschirms. Ähnliche Bedingungen verringern Mehrdeutigkeit; sie garantieren nicht, dass jeder Unterschied auf Übung oder Aufmerksamkeit zurückgeht.",
+              "Das lokale Journal speichert die gewählte Variante und den Aufbau zusammen mit den Ergebnissen. Vergleiche kompatible Durchläufe und betrachte neben dem Median auch Streuung und Ereigniszahlen. Ein eingeschränkter oder unterbrochener Durchlauf sagt möglicherweise mehr über diesen Versuch aus als über eine Veränderung deiner Reaktionsgeschwindigkeit.",
+              "Der Link hier öffnet Segnale mit der üblichen Einrichtung und dem Schritt zur Einwilligung. Deine Reaktionszeiten bleiben in diesem Browser. Sense6 bietet weder eine weltweite Rangliste noch eine klinische Deutung des Ergebnisses."
+            ],
+            "sourceIds": ["sense6-riflessi", "anwyl-irvine-2021"]
+          }
+        ],
+        "experiment": {
+          "route": "riflessi",
+          "title": "Das kurze Reaktionslabor ausprobieren",
+          "href": "/en/riflessi/?scope=signal",
+          "hint": "Vorhandene Variante Segnale · etwa 2 Minuten nach der Einrichtung · deine Antworten bleiben in diesem Browser"
+        },
+        "sources": [
+          {
+            "role": "Unabhängiger Vergleich der Zeitmessung",
+            "title": "Bridges, Pitiot, MacAskill & Peirce (2020) — The timing mega-study",
+            "href": "https://doi.org/10.7717/peerj.9414",
+            "id": "bridges-2020"
+          },
+          {
+            "role": "Forschung zur Zeitmessung mit Browsern und Geräten",
+            "title": "Anwyl-Irvine, Dalmaijer, Hodges & Evershed (2021) — Realistic precision and accuracy of online experiments",
+            "href": "https://doi.org/10.3758/s13428-020-01501-5",
+            "id": "anwyl-irvine-2021"
+          },
+          {
+            "role": "Was Sense6 tatsächlich umsetzt",
+            "title": "Sense6 Riflessi — Varianten, Zeitmesskontrollen und Grenzen",
+            "href": "/en/riflessi/",
+            "id": "sense6-riflessi"
+          }
+        ],
+        "publishedDate": "2026-10-09",
+        "dateModified": "2026-10-11"
+      },
+      "color-blindness-guide": {
+        "title": "Was kann ein Onlinetest auf Farbsehschwäche aussagen?",
+        "eyebrow": "Unterschiede im Farbsehen · 4 Minuten Lesezeit",
+        "metaTitle": "Was kann ein Onlinetest auf Farbsehschwäche aussagen? | Sense6",
+        "description": "Wie sich Punktetafeln und Lückenaufgaben mit visueller Störung unterscheiden, warum Helligkeit einen Hinweis geben kann und wie du Daltonias getrennte Bildschirmfarbreihen einordnest.",
+        "updated": "11. Oktober 2026",
+        "summary": "Eine Onlineaufgabe kann erfassen, welche dargestellten Farbunterschiede du erkannt hast. Allein kann sie eine Farbsehschwäche weder bestätigen noch ausschließen. Sowohl der Bildschirm als auch die Gestaltung der Aufgabe beeinflussen die Bedeutung des Ergebnisses.",
+        "sections": [
+          {
+            "heading": "Farbblindheit bedeutet meist nicht, gar keine Farben zu sehen",
+            "paragraphs": [
+              "Eine Farbsehschwäche beeinträchtigt die Unterscheidung bestimmter Farbunterschiede. Die meisten Menschen, die als farbblind bezeichnet werden, sehen weiterhin viele Farben. Die Schwierigkeit betrifft bestimmte Unterscheidungen, nicht grundsätzlich jede Farbwahrnehmung.",
+              "Bei einer fachlichen Untersuchung können Punktetafeln mit eingebetteten Formen, Farbtonsortieraufgaben oder ein Anomaloskop zum Einsatz kommen. Beim Anomaloskop gleicht die untersuchte Person Lichtfarben ab. Diese Aufgaben prüfen unterschiedliche Vergleiche. Das National Eye Institute erklärt ihre Einsatzgebiete; ein einzelnes Onlineergebnis kann die klinische Einordnung einer fachgerecht durchgeführten Untersuchung nicht liefern."
+            ],
+            "sourceIds": ["nei-colour-vision"]
+          },
+          {
+            "heading": "Helligkeit kann die Antwort verraten",
+            "paragraphs": [
+              "Eine farbige Form kann auffallen, weil sie heller als ihr Hintergrund ist – selbst wenn der beabsichtigte Farbunterschied schwer zu erkennen ist. Eine Aufgabe zur Farbunterscheidung muss diesen alternativen Hinweis berücksichtigen.",
+              "Bei gedruckten Punktetafeln kommt es auf ihre Farben und die Betrachtungsbedingungen an. Ein Foto oder Screenshot bringt weitere Veränderungen mit sich, bevor das Bild auf deinem Bildschirm erscheint. Bildschirmhelligkeit, Nachtlichtfilter und Raumbeleuchtung können die Darstellung zusätzlich verändern. Eine Zahl in diesem Bild zu erkennen ist nicht gleichbedeutend damit, den ursprünglichen Test unter seinen vorgegebenen Bedingungen zu absolvieren.",
+              "Die Labormethode von Regan, Reffin und Mollon nutzte unterschiedliche Punktleuchtdichten und maskierende Konturen, damit Helligkeit und Form weniger hilfreiche Hinweise liefern. Sie bildet einen methodischen Hintergrund für Unterscheidungsaufgaben mit störenden Punktmustern. Sie belegt nicht, dass jede Browserumsetzung Farbe auf dieselbe Weise isoliert."
+            ],
+            "sourceIds": ["nei-colour-vision", "regan-1994"]
+          },
+          {
+            "heading": "Bei Daltonia suchst du eine Lücke",
+            "paragraphs": [
+              "In Sense6s Daltonia-Aufgabe liegt ein C-förmiges Ziel in einem störenden Punktmuster. Du wählst die Richtung seiner Lücke oder gibst an, dass keine Lücke sichtbar ist. Der Durchlauf prüft drei Richtungen im Bildschirmfarbmodell unabhängig voneinander. Jede Reihe wird je nach deinen Antworten schwieriger oder leichter.",
+              "Das störende Punktmuster soll Helligkeitshinweise verringern, garantiert aber nicht, dass das Ziel ausschließlich anhand der Farbe unterscheidbar ist. Restliche Leuchtdichteunterschiede können bestehen bleiben. Daltonia ist eine eigens entwickelte Bildschirmaufgabe, keine Ishihara-Tafel und keine zertifizierte Nachbildung des Cambridge Colour Test.",
+              "Kontrolldarstellungen mit hohem Kontrast prüfen, ob du die Lückenrichtung angeben kannst, wenn das Ziel leichter sichtbar ist. Eine falsche Antwort kann auf Schwierigkeiten mit der Aufgabe oder einen unzuverlässigen Versuch hindeuten. Richtige Kontrollantworten stützen die Einordnung dieses Durchlaufs; sie klassifizieren dein Farbsehen nicht."
+            ],
+            "sourceIds": ["regan-1994", "sense6-daltonia"]
+          },
+          {
+            "heading": "Was die drei Endniveaus bedeuten",
+            "paragraphs": [
+              "Jedes adaptive Ergebnis gehört zu einer Richtung im Bildschirmfarbmodell der Software. Ein Niveau ist weder eine Messung der Zapfenempfindlichkeit noch eine allgemeingültige Bewertung deiner Augen. Die drei Werte sollten getrennt bleiben: Ein Mittelwert würde verdecken, welche dargestellten Vergleiche schwierig waren.",
+              "Lies neben den Niveaus auch die Kontrollantworten und die Angaben zum Verlauf der Reihen. Ein Umkehrpunkt ist ein Richtungswechsel in der adaptiven Folge, wenn die Antworten zwischen richtig und falsch wechseln. Eine kurze Reihe mit wenigen Umkehrpunkten liefert nur begrenzte Hinweise darauf, wo sich die Leistung einpendelt. Wird das leichteste oder schwierigste zulässige Niveau erreicht, bleibt ebenfalls eine Grenze statt einer exakten Schwelle.",
+              "Halte bei einer Wiederholung Bildschirm, Filter und Raumbeleuchtung ähnlich und nutze eine ähnliche Betrachtungsposition. Das private Journal speichert Durchläufe mit Aufbau und Methode, damit nicht vergleichbare Versuche erkennbar sind. Wenn Farbunterscheidungen im Alltag Schwierigkeiten bereiten oder für berufliche Anforderungen relevant sind, wende dich an eine Fachperson für Augengesundheit; Daltonia kann das nicht klären."
+            ],
+            "sourceIds": ["sense6-daltonia"]
+          }
+        ],
+        "experiment": {
+          "route": "color-blindness",
+          "title": "Daltonias Farbunterscheidungsaufgabe erkunden",
+          "hint": "Drei getrennte adaptive Richtungen im Bildschirmfarbmodell · etwa 3 Minuten plus Einrichtung · keine Diagnose"
+        },
+        "sources": [
+          {
+            "role": "Hinweise zur klinischen Untersuchung",
+            "title": "U.S. National Eye Institute — Untersuchung auf Farbsehschwäche",
+            "href": "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/color-blindness/testing-color-vision-deficiency",
+            "id": "nei-colour-vision"
+          },
+          {
+            "role": "Unabhängige Labormethode",
+            "title": "Regan, Reffin & Mollon (1994) — Luminance noise and the rapid determination of discrimination ellipses",
+            "href": "https://doi.org/10.1016/0042-6989(94)90203-8",
+            "id": "regan-1994"
+          },
+          {
+            "role": "Was Sense6 tatsächlich umsetzt",
+            "title": "Sense6 Daltonia — adaptive Reihen, Kontrollen und Grenzen der Aussagekraft",
+            "href": "/en/color-blindness/",
+            "id": "sense6-daltonia"
+          }
+        ],
+        "publishedDate": "2026-10-09",
+        "dateModified": "2026-10-11"
+      },
+      "hearing-range-guide": {
+        "title": "Kann ein Browser deinen Hörbereich testen?",
+        "eyebrow": "Hören und Kopfhörer · 4 Minuten Lesezeit",
+        "metaTitle": "Kann ein Browser deinen Hörbereich testen? | Sense6",
+        "description": "Warum die Frequenz eines Tons nichts über seinen Pegel am Ohr aussagt, was Uditos Einrichtungskontrollen zeigen und wie sich die Ergebnisse von einer Audiometrie unterscheiden.",
+        "updated": "11. Oktober 2026",
+        "publishedDate": "2026-10-10",
+        "summary": "Ein Browser kann Töne erzeugen, kennt aber ihren Schalldruck an deinen Ohren nicht. Die höchste Frequenz, die du mit einem bestimmten Aufbau wahrnimmst, ist weder ein Audiogramm noch eine Diagnose von Hörverlust oder ein Maß für das Höralter.",
+        "sections": [
+          {
+            "heading": "Die Frequenz erklärt nur einen Teil",
+            "paragraphs": [
+              "Die Frequenz, gemessen in Hertz (Hz), beschreibt, wie schnell ein Schall schwingt. Ob du einen Ton hörst, hängt auch von seinem Pegel ab. Ein Browser kann eine digitale Frequenz und Amplitude festlegen. Die tatsächliche Kopfhörerausgabe hängt jedoch von allem ab, was zwischen diesem Signal und deinen Ohren liegt.",
+              "Dieselbe Stellung des Lautstärkereglers bedeutet bei zwei verschiedenen Kopfhörern nicht denselben Schalldruck. Auch ein veränderter Sitz kann beeinflussen, was dich erreicht. Wenn ein Ton nach einem Kopfhörerwechsel nicht mehr hörbar ist, lässt sich daraus allein keine Veränderung des Hörvermögens ableiten.",
+              "Die klinische Reintonaudiometrie misst die Empfindlichkeit für kalibrierte Töne bei ausgewählten Frequenzen, meist angegeben als Hörpegel in Dezibel (dB HL). Die American Speech-Language-Hearing Association legt Anforderungen an Gerätekalibrierung, Schallwandler und Testumgebung fest. Ein Browserton mit unbekanntem akustischem Pegel kann diese Messung nicht liefern."
+            ],
+            "sourceIds": ["asha-audiometry"]
+          },
+          {
+            "heading": "Der Browser misst deine Kopfhörer nicht",
+            "paragraphs": [
+              "Die Web-Audio-Spezifikation beschreibt die digitale Erzeugung und Verarbeitung von Klang. Der Audiokontext gibt eine Abtastrate an, die der Frequenzerzeugung eine mathematische Grenze setzt. Über das akustische Übertragungsverhalten deiner Kopfhörer sagt sie nichts aus. Ein Ton, der in der Software vorhanden ist, kann vom Wiedergabegerät nur schlecht wiedergegeben werden.",
+              "Das Übertragungsverhalten von Kopfhörern verändert sich mit der Frequenz. Hintergrundgeräusche können einen leisen Ton verdecken; Audioverarbeitung oder eine andere Abdichtung von Ohrhörern können seine Hörbarkeit verändern. Diese Einflüsse sind bei hochfrequenten Ergebnissen relevant. Der Browser hat kein kalibriertes Mikrofon an deinem Ohr, um sie auseinanderzuhalten.",
+              "Wähle eine angenehme Lautstärke und höre auf, wenn ein Ton unangenehm ist. Erhöhe die Lautstärke nicht, um eine höhere Frequenz zu hören. Eine unveränderte Lautstärke erleichtert den Vergleich deiner Antworten innerhalb eines Durchlaufs. Sie kalibriert aber weder die Ausgabe noch garantiert sie auf jedem Gerät einen sicheren Schallpegel."
+            ],
+            "sourceIds": ["w3c-web-audio", "asha-audiometry"]
+          },
+          {
+            "heading": "Was Udito vor der Ergebnisanzeige prüft",
+            "paragraphs": [
+              "Udito beginnt mit Darbietungskontrollen, die Hinweise auf eine kopfhörerähnliche Wiedergabe liefern sollen. Wer sie besteht, hat damit weder das tatsächliche Gerät identifiziert noch dessen Ausgabe gemessen. Bei der Einrichtung bestätigst du außerdem, dass Referenztöne hörbar sind, bevor du fortfährst.",
+              "Die Variante „Fokussiert“ folgt anschließend einer adaptiven Frequenzfolge und zeigt deren obere Durchlaufgrenze. „Standard“ ergänzt getrennte Aufgaben zu Tonhöhenunterschieden nahe ausgewählten Referenzfrequenzen. Einen kleinen Tonhöhenunterschied zu erkennen und einen hochfrequenten Ton zu hören sind verschiedene Aufgaben. Ihre Ergebnisse werden deshalb nicht zu einem Hörwert zusammengefasst.",
+              "Kontrollantworten, Unterbrechungen und deine abschließende Bestätigung einer unveränderten Lautstärke begleiten das Ergebnis. Lies mögliche Vorsichtshinweise, bevor du Versuche vergleichst. Erreicht die Frequenzfolge die Obergrenze der Software, zeigt das Ergebnis, dass die Aufgabe dort endete. Es bestimmt nicht die höchste Frequenz, die du hören könntest.",
+              "Wenn du Sitzungen vergleichen möchtest, wiederhole sie mit denselben Kopfhörern, derselben Verbindung und derselben angenehmen Lautstärkeeinstellung. Das private Journal speichert Aufgabe und Aufbau bei jedem Eintrag. Ein Gerätewechsel kann zwei ansonsten ähnliche Durchläufe für einen Vergleich ungeeignet machen."
+            ],
+            "sourceIds": ["sense6-udito"]
+          },
+          {
+            "heading": "Ein Hörcheck hat seine eigene Methode",
+            "paragraphs": [
+              "In der WHO-App hearWHO erkennen Nutzende gesprochene Ziffern in Hintergrundgeräuschen. Die Evidenz für diesen Hörcheck gehört zu seiner Ziffern-im-Rauschen-Methode; sie validiert Uditos Tonaufgaben nicht. Die WHO weist außerdem darauf hin, dass hearWHO keine Beratung durch medizinisches Fachpersonal ersetzt.",
+              "Schwierigkeiten, Gesprächen zu folgen, oder eine Veränderung des Hörvermögens sollten fachlich abgeklärt werden. Ein Frequenzwert aus einem Experiment zum Ausprobieren kann nicht bestimmen, ob du Hörgeräte brauchst. Nutze Udito, um deine Hörentscheidungen mit einem bekannten Aufbau zu betrachten, statt damit klinische Hörschwellen zu dokumentieren."
+            ],
+            "sourceIds": ["who-hearwho", "asha-audiometry"]
+          }
+        ],
+        "experiment": {
+          "route": "udito",
+          "title": "Das Hörlabor Udito ausprobieren",
+          "hint": "Hörbeobachtungen in „Fokussiert“ oder „Standard“ · angenehme, unveränderte Lautstärke · keine Hördiagnose"
+        },
+        "sources": [
+          {
+            "role": "Fachliche Verfahren der Audiometrie",
+            "title": "ASHA (2005) — Guidelines for Manual Pure-Tone Threshold Audiometry",
+            "href": "https://www.asha.org/policy/GL2005-00014/",
+            "id": "asha-audiometry"
+          },
+          {
+            "role": "Technischer Standard für Browseraudio",
+            "title": "W3C Web Audio API — Audiokontext, Abtastrate und Ausgabeverarbeitung",
+            "href": "https://www.w3.org/TR/webaudio-1.0/",
+            "id": "w3c-web-audio"
+          },
+          {
+            "role": "Vergleich mit einem eigenständigen Hörcheck",
+            "title": "Weltgesundheitsorganisation — Hörchecks und die App hearWHO",
+            "href": "https://www.who.int/news-room/questions-and-answers/item/deafness-and-hearing-loss-hearing-checks-and-the-hearwho-app",
+            "id": "who-hearwho"
+          },
+          {
+            "role": "Was Sense6 umsetzt",
+            "title": "Sense6 Udito — Kontrolle auf kopfhörerähnliche Wiedergabe, Tonaufgaben und Grenzen der Interpretation",
+            "href": "/en/udito/",
+            "id": "sense6-udito"
+          }
+        ],
+        "dateModified": "2026-10-11"
+      },
+      "visual-acuity-guide": {
+        "title": "Kann ein Online-Sehschärfetest eine Augenuntersuchung ersetzen?",
+        "eyebrow": "Sehschärfe und Bildschirme · 4 Minuten Lesezeit",
+        "metaTitle": "Kann ein Online-Sehschärfetest eine Augenuntersuchung ersetzen? | Sense6",
+        "description": "Wie Pixelgröße und Betrachtungsabstand ein kleines Sehzeichen beeinflussen, was Acutezzas Modellintervall abdeckt und warum Sehschärfe nur ein Teil einer Augenuntersuchung ist.",
+        "updated": "11. Oktober 2026",
+        "publishedDate": "2026-10-10",
+        "summary": "Nein. Eine Bildschirmaufgabe kann erfassen, welche kleinen Formen du aus einem angegebenen Abstand erkannt hast. Sie kann weder die Augengesundheit feststellen noch Korrekturgläser verordnen oder eine Augenuntersuchung ersetzen. Ihre Schätzung hängt auch davon ab, wie genau Bildschirmmaßstab und Betrachtungsabstand eingestellt wurden.",
+        "sections": [
+          {
+            "heading": "Pixel brauchen eine physische Größe und einen Betrachtungsabstand",
+            "paragraphs": [
+              "Gehst du näher an einen kleinen Ring auf dem Bildschirm heran, nimmt seine Lücke an deinem Auge einen größeren Winkel ein. Die Pixelzahl bleibt gleich, aber die Sehaufgabe verändert sich. Eine Sehschärfeschätzung benötigt deshalb sowohl die physische Größe des Sehzeichens als auch deinen Abstand dazu.",
+              "Ein CSS-Pixel ist eine Einheit für das Browserlayout, nicht zwangsläufig ein physischer Bildpunkt auf dem Display. Seitenzoom und Skalierung des Betriebssystems beeinflussen die dargestellte Größe. Ein Ring mit denselben CSS-Abmessungen kann auf einem anderen Bildschirm eine andere physische Größe haben. Gleiche Pixelzahlen allein schaffen keine gleichwertigen Betrachtungsbedingungen.",
+              "ISO 8596 beschreibt die Darstellung von Landoltringen für den Nachweis des Sehens in der Ferne im Rahmen von Bescheinigungen oder Zulassungen. Ihr angegebener Geltungsbereich schließt klinische Messungen aus. Sie liefert Hintergrund zur Ringgestaltung, zertifiziert aber nicht Sense6s selbstständig durchgeführte Aufgabe."
+            ],
+            "sourceIds": ["iso-8596", "css-reference-pixel"]
+          },
+          {
+            "heading": "Eine Lücke zu erkennen ist eine bestimmte Aufgabe",
+            "paragraphs": [
+              "Ein Landoltring ist ein unterbrochener Kreis, dessen Lücke in verschiedene Richtungen zeigen kann. Die Richtung auszuwählen verlangt, dieses Detail bei der dargestellten Größe und dem gegebenen Kontrast aufzulösen. Die Aufgabe erfasst weniger als eine Beurteilung deines Sehens im Alltag und liefert keine Verordnung für Korrekturgläser.",
+              "Acutezza schätzt anhand einer kurzen Antwortfolge die Auflösung von Details als Sehwinkel. Das angezeigte Modellintervall beschreibt die Unsicherheit innerhalb des Auswertungsmodells. Es erfasst nicht jeden möglichen Fehler beim Abgleich mit der Karte, beim Betrachtungsabstand oder bei der Bildschirmausgabe. Auch bei einem nur ungefähr vermessenen Aufbau kann das Intervall schmal sein.",
+              "Der Bildschirm begrenzt außerdem, wie klein sich eine Lücke darstellen lässt. An einer Unter- oder Obergrenze der Software wird das Ergebnis durch die verfügbaren Sehzeichen begrenzt. Lies den Grenzhinweis, bevor du die angezeigte Schätzung als exakte Grenze deines Auflösungsvermögens deutest."
+            ],
+            "sourceIds": ["iso-8596", "sense6-acutezza"]
+          },
+          {
+            "heading": "Augen und Kontrastbedingungen getrennt betrachten",
+            "paragraphs": [
+              "Acutezza fordert dich auf, den Bildschirmmaßstab mit einer physischen Karte abzugleichen und einen Betrachtungsabstand festzulegen. Wie der Aufbau bestimmt wurde, ist relevant: Ein gemessener Abstand und ein angenommener Abstand sind nicht gleich aussagekräftig. Bewegungen während der Aufgabe können den Sehwinkel auch nach der Einrichtung verändern.",
+              "Die Variante „Fokussiert“ nutzt ein Sehzeichen mit hohem Kontrast. „Standard“ ergänzt eine nominelle Bedingung mit niedrigem Kontrast, wenn der Aufbau das zulässt. „Nominell“ bezeichnet den beabsichtigten dargestellten Kontrast: Sense6 misst die Lichtausgabe des Bildschirms nicht. Eine Schätzung aus der kontrastärmeren Bedingung braucht eine eigene Einordnung.",
+              "Die Ergebnisse bleiben für jedes Auge und jede Bedingung getrennt. Die Sitzung erfasst Angaben zu Maßstab und Abstand, Kontrollantworten, Bildschirmänderungen und Grenzen. Diese Details erklären, worauf die Schätzung beruht. Sie sind besonders hilfreich, wenn eine Bedingung unvollständig war oder eine Einrichtungskontrolle zur Vorsicht mahnte.",
+              "Halte bei Wiederholungen deine Sehkorrektur und die Raumbeleuchtung gleich, nutze denselben Bildschirm und prüfe den Abstand erneut. Vergleiche kompatible Bedingungen im lokalen Journal. Acutezza leitet aus den Schätzungen weder eine Sehschärfe von 20/20 noch eine Astigmatismusachse, Fahrtauglichkeit oder eine Gesamtbewertung des Sehens ab."
+            ],
+            "sourceIds": ["sense6-acutezza"]
+          },
+          {
+            "heading": "Eine Augenuntersuchung prüft mehr als Sehschärfe",
+            "paragraphs": [
+              "Das National Eye Institute beschreibt eine Augenuntersuchung bei erweiterter Pupille, die Sehschärfe, Gesichtsfeld, Augenmuskelfunktion, Pupillenreaktion und Augeninnendruck sowie das Innere des Auges untersucht. Eine kleine Lücke auf dem Bildschirm zu erkennen kann weder Netzhaut noch Sehnerv prüfen.",
+              "Wenn sich dein Sehen verändert oder Beschwerden auftreten, lass sie fachlich untersuchen. Plötzlicher Sehverlust, starke Schmerzen, neue Lichtblitze oder schwebende Punkte sowie ein Vorhang im Gesichtsfeld erfordern rasche fachliche Abklärung. Ein gutes Ergebnis bei einer Browseraufgabe darf niemals ein Grund sein, eine Behandlung hinauszuzögern."
+            ],
+            "sourceIds": ["nei-eye-exam"]
+          }
+        ],
+        "experiment": {
+          "route": "acutezza",
+          "title": "Das Sehschärfelabor Acutezza ausprobieren",
+          "hint": "Getrennte Beobachtungen für jedes Auge · Prüfung von Bildschirmmaßstab und Betrachtungsabstand · kein Sehscreening"
+        },
+        "sources": [
+          {
+            "role": "Standard für Sehzeichen und ihre Darstellung bei Sehschärfeprüfungen",
+            "title": "ISO 8596:2017 — Landoltring-Standard und sein vorgesehener Geltungsbereich (über das Swedish Institute for Standards)",
+            "href": "https://www.sis.se/en/produkter/health-care-technology/medical-equipment/ophthalmic-equipment/iso-85962017/",
+            "id": "iso-8596"
+          },
+          {
+            "role": "Augengesundheit und fachliche Untersuchung",
+            "title": "U.S. National Eye Institute — Augenuntersuchung bei erweiterter Pupille",
+            "href": "https://www.nei.nih.gov/eye-health-information/healthy-vision/finding-eye-doctor/get-dilated-eye-exam",
+            "id": "nei-eye-exam"
+          },
+          {
+            "role": "Messmodell für Weblayouts",
+            "title": "W3C CSS Values and Units Level 4 — das Referenzpixel",
+            "href": "https://www.w3.org/TR/css-values-4/#absolute-lengths",
+            "id": "css-reference-pixel"
+          },
+          {
+            "role": "Was Sense6 umsetzt",
+            "title": "Sense6 Acutezza — Einrichtung, getrennte Bedingungen je Auge und Messgrenzen",
+            "href": "/en/acutezza/",
+            "id": "sense6-acutezza"
+          }
+        ],
+        "dateModified": "2026-10-11"
+      }
+    }
+  },
+  "ui": {
+    ". Browser scheduling, timestamps, display refresh and hardware processing vary in real life, sometimes differently from trial to trial.": ". In der Praxis variieren die Ablaufplanung des Browsers, Zeitstempel, die Bildaktualisierung und die Verarbeitung durch die Hardware, mitunter auch von Versuch zu Versuch.",
+    "248 of 320 milliseconds": "248 von 320 Millisekunden",
+    "All experiments": "Alle Experimente",
+    "Another question": "Eine weitere Frage",
+    "Breadcrumb": "Navigationspfad",
+    "By": "Von",
+    "Display contribution": "Anteil der Anzeige",
+    "Each lab explains its setup and records results in your browser. Choose a short scope to see how the task works; return to a guide when you want to understand its result.": "Jedes Experiment erklärt seinen Aufbau und speichert die Ergebnisse in deinem Browser. Wähle einen kurzen Umfang, um die Aufgabe kennenzulernen. Wenn du das Ergebnis verstehen möchtest, kehre zu einem Leitfaden zurück.",
+    "Explore all five experiments →": "Alle fünf Experimente erkunden →",
+    "Explore experiments": "Experimente erkunden",
+    "Fictional response": "Fiktive Reaktion",
+    "Hypothetical display delay": "Angenommene Anzeigeverzögerung",
+    "Hypothetical input delay": "Angenommene Eingabeverzögerung",
+    "Illustrative interval": "Beispielintervall",
+    "Illustrative interval out of 320 milliseconds": "Beispielintervall auf einer Skala von 0 bis 320 Millisekunden",
+    "Imagine a person who responds in the same": "Stell dir eine Person vor, deren Reaktionszeit immer genau",
+    "In this guide": "In diesem Leitfaden",
+    "Input contribution": "Anteil der Eingabe",
+    "Interactive explanation · hypothetical values": "Interaktive Erklärung · hypothetische Werte",
+    "Interpretation boundary": "Grenze der Interpretation",
+    "Interpretation limits": "Grenzen der Interpretation",
+    "Keep exploring": "Weiter erkunden",
+    "Learn": "Wissen",
+    "On this page": "Auf dieser Seite",
+    "Open the experiment →": "Experiment öffnen →",
+    "Research guides": "Leitfäden zur Forschung",
+    "Research papers address the scientific question; standards describe equipment or browser behaviour. The Sense6 link documents the task implemented here. None validates the Sense6 protocol.": "Forschungsarbeiten behandeln die wissenschaftliche Frage; Normen und Standards beschreiben Geräte oder das Verhalten des Browsers. Der Sense6-Link dokumentiert die hier umgesetzte Aufgabe. Keine dieser Quellen validiert das Sense6-Protokoll.",
+    "Reviewed": "Geprüft am",
+    "Sense6 experiment artwork:": "Illustration zum Sense6-Experiment:",
+    "Sense6 is a recreational browser lab, not a clinical or diagnostic test. Answers and measurements stay on your device.": "Sense6 ist ein Browserlabor zur Freizeitgestaltung, kein klinischer oder diagnostischer Test. Antworten und Messwerte bleiben auf deinem Gerät.",
+    "Short answer": "Kurze Antwort",
+    "Source": "Quelle",
+    "Sources": "Quellen",
+    "Sources and their roles": "Quellen und ihre Funktion",
+    "This is an arithmetic teaching example,": "Dies ist ein Rechenbeispiel zur Veranschaulichung,",
+    "Time between an action and its arrival at the browser event handler.": "Zeit zwischen einer Handlung und ihrem Eintreffen bei der Ereignisverarbeitung des Browsers.",
+    "Time between asking the browser to show a stimulus and the display actually showing it.": "Zeit zwischen der Aufforderung an den Browser, einen Reiz anzuzeigen, und dessen tatsächlicher Anzeige auf dem Bildschirm.",
+    "Try an experiment": "Ein Experiment ausprobieren",
+    "What can be hiding inside a browser reaction time?": "Was kann in einer im Browser gemessenen Reaktionszeit stecken?",
+    "not a latency measurement, calibration or correction formula": "keine Latenzmessung, Kalibrierung oder Korrekturformel",
+    "← All research guides": "← Alle Leitfäden zur Forschung",
+    "each time. Move the illustrative display and input delays to see how a browser-observed interval could differ even though that person's response stays unchanged.": "beträgt. Verändere die beispielhaften Anzeige- und Eingabeverzögerungen, um zu sehen, wie sich das vom Browser erfasste Intervall unterscheiden könnte, obwohl die Reaktionszeit dieser Person unverändert bleibt."
+  }
+}
