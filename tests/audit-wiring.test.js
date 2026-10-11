@@ -10,6 +10,10 @@ import {
 import primaryConfig from '../playwright.config.js';
 import deployedConfig from '../playwright.deployed.config.js';
 import siteConfig from '../playwright.site.config.js';
+import { EXAMS } from '../src/exams/registry.js';
+import { LEARN_PUBLISHED_LOCALES } from '../src/learn-publication.js';
+import { LOCALES } from '../src/locale-metadata.js';
+import { LEARN_ROUTES } from '../src/routes.js';
 
 const packageJson = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
@@ -458,8 +462,11 @@ test('the visual comparison covers a pinned set of representative routes', () =>
 });
 
 test('Lighthouse audits the indexable route set instead of penalizing deliberate noindex pages', () => {
-  assert.equal(SITE_ROUTES.length, 115);
-  assert.equal(SEARCH_ROUTES.length, 91);
+  const guides = LEARN_PUBLISHED_LOCALES.length * LEARN_ROUTES.length;
+  // Indexable guides exist only for fully published locales. The three utility
+  // routes include the deliberately nonindexed journal and privacy pages.
+  assert.equal(SITE_ROUTES.length, 1 + LOCALES.length * (EXAMS.length + 4) + guides);
+  assert.equal(SEARCH_ROUTES.length, 1 + LOCALES.length * (EXAMS.length + 2) + guides);
   assert.ok(SEARCH_ROUTES.every((route) => !/\/(?:journal|privacy)\/$/.test(route)));
   assert.ok(SEARCH_REPRESENTATIVE_ROUTES.every((route) => SEARCH_ROUTES.includes(route)));
   assert.ok(!SEARCH_REPRESENTATIVE_ROUTES.includes('/en/journal/'));

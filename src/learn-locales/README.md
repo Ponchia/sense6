@@ -1,8 +1,8 @@
 # Learn locale publication
 
 Only locales in [published.json](published.json) have public Learn pages. The
-initial manifest contains English alone: six Learn pages and 91 sitemap URLs
-across the site. Supporting a language in the experiment UI does not publish a
+current manifest contains English, Italian and Spanish: 18 Learn pages
+among 103 canonical sitemap URLs. The initial English-only baseline had 91. Supporting a language in the experiment UI does not publish a
 Learn translation. Canonical locale codes come from
 [locale-metadata.js](../locale-metadata.js): `en`, `it`, `de`, `fr`, `es`, `pt`,
 `pt-br`, `ar`, `ja`, `ko`, `hi`, and `zh-hans`. Portuguese variants have separate
@@ -72,8 +72,11 @@ URLs. Its dates also feed the existing content fingerprint gate.
    validation. No cited paper validates the assembled Sense6 implementation.
 3. Run `npm run learn:check -- /tmp/sense6-fr.json fr` while still a draft.
 4. Copy the reviewed catalog to `src/learn-locales/fr.json` and add
-   `"fr": { "label": "Comprendre" }` to `published.json`. Use the catalog's exact
-   `ui.Learn` translation as the label. Both changes must ship together. Never
+   `"fr": { "label": "Comprendre", "publishedAt": "2026-10-11" }` to `published.json`. Use the catalog's exact
+   `ui.Learn` translation as the label. Add `publishedAt` as the ISO
+   first-release date for that language. Keep it unchanged on later revisions;
+   structured-data `datePublished` uses this, while `dateModified` follows
+   the updated review date. Both changes must ship together. Never
    add a manifest entry without its complete catalog.
 5. Run `npm run check:core`, `npm run docs:check`, focused Learn browser checks,
    and the existing release gates before publication. Update baseline tests
