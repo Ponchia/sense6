@@ -23,6 +23,7 @@ import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 import { protocolPassport } from './protocols.js';
+import { relatedGuideResultLink } from './related-guide.js';
 import { applyScopeSelection, scopeOptionMarkup } from './views/scope-picker.js';
 import { UDITO_INSTRUMENTS, uditoIntroMarkup } from './views/udito-intro.js';
 
@@ -631,6 +632,11 @@ function renderResults() {
   };
   state.session.result = result;
 
+  const uditoGuideLink = relatedGuideResultLink(
+    'udito',
+    state.locale,
+    'Understand what a browser hearing test can tell you',
+  );
   state.app.innerHTML = `
     <section class="au-results ui-container ui-container--wide">
       <button class="back-link" type="button" data-action="au-home"><span aria-hidden="true">←</span> ${m('nav.allTests')}</button>
@@ -644,7 +650,7 @@ function renderResults() {
       </div>
       <div class="au-context-grid">
         <article class="ui-card"><p class="ui-eyebrow">${t('Run context')}</p><h2>${t('What travelled with the sound.')}</h2><dl><div><dt>${t('Listening setup')}</dt><dd>${deviceLabel(state.session.device)}</dd></div><div><dt>Connection</dt><dd>${connectionLabel(state.session.connection)}</dd></div><div><dt>${t('Audio context')}</dt><dd>${formatNumber(state.session.sampleRate)} Hz</dd></div><div><dt>Audibility anchors</dt><dd>200 Hz, 500 Hz, and 2 kHz confirmed</dd></div><div><dt>Volume</dt><dd>${state.session.volumeConsistent ? 'Self-reported unchanged' : 'Changed or unsure'}</dd></div><div><dt>${t('Portata controls')}</dt><dd>${formatControlAccuracy(range)}</dd></div><div><dt>${t('Interruptions')}</dt><dd>${state.session.interruptions}</dd></div></dl></article>
-        <article class="ui-card"><p class="ui-eyebrow">${t('Interpretation boundary')}</p><h2>${t('Device-relative, never dB HL.')}</h2><p>${t('A browser knows digital amplitude, not sound pressure at your eardrum. Headphone response, fit, output, age, room noise, device processing, and the volume setting all shape these numbers.')}</p><p>${t('Do not infer hearing age, “normal” hearing, safety for work, or a medical diagnosis. If hearing concerns affect daily life, use calibrated clinical audiometry.')}</p>${state.locale === 'en' ? '<p class="au-results__learn"><a class="ui-link" data-sense6-route="hearing-range-guide" href="/en/hearing-range-guide/">Understand what a browser hearing test can tell you →</a></p>' : ''}</article>
+        <article class="ui-card"><p class="ui-eyebrow">${t('Interpretation boundary')}</p><h2>${t('Device-relative, never dB HL.')}</h2><p>${t('A browser knows digital amplitude, not sound pressure at your eardrum. Headphone response, fit, output, age, room noise, device processing, and the volume setting all shape these numbers.')}</p><p>${t('Do not infer hearing age, “normal” hearing, safety for work, or a medical diagnosis. If hearing concerns affect daily life, use calibrated clinical audiometry.')}</p>${uditoGuideLink ? `<p class="au-results__learn">${uditoGuideLink}</p>` : ''}</article>
       </div>
       <aside class="au-results__safety"><strong>${t('Keep the same volume only for comparison.')}</strong><p>${t('Compare your own runs only with the same device, headphones, fit, room, and volume. Stop testing if any sound is uncomfortable.')}</p></aside>
       <div class="ui-cluster au-results__actions"></div>
