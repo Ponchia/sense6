@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { EXAMS } from '../src/exams/registry.js';
 import {
   isAllowedMetric,
   isProductionMetricOrigin,
@@ -84,4 +85,17 @@ test('metrics stay disabled away from the canonical production origin', async ()
     false,
   );
   assert.equal(requests, 0);
+});
+
+test('every experiment route maps to an allowed anonymous metric identity', () => {
+  for (const exam of EXAMS) {
+    assert.equal(
+      isAllowedMetric(METRIC_EVENTS.testViewed, exam.metricTest),
+      true,
+      `${exam.route} must resolve to its approved metric key`,
+    );
+  }
+  const daltonia = EXAMS.find((exam) => exam.id === 'color-blindness');
+  assert.equal(daltonia?.metricTest, METRIC_TESTS.daltonia);
+  assert.equal(METRIC_TESTS['color-blindness'], undefined);
 });
