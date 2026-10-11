@@ -52,6 +52,49 @@ test('English-only guides have original substantive answers, methods and referen
   }
 });
 
+test('all Learn sections link to specific declared source roles and navigation targets', () => {
+  for (const route of LEARN_ROUTES.filter((name) => name !== 'learn')) {
+    const article = learnPage(route);
+    const html = learnMarkup(route);
+    const sourceIds = article.sources.map((source) => source.id);
+    assert.equal(new Set(sourceIds).size, sourceIds.length, `${route} has duplicate source IDs`);
+    assert.ok(
+      sourceIds.every((id) => /^[a-z][a-z0-9-]+$/.test(id)),
+      `${route} has invalid IDs`,
+    );
+    assert.equal(
+      (html.match(/class="learn-section-sources"/g) ?? []).length,
+      article.sections.length,
+      `${route} must link its source roles at every section`,
+    );
+    assert.equal(
+      (html.match(/class="learn-contents"/g) ?? []).length,
+      1,
+      `${route} must have exactly one reading navigation`,
+    );
+    for (const [index, section] of article.sections.entries()) {
+      const anchor = `learn-section-${index + 1}`;
+      assert.ok(html.includes(`id="${anchor}"`), `${route} lacks ${anchor} target`);
+      assert.ok(html.includes(`href="#${anchor}"`), `${route} lacks ${anchor} jump link`);
+      assert.ok(section.sourceIds.length > 0, `${route} section ${index + 1} lacks sources`);
+      assert.equal(
+        new Set(section.sourceIds).size,
+        section.sourceIds.length,
+        `${route} section ${index + 1} repeats a reference`,
+      );
+      for (const id of section.sourceIds) {
+        assert.ok(sourceIds.includes(id), `${route} section ${index + 1} has unknown ${id}`);
+        assert.ok(html.includes(`href="#learn-source-${id}"`), `${route} lacks source jump ${id}`);
+      }
+    }
+    for (const id of sourceIds) {
+      assert.ok(html.includes(`id="learn-source-${id}"`), `${route} lacks cited source ${id}`);
+    }
+    assert.ok(html.includes('href="#research-sources"'), `${route} lacks source index jump`);
+    assert.doesNotMatch(html, /onclick=|javascript:/i, `${route} should use native links only`);
+  }
+});
+
 test('independent published research never claims validation of Sense6', () => {
   const tetra = learnPage('tetrachromacy-guide');
   const timing = learnPage('reaction-time-guide');
