@@ -111,6 +111,17 @@ function articleMarkup(route, article) {
         <p class="ui-eyebrow" id="answer-title">The short answer</p>
         <p>${esc(article.summary)}</p>
       </section>
+      <nav class="learn-contents" aria-label="On this page">
+        <p class="ui-eyebrow">In this guide</p>
+        <ol>${article.sections
+          .map(
+            (section, i) =>
+              `<li><a href="#learn-section-${i + 1}"><span aria-hidden="true">0${i + 1}</span>${esc(section.heading)}</a></li>`,
+          )
+          .join('')}
+          <li><a href="#research-sources"><span aria-hidden="true">↗</span>Sources and their roles</a></li>
+        </ol>
+      </nav>
       <figure class="learn-model" aria-label="Three important parts of this question">
         <ol>${article.facts.map((fact, i) => `<li><span class="learn-model__num" aria-hidden="true">0${i + 1}</span><strong>${esc(fact.head)}</strong><p>${esc(fact.detail)}</p></li>`).join('')}</ol>
         <figcaption>A way to think about the problem · not a device calibration or research measurement.</figcaption>
@@ -122,6 +133,7 @@ function articleMarkup(route, article) {
               (section, i) => `<section aria-labelledby="learn-section-${i + 1}">
             <h2 id="learn-section-${i + 1}">${esc(section.heading)}</h2>
             ${section.paragraphs.map((p) => `<p>${esc(p)}</p>`).join('')}
+            ${relatedSourcesMarkup(section, article)}
           </section>`,
             )
             .join('')}
@@ -138,7 +150,7 @@ function articleMarkup(route, article) {
             <p>These sources explain science, engineering, or the Sense6 method. They do not validate the assembled Sense6 browser protocol.</p>
             <ol>${article.sources
               .map(
-                (source) => `<li>
+                (source) => `<li id="learn-source-${esc(source.id)}">
               <span class="ui-eyebrow">${esc(source.role)}</span>
               <a href="${esc(source.href)}"${source.href.startsWith('https://') ? ' target="_blank" rel="noreferrer"' : ''}>${esc(source.title)}</a>
             </li>`,
@@ -157,6 +169,21 @@ function articleMarkup(route, article) {
       </nav>
     </article>
   `;
+}
+
+/** Connect a section to its cited background, specification or Sense6 method
+ * without suggesting those sources directly validate this browser protocol.
+ * @param {(typeof content.articles)['tetrachromacy-guide']['sections'][number]} section
+ * @param {(typeof content.articles)['tetrachromacy-guide']} article
+ */
+function relatedSourcesMarkup(section, article) {
+  const links = section.sourceIds.map((id) => {
+    const position = article.sources.findIndex((source) => source.id === id);
+    if (position === -1) throw new Error(`Unknown Learn reference: ${id}`);
+    const source = article.sources[position];
+    return `<a href="#learn-source-${esc(id)}">[${position + 1}] ${esc(source.role)}</a>`;
+  });
+  return `<p class="learn-section-sources"><span>Related sources</span> ${links.join(' · ')}</p>`;
 }
 
 /** @param {string} value */
