@@ -29,5 +29,21 @@
   "ar": {
     "label": "تعلّم",
     "publishedAt": "2026-10-11"
+  },
+  "ja": {
+    "label": "学ぶ",
+    "publishedAt": "2026-10-11"
+  },
+  "ko": {
+    "label": "알아보기",
+    "publishedAt": "2026-10-11"
+  },
+  "hi": {
+    "label": "जानें",
+    "publishedAt": "2026-10-11"
+  },
+  "zh-hans": {
+    "label": "了解原理",
+    "publishedAt": "2026-10-11"
   }
 }
