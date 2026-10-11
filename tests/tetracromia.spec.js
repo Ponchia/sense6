@@ -741,7 +741,7 @@ test('German landing and results reflow readably across narrow viewports', async
   await expect(page.locator('.results-head')).toContainText('Sitzung abgeschlossen');
   await expect(page.locator('.result-details')).toContainText('Kachelauswahl');
   await expect(page.locator('.result-details')).toContainText('Farbtonreihenfolge');
-  await expect(page.locator('.result-note__learn')).toHaveCount(0);
+  await expect(page.locator('.result-note__learn a')).toHaveAttribute('href', '/de/tetrachromacy-guide/');
   await page
     .locator('.result-metric__head > strong')
     .nth(1)

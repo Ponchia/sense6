@@ -1,0 +1,86 @@
+{
+  "en": {
+    "tetracromia": "Can an online test detect tetrachromacy?",
+    "color-blindness": "What can an online colour-blindness test tell you?",
+    "riflessi": "How accurate is a reaction-time test in a browser?",
+    "udito": "Can a browser test your hearing range?",
+    "acutezza": "Can an online visual-acuity test replace an eye exam?"
+  },
+  "it": {
+    "tetracromia": "Un test online può rilevare la tetracromia?",
+    "color-blindness": "Che cosa può dirti un test online per il daltonismo?",
+    "riflessi": "Quanto è accurato un test dei tempi di reazione nel browser?",
+    "udito": "Un browser può testare la gamma di frequenze che senti?",
+    "acutezza": "Un test online dell’acuità visiva può sostituire una visita oculistica?"
+  },
+  "es": {
+    "tetracromia": "¿Puede una prueba en línea detectar la tetracromacia?",
+    "color-blindness": "¿Qué puede decirte una prueba de daltonismo en línea?",
+    "riflessi": "¿Qué exactitud tiene una prueba de tiempo de reacción en el navegador?",
+    "udito": "¿Puede un navegador evaluar tu rango auditivo?",
+    "acutezza": "¿Puede una prueba de agudeza visual en línea sustituir una exploración ocular?"
+  },
+  "de": {
+    "tetracromia": "Kann ein Onlinetest Tetrachromatie nachweisen?",
+    "color-blindness": "Was kann ein Onlinetest auf Farbsehschwäche aussagen?",
+    "riflessi": "Wie genau ist ein Reaktionszeittest im Browser?",
+    "udito": "Kann ein Browser deinen Hörbereich testen?",
+    "acutezza": "Kann ein Online-Sehschärfetest eine Augenuntersuchung ersetzen?"
+  },
+  "fr": {
+    "tetracromia": "Un test en ligne peut-il détecter la tétrachromatie ?",
+    "color-blindness": "Que peut vous apprendre un test de daltonisme en ligne ?",
+    "riflessi": "Quelle est l’exactitude d’un test de temps de réaction dans le navigateur ?",
+    "udito": "Un navigateur peut-il tester la plage de fréquences que vous entendez ?",
+    "acutezza": "Un test d’acuité visuelle en ligne peut-il remplacer un examen des yeux ?"
+  },
+  "pt": {
+    "tetracromia": "Um teste online pode detetar tetracromacia?",
+    "color-blindness": "O que lhe pode dizer um teste de daltonismo online?",
+    "riflessi": "Qual é a exatidão de um teste de tempo de reação no navegador?",
+    "udito": "Um navegador pode testar a sua gama auditiva?",
+    "acutezza": "Um teste de acuidade visual online pode substituir um exame aos olhos?"
+  },
+  "pt-br": {
+    "tetracromia": "Um teste online pode detectar tetracromacia?",
+    "color-blindness": "O que um teste online de daltonismo pode dizer?",
+    "riflessi": "Qual é a exatidão de um teste de tempo de reação no navegador?",
+    "udito": "Um navegador pode testar sua faixa de audição?",
+    "acutezza": "Um teste online de acuidade visual pode substituir um exame oftalmológico?"
+  },
+  "ar": {
+    "tetracromia": "هل يمكن لاختبار عبر الإنترنت كشف رؤية الألوان الرباعية؟",
+    "color-blindness": "ماذا يخبرك اختبار عمى الألوان عبر الإنترنت؟",
+    "riflessi": "ما مدى دقة اختبار زمن الاستجابة في المتصفح؟",
+    "udito": "هل يمكن للمتصفح اختبار نطاق السمع لديك؟",
+    "acutezza": "هل يمكن لاختبار حدة البصر عبر الإنترنت أن يحل محل فحص العيون؟"
+  },
+  "ja": {
+    "tetracromia": "オンラインのテストで四色型色覚はわかる？",
+    "color-blindness": "オンラインの色覚テストで何がわかる？",
+    "riflessi": "ブラウザの反応時間テストはどれくらい正確？",
+    "udito": "ブラウザで聴こえる周波数の範囲を調べられる？",
+    "acutezza": "オンラインの視力テストは眼科の検査に代わる？"
+  },
+  "ko": {
+    "tetracromia": "온라인 검사로 사색형 색각을 확인할 수 있을까요?",
+    "color-blindness": "온라인 색각 이상 검사로 무엇을 알 수 있을까요?",
+    "riflessi": "브라우저 반응 시간 검사는 얼마나 정확할까요?",
+    "udito": "브라우저로 들을 수 있는 주파수 범위를 검사할 수 있을까요?",
+    "acutezza": "온라인 시력 검사가 안과 검진을 대신할 수 있을까요?"
+  },
+  "hi": {
+    "tetracromia": "क्या ऑनलाइन परीक्षण से टेट्राक्रोमेसी का पता चल सकता है?",
+    "color-blindness": "ऑनलाइन रंग दृष्टि की कमी का परीक्षण क्या बता सकता है?",
+    "riflessi": "ब्राउज़र में प्रतिक्रिया समय का परीक्षण कितना सटीक है?",
+    "udito": "क्या ब्राउज़र सुनने की आवृत्ति-सीमा जाँच सकता है?",
+    "acutezza": "क्या ऑनलाइन दृष्टि तीक्ष्णता परीक्षण आँखों की जाँच की जगह ले सकता है?"
+  },
+  "zh-hans": {
+    "tetracromia": "在线测试能检测四色视觉吗？",
+    "color-blindness": "在线色盲测试能告诉你什么？",
+    "riflessi": "浏览器反应时间测试有多准确？",
+    "udito": "浏览器能测试你的听力频率范围吗？",
+    "acutezza": "在线视力测试能代替眼科检查吗？"
+  }
+}

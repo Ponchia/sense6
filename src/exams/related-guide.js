@@ -1,55 +1,71 @@
+import { isLearnPublished, learnNavigationLabel } from '../learn-publication.js';
 import { LEARN_ROUTES } from '../routes.js';
+import localizedTitles from './related-guide-titles.json' with { type: 'json' };
 
-/**
- * An honest, reviewed article for each experiment. Only publish links when
- * the guide exists in the registry. Other locales retain their own translated
- * experiment copy until a guide is reviewed in that language.
+/** @type {Record<string, Record<string, string>>} */
+const guideTitles = localizedTitles;
+
+/** One researched article per experiment, referenced by a small title index
+ * instead of eagerly importing long research catalogs on experiment routes.
  */
 const RELATED = Object.freeze({
-  tetracromia: {
-    route: 'tetrachromacy-guide',
-    title: 'Can an online test detect tetrachromacy?',
-  },
-  'color-blindness': {
-    route: 'color-blindness-guide',
-    title: 'What can an online colour-blindness test tell you?',
-  },
-  riflessi: {
-    route: 'reaction-time-guide',
-    title: 'How accurate is a reaction-time test in a browser?',
-  },
-  udito: {
-    route: 'hearing-range-guide',
-    title: 'Can a browser test your hearing range?',
-  },
-  acutezza: {
-    route: 'visual-acuity-guide',
-    title: 'Can an online visual-acuity test replace an eye exam?',
-  },
+  tetracromia: 'tetrachromacy-guide',
+  'color-blindness': 'color-blindness-guide',
+  riflessi: 'reaction-time-guide',
+  udito: 'hearing-range-guide',
+  acutezza: 'visual-acuity-guide',
 });
 
 /**
- * Look up an existing, reviewed article for the experiment and active locale.
- * English is currently the only published Learn language.
  * @param {import('./contracts.js').ExamId} examId
  * @param {string} locale
  */
 export function relatedGuideFor(examId, locale) {
-  if (locale !== 'en') return null;
-  const guide = RELATED[examId];
-  return guide && LEARN_ROUTES.includes(guide.route) ? guide : null;
+  if (!isLearnPublished(locale)) return null;
+  const route = RELATED[examId];
+  const title = guideTitles[locale]?.[examId];
+  if (!route || !LEARN_ROUTES.includes(route) || !title?.trim()) return null;
+  return { route, title, href: `/${locale}/${route}/` };
 }
 
 /**
- * Render a link to the same reviewed guide for the experiment landing.
+ * Static and interactive experiment landings render the same localized link.
+ * English markup remains visually unchanged; published translations use their
+ * real guide titles, never a duplicated English fallback.
  * @param {import('./contracts.js').ExamId} examId
  * @param {string} locale
  */
 export function relatedGuideMarkup(examId, locale) {
   const guide = relatedGuideFor(examId, locale);
   if (!guide) return '';
-  return `<aside class="experiment-guide-link ui-container ui-container--wide" aria-label="Related research explanation">
-    <p class="ui-eyebrow">Research, explained</p>
-    <a class="ui-link" data-sense6-route="${guide.route}" href="/en/${guide.route}/">${guide.title} →</a>
+  const label = locale === 'en' ? 'Related research explanation' : guide.title;
+  const eyebrow = locale === 'en' ? 'Research, explained' : learnNavigationLabel(locale);
+  return `<aside class="experiment-guide-link ui-container ui-container--wide" aria-label="${esc(label)}">
+    <p class="ui-eyebrow">${esc(eyebrow)}</p>
+    <a class="ui-link" data-sense6-route="${guide.route}" href="${guide.href}">${esc(guide.title)} →</a>
   </aside>`;
+}
+
+/**
+ * Reuse the same canonical guide identity in a result interpretation.
+ * @param {import('./contracts.js').ExamId} examId
+ * @param {string} locale
+ * @param {string} englishLabel - Existing English result action text.
+ * @param {string} [cssClass] - Existing result-scoped style class.
+ */
+export function relatedGuideResultLink(examId, locale, englishLabel, cssClass = '') {
+  const guide = relatedGuideFor(examId, locale);
+  if (!guide) return '';
+  const label = locale === 'en' ? englishLabel : guide.title;
+  return `<a class="ui-link${cssClass ? ` ${cssClass}` : ''}" data-sense6-route="${guide.route}" href="${guide.href}">${esc(label)} →</a>`;
+}
+
+/** @param {string} value */
+function esc(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }

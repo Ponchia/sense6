@@ -18,5 +18,10 @@ test('experiment research sections link to the matching explanation @pr-smoke', 
   }
   await page.goto('/it/riflessi/');
   await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'riflessi');
-  await expect(page.locator('.experiment-guide-link')).toHaveCount(0);
+  const italianResearch = page.locator('.experiment-guide-link a');
+  await expect(italianResearch).toHaveAttribute('href', '/it/reaction-time-guide/');
+  await expect(italianResearch).toContainText('tempi di reazione');
+  await italianResearch.click();
+  await expect(page).toHaveURL(/\/it\/reaction-time-guide\/$/);
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'reaction-time-guide');
 });

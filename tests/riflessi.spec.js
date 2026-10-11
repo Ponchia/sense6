@@ -502,7 +502,8 @@ test('German Riflessi stages localize generated runner labels', async ({ page },
   await expect(page.locator('.rx-results')).toBeVisible();
   await expect(page.locator('.rx-results__hero h1')).toContainText('Typische Signalreaktion');
   await expect(page.locator('.rx-results__stamp')).toContainText('Durchlauf nutzbar');
-  await expect(page.locator('.rx-limit__learn')).toHaveCount(0);
+  await expect(page.locator('.rx-limit__learn')).toHaveAttribute('href', '/de/reaction-time-guide/');
+  await expect(page.locator('.rx-limit__learn')).toContainText('Reaktionszeittest');
   await expect(page.locator('.rx-metric')).toContainText('Typische Signalreaktion');
   await expect(page.locator('.rx-metric > p')).toContainText(
     /Median aus 2 sauberen einfachen Reaktionen von 2 geplanten Ereignissen/,

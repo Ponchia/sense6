@@ -15,6 +15,7 @@ import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
 import { ColorLabSession, PHASES } from '../lib/session.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 import { protocolPassport } from './protocols.js';
+import { relatedGuideResultLink } from './related-guide.js';
 import { tetracromiaHomeMarkup } from './views/tetracromia-home.js';
 
 const MOUNT_OWNER = Symbol('tetracromia');
@@ -604,6 +605,11 @@ function renderResults() {
   document.title = t('Screen Colour Lab observations — Tetracromia | Sense6');
   const result = state.session.results();
 
+  const tetracromiaGuideLink = relatedGuideResultLink(
+    'tetracromia',
+    state.locale,
+    'Why an RGB screen cannot confirm tetrachromacy',
+  );
   state.app.innerHTML = `
     <section class="results-view ui-container ui-container--wide" tabindex="-1">
       <div class="results-head">
@@ -636,7 +642,7 @@ function renderResults() {
             these observations is a population score, diagnosis, clinical screen, or evidence for
             tetrachromacy. A repeat is stored independently—Sense6 never pools runs or keeps a best.
           </p>
-          ${state.locale === 'en' ? '<p class="result-note__learn"><a class="ui-link" data-sense6-route="tetrachromacy-guide" href="/en/tetrachromacy-guide/">Why an RGB screen cannot confirm tetrachromacy →</a></p>' : ''}
+          ${tetracromiaGuideLink ? `<p class="result-note__learn">${tetracromiaGuideLink}</p>` : ''}
         </div>
       </div>
 

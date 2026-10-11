@@ -255,6 +255,7 @@ test('German focused Udito results keep the heading and caution copy localized @
   await expect(explanation).not.toContainText(
     /At least one setup check|The setup checks and adaptive tracks/,
   );
+  await expect(page.locator('.au-results__learn a')).toHaveAttribute('href', '/de/hearing-range-guide/');
   await expect
     .poll(() =>
       page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
