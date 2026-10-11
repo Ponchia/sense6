@@ -184,6 +184,8 @@ test('readers can jump to a topic and trace its background sources without leavi
 
   const citedSource = page.locator('#learn-source-css-color-4');
   await expect(citedSource).toBeVisible();
+  await expect(citedSource).toBeFocused();
+  await expect(citedSource.locator('.learn-reference-role')).toHaveText('[2] Display engineering standard');
   await expect(citedSource.getByRole('link')).toHaveAttribute('href', 'https://www.w3.org/TR/css-color-4/');
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     'href',
@@ -207,6 +209,16 @@ test('all Learn pages remain readable and accessible at a narrow viewport', asyn
     await page.goto(`/en/${route}/`);
     await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', route);
     await expect(page.locator('main h1')).toBeVisible();
+    if (route !== 'learn') {
+      await expect(page.getByRole('heading', { level: 2, name: 'Short answer' })).toBeVisible();
+      const reading = await page.locator('.learn-article__body').evaluate((body) => {
+        const text = body.querySelector('p');
+        const style = getComputedStyle(text);
+        return { fontSize: parseFloat(style.fontSize), lineHeight: parseFloat(style.lineHeight) };
+      });
+      expect(reading.fontSize).toBeGreaterThanOrEqual(16);
+      expect(reading.lineHeight / reading.fontSize).toBeGreaterThanOrEqual(1.6);
+    }
     const accessibility = await new AxeBuilder({ page }).analyze();
     expect(accessibility.violations, route).toEqual([]);
     const dimensions = await page.evaluate(() => ({

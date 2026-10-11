@@ -23,8 +23,10 @@
 #
 
 en-mobile-chromium-linux.png  # compact visual previews make all five experiments easier to browse on a phone
-en-color-blindness-guide-desktop-chromium-linux.png  # PR #113: compact related-task link within the short answer, independent of long-form citations
-en-color-blindness-guide-mobile-chromium-linux.png   # PR #113: related-task link now follows the short answer instead of requiring the entire article scroll
+en-learn-desktop-chromium-linux.png  # editorial rewrite: remove decorative counters, prioritize plain guide titles and natural reading hierarchy
+en-learn-mobile-chromium-linux.png  # same simplified Learn index and readable page hierarchy at narrow widths
+en-color-blindness-guide-desktop-chromium-linux.png  # editorial rewrite: remove redundant callouts and triads; reduce source-link noise and simplify reading layout
+en-color-blindness-guide-mobile-chromium-linux.png  # mobile editorial hierarchy and source-navigation changes with unchanged experimental boundaries
 
 en-journal-desktop-chromium-linux.png  # first-time journal starter moves beside introduction, ahead of export details
 en-journal-mobile-chromium-linux.png   # starter becomes immediately available before long privacy/export disclosure
