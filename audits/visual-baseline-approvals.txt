@@ -23,8 +23,8 @@
 #
 
 en-mobile-chromium-linux.png  # compact visual previews make all five experiments easier to browse on a phone
-en-learn-desktop-chromium-linux.png  # editorial rewrite: remove decorative counters, prioritize plain guide titles and natural reading hierarchy
-en-learn-mobile-chromium-linux.png  # same simplified Learn index and readable page hierarchy at narrow widths
+en-learn-desktop-chromium-linux.png  # index-only spacing and introduction scale bring the first complete research-guide title into the initial laptop viewport without changing article methods
+en-learn-mobile-chromium-linux.png  # tighter index-only hero and first guide placement at 320/390px, preserving mobile reading width and the five source-backed choices
 en-color-blindness-guide-desktop-chromium-linux.png  # editorial rewrite: remove redundant callouts and triads; reduce source-link noise and simplify reading layout
 en-color-blindness-guide-mobile-chromium-linux.png  # mobile editorial hierarchy and source-navigation changes with unchanged experimental boundaries
 

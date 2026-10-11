@@ -84,6 +84,26 @@
   text-wrap: balance;
 }
 
+/* Keep the actual guide choices visible on a laptop's first screen.
+   Only the Learn index is condensed; research articles retain their reading
+   rhythm and the short-answer/experiment-first structure. */
+.learn-view:not(.learn-article) .learn-breadcrumb {
+  margin-block-end: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.learn-view:not(.learn-article) .learn-hero {
+  padding-block-end: clamp(1.75rem, 2.8vw, 2.5rem);
+}
+
+.learn-view:not(.learn-article) .learn-hero__lede {
+  font-size: clamp(1.08rem, 1.55vw, 1.22rem);
+  line-height: 1.5;
+}
+
+.learn-view:not(.learn-article) .learn-section-heading {
+  margin-block: clamp(2rem, 3vw, 2.5rem) 1.25rem;
+}
+
 .learn-topic-grid {
   background: var(--line);
   border: 1px solid var(--line);
