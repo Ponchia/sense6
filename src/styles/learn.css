@@ -524,3 +524,116 @@
     line-height: 1.75;
   }
 }
+
+/* An original, explicitly hypothetical teaching model for browser latency.
+   The native range inputs and meter work with keyboard and assistive technology. */
+.learn-timing {
+  border: 1px solid var(--line-strong);
+  background: var(--panel);
+  margin-block: clamp(2.5rem, 5vw, 4rem);
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+.learn-timing__intro h2 {
+  font-size: clamp(1.6rem, 3vw, 2.45rem);
+  letter-spacing: -0.035em;
+  line-height: 1.17;
+  max-inline-size: 27ch;
+  margin-block: 0.85rem;
+}
+.learn-timing__intro > p:last-child {
+  color: var(--text-soft);
+  line-height: 1.7;
+  max-inline-size: 70ch;
+}
+.learn-timing__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.5rem, 3vw, 3rem);
+  margin-block-start: 1.75rem;
+}
+.learn-timing__inputs,
+.learn-timing__result {
+  min-inline-size: 0;
+}
+.learn-timing__fixed,
+.learn-timing__label,
+.learn-timing__result dl > div {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+}
+.learn-timing__fixed {
+  border-block-end: 1px solid var(--line);
+  padding-block-end: 1rem;
+}
+.learn-timing__fixed strong,
+.learn-timing__label output,
+.learn-timing__result dd {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+.learn-timing__control {
+  margin-block-start: 1.5rem;
+}
+.learn-timing__control label {
+  font-weight: 650;
+}
+.learn-timing__control input {
+  accent-color: var(--accent);
+  display: block;
+  inline-size: 100%;
+  margin-block: 0.8rem 0;
+  min-block-size: 2.75rem;
+}
+.learn-timing__control input:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+.learn-timing__control p,
+.learn-timing__result figcaption {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin-block: 0.5rem 0;
+}
+.learn-timing__result {
+  background: var(--bg);
+  padding: clamp(1rem, 2.5vw, 2rem);
+  margin: 0;
+}
+.learn-timing__total {
+  display: block;
+  font-family: var(--display);
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+  line-height: 1.2;
+  margin-block: 0.7rem;
+}
+.learn-timing__result meter {
+  accent-color: var(--accent);
+  display: block;
+  inline-size: 100%;
+  block-size: 0.9rem;
+}
+.learn-timing__result dl {
+  display: grid;
+  gap: 0.8rem;
+  margin-block: 1.4rem;
+}
+.learn-timing__result dl > div {
+  border-block-end: 1px solid var(--line);
+  padding-block-end: 0.6rem;
+}
+.learn-timing__result dd {
+  font-weight: 650;
+  margin: 0;
+}
+@media (max-width: 760px) {
+  .learn-timing__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

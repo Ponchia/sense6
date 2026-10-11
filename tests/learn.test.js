@@ -2,6 +2,11 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { learnPageData } from '../scripts/learn-structured-data.mjs';
 import { learnMarkup, learnMetadata, learnPage } from '../src/learn.js';
+import {
+  EXAMPLE_RESPONSE_MS,
+  illustrativeInterval,
+  timingIllustrationMarkup,
+} from '../src/learn-timing-illustration.js';
 import { LEARN_ROUTES } from '../src/routes.js';
 
 test('English-only guides have original substantive answers, methods and references', () => {
@@ -45,6 +50,7 @@ test('English-only guides have original substantive answers, methods and referen
     assert.equal(record.inLanguage, 'en');
     assert.equal(record.datePublished, route === 'learn' ? undefined : content.publishedDate);
     assert.equal(record.dateModified, meta.dateModified);
+    if (route !== 'learn') assert.ok(html.includes(`datetime="${record.dateModified}"`));
     assert.equal(record.author.name, 'Zeno');
     assert.equal(record.image, route === 'learn' ? undefined : `https://sense6.net${expectedImage}`);
     assert.equal(schema['@graph'][1]['@type'], 'BreadcrumbList');
@@ -151,4 +157,24 @@ test('independent published research never claims validation of Sense6', () => {
   assert.match(learnMarkup('visual-acuity-guide'), /National Eye Institute/);
   assert.equal(learnMetadata('wrong-guide'), null);
   assert.throws(() => learnMarkup('wrong-guide'), /Unknown/);
+});
+
+test('hypothetical reaction model remains arithmetic, bounded, static and explicitly non-diagnostic', () => {
+  assert.equal(EXAMPLE_RESPONSE_MS, 220);
+  assert.equal(illustrativeInterval(16, 12), 248);
+  assert.equal(illustrativeInterval(0, 0), 220);
+  assert.equal(illustrativeInterval(50, 50), 320);
+  assert.throws(() => illustrativeInterval(-1, 2), RangeError);
+  assert.throws(() => illustrativeInterval(2, 51), RangeError);
+  assert.throws(() => illustrativeInterval(1.5, 3), RangeError);
+  const markup = timingIllustrationMarkup();
+  assert.match(markup, /aria-live="polite"/);
+  assert.match(markup, /not a latency measurement, calibration or correction formula/);
+  assert.match(markup, /data-timing-total[^>]*>248 ms<\/output>/);
+  assert.equal((markup.match(/type="range"/g) ?? []).length, 2);
+  assert.equal((markup.match(/type="range"[^>]*disabled/g) ?? []).length, 2);
+  assert.match(learnMarkup('reaction-time-guide'), /data-learn-timing/);
+  for (const route of LEARN_ROUTES.filter((route) => route !== 'reaction-time-guide')) {
+    assert.doesNotMatch(learnMarkup(route), /data-learn-timing/);
+  }
 });
