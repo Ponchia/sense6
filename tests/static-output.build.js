@@ -104,7 +104,7 @@ test('the footer and gallery expose only actually published Learn locales', asyn
     if (!published) {
       assert.ok(!html.includes(`href="/${code}/learn/"`), `${code} phantom translation`);
     }
-    assert.equal(html.includes('class="ui-link gallery-hero__learn"'), code === 'en');
+    assert.equal(html.includes('class="ui-link gallery-hero__learn"'), published);
   }
 });
 

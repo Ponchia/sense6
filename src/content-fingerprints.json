@@ -7,7 +7,7 @@
   "/ar/": {
     "key": "site",
     "date": "2026-10-11",
-    "hash": "296ef44cba82f393945c55250b7048bf"
+    "hash": "54a0885144225130a10cf53de6c19a17"
   },
   "/ar/about/": {
     "key": "about",
@@ -72,7 +72,7 @@
   "/de/": {
     "key": "site",
     "date": "2026-10-11",
-    "hash": "622f52a85eb17492c6c3d7159754515d"
+    "hash": "3775d26ed6b20566e6a1090838f6dc9d"
   },
   "/de/about/": {
     "key": "about",
@@ -202,7 +202,7 @@
   "/es/": {
     "key": "site",
     "date": "2026-10-11",
-    "hash": "74e8dfe3d8af696e92499d6b30b532c9"
+    "hash": "68f6198f8e63936becaffc45bb8ccb56"
   },
   "/es/about/": {
     "key": "about",
@@ -267,7 +267,7 @@
   "/fr/": {
     "key": "site",
     "date": "2026-10-11",
-    "hash": "8f6310de688efb8f468513891cb8c4a2"
+    "hash": "c822a974819e3daeb2ea34816a0f7d65"
   },
   "/fr/about/": {
     "key": "about",
@@ -332,7 +332,7 @@
   "/hi/": {
     "key": "site",
     "date": "2026-10-11",
-    "hash": "b5431f21cfcc308bfefec759cdac0259"
+    "hash": "ec11881fcceef6e2287c1af914d73755"
   },
   "/hi/about/": {
     "key": "about",
@@ -344,15 +344,40 @@
     "date": "2026-10-10",
     "hash": "530bcd21f583ec4508070a40204011e3"
   },
+  "/hi/color-blindness-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "28199550b0863fcff0aca8ca65b26295"
+  },
   "/hi/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-10-10",
     "hash": "db9a185edc266ad814fc3310e99102e5"
   },
+  "/hi/hearing-range-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "f9654aa60ecf084c40848632a923b2b1"
+  },
+  "/hi/learn/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "2b73e15047b94a37e76c74bd809bbd63"
+  },
+  "/hi/reaction-time-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "88734a3fe762034b2c1c2acb097887cb"
+  },
   "/hi/riflessi/": {
     "key": "exams.riflessi",
     "date": "2026-10-10",
     "hash": "2400a3bb18c438ce14574bc447ec11d1"
+  },
+  "/hi/tetrachromacy-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "9ebe198ced53bfd12e54b6314469b1b5"
   },
   "/hi/tetracromia/": {
     "key": "exams.tetracromia",
@@ -364,10 +389,15 @@
     "date": "2026-10-10",
     "hash": "43e74ae13f7bc3ae6668a7e45ff04cc3"
   },
+  "/hi/visual-acuity-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "97b94cbb152eff69e38257892ae12f2d"
+  },
   "/it/": {
     "key": "site",
     "date": "2026-10-11",
-    "hash": "6b6b24ffa2afce7d876a511e8960b0de"
+    "hash": "7eb19f6ef0c6d813072f1ca5d4525535"
   },
   "/it/about/": {
     "key": "about",
@@ -432,7 +462,7 @@
   "/ja/": {
     "key": "site",
     "date": "2026-10-11",
-    "hash": "18d2bf060ed63f383bb7c0446fbb3527"
+    "hash": "94433a69652944b366a3a5cb2fbe18e9"
   },
   "/ja/about/": {
     "key": "about",
@@ -444,15 +474,40 @@
     "date": "2026-10-10",
     "hash": "6fdb150d91dda9ba426bd1642716a29a"
   },
+  "/ja/color-blindness-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "f1ae7d4d79232011779ac1ecdca1fbc0"
+  },
   "/ja/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-10-10",
     "hash": "f9359ea6d65f61ba744b712c46dbc894"
   },
+  "/ja/hearing-range-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "079985e916fcc22c23037b4cab629d5c"
+  },
+  "/ja/learn/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "9e954da6133d72e98fc35d9bd228ff57"
+  },
+  "/ja/reaction-time-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "b60589ae520fe4c74bd538142ac94d40"
+  },
   "/ja/riflessi/": {
     "key": "exams.riflessi",
     "date": "2026-10-10",
     "hash": "cc9b898dc027092aed21603dc52b3514"
+  },
+  "/ja/tetrachromacy-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "7dc3d5001063e82575f7b90cec431213"
   },
   "/ja/tetracromia/": {
     "key": "exams.tetracromia",
@@ -464,10 +519,15 @@
     "date": "2026-10-10",
     "hash": "0c9f594a5fc8cbc3d245845dcdbc21e1"
   },
+  "/ja/visual-acuity-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "6aaa34def7ffa5bd4d2bf15c39885dd5"
+  },
   "/ko/": {
     "key": "site",
     "date": "2026-10-11",
-    "hash": "86c3783812354c0dd6463809823b301a"
+    "hash": "5a9d9b2c923a4f06ebda5682cd5670c3"
   },
   "/ko/about/": {
     "key": "about",
@@ -479,15 +539,40 @@
     "date": "2026-10-10",
     "hash": "c94a340286c21da1bfd0a5d90cdf5289"
   },
+  "/ko/color-blindness-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "fd9275ce8c9d1892445fe37cbb8a5442"
+  },
   "/ko/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-10-10",
     "hash": "037f09a38d6efb80d4367356c66f5439"
   },
+  "/ko/hearing-range-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "fcb9300efaad71c72bff3bae1e746bea"
+  },
+  "/ko/learn/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "8ff13c635a6cc14528a2d30376c363b7"
+  },
+  "/ko/reaction-time-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "17b98fd188fcfaf53c2d21d5d81d1b19"
+  },
   "/ko/riflessi/": {
     "key": "exams.riflessi",
     "date": "2026-10-10",
     "hash": "40625f10a78387492c3e58c435be758a"
+  },
+  "/ko/tetrachromacy-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "ffb82e84b99ab1b416a374d79fb6e31c"
   },
   "/ko/tetracromia/": {
     "key": "exams.tetracromia",
@@ -499,10 +584,15 @@
     "date": "2026-10-10",
     "hash": "df032b20f0ef46059e944f81f3640b52"
   },
+  "/ko/visual-acuity-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "88baafdef2eaca9c3ecdd55394ada10f"
+  },
   "/pt-br/": {
     "key": "site",
     "date": "2026-10-11",
-    "hash": "b44be11528d6c38e533e5c407090eae5"
+    "hash": "06e1d96626c34d731c7dfb3e37eafb80"
   },
   "/pt-br/about/": {
     "key": "about",
@@ -567,7 +657,7 @@
   "/pt/": {
     "key": "site",
     "date": "2026-10-11",
-    "hash": "e0ac28b7d836cbd41b1a42458bc81979"
+    "hash": "00fbf8c42fb9ed9c33aaa5d2508fa34a"
   },
   "/pt/about/": {
     "key": "about",
@@ -632,7 +722,7 @@
   "/zh-hans/": {
     "key": "site",
     "date": "2026-10-11",
-    "hash": "2c6072b202407de894f820dfcd522914"
+    "hash": "ee85cc1ff958f25d03368ba00b8c8259"
   },
   "/zh-hans/about/": {
     "key": "about",
@@ -644,15 +734,40 @@
     "date": "2026-10-10",
     "hash": "85602994e549faf4d9d20daca2e8cfaa"
   },
+  "/zh-hans/color-blindness-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "82e00874e2782f5d555239fe40c1b83a"
+  },
   "/zh-hans/color-blindness/": {
     "key": "exams.color-blindness",
     "date": "2026-10-10",
     "hash": "1447f53df450d3baeeeffc2aeac6bd35"
   },
+  "/zh-hans/hearing-range-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "5b349df41bee71dc874cb3f56e14cdbb"
+  },
+  "/zh-hans/learn/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "a2dfb87cfe0f6ecb47c065ff4284d00d"
+  },
+  "/zh-hans/reaction-time-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "5711b188f33b240ae1cd471fa04b8708"
+  },
   "/zh-hans/riflessi/": {
     "key": "exams.riflessi",
     "date": "2026-10-10",
     "hash": "8adf8078ec4570dd857923f6383cc963"
+  },
+  "/zh-hans/tetrachromacy-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "e00499607e994e62b24ea60d95c29df3"
   },
   "/zh-hans/tetracromia/": {
     "key": "exams.tetracromia",
@@ -663,5 +778,10 @@
     "key": "exams.udito",
     "date": "2026-10-10",
     "hash": "5b82b9430831fa7464d269257334f3a3"
+  },
+  "/zh-hans/visual-acuity-guide/": {
+    "key": "learn",
+    "date": "2026-10-11",
+    "hash": "b956516d159e2affccc17fd78e49b3ac"
   }
 }

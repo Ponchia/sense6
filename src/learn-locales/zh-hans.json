@@ -1,0 +1,443 @@
+{
+  "locale": "zh-hans",
+  "sourceHash": "fcbf2bc35a6e120630e2234706fe70e1be11a658636ca9bf6185cb62df28a997",
+  "reviewedDate": "2026-10-11",
+  "review": {
+    "reviewer": "AI-assisted translation and source-consistency review (no native-language human or clinical certification)",
+    "complete": true,
+    "boundariesPreserved": true,
+    "protocolsUnchanged": true,
+    "referencesPreserved": true
+  },
+  "content": {
+    "overview": {
+      "title": "理解感知与浏览器实验。",
+      "metaTitle": "了解感知与浏览器实验 | Sense6",
+      "description": "五篇指南，介绍色觉、反应时间、听力频率范围和视力，结合研究资料，具体说明浏览器测试的局限。",
+      "intro": "一道颜色渐变、以毫秒计的反应时间、几乎听不见的纯音：这些看起来都能为你的感官能力提供一个简单答案。这五篇指南解释各项任务究竟在测试什么、设备如何影响结果，以及相关研究能说明哪些问题。每篇都附有一个可亲自尝试的 Sense6 实验链接。",
+      "boundary": "Sense6 是供娱乐和探索的浏览器实验室。这些实验未经临床验证，不能诊断疾病，也不能确认生物学特征。",
+      "updated": "2026年10月11日"
+    },
+    "articles": {
+      "tetrachromacy-guide": {
+        "title": "在线测试能检测四色视觉吗？",
+        "eyebrow": "色觉 · 阅读约需4分钟",
+        "metaTitle": "在线测试能检测四色视觉吗？ | Sense6",
+        "description": "多一种视锥细胞信号意味着什么？为什么数渐变中的色带不能证实四色视觉？屏幕色彩实验室实际记录的又是什么？",
+        "updated": "2026年10月11日",
+        "summary": "普通 RGB 屏幕上的测试无法证明功能性四色视觉。能分辨屏幕上细微的颜色差异，与证明一个人的色觉使用了第四种独立信号，是两回事。",
+        "sections": [
+          {
+            "heading": "多一种感光色素，只是问题的一部分",
+            "paragraphs": [
+              "大多数人的色觉始于三类视锥感光细胞，它们对光的敏感范围彼此重叠。功能性四色视觉意味着颜色辨别多了一个独立维度，并不只是能察觉更多色调，或知道更多颜色名称。",
+              "某些遗传变异可能产生额外一类视锥感光色素，尤其是在携带某些 X 连锁色觉变异的人群中。不过，要让这种额外信号影响感知，视觉系统必须利用它来区分原本会被视为相同的颜色。仅仅存在四种感光色素，还不足以下结论。",
+              "Jordan 及其同事在2010年的研究中，将颜色匹配和辨别任务与遗传分析结合起来。他们的证据来自专门设计的刺激，以及不同观察者之间的比较。这项研究考察的是实际发挥作用的色觉，并非教人凭一张彩色图片识别四色视觉者。"
+            ],
+            "sourceIds": ["jordan-2010"]
+          },
+          {
+            "heading": "渐变仍然由显示器的三种基色生成",
+            "paragraphs": [
+              "普通 RGB 显示器混合红、绿、蓝三种成分的光。改变它们的强度可以生成许多颜色，但色调再多，也不会增加一种独立基色。广色域显示器能扩大可显示的颜色范围，却不能把三基色图像变成检验第四类视锥细胞作用的测试。",
+              "数渐变中的色带，只能说明你在这张图里注意到了哪些边界，无法表明第四种视锥信号是否参与其中。即使颜色任务很难，也必须先设计出合适的刺激，让三类视锥视觉下的颜色匹配与可能存在的四类视锥辨别能力区分开来，才有可能研究四色视觉。",
+              "CSS Color 规范说明浏览器如何描述和转换颜色。它是所显示数值的工程参考，并不测量屏幕实际发出的光。亮度设置、颜色滤镜和室内照明仍然是观看条件的一部分。"
+            ],
+            "sourceIds": ["css-color-4", "jordan-2010"]
+          },
+          {
+            "heading": "屏幕色彩实验室的三项任务",
+            "paragraphs": [
+              "Sense6 会让你选出不同的色块、选出不同的点阵，并将一组色相排序。这些任务对注意力的要求各不相同：找出异样色块是在局部作比较，排列一行颜色则需要将多个颜色相互比较。",
+              "在色块和点阵任务中，答对会让差异缩小，答错则会让差异增大。结果显示每段简短自适应序列结束时的水平，同时列出作答次数和呈现过的范围。结束水平不是稳定阈值；最后几次选择仍可能改变它。",
+              "色相排序有自己的结果。Sense6 将它与两项自适应任务的水平分别记录，不把性质不同的任务平均成一个色觉分数。这三项结果描述的，都是你在当前浏览器和显示器所呈现的颜色之间作出的选择。"
+            ],
+            "sourceIds": ["sense6-tetracromia", "css-color-4"]
+          },
+          {
+            "heading": "如何看待重复尝试",
+            "paragraphs": [
+              "再次尝试时，尽量使用相同的显示器、亮度和照明。如果换了滤镜或屏幕，先记下这些变化，再解释结果差异。私人记录会分别保存每次尝试，不会将它们合并，也不会只留下最好的一次。",
+              "重复尝试可以帮助你观察，在相似条件下自己的选择如何变化。但它不能回答实验室里关于额外感知维度的问题。要研究这一点，需要使用合适的光谱刺激，在受控条件下进行颜色辨别，并与其他观察者比较。"
+            ],
+            "sourceIds": ["jordan-2010", "sense6-tetracromia"]
+          }
+        ],
+        "experiment": {
+          "route": "tetracromia",
+          "title": "试试屏幕色彩实验室",
+          "hint": "三项独立的屏幕相对观察 · 约4分钟 · 不用于诊断四色视觉"
+        },
+        "sources": [
+          {
+            "role": "人类视觉原始研究",
+            "title": "Jordan, Deeb, Bosten & Mollon (2010) — The dimensionality of color vision in carriers of anomalous trichromacy",
+            "href": "https://doi.org/10.1167/10.8.12",
+            "id": "jordan-2010"
+          },
+          {
+            "role": "显示技术工程标准",
+            "title": "W3C CSS Color Module Level 4 — 色彩空间、转换与色差",
+            "href": "https://www.w3.org/TR/css-color-4/",
+            "id": "css-color-4"
+          },
+          {
+            "role": "Sense6 实际实现的方法",
+            "title": "Sense6 屏幕色彩实验室 — 方法、资料来源与局限",
+            "href": "/en/tetracromia/",
+            "id": "sense6-tetracromia"
+          }
+        ],
+        "publishedDate": "2026-10-09",
+        "dateModified": "2026-10-11"
+      },
+      "reaction-time-guide": {
+        "title": "浏览器反应时间测试有多准确？",
+        "eyebrow": "反应计时 · 阅读约需4分钟",
+        "metaTitle": "浏览器反应时间测试有多准确？ | Sense6",
+        "description": "显示和输入延迟如何计入浏览器记录的反应时间、怎样理解中位数，以及重复 Riflessi 时应保持哪些条件一致。",
+        "updated": "2026年10月11日",
+        "summary": "浏览器记录的反应时间既包括你的反应，也包括显示器和输入设备的延迟。它不是经过仪器校准的人体反应速度测量。使用相同配置有助于解释重复尝试的结果，但不能消除这些延迟。",
+        "sections": [
+          {
+            "heading": "从颜色变化到按下按键",
+            "paragraphs": [
+              "设想一个圆变了颜色，你看到后按下按键。网页先安排颜色变化，显示器随后将变化呈现出来；你作出反应后，键盘和操作系统再将事件传给浏览器。记录的时间间隔涵盖了这条链路的多个环节，而网页无法分别测出每个环节的耗时。",
+              "显示延迟发生在可见信号到达你眼前之前。键盘延迟发生在按下按键之后、反应传到软件之前。即便浏览器时钟很精确，也无法单靠它确定这两个实际发生的时刻。这需要外部设备，例如光传感器，以及测量实际按键动作的装置。",
+              "从键盘改用触摸屏，不仅更换了输入硬件，也改变了作答动作。如果记录的时间发生变化，单凭结果无法判断有多少来自你的动作，又有多少来自设备。本页示意图将假设的延迟分开显示，是为了说明这种区别，并没有测量你的延迟。"
+            ],
+            "sourceIds": ["bridges-2020", "anwyl-irvine-2021"]
+          },
+          {
+            "heading": "准确性与一致性并不相同",
+            "paragraphs": [
+              "一套设备可能引入相当固定的延迟，同时给出十分集中的读数。这些读数的精密度可以很高，却未必准确反映实际发生的时间间隔。波动的延迟则带来另一种问题：它会增加数据离散程度，掩盖不同轮次之间的小差异。",
+              "Bridges 及其同事使用外部计时设备测试了实验室和在线实验工具。Anwyl-Irvine 及其同事考察了浏览器与设备的不同组合，包括使用普通消费级键盘作答的情况。他们的发现针对所测试的软件和设备，既没有确定一个适用于所有浏览器的固定偏差，也没有给出可用于 Sense6 的校正值。"
+            ],
+            "sourceIds": ["bridges-2020", "anwyl-irvine-2021"]
+          },
+          {
+            "heading": "看整轮表现，不只看最快的一次",
+            "paragraphs": [
+              "Riflessi 会报告有效反应时间的中位数及其离散程度。中位数是排序后位于中间的记录值，因此，与平均数相比，一次特别慢的反应对它的影响较小。不过仍需结合整轮情况来理解：看似整齐的中位数，也可能来自漏掉信号或排除许多作答的一轮。",
+              "请查看计划事件数、有效事件数、提前作答次数和中断说明。信号出现前就按键属于预判，不是一次更快的成功反应。页面失去焦点或切换标签页可能打断尝试；实验会暂停，并舍弃被中断的事件，不会把它当作普通反应处理。",
+              "简短的 Segnale 模式要求对单一信号作出反应。Scelta 增加了左、右选择，完整模式还包含一段持续反应任务。选择反应时间包含决定如何作答所需的时间，因此不能把它与简单反应时间直接比较，仿佛两者测的是同一项任务。"
+            ],
+            "sourceIds": ["sense6-riflessi"]
+          },
+          {
+            "heading": "在同一套设备上重复 Riflessi",
+            "paragraphs": [
+              "使用相同的设备和选定的输入方式，让标签页保持可见，并在正式计时前完成练习。如果更换键盘或屏幕，请记录下来。相似条件能减少解释上的不确定性，但不能保证每一处差异都来自练习或注意力变化。",
+              "本地记录会将模式、设备设置和结果一同保存。比较条件相容的轮次时，除了中位数，也要看离散程度和事件数量。一轮受限或被中断的尝试，可能更多反映当次情况，而非你的反应速度变化。",
+              "这里的链接会打开 Segnale，并保留正常的设置与同意步骤。你的反应时间留在当前浏览器中。Sense6 不设全球排行榜，也不对结果作临床解释。"
+            ],
+            "sourceIds": ["sense6-riflessi", "anwyl-irvine-2021"]
+          }
+        ],
+        "experiment": {
+          "route": "riflessi",
+          "title": "试试简短反应实验",
+          "href": "/en/riflessi/?scope=signal",
+          "hint": "现有 Segnale 模式 · 设置后约2分钟 · 作答数据留在当前浏览器"
+        },
+        "sources": [
+          {
+            "role": "独立计时比较研究",
+            "title": "Bridges, Pitiot, MacAskill & Peirce (2020) — The timing mega-study",
+            "href": "https://doi.org/10.7717/peerj.9414",
+            "id": "bridges-2020"
+          },
+          {
+            "role": "浏览器与设备计时研究",
+            "title": "Anwyl-Irvine, Dalmaijer, Hodges & Evershed (2021) — Realistic precision and accuracy of online experiments",
+            "href": "https://doi.org/10.3758/s13428-020-01501-5",
+            "id": "anwyl-irvine-2021"
+          },
+          {
+            "role": "Sense6 实际实现的方法",
+            "title": "Sense6 Riflessi — 模式、计时控制与局限",
+            "href": "/en/riflessi/",
+            "id": "sense6-riflessi"
+          }
+        ],
+        "publishedDate": "2026-10-09",
+        "dateModified": "2026-10-11"
+      },
+      "color-blindness-guide": {
+        "title": "在线色盲测试能告诉你什么？",
+        "eyebrow": "色觉差异 · 阅读约需4分钟",
+        "metaTitle": "在线色盲测试能告诉你什么？ | Sense6",
+        "description": "点图与噪声背景中的缺口任务有何区别、亮度为什么会成为线索，以及如何理解 Daltonia 各条独立的屏幕颜色测试序列。",
+        "updated": "2026年10月11日",
+        "summary": "在线任务可以记录你分辨出了哪些屏幕颜色差异，但单凭它，不能确认或排除色觉缺陷。屏幕和任务设计都会影响结果的含义。",
+        "sections": [
+          {
+            "heading": "色盲通常不意味着完全看不见颜色",
+            "paragraphs": [
+              "色觉缺陷影响的是分辨某些颜色差异的能力。大多数被称为色盲的人仍然能看到许多颜色。他们的困难有特定范围，而不是普遍无法感知颜色。",
+              "专业评估可能使用带有隐藏图形的点图、色相排列任务，或要求观察者匹配光色的色觉镜。这些任务比较的内容各不相同。美国国家眼科研究所介绍了它们的用途；一次在线结果无法提供按适当程序实施的专业评估所能给出的临床解释。"
+            ],
+            "sourceIds": ["nei-colour-vision"]
+          },
+          {
+            "heading": "亮度可能泄露答案",
+            "paragraphs": [
+              "一个彩色图形可能因为亮度比背景更高而显得突出，即使原本要考察的颜色差异很难看出。研究颜色辨别的任务，需要考虑这种替代线索。",
+              "印刷点图依赖特定颜色和观看条件。拍照或截屏会在图像到达你的显示器之前引入另一层变化。屏幕亮度、夜间滤镜和室内照明还可能进一步改变你看到的内容。在这样的图像中认出一个数字，并不等于在规定条件下完成原来的测试。",
+              "Regan、Reffin 和 Mollon 的实验室方法通过改变点的亮度并掩蔽轮廓，降低亮度和形状线索的作用。这种方法为噪声点阵中的辨别任务提供了研究背景，但不能证明每一种浏览器改编都能以同样方式排除颜色之外的线索。"
+            ],
+            "sourceIds": ["nei-colour-vision", "regan-1994"]
+          },
+          {
+            "heading": "Daltonia 要你找出缺口",
+            "paragraphs": [
+              "在 Sense6 的 Daltonia 任务中，一个 C 形目标位于噪声点阵之中。你需要选择缺口方向，或表示看不到缺口。每轮分别测试三个屏幕颜色方向，各条序列根据你的选择独立提高或降低难度。",
+              "点阵噪声旨在减少亮度线索，却不能保证只能靠颜色辨别目标。残余的亮度差异仍可能存在。Daltonia 是自定义的屏幕任务，不是石原色觉检查图，也不是经过认证的剑桥色觉测试复刻版。",
+              "高对比度对照刺激用于检查：当目标较容易看见时，你能否完成缺口方向作答。漏答一次可能反映对任务不熟悉，也可能说明这次尝试不可靠。答对对照题有助于解释当轮结果，但不能据此判定你的色觉类型。"
+            ],
+            "sourceIds": ["regan-1994", "sense6-daltonia"]
+          },
+          {
+            "heading": "三个结束水平意味着什么",
+            "paragraphs": [
+              "每项自适应结果都对应软件屏幕颜色模型中的一个方向。这个水平不是视锥细胞敏感度的测量，也不是适用于所有人的视力排名。三个数值应分别保留；取平均值会掩盖哪些屏幕颜色比较较难。",
+              "解读水平时，也要查看对照作答和各条序列的证据。随着作答在正确与错误之间切换，自适应序列的调整方向发生改变，这称为一次反转。序列较短、反转较少时，关于表现稳定在哪个水平的证据有限。如果到达允许的最易或最难水平，得到的也只是一个界限，而非精确阈值。",
+              "再次尝试时，尽量保持屏幕、滤镜和室内照明一致，并采用相近的观看位置。私人记录会连同设置与方法一起保存每轮结果，便于识别不适合比较的尝试。如果颜色辨别困难影响日常生活，或涉及职业要求，请向眼科专业人员咨询；Daltonia 无法解决这些问题。"
+            ],
+            "sourceIds": ["sense6-daltonia"]
+          }
+        ],
+        "experiment": {
+          "route": "color-blindness",
+          "title": "探索 Daltonia 颜色辨别任务",
+          "hint": "三个独立的屏幕颜色方向自适应序列 · 约3分钟，另需设置时间 · 不用于诊断"
+        },
+        "sources": [
+          {
+            "role": "临床测试指导",
+            "title": "U.S. National Eye Institute — Testing for Color Vision Deficiency",
+            "href": "https://www.nei.nih.gov/eye-health-information/eye-conditions-and-diseases/color-blindness/testing-color-vision-deficiency",
+            "id": "nei-colour-vision"
+          },
+          {
+            "role": "独立实验室方法",
+            "title": "Regan, Reffin & Mollon (1994) — Luminance noise and the rapid determination of discrimination ellipses",
+            "href": "https://doi.org/10.1016/0042-6989(94)90203-8",
+            "id": "regan-1994"
+          },
+          {
+            "role": "Sense6 实际实现的方法",
+            "title": "Sense6 Daltonia — 自适应序列、对照与证据边界",
+            "href": "/en/color-blindness/",
+            "id": "sense6-daltonia"
+          }
+        ],
+        "publishedDate": "2026-10-09",
+        "dateModified": "2026-10-11"
+      },
+      "hearing-range-guide": {
+        "title": "浏览器能测试你的听力频率范围吗？",
+        "eyebrow": "听力与耳机 · 阅读约需4分钟",
+        "metaTitle": "浏览器能测试你的听力频率范围吗？ | Sense6",
+        "description": "为什么纯音频率不能说明耳边的声级、Udito 的设置检查能确认什么，以及其结果与测听有何不同。",
+        "updated": "2026年10月11日",
+        "publishedDate": "2026-10-10",
+        "summary": "浏览器能够生成纯音，却无法知道它们在你耳边的声压。在一套设备上听到的最高频率，不是听力图，不能用于诊断听力损失，也不能衡量“听力年龄”。",
+        "sections": [
+          {
+            "heading": "频率只能说明一部分",
+            "paragraphs": [
+              "频率以赫兹（Hz）为单位，描述声音振动的快慢。能否听到一个纯音，还取决于它的声级。浏览器可以设定数字信号的频率和振幅，但耳机实际输出什么，取决于从该信号到你耳朵之间的整条链路。",
+              "音量滑块在相同位置，不代表两副不同耳机产生相同声压。佩戴是否贴合，也会改变传到耳边的声音。如果换耳机后听不到某个纯音，单凭这一点不能确认听力发生了变化。",
+              "临床纯音测听在选定频率上，测量人对经过校准的声音的敏感度，结果通常以听力级分贝（dB HL）表示。美国言语语言听力协会规定了设备校准、换能器和测试环境的要求。声学声级未知的浏览器纯音，无法提供这种测量。"
+            ],
+            "sourceIds": ["asha-audiometry"]
+          },
+          {
+            "heading": "浏览器不会测量你的耳机",
+            "paragraphs": [
+              "Web Audio 规范描述数字声音的生成与处理。音频上下文会报告采样率，它在数学上限定了可生成的频率范围，但不会报告耳机的声学响应。软件中存在的纯音，播放设备未必能很好地还原。",
+              "耳机对不同频率的响应不同。背景噪声可能掩蔽较轻的纯音，音频处理或耳塞密封程度的变化也会影响可听性。解释高频结果时，这些因素都不可忽视；浏览器没有放在你耳边的校准麦克风，无法将它们分开测量。",
+              "请选择舒适的音量；如果声音令人不适，就停止。不要为了听到更高频率而调大音量。保持音量不变，有助于比较同一轮中的选择，但既不能校准输出，也不能保证每种设备上的声级都安全。"
+            ],
+            "sourceIds": ["w3c-web-audio", "asha-audiometry"]
+          },
+          {
+            "heading": "Udito 在报告结果前检查什么",
+            "paragraphs": [
+              "Udito 首先通过一组声音呈现检查，收集听音方式是否类似于使用耳机的证据。通过检查，并不意味着已识别实际设备或测量其输出。设置阶段还会要求你确认能听到参考纯音，然后才继续。",
+              "Focused 模式随后沿自适应频率序列进行，报告当轮的频率上边界。Standard 模式增加了选定参考频率附近的独立音高差辨别任务。发现细小的音高差与听到高频纯音是不同的任务，因此结果不会合并成一个听力分数。",
+              "结果还会附上对照作答、中断情况，以及你在结束时对音量始终未变的确认。比较尝试前，请先阅读各项需谨慎解释的原因。如果频率序列达到软件上限，结果只说明任务在这里停止，并没有找出你能听到的最高频率。",
+              "若要比较不同次尝试，请使用相同的耳机、连接方式和舒适音量设置。私人记录会为每条记录保存任务和设置。更换设备，可能让两轮原本相似的尝试不再适合比较。"
+            ],
+            "sourceIds": ["sense6-udito"]
+          },
+          {
+            "heading": "听力检查有其特定方法",
+            "paragraphs": [
+              "世界卫生组织的 hearWHO 应用要求用户辨认背景噪声中的语音数字。支持这项听力检查的证据属于其噪声中数字辨认方法，并不能验证 Udito 的纯音任务。世卫组织也说明，hearWHO 不能替代向医疗专业人员咨询。",
+              "如果听对话有困难，或听力发生变化，应接受适当的专业评估。娱乐性的频率结果无法判断你是否需要助听器。可以用 Udito 观察自己在已知设备配置上的听音选择，但不能把它作为临床听阈记录。"
+            ],
+            "sourceIds": ["who-hearwho", "asha-audiometry"]
+          }
+        ],
+        "experiment": {
+          "route": "udito",
+          "title": "试试 Udito 听音实验室",
+          "hint": "Focused 或 Standard 听音观察 · 保持舒适音量不变 · 不用于听力诊断"
+        },
+        "sources": [
+          {
+            "role": "专业测听规程",
+            "title": "ASHA (2005) — Guidelines for Manual Pure-Tone Threshold Audiometry",
+            "href": "https://www.asha.org/policy/GL2005-00014/",
+            "id": "asha-audiometry"
+          },
+          {
+            "role": "浏览器音频工程标准",
+            "title": "W3C Web Audio API — 音频上下文、采样率与输出处理",
+            "href": "https://www.w3.org/TR/webaudio-1.0/",
+            "id": "w3c-web-audio"
+          },
+          {
+            "role": "与另一种听力检查的比较",
+            "title": "World Health Organization — Hearing checks and the hearWHO app",
+            "href": "https://www.who.int/news-room/questions-and-answers/item/deafness-and-hearing-loss-hearing-checks-and-the-hearwho-app",
+            "id": "who-hearwho"
+          },
+          {
+            "role": "Sense6 实现的方法",
+            "title": "Sense6 Udito — 类耳机听音检查、纯音任务与解释局限",
+            "href": "/en/udito/",
+            "id": "sense6-udito"
+          }
+        ],
+        "dateModified": "2026-10-11"
+      },
+      "visual-acuity-guide": {
+        "title": "在线视力测试能代替眼科检查吗？",
+        "eyebrow": "视力与屏幕 · 阅读约需4分钟",
+        "metaTitle": "在线视力测试能代替眼科检查吗？ | Sense6",
+        "description": "像素大小和观看距离如何影响小目标、Acutezza 的模型区间涵盖什么，以及为什么视力只是眼科检查的一部分。",
+        "updated": "2026年10月11日",
+        "publishedDate": "2026-10-10",
+        "summary": "不能。屏幕任务可以记录你在指定距离下辨认出了哪些小图形，却不能确认眼睛健康、开具配镜处方或代替眼科检查。估计结果还取决于屏幕尺寸比例和观看距离设置得是否准确。",
+        "sections": [
+          {
+            "heading": "像素需要对应实际尺寸和观看距离",
+            "paragraphs": [
+              "靠近屏幕上的小圆环时，它的缺口在你眼前所占的视角会变大。像素数量没有改变，观看任务却变了。因此，估计视力需要同时知道目标的实际尺寸，以及你与它之间的距离。",
+              "CSS 像素是浏览器的布局单位，不一定对应面板上的一个物理像素点。页面缩放和操作系统缩放都会影响实际显示尺寸。CSS 尺寸相同的圆环，在另一块屏幕上可能占据不同的实际大小；仅仅像素数量相同，并不能让观看条件等同。",
+              "ISO 8596 描述用于远视力认证或资格许可的兰多尔特环呈现方式，其规定的适用范围不包括临床测量。它为圆环设计提供背景，并不意味着 Sense6 的自行操作任务获得了认证。"
+            ],
+            "sourceIds": ["iso-8596", "css-reference-pixel"]
+          },
+          {
+            "heading": "辨认缺口是一项特定任务",
+            "paragraphs": [
+              "兰多尔特环是一个带缺口的圆环，缺口可朝向不同方向。选择缺口方向，要求你在屏幕呈现的尺寸和对比度下分辨这一细节。这项任务比评估日常条件下的视觉能力更有限，也不能得出配镜处方。",
+              "Acutezza 通过一段简短的作答序列，估计可分辨细节的视角大小。报告中的模型区间描述评分模型内部的不确定性，并不涵盖卡片尺寸匹配、观看距离或屏幕输出中所有可能的误差。即使区间很窄，设置时的测量也可能只是近似值。",
+              "显示器还会限制能呈现多小的缺口。达到软件下限或上限时，结果会受到可用目标范围的约束。在把显示的估计值视为自己分辨能力的精确极限之前，请先查看边界标记。"
+            ],
+            "sourceIds": ["iso-8596", "sense6-acutezza"]
+          },
+          {
+            "heading": "分别看待各眼和各对比度条件",
+            "paragraphs": [
+              "Acutezza 要求你用一张实体卡片核对屏幕尺寸比例，并确定观看距离。设置数值的来源很重要：实际测量的距离与假定的距离，所能提供的信息并不相同。设置完成后，如果在任务中移动位置，视角也会改变。",
+              "Focused 模式使用高对比度目标。设置条件允许时，Standard 模式会增加名义低对比度条件。“名义”指预期呈现的对比度；Sense6 并不测量屏幕实际发出的光。较淡目标下的估计值，需要单独解释。",
+              "每只眼睛、每种条件的结果都会分别保存。本次记录包含尺寸比例和距离信息、对照作答、显示变化及边界。这些细节说明估计值是如何得到的；如果某项条件未完成，或设置检查提示需谨慎解释，它们尤其有用。",
+              "重复尝试时，保持视力矫正方式和室内照明一致，使用同一块显示器，并重新核对距离。在本地记录中比较相容的条件。Acutezza 不会将估计值转换为 20/20 视力结论、散光轴位、驾驶资格或综合视力等级。"
+            ],
+            "sourceIds": ["sense6-acutezza"]
+          },
+          {
+            "heading": "眼科检查不只关注视力",
+            "paragraphs": [
+              "美国国家眼科研究所介绍的散瞳眼科检查，除检查眼内结构外，还包括视力、视野、眼肌功能、瞳孔反应和眼压。分辨屏幕上的小缺口，无法检查视网膜或视神经。",
+              "如果视力发生变化，或出现症状，请寻求眼科专业人员的评估。突然视力丧失、剧烈疼痛、新出现的闪光或飞蚊，或视野像被帘幕遮挡，都应及时寻求专业诊疗。即使浏览器任务结果良好，也绝不能以此为由延误就医。"
+            ],
+            "sourceIds": ["nei-eye-exam"]
+          }
+        ],
+        "experiment": {
+          "route": "acutezza",
+          "title": "试试 Acutezza 视力实验室",
+          "hint": "分别观察每只眼睛 · 核对屏幕尺寸与观看距离 · 不用于视力筛查"
+        },
+        "sources": [
+          {
+            "role": "视力视标与呈现标准",
+            "title": "ISO 8596:2017 — 兰多尔特环标准及其适用范围（通过瑞典标准化协会查阅）",
+            "href": "https://www.sis.se/en/produkter/health-care-technology/medical-equipment/ophthalmic-equipment/iso-85962017/",
+            "id": "iso-8596"
+          },
+          {
+            "role": "眼部健康与专业评估",
+            "title": "U.S. National Eye Institute — Get a Dilated Eye Exam",
+            "href": "https://www.nei.nih.gov/eye-health-information/healthy-vision/finding-eye-doctor/get-dilated-eye-exam",
+            "id": "nei-eye-exam"
+          },
+          {
+            "role": "网页布局的计量模型",
+            "title": "W3C CSS Values and Units Level 4 — 参考像素",
+            "href": "https://www.w3.org/TR/css-values-4/#absolute-lengths",
+            "id": "css-reference-pixel"
+          },
+          {
+            "role": "Sense6 实现的方法",
+            "title": "Sense6 Acutezza — 设置、各眼独立测试条件与测量局限",
+            "href": "/en/acutezza/",
+            "id": "sense6-acutezza"
+          }
+        ],
+        "dateModified": "2026-10-11"
+      }
+    }
+  },
+  "ui": {
+    ". Browser scheduling, timestamps, display refresh and hardware processing vary in real life, sometimes differently from trial to trial.": "。实际使用中，浏览器任务调度、时间戳、屏幕刷新和硬件处理都存在变化，有时每次试验也会不同。",
+    "248 of 320 milliseconds": "320毫秒中的248毫秒",
+    "All experiments": "所有实验",
+    "Another question": "另一个问题",
+    "Breadcrumb": "当前位置",
+    "By": "作者：",
+    "Display contribution": "显示环节增加的时间",
+    "Each lab explains its setup and records results in your browser. Choose a short scope to see how the task works; return to a guide when you want to understand its result.": "每个实验都会说明设置方法，并将结果保存在你的浏览器中。可以先选择简短的实验方案，了解任务如何进行；想理解结果时，再回到指南。",
+    "Explore all five experiments →": "探索全部五项实验 →",
+    "Explore experiments": "探索实验",
+    "Fictional response": "虚构的反应时间",
+    "Hypothetical display delay": "假设的显示延迟",
+    "Hypothetical input delay": "假设的输入延迟",
+    "Illustrative interval": "示例时间间隔",
+    "Illustrative interval out of 320 milliseconds": "以0至320毫秒为范围显示的示例时间间隔",
+    "Imagine a person who responds in the same": "假设一个人每次反应都恰好需要",
+    "In this guide": "本指南内容",
+    "Input contribution": "输入环节增加的时间",
+    "Interactive explanation · hypothetical values": "交互式讲解 · 假设数值",
+    "Interpretation boundary": "结果解读的边界",
+    "Interpretation limits": "解读的局限",
+    "Keep exploring": "继续探索",
+    "Learn": "了解原理",
+    "On this page": "本页内容",
+    "Open the experiment →": "打开实验 →",
+    "Research guides": "研究指南",
+    "Research papers address the scientific question; standards describe equipment or browser behaviour. The Sense6 link documents the task implemented here. None validates the Sense6 protocol.": "研究论文探讨科学问题，标准说明设备要求或浏览器行为。Sense6链接介绍的是这里实现的任务。这些来源都没有验证Sense6实验方案的有效性。",
+    "Reviewed": "审核日期：",
+    "Sense6 experiment artwork:": "Sense6实验配图：",
+    "Sense6 is a recreational browser lab, not a clinical or diagnostic test. Answers and measurements stay on your device.": "Sense6是供休闲探索的浏览器实验室，不是临床或诊断测试。回答和测量数据保留在你的设备上。",
+    "Short answer": "简要回答",
+    "Source": "来源",
+    "Sources": "来源列表",
+    "Sources and their roles": "来源及其作用",
+    "This is an arithmetic teaching example,": "这只是用于教学的算术示例，",
+    "Time between an action and its arrival at the browser event handler.": "从执行操作到该操作传入浏览器事件处理程序之间的时间。",
+    "Time between asking the browser to show a stimulus and the display actually showing it.": "从要求浏览器呈现刺激到屏幕实际显示刺激之间的时间。",
+    "Try an experiment": "试一项实验",
+    "What can be hiding inside a browser reaction time?": "浏览器测得的反应时间中可能包含什么？",
+    "not a latency measurement, calibration or correction formula": "并非延迟测量、校准或修正公式",
+    "← All research guides": "← 所有研究指南",
+    "each time. Move the illustrative display and input delays to see how a browser-observed interval could differ even though that person's response stays unchanged.": "。调整示例中的显示延迟和输入延迟，看看即使这个人的反应保持不变，浏览器记录的时间间隔仍可能如何变化。"
+  }
+}

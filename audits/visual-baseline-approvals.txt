@@ -34,3 +34,4 @@ en-udito-mobile-chromium-linux.png  # compact listening-lab mobile hero brings s
 en-tetracromia-mobile-chromium-linux.png  # compact mobile screen-colour hero keeps safe setup action visible on 360px phones
 en-acutezza-mobile-chromium-linux.png  # compact Acutezza first-screen CTA on phones, preserving safe calibration and consent
 ar-about-mobile-chromium-linux.png  # Arabic Learn is now published; the localized footer Learn link becomes visible on About at 320px, adding one 38px footer row without changing the About content or test protocols
+hi-about-mobile-chromium-linux.png  # Hindi Learn publication exposes the previously hidden footer guide link on a 320px About viewport, retaining access to the full experiment gallery
