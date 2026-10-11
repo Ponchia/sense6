@@ -39,7 +39,7 @@
     "learn:check": "node scripts/check-learn-locales.mjs"
   },
   "dependencies": {
-    "@ponchia/ui": "0.11.0"
+    "@ponchia/ui": "0.16.1"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.10.2",
