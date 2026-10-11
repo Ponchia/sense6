@@ -55,7 +55,10 @@ jobs:
   # What remains here is the scheduled full-site sweep over every route.
   lighthouse-full-site:
     runs-on: arc-vps-sense6
-    timeout-minutes: 45
+    # The full indexable set grew from 85 to 157 routes as Learn was published
+    # across 12 languages. The old 45-minute ceiling was too close to the
+    # projected serial mobile Lighthouse runtime; keep every route in scope.
+    timeout-minutes: 65
     container:
       image: mcr.microsoft.com/playwright:v1.61.1-noble@sha256:5b8f294aff9041b7191c34a4bab3ac270157a28774d4b0660e9743297b697e48
     env:
