@@ -9,5 +9,25 @@
   "es": {
     "label": "Aprender",
     "publishedAt": "2026-10-11"
+  },
+  "de": {
+    "label": "Wissen",
+    "publishedAt": "2026-10-11"
+  },
+  "fr": {
+    "label": "Comprendre",
+    "publishedAt": "2026-10-11"
+  },
+  "pt": {
+    "label": "Aprender",
+    "publishedAt": "2026-10-11"
+  },
+  "pt-br": {
+    "label": "Aprender",
+    "publishedAt": "2026-10-11"
+  },
+  "ar": {
+    "label": "تعلّم",
+    "publishedAt": "2026-10-11"
   }
 }
