@@ -37,6 +37,38 @@ async function completeCalibrationFromCard(page) {
   await page.getByRole('button', { name: /Yes, clearly/i }).click();
 }
 
+test('Acutezza offers safe preparation before scrolling on phones @pr-smoke', async ({ page }, testInfo) => {
+  test.skip(
+    !['chromium', 'mobile'].includes(testInfo.project.name),
+    'First-screen landing geometry is checked in Chromium and emulated mobile',
+  );
+  for (const viewport of [
+    { width: 360, height: 740 },
+    { width: 390, height: 844 },
+    { width: 412, height: 915 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/en/acutezza/');
+    await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'acutezza');
+    await page.evaluate(async () => document.fonts.ready);
+    const prepare = page.locator('.ac-hero__actions [data-action="ac-prepare"]');
+    await expect(prepare).toBeVisible();
+    const bounds = await prepare.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds.y, `prepare top at ${viewport.width}px`).toBeGreaterThanOrEqual(0);
+    expect(bounds.y + bounds.height, `prepare bottom at ${viewport.width}px`).toBeLessThan(
+      viewport.height - 8,
+    );
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+      `horizontal overflow at ${viewport.width}px`,
+    ).toBe(true);
+  }
+  await page.locator('.ac-hero__actions [data-action="ac-prepare"]').click();
+  await expect(page.locator('[data-ac-consent]')).not.toBeChecked();
+  await expect(page.locator('[data-action="ac-card"]')).toBeDisabled();
+});
+
 const ACUTEZZA_MOBILE_VIEWPORTS = [
   { width: 320, height: 568 },
   { width: 360, height: 800 },
