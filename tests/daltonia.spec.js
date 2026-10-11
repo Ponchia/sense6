@@ -401,7 +401,10 @@ test('real passing results explain adaptive levels and control evidence at every
     '3 von 3 geplanten Kontrollen mit kontrastreicher Lücke wurden richtig beantwortet.',
   );
   await expect(page.locator('.result-note')).toContainText('weder bestätigen noch ausschließen');
-  await expect(page.locator('.cb-result-note__learn')).toHaveCount(0);
+  await expect(page.locator('.cb-result-note__learn a')).toHaveAttribute(
+    'href',
+    '/de/color-blindness-guide/',
+  );
 
   const resultScan = await new AxeBuilder({ page }).analyze();
   expect(resultScan.violations).toEqual([]);

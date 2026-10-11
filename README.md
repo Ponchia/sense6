@@ -166,8 +166,8 @@ bounds when an instrument provides them, and a setup passport with the
 conditions needed for comparison. Comparisons are instrument-specific and use
 three labels: comparable, comparable with caution, or not comparable. Sense6
 does not convert the five instruments into a suite-wide score. A saved entry
-links back to its experiment, and English entries link to the corresponding
-reviewed research explanation. An empty journal offers the existing short
+links back to its experiment and its research explanation in the same published
+language. An empty journal offers the existing short
 reaction-time starter. Those links do not store or upload any additional data.
 
 You can delete one entry, delete the complete journal, export a documented JSON
@@ -246,14 +246,18 @@ keys, empty values, missing stable IDs, and placeholder drift.
 
 ## Static discovery and crawler policy
 
-`npm run build` creates 109 localized static entry pages: the root, all twelve
-galleries, all 60 exam routes, all twelve About routes, all twelve journal
-routes, and all twelve privacy routes. Each route contains useful content
+`npm run build` creates 181 canonical static entry pages: the root, twelve
+galleries, 60 exam routes, twelve About routes, twelve journal routes, twelve
+privacy routes, and 72 published Learn routes (six guides/index pages across
+twelve languages). It also produces a script-free 404 page.
+Each route contains useful content
 without JavaScript, a unique title and description, a canonical URL, reciprocal
 `hreflang` links, truthful structured data, research links, and real internal
 links. Journal and privacy remain reachable user tools but carry `noindex` and
-stay out of the sitemap; the 85 root, gallery, experiment, and About pages form
-the search-indexable set. English experiment pages add original query-led
+stay out of the sitemap; the 157 root, gallery, experiment, About and Learn
+pages form the search-indexable set. All five experiment entry pages, results
+and saved journal entries connect to the research guide published in that
+language. English experiment pages add original query-led
 explainers without silently copying unreviewed English prose into other locales.
 The build also creates an exact sitemap, `robots.txt`, an optional `llms.txt` discovery
 summary, and a script-free `404.html` so unknown paths don't become indexable

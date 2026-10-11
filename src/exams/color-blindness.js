@@ -24,6 +24,7 @@ import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
 import { createResultStore, isRecord } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 import { protocolPassport } from './protocols.js';
+import { relatedGuideResultLink } from './related-guide.js';
 import { colorBlindnessIntroMarkup } from './views/color-blindness-intro.js';
 
 const RESULT_STORE = createResultStore({
@@ -444,6 +445,11 @@ function renderResults() {
   const result = summarizeAdaptiveRun(state.run);
   state.dprGuardCleanup();
 
+  const colorGuideLink = relatedGuideResultLink(
+    'color-blindness',
+    state.locale,
+    'Understand what an online colour-vision result means',
+  );
   state.app.innerHTML = `
     <section class="results-view ui-container ui-container--wide">
       <div class="results-head">
@@ -468,7 +474,7 @@ function renderResults() {
             CAD, Cambridge Colour Test, or a diagnosed cohort. These values cannot confirm or rule
             out a colour-vision deficiency. Compare repeat runs only on the same display and setup.
           </p>
-          ${state.locale === 'en' ? '<p class="cb-result-note__learn"><a class="ui-link" data-sense6-route="color-blindness-guide" href="/en/color-blindness-guide/">Understand what an online colour-vision result means →</a></p>' : ''}
+          ${colorGuideLink ? `<p class="cb-result-note__learn">${colorGuideLink}</p>` : ''}
         </div>
       </div>
 

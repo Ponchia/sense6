@@ -35,6 +35,31 @@ test('the Learn page links to original research guides and returns to the lab @p
   await expect(page.locator('h1')).toContainText('Tetracromia');
 });
 
+test('localized experiment introductions take readers to the matching research, never English fallback @pr-smoke', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const [locale, experiment, guideRoute] of [
+    ['it', 'tetracromia', 'tetrachromacy-guide'],
+    ['es', 'color-blindness', 'color-blindness-guide'],
+    ['fr', 'udito', 'hearing-range-guide'],
+    ['ja', 'riflessi', 'reaction-time-guide'],
+    ['hi', 'acutezza', 'visual-acuity-guide'],
+    ['ar', 'udito', 'hearing-range-guide'],
+    ['zh-hans', 'riflessi', 'reaction-time-guide'],
+  ]) {
+    await page.goto(`/${locale}/${experiment}/`);
+    await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', experiment);
+    const article = page.locator('.experiment-guide-link a');
+    await expect(article).toBeVisible();
+    await expect(article).toHaveAttribute('href', `/${locale}/${guideRoute}/`);
+    await article.click();
+    await expect(page).toHaveURL(new RegExp(`/${locale}/${guideRoute}/$`));
+    await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', guideRoute);
+    await expect(page.locator('.learn-article__body section')).toHaveCount(4);
+  }
+});
+
 test('the mobile research answer offers its experiment before the long article @pr-smoke', async ({
   page,
 }) => {
