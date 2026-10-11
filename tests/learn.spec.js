@@ -1,5 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { isLearnPublished } from '../src/learn-publication.js';
+import { LOCALES } from '../src/locales.js';
 import { LEARN_ROUTES } from '../src/routes.js';
 
 test('the Learn page links to original research guides and returns to the lab @pr-smoke', async ({
@@ -210,11 +212,14 @@ test('Learn language switching retains the topic where translated and falls back
   await expect(page).toHaveURL(/\/es\/reaction-time-guide\/$/);
   await expect(page.locator('html')).toHaveAttribute('lang', 'es');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('tiempo de reacción');
-  await page.locator('[data-locale-select]').selectOption('de');
-  await expect(page).toHaveURL(/\/de\/$/);
-  await expect(page.locator('html')).toHaveAttribute('lang', 'de');
-  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'gallery');
-  await expect(page.locator('main h1')).toBeVisible();
+  const unpublished = LOCALES.find(({ code }) => !isLearnPublished(code));
+  if (unpublished) {
+    await page.locator('[data-locale-select]').selectOption(unpublished.code);
+    await expect(page).toHaveURL(new RegExp(`/${unpublished.code}/$`));
+    await expect(page.locator('html')).toHaveAttribute('lang', unpublished.languageTag);
+    await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'gallery');
+    await expect(page.locator('main h1')).toBeVisible();
+  }
 });
 
 test('Italian and Spanish Learn content remains readable and internally linked on mobile @pr-smoke', async ({
@@ -250,6 +255,96 @@ test('Italian and Spanish Learn content remains readable and internally linked o
     await expect(page).toHaveURL(new RegExp(`/${locale}/tetracromia/$`));
     await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'tetracromia');
   }
+});
+
+test('German, French and Portuguese editions keep guides and experiments connected @pr-smoke', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const [locale, languageTag] of [
+    ['de', 'de'],
+    ['fr', 'fr'],
+    ['pt', 'pt-PT'],
+    ['pt-br', 'pt-BR'],
+  ]) {
+    await page.goto('/' + locale + '/learn/');
+    await expect(page.locator('html')).toHaveAttribute('lang', languageTag);
+    await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'learn');
+    await expect(page.locator('.learn-topic')).toHaveCount(5);
+    await page.locator('.learn-topic [data-sense6-route="reaction-time-guide"]').click();
+    await expect(page).toHaveURL(new RegExp('/' + locale + '/reaction-time-guide/$'));
+    await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'reaction-time-guide');
+    await expect(page.locator('.learn-article__body section')).toHaveCount(4);
+    await expect(page.locator('.learn-references li')).toHaveCount(3);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      'https://sense6.net/' + locale + '/reaction-time-guide/',
+    );
+    await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(8);
+    const article = await page
+      .locator('script[type="application/ld+json"]')
+      .evaluateAll((scripts) =>
+        scripts
+          .flatMap((script) => JSON.parse(script.textContent)['@graph'] ?? [])
+          .find((item) => item['@type'] === 'Article'),
+      );
+    expect(article.inLanguage).toBe(languageTag);
+    expect(article.datePublished).toBe('2026-10-11');
+    await expect(page.locator('.learn-answer [data-learn-early-experiment]')).toHaveAttribute(
+      'href',
+      '/' + locale + '/riflessi/?scope=signal',
+    );
+    const width = await page.evaluate(() => ({
+      viewport: document.documentElement.clientWidth,
+      content: document.documentElement.scrollWidth,
+    }));
+    expect(width.content, locale + ' must remain readable on mobile').toBe(width.viewport);
+    await page.locator('.learn-answer [data-learn-early-experiment]').click();
+    await expect(page).toHaveURL(new RegExp('/' + locale + '/riflessi/[?]scope=signal$'));
+  }
+});
+
+test('Arabic Learn is fully translated, accessible and right-to-left @pr-smoke', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('/ar/learn/');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ar');
+  await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'learn');
+  await expect(page.locator('.learn-topic')).toHaveCount(5);
+  await page.locator('.learn-topic [data-sense6-route="reaction-time-guide"]').click();
+  await expect(page).toHaveURL(/\/ar\/reaction-time-guide\/$/);
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'reaction-time-guide');
+  await expect(page.locator('.learn-article__body section')).toHaveCount(4);
+  await expect(page.locator('.learn-references li')).toHaveCount(3);
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://sense6.net/ar/reaction-time-guide/',
+  );
+  await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(8);
+  const jsonld = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((scripts) =>
+      scripts
+        .flatMap((script) => JSON.parse(script.textContent)['@graph'] ?? [])
+        .find((entry) => entry['@type'] === 'Article'),
+    );
+  expect(jsonld.inLanguage).toBe('ar');
+  expect(jsonld.datePublished).toBe('2026-10-11');
+  await expect(page.locator('[data-learn-timing] [data-timing-display]')).toBeEnabled();
+  await expect(page.locator('[data-learn-timing] [data-timing-total]')).toHaveText('248 ms');
+  await page.locator('.learn-section-sources a').first().click();
+  await expect(page).toHaveURL(/#learn-source-/);
+  const dimensions = await page.evaluate(() => ({
+    viewport: document.documentElement.clientWidth,
+    content: document.documentElement.scrollWidth,
+  }));
+  expect(dimensions.content).toBe(dimensions.viewport);
+  await expect(page.locator('.learn-answer [data-learn-early-experiment]')).toHaveAttribute(
+    'href',
+    '/ar/riflessi/?scope=signal',
+  );
+  await page.locator('.learn-answer [data-learn-early-experiment]').click();
+  await expect(page).toHaveURL(/\/ar\/riflessi\/[?]scope=signal$/);
 });
 
 test('all Learn pages remain readable and accessible at a narrow viewport', async ({ page }, testInfo) => {

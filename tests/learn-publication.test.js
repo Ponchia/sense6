@@ -58,7 +58,7 @@ function frenchFixture() {
 
 test('published Learn locales are complete; other supported locales do not expose unfinished guides', async () => {
   assert.deepEqual(await validateLearnPublication(), LEARN_PUBLISHED_LOCALES);
-  assert.deepEqual(LEARN_PUBLISHED_LOCALES, ['en', 'it', 'es']);
+  assert.deepEqual(LEARN_PUBLISHED_LOCALES, ['en', 'it', 'es', 'de', 'fr', 'pt', 'pt-br', 'ar']);
   assert.equal(LOCALES.length, 12);
   for (const code of LEARN_PUBLISHED_LOCALES) {
     await prepareLearnLocale(code);

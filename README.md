@@ -16,7 +16,11 @@ work, who maintains them, their privacy boundary, and what each result can and
 cannot describe.
 
 The [Learn section](https://sense6.net/en/learn/) is available in English,
-[Italian](https://sense6.net/it/learn/) and [Spanish](https://sense6.net/es/learn/).
+[Italian](https://sense6.net/it/learn/), [Spanish](https://sense6.net/es/learn/),
+[German](https://sense6.net/de/learn/), [French](https://sense6.net/fr/learn/),
+[European Portuguese](https://sense6.net/pt/learn/),
+[Brazilian Portuguese](https://sense6.net/pt-br/learn/) and
+[Arabic](https://sense6.net/ar/learn/).
 It answers research
 questions beyond the experiments: [tetrachromacy and what an RGB screen can
 establish](https://sense6.net/en/tetrachromacy-guide/), [reaction-time

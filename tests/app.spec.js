@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 import { aboutCopy } from '../src/about.js';
 import { examDescriptionSource } from '../src/exams/metadata.js';
 import { EXAMS } from '../src/exams/registry.js';
+import { isLearnPublished } from '../src/learn-publication.js';
 import { LANDING_COPY_SOURCES, SETUP_COPY_SOURCES } from '../src/locales/landing-copy.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
 import { preparePrivacyCopy, privacyCopy } from '../src/privacy.js';
@@ -91,19 +92,23 @@ test('Learn footer follows published languages and hides unavailable editions @p
   await expect(learnLink).toHaveText('Aprender');
   await expect(learnLink).toHaveAttribute('href', '/es/learn/');
 
-  await page.locator('[data-locale-select]').selectOption('de');
-  await expect(page).toHaveURL(/\/de\/$/);
-  await expect(learnLink).toBeHidden();
-  await expect(learnLink).toHaveAttribute('href', '/de/');
-  await page.reload();
-  await expect(learnLink).toBeHidden();
-  await expect(learnLink).toHaveAttribute('href', '/de/');
+  const unavailable = LOCALES.find(({ code }) => !isLearnPublished(code));
+  if (unavailable) {
+    const fallbackLocale = unavailable.code;
+    await page.locator('[data-locale-select]').selectOption(fallbackLocale);
+    await expect(page).toHaveURL(new RegExp(`/${fallbackLocale}/$`));
+    await expect(learnLink).toBeHidden();
+    await expect(learnLink).toHaveAttribute('href', `/${fallbackLocale}/`);
+    await page.reload();
+    await expect(learnLink).toBeHidden();
+    await expect(learnLink).toHaveAttribute('href', `/${fallbackLocale}/`);
+  }
 
   await page.locator('[data-locale-select]').selectOption('en');
-  await expect(page).toHaveURL(/\/en\/$/);
   await expect(learnLink).toBeVisible();
   await expect(learnLink).toHaveText('Learn');
   await expect(learnLink).toHaveAttribute('href', '/en/learn/');
+  await page.goto('/en/');
   await expect(page.locator('.gallery-hero__learn')).toHaveAttribute('href', '/en/learn/');
   await page.locator('.gallery-hero__learn').click();
   await expect(page).toHaveURL(/\/en\/learn\/$/);
