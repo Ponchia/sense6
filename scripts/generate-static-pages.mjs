@@ -15,7 +15,7 @@ import { journalCopy, prepareJournalCopy } from '../src/journal-copy.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
 import { preparePrivacyCopy, privacyCopy, privacyMarkup } from '../src/privacy.js';
 import { ROOT_GATEWAY, rootGatewayMarkup } from '../src/root-gateway.js';
-import { createRouteMetadata, SITE_ORIGIN, UTILITY_ROUTES } from '../src/routes.js';
+import { createRouteMetadata, LEARN_ROUTES, SITE_ORIGIN, UTILITY_ROUTES } from '../src/routes.js';
 import { ENGLISH_EXPLAINER_COPY, STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
 import { recordContentFingerprint, verifyContentFingerprints } from './content-fingerprints.mjs';
 import { learnDiscoveryLinks, writeLearnPages } from './learn-pages.mjs';
@@ -199,6 +199,12 @@ async function writePage(relativePath, page) {
   html = replaceMeta(html, 'name', 'description', metadata.description);
   html = replaceMeta(html, 'property', 'og:title', metadata.title);
   html = replaceMeta(html, 'property', 'og:description', metadata.description);
+  html = replaceMeta(
+    html,
+    'property',
+    'og:type',
+    LEARN_ROUTES.includes(page.route) && page.route !== 'learn' ? 'article' : 'website',
+  );
   html = replaceMeta(html, 'property', 'og:url', metadata.canonical);
   html = replaceMeta(html, 'property', 'og:image', metadata.socialImage);
   html = replaceMeta(html, 'property', 'og:image:alt', metadata.socialImageAlt);

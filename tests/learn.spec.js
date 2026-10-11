@@ -65,6 +65,36 @@ test('the mobile research answer offers its experiment before the long article @
   await expect(page.locator('[data-action="rx-start"]')).toBeDisabled();
 });
 
+test('the accessible hypothetical timing model responds on a real mobile viewport @pr-smoke', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/en/reaction-time-guide/');
+  const model = page.locator('[data-learn-timing]');
+  const display = model.locator('[data-timing-display]');
+  const input = model.locator('[data-timing-input]');
+  await expect(display).toBeEnabled();
+  await expect(input).toBeEnabled();
+  await expect(model.locator('[data-timing-total]')).toHaveText('248 ms');
+  await display.focus();
+  await display.press('End');
+  await expect(model.locator('[data-timing-total]')).toHaveText('282 ms');
+  await input.focus();
+  await input.press('Home');
+  await expect(model.locator('[data-timing-total]')).toHaveText('270 ms');
+  await expect(model.locator('[data-timing-meter]')).toHaveAttribute('value', '270');
+  const layout = await model.evaluate((element) => {
+    const bounds = element.getBoundingClientRect();
+    return { left: bounds.left, right: bounds.right, viewport: document.documentElement.clientWidth };
+  });
+  expect(layout.left).toBeGreaterThanOrEqual(0);
+  expect(layout.right).toBeLessThanOrEqual(layout.viewport);
+  await expect(model).toContainText('not a latency measurement, calibration or correction formula');
+  await page.locator('[data-learn-early-experiment]').click();
+  await expect(page).toHaveURL(/\/en\/riflessi\/\?scope=signal$/);
+  await expect(page.locator('[data-learn-timing]')).toHaveCount(0);
+});
+
 test('reaction guide explains hardware delay without short-circuiting consent @pr-smoke', async ({
   page,
 }) => {

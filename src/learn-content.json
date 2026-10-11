@@ -5,7 +5,7 @@
     "description": "Research-backed answers about colour vision, response timing, hearing and visual sharpness—and what uncalibrated browser experiments cannot establish.",
     "intro": "Explore five questions about what we see, hear and notice. Each explanation connects real research to an interactive Sense6 experiment, with device limits and interpretation boundaries visible.",
     "boundary": "Sense6 is a recreational browser lab. These explanations and experiments are not diagnoses, clinical tests or proof of a biological trait.",
-    "updated": "10 October 2026"
+    "updated": "11 October 2026"
   },
   "articles": {
     "tetrachromacy-guide": {
@@ -13,7 +13,7 @@
       "eyebrow": "Colour vision · 7-minute read",
       "metaTitle": "Can an online test detect tetrachromacy? | Sense6",
       "description": "Why RGB screen tests cannot confirm tetrachromacy, what four-cone vision really means, and what colour-discrimination tasks can tell you instead.",
-      "updated": "9 October 2026",
+      "updated": "11 October 2026",
       "summary": "No ordinary RGB-screen test can demonstrate that you have four functioning dimensions of colour vision. A screen-controlled exercise can describe differences you distinguished on that screen, under those conditions. Establishing functional tetrachromacy is a different research question.",
       "facts": [
         {
@@ -99,7 +99,7 @@
       "eyebrow": "Response timing · 6-minute read",
       "metaTitle": "How accurate are browser reaction-time tests? | Sense6",
       "description": "Understand stimulus display delay, keyboard and touch latency, response timing, medians and why two devices may give different reaction-time readings.",
-      "updated": "9 October 2026",
+      "updated": "11 October 2026",
       "summary": "Browser reaction-time results combine human response with display, software and input-device delays. A carefully designed web task can describe a run, but its milliseconds are not an instrument-calibrated measurement of pure human reflex speed.",
       "facts": [
         {
@@ -186,7 +186,7 @@
       "eyebrow": "Colour-vision differences · 6-minute read",
       "metaTitle": "What Can an Online Colour Blindness Test Tell You? | Sense6",
       "description": "Learn what online colour-vision tasks can reveal, why screen calibration matters, and how they differ from professional colour-vision testing.",
-      "updated": "9 October 2026",
+      "updated": "11 October 2026",
       "summary": "An online colour-vision task can show which displayed differences you could distinguish during one run. It cannot, by itself, confirm or rule out a colour-vision deficiency, identify its clinical type, or replace an eye professional's evaluation.",
       "facts": [
         {
@@ -273,7 +273,7 @@
       "eyebrow": "Hearing and headphones · 5-minute read",
       "metaTitle": "Can a browser test your hearing range? | Sense6",
       "description": "What online tone tests can reveal, why headphone volume and calibration matter, and why a frequency result cannot diagnose hearing loss or reveal hearing age.",
-      "updated": "10 October 2026",
+      "updated": "11 October 2026",
       "publishedDate": "2026-10-10",
       "summary": "A browser can play tones and record which choices you made on your current headphones and volume setting. It cannot know the sound pressure reaching your ears, so an upper frequency observed online is not an audiogram, a diagnosis of hearing loss, or a measure of 'hearing age'.",
       "facts": [
@@ -366,7 +366,7 @@
       "eyebrow": "Visual sharpness and screens · 5-minute read",
       "metaTitle": "Can an online visual-acuity test replace an eye exam? | Sense6",
       "description": "Why screen size, viewing distance and contrast affect online sharpness tasks, and how self-measured acuity observations differ from a professional eye examination.",
-      "updated": "10 October 2026",
+      "updated": "11 October 2026",
       "publishedDate": "2026-10-10",
       "summary": "No. A screen-based task can describe which small shapes you identified on a particular display at a stated distance. It cannot establish eye health, prescribe lenses, or substitute for a comprehensive examination. Screen calibration and viewing conditions determine how the result should be read.",
       "facts": [
