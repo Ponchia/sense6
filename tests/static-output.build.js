@@ -765,7 +765,9 @@ test('the entry bundle stays route-split and within its documented budget', asyn
   const files = await readdir(new URL('assets/', DIST));
   const initialGraph = await measureInitialLocaleGraph('en', DIST);
   assert.ok(
-    initialGraph.files.every(({ file }) => !/^assets\/learn-[^/]+\.js$/.test(file)),
+    // The tiny publication manifest is shared with the language switcher. The
+    // actual article renderer and catalog must still be lazy, not startup JS.
+    initialGraph.files.every(({ file }) => !/^assets\/learn-(?!publication-)[^/]+\.js$/.test(file)),
     'Learn articles must remain lazy-loaded, not part of the initial locale graph',
   );
   assert.ok(

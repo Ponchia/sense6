@@ -4,6 +4,7 @@ import './styles.css';
 
 import { EXAM_BY_ID, EXAMS, loadExam } from './exams/registry.js';
 import { getLocale, initializeI18n, localeHref, localizedRoot, m, setLocale, t } from './i18n.js';
+import { isLearnPublished } from './learn-publication.js';
 import { disposeActiveMounts } from './lib/mount-registry.js';
 import { LOCALES } from './locales.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from './metrics.js';
@@ -25,9 +26,9 @@ await initializeI18n({
       window.location.assign(localeHref('', nextLocale));
       return;
     }
-    // No translated guides: language switching leads to that locale's gallery.
+    // Keep the guide only when its complete locale has been published.
     const route = currentRoute();
-    navigate(LEARN_ROUTES.includes(route) ? '' : route, nextLocale);
+    navigate(LEARN_ROUTES.includes(route) && !isLearnPublished(nextLocale) ? '' : route, nextLocale);
   },
 });
 
@@ -120,7 +121,14 @@ async function renderRoute({ route, locale }) {
     } else {
       await import('./styles/gallery.css');
       if (token !== renderToken) return;
-      mountRoute = () => renderGallery({ ...context(), exams: EXAMS });
+      let learnInfo = null;
+      if (locale !== 'en' && isLearnPublished(locale)) {
+        const { prepareLearnLocale, learnCatalog } = await import('./learn-catalog.js');
+        await prepareLearnLocale(locale);
+        learnInfo = learnCatalog(locale);
+      }
+      if (token !== renderToken) return;
+      mountRoute = () => renderGallery({ ...context(), exams: EXAMS, learnInfo });
       metadata = createRouteMetadata({
         locale,
         title: t('Sense6 — measure what your senses notice'),
@@ -218,7 +226,7 @@ async function prepareInformationalRoute(route, locale) {
     };
   }
 
-  if (locale !== 'en') {
+  if (!isLearnPublished(locale)) {
     // A route without a translated guide must not masquerade as translated.
     navigate('', locale, { replace: true });
     return null;
@@ -227,7 +235,12 @@ async function prepareInformationalRoute(route, locale) {
     import('./learn.js'),
     import('./styles/learn.css'),
   ]);
-  const page = learnMetadata(route);
+  const [{ prepareLearnLocale }, { learnPageData }] = await Promise.all([
+    import('./learn-catalog.js'),
+    import('./learn-seo.js'),
+  ]);
+  await prepareLearnLocale(locale);
+  const page = learnMetadata(route, locale);
   if (!page) throw new Error('Unknown Learn guide');
   return {
     mountRoute: () => renderLearn(context(), route),
@@ -238,6 +251,7 @@ async function prepareInformationalRoute(route, locale) {
       description: page.description,
       socialImage: page.socialImage,
       socialImageAlt: page.socialImageAlt,
+      structuredData: learnPageData(route, locale),
     }),
   };
 }

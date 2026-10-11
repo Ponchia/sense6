@@ -228,3 +228,35 @@ test('all Learn pages remain readable and accessible at a narrow viewport', asyn
     expect(dimensions.content, `${route} should not scroll horizontally`).toBe(dimensions.viewport);
   }
 });
+
+test('Learn navigation updates Article identity and retires claims when returning to a gallery', async ({
+  page,
+}) => {
+  await page.goto('/en/');
+  await page.locator('.gallery-learn [data-sense6-route="tetrachromacy-guide"]').click();
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'tetrachromacy-guide');
+  const article = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((scripts) =>
+      scripts
+        .flatMap((script) => JSON.parse(script.textContent)['@graph'] ?? [])
+        .find((entry) => entry['@type'] === 'Article'),
+    );
+  expect(article.inLanguage).toBe('en');
+  expect(article.url).toBe('https://sense6.net/en/tetrachromacy-guide/');
+  expect(article.dateModified).toBe(await page.locator('.learn-hero time').getAttribute('datetime'));
+  await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(0);
+  await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'article');
+  await page.locator('.learn-breadcrumb [data-sense6-route=""]').click();
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'gallery');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://sense6.net/en/');
+  await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'website');
+  const claims = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((scripts) =>
+      scripts
+        .flatMap((script) => JSON.parse(script.textContent)['@graph'] ?? [])
+        .filter((entry) => ['Article', 'CollectionPage'].includes(entry['@type'])),
+    );
+  expect(claims).toEqual([]);
+});
