@@ -145,6 +145,37 @@ async function centerBelowStickyChrome(locator) {
   });
 }
 
+test('Screen Colour Lab entry stays in the first mobile screen @pr-smoke', async ({ page }, testInfo) => {
+  test.skip(
+    !['chromium', 'mobile'].includes(testInfo.project.name),
+    'First-screen geometry is covered in Chromium and emulated mobile',
+  );
+  for (const viewport of [
+    { width: 360, height: 740 },
+    { width: 390, height: 844 },
+    { width: 412, height: 915 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/en/tetracromia/');
+    await page.evaluate(async () => document.fonts.ready);
+    const start = page.locator('.tetracromia-hero__actions [data-action="setup"]');
+    await expect(start).toBeVisible();
+    const bounds = await start.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds.y, String(viewport.width) + ' start button top').toBeGreaterThanOrEqual(0);
+    expect(bounds.y + bounds.height, String(viewport.width) + ' start button bottom').toBeLessThan(
+      viewport.height - 8,
+    );
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
+      String(viewport.width) + ' horizontal overflow',
+    ).toBe(true);
+  }
+  await page.locator('.tetracromia-hero__actions [data-action="setup"]').click();
+  await expect(page.locator('#screen-ready')).not.toBeChecked();
+  await expect(page.getByRole('button', { name: /Start instrument 01/i })).toBeDisabled();
+});
+
 test('landing page presents the method and passes an accessibility scan', async ({ page }) => {
   await page.goto('/en/tetracromia/');
 

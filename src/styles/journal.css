@@ -20,7 +20,7 @@
   text-wrap: balance;
 }
 
-.journal-hero > div > p:last-child {
+.journal-hero > div > p:not(.ui-eyebrow) {
   color: var(--text-soft);
   font-size: 1.1rem;
   line-height: 1.6;
@@ -30,6 +30,10 @@
 .journal-hero .ui-alert {
   margin: 0;
   max-inline-size: none;
+}
+.journal-hero__starter {
+  inline-size: max-content;
+  margin-block-start: 1.25rem;
 }
 
 .journal-toolbar {
@@ -192,6 +196,26 @@
 .journal-comparison ul {
   color: var(--text-dim);
   margin-block-end: 0;
+}
+
+/* Saved runs link to their experiment and the corresponding reviewed explanation. */
+.journal-entry__actions {
+  align-items: center;
+  border-block-start: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-block-start: 1.4rem;
+  padding-block-start: 1rem;
+}
+
+.journal-entry__actions a {
+  align-items: center;
+  display: inline-flex;
+  min-block-size: 2.75rem;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  text-underline-offset: 0.2em;
 }
 
 .journal-empty {

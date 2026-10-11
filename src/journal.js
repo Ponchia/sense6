@@ -1,4 +1,5 @@
 import { toast } from '@ponchia/ui/behaviors';
+import { relatedGuideFor } from './exams/related-guide.js';
 import { journalCopy, journalMetricLabel, journalSetupLabel } from './journal-copy.js';
 import { journalRecoveryCopy } from './journal-recovery-copy.js';
 import {
@@ -40,12 +41,13 @@ export function renderJournal(context) {
             <p class="ui-eyebrow">${escapeHtml(copy.eyebrow)}</p>
             <h1>${escapeHtml(copy.title)}</h1>
             <p>${escapeHtml(copy.intro)}</p>
+            ${!recoveryRequired && entries.length === 0 ? `<a class="ui-button journal-empty__starter journal-hero__starter" data-journal-starter href="${escapeAttribute(`${localeHref('riflessi')}?scope=signal`)}">${escapeHtml(t('Try a short reaction test'))} <span aria-hidden="true">→</span></a>` : ''}
           </div>
           <aside class="ui-alert ui-alert--info"><div class="ui-alert__body"><p>${escapeHtml(copy.privacy)}</p><ul class="journal-export-disclosure">${JOURNAL_DISCLOSURE_KEYS.map((key) => `<li>${escapeHtml(copy.exportDisclosure[key])}</li>`).join('')}</ul></div></aside>
         </header>
         ${recoveryMarkup(journal, recoveryCopy)}
         <div class="journal-toolbar">
-          <label><span>${escapeHtml(copy.filter)}</span><select data-journal-filter${recoveryRequired ? ' disabled' : ''}>${filterOptions(exams, copy, filter)}</select></label>
+          <label><span>${escapeHtml(copy.filter)}</span><select data-journal-filter${recoveryRequired ? ' disabled' : ''}>${filterOptions(exams, copy, filter, t)}</select></label>
           <div class="ui-cluster">
             <button class="ui-button ui-button--ghost" type="button" data-journal-export${entries.length ? '' : ' disabled'}>${escapeHtml(copy.export)}</button>
             <label class="ui-button ui-button--ghost journal-import"${recoveryRequired ? ' aria-disabled="true"' : ''}>${escapeHtml(copy.import)}<input type="file" accept="application/json,.json" data-journal-import${recoveryRequired ? ' disabled' : ''}></label>
@@ -58,12 +60,8 @@ export function renderJournal(context) {
           recoveryRequired
             ? ''
             : visible.length
-              ? `<div class="journal-list">${visible.map((entry) => entryMarkup(entry, entries, exams, copy, locale, t)).join('')}</div>`
-              : emptyMarkup(copy, {
-                  firstRun: entries.length === 0,
-                  starterUrl: `${localeHref('riflessi')}?scope=signal`,
-                  starterText: t('Try a short reaction test'),
-                })
+              ? `<div class="journal-list">${visible.map((entry) => entryMarkup(entry, entries, exams, copy, locale, localeHref, t)).join('')}</div>`
+              : emptyMarkup(copy)
         }
       </article>`;
   }
@@ -146,8 +144,9 @@ export function renderJournal(context) {
   return () => controller.abort();
 }
 
-function entryMarkup(entry, entries, exams, copy, locale, t) {
+function entryMarkup(entry, entries, exams, copy, locale, localeHref, t) {
   const definition = exams.find((exam) => exam.id === entry.examId);
+  const relatedGuide = relatedGuideFor(entry.examId, locale);
   const previous = entries.find(
     (candidate) => candidate.examId === entry.examId && candidate.recordedAt < entry.recordedAt,
   );
@@ -159,7 +158,7 @@ function entryMarkup(entry, entries, exams, copy, locale, t) {
   }).format(new Date(entry.recordedAt));
   return `<section class="journal-entry" data-journal-entry="${escapeAttribute(entry.id)}">
     <header>
-      <div><p class="ui-eyebrow">${escapeHtml(definition?.category ?? entry.examId)}</p><h2>${escapeHtml(definition?.name ?? entry.examId)}</h2><p>${escapeHtml(date)} · ${escapeHtml(t(qualitySource(entry.quality)))}</p></div>
+      <div><p class="ui-eyebrow">${escapeHtml(t(definition?.category ?? entry.examId))}</p><h2>${escapeHtml(t(definition?.name ?? entry.examId))}</h2><p>${escapeHtml(date)} · ${escapeHtml(t(qualitySource(entry.quality)))}</p></div>
       <button class="ui-button ui-button--subtle ui-button--sm" type="button" data-journal-delete="${escapeAttribute(entry.id)}">${escapeHtml(copy.deleteOne)}</button>
     </header>
     <div class="journal-entry__grid">
@@ -176,6 +175,14 @@ function entryMarkup(entry, entries, exams, copy, locale, t) {
       <strong>${escapeHtml(comparison ? statusLabel(comparison.status, copy) : copy.noPrevious)}</strong>
       ${comparison?.reasons.length ? `<ul>${comparison.reasons.map((reason) => `<li>${escapeHtml(reasonLabel(reason, copy))}</li>`).join('')}</ul>` : ''}
     </aside>
+    ${
+      definition
+        ? `<div class="journal-entry__actions">
+      <a class="ui-link" data-sense6-route="${escapeAttribute(entry.examId)}" data-journal-return href="${escapeAttribute(localeHref(entry.examId))}" aria-label="${escapeAttribute(`${t('Open test')}: ${t(definition.name)}`)}">${escapeHtml(t('Open test'))} <span aria-hidden="true">→</span></a>
+      ${relatedGuide ? `<a class="ui-link" data-sense6-route="${relatedGuide.route}" data-journal-guide href="/en/${relatedGuide.route}/">${escapeHtml(relatedGuide.title)} <span aria-hidden="true">→</span></a>` : ''}
+    </div>`
+        : ''
+    }
   </section>`;
 }
 
@@ -185,22 +192,18 @@ function measurementMarkup(measurement, changes, copy, t) {
   return `<div><dt>${escapeHtml(journalMetricLabel(measurement.id, t))}</dt><dd><strong>${escapeHtml(formatMeasurement(measurement))}</strong>${interval ? `<small>${escapeHtml(interval)}</small>` : ''}${change ? `<small>${escapeHtml(copy.change)} ${signed(change.delta)} ${escapeHtml(change.unit)}${change.bounded ? ` · ${escapeHtml(copy.bounded)}` : ''}</small>` : ''}</dd></div>`;
 }
 
-function filterOptions(exams, copy, selected) {
+function filterOptions(exams, copy, selected, t) {
   return [
     `<option value="all"${selected === 'all' ? ' selected' : ''}>${escapeHtml(copy.all)}</option>`,
     ...exams.map(
       (exam) =>
-        `<option value="${escapeAttribute(exam.id)}"${selected === exam.id ? ' selected' : ''}>${escapeHtml(exam.name)}</option>`,
+        `<option value="${escapeAttribute(exam.id)}"${selected === exam.id ? ' selected' : ''}>${escapeHtml(t(exam.name))}</option>`,
     ),
   ].join('');
 }
 
-function emptyMarkup(copy, { firstRun, starterUrl, starterText }) {
-  return `<section class="journal-empty"><p class="ui-eyebrow">0 ${escapeHtml(copy.entries)}</p><h2>${escapeHtml(copy.emptyTitle)}</h2><p>${escapeHtml(copy.empty)}</p>${
-    firstRun
-      ? `<a class="ui-button journal-empty__starter" data-journal-starter href="${escapeAttribute(starterUrl)}">${escapeHtml(starterText)} <span aria-hidden="true">→</span></a>`
-      : ''
-  }</section>`;
+function emptyMarkup(copy) {
+  return `<section class="journal-empty"><p class="ui-eyebrow">0 ${escapeHtml(copy.entries)}</p><h2>${escapeHtml(copy.emptyTitle)}</h2><p>${escapeHtml(copy.empty)}</p></section>`;
 }
 
 function recoveryMarkup(journal, copy) {
