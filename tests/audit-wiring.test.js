@@ -283,6 +283,22 @@ test('the Lighthouse budget can stop a deploy', () => {
   );
 });
 
+test('scheduled Lighthouse covers the whole indexable site with a scalable timeout', () => {
+  const audit = workflow('site-audit.yml');
+  const lighthouse = audit.split('  lighthouse-full-site:')[1]?.split('  external-links:')[0];
+  assert.ok(lighthouse, 'the scheduled complete Lighthouse job must exist');
+  const timeout = Number(lighthouse.match(/^\s+timeout-minutes:\s*(\d+)$/m)?.[1]);
+  assert.ok(Number.isFinite(timeout), 'the full audit needs an explicit timeout');
+  // Twelve languages expanded 85 indexable routes to 157. Preserve enough
+  // headroom for the serial, throttled mobile crawl instead of dropping pages.
+  assert.ok(timeout >= Math.ceil(SEARCH_ROUTES.length * 0.4));
+  assert.match(lighthouse, /FULL_SITE_AUDIT: '1'/);
+  const configuration = readFileSync(new URL('../unlighthouse.config.mjs', import.meta.url), 'utf8');
+  assert.match(configuration, /FULL_SITE_AUDIT === '1' \? SEARCH_ROUTES : SEARCH_REPRESENTATIVE_ROUTES/);
+  assert.match(configuration, /maxRoutes: false/);
+  assert.match(configuration, /crawler: false/);
+});
+
 test('the visual comparison gates pull requests and direct pushes', () => {
   // The comparison used to race the deployment from site-audit.yml, so a red
   // result could arrive after production had already published. It now belongs
