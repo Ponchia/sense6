@@ -170,6 +170,15 @@ test('full catalog gate rejects missing text, source drift, placeholders and rev
   }
 });
 
+test('real Spanish prose is not a TODO marker', () => {
+  const catalog = frenchFixture();
+  catalog.content.articles['color-blindness-guide'].sections[1].paragraphs[2] =
+    'El método de laboratorio utiliza controles para interpretar lo que aparece en pantalla. Todo depende de la iluminación y del dispositivo: la medición no permite un diagnóstico.';
+  assert.doesNotThrow(() => validateLearnCatalog(catalog, 'fr'));
+  catalog.ui.Breadcrumb = 'TODO';
+  assert.throws(() => validateLearnCatalog(catalog, 'fr'), /Placeholder/);
+});
+
 test('unlisted source catalogs fail closed before emitting public paths', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'sense6-unlisted-'));
   try {

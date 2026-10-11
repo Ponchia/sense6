@@ -13,8 +13,11 @@ export function learnSourceHash() {
     .digest('hex');
 }
 
-const PLACEHOLDER =
-  /\b(?:TODO|TBD|FIXME|lorem ipsum|placeholder|translate me|translation pending)\b|\[\s*(?:translate|insert)[^\]]*\]/i;
+// Match uppercase editing markers exactly: lowercase Spanish 'todo' or 'método'
+// must not be rejected as an untranslated TODO.
+const PLACEHOLDER_MARKERS = /\b(?:TODO|TBD|FIXME)\b/;
+const PLACEHOLDER_WORDS =
+  /\b(?:lorem ipsum|placeholder|translate me|translation pending)\b|\[\s*(?:translate|insert)[^\]]*\]/i;
 const FALSE_REVIEW = /(?:professionally|natively)[ -](?:translated|reviewed)|certified translation/i;
 const IMMUTABLE = /(?:\.id|\.href|\.route|\.sourceIds\.\d+)$/;
 const DATES = /\.(?:dateModified|publishedDate)$/;
@@ -49,7 +52,7 @@ function compare(source, target, path) {
       return;
     }
     requireValue(
-      !PLACEHOLDER.test(target) && !FALSE_REVIEW.test(target),
+      !PLACEHOLDER_MARKERS.test(target) && !PLACEHOLDER_WORDS.test(target) && !FALSE_REVIEW.test(target),
       `Placeholder or unsupported review claim: ${path}`,
     );
     if (DATES.test(path)) return;
@@ -136,7 +139,10 @@ export function validateLearnCatalog(catalog, locale, today = new Date().toISOSt
     'Missing/extra review fields',
   );
   requireValue(
-    typeof review.reviewer === 'string' && review.reviewer.trim() && !PLACEHOLDER.test(review.reviewer),
+    typeof review.reviewer === 'string' &&
+      review.reviewer.trim() &&
+      !PLACEHOLDER_MARKERS.test(review.reviewer) &&
+      !PLACEHOLDER_WORDS.test(review.reviewer),
     'Missing reviewer',
   );
   for (const key of ['complete', 'boundariesPreserved', 'protocolsUnchanged', 'referencesPreserved']) {
