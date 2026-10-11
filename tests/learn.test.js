@@ -52,6 +52,28 @@ test('English-only guides have original substantive answers, methods and referen
   }
 });
 
+test('every research short answer offers one direct, scope-preserving experiment link', () => {
+  for (const route of LEARN_ROUTES.filter((name) => name !== 'learn')) {
+    const article = learnPage(route);
+    const html = learnMarkup(route);
+    const target = article.experiment.href ?? `/en/${article.experiment.route}/`;
+    const entry = `<a class="ui-link" data-learn-early-experiment href="${target}">`;
+    assert.equal(
+      (html.match(/data-learn-early-experiment/g) ?? []).length,
+      1,
+      `${route} should offer one early experiment link`,
+    );
+    assert.ok(html.includes(entry), `${route} does not preserve the experiment route/scope`);
+    assert.ok(
+      html.indexOf('class="learn-answer__try"') > html.indexOf('id="answer-title"') &&
+        html.indexOf('class="learn-answer__try"') < html.indexOf('class="learn-contents"'),
+      `${route} must offer the task after the answer, before the long reading`,
+    );
+    assert.ok(html.includes(article.experiment.hint), `${route} needs the truthful setup hint`);
+    assert.ok(html.includes('class="learn-experiment"'), `${route} must retain the full task card`);
+  }
+});
+
 test('all Learn sections link to specific declared source roles and navigation targets', () => {
   for (const route of LEARN_ROUTES.filter((name) => name !== 'learn')) {
     const article = learnPage(route);

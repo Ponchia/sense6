@@ -110,6 +110,11 @@ function articleMarkup(route, article) {
       <section class="learn-answer" aria-labelledby="answer-title">
         <p class="ui-eyebrow" id="answer-title">The short answer</p>
         <p>${esc(article.summary)}</p>
+        <div class="learn-answer__try">
+          <p class="ui-eyebrow">Try the related experiment</p>
+          <a class="ui-link" data-learn-early-experiment href="${esc(experimentPath)}">${esc(article.experiment.title)} →</a>
+          <p class="learn-answer__try-note">${esc(article.experiment.hint)}</p>
+        </div>
       </section>
       <nav class="learn-contents" aria-label="On this page">
         <p class="ui-eyebrow">In this guide</p>

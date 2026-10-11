@@ -186,12 +186,44 @@
   padding: clamp(1.4rem, 3vw, 2.6rem);
 }
 
-.learn-answer p:last-child {
+.learn-answer > p:not(.ui-eyebrow) {
   font-size: clamp(1.25rem, 2.3vw, 1.8rem);
   font-weight: 600;
   line-height: 1.5;
   margin-block: 1rem 0;
   text-wrap: pretty;
+}
+
+/* The related experiment stays reachable after the short answer on mobile.
+   The full methods, sources, and detailed experiment card remain farther down. */
+.learn-answer__try {
+  border-block-start: 1px solid var(--line-strong);
+  display: grid;
+  gap: 0.5rem;
+  margin-block-start: clamp(1.5rem, 3vw, 2rem);
+  min-inline-size: 0;
+  padding-block-start: 1.2rem;
+}
+
+.learn-answer__try .ui-eyebrow {
+  margin: 0;
+}
+
+.learn-answer__try a {
+  color: var(--accent-text);
+  font-size: clamp(1rem, 1.7vw, 1.15rem);
+  font-weight: 700;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  text-underline-offset: 0.2em;
+}
+
+.learn-answer__try .learn-answer__try-note {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  font-weight: 400;
+  line-height: 1.55;
+  margin: 0;
 }
 
 /* Reading navigation and transparent claim-to-source pathways. */
