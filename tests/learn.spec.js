@@ -4,6 +4,30 @@ import { isLearnPublished, LEARN_PUBLISHED_LOCALES } from '../src/learn-publicat
 import { LOCALES } from '../src/locales.js';
 import { LEARN_ROUTES } from '../src/routes.js';
 
+test('the Learn index reveals a research title within a laptop first screen @pr-smoke', async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto('/en/learn/');
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'learn');
+  await page.evaluate(async () => document.fonts.ready);
+  const firstTitle = page.locator('.learn-topic').first().getByRole('heading', { level: 3 });
+  await expect(firstTitle).toBeVisible();
+  const bounds = await firstTitle.evaluate((element) => element.getBoundingClientRect().toJSON());
+  expect(bounds.bottom, 'complete first research title must be visible without scrolling').toBeLessThan(780);
+  await firstTitle.getByRole('link').click();
+  await expect(page).toHaveURL(/\/en\/tetrachromacy-guide\/$/);
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'tetrachromacy-guide');
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto('/en/learn/');
+    const dimensions = await page.evaluate(() => ({
+      content: document.documentElement.scrollWidth,
+      viewport: document.documentElement.clientWidth,
+    }));
+    expect(dimensions.content, `${width}px Learn index must not overflow`).toBe(dimensions.viewport);
+    await expect(page.locator('.learn-topic')).toHaveCount(5);
+  }
+});
+
 test('the Learn page links to original research guides and returns to the lab @pr-smoke', async ({
   page,
 }) => {
