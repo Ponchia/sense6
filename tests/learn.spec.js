@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
-import { isLearnPublished } from '../src/learn-publication.js';
+import { isLearnPublished, LEARN_PUBLISHED_LOCALES } from '../src/learn-publication.js';
 import { LOCALES } from '../src/locales.js';
 import { LEARN_ROUTES } from '../src/routes.js';
 
@@ -245,7 +245,7 @@ test('Italian and Spanish Learn content remains readable and internally linked o
       'href',
       `https://sense6.net/${locale}/tetrachromacy-guide/`,
     );
-    await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(3);
+    await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(LEARN_PUBLISHED_LOCALES.length);
     const dimensions = await page.evaluate(() => ({
       width: document.documentElement.clientWidth,
       scroll: document.documentElement.scrollWidth,
@@ -267,20 +267,20 @@ test('German, French and Portuguese editions keep guides and experiments connect
     ['pt', 'pt-PT'],
     ['pt-br', 'pt-BR'],
   ]) {
-    await page.goto('/' + locale + '/learn/');
+    await page.goto(`/${locale}/learn/`);
     await expect(page.locator('html')).toHaveAttribute('lang', languageTag);
     await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'learn');
     await expect(page.locator('.learn-topic')).toHaveCount(5);
     await page.locator('.learn-topic [data-sense6-route="reaction-time-guide"]').click();
-    await expect(page).toHaveURL(new RegExp('/' + locale + '/reaction-time-guide/$'));
+    await expect(page).toHaveURL(new RegExp(`/${locale}/reaction-time-guide/$`));
     await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'reaction-time-guide');
     await expect(page.locator('.learn-article__body section')).toHaveCount(4);
     await expect(page.locator('.learn-references li')).toHaveCount(3);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
       'href',
-      'https://sense6.net/' + locale + '/reaction-time-guide/',
+      `https://sense6.net/${locale}/reaction-time-guide/`,
     );
-    await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(8);
+    await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(LEARN_PUBLISHED_LOCALES.length);
     const article = await page
       .locator('script[type="application/ld+json"]')
       .evaluateAll((scripts) =>
@@ -292,15 +292,15 @@ test('German, French and Portuguese editions keep guides and experiments connect
     expect(article.datePublished).toBe('2026-10-11');
     await expect(page.locator('.learn-answer [data-learn-early-experiment]')).toHaveAttribute(
       'href',
-      '/' + locale + '/riflessi/?scope=signal',
+      `/${locale}/riflessi/?scope=signal`,
     );
     const width = await page.evaluate(() => ({
       viewport: document.documentElement.clientWidth,
       content: document.documentElement.scrollWidth,
     }));
-    expect(width.content, locale + ' must remain readable on mobile').toBe(width.viewport);
+    expect(width.content, `${locale} must remain readable on mobile`).toBe(width.viewport);
     await page.locator('.learn-answer [data-learn-early-experiment]').click();
-    await expect(page).toHaveURL(new RegExp('/' + locale + '/riflessi/[?]scope=signal$'));
+    await expect(page).toHaveURL(new RegExp(`/${locale}/riflessi/[?]scope=signal$`));
   }
 });
 
@@ -320,7 +320,7 @@ test('Arabic Learn is fully translated, accessible and right-to-left @pr-smoke',
     'href',
     'https://sense6.net/ar/reaction-time-guide/',
   );
-  await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(8);
+  await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(LEARN_PUBLISHED_LOCALES.length);
   const jsonld = await page
     .locator('script[type="application/ld+json"]')
     .evaluateAll((scripts) =>
@@ -390,7 +390,7 @@ test('Learn navigation updates Article identity and retires claims when returnin
   expect(article.inLanguage).toBe('en');
   expect(article.url).toBe('https://sense6.net/en/tetrachromacy-guide/');
   expect(article.dateModified).toBe(await page.locator('.learn-hero time').getAttribute('datetime'));
-  await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(3);
+  await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(LEARN_PUBLISHED_LOCALES.length);
   await expect(page.locator('link[rel="alternate"][hreflang="it"]')).toHaveAttribute(
     'href',
     'https://sense6.net/it/tetrachromacy-guide/',
