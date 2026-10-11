@@ -19,8 +19,11 @@ The [Learn section](https://sense6.net/en/learn/) is available in English,
 [Italian](https://sense6.net/it/learn/), [Spanish](https://sense6.net/es/learn/),
 [German](https://sense6.net/de/learn/), [French](https://sense6.net/fr/learn/),
 [European Portuguese](https://sense6.net/pt/learn/),
-[Brazilian Portuguese](https://sense6.net/pt-br/learn/) and
-[Arabic](https://sense6.net/ar/learn/).
+[Brazilian Portuguese](https://sense6.net/pt-br/learn/),
+[Arabic](https://sense6.net/ar/learn/),
+[Japanese](https://sense6.net/ja/learn/), [Korean](https://sense6.net/ko/learn/),
+[Hindi](https://sense6.net/hi/learn/) and
+[Simplified Chinese](https://sense6.net/zh-hans/learn/).
 It answers research
 questions beyond the experiments: [tetrachromacy and what an RGB screen can
 establish](https://sense6.net/en/tetrachromacy-guide/), [reaction-time

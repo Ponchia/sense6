@@ -52,7 +52,13 @@ export function galleryMarkup({ exams, locale, localeHref, m, t, learnInfo = nul
         </div>
         <div class="gallery-hero__actions">
           <a class="ui-link" href="#tests">${m('nav.allTests')} <span aria-hidden="true">↓</span></a>
-          ${locale === 'en' ? '<a class="ui-link gallery-hero__learn" data-sense6-route="learn" href="/en/learn/">Explore the research <span aria-hidden="true">→</span></a>' : ''}
+          ${
+            locale === 'en'
+              ? '<a class="ui-link gallery-hero__learn" data-sense6-route="learn" href="/en/learn/">Explore the research <span aria-hidden="true">→</span></a>'
+              : learnInfo
+                ? `<a class="ui-link gallery-hero__learn" data-sense6-route="learn" href="/${locale}/learn/">${escapeLearnText(learnInfo.ui.Learn)} <span aria-hidden="true">→</span></a>`
+                : ''
+          }
           <a class="ui-link gallery-hero__about" data-sense6-route="about" href="${localeHref('about')}">
             ${t('How Sense6 works')} <span aria-hidden="true">→</span>
           </a>
@@ -137,13 +143,17 @@ export function galleryMarkup({ exams, locale, localeHref, m, t, learnInfo = nul
  * A localized Learn preview exists only when its complete article catalog has
  * passed publication checks. EN retains the established first-screen cards.
  */
+/** Escape authored Learn copy in localized gallery navigation. */
+function escapeLearnText(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+}
+
 function localizedLearnGallery(locale, { content, ui }) {
-  const esc = (value) =>
-    String(value)
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;');
+  const esc = escapeLearnText;
   const topics = Object.entries(content.articles)
     .slice(0, 3)
     .map(
