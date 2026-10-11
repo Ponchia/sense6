@@ -33,6 +33,38 @@ test('the Learn page links to original research guides and returns to the lab @p
   await expect(page.locator('h1')).toContainText('Tetracromia');
 });
 
+test('the mobile research answer offers its experiment before the long article @pr-smoke', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/en/reaction-time-guide/');
+  const early = page.locator('.learn-answer [data-learn-early-experiment]');
+  await expect(early).toBeVisible();
+  await expect(early).toHaveText(/Try the short reaction lab/);
+  await expect(early).toHaveAttribute('href', '/en/riflessi/?scope=signal');
+  const geometry = await early.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return {
+      fitsScreenWidth: rect.left >= 0 && rect.right <= document.documentElement.clientWidth,
+      answerBeforeContents:
+        (document
+          .querySelector('.learn-answer')
+          ?.compareDocumentPosition(document.querySelector('.learn-contents')) &
+          Node.DOCUMENT_POSITION_FOLLOWING) !==
+        0,
+    };
+  });
+  expect(geometry).toEqual({ fitsScreenWidth: true, answerBeforeContents: true });
+  await early.click();
+  await expect(page).toHaveURL(/\/en\/riflessi\/\?scope=signal$/);
+  await expect(page.locator('[data-rx-scope-picker] [data-scope="signal"]')).toHaveAttribute(
+    'aria-pressed',
+    'true',
+  );
+  await expect(page.locator('[data-rx-consent]')).not.toBeChecked();
+  await expect(page.locator('[data-action="rx-start"]')).toBeDisabled();
+});
+
 test('reaction guide explains hardware delay without short-circuiting consent @pr-smoke', async ({
   page,
 }) => {

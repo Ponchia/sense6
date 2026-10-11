@@ -92,7 +92,7 @@
         }
       ],
       "publishedDate": "2026-10-09",
-      "dateModified": "2026-10-10"
+      "dateModified": "2026-10-11"
     },
     "reaction-time-guide": {
       "title": "How accurate is a reaction-time test in a browser?",
@@ -179,7 +179,7 @@
         }
       ],
       "publishedDate": "2026-10-09",
-      "dateModified": "2026-10-10"
+      "dateModified": "2026-10-11"
     },
     "color-blindness-guide": {
       "title": "What can an online colour-blindness test tell you?",
@@ -266,7 +266,7 @@
         }
       ],
       "publishedDate": "2026-10-09",
-      "dateModified": "2026-10-10"
+      "dateModified": "2026-10-11"
     },
     "hearing-range-guide": {
       "title": "Can a browser test your hearing range?",
@@ -359,7 +359,7 @@
           "id": "sense6-udito"
         }
       ],
-      "dateModified": "2026-10-10"
+      "dateModified": "2026-10-11"
     },
     "visual-acuity-guide": {
       "title": "Can an online visual-acuity test replace an eye exam?",
@@ -452,7 +452,7 @@
           "id": "sense6-acutezza"
         }
       ],
-      "dateModified": "2026-10-10"
+      "dateModified": "2026-10-11"
     }
   }
 }
