@@ -63,27 +63,47 @@ test('the gallery lists exams, is accessible, and routes into one @pr-smoke', as
   await expect(page.getByRole('heading', { name: /Find the gap in the dots/i })).toBeVisible();
 });
 
-test('Learn remains reachable throughout English navigation without false translated routes @pr-smoke', async ({
+test('Learn footer follows published languages and hides unavailable editions @pr-smoke', async ({
   page,
 }) => {
   await page.goto('/en/riflessi/');
-  const englishLearn = page.locator('.ui-sitefooter__links [data-sense6-english-only]');
-  await expect(englishLearn).toHaveText('Learn');
-  await expect(englishLearn).toHaveAttribute('href', '/en/learn/');
-  await expect(englishLearn).toBeVisible();
-  await englishLearn.click();
+  const learnLink = page.locator('.ui-sitefooter__links [data-sense6-english-only]');
+  await expect(learnLink).toHaveText('Learn');
+  await expect(learnLink).toHaveAttribute('href', '/en/learn/');
+  await expect(learnLink).toBeVisible();
+  await learnLink.click();
   await expect(page).toHaveURL(/\/en\/learn\/$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Perception, explained.');
+
   await page.locator('[data-locale-select]').selectOption('it');
-  await expect(page).toHaveURL(/\/it\/$/);
-  await expect(englishLearn).toBeHidden();
-  await expect(englishLearn).toHaveAttribute('href', '/it/');
+  await expect(page).toHaveURL(/\/it\/learn\/$/);
+  await expect(learnLink).toBeVisible();
+  await expect(learnLink).toHaveText('Approfondisci');
+  await expect(learnLink).toHaveAttribute('href', '/it/learn/');
+  await expect(learnLink).toHaveAttribute('lang', 'it');
   await page.reload();
-  await expect(englishLearn).toBeHidden();
-  await expect(englishLearn).toHaveAttribute('href', '/it/');
+  await expect(learnLink).toBeVisible();
+  await expect(learnLink).toHaveAttribute('href', '/it/learn/');
+
+  await page.locator('[data-locale-select]').selectOption('es');
+  await expect(page).toHaveURL(/\/es\/learn\/$/);
+  await expect(learnLink).toBeVisible();
+  await expect(learnLink).toHaveText('Aprender');
+  await expect(learnLink).toHaveAttribute('href', '/es/learn/');
+
+  await page.locator('[data-locale-select]').selectOption('de');
+  await expect(page).toHaveURL(/\/de\/$/);
+  await expect(learnLink).toBeHidden();
+  await expect(learnLink).toHaveAttribute('href', '/de/');
+  await page.reload();
+  await expect(learnLink).toBeHidden();
+  await expect(learnLink).toHaveAttribute('href', '/de/');
+
   await page.locator('[data-locale-select]').selectOption('en');
   await expect(page).toHaveURL(/\/en\/$/);
-  await expect(englishLearn).toBeVisible();
+  await expect(learnLink).toBeVisible();
+  await expect(learnLink).toHaveText('Learn');
+  await expect(learnLink).toHaveAttribute('href', '/en/learn/');
   await expect(page.locator('.gallery-hero__learn')).toHaveAttribute('href', '/en/learn/');
   await page.locator('.gallery-hero__learn').click();
   await expect(page).toHaveURL(/\/en\/learn\/$/);

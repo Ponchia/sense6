@@ -15,7 +15,9 @@ The localized [About page](https://sense6.net/en/about/) explains how the tasks
 work, who maintains them, their privacy boundary, and what each result can and
 cannot describe.
 
-The English [Learn section](https://sense6.net/en/learn/) answers research
+The [Learn section](https://sense6.net/en/learn/) is available in English,
+[Italian](https://sense6.net/it/learn/) and [Spanish](https://sense6.net/es/learn/).
+It answers research
 questions beyond the experiments: [tetrachromacy and what an RGB screen can
 establish](https://sense6.net/en/tetrachromacy-guide/), [reaction-time
 measurement in browsers](https://sense6.net/en/reaction-time-guide/), and
@@ -23,9 +25,11 @@ measurement in browsers](https://sense6.net/en/reaction-time-guide/), and
 [what a browser hearing-range observation can mean](https://sense6.net/en/hearing-range-guide/),
 and [why screen-based acuity cannot replace an eye examination](https://sense6.net/en/visual-acuity-guide/).
 Each guide has cited sources, an author/review date and a link to a related
-experiment. No translated versions are published until review, so these guides
-do not advertise invented multilingual alternatives. Research informs their
-content but does not validate the Sense6 implementations.
+experiment. Only complete catalogs in the publication manifest enter the sitemap and
+reciprocal language links. Other locales lead to their existing test gallery,
+not English guides under false translated URLs. These new editions have
+AI-assisted editorial review, not certified or native human review. Research
+informs the guides but does not validate the Sense6 implementations.
 
 Live exams:
 

@@ -193,13 +193,63 @@ test('readers can jump to a topic and trace its background sources without leavi
   );
 });
 
-test('English-only guide language switching leads to a real localized route', async ({ page }) => {
-  await page.goto('/en/learn/');
+test('Learn language switching retains the topic where translated and falls back safely otherwise @pr-smoke', async ({
+  page,
+}) => {
+  await page.goto('/en/reaction-time-guide/');
   await page.locator('[data-locale-select]').selectOption('it');
-  await expect(page).toHaveURL(/\/it\/$/);
+  await expect(page).toHaveURL(/\/it\/reaction-time-guide\/$/);
   await expect(page.locator('html')).toHaveAttribute('lang', 'it');
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'reaction-time-guide');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('tempi di reazione');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    'href',
+    'https://sense6.net/it/reaction-time-guide/',
+  );
+  await page.locator('[data-locale-select]').selectOption('es');
+  await expect(page).toHaveURL(/\/es\/reaction-time-guide\/$/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'es');
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('tiempo de reacción');
+  await page.locator('[data-locale-select]').selectOption('de');
+  await expect(page).toHaveURL(/\/de\/$/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'de');
   await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'gallery');
   await expect(page.locator('main h1')).toBeVisible();
+});
+
+test('Italian and Spanish Learn content remains readable and internally linked on mobile @pr-smoke', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const locale of ['it', 'es']) {
+    await page.goto(`/${locale}/learn/`);
+    await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'learn');
+    await expect(page.locator('.learn-topic')).toHaveCount(5);
+    const sectionLink = page.locator('.learn-topic [data-sense6-route="tetrachromacy-guide"]');
+    await sectionLink.click();
+    await expect(page).toHaveURL(new RegExp(`/${locale}/tetrachromacy-guide/$`));
+    await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'tetrachromacy-guide');
+    await expect(page.locator('.learn-article__body section')).toHaveCount(4);
+    await expect(page.locator('.learn-references li')).toHaveCount(3);
+    const source = page.locator('.learn-section-sources a').first();
+    await expect(source).toHaveAttribute('href', /#learn-source-/);
+    await source.click();
+    await expect(page).toHaveURL(/#learn-source-/);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      `https://sense6.net/${locale}/tetrachromacy-guide/`,
+    );
+    await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(3);
+    const dimensions = await page.evaluate(() => ({
+      width: document.documentElement.clientWidth,
+      scroll: document.documentElement.scrollWidth,
+    }));
+    expect(dimensions.scroll, `${locale} must not cause horizontal overflow`).toBe(dimensions.width);
+    await page.locator('.learn-experiment a').click();
+    await expect(page).toHaveURL(new RegExp(`/${locale}/tetracromia/$`));
+    await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'tetracromia');
+  }
 });
 
 test('all Learn pages remain readable and accessible at a narrow viewport', async ({ page }, testInfo) => {
@@ -245,7 +295,11 @@ test('Learn navigation updates Article identity and retires claims when returnin
   expect(article.inLanguage).toBe('en');
   expect(article.url).toBe('https://sense6.net/en/tetrachromacy-guide/');
   expect(article.dateModified).toBe(await page.locator('.learn-hero time').getAttribute('datetime'));
-  await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(0);
+  await expect(page.locator('link[rel="alternate"][hreflang]')).toHaveCount(3);
+  await expect(page.locator('link[rel="alternate"][hreflang="it"]')).toHaveAttribute(
+    'href',
+    'https://sense6.net/it/tetrachromacy-guide/',
+  );
   await expect(page.locator('meta[property="og:type"]')).toHaveAttribute('content', 'article');
   await page.locator('.learn-breadcrumb [data-sense6-route=""]').click();
   await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'gallery');
