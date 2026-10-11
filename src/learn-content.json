@@ -2,66 +2,52 @@
   "overview": {
     "title": "Perception, explained.",
     "metaTitle": "Learn about perception and browser experiments | Sense6",
-    "description": "Research-backed answers about colour vision, response timing, hearing and visual sharpness—and what uncalibrated browser experiments cannot establish.",
-    "intro": "Explore five questions about what we see, hear and notice. Each explanation connects real research to an interactive Sense6 experiment, with device limits and interpretation boundaries visible.",
-    "boundary": "Sense6 is a recreational browser lab. These explanations and experiments are not diagnoses, clinical tests or proof of a biological trait.",
+    "description": "Five guides to colour vision, reaction time, hearing and visual sharpness, with research sources and practical explanations of browser-test limits.",
+    "intro": "A colour gradient, a reaction time in milliseconds, a tone you can barely hear: each seems to offer a simple answer about your senses. These five guides explain what is being tested, how the equipment affects the result, and where the research fits. Each links to a Sense6 experiment you can try.",
+    "boundary": "Sense6 is a recreational browser lab. Its experiments are not clinically validated and cannot diagnose a condition or establish a biological trait.",
     "updated": "11 October 2026"
   },
   "articles": {
     "tetrachromacy-guide": {
       "title": "Can an online test detect tetrachromacy?",
-      "eyebrow": "Colour vision · 7-minute read",
+      "eyebrow": "Colour vision · 4-minute read",
       "metaTitle": "Can an online test detect tetrachromacy? | Sense6",
-      "description": "Why RGB screen tests cannot confirm tetrachromacy, what four-cone vision really means, and what colour-discrimination tasks can tell you instead.",
+      "description": "What an extra cone signal would mean, why counting bands in a gradient cannot establish it, and what the Screen Colour Lab actually records.",
       "updated": "11 October 2026",
-      "summary": "No ordinary RGB-screen test can demonstrate that you have four functioning dimensions of colour vision. A screen-controlled exercise can describe differences you distinguished on that screen, under those conditions. Establishing functional tetrachromacy is a different research question.",
-      "facts": [
-        {
-          "head": "The biological question",
-          "detail": "A fourth type of photopigment does not automatically mean four-dimensional colour perception."
-        },
-        {
-          "head": "The display question",
-          "detail": "An ordinary screen mixes three primaries. Its output is limited by the display and its calibration."
-        },
-        {
-          "head": "The Sense6 question",
-          "detail": "Can you discriminate certain colour differences in a short, screen-relative task?"
-        }
-      ],
+      "summary": "No ordinary RGB-screen test can demonstrate functional tetrachromacy. Distinguishing small colour differences on a screen is a different task from showing that someone uses a fourth independent signal for colour vision.",
       "sections": [
         {
-          "heading": "What tetrachromacy actually means",
+          "heading": "An extra photopigment is only part of the story",
           "paragraphs": [
-            "Human colour vision typically begins with three classes of cone photoreceptors whose sensitivities overlap across the visible spectrum. Tetrachromacy concerns a possible fourth independent channel of colour discrimination—not simply being especially observant, naming more shades, or having a large vocabulary for colours.",
-            "Genetic variation can create additional cone photopigment classes in some people, especially carriers of certain X-linked colour-vision variants. But the neural visual system must also use that additional signal in a way that changes what a person can distinguish. More photopigments are not, by themselves, proof of a fourth perceptual dimension.",
-            "In their 2010 study, Jordan and colleagues tested candidates with several complementary tasks and genetic analyses. Only one of 24 obligate carriers of deuteranomaly showed tetrachromatic behaviour across their tests. This was careful evidence about particular participants and laboratory stimuli, not an internet screening rule."
+            "Most human colour vision starts with three classes of cone photoreceptors, with overlapping sensitivities to light. Functional tetrachromacy would add an independent dimension of colour discrimination. It does not simply mean noticing more shades or knowing more colour names.",
+            "Some inherited variations can produce an additional class of cone photopigment, particularly in carriers of certain X-linked colour-vision variants. For that extra signal to matter perceptually, the visual system must use it to distinguish colours that would otherwise match. The presence of four photopigments alone does not settle the question.",
+            "Jordan and colleagues combined colour-matching and discrimination tasks with genetic analysis in their 2010 study. Their evidence depended on purpose-built stimuli and comparisons between observers. It was a study of functional colour vision, not a recipe for identifying tetrachromats from a colourful image."
           ],
           "sourceIds": ["jordan-2010"]
         },
         {
-          "heading": "Why a colourful image on your screen is not a fourth-cone test",
+          "heading": "A gradient still comes from three display primaries",
           "paragraphs": [
-            "Most consumer displays generate visible colours by varying red, green and blue light-producing components. Different numerical RGB values can produce many shades, but the set of stimuli remains constrained by those display primaries, the device gamut, the operating system and the viewer's settings.",
-            "To establish an additional perceptual dimension, researchers need spectral stimuli and comparisons designed to separate responses that normally match for three-cone observers. A still image shown through ordinary RGB channels is not an equivalent instrument. Counting bands in a gradient or seeing a hidden number is not evidence of tetrachromacy.",
-            "The W3C CSS Color specification describes how browsers represent, convert and display colours within colour spaces. That engineering specification is useful for building reproducible on-screen tasks, but it does not calibrate your screen or reveal the biology of your eyes."
+            "An ordinary RGB display mixes light from red, green and blue components. Changing their intensities produces many colours, but more shades do not add another independent primary. A wide-gamut display can extend the available colours without turning a three-primary image into a fourth-cone test.",
+            "Counting bands in a gradient tells you what boundaries you noticed in that image. It cannot show whether a fourth cone signal contributed. Even a demanding colour task needs stimuli designed to separate three-cone matches from possible four-cone discrimination before it can address tetrachromacy.",
+            "The CSS Color specification explains how browsers describe and convert colours. That is an engineering reference for the displayed values; it does not measure the light from your screen. Brightness settings, colour filters and room lighting remain part of the viewing conditions."
           ],
           "sourceIds": ["css-color-4", "jordan-2010"]
         },
         {
-          "heading": "What a browser colour experiment can genuinely explore",
+          "heading": "Three tasks in the Screen Colour Lab",
           "paragraphs": [
-            "A well-described screen task can still be interesting: it can ask you to locate a colour difference, adjust difficulty after responses and record where an abbreviated track happened to finish. These observations depend on the current display, brightness, colour management, ambient light, fatigue and choices made during that run.",
-            "Sense6's Screen Colour Lab uses three short observations rather than claiming a single number that ranks colour vision. Its results are deliberately separate, local to the browser and not population thresholds. Repeating under similar lighting and screen conditions may tell you about variation in your own experience; it cannot establish an extra cone class.",
-            "If you are curious, try the task as an experiment in what your *screen and setup* let you distinguish. Do not use it to make medical, genetic or diagnostic decisions."
+            "Sense6 asks you to pick a different tile, choose a different dot field, and arrange a sequence of hues. These tasks put different demands on your attention. Finding an odd tile is a local comparison; ordering a row requires comparing several colours with one another.",
+            "In the tile and dot-field tasks, correct responses make the difference smaller and errors make it larger. The result shows where each short adaptive sequence ended, alongside response counts and the range presented. An ending level is not a stable threshold: a few late choices can still move it.",
+            "Hue ordering has its own result. Sense6 keeps it separate from the two adaptive levels rather than averaging unlike tasks into a colour-vision score. All three describe your choices among colours rendered by this browser on this display."
           ],
           "sourceIds": ["sense6-tetracromia", "css-color-4"]
         },
         {
-          "heading": "A better question to ask",
+          "heading": "Reading a repeat",
           "paragraphs": [
-            "Instead of “Am I a tetrachromat?”, ask “Which colour differences could I reliably distinguish on this display today, and how did my responses change across a repeated task?” That narrower question has an honest answer within a recreational browser lab.",
-            "Further research about functional tetrachromacy would require dedicated stimuli, suitable comparison observers and scientific analysis well beyond an ordinary website. The studies below inform this explanation; none tested or validated the Sense6 implementation."
+            "Keep the display, brightness and lighting similar if you repeat the lab. Note a filter change or a different screen before interpreting a change in the result. The private journal keeps attempts separate; it does not pool them or retain only a best run.",
+            "A repeat can help you inspect how your choices varied under similar conditions. It cannot answer the laboratory question about an extra perceptual dimension. For that, the relevant evidence is controlled colour discrimination with suitable spectral stimuli and comparison observers."
           ],
           "sourceIds": ["jordan-2010", "sense6-tetracromia"]
         }
@@ -96,58 +82,44 @@
     },
     "reaction-time-guide": {
       "title": "How accurate is a reaction-time test in a browser?",
-      "eyebrow": "Response timing · 6-minute read",
+      "eyebrow": "Response timing · 4-minute read",
       "metaTitle": "How accurate are browser reaction-time tests? | Sense6",
-      "description": "Understand stimulus display delay, keyboard and touch latency, response timing, medians and why two devices may give different reaction-time readings.",
+      "description": "Where display and input delays enter a browser reaction time, how to read a median, and which conditions to keep steady when repeating Riflessi.",
       "updated": "11 October 2026",
-      "summary": "Browser reaction-time results combine human response with display, software and input-device delays. A carefully designed web task can describe a run, but its milliseconds are not an instrument-calibrated measurement of pure human reflex speed.",
-      "facts": [
-        {
-          "head": "Display",
-          "detail": "A stimulus can be scheduled before its light reaches your eyes."
-        },
-        {
-          "head": "Response",
-          "detail": "Keys, touchscreens and operating systems contribute their own latency."
-        },
-        {
-          "head": "Interpretation",
-          "detail": "Repeated runs on one setup are easier to compare than scores from different devices."
-        }
-      ],
+      "summary": "A browser reaction time includes delays from the display and input device as well as your response. It is not an instrument-calibrated measurement of human reflex speed. Using the same setup makes repeats easier to interpret, but does not remove those delays.",
       "sections": [
         {
-          "heading": "What happens between a signal and the recorded answer?",
+          "heading": "From a colour change to a key press",
           "paragraphs": [
-            "Imagine a circle changing colour and you pressing a key as soon as you see it. Several stages sit between the instruction to show the colour and the timestamp the page receives: the browser schedules rendering, the display refreshes, you perceive the change, you decide to respond, and the input hardware and operating system deliver an event.",
-            "A browser can use a monotonic clock and record events consistently within its own execution model. It still does not have a photodiode measuring the exact moment each pixel lit up or an external instrument measuring when your finger moved. The displayed time reflects the entire chain, including parts outside the page's control.",
-            "Touch input and keyboard input can differ. Background tabs, temporary focus loss, power saving, display refresh rate and performance interruptions can introduce additional variation. A result may therefore be useful as an observation without representing a universal biological constant."
+            "Imagine a circle changing colour and you pressing a key when you see it. The page first schedules the change. The display then shows it, you respond, and the keyboard and operating system deliver an event to the browser. The recorded interval spans parts of this chain that the page cannot measure separately.",
+            "Display lag occurs before the visible signal reaches you. Keyboard lag occurs after you press the key, before the response reaches the software. A precise browser clock cannot identify either physical moment on its own. That would require external equipment, such as a light sensor and a way to measure the physical response.",
+            "Switching from a key to a touchscreen also changes how you respond, as well as the input hardware. If the recorded time changes, the result alone cannot say how much came from your movement and how much from the device. The illustration on this page separates assumed delays to explain this distinction; it does not measure yours."
           ],
           "sourceIds": ["bridges-2020", "anwyl-irvine-2021"]
         },
         {
-          "heading": "What timing research tells us—and what it does not",
+          "heading": "Accuracy and consistency are different",
           "paragraphs": [
-            "Bridges and colleagues compared the timing performance of multiple laboratory and online experiment tools using external measurement equipment. Anwyl-Irvine and colleagues likewise tested realistic combinations of online platforms, browsers and devices. Both bodies of work show why timing precision and accuracy depend on implementation and environment.",
-            "Those studies do not certify every website that uses browser APIs. In particular, they did not validate the specific stimulus onset, hardware setup or scoring of your current Sense6 session. They support care in reporting timing and checking for interruptions, not the claim that every displayed millisecond equals a calibrated reflex latency."
+            "A setup can add a fairly consistent delay and still give closely grouped readings. Those readings may be precise without being accurate to the physical interval. Variable delays create another problem: they add scatter, which can obscure small differences between runs.",
+            "Bridges and colleagues tested laboratory and online experiment tools using external timing equipment. Anwyl-Irvine and colleagues examined browser and device combinations, including responses made with consumer keyboards. Their findings concern the tested software and equipment. They establish neither a universal browser offset nor a correction you can apply to Sense6."
           ],
           "sourceIds": ["bridges-2020", "anwyl-irvine-2021"]
         },
         {
-          "heading": "How to read a reaction-time result",
+          "heading": "Read the run, not just the fastest response",
           "paragraphs": [
-            "A single fastest response can be influenced by anticipation or chance. In a sequence of responses, a median summarizes the centre of the recorded observations without allowing one unusually slow event to dominate it. False starts, missed signals and interruptions matter too: a neat number can conceal a poor-quality run.",
-            "A simple response task and a choice task also ask different things. Reacting when a signal appears is not the same as deciding between left and right responses. Comparing those numbers may be interesting, but it does not isolate one mental process without stronger controls.",
-            "Keep both the observed value and its context: input mode, device, screen, interruptions and how much of the scheduled task was completed. If the conditions changed, any apparent improvement may be partly due to hardware rather than practice."
+            "Riflessi reports the median of valid responses and their spread. The median is the middle recorded value, so one unusually slow response has less influence than it would on a mean. It still needs context: a tidy median can come from a run with missed signals or many excluded responses.",
+            "Check the scheduled and valid event counts, false starts and interruption notes. Pressing before the signal is anticipation, not a faster successful response. Losing focus or switching tabs can disrupt an attempt; the experiment pauses and discards the interrupted event rather than treating it as an ordinary response.",
+            "The short Segnale scope asks for a response to one signal. Scelta adds a left-or-right choice. The complete scope also includes a sustained-response block. A choice time includes deciding which response to make, so it should not be compared with a simple-response time as though both measured the same task."
           ],
           "sourceIds": ["sense6-riflessi"]
         },
         {
-          "heading": "How to make your own comparisons less misleading",
+          "heading": "Repeating Riflessi on one setup",
           "paragraphs": [
-            "Use the same device, input method and similar surroundings when repeating a run. Keep the tab visible, avoid distractions and allow practice to familiarize you with the response. If a run is marked limited or interrupted, treat it as information about that attempt rather than evidence you became slower.",
-            "Sense6 records the protocol scope and relevant setup in its local journal so it can distinguish comparable from incompatible runs. It does not upload individual response times or maintain a global leaderboard. Comparing yourself against an invented “average human score” would be much less defensible.",
-            "Start with the short Segnale scope if you want to see the mechanics. Its result is a browser-and-device-relative response observation—not a neurological assessment or medical clearance."
+            "Use the same device and chosen input method, keep the tab visible, and complete the practice before the measured run. If you switch keyboards or screens, record that change. Similar conditions reduce ambiguity; they do not guarantee that every difference reflects practice or attention.",
+            "The local journal records the scope and setup alongside the results. Compare compatible runs and look at the spread and event counts as well as the median. A limited or interrupted run may tell you more about that attempt than about a change in your response speed.",
+            "The link here opens Segnale with its normal setup and consent step. Your response times stay in this browser. Sense6 has no global leaderboard or clinical interpretation of the result."
           ],
           "sourceIds": ["sense6-riflessi", "anwyl-irvine-2021"]
         }
@@ -183,59 +155,44 @@
     },
     "color-blindness-guide": {
       "title": "What can an online colour-blindness test tell you?",
-      "eyebrow": "Colour-vision differences · 6-minute read",
-      "metaTitle": "What Can an Online Colour Blindness Test Tell You? | Sense6",
-      "description": "Learn what online colour-vision tasks can reveal, why screen calibration matters, and how they differ from professional colour-vision testing.",
+      "eyebrow": "Colour-vision differences · 4-minute read",
+      "metaTitle": "What can an online colour-blindness test tell you? | Sense6",
+      "description": "Why dot plates and noisy gap tasks differ, how brightness can become a clue, and how to interpret Daltonia’s separate display-colour tracks.",
       "updated": "11 October 2026",
-      "summary": "An online colour-vision task can show which displayed differences you could distinguish during one run. It cannot, by itself, confirm or rule out a colour-vision deficiency, identify its clinical type, or replace an eye professional's evaluation.",
-      "facts": [
-        {
-          "head": "A display-relative result",
-          "detail": "The colours reaching your eyes depend on the screen, software, brightness, filters and surroundings."
-        },
-        {
-          "head": "Different kinds of tasks",
-          "detail": "Recognising numbers in dot plates, matching lights and finding a gap among dots test related but different abilities."
-        },
-        {
-          "head": "A separate clinical question",
-          "detail": "Only an appropriately administered and interpreted professional assessment can address diagnosis or a clinical classification."
-        }
-      ],
+      "summary": "An online task can record which displayed colour differences you distinguished. It cannot, by itself, confirm or rule out a colour-vision deficiency. The screen and the task design both affect what the result means.",
       "sections": [
         {
-          "heading": "What is colour-vision deficiency?",
+          "heading": "Colour blindness does not usually mean no colour",
           "paragraphs": [
-            "Colour-vision deficiency means having difficulty distinguishing some colour differences that many other observers can distinguish. Different types affect different regions or directions of colour perception. It is often inherited, but some acquired eye or health conditions can also affect colour vision.",
-            "The phrase “colour blindness” is familiar, but it can be misleading: most affected people still see many colours. A particular screen result cannot establish whether someone has a deficiency or which biological mechanism might explain it. The National Eye Institute recommends talking to an eye doctor if you or your child are concerned about colour vision.",
-            "A surprising online result is therefore a reason to ask a better question, not a diagnosis. It may reflect an actual perceptual difference, the device and environment, misunderstanding the instructions or ordinary variation between attempts."
+            "Colour-vision deficiency affects the ability to distinguish particular colour differences. Most people described as colour blind still see many colours. The difficulty is selective, rather than a general inability to see colour.",
+            "Professional assessment can use dot plates with embedded shapes, hue-arrangement tasks or an anomaloscope, which asks the observer to match lights. These tasks make different comparisons. The National Eye Institute explains their uses; one online result cannot supply the clinical interpretation of an appropriately administered assessment."
           ],
           "sourceIds": ["nei-colour-vision"]
         },
         {
-          "heading": "Why online tests and clinical tests are different",
+          "heading": "Brightness can give the answer away",
           "paragraphs": [
-            "Clinicians may use colour plates made of coloured dots, hue-arrangement tasks and—in selected cases—specialist instruments such as an anomaloscope. These are different instruments with different intended interpretations. In a clinical setting, their administration and results can be checked together by a trained professional.",
-            "A browser cannot assume that its requested colour values are exactly the colours coming from your screen. Display gamut, colour management, brightness, night-light filters, ambient lighting and visual adaptation can all change the stimulus. Photographs or screenshots of printed colour plates add another uncontrolled transformation.",
-            "The National Eye Institute describes professional colour plate, anomaloscope and hue tests. That guidance does not establish that any web page reproducing a similar image has the same diagnostic performance. A result from a consumer screen should not be described as a clinical screening classification."
+            "A coloured shape may stand out because it is brighter than its background, even when the intended colour difference is difficult to see. A task meant to study colour discrimination needs to account for that alternative clue.",
+            "Printed dot plates depend on their colours and viewing conditions. A photograph or screenshot introduces another set of changes before the image reaches your display. Screen brightness, night-light filters and room lighting can further alter what you see. Recognising a number in that image is not equivalent to completing the original test under its specified conditions.",
+            "Regan, Reffin and Mollon’s laboratory method used varying dot luminance and masking contours to make brightness and shape clues less useful. The method provides background for noisy-dot discrimination tasks. It does not establish that every browser adaptation isolates colour in the same way."
           ],
           "sourceIds": ["nei-colour-vision", "regan-1994"]
         },
         {
-          "heading": "Why noise, gap choices and control trials matter",
+          "heading": "Daltonia asks you to find a gap",
           "paragraphs": [
-            "Some research instruments deliberately mix colour differences with varying dot brightness so that participants cannot solve the task simply by following an obvious luminance edge. In 1994, Regan, Reffin and Mollon described a computer-controlled colour-discrimination method with luminance noise and masking contours. Their laboratory test helped distinguish patterns of colour sensitivity under controlled conditions.",
-            "Daltonia borrows ideas from that family of psychophysical tasks: a C-shaped gap sits inside a field of noisy dots, and three separately sampled display-colour directions adapt during the run. It is not an Ishihara plate, the Cambridge Colour Test, or a certified reproduction of either. A published source about the design principle does not validate the Sense6 task.",
-            "The easiest high-contrast presentations serve as task controls: they help show whether you understood and could perform the gap response. Controls and misses affect how cautiously to read the adaptive results. Passing them does not prove normal colour vision; missing them does not diagnose any deficiency."
+            "In Sense6’s Daltonia task, a C-shaped target sits among noisy dots. You choose the direction of its gap, or indicate that no gap is visible. The run samples three display-colour directions independently, making each track harder or easier in response to your choices.",
+            "The dot noise is intended to reduce brightness clues, but it does not guarantee that the target is distinguishable only by colour. Residual luminance differences can remain. Daltonia is a custom display task, not an Ishihara plate or a certified reproduction of the Cambridge Colour Test.",
+            "High-contrast control presentations check whether you can perform the gap response when the target is easier to see. Missing one can reflect difficulty with the task or an unreliable attempt. Getting them right supports the interpretation of that run; it does not classify your colour vision."
           ],
           "sourceIds": ["regan-1994", "sense6-daltonia"]
         },
         {
-          "heading": "How to read a Sense6 Daltonia result",
+          "heading": "What the three ending levels mean",
           "paragraphs": [
-            "Daltonia reports the ending adaptive level of each short, independent on-screen track. Whatever numerical level the task reports, it is not a universal ranking of your eyes: the scale belongs to the stimulus model and current display. A run with few reversals or a boundary reached at the easiest or hardest level is especially limited.",
-            "The result also reports high-contrast control responses, bounds and track evidence. Read that context before comparing runs. If you repeat the task, keep the same device, filters, lighting and approximate viewing conditions, and treat any differences as run observations rather than a stable biological trend.",
-            "Sense6 stores completed runs locally in your browser's journal, with setup information intended to prevent incompatible comparisons. It does not upload your answers or classify you against a population. If a colour-vision concern affects daily life or an occupational decision, seek an appropriate professional assessment instead of relying on a recreational web result."
+            "Each adaptive result belongs to a direction in the software’s display-colour model. A level is not a cone-sensitivity measurement or a universal ranking of your eyes. The three values should remain separate: averaging them would hide which displayed comparisons were difficult.",
+            "Read the control responses and track evidence alongside the levels. A reversal is a change in the direction of the adaptive sequence as responses switch between success and error. A short track with few reversals offers limited evidence about where performance settles. Reaching the easiest or hardest allowed level also leaves a bound, rather than an exact threshold.",
+            "For a repeat, keep the screen, filters and room lighting similar, and use a similar viewing position. The private journal stores runs with their setup and method so incompatible attempts can be identified. If colour distinctions are causing difficulty in daily life or affect an occupational requirement, take that concern to an eye-care professional; Daltonia cannot resolve it."
           ],
           "sourceIds": ["sense6-daltonia"]
         }
@@ -270,60 +227,46 @@
     },
     "hearing-range-guide": {
       "title": "Can a browser test your hearing range?",
-      "eyebrow": "Hearing and headphones · 5-minute read",
+      "eyebrow": "Hearing and headphones · 4-minute read",
       "metaTitle": "Can a browser test your hearing range? | Sense6",
-      "description": "What online tone tests can reveal, why headphone volume and calibration matter, and why a frequency result cannot diagnose hearing loss or reveal hearing age.",
+      "description": "Why a tone’s frequency does not tell you its level at your ears, what Udito’s setup checks establish, and how its results differ from audiometry.",
       "updated": "11 October 2026",
       "publishedDate": "2026-10-10",
-      "summary": "A browser can play tones and record which choices you made on your current headphones and volume setting. It cannot know the sound pressure reaching your ears, so an upper frequency observed online is not an audiogram, a diagnosis of hearing loss, or a measure of 'hearing age'.",
-      "facts": [
-        {
-          "head": "The digital tone",
-          "detail": "The browser controls frequency and digital amplitude, not the calibrated sound level at your eardrum."
-        },
-        {
-          "head": "The listening chain",
-          "detail": "Headphones, fit, volume, room noise and audio processing all affect audibility."
-        },
-        {
-          "head": "The useful result",
-          "detail": "A run-relative observation that you can revisit under similar conditions, with the limits attached."
-        }
-      ],
+      "summary": "A browser can generate tones, but it cannot know their sound pressure at your ears. The highest frequency noticed on one setup is not an audiogram, a diagnosis of hearing loss, or a measure of hearing age.",
       "sections": [
         {
-          "heading": "A frequency number and a hearing threshold are different",
+          "heading": "Frequency tells only part of the story",
           "paragraphs": [
-            "Frequency is the rate of vibration, measured in hertz (Hz). A browser can generate a digital tone at a requested frequency, but hearing that tone also depends on its level and on how that level reaches you. A digital amplitude setting does not tell a website the resulting sound pressure at your eardrum.",
-            "Two people may hear different things with the same laptop, and the same person may get a different result when switching headphones or changing volume. Equal numbers on an operating-system volume slider do not guarantee equal acoustic output across devices. An upper frequency noticed on one setup is therefore not a biological upper limit.",
-            "A clinical audiogram answers a different question: how sensitive someone is to calibrated sounds at selected frequencies, usually expressed in decibels hearing level (dB HL). That measurement requires known transducers, a suitable test environment and established procedures. The American Speech-Language-Hearing Association's guidelines specify those conditions; Sense6 does not reproduce them."
+            "Frequency, measured in hertz (Hz), describes how rapidly a sound vibrates. Whether you can hear a tone also depends on its level. A browser can set a digital frequency and amplitude, but the actual headphone output depends on everything between that signal and your ears.",
+            "The same position on a volume slider does not mean the same sound pressure with two different headphones. Changing their fit can change what reaches you too. If a tone disappears after a headphone swap, that alone cannot establish a change in hearing.",
+            "Clinical pure-tone audiometry measures sensitivity to calibrated sounds at selected frequencies, commonly reported in decibels hearing level (dB HL). The American Speech-Language-Hearing Association specifies equipment calibration, transducer and test-environment requirements. A browser tone with an unknown acoustic level cannot provide that measurement."
           ],
           "sourceIds": ["asha-audiometry"]
         },
         {
-          "heading": "Why headphones, volume and room noise matter",
+          "heading": "The browser does not measure your headphones",
           "paragraphs": [
-            "Every headphone has its own frequency response. Earbuds may fit or seal differently from over-ear headphones; background sounds can mask quiet tones; and the phone or computer may apply equalization, noise reduction or other audio processing. None of these conditions is reliably calibrated by a normal web page.",
-            "The Web Audio API defines how the browser creates and processes digital sound. Its audio context reports a sample rate, and frequency generation has mathematical limits related to that rate. The specification does not provide a measurement of your headphone's acoustic output at your ears. At high frequencies, headphone response and playback limits can be especially important.",
-            "Turning volume up in search of a higher number is a poor way to learn. Use only a comfortable level, and stop if a sound is uncomfortable. If a task asks you to keep volume unchanged, that instruction protects within-run comparability; it does not make the output clinically calibrated or guarantee that a previous result is comparable on another device."
+            "The Web Audio specification describes digital sound generation and processing. The audio context reports a sample rate, which places a mathematical limit on frequency generation. It does not report the acoustic response of your headphones. A tone that exists in the software may be poorly reproduced by the playback equipment.",
+            "Headphone response varies with frequency. Background noise can mask a quiet tone, while audio processing or a different earbud seal can change audibility. These effects matter when interpreting a high-frequency result; the browser has no calibrated microphone at your ear to separate them.",
+            "Choose a comfortable volume and stop if a sound is uncomfortable. Do not turn the volume up to chase a higher frequency. Keeping volume unchanged makes choices within a run easier to compare, but it neither calibrates the output nor guarantees a safe sound level on every device."
           ],
           "sourceIds": ["w3c-web-audio", "asha-audiometry"]
         },
         {
-          "heading": "What Udito actually checks",
+          "heading": "What Udito checks before reporting a result",
           "paragraphs": [
-            "Sense6's Udito is a recreational listening lab. It begins with headphone-like presentation checks, then asks questions about tones in separate tasks. Its frequency-range observation records where its adaptive sequence ended on this setup. A longer scope also includes pitch-difference choices near selected reference frequencies. Those observations are deliberately not combined into a hearing score.",
-            "The task includes known-audibility anchors, control trials and a final check that you did not knowingly change the volume. These make it easier to explain whether a particular run deserves caution. Passing a headphone-like presentation check does not identify the physical device or demonstrate that it is calibrated; failing a check does not diagnose anything either.",
-            "When a result reaches the experiment's technical frequency ceiling, that is a limit of what the software attempted, not the highest frequency your ears could possibly hear. If control trials fail, if you are interrupted, or if you change volume, interpret the visible observations cautiously rather than treating them as a reliable personal boundary."
+            "Udito starts with presentation checks intended to give evidence of headphone-like listening. Passing them does not identify the physical device or measure its output. The setup also asks you to confirm audibility of reference tones before proceeding.",
+            "The Focused scope then follows an adaptive frequency sequence and reports its upper run boundary. Standard adds separate pitch-difference tasks near selected reference frequencies. Finding a small pitch difference and hearing a high-frequency tone are different tasks, so their results are not combined into a hearing score.",
+            "Control responses, interruptions and your final confirmation about unchanged volume accompany the result. Read any caution reasons before comparing attempts. If the frequency sequence reaches the software’s ceiling, the result says that the task stopped there. It does not locate the highest frequency you could hear.",
+            "Repeat with the same headphones, connection and comfortable volume setting if you want to compare sessions. The private journal keeps the task and setup with each entry. A change of equipment can make two otherwise similar runs unsuitable for comparison."
           ],
           "sourceIds": ["sense6-udito"]
         },
         {
-          "heading": "How this differs from a hearing check or audiometry",
+          "heading": "A hearing check uses its own method",
           "paragraphs": [
-            "The World Health Organization's hearWHO app uses digits presented in background noise to provide a hearing check. It has published evidence for that specific task and population, and WHO still says it does not replace professional assessment. A digits-in-noise hearing check and Sense6's browser tone tasks measure different things; validation of the former does not transfer to the latter.",
-            "If you have difficulty following conversations or notice a change in hearing, a qualified hearing-care professional can choose the appropriate assessment. An arbitrary online high-frequency result cannot tell you whether you need hearing aids or whether a hearing change is medically significant.",
-            "For curiosity, the useful question is narrower: which tone choices could you identify today with this equipment, and were the setup checks coherent? Repeat only under comparable, comfortable conditions, retain the uncertainty and use the private journal as a record of those sessions—not as a clinical hearing history."
+            "WHO’s hearWHO app asks users to identify spoken digits in background noise. Evidence for that hearing check belongs to its digits-in-noise method; it does not validate Udito’s tone tasks. WHO also states that hearWHO does not replace consulting a health professional.",
+            "Trouble following conversations or a change in hearing deserves an appropriate professional assessment. A recreational frequency result cannot determine whether you need hearing aids. Use Udito to inspect your listening choices on a known setup, rather than as a record of clinical hearing thresholds."
           ],
           "sourceIds": ["who-hearwho", "asha-audiometry"]
         }
@@ -363,60 +306,46 @@
     },
     "visual-acuity-guide": {
       "title": "Can an online visual-acuity test replace an eye exam?",
-      "eyebrow": "Visual sharpness and screens · 5-minute read",
+      "eyebrow": "Visual sharpness and screens · 4-minute read",
       "metaTitle": "Can an online visual-acuity test replace an eye exam? | Sense6",
-      "description": "Why screen size, viewing distance and contrast affect online sharpness tasks, and how self-measured acuity observations differ from a professional eye examination.",
+      "description": "How pixel size and viewing distance affect a small target, what Acutezza’s model interval covers, and why sharpness is only part of an eye examination.",
       "updated": "11 October 2026",
       "publishedDate": "2026-10-10",
-      "summary": "No. A screen-based task can describe which small shapes you identified on a particular display at a stated distance. It cannot establish eye health, prescribe lenses, or substitute for a comprehensive examination. Screen calibration and viewing conditions determine how the result should be read.",
-      "facts": [
-        {
-          "head": "Size on the retina",
-          "detail": "A target's visual angle depends on its physical size and your distance from the display."
-        },
-        {
-          "head": "Conditions",
-          "detail": "Screen scaling, viewing distance, contrast, correction and lighting can change your choices."
-        },
-        {
-          "head": "What remains unknown",
-          "detail": "A sharpness estimate does not examine the retina, eye pressure, visual fields or disease."
-        }
-      ],
+      "summary": "No. A screen task can record which small shapes you identified at a stated distance. It cannot establish eye health, prescribe lenses, or replace an eye examination. Its estimate also depends on how accurately the display scale and viewing distance were set.",
       "sections": [
         {
-          "heading": "Why a target on a screen needs a distance",
+          "heading": "Pixels need a physical size and a viewing distance",
           "paragraphs": [
-            "An eye-chart symbol has a physical size. What matters for recognizing its detail is also the angle it occupies from the viewer's eye. Move closer to the same symbol and its angular size changes, even though its pixels have not. A browser-based sharpness task must therefore connect on-screen size to a viewing distance rather than treating a pixel count as vision.",
-            "Pixels reported by a browser are not necessarily physical dots on the panel. Display density, page zoom, operating-system scaling and browser rendering influence how CSS dimensions appear. An on-screen card-size check can help estimate physical scale, while a viewing-distance step helps estimate the resulting visual angle. Both depend on what the participant actually does.",
-            "The ISO 8596 visual-acuity standard specifies Landolt-ring optotypes and their presentation for particular distance-vision certification or licensing purposes. It explicitly does not claim to be a standard for clinical measurements. Sense6's self-administered display task is not an ISO-certified acuity test and does not inherit any standard's intended use."
+            "Move closer to a small ring on a screen and its gap occupies a larger angle at your eye. The pixel count has not changed, but the viewing task has. A sharpness estimate therefore needs both the target’s physical size and your distance from it.",
+            "A CSS pixel is a browser layout unit, not necessarily one physical dot on the panel. Page zoom and operating-system scaling affect the rendered size. A ring with the same CSS dimensions can occupy a different physical space on another screen; matching pixel counts alone does not make the viewing conditions equivalent.",
+            "ISO 8596 describes Landolt-ring presentation for distance-vision certification or licensing. Its stated scope excludes clinical measurement. It supplies context for the ring design, not certification of Sense6’s self-administered task."
           ],
           "sourceIds": ["iso-8596", "css-reference-pixel"]
         },
         {
-          "heading": "A sharpness result describes a particular task",
+          "heading": "Identifying a gap is a specific task",
           "paragraphs": [
-            "Many visual-sharpness tasks ask which way a gap faces in a small broken ring. The response depends on the size of that gap, the rendered contrast, the display, focus, attention and the viewing setup. Getting several directions correct says something about those stimuli; it does not reveal a glasses prescription or an eye disease.",
-            "A short adaptive sequence can estimate where the person's responses changed during that run. When software reports a model interval, it describes variation under the assumptions of its scoring model. It is not a promise that the screen's scale, the viewing distance or the participant's setup were measured with the same certainty.",
-            "A technical display floor or ceiling is another important limit: some gaps cannot become physically smaller on a given screen, and others may exceed the task's chosen range. Results near those boundaries should be labelled as bounded observations rather than presented as exact human visual thresholds."
+            "A Landolt ring is a broken circle whose gap can face different directions. Choosing the direction asks you to resolve that detail at the displayed size and contrast. The task is narrower than assessing your sight in everyday conditions, and does not yield a lens prescription.",
+            "Acutezza uses a short response sequence to estimate angular detail. The reported model interval describes uncertainty within the scoring model. It does not include every possible error in card matching, viewing distance or screen output. A narrow interval can accompany a setup that was only approximately measured.",
+            "The display also limits how small a gap can be rendered. At a software floor or ceiling, the result is bounded by the available targets. Read the boundary flag before treating the displayed estimate as an exact limit of what you can resolve."
           ],
           "sourceIds": ["iso-8596", "sense6-acutezza"]
         },
         {
-          "heading": "What Acutezza can record—and what it deliberately cannot",
+          "heading": "Keep eye and contrast conditions separate",
           "paragraphs": [
-            "Sense6's Acutezza asks for directional choices on a calibrated-as-possible display setup, with checks for scale and viewing distance. Its Focused scope measures a high-contrast sharpness condition. The longer Standard scope adds a nominal low-contrast condition, which must be interpreted separately. Results are recorded per eye, never as one overall vision grade.",
-            "The session remembers whether its scale and distance were measured or assumed, whether task controls were answered coherently, whether the display environment changed, and whether each estimate met a software bound. Those details are part of the result, not technical clutter: without them a small number could appear more certain than it is.",
-            "Do not turn an Acutezza result into a '20/20' claim, an astigmatism axis, lens strength, driving eligibility or confirmation of eye health. A weaker or stronger observation may reflect lighting, distance, correction, focus, fatigue or the display just as much as differences in the task."
+            "Acutezza asks you to check the on-screen scale against a physical card and establish a viewing distance. The setup’s provenance matters: a measured distance and an assumed one are not equally informative. Moving during the task can also change the visual angle after setup is complete.",
+            "The Focused scope uses a high-contrast target. Standard adds a nominal low-contrast condition when the setup permits it. “Nominal” refers to the intended rendered contrast: Sense6 does not measure the screen’s light output. An estimate from the fainter condition needs its own interpretation.",
+            "Results stay separate for each eye and condition. The session records scale and distance information, control responses, display changes and bounds. Those details explain what went into the estimate. They are especially useful if one condition was incomplete or a setup check required caution.",
+            "For repeats, keep your correction and room lighting consistent, use the same display, and recheck the distance. Compare compatible conditions in the local journal. Acutezza does not convert the estimates into a 20/20 claim, an astigmatism axis, driving eligibility or an overall vision grade."
           ],
           "sourceIds": ["sense6-acutezza"]
         },
         {
-          "heading": "What a comprehensive examination adds",
+          "heading": "An eye examination looks beyond sharpness",
           "paragraphs": [
-            "Visual acuity is only one part of an eye examination. The U.S. National Eye Institute explains that a dilated exam can also check visual fields, eye-muscle function, pupil response and eye pressure, and examine structures such as the retina and optic nerve. A web page that displays letters or gaps cannot perform those assessments.",
-            "If your vision changes or you have symptoms, use an eye-care professional rather than relying on a repeated online task. In particular, sudden vision loss, severe pain, new flashes or floaters, or a curtain over the field of view warrant prompt professional assessment. A recreational score should never be used to delay care.",
-            "For personal curiosity, repeat the same task only with similar correction, room lighting, screen size and measured distance. Keep left and right eyes separate, note any caution flags, and compare only compatible runs in your private journal. The useful conclusion is about the task you performed—not a diagnosis."
+            "The National Eye Institute describes a dilated eye examination that includes acuity, visual fields, eye-muscle function, pupil response and eye pressure, as well as inspection inside the eye. Resolving a small on-screen gap cannot check the retina or optic nerve.",
+            "If your vision changes or you have symptoms, seek an eye-care professional’s assessment. Sudden vision loss, severe pain, new flashes or floaters, or a curtain over your field of view warrant prompt professional attention. A good result in a browser task should never be used to delay care."
           ],
           "sourceIds": ["nei-eye-exam"]
         }

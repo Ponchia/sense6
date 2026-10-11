@@ -58,30 +58,27 @@ function overviewMarkup() {
     <div class="learn-view ui-container ui-container--wide" data-sense6-view="learn" data-sense6-route="learn">
       <nav class="learn-breadcrumb" aria-label="Breadcrumb"><a data-sense6-route="" href="/en/">All experiments</a><span aria-hidden="true">/</span><span aria-current="page">Learn</span></nav>
       <header class="learn-hero">
-        <p class="ui-eyebrow">Sense6 / Learn</p>
         <h1>${esc(page.title)}</h1>
         <p class="learn-hero__lede">${esc(page.intro)}</p>
         <p class="learn-hero__date">By <a href="${CREATOR_PROFILE_URL}" rel="me noreferrer">Zeno</a> · Reviewed ${esc(page.updated)}</p>
       </header>
       <section aria-labelledby="learn-topics" class="learn-topics">
-        <div class="learn-section-heading"><p class="ui-eyebrow">Start with a question</p><h2 id="learn-topics">Questions worth exploring</h2></div>
+        <div class="learn-section-heading"><h2 id="learn-topics">Research guides</h2></div>
         <div class="learn-topic-grid">
           ${Object.entries(content.articles)
             .map(
-              ([id, article], index) => `<article class="learn-topic">
-            <span class="learn-topic__number" aria-hidden="true">0${index + 1}</span>
+              ([id, article]) => `<article class="learn-topic">
             <p class="ui-eyebrow">${esc(article.eyebrow)}</p>
             <h3><a data-sense6-route="${id}" href="/en/${id}/">${esc(article.title)}</a></h3>
             <p>${esc(article.description)}</p>
-            <span class="learn-topic__cta" aria-hidden="true">Read the explanation →</span>
           </article>`,
             )
             .join('')}
         </div>
       </section>
-      <aside class="learn-boundary" aria-label="Interpretation limits"><strong>What we can promise</strong><p>${esc(page.boundary)}</p></aside>
+      <aside class="learn-boundary" aria-label="Interpretation limits"><p>${esc(page.boundary)}</p></aside>
       <section class="learn-next" aria-label="Explore experiments">
-        <div><p class="ui-eyebrow">Try it yourself</p><h2>The lab is one click away.</h2><p>The experiments describe one browser-and-device session, not your medical status.</p></div>
+        <div><h2>Try an experiment</h2><p>Each lab explains its setup and records results in your browser. Choose a short scope to see how the task works; return to a guide when you want to understand its result.</p></div>
         <a class="ui-button" data-sense6-route="" href="/en/">Explore all five experiments →</a>
       </section>
     </div>
@@ -105,14 +102,12 @@ function articleMarkup(route, article) {
       <header class="learn-hero">
         <p class="ui-eyebrow">${esc(article.eyebrow)}</p>
         <h1>${esc(article.title)}</h1>
-        <p class="learn-hero__lede">${esc(article.description)}</p>
         <p class="learn-hero__date">By <a href="${CREATOR_PROFILE_URL}" rel="me noreferrer">${byline}</a> · Reviewed <time datetime="${article.dateModified}">${esc(article.updated)}</time></p>
       </header>
       <section class="learn-answer" aria-labelledby="answer-title">
-        <p class="ui-eyebrow" id="answer-title">The short answer</p>
+        <h2 id="answer-title">Short answer</h2>
         <p>${esc(article.summary)}</p>
         <div class="learn-answer__try">
-          <p class="ui-eyebrow">Try the related experiment</p>
           <a class="ui-link" data-learn-early-experiment href="${esc(experimentPath)}">${esc(article.experiment.title)} →</a>
           <p class="learn-answer__try-note">${esc(article.experiment.hint)}</p>
         </div>
@@ -120,18 +115,11 @@ function articleMarkup(route, article) {
       <nav class="learn-contents" aria-label="On this page">
         <p class="ui-eyebrow">In this guide</p>
         <ol>${article.sections
-          .map(
-            (section, i) =>
-              `<li><a href="#learn-section-${i + 1}"><span aria-hidden="true">0${i + 1}</span>${esc(section.heading)}</a></li>`,
-          )
+          .map((section, i) => `<li><a href="#learn-section-${i + 1}">${esc(section.heading)}</a></li>`)
           .join('')}
-          <li><a href="#research-sources"><span aria-hidden="true">↗</span>Sources and their roles</a></li>
+          <li><a href="#research-sources">Sources and their roles</a></li>
         </ol>
       </nav>
-      <figure class="learn-model" aria-label="Three important parts of this question">
-        <ol>${article.facts.map((fact, i) => `<li><span class="learn-model__num" aria-hidden="true">0${i + 1}</span><strong>${esc(fact.head)}</strong><p>${esc(fact.detail)}</p></li>`).join('')}</ol>
-        <figcaption>A way to think about the problem · not a device calibration or research measurement.</figcaption>
-      </figure>
       ${route === 'reaction-time-guide' ? timingIllustrationMarkup() : ''}
       <div class="learn-article__columns">
         <div class="learn-article__body">
@@ -147,18 +135,17 @@ function articleMarkup(route, article) {
         </div>
         <aside class="learn-side">
           <section class="learn-experiment" aria-labelledby="related-experiment">
-            <p class="ui-eyebrow">Explore a real task</p>
             <h2 id="related-experiment">${esc(article.experiment.title)}</h2>
             <p>${esc(article.experiment.hint)}</p>
             <a class="ui-button" href="${esc(experimentPath)}">Open the experiment →</a>
           </section>
           <section class="learn-references" aria-labelledby="research-sources">
             <h2 id="research-sources">Sources and their roles</h2>
-            <p>These sources explain science, engineering, or the Sense6 method. They do not validate the assembled Sense6 browser protocol.</p>
+            <p>Research papers address the scientific question; standards describe equipment or browser behaviour. The Sense6 link documents the task implemented here. None validates the Sense6 protocol.</p>
             <ol>${article.sources
               .map(
-                (source) => `<li id="learn-source-${esc(source.id)}">
-              <span class="ui-eyebrow">${esc(source.role)}</span>
+                (source, i) => `<li id="learn-source-${esc(source.id)}" tabindex="-1">
+              <span class="learn-reference-role">[${i + 1}] ${esc(source.role)}</span>
               <a href="${esc(source.href)}"${source.href.startsWith('https://') ? ' target="_blank" rel="noreferrer"' : ''}>${esc(source.title)}</a>
             </li>`,
               )
@@ -167,8 +154,7 @@ function articleMarkup(route, article) {
         </aside>
       </div>
       <aside class="learn-boundary" aria-label="Interpretation boundary">
-        <strong>Curiosity is the purpose, not diagnosis.</strong>
-        <p>Browser experiments cannot reveal the biological or clinical status of your senses. Answers and measurements stay on your device. No paper cited here has validated this particular Sense6 implementation.</p>
+        <p>Sense6 is a recreational browser lab, not a clinical or diagnostic test. Answers and measurements stay on your device.</p>
       </aside>
       <nav class="learn-further" aria-label="Keep exploring">
         <div><span class="ui-eyebrow">Another question</span><a data-sense6-route="${relatedRoute}" href="/en/${relatedRoute}/">${esc(relatedArticle.title)} →</a></div>
@@ -188,9 +174,9 @@ function relatedSourcesMarkup(section, article) {
     const position = article.sources.findIndex((source) => source.id === id);
     if (position === -1) throw new Error(`Unknown Learn reference: ${id}`);
     const source = article.sources[position];
-    return `<a href="#learn-source-${esc(id)}">[${position + 1}] ${esc(source.role)}</a>`;
+    return `<a href="#learn-source-${esc(id)}" aria-label="Source ${position + 1}: ${esc(source.role)}">[${position + 1}]</a>`;
   });
-  return `<p class="learn-section-sources"><span>Related sources</span> ${links.join(' · ')}</p>`;
+  return `<p class="learn-section-sources">Sources ${links.join(' ')}</p>`;
 }
 
 /** @param {string} value */

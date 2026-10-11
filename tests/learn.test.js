@@ -76,7 +76,8 @@ test('every research short answer offers one direct, scope-preserving experiment
       `${route} must offer the task after the answer, before the long reading`,
     );
     assert.ok(html.includes(article.experiment.hint), `${route} needs the truthful setup hint`);
-    assert.ok(html.includes('class="learn-experiment"'), `${route} must retain the full task card`);
+    assert.ok(html.includes('class="learn-experiment"'), `${route} must retain the task details`);
+    assert.match(html, /<h2 id="answer-title">Short answer<\/h2>/);
   }
 });
 
@@ -112,11 +113,18 @@ test('all Learn sections link to specific declared source roles and navigation t
       );
       for (const id of section.sourceIds) {
         assert.ok(sourceIds.includes(id), `${route} section ${index + 1} has unknown ${id}`);
-        assert.ok(html.includes(`href="#learn-source-${id}"`), `${route} lacks source jump ${id}`);
+        const position = sourceIds.indexOf(id) + 1;
+        const role = article.sources[position - 1].role;
+        assert.ok(
+          html.includes(
+            `href="#learn-source-${id}" aria-label="Source ${position}: ${role}">[${position}]</a>`,
+          ),
+          `${route} lacks an accessible, numbered source jump for ${id}`,
+        );
       }
     }
     for (const id of sourceIds) {
-      assert.ok(html.includes(`id="learn-source-${id}"`), `${route} lacks cited source ${id}`);
+      assert.ok(html.includes(`id="learn-source-${id}" tabindex="-1"`), `${route} lacks cited source ${id}`);
     }
     assert.ok(html.includes('href="#research-sources"'), `${route} lacks source index jump`);
     assert.doesNotMatch(html, /onclick=|javascript:/i, `${route} should use native links only`);
@@ -135,7 +143,6 @@ test('independent published research never claims validation of Sense6', () => {
   assert.match(hearing.summary, /not an audiogram/);
   assert.match(visual.summary, /cannot establish eye health/);
   for (const article of [tetra, timing, colourVision, hearing, visual]) {
-    assert.equal(article.facts.length, 3);
     assert.ok(article.sections.length >= 4);
     assert.ok(article.sections.every((section) => section.paragraphs.length >= 2));
     assert.ok(article.sources.length >= 3);
@@ -144,9 +151,13 @@ test('independent published research never claims validation of Sense6', () => {
     );
     assert.ok(article.sources.filter(({ href }) => href.startsWith('https://')).length >= 2);
     assert.ok(article.sources.some(({ role }) => role.includes('Sense6')));
+    const bodyWords = article.sections
+      .flatMap(({ paragraphs }) => paragraphs)
+      .join(' ')
+      .split(/\s+/);
+    assert.ok(bodyWords.length >= 450 && bodyWords.length <= 700, `${article.title} body length`);
   }
   const tetraHTML = learnMarkup('tetrachromacy-guide');
-  assert.match(tetraHTML, /not a device calibration/);
   assert.match(tetraHTML, /href="\/en\/tetracromia\/"/);
   assert.match(learnMarkup('reaction-time-guide'), /href="\/en\/riflessi\/\?scope=signal"/);
   assert.match(learnMarkup('color-blindness-guide'), /href="\/en\/color-blindness\/"/);

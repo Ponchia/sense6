@@ -139,8 +139,11 @@ test('Learn pages are genuinely English-only and share one static/runtime render
         data['@graph'][0].citation.length,
         learnPage(route).sources.filter(({ href }) => href.startsWith('https://')).length,
       );
-      assert.match(html, /not a device calibration or research measurement/);
-      assert.match(html, /do not validate the assembled Sense6 browser protocol/);
+      assert.match(html, /not a clinical or diagnostic test/);
+      assert.match(html, /None validates the Sense6 protocol/);
+      if (route === 'reaction-time-guide') {
+        assert.match(html, /not a latency measurement, calibration or correction formula/);
+      }
     }
   }
 });
