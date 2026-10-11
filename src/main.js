@@ -146,7 +146,9 @@ async function renderRoute({ route, locale }) {
       metadata,
     });
     if (!committed) return;
-    if (EXAM_BY_ID.has(route)) trackMetric(METRIC_EVENTS.testViewed, METRIC_TESTS[route]);
+    // Route IDs and approved anonymous metric IDs differ for Daltonia.
+    const exam = EXAM_BY_ID.get(route);
+    if (exam) trackMetric(METRIC_EVENTS.testViewed, exam.metricTest);
     committedRoute = true;
     committedRouteName = route;
   } catch (error) {

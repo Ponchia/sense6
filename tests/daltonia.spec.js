@@ -2,7 +2,12 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { createAdaptiveRun, currentAdaptiveTrial, recordAdaptiveAnswer } from '../src/lib/daltonism.js';
 import { seededRandom } from '../src/lib/random.js';
-import { expectInVisualViewport, expectJournalEntry, expectNoHorizontalOverflow } from './helpers/browser.js';
+import {
+  captureMetrics,
+  expectInVisualViewport,
+  expectJournalEntry,
+  expectNoHorizontalOverflow,
+} from './helpers/browser.js';
 
 const AUDITED_VIEWPORTS = [
   { width: 320, height: 568 },
@@ -18,6 +23,15 @@ async function installDeterministicDaltonia(page) {
     window.__SENSE6_TEST_CONFIG__ = { daltonia: { seed } };
   }, DALTONIA_RESULT_SEED);
 }
+
+test('Daltonia route-view telemetry uses its permitted daltonia identifier @pr-smoke', async ({ page }) => {
+  const received = await captureMetrics(page);
+  await page.goto('/en/color-blindness/');
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'color-blindness');
+  await expect
+    .poll(() => received.filter((item) => item.event === 'test_viewed'))
+    .toEqual([{ event: 'test_viewed', test: 'daltonia' }]);
+});
 
 async function startPractice(page, locale = 'en') {
   await page.goto(`/${locale}/color-blindness/`);
