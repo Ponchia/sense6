@@ -1,4 +1,5 @@
 import { messageSource } from './i18n/message-ids.js';
+import { isLearnPublished, learnNavigationLabel } from './learn-publication.js';
 import { DEFAULT_LOCALE, LOCALES, loadMessages, localeMetadata, resolveLocale } from './locales.js';
 
 /** @typedef {import('./locale-metadata.js').LocaleCode} LocaleCode */
@@ -344,10 +345,13 @@ function localizeInternalLinks(root) {
   for (const link of root.querySelectorAll?.('a[data-sense6-route]') ?? []) {
     if (!(link instanceof HTMLAnchorElement)) continue;
     if (link.hasAttribute('data-sense6-english-only')) {
-      // The guides exist only in English. Keep this a real English link when
-      // switching locales; never create a nonexistent /it/learn/ URL.
-      link.hidden = locale !== DEFAULT_LOCALE;
-      link.setAttribute('href', locale === DEFAULT_LOCALE ? '/en/learn/' : localeHref());
+      // The publication manifest prevents phantom guide links.
+      link.hidden = !isLearnPublished(locale);
+      if (isLearnPublished(locale)) {
+        link.textContent = learnNavigationLabel(locale);
+        link.lang = localeMetadata(locale).languageTag;
+      }
+      link.setAttribute('href', isLearnPublished(locale) ? localeHref('learn') : localeHref());
       continue;
     }
     link.setAttribute('href', localeHref(link.dataset.sense6Route));

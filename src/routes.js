@@ -1,4 +1,6 @@
-// The field-guide pages are original English content, not translated routes.
+import { learnAlternates } from './learn-publication.js';
+import { LOCALES } from './locale-metadata.js';
+// Stable Learn identities shared by all complete published locale catalogs.
 export const LEARN_ROUTES = Object.freeze([
   'learn',
   'tetrachromacy-guide',
@@ -12,7 +14,7 @@ export const NON_INDEXABLE_ROUTES = Object.freeze(['journal', 'privacy']);
 export const STATIC_ADOPTED_ROUTES = Object.freeze(['', 'about', 'privacy', ...LEARN_ROUTES]);
 export const SITE_ORIGIN = 'https://sense6.net';
 
-/** @typedef {{ locale: string, route: string, path: string, title: string, description: string, canonical: string, socialImage: string, socialImageAlt: string, indexable: boolean }} RouteMetadata */
+/** @typedef {{ locale: string, route: string, path: string, title: string, description: string, canonical: string, socialImage: string, socialImageAlt: string, indexable: boolean, structuredData?: object }} RouteMetadata */
 
 /** @param {string} locale @param {string} route */
 export function routePath(locale, route = '') {
@@ -21,7 +23,7 @@ export function routePath(locale, route = '') {
 
 /**
  * Build the canonical identity shared by static output and runtime navigation.
- * @param {{ locale: string, route?: string, path?: string, title: string, description: string, socialImage?: string, socialImageAlt?: string, indexable?: boolean }} value
+ * @param {{ locale: string, route?: string, path?: string, title: string, description: string, socialImage?: string, socialImageAlt?: string, indexable?: boolean, structuredData?: object }} value
  * @returns {Readonly<RouteMetadata>}
  */
 export function createRouteMetadata({
@@ -33,6 +35,7 @@ export function createRouteMetadata({
   socialImage = '/social/sense6.png',
   socialImageAlt = description,
   indexable = true,
+  structuredData,
 }) {
   return Object.freeze({
     locale,
@@ -44,6 +47,7 @@ export function createRouteMetadata({
     socialImage: new URL(socialImage, SITE_ORIGIN).href,
     socialImageAlt,
     indexable,
+    ...(structuredData ? { structuredData } : {}),
   });
 }
 
@@ -68,6 +72,51 @@ export function applyRouteMetadata(metadata, root = document) {
   if (!(canonical instanceof HTMLLinkElement)) throw new Error('Canonical link is unavailable');
   canonical.href = metadata.canonical;
   applyRobotsMetadata(root, metadata.indexable);
+  setMeta(
+    root,
+    'property',
+    'og:type',
+    LEARN_ROUTES.includes(metadata.route) && metadata.route !== 'learn' ? 'article' : 'website',
+  );
+  for (const link of root.querySelectorAll('link[rel="alternate"][hreflang]')) link.remove();
+  const alternates = LEARN_ROUTES.includes(metadata.route)
+    ? learnAlternates(metadata.route)
+    : [
+        ...LOCALES.map(({ code, languageTag }) => ({
+          languageTag,
+          href: `${SITE_ORIGIN}${routePath(code, metadata.route)}`,
+        })),
+        {
+          languageTag: 'x-default',
+          href:
+            metadata.path === '/' ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}${routePath('en', metadata.route)}`,
+        },
+      ];
+  for (const alternate of alternates) {
+    const link = root.createElement('link');
+    link.rel = 'alternate';
+    link.hreflang = alternate.languageTag;
+    link.href = alternate.href;
+    root.head.append(link);
+  }
+  // Remove stale Learn Article/CollectionPage claims when leaving a guide.
+  for (const script of root.querySelectorAll('script[type="application/ld+json"]')) {
+    const data = JSON.parse(script.textContent ?? '{}');
+    if (
+      metadata.structuredData ||
+      data['@graph']?.some(
+        /** @param {{'@type'?: string}} entry */ (entry) =>
+          ['Article', 'CollectionPage'].includes(entry['@type'] ?? ''),
+      )
+    )
+      script.remove();
+  }
+  if (metadata.structuredData) {
+    const script = root.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(metadata.structuredData);
+    root.head.append(script);
+  }
 }
 
 /** @param {Document} root @param {boolean} indexable */

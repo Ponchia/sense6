@@ -25,9 +25,10 @@ const PLATE_EIGHT = [
  *   localeHref: (route: string) => string,
  *   m: (id: import('./i18n/message-ids.js').MessageId) => string,
  *   t: (source: string, values?: Record<string, string | number>) => string,
+ *   learnInfo?: { content: any, ui: Record<string,string> } | null,
  * }} context
  */
-export function galleryMarkup({ exams, locale, localeHref, m, t }) {
+export function galleryMarkup({ exams, locale, localeHref, m, t, learnInfo = null }) {
   return `
     <section class="gallery-hero ui-container ui-container--wide" data-sense6-view="gallery" data-sense6-locale="${locale}">
       <div class="gallery-hero__copy">
@@ -116,7 +117,9 @@ export function galleryMarkup({ exams, locale, localeHref, m, t }) {
       </div>
       <a class="ui-link gallery-learn__all" data-sense6-route="learn" href="/en/learn/">Browse the Learn section →</a>
     </section>`
-        : ''
+        : learnInfo
+          ? localizedLearnGallery(locale, learnInfo)
+          : ''
     }
 
     ${
@@ -128,6 +131,38 @@ export function galleryMarkup({ exams, locale, localeHref, m, t }) {
         : ''
     }
   `;
+}
+
+/**
+ * A localized Learn preview exists only when its complete article catalog has
+ * passed publication checks. EN retains the established first-screen cards.
+ */
+function localizedLearnGallery(locale, { content, ui }) {
+  const esc = (value) =>
+    String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;');
+  const topics = Object.entries(content.articles)
+    .slice(0, 3)
+    .map(
+      ([route, article]) => `<a data-sense6-route="${route}" href="/${locale}/${route}/">
+          <span class="ui-eyebrow">${esc(article.eyebrow)}</span>
+          <strong>${esc(article.title)}</strong>
+          <span class="gallery-learn__arrow" aria-hidden="true">→</span>
+        </a>`,
+    )
+    .join('');
+  return `<section class="gallery-learn ui-container ui-container--wide" aria-labelledby="gallery-learn-heading">
+    <header class="gallery-heading"><div>
+      <p class="ui-eyebrow">${esc(ui.Learn)}</p>
+      <h2 id="gallery-learn-heading">${esc(content.overview.title)}</h2>
+    </div><p>${esc(content.overview.description)}</p></header>
+    <div class="gallery-learn__links">${topics}</div>
+    <a class="ui-link gallery-learn__all" data-sense6-route="learn" href="/${locale}/learn/">
+      ${esc(ui.Learn)} →</a>
+  </section>`;
 }
 
 function liveCard(meta, localeHref, m, t) {

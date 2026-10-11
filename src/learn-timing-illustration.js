@@ -1,3 +1,4 @@
+import englishUI from './learn-locales/en-ui.json' with { type: 'json' };
 /**
  * A deliberately hypothetical timing pipeline, never a calibration of Sense6
  * or a correction to a participant's reaction-time result.
@@ -23,37 +24,37 @@ export function illustrativeInterval(displayDelay, inputDelay) {
 }
 
 /** Static, indexable and useful even without JavaScript. */
-export function timingIllustrationMarkup() {
+export function timingIllustrationMarkup(ui = englishUI) {
   return `<section class="learn-timing" data-learn-timing aria-labelledby="learn-timing-title">
     <header class="learn-timing__intro">
-      <p class="ui-eyebrow">Interactive explanation · hypothetical values</p>
-      <h2 id="learn-timing-title">What can be hiding inside a browser reaction time?</h2>
-      <p>Imagine a person who responds in the same <strong>220 ms</strong> each time. Move the illustrative display and input delays to see how a browser-observed interval could differ even though that person's response stays unchanged.</p>
+      <p class="ui-eyebrow">${escapeUI(ui['Interactive explanation \u00b7 hypothetical values'])}</p>
+      <h2 id="learn-timing-title">${escapeUI(ui['What can be hiding inside a browser reaction time?'])}</h2>
+      <p>${escapeUI(ui['Imagine a person who responds in the same'])} <strong>220 ms</strong> ${escapeUI(ui["each time. Move the illustrative display and input delays to see how a browser-observed interval could differ even though that person's response stays unchanged."])}</p>
     </header>
     <div class="learn-timing__grid">
       <div class="learn-timing__inputs">
-        <div class="learn-timing__fixed"><span>Fictional response</span><strong>220 ms</strong></div>
+        <div class="learn-timing__fixed"><span>${escapeUI(ui['Fictional response'])}</span><strong>220 ms</strong></div>
         <div class="learn-timing__control">
-          <div class="learn-timing__label"><label for="learn-display-delay">Hypothetical display delay</label><output for="learn-display-delay" data-timing-display-output>16 ms</output></div>
+          <div class="learn-timing__label"><label for="learn-display-delay">${escapeUI(ui['Hypothetical display delay'])}</label><output for="learn-display-delay" data-timing-display-output>16 ms</output></div>
           <input id="learn-display-delay" type="range" min="0" max="50" step="1" value="16" data-timing-display disabled>
-          <p>Time between asking the browser to show a stimulus and the display actually showing it.</p>
+          <p>${escapeUI(ui['Time between asking the browser to show a stimulus and the display actually showing it.'])}</p>
         </div>
         <div class="learn-timing__control">
-          <div class="learn-timing__label"><label for="learn-input-delay">Hypothetical input delay</label><output for="learn-input-delay" data-timing-input-output>12 ms</output></div>
+          <div class="learn-timing__label"><label for="learn-input-delay">${escapeUI(ui['Hypothetical input delay'])}</label><output for="learn-input-delay" data-timing-input-output>12 ms</output></div>
           <input id="learn-input-delay" type="range" min="0" max="50" step="1" value="12" data-timing-input disabled>
-          <p>Time between an action and its arrival at the browser event handler.</p>
+          <p>${escapeUI(ui['Time between an action and its arrival at the browser event handler.'])}</p>
         </div>
       </div>
       <figure class="learn-timing__result">
-        <p class="ui-eyebrow">Illustrative interval</p>
+        <p class="ui-eyebrow">${escapeUI(ui['Illustrative interval'])}</p>
         <output class="learn-timing__total" data-timing-total aria-live="polite" aria-atomic="true">248 ms</output>
-        <meter min="0" max="320" value="248" data-timing-meter aria-label="Illustrative interval out of 320 milliseconds">248 of 320 milliseconds</meter>
+        <meter min="0" max="320" value="248" data-timing-meter aria-label="${escapeUI(ui['Illustrative interval out of 320 milliseconds'])}">${escapeUI(ui['248 of 320 milliseconds'])}</meter>
         <dl>
-          <div><dt>Fictional response</dt><dd>220 ms</dd></div>
-          <div><dt>Display contribution</dt><dd data-timing-display-detail>16 ms</dd></div>
-          <div><dt>Input contribution</dt><dd data-timing-input-detail>12 ms</dd></div>
+          <div><dt>${escapeUI(ui['Fictional response'])}</dt><dd>220 ms</dd></div>
+          <div><dt>${escapeUI(ui['Display contribution'])}</dt><dd data-timing-display-detail>16 ms</dd></div>
+          <div><dt>${escapeUI(ui['Input contribution'])}</dt><dd data-timing-input-detail>12 ms</dd></div>
         </dl>
-        <figcaption>This is an arithmetic teaching example, <strong>not a latency measurement, calibration or correction formula</strong>. Browser scheduling, timestamps, display refresh and hardware processing vary in real life, sometimes differently from trial to trial.</figcaption>
+        <figcaption>${escapeUI(ui['This is an arithmetic teaching example,'])} <strong>${escapeUI(ui['not a latency measurement, calibration or correction formula'])}</strong>${escapeUI(ui['. Browser scheduling, timestamps, display refresh and hardware processing vary in real life, sometimes differently from trial to trial.'])}</figcaption>
       </figure>
     </div>
   </section>`;
@@ -97,4 +98,13 @@ export function activateTimingIllustration(root) {
     display.removeEventListener('input', update);
     input.removeEventListener('input', update);
   };
+}
+
+function escapeUI(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
 }

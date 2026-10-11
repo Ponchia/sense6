@@ -12,6 +12,8 @@ import { galleryMarkup } from '../src/gallery-markup.js';
 import { messageSource } from '../src/i18n/message-ids.js';
 import { interpolateMessage } from '../src/i18n.js';
 import { journalCopy, prepareJournalCopy } from '../src/journal-copy.js';
+import { learnCatalog, prepareLearnLocale } from '../src/learn-catalog.js';
+import { isLearnPublished, LEARN_PUBLISHED_LOCALES } from '../src/learn-publication.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
 import { preparePrivacyCopy, privacyCopy, privacyMarkup } from '../src/privacy.js';
 import { ROOT_GATEWAY, rootGatewayMarkup } from '../src/root-gateway.js';
@@ -36,6 +38,8 @@ const examById = new Map(EXAMS.map((definition) => [definition.id, definition]))
 const catalogs = new Map(
   await Promise.all(LOCALES.map(async ({ code }) => [code, await loadMessages(code)])),
 );
+
+await Promise.all(LEARN_PUBLISHED_LOCALES.map(prepareLearnLocale));
 
 await writePage('index.html', {
   locale: 'en',
@@ -80,6 +84,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
       localeHref: (route) => `/${locale}/${route ? `${route}/` : ''}`,
       m: (id) => translate(messageSource(id)),
       t: translate,
+      learnInfo: locale !== 'en' && isLearnPublished(locale) ? learnCatalog(locale) : null,
     }),
     stylesheet: routeStyles.get('gallery'),
     alternates: galleryAlternates(),
@@ -181,7 +186,7 @@ console.log(`Public-content freshness gate · ${await verifyContentFingerprints(
 async function writePage(relativePath, page) {
   const json = JSON.stringify(page.structuredData);
   const metadata = createRouteMetadata(page);
-  recordContentFingerprint({ ...metadata, main: page.main });
+  recordContentFingerprint({ ...metadata, main: page.main, lastModified: page.lastModified });
   let html = localizeShell(template, page.locale);
   const routeFiles =
     page.preloadModules === false ? [] : await activeRouteModuleFiles(page.locale, page.route);
@@ -305,7 +310,14 @@ function localizeShell(html, locale) {
     );
   }
   localized = replaceChecked(localized, 'href="/en/"', `href="/${locale}/"`, 'gallery links', 2);
-  if (locale !== 'en') {
+  if (locale !== 'en' && isLearnPublished(locale)) {
+    localized = replaceChecked(
+      localized,
+      'data-sense6-english-only href="/en/learn/" lang="en">Learn</a>',
+      `data-sense6-english-only href="/${locale}/learn/" lang="${locale}">${escapeHtml(learnCatalog(locale).ui.Learn)}</a>`,
+      'Published Learn navigation',
+    );
+  } else if (locale !== 'en') {
     localized = replaceChecked(
       localized,
       'data-sense6-english-only href="/en/learn/"',

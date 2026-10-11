@@ -58,6 +58,10 @@ export async function activeRouteModuleFiles(locale, route, dist = new URL('../d
   if (!manifest[routeEntry]) throw new Error(`Vite manifest has no ${routeEntry} chunk`);
 
   const roots = [routeEntry];
+  if (LEARN_ROUTES.includes(route)) {
+    roots.push('src/learn-seo.js');
+    if (locale !== 'en') roots.push(`src/learn-locales/${locale}.json`);
+  }
   if (SUPPLEMENTAL_LOCALES.has(locale) && ['journal', 'privacy'].includes(route)) {
     roots.push(`src/locales/supplemental/${locale}.js`);
   }

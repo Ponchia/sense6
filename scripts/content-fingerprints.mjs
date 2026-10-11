@@ -30,14 +30,14 @@ const recorded = new Map();
 /**
  * Fingerprint one generated route. Routes without a published content date are
  * ignored rather than silently gated against a date that does not exist.
- * @param {{ path: string, title: string, description: string, main: string }} page
+ * @param {{ path: string, title: string, description: string, main: string, lastModified?: string }} page
  */
-export function recordContentFingerprint({ path, title, description, main }) {
+export function recordContentFingerprint({ path, title, description, main, lastModified }) {
   const key = contentDateKey(path);
   if (!key) return;
   recorded.set(path, {
     key,
-    date: contentDate(key),
+    date: lastModified ?? contentDate(key),
     hash: createHash('sha256').update(`${title}\n${description}\n${main}`).digest('hex').slice(0, 32),
   });
 }
