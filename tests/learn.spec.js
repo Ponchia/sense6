@@ -586,3 +586,31 @@ test('Learn navigation updates Article identity and retires claims when returnin
     );
   expect(claims).toEqual([]);
 });
+
+test('social preview language stays aligned with client-side Learn navigation @pr-smoke', async ({
+  page,
+}) => {
+  await page.goto('/en/learn/');
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'learn');
+  const previewLocale = page.locator('meta[property="og:locale"]');
+  await expect(previewLocale).toHaveCount(1);
+  await expect(previewLocale).toHaveAttribute('content', 'en_US');
+
+  for (const [code, htmlLanguage, socialLanguage] of [
+    ['it', 'it', 'it_IT'],
+    ['pt-br', 'pt-BR', 'pt_BR'],
+    ['ar', 'ar', 'ar_AR'],
+    ['zh-hans', 'zh-Hans', 'zh_CN'],
+    ['en', 'en', 'en_US'],
+  ]) {
+    await page.locator('[data-locale-select]').selectOption(code);
+    await expect(page).toHaveURL(new RegExp(`/${code}/learn/$`));
+    await expect(page.locator('html')).toHaveAttribute('lang', htmlLanguage);
+    await expect(previewLocale).toHaveAttribute('content', socialLanguage);
+    await expect(previewLocale).toHaveCount(1);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      `https://sense6.net/${code}/learn/`,
+    );
+  }
+});

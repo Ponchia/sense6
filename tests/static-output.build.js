@@ -24,6 +24,7 @@ import {
   learnAlternates,
   learnPublicationDate,
 } from '../src/learn-publication.js';
+import { openGraphLocale } from '../src/locale-metadata.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
 import { LEARN_ROUTES, NON_INDEXABLE_ROUTES, routePath, UTILITY_ROUTES } from '../src/routes.js';
 import { ENGLISH_EXPLAINER_COPY, STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
@@ -238,6 +239,10 @@ test('every canonical route has substantive, localized raw HTML', async () => {
       path,
     );
     assert.match(html, /<meta name="twitter:card" content="summary_large_image"\s*\/?>/, path);
+    const ogLocales = [...html.matchAll(/<meta property="og:locale" content="([^"]+)"\s*\/?>/g)];
+    assert.equal(ogLocales.length, 1, `${path} must have exactly one Open Graph locale`);
+    assert.equal(ogLocales[0]?.[1], openGraphLocale(locale), `${path} social preview language`);
+
     assert.match(
       html,
       new RegExp(`<link rel="canonical" href="https://sense6\\.net${escapeRegex(path)}">`),

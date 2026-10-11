@@ -1,5 +1,5 @@
 import { learnAlternates } from './learn-publication.js';
-import { LOCALES } from './locale-metadata.js';
+import { LOCALES, openGraphLocale } from './locale-metadata.js';
 // Stable Learn identities shared by all complete published locale catalogs.
 export const LEARN_ROUTES = Object.freeze([
   'learn',
@@ -62,6 +62,7 @@ export function applyRouteMetadata(metadata, root = document) {
   setMeta(root, 'property', 'og:title', metadata.title);
   setMeta(root, 'property', 'og:description', metadata.description);
   setMeta(root, 'property', 'og:url', metadata.canonical);
+  setMeta(root, 'property', 'og:locale', openGraphLocale(metadata.locale));
   setMeta(root, 'property', 'og:image', metadata.socialImage);
   setMeta(root, 'property', 'og:image:alt', metadata.socialImageAlt);
   setMeta(root, 'name', 'twitter:title', metadata.title);
