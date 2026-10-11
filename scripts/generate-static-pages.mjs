@@ -14,6 +14,7 @@ import { interpolateMessage } from '../src/i18n.js';
 import { journalCopy, prepareJournalCopy } from '../src/journal-copy.js';
 import { learnCatalog, prepareLearnLocale } from '../src/learn-catalog.js';
 import { isLearnPublished, LEARN_PUBLISHED_LOCALES } from '../src/learn-publication.js';
+import { openGraphLocale } from '../src/locale-metadata.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
 import { preparePrivacyCopy, privacyCopy, privacyMarkup } from '../src/privacy.js';
 import { ROOT_GATEWAY, rootGatewayMarkup } from '../src/root-gateway.js';
@@ -211,6 +212,7 @@ async function writePage(relativePath, page) {
     LEARN_ROUTES.includes(page.route) && page.route !== 'learn' ? 'article' : 'website',
   );
   html = replaceMeta(html, 'property', 'og:url', metadata.canonical);
+  html = replaceMeta(html, 'property', 'og:locale', openGraphLocale(page.locale));
   html = replaceMeta(html, 'property', 'og:image', metadata.socialImage);
   html = replaceMeta(html, 'property', 'og:image:alt', metadata.socialImageAlt);
   html = replaceMeta(html, 'name', 'twitter:title', metadata.title);
