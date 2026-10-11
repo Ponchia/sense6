@@ -182,7 +182,9 @@ jobs:
           name: visual-regression-playwright-report
           path: playwright-report/site-audit
           if-no-files-found: ignore
-          retention-days: 14
+          # Keep a week of reviewable base/candidate/diff evidence; the
+          # comparison itself and release gate remain mandatory.
+          retention-days: 7
 
   release:
     needs: [browser, lighthouse, visual]
