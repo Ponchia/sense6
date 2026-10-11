@@ -133,16 +133,25 @@ async function compareScreenshot(page, name) {
     );
   }
 
+  // Preserve only the three distinct images a reviewer needs. Playwright's
+  // expected repeats the baseline and actual repeats the candidate image.
+  // Attaching five images per approved difference consumed shared artifact
+  // storage without adding evidence. Missing diff images now fail closed.
+  const diffPath = testInfo.outputPath(name.replace(/\.png$/, '-diff.png'));
+  const diff = await readFile(diffPath).catch(() => null);
+  if (!diff) {
+    throw new Error(
+      `${snapshotName} was approved but no pixel-diff artifact exists at ${diffPath}. ` +
+        'The approved change cannot be reviewed without the difference image.',
+    );
+  }
+
   await testInfo.attach(`${snapshotName} (base revision)`, { body: baseline, contentType: 'image/png' });
   await testInfo.attach(`${snapshotName} (candidate)`, {
     body: await page.screenshot(screenshotOptions()),
     contentType: 'image/png',
   });
-  for (const suffix of ['diff', 'actual', 'expected']) {
-    const artifact = testInfo.outputPath(name.replace(/\.png$/, `-${suffix}.png`));
-    const body = await readFile(artifact).catch(() => null);
-    if (body) await testInfo.attach(`${snapshotName} (${suffix})`, { body, contentType: 'image/png' });
-  }
+  await testInfo.attach(`${snapshotName} (diff)`, { body: diff, contentType: 'image/png' });
 
   testInfo.annotations.push({
     type: 'approved-visual-change',
