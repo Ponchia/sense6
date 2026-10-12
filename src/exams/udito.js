@@ -21,16 +21,16 @@ import { captureDisplayPassport, saveJournalRun } from '../lib/journal.js';
 import { createExamLifecycle, isCurrentMount } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
 import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
-import { createResultStore, isRecord } from '../lib/storage.js';
+import { createResultStore } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 import { protocolPassport } from './protocols.js';
 import { relatedGuideResultLink } from './related-guide.js';
+import { isUditoLatestResult } from './results/udito.js';
 import { applyScopeSelection, scopeOptionMarkup } from './views/scope-picker.js';
 import { UDITO_INSTRUMENTS, uditoIntroMarkup } from './views/udito-intro.js';
 
 const STORAGE_KEY = 'sense6:udito:last';
-const SETUP_QUALITIES = new Set(['Setup checks coherent', 'Interpret with caution']);
-const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isLatestResult });
+const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isUditoLatestResult });
 const MOUNT_OWNER = Symbol('udito');
 const TRIAL_PHASES = Object.freeze({
   idle: 'idle',
@@ -104,6 +104,7 @@ function renderIntro() {
   stopPlayback();
   state.trialPhase = TRIAL_PHASES.idle;
   state.session = null;
+  state.activeTrial = null;
   state.referencePlayed = false;
   state.anchorsPlayed = false;
   document.body.classList.remove('lab-mode', 'au-running');
@@ -116,6 +117,8 @@ function renderSetup() {
   state.lifecycle.setActive(false);
   stopPlayback();
   state.trialPhase = TRIAL_PHASES.idle;
+  state.session = null;
+  state.activeTrial = null;
   state.referencePlayed = false;
   state.anchorsPlayed = false;
   document.body.classList.add('lab-mode');
@@ -222,6 +225,8 @@ async function playReference() {
 function invalidateReference(message = '') {
   state.referencePlayed = false;
   state.anchorsPlayed = false;
+  const reference = state.app.querySelector('[data-action="au-reference"]');
+  if (reference?.disabled) reference.textContent = t('Play reference again');
   const anchors = state.app.querySelector('[data-au-anchors-confirmed]');
   if (anchors) {
     anchors.checked = false;
@@ -847,6 +852,7 @@ function handleAudioStateChange(contextState) {
 function handleOutputDeviceChange() {
   if (!state) return;
   if (state.app.querySelector('[data-au-reference-status]')) {
+    stopPlayback();
     invalidateReference(
       'The available audio outputs changed. Confirm the route and play the maximum-level reference again.',
     );
@@ -864,17 +870,18 @@ function handleOutputDeviceChange() {
 
 async function copyResults() {
   const mountState = state;
-  if (!mountState?.session?.result) return;
-  const { headphones, range, pitch, usable, setupQuality, cautionReasons } = mountState.session.result;
+  const session = mountState?.session;
+  if (!mountState || !session?.result) return;
+  const { headphones, range, pitch, usable, setupQuality, cautionReasons } = session.result;
   const text = [
     t('Udito — device-relative listening observations'),
     t('Run quality: {quality}', { quality: t(setupQuality) }),
     t('Setup: {device}; {connection}; {sampleRate} Hz audio context', {
-      device: t(deviceLabel(state.session.device)),
-      connection: t(connectionLabel(state.session.connection)),
-      sampleRate: formatNumber(state.session.sampleRate),
+      device: t(deviceLabel(session.device)),
+      connection: t(connectionLabel(session.connection)),
+      sampleRate: formatNumber(session.sampleRate),
     }),
-    `Volume: ${state.session.volumeConsistent ? 'self-reported unchanged' : 'changed or unsure'} during the run; the browser could not verify it.`,
+    `Volume: ${session.volumeConsistent ? 'self-reported unchanged' : 'changed or unsure'} during the run; the browser could not verify it.`,
     t('Headphone confidence: {correct}/{trials} ({confidence})', {
       correct: headphones.correct,
       trials: headphones.trials,
@@ -887,7 +894,7 @@ async function copyResults() {
       trials: range.trials,
     }),
     t('Portata control accuracy: {accuracy}', { accuracy: formatControlAccuracy(range) }),
-    ...(state.session.scope === 'standard' ? pitch : []).map((item) =>
+    ...(session.scope === 'standard' ? pitch : []).map((item) =>
       t('Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials', {
         anchor: formatNumber(item.anchorHz),
         step: formatPitch(pitch, item.anchorHz),
@@ -896,7 +903,7 @@ async function copyResults() {
         trials: item.trials,
       }),
     ),
-    t('Playback interruptions: {count}', { count: state.session.interruptions }),
+    t('Playback interruptions: {count}', { count: session.interruptions }),
     ...(usable
       ? []
       : [
@@ -913,10 +920,10 @@ async function copyResults() {
       route: 'udito',
       locale: mountState.locale,
     });
-    if (!isCurrentMount(state, mountState)) return;
+    if (!isCurrentMount(state, mountState) || mountState.session !== session) return;
     if (outcome === 'copied') toast(t('Result summary copied.'));
   } catch {
-    if (!isCurrentMount(state, mountState)) return;
+    if (!isCurrentMount(state, mountState) || mountState.session !== session) return;
     toast(t('Copy was unavailable in this browser.'));
   }
 }
@@ -1023,6 +1030,7 @@ function wireEvents(signal) {
     (event) => {
       if (event.target.matches('[data-au-consent], [data-au-anchors-confirmed]')) updateSetupGate();
       if (event.target.matches('[data-au-device], [data-au-connection]')) {
+        stopPlayback();
         invalidateReference(
           'The listening setup changed. Play the maximum-level reference again before beginning.',
         );
@@ -1148,17 +1156,4 @@ function saveJournalResult(result) {
 
 function loadLast() {
   return RESULT_STORE.load();
-}
-
-function isLatestResult(value) {
-  return (
-    isRecord(value) &&
-    SETUP_QUALITIES.has(value.setupQuality) &&
-    typeof value.sampleRate === 'number' &&
-    Number.isFinite(value.sampleRate) &&
-    value.sampleRate > 0 &&
-    typeof value.recordedAt === 'number' &&
-    Number.isFinite(value.recordedAt) &&
-    value.recordedAt >= 0
-  );
 }

@@ -14,15 +14,16 @@ import {
   summarizeRiflessi,
 } from '../lib/reflexes.js';
 import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
-import { createResultStore, isRecord } from '../lib/storage.js';
+import { createResultStore } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 import { protocolPassport } from './protocols.js';
 import { relatedGuideResultLink } from './related-guide.js';
+import { isRiflessiLatestResult } from './results/riflessi.js';
 import { RIFLESSI_INSTRUMENTS, riflessiIntroMarkup } from './views/riflessi-intro.js';
 import { applyScopeSelection, scopeOptionMarkup } from './views/scope-picker.js';
 
 const STORAGE_KEY = 'sense6:riflessi:last';
-const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isLatestRiflessiResult });
+const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isRiflessiLatestResult });
 const MOUNT_OWNER = Symbol('riflessi');
 // A press only counts while the trial itself is in one of these phases. The
 // `rx-running` body class is presentation and must never gate measurement.
@@ -84,6 +85,8 @@ function renderIntro() {
 function renderSetup() {
   state.lifecycle.setActive(false);
   stopClocks();
+  state.session = null;
+  state.activeTrial = null;
   document.body.classList.add('lab-mode');
   document.body.classList.remove('rx-running');
   document.title = t('Prepare your response setup — Riflessi | Sense6');
@@ -840,20 +843,23 @@ function timingHealth(diagnostics) {
 
 async function copyResults() {
   const mountState = state;
-  if (!mountState?.session?.result) return;
-  const result = mountState.session.result;
-  const timing = timingHealth(mountState.session.diagnostics);
-  const includesChoice = mountState.session.scope !== 'signal';
-  const includesStability = mountState.session.scope === 'complete';
+  const session = mountState?.session;
+  if (!session?.result) return;
+  const result = session.result;
+  const ownsResult = () =>
+    isCurrentMount(state, mountState) && mountState.session === session && session.result === result;
+  const timing = timingHealth(session.diagnostics);
+  const includesChoice = session.scope !== 'signal';
+  const includesStability = session.scope === 'complete';
   const lines = [
     t('Riflessi — device-relative response observations'),
     t('Input: {input}', {
-      input: t(mountState.session.inputMode === 'pointer' ? 'touch / pointer' : 'keyboard'),
+      input: t(session.inputMode === 'pointer' ? 'touch / pointer' : 'keyboard'),
     }),
     t('Run quality: {quality}', { quality: t(result.usable ? 'Usable run' : 'Limited run') }),
     t('Timing: {timing}; interruptions: {interruptions}', {
       timing: t(timing.label),
-      interruptions: mountState.session.diagnostics.interruptions,
+      interruptions: session.diagnostics.interruptions,
     }),
     t('Signal median: {value} ms', { value: metric(result.signal.medianMs) }),
   ];
@@ -896,9 +902,9 @@ async function copyResults() {
       route: 'riflessi',
       locale: mountState.locale,
     });
-    if (outcome === 'copied' && isCurrentMount(state, mountState)) toast(t('Result summary copied.'));
+    if (outcome === 'copied' && ownsResult()) toast(t('Result summary copied.'));
   } catch {
-    if (isCurrentMount(state, mountState)) toast(t('Copy was unavailable in this browser.'));
+    if (ownsResult()) toast(t('Copy was unavailable in this browser.'));
   }
 }
 
@@ -1108,37 +1114,4 @@ function saveJournalResult(result, timing) {
 
 function loadLast() {
   return RESULT_STORE.load();
-}
-
-/** @param {unknown} value */
-function isLatestRiflessiResult(value) {
-  if (
-    !isRecord(value) ||
-    !['keyboard', 'pointer'].includes(value.inputMode) ||
-    typeof value.timing !== 'string' ||
-    value.timing.length === 0 ||
-    !Number.isFinite(value.recordedAt) ||
-    typeof value.usable !== 'boolean'
-  ) {
-    return false;
-  }
-  if (!isCommonResultMetric(value.signal) || !isCommonResultMetric(value.choice)) return false;
-  if (!isCommonResultMetric(value.stability) || !isRecord(value.events)) return false;
-  return ['falseStarts', 'anticipations', 'misses', 'wrongChoices'].every((field) =>
-    isNonNegativeInteger(value.events[field]),
-  );
-}
-
-/** @param {unknown} value */
-function isCommonResultMetric(value) {
-  return (
-    isRecord(value) &&
-    (value.medianMs === null || Number.isFinite(value.medianMs)) &&
-    isNonNegativeInteger(value.valid)
-  );
-}
-
-/** @param {unknown} value */
-function isNonNegativeInteger(value) {
-  return Number.isInteger(value) && Number(value) >= 0;
 }

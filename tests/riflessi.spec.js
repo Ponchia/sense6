@@ -154,6 +154,60 @@ test('a settled Riflessi share cannot publish feedback after its mount is dispos
   await expect(page.locator('.ui-toast')).toHaveCount(0);
 });
 
+for (const transport of ['share', 'copy']) {
+  test(`a pending Riflessi ${transport} cannot publish feedback after repeat setup @pr-smoke`, async ({
+    page,
+  }) => {
+    await installQuickRiflessi(page);
+    await page.addInitScript((selectedTransport) => {
+      const pending = () =>
+        new Promise((resolve, reject) => {
+          window.__riflessiResultPending = true;
+          window.__settleRiflessiResult = () => {
+            if (selectedTransport === 'share') reject(new Error('settled after repeat setup'));
+            else resolve();
+          };
+        });
+      Object.defineProperty(navigator, 'share', {
+        configurable: true,
+        value: selectedTransport === 'share' ? pending : undefined,
+      });
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value: { writeText: pending },
+      });
+    }, transport);
+    await page.goto('/en/riflessi/');
+    await prepareRiflessi(page, 'keyboard', 'signal');
+    await page.getByRole('button', { name: /Start practice/i }).click();
+    await respondWithKey(page, 'Space');
+    await page.getByRole('button', { name: /Begin measured block/i }).click();
+    const total = Number(
+      await page.locator('[data-rx-count]').evaluate((element) => element.textContent.split('/')[1]),
+    );
+    for (let trial = 0; trial < total; trial += 1) await respondWithKey(page, 'Space');
+
+    await page
+      .getByRole('button', { name: transport === 'share' ? /Share result/i : /Copy result summary/i })
+      .click();
+    await expect.poll(() => page.evaluate(() => window.__riflessiResultPending)).toBe(true);
+    await page.getByRole('button', { name: /Repeat this scope independently/i }).click();
+    await expect(page.getByRole('heading', { name: 'Choose one response path.' })).toBeVisible();
+    await expect(page.locator('[data-rx-consent]')).not.toBeChecked();
+
+    await page.evaluate(async () => {
+      window.__settleRiflessiResult();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+    await expect(page.locator('.ui-toast')).toHaveCount(0);
+    await expect(page.locator('[data-action="rx-start"]')).toBeDisabled();
+    await expect(page.locator('[data-rx-scope-picker] [data-scope="signal"]')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+}
+
 test('Riflessi accepts legacy result shapes and rejects malformed latest-result storage', async ({
   page,
 }) => {
@@ -179,9 +233,27 @@ test('Riflessi accepts legacy result shapes and rejects malformed latest-result 
     )
     .toBe('sense6-result');
 
+  const currentResult = {
+    ...legacyResult,
+    signal: { medianMs: 215, withinRunSpreadMs: 10, valid: 20, scheduled: 22 },
+    choice: {
+      medianMs: 310,
+      conditionalAccuracyPercent: 94,
+      scheduledAccuracyPercent: 94,
+      blockDifferenceMs: 95,
+      valid: 30,
+      attempts: 32,
+      scheduled: 32,
+    },
+    events: { ...legacyResult.events, catchesPassed: 2, catchesScheduled: 2 },
+    qualityReasons: [],
+  };
   for (const malformed of [
     { ...legacyResult, inputMode: 'gamepad' },
     { ...legacyResult, signal: { medianMs: 'fast', valid: 20 } },
+    { ...currentResult, signal: { ...currentResult.signal, withinRunSpreadMs: 'unknown' } },
+    { ...currentResult, recordedAt: -1 },
+    { ...currentResult, choice: { ...currentResult.choice, scheduled: 0 } },
   ]) {
     await page.evaluate((stored) => {
       localStorage.setItem('sense6:riflessi:last', JSON.stringify(stored));
