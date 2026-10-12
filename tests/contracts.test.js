@@ -64,6 +64,15 @@ test('Acutezza latest-result validation is strict and migrates the legacy count-
     }),
     true,
   );
+  for (const recordedAt of [1, 8_640_000_000_000_000]) {
+    assert.equal(isAcutezzaLatestResult({ ...migrated, recordedAt }), true);
+    assert.equal(isLegacyAcutezzaLatestResult({ ...legacy, recordedAt }), true);
+  }
+  for (const recordedAt of [0, -1, 1.5, NaN, Infinity, 8_640_000_000_000_001, Number.MAX_SAFE_INTEGER + 1]) {
+    assert.equal(isAcutezzaLatestResult({ ...migrated, recordedAt }), false);
+    assert.equal(isLegacyAcutezzaLatestResult({ ...legacy, recordedAt }), false);
+    assert.equal(migrateLegacyAcutezzaLatestResult({ ...legacy, recordedAt }), null);
+  }
   for (const malformed of [
     {},
     { setupQuality: 'anything', recordedAt: 1, completion: { variant: 'single-eye', eyes: ['left'] } },

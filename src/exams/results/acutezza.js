@@ -12,8 +12,9 @@ export function isAcutezzaLatestResult(value) {
     hasExactKeys(value, ['completion', 'recordedAt', 'setupQuality']) &&
     validSetupQuality(value.setupQuality) &&
     typeof value.recordedAt === 'number' &&
-    Number.isInteger(value.recordedAt) &&
+    Number.isSafeInteger(value.recordedAt) &&
     value.recordedAt > 0 &&
+    value.recordedAt <= 8_640_000_000_000_000 &&
     validCompletion(value.completion)
   );
 }
@@ -25,8 +26,9 @@ export function isLegacyAcutezzaLatestResult(value) {
     hasExactKeys(value, ['eyes', 'recordedAt', 'setupQuality']) &&
     validSetupQuality(value.setupQuality) &&
     typeof value.recordedAt === 'number' &&
-    Number.isInteger(value.recordedAt) &&
+    Number.isSafeInteger(value.recordedAt) &&
     value.recordedAt > 0 &&
+    value.recordedAt <= 8_640_000_000_000_000 &&
     typeof value.eyes === 'number' &&
     Number.isInteger(value.eyes) &&
     (value.eyes === 1 || value.eyes === 2)
