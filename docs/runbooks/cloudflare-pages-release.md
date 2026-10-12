@@ -189,6 +189,46 @@ The current direct runner replaces an older Unlighthouse dependency chain
 containing unresolved *development-only* advisories. It doesn't change the
 browser experiments, the users' local results, or anonymous product metrics.
 
+## Optional IndexNow change notifications (Bing and other participating engines)
+
+IndexNow is separate from the verified Cloudflare deployment and does **not**
+affect its checksums, production gate, or user analytics. A single ownership
+proof text file is copied from `public/<key>.txt` to the site root. The key is a
+**public host-ownership proof**, not a payment or Cloudflare secret. Do not
+place visitor data or measurements in it.
+
+After a successful deployment, record the **previous successful live commit**
+and the **new successful live commit**, both exact 40-character SHAs. Run the
+operator CLI against a checkout containing both revisions:
+
+```sh
+npm run indexnow:changed -- --before <old-verified-SHA> --after <new-verified-SHA>
+```
+
+This is an **offline dry-run**: it compares content hashes, not blanket
+sitemap `lastmod` dates. It lists only added/changed *currently indexable*
+canonical URLs, excluding private journal/privacy routes and old unchanged
+pages. An initial key-file rollout is not permission to send the historical
+sitemap. Wait for a **subsequent** verified release with the same key already
+present in both commits.
+
+When the listed URLs are appropriate and the newly deployed production has
+passed its smoke checks, the owner can explicitly submit:
+
+```sh
+npm run indexnow:changed -- --before <old-verified-SHA> --after <new-verified-SHA> --submit
+```
+
+The CLI checks the published `build-meta.json` commit, public key response,
+correct canonical HTML and indexability **before** contacting the fixed
+IndexNow endpoint. An HTTP 200 means URLs were received; HTTP 202 means key
+validation is pending. Neither guarantees a crawl, an index entry, a search
+snippet, or a ranking change. A failed request stops without automatic retries;
+use Bing Webmaster Tools to inspect receipt/coverage later. Removed URLs
+require a separate deliberate deletion procedure, not this update-only tool.
+
+Protocol: [IndexNow official documentation](https://www.indexnow.org/documentation).
+
 ## Verify
 
 - `https://sense6.net/build-meta.json` reports the merged 40-character commit.
