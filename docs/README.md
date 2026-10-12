@@ -14,6 +14,9 @@ decisions or research for operating instructions.
   contracts, methods, localization, journal data, static output, and tests.
 - [Roadmap](roadmap.md) records current product boundaries and the ordered,
   bounded decomposition backlog.
+- [Product readiness](product-readiness.md) provides the consented usability
+  study script, translation review checklist, search-indexing baseline and
+  decision criteria for further feature work.
 - [Cloudflare Pages release](runbooks/cloudflare-pages-release.md) is the
   operational procedure for migrations, preview, production, and rollback.
 - [Learn locale publication](../src/learn-locales/README.md) records translation
