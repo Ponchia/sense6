@@ -116,6 +116,38 @@ publication is currently disabled.
    Pull-request workflows do not receive a production publication path or run
    branch code against a production credential.
 
+
+## Keep Playwright dependencies and CI images in lockstep
+
+The browser, visual, Lighthouse and release jobs run inside digest-pinned
+`mcr.microsoft.com/playwright:vX.Y.Z-noble` images. The installed
+`@playwright/test` and `playwright-core` versions in `package-lock.json`
+**must be exactly X.Y.Z**. A newer npm package with an older image fails
+before it launches Chromium, Firefox or WebKit; it does not indicate a broken
+Sense6 instrument.
+
+Treat Playwright as a dedicated dependency upgrade, not part of a general npm
+Dependabot bundle:
+
+1. Update the npm lockfile and the image *tag and verified manifest digest* in
+   every `.github/workflows/*.yml` job together. Resolve the digest from the
+   official Microsoft registry (the `Docker-Content-Digest` response header for
+   `https://mcr.microsoft.com/v2/playwright/manifests/vX.Y.Z-noble` with an
+   OCI image-index `Accept` header). Do not guess or omit the digest.
+2. Run `node --test tests/audit-wiring.test.js` followed by `npm run check:core`.
+   The audit rejects a mismatched version, a missing digest, or inconsistent
+   browser images. It also checks that every artifact-upload Action use retains
+   a consistent full commit SHA and version annotation without hardcoding a
+   particular patch release.
+3. Run the standard browser, visual and Lighthouse CI gates on the same PR.
+   Do not work around the mismatch by skipping browsers, weakening coverage,
+   or pulling an unpinned runtime image.
+
+The npm Dependabot configuration excludes `@playwright/test` from the general
+non-major group so routine unrelated upgrades remain testable. A standalone
+Playwright PR may initially fail the explicit image-alignment assertion until
+its matching image update is prepared; that failure is intentional.
+
 ## Verify
 
 - `https://sense6.net/build-meta.json` reports the merged 40-character commit.
