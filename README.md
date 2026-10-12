@@ -3,520 +3,157 @@
 <!-- vale on -->
 <!-- vale Vale.Spelling = NO -->
 
-A small collection of experimental browser-based perception tests, made for
-curiosity and fun. Every gallery, exam, About, journal, and privacy route has a
-substantive localized HTML entry page for people, search engines, and
-text-retrieval tools. JavaScript then mounts the selected experiment as a
-progressively enhanced module; results and answers remain local. The service
-stores only anonymous daily activity totals. Sense6 is not validated,
-certified, diagnostic, or intended to become a medical product.
+Browser perception experiments for curiosity: explore colour, response timing,
+listening, and visual sharpness, then keep and compare runs in a private local
+journal. No account is required.
 
-The localized [About page](https://sense6.net/en/about/) explains how the tasks
-work, who maintains them, their privacy boundary, and what each result can and
-cannot describe.
+**[Try Sense6](https://sense6.net/) · [Read the research guides](https://sense6.net/en/learn/) · [Contributor guide](CONTRIBUTING.md)**
 
-The [Learn section](https://sense6.net/en/learn/) is available in English,
-[Italian](https://sense6.net/it/learn/), [Spanish](https://sense6.net/es/learn/),
-[German](https://sense6.net/de/learn/), [French](https://sense6.net/fr/learn/),
-[European Portuguese](https://sense6.net/pt/learn/),
-[Brazilian Portuguese](https://sense6.net/pt-br/learn/),
-[Arabic](https://sense6.net/ar/learn/),
-[Japanese](https://sense6.net/ja/learn/), [Korean](https://sense6.net/ko/learn/),
-[Hindi](https://sense6.net/hi/learn/) and
-[Simplified Chinese](https://sense6.net/zh-hans/learn/).
-It answers research
-questions beyond the experiments: [tetrachromacy and what an RGB screen can
-establish](https://sense6.net/en/tetrachromacy-guide/), [reaction-time
-measurement in browsers](https://sense6.net/en/reaction-time-guide/), and
-[what an online colour-blindness test can tell you](https://sense6.net/en/color-blindness-guide/),
-[what a browser hearing-range observation can mean](https://sense6.net/en/hearing-range-guide/),
-and [why screen-based acuity cannot replace an eye examination](https://sense6.net/en/visual-acuity-guide/).
-Each guide has cited sources, an author/review date and a link to a related
-experiment. Only complete catalogs in the publication manifest enter the sitemap and
-reciprocal language links. Shared previews now identify the active language
-with Open Graph locale metadata without changing canonical search URLs.
-Other locales lead to their existing test gallery,
-not English guides under false translated URLs. These new editions have
-AI-assisted editorial review, not certified or native human review. Research
-informs the guides but does not validate the Sense6 implementations.
+Sense6 is an experimental personal project. Results describe one task on one
+device under one setup. The software is not clinically validated, certified, or
+suitable for medical or occupational decisions, and becoming a medical product
+is outside its purpose.
 
-Live exams:
+## Explore the experiments
 
-- **Tetracromia / Screen Colour Lab** — three fixed-dose colour observations:
-  tile choices, dot-field choices, and hue ordering. It reports no composite
-  score or stable threshold.
-- **Daltonia** — three exploratory, display-relative adaptive colour-direction
-  levels with luminance-noise targets and task controls. It reports no
-  colour-vision classification or cone threshold.
-- **Riflessi** — selectable simple-response, two-choice, and sustained-response
-  tasks. It keeps timing, accuracy, slow-tail, and within-run drift observations
-  separate.
-- **Udito** — selectable device-relative listening tasks for presentation
-  confidence, an upper run boundary, and pitch steps near 500 Hz and 2 kHz. It
-  reports no dB HL, hearing age, diagnosis, or composite score.
-- **Acutezza** — selectable per-eye calibrated sharpness and nominal
-  low-contrast conditions. It reports angular-gap estimates with 90% model
-  intervals, never 20/20, a diagnosis, astigmatism, or a prescription.
+| Experiment | What you explore | What the result describes |
+| --- | --- | --- |
+| [Screen Colour Lab / Tetracromia](https://sense6.net/en/tetracromia/) | Tile choices, dot-field choices, and hue ordering | Three short display-relative observations; no tetrachromacy inference or overall ability score |
+| [Daltonia](https://sense6.net/en/color-blindness/) | Adaptive colour-direction tasks with task controls | Levels reached on that display; no colour-vision classification |
+| [Riflessi](https://sense6.net/en/riflessi/) | Simple response, two-choice response, and sustained response | Separate timing, accuracy, and within-run observations; device delays remain uncalibrated |
+| [Udito](https://sense6.net/en/udito/) | Listening confidence, an upper run boundary, and pitch steps | Device-relative listening observations; no clinical hearing threshold or hearing age |
+| [Acutezza](https://sense6.net/en/acutezza/) | Per-eye angular detail and a nominal low-contrast condition | Setup-dependent estimates and model intervals; no prescription or clinical acuity claim |
 
-The gallery offers a short Riflessi starter at
-`/{locale}/riflessi/?scope=signal`. This link preselects the existing
-approximately two-minute Segnale scope and opens its normal setup; it never
-starts a timed run or bypasses device/input choice or explicit consent.
-The canonical experiment route and other scopes remain available.
+For a short first visit, [Riflessi's signal task](https://sense6.net/en/riflessi/?scope=signal)
+opens its normal preparation flow with the shortest scope selected. It does not
+start a timed run automatically.
 
-Read the [architecture overview](docs/architecture.md) before changing a
-cross-cutting boundary. To add an experiment, follow the
-[experiment extension guide](docs/adding-an-experiment.md). It covers the
-service contract, presentation registry, domain model, mount lifecycle,
-journal passport, localization, route stylesheet, static content, and required
-tests. The [documentation index](docs/README.md) distinguishes maintained
-guides from decisions, archived research snapshots, and operational runbooks.
+The [About page](https://sense6.net/en/about/) explains authorship, methods,
+privacy, and interpretation limits. The Learn guides distinguish research that
+informs a task from evidence that would validate its exact implementation.
 
-Acutezza's source-backed [research and implementation
-brief](docs/research/acutezza.md) records the method, product boundary, completed
-software checks, and the permanent distinction between implementation
-verification and scientific validity.
+## What is included
 
-The cross-test [evidence and product
-audit](docs/research/five-test-evidence-and-product-audit.md) reviews the shipped
-protocol, duration, references, competitors, interface, result completeness,
-open-source precedents, and recommended next work for all five experiments.
+- Five interactive experiments with explicit setup, interruption handling,
+  separate result measures, and links to their research explanations.
+- A [local journal](https://sense6.net/en/journal/) with up to 100 runs,
+  protocol-aware comparison, individual or complete deletion, and validated
+  JSON export and import.
+- English, Italian, Spanish, German, French, European Portuguese, Brazilian
+  Portuguese, Arabic, Japanese, Korean, Hindi, and Simplified Chinese.
+- Localized HTML entry pages with useful content before JavaScript runs;
+  the interactive experiment loads when its route is opened.
 
-The [product and engineering roadmap](docs/roadmap.md) records the completed
-private repeated-run journal and the permanent experimental product boundary.
-The shared lifecycle, versioned persistence, route-level loading, and bundle
-budgets are established foundations.
+Journal comparisons retain the method, scope, and setup conditions of each
+run. Incompatible protocols are kept separate, and Sense6 never combines the
+experiments into a suite-wide score. Browser storage can be cleared or lost;
+export any runs you want to keep.
 
-## Background
+The project is in active development. Human comprehension review and editorial
+review of the AI-assisted translations remain explicit work in the
+[product-readiness plan](docs/product-readiness.md). Automated tests verify
+software behavior; they do not establish scientific validity, native language
+fluency, or reliable measurements across consumer devices.
 
-Each experiment freezes its method identity, scope, schedule summary, stopping
-rule, and interpretation boundary in `src/exams/protocols.js`. A completed
-journal entry stores that passport. The journal doesn't compare entries from
-different scopes, changed methods, or legacy protocols.
+## Run locally
 
-`src/exams/sources.js` is the canonical evidence ledger. Every source has one
-role: method source, interpretation boundary, related instrument, or Sense6
-validation. The interactive research trails, localized static pages, and
-`llms.txt` are generated from this ledger. The validation role is intentionally
-empty because no publication has evaluated an exact, frozen Sense6 protocol.
-
-The five-test [evidence and product
-audit](docs/research/five-test-evidence-and-product-audit.md) records the full
-protocol, source review, competitor analysis, interface findings, and remaining
-evidence gaps. It distinguishes software verification from construct validity,
-external validation, and population norms.
-
-The production scopes are:
-
-- **Screen Colour Lab:** one fixed 29-block exploratory protocol. Its two
-  adaptive tasks report ending levels and performance counts; the ordering task
-  reports ordered adjacent pairs. It computes no overall score, best result,
-  radar, stable threshold, or tetrachromacy inference.
-- **Daltonia:** one short exploratory protocol with two feedback practices, 36
-  scheduled direction presentations, and three task controls. Responses stay
-  locked until the stimulus has painted. Invalid and duplicate responses can't
-  advance the track. Target and field dots use matched linear-sRGB luminance.
-- **Riflessi:** Segnale, Segnale + Scelta, or the complete three-instrument set.
-  Results retain scheduled and valid denominators, choice accuracy, event
-  counts, timing health, interruptions, input mode, and physical setup.
-- **Udito:** Focused includes Cuffie and Portata; Standard adds the two
-  Intonazione tracks. A maximum-level reference, three audibility anchors,
-  guaranteed Portata controls, recent ceiling evidence, and a final unchanged-
-  volume confirmation gate every result.
-- **Acutezza:** Focused measures high-contrast angular detail; Standard adds a
-  nominal low-contrast condition. Controls run per eye and condition. Results
-  retain calibration provenance, physical scale, actual contrast, second-eye
-  distance recheck, bounds, and 90% model intervals. The invalid Meridiani
-  implementation and scorer are removed pending a separately designed and
-  simulated protocol.
-
-Choosing a smaller scope omits unrun instruments instead of displaying
-placeholders. “Repeat this scope independently” starts the same frozen method
-again and preserves both entries for an honest same-protocol comparison. Sense6
-never pools repeats silently or keeps only a best run.
-
-## Install
-
-You need Node.js 22 or later.
+Use **Node.js 22.19 or later**. CI uses Node.js 24.
 
 ```sh
+git clone https://github.com/Ponchia/sense6.git
+cd sense6
 npm ci
-npx playwright install --with-deps chromium firefox webkit
-```
-
-## Usage
-
-Start the local development server:
-
-```sh
 npm run dev
 ```
 
-Open the URL printed by Vite. Complete the screen check before you start the
-colour tests, choose one input path before starting Riflessi, or complete
-Udito's low-volume reference and volume-lock contract. Each completed run adds
-a structured entry to the private journal in local browser storage. Sense6 does
-not send session answers, measurements, journal entries, or results to a
-server. It sends one allowlisted event name and test name when a page loads or a
-measured run starts or completes.
+Open the local URL printed by Vite. Local development and tests need no account,
+Cloudflare credentials, or production database. The app's aggregate-metrics
+endpoint is a separate Pages Function; Vite does not run it, and unavailable
+metrics do not block experiments.
 
-## Private measurement journal
-
-Open `/{locale}/journal/`, for example `/en/journal/`, to review up to 100 saved
-runs. Each entry contains structured measurements, uncertainty or measurement
-bounds when an instrument provides them, and a setup passport with the
-conditions needed for comparison. Comparisons are instrument-specific and use
-three labels: comparable, comparable with caution, or not comparable. Sense6
-does not convert the five instruments into a suite-wide score. A saved entry
-links back to its experiment and its research explanation in the same published
-language. An empty journal offers the existing short
-reaction-time starter. Those links do not store or upload any additional data.
-
-You can delete one entry, delete the complete journal, export a documented JSON
-file, or merge that file back into a browser. Imports are size-limited,
-validated, schema-versioned, and idempotent by entry ID. The journal remains on
-the device unless you deliberately save or move an exported file. The compact
-legacy latest-or-best result keys remain readable for compatibility.
-
-## Privacy-preserving metrics
-
-Sense6 doesn't use analytics cookies, browser storage, identifiers,
-fingerprints, IP addresses, user-agent strings, referrers, answers, scores, or
-exact event timestamps for product metrics. A Cloudflare Pages Function accepts
-only an allowlisted event and test name. The server chooses the coordinated
-universal time day and atomically increments one row in D1. The resulting table
-contains only `day`, `test`, `metric`, and `count`.
-
-`site_loaded` measures document loads, not unique people. Reloads and bots can
-increase the count. `test_viewed` records a successfully mounted experiment
-landing route, including repeated navigation. It makes aggregate
-landing-to-measured-start conversion visible without joining events into a
-visit. `test_started` begins at the first measured block after any practice.
-Sense6 records `test_completed` only when the result view appears. Sense6
-reserves `report_downloaded` for a future report action.
-
-The write endpoint has no read, update, or delete operation. It requires a JSON
-request whose request URL and `Origin` are both exactly `https://sense6.net`,
-rejects unknown fields and event combinations, limits the body to 128 bytes,
-and fails closed when D1 is unavailable. Production builds also disable metric
-sends away from that canonical origin. Analytics availability can't block a
-test.
-
-The interface uses [`@ponchia/ui`](https://github.com/Ponchia/bronto-ui) for its
-tokens, typography, layout primitives, controls, feedback, theme behavior, and
-site shell. Product-specific stimulus geometry remains local to this project.
-
-## Localization
-
-Sense6 supports English, Italian, German, French, Spanish, European Portuguese,
-Brazilian Portuguese, Arabic, Japanese, Korean, Hindi, and Simplified Chinese.
-Locale-aware paths make every exam directly addressable, for example
-`/it/udito/`, `/pt-br/acutezza/`, or `/zh-hans/riflessi/`. Historic hash links
-such as `#/it/udito` and `#/udito` remain valid and are replaced with the
-corresponding canonical path in the browser. Regional language-tag paths such
-as `/pt-BR/` and `/zh-CN/` redirect to their canonical locale routes.
-
-On a first visit, Sense6 selects the first supported language reported by the
-browser and otherwise falls back to English. A choice made in the header is
-stored under `sense6:locale` in local storage. Changing the language keeps the
-current exam open. The runtime also updates the document language, page title,
-metadata, internal links, accessibility labels, number formatting, and copied
-result summaries. Arabic sets right-to-left document flow. Spatial experiment
-controls retain physical left/right placement and numbered keyboard order in
-every writing direction.
-
-English source phrases and their eleven translations live in
-`src/locales/<language>.js`. Coordinated registry, landing, and mobile copy is
-authored in shared source modules and generated into
-`src/locales/generated/*.json`; run `npm run locales:generate` after changing
-those rows. Only the active language catalog is loaded at runtime.
-Reusable controls and safety boundaries use stable IDs from
-`src/i18n/message-ids.js`; call `m(id)` for that copy. Existing experiment
-prose remains source-keyed and migrates when it is changed. Add every new source
-phrase with the same placeholders in every language and translate dynamic text
-explicitly where it is rendered. Route-specific privacy and journal copy for
-the added locales lives in `src/locales/supplemental/`.
-`tests/i18n.test.js` rejects missing stable IDs, missing values, duplicate
-English source phrases, placeholder drift, and accidental safety-copy fallback.
-Browser tests cover locale routing, regional detection, right-to-left behavior,
-persistence, accessibility, and mobile overflow.
-
-Run `npm run locales:check` for a compact completion report across all catalogs,
-or `npm run locales:check -- --details` to list every source-equal string. The
-same audit runs inside the release gate and also catches missing or duplicate
-keys, empty values, missing stable IDs, and placeholder drift.
-
-## Static discovery and crawler policy
-
-`npm run build` creates 181 canonical static entry pages: the root, twelve
-galleries, 60 exam routes, twelve About routes, twelve journal routes, twelve
-privacy routes, and 72 published Learn routes (six guides/index pages across
-twelve languages). It also produces a script-free 404 page.
-Each route contains useful content
-without JavaScript, a unique title and description, a canonical URL, reciprocal
-`hreflang` links, truthful structured data, research links, and real internal
-links. Journal and privacy remain reachable user tools but carry `noindex` and
-stay out of the sitemap; the 157 root, gallery, experiment, About and Learn
-pages form the search-indexable set. All five experiment entry pages, results
-and saved journal entries connect to the research guide published in that
-language. English experiment pages add original query-led
-explainers without silently copying unreviewed English prose into other locales.
-The build also creates an exact sitemap, `robots.txt`, an optional `llms.txt` discovery
-summary, and a script-free `404.html` so unknown paths don't become indexable
-soft-404 responses.
-
-The default policy allows conventional search and user-directed retrieval
-crawlers. It disallows `GPTBot` and `ClaudeBot`, which are associated with model
-training rather than a user's immediate request. Review that deliberate product
-choice whenever the crawler policy changes; `llms.txt` is a convenience, not an
-access-control mechanism. `src/crawler-policy.js` records the provider purpose,
-official guidance, review date, and next review deadline. Static verification
-fails after that deadline until the policy is reviewed. Preview deployments
-send `X-Robots-Tag: noindex`.
-
-Static pages are generated from `src/exams/registry.js`, the locale catalogs,
-the structured About copy, and the privacy copy. Don't hand-edit files under
-`dist/`.
-
-## Develop and test
-
-Run the deterministic colour, timing, adaptive hearing, calibrated acuity, and
-session-engine tests:
-
-```sh
-npm test
-```
-
-Check the JavaScript and CSS source with Biome:
-
-```sh
-npm run lint
-```
-
-Check the strict typed-JavaScript contracts and coverage ratchet:
-
-```sh
-npm run typecheck
-```
-
-The ratchet automatically includes domain models, experiment views,
-localization helpers, and locale catalogs; it also rejects unchecked additions
-and type-suppression escapes in those boundaries. Unchecked indexed access is a
-compiler error, so fixed-size data uses tuples and variable lookups declare
-their fallback or failure behavior. Experiment controllers expose checked
-public declarations and are converted internally one stable transition at a
-time. See ADR 0005 for the evidence that would justify moving individual
-modules to TypeScript.
-
-Run unit tests with enforced coverage for shared storage and lifecycle code:
-
-```sh
-npm run test:coverage
-```
-
-Coverage says a line ran; it does not say anything asserted its result. Check
-that the shared `src/lib` modules are actually pinned by mutating one operator
-or literal at a time and re-running the unit suite:
-
-```sh
-node scripts/mutation-check.mjs                     # every src/lib module
-node scripts/mutation-check.mjs src/lib/hearing.js  # one module
-node scripts/mutation-check.mjs --list src/lib/hearing.js
-```
-
-A mutant reported as `KILLED` is a line the suite genuinely checks. A `SURVIVED`
-mutant is a line the suite executes without asserting anything about it, and it
-is either a missing assertion or an equivalent mutant whose change cannot alter
-observable behaviour. That distinction needs per-mutant evidence: read the
-reported line, decide which it is, and add a test if it is the first. `TIMEOUT`
-means the mutant made the suite hang, which usually means the mutated line was a
-loop's only exit — real, but better replaced by a test that fails fast.
-
-The harness edits files in place and restores them afterwards, so it refuses to
-run against a target with uncommitted changes; `git checkout -- <file>` is always
-a valid recovery. It is a reporting tool and never sets a failing exit code, and
-it is deliberately not part of `check:core` because a full sweep re-runs the
-suite once per mutant.
-
-Build the production bundle:
+To inspect the generated site:
 
 ```sh
 npm run build
+npm run preview
 ```
 
-Verify the generated routes, metadata, crawler files, security policy, and
-bundle budgets:
+Vite preview serves the generated files for local inspection. The automated
+artifact journey additionally checks the production security headers and
+hydration behavior.
+
+## Verify a change
 
 ```sh
-npm run test:static
+npm run check:core
 ```
 
-Run the browser, accessibility, and responsive checks:
+This runs source, type, localization, documentation, UI-contract, coverage,
+build, and static-output checks. For browser changes, install the test browsers
+and run the representative journeys:
 
 ```sh
-npm run test:e2e
-```
-
-The full suite runs in desktop and mobile Chromium; the artifact hydration,
-full Screen Colour Lab run, and display-invalidation checks also run in
-Firefox and WebKit.
-
-For a quicker representative browser pass, including all five instruments,
-route navigation, journal import, and the built-artifact handover, run:
-
-```sh
+npx playwright install chromium firefox webkit
 npm run test:pr-smoke
 ```
 
-The named `@pr-smoke` journeys are the browser gate for same-repository pull
-requests. The **complete** multi-browser suite still gates every production
-deployment from `main`; the fast pass does not authorize a publication.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for Linux browser dependencies, focused
+tests, the full release checks, visual review, and generated-file ownership.
+Production deployment also requires the separate CI visual and Lighthouse
+gates.
 
-Run every gate:
+## Privacy and data
 
-```sh
-npm run check
-```
+Session answers, measurements, setup details, and journal entries stay in the
+browser. A journal export leaves it only when you choose to save or share the
+file. Sense6 uses local storage for preferences and results, not visitor
+identification.
 
-The release-only artifact checks add generated HTML validation, internal-link
-validation, and the production site audit:
+On the canonical production site, an allowlisted event and experiment name can
+increment an anonymous daily counter. The database contains only `day`,
+`test`, `metric`, and `count`. These totals do not identify unique people or
+link events into sessions. The app does not send results, answers, locale,
+identifiers, fingerprints, or exact event timestamps with those counters.
 
-```sh
-npm run check:release
-```
+Cloudflare processes ordinary requests to deliver and protect the site; that
+hosting boundary is separate from the data Sense6 stores. Read the
+[privacy page](https://sense6.net/en/privacy/) and
+[architecture](docs/architecture.md#data-and-privacy) for the full contract.
 
-`check:core` covers lint, the typed-JavaScript and locale ratchets, Bronto UI
-contracts, coverage, the production build, static output, security policy, and
-bundle budgets. `check` adds the browser matrix. `check:release` adds checks
-against the exact generated site. Every pull request and push also runs the
-container visual comparison and indexable representative-route Lighthouse budgets
-in the same dependency graph as release, so either can stop publication. The scheduled full indexable-route Lighthouse sweep follows the current
-canonical route registry (157 URLs today) rather than a fixed historical count;
-the external-link crawl and passive ZAP scan remain scheduled or operator-run
-audits. The external-link job uses bounded
-retries and per-host concurrency for transient publisher failures. The passive
-scan fails on unreviewed ZAP alerts and records accepted static-site findings in
-`.zap-rules.tsv`; it prints the result directly instead of depending on
-account-wide artifact storage.
+## Find your way around
 
-Visual regression remains a hard release gate. Approved changes preserve their
-base, candidate and pixel-diff screenshots together in a seven-day Playwright
-report. Failed comparisons still upload diagnostics; successful unchanged
-comparisons upload nothing. The shorter retention and removal of duplicate
-expected/actual attachments reduce shared GitHub Actions artifact usage without
-deleting historical records. GitHub usage changes can take hours to recalculate.
+| Location | Purpose |
+| --- | --- |
+| `src/exams/` | Experiment controllers, contracts, frozen protocols, evidence sources, result schemas, and views |
+| `src/lib/` | Domain models, lifecycle, persistence, and journal comparison |
+| `src/locales/`, `src/learn-locales/` | Interface catalogs and published research-guide translations |
+| `functions/`, `migrations/` | Aggregate-metrics endpoint and forward database migrations |
+| `scripts/` | Generators and verification tools |
+| `tests/`, `audits/` | Unit, browser, static-output, visual, and site checks |
+| [`docs/`](docs/README.md) | Current guides, release runbook, decisions, and archived research |
 
-## Deploy
+The runtime uses vanilla JavaScript modules, Vite, and
+[Bronto UI](https://github.com/Ponchia/bronto-ui). Experiment geometry and
+measurement models belong to Sense6.
 
-Every push to `main` runs the complete lint, locale, unit, build, browser,
-visual, responsive, accessibility, static-output, and bundle-budget gate. The
-release job builds `dist/` once, stamps `build-meta.json` with the workflow
-commit, writes a file-by-file SHA-256 manifest, verifies it, and runs the
-production site audit. After the browser, visual, and Lighthouse gates pass,
-that release job deploys the checked working tree without rebuilding production
-output or depending on external artifact storage.
+Start with the [architecture](docs/architecture.md) for a code change or
+[adding an experiment](docs/adding-an-experiment.md) for a new task.
+The [roadmap](docs/roadmap.md) records current priorities and bounded technical
+debt; the [changelog](CHANGELOG.md) records behavior changes. Production
+operations belong in the [Cloudflare Pages runbook](docs/runbooks/cloudflare-pages-release.md).
+The [public-repository readiness review](docs/public-repository-readiness.md)
+tracks the remaining conditions for changing repository visibility.
 
-Same-repository pull requests run representative browser journeys, all
-non-browser release checks, visual regression, and Lighthouse budgets without
-deployment credentials or preview publication. A push to `main` runs the
-complete browser matrix as an additional hard prerequisite.
-All jobs use the `arc-vps-sense6` ARC scale set in the netcup cluster,
-managed by `vps-infra/cluster/gha-runner/`, rather than GitHub-hosted
-runners. External fork pull requests are denied access to that scale set.
+## Contributing
 
-Both the client and Pages Function accept metrics only on
-`https://sense6.net`; Pages project URLs remain non-production origins. The
-protected preview prerequisite and activation constraints appear below and in
-the release runbook.
+Useful contributions include reproducible bug reports, accessibility fixes,
+clearer instructions, reviewed translations, and focused improvements to the
+measurement and persistence code. Follow the
+[contributor guide](CONTRIBUTING.md) before changing a protocol or data boundary.
 
-The initial English route has a generous 150 kB raw-JavaScript guardrail
-across the transitive Vite entry and locale graph. Entry CSS may be up to
-160 kB raw, an individual route stylesheet up to 60 kB, and the entry plus
-largest route stylesheet up to 200 kB. Experiments and Learn remain route-split;
-unused editorial code must not enter the initial payload.
+## Maintainer and license
 
-These are broad build-size safety limits, not micro-optimization targets.
-Lighthouse still enforces strict LCP, TBT and CLS thresholds on rendered pages.
-A small feature-driven bundle increase should not require architecture churn
-when measured user-facing performance remains within those gates.
+Maintained by [Zeno Trevisan](https://brontolotto.observer/).
 
-The production site is available at
-[`sense6.net`](https://sense6.net). Cloudflare Pages terminates TLS and serves
-the files from its edge; the site has no application server or origin in the
-personal Kubernetes cluster. The old
-[`tetracromia.brontolotto.observer`](https://tetracromia.brontolotto.observer)
-hostname and `www.sense6.net` redirect to the canonical domain through
-Cloudflare Single Redirect rules. Pages `_redirects` files cannot match source
-hostnames, so keep domain-level redirects in the corresponding Cloudflare zone.
-
-Pull requests run verification with read-only repository access and without
-deployment credentials. Pull-request preview publication is disabled. To
-activate it, first create and verify an isolated, protected preview environment,
-then add a default-branch-owned workflow that publishes only the verified
-artifact without running pull-request-controlled code. This repository change
-doesn't verify or create that external configuration.
-
-The production workflow uses the existing Cloudflare account credentials and
-can publish only from `main`. Scope its token to Cloudflare Pages edits for the
-account that owns `sense6.net`.
-
-The Pages project also requires a D1 binding named `ANALYTICS_DB`. Apply
-the complete ordered migration set in `migrations/` to that database before
-enabling the binding or merging code that adds a metric pair. Migration tests
-execute the full set in SQLite and prove that every runtime-allowed pair fits
-the production constraints. Keep metric reads private in the Cloudflare
-dashboard or Wrangler; don't add a public read endpoint.
-
-Add the zone's single rate-limiting rule for production before enabling the
-counter. Match `POST` requests whose path equals `/api/metric`, allow 10 requests
-per 10 seconds per source IP, and block excess requests for 10 seconds. This is
-the free-plan minimum window and leaves ample room for a page load, experiment
-view, test start, completion, and report download. Cloudflare uses the request
-IP transiently for this edge control; Sense6 doesn't copy or store it.
-
-Use the [Cloudflare Pages release runbook](docs/runbooks/cloudflare-pages-release.md)
-for migration, binding, production verification, rollback, and the protected
-preview activation prerequisite.
-
-## Scientific limits
-
-Browser color output depends on the panel, color profile, browser, brightness,
-ambient light, viewing angle, and color-altering operating-system features.
-Tetracromia therefore keeps the stimulus surround neutral, detects the gamut
-reported by the browser, and reports three short-run, display-relative
-observations rather than stable thresholds or an ability score. Daltonia's
-adaptive levels remain coordinates from one browser display, not cone
-measurements or a colour-vision classification.
-
-Browser response timing depends on the display refresh path, input hardware,
-operating system, browser, and current device load. Riflessi exposes timing
-health and input mode but cannot calibrate those delays. It does not assess
-fatigue, concussion, driving fitness, neurological health, or any other medical
-or occupational condition.
-
-Browser audio depends on device volume, digital processing, sample rate,
-headphone frequency response and fit, assistive devices, room noise, and the
-listener. Udito has no acoustic coupler, calibrated transducer, microphone, or
-sound-level measurement. Its upper boundary and pitch steps therefore describe
-only one run under one setup. They cannot establish clinical hearing thresholds,
-hearing loss, hearing age, safe listening ability, or fitness for medical or
-occupational use.
-
-Browser acuity depends on physical scale, viewing distance, display resolution,
-contrast rendering, correction, lighting, and the person's setup. Acutezza
-records those conditions and reports model-based angular-gap estimates for one
-run. Its model interval isn't a clinical confidence interval, and its nominal
-low-contrast difference isn't contrast sensitivity. It doesn't establish
-20/20 vision, refractive error, astigmatism, or a prescription.
-
-Do not use this site for medical or occupational decisions. Use a validated
-clinical or physical test administered under controlled conditions when the
-result matters.
-
-## Maintainer
-
-Zeno
-
-## License
-
-[MIT](LICENSE)
+The source code is licensed under the [MIT license](LICENSE). Distributed UI
+code and fonts retain their own [third-party notices](THIRD_PARTY_NOTICES.md).

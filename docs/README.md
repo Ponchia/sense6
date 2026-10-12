@@ -8,6 +8,13 @@ decisions or research for operating instructions.
 
 ## Current guides
 
+- [Contributing](../CONTRIBUTING.md) covers local setup, verification,
+  generated-file ownership, and pull-request expectations.
+- [Security](../SECURITY.md) explains how to report security-sensitive issues.
+- [Third-party notices](../THIRD_PARTY_NOTICES.md) records the runtime and font
+  licenses included in each build.
+- [Public-repository readiness](public-repository-readiness.md) tracks the
+  review and external prerequisites for changing repository visibility.
 - [Architecture](architecture.md) describes runtime boundaries, data flow,
   quality gates, pressure points, and delivery environments.
 - [Adding an experiment](adding-an-experiment.md) is the extension checklist for
@@ -51,7 +58,9 @@ roadmap, contracts, protocols, migrations, and tests.
 - Remove or archive a document when another page becomes its source of truth;
   don't leave two current instructions for the same task.
 
-`npm run docs:check` verifies this routing map, current-document markers, local
-links, and a broad-audit baseline of two research documents. The current docs,
-ADRs, README, and changelog form the strict lifecycle set. Research remains the
-two-file broad audit: useful source-backed context, but not operational truth.
+`npm run docs:check` verifies the classified documentation set,
+current-document markers, and local links. Current guides, root entry points,
+and ADRs belong to the strict set in `scripts/check-docs-lifecycle.mjs`.
+Research has a separate bounded archive set: useful source-backed context,
+but not operational truth. Classify a new document in that checker and route
+it here rather than leaving it outside the maintained set.

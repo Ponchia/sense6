@@ -882,3 +882,139 @@ test('a completion promise settles exactly once', async () => {
     assert.equal(await playing, true);
   });
 });
+
+for (const method of ['playReference', 'playAudibilityAnchors']) {
+  test(`${method} cannot schedule sound after stop during a pending resume`, async () => {
+    await withAudio(async () => {
+      const audio = new HearingAudio(CONFIG);
+      const context = await audio.init();
+      await audio.suspend();
+      let finishResume;
+      context.resume = () =>
+        new Promise((resolve) => {
+          finishResume = () => {
+            context.state = 'running';
+            context.emit('statechange');
+            resolve();
+          };
+        });
+
+      const playing = audio[method]();
+      audio.stop();
+      finishResume();
+      await flush();
+
+      assert.equal(context.nodesOfKind('oscillator').length, 0, 'cancelled initialization must stay silent');
+      assert.equal(context.pendingMarkers.size, 0, 'cancelled initialization cannot install callbacks');
+      assert.equal(await playing, false);
+    });
+  });
+}
+
+test('a delayed older resume cannot supersede a newer playback', async () => {
+  await withAudio(async () => {
+    const audio = new HearingAudio(CONFIG);
+    const context = await audio.init();
+    await audio.suspend();
+    const resumes = [];
+    context.resume = () =>
+      new Promise((resolve) => {
+        resumes.push(() => {
+          context.state = 'running';
+          context.emit('statechange');
+          resolve();
+        });
+      });
+
+    const older = audio.playReference();
+    const newer = audio.playIntervals([{ frequencyHz: 800, gain: 0.1 }]);
+    resumes[1]();
+    await flush();
+    resumes[0]();
+    await flush();
+
+    assert.deepEqual(
+      context.nodesOfKind('oscillator').map((node) => node.frequency.automation[0].value),
+      [800],
+      'only the newest request may schedule audio, regardless of resume completion order',
+    );
+    assert.equal(await older, false);
+    assert.equal(await settle(context, newer, 5), true);
+  });
+});
+
+test('an asynchronous close cannot discard a newly initialized context', async () => {
+  await withAudio(async () => {
+    const audio = new HearingAudio(CONFIG);
+    const first = await audio.init();
+    let finishClose;
+    first.close = () =>
+      new Promise((resolve) => {
+        first.state = 'closed';
+        finishClose = resolve;
+      });
+
+    const closing = audio.close();
+    const second = await audio.init();
+    assert.notEqual(second, first);
+    finishClose();
+    await closing;
+
+    assert.equal(audio.context, second, 'completion of old teardown must preserve the current context');
+    assert.equal(audio.master.connections[0].target, second.destination);
+    const playing = audio.playReference();
+    await flush();
+    assert.equal(await settle(second, playing, 5), true);
+  });
+});
+
+test('closing during resume cancels playback without dereferencing a released context', async () => {
+  await withAudio(async () => {
+    const audio = new HearingAudio(CONFIG);
+    const context = await audio.init();
+    await audio.suspend();
+    let finishResume;
+    context.resume = () =>
+      new Promise((resolve) => {
+        finishResume = resolve;
+      });
+
+    const playing = audio.playReference();
+    await audio.close();
+    finishResume();
+
+    assert.equal(await playing, false);
+    assert.equal(context.nodesOfKind('oscillator').length, 0);
+    assert.equal(audio.context, null);
+  });
+});
+
+test('playback still reports a resume failure when the request was not cancelled', async () => {
+  await withAudio(async () => {
+    const audio = new HearingAudio(CONFIG);
+    const context = await audio.init();
+    await audio.suspend();
+    const error = new Error('Audio output is unavailable');
+    context.resume = async () => {
+      throw error;
+    };
+
+    await assert.rejects(() => audio.playReference(), error);
+    assert.equal(context.nodesOfKind('oscillator').length, 0);
+  });
+});
+
+for (const method of ['playReference', 'playAudibilityAnchors']) {
+  test(`${method} checks cancellation again before scheduling the initialized graph`, async () => {
+    await withAudio(async () => {
+      const audio = new HearingAudio(CONFIG);
+      const context = await audio.init();
+      const playing = audio[method]();
+      queueMicrotask(() => audio.stop());
+      await flush();
+
+      assert.equal(context.nodesOfKind('oscillator').length, 0);
+      assert.equal(await playing, false);
+    });
+  });
+}

@@ -9,7 +9,8 @@ the current architecture, not a template for the scientific method.
 ## Before you code
 
 Write down the narrow question, device limitations, setup conditions, stopping
-rules, output units, uncertainty, bounds, and claims the result must not make.
+rules, output units, descriptive model intervals, measurement bounds, and
+claims the result must not make.
 Identify sources that inform the task. Research inspiration doesn't make the
 implementation validated.
 
@@ -120,10 +121,12 @@ sources.
 
 Create a language-neutral journal entry when the result becomes visible. Record
 the exact protocol passport, service-contract setup fields, quality evidence,
-separate named measurements, units, explicit uncertainty, bounds, and
-machine-readable notes. Add comparison, migration, and round-trip tests. Don't
-derive uncertainty from an interval unless the estimator defines it as
-uncertainty.
+separate named measurements, units, optional descriptive `lower`/`upper` model
+intervals, bound flags, and machine-readable notes. Add comparison, migration,
+and round-trip tests. The current schema does not accept combinable
+uncertainty, and run-to-run changes must not treat a model interval as one.
+Changing that contract requires a separate supported measurement model and
+review of journal comparison and export behavior.
 
 Version any separate latest-result store and validate reads. Preserve a legacy
 key only when one already exists. Put experiment-specific payload validation
@@ -178,20 +181,12 @@ string replacement.
 
 ## 9. Verify the extension
 
-Run:
+Follow the [contributor setup](../CONTRIBUTING.md#set-up-a-checkout), including
+browser installation. Use focused model and journey tests while iterating,
+then run the complete local release command:
 
 ```sh
-npm ci
-npm run lint
-npm run typecheck
-npm run locales:check
-npm run test:coverage
-npm run build
-npm run test:static
-npm run test:e2e
-npm run test:html
-npm run test:links
-npm run test:site-audit
+npm run check:release
 ```
 
 Add browser coverage for each selectable scope, the complete happy path,
@@ -206,8 +201,11 @@ type-ratchet script together when it lives elsewhere.
 
 Before merging, confirm that `npm run check:release` passes from a clean
 checkout and that the built route stays inside the documented JavaScript and
-CSS ceilings. The 110 kB startup budget traverses the complete Vite-manifest
-dependency graph for the initial English route.
+CSS ceilings. The current 150 kB raw-JavaScript startup ceiling traverses the complete
+Vite-manifest dependency graph for the initial English route. The
+[architecture](architecture.md#quality-gates) describes the remaining bundle
+ceilings. Visual comparison and Lighthouse remain separate CI release gates.
 Pull requests verify the generated `dist/` directory without deployment
 credentials. Preview publication remains disabled until the protected external
-configuration described in the release runbook exists.
+configuration described in the [release runbook](runbooks/cloudflare-pages-release.md)
+exists.

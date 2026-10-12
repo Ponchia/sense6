@@ -1,8 +1,6 @@
 # Sense6 architecture
 <!-- vale Vale.Spelling = NO -->
 
-Status: current, 2026-07-28
-
 Lifecycle: current
 
 This document describes the app boundaries you need when changing or
@@ -110,7 +108,22 @@ The current design has three deliberately separate stores:
 
 Don't merge these models. The metrics endpoint must never accept result,
 setup, locale, timing, or visitor data. Journal exports become portable files
-only when the person explicitly saves them.
+only when the person explicitly saves them. Clearing browser storage can
+remove the journal; it is not a remote backup.
+
+`src/metrics.js` owns allowed event/experiment pairs. The Pages Function accepts
+only those two fields in a JSON body of at most 128 bytes, requires the
+canonical production request origin and `Origin` header, and chooses the UTC
+day on the server. It stores only `day`, `test`, `metric`, and `count`; there is
+no public read operation. The client omits credentials and referrers, and a
+failed metric request cannot block the experiment. Hosting and edge protection
+still process ordinary web requests outside this application store.
+
+Document loads, mounted experiment landings, first measured starts, and result
+views are separate activity counts. Repeated navigation, reloads, and bots can
+affect totals. They cannot identify unique visitors, establish a session
+funnel, or demonstrate task validity. `report_downloaded` is reserved for a
+future report action.
 
 Journal imports first validate and canonicalize the file, then show additions,
 duplicates, discarded additions, existing-entry evictions, and the resulting
@@ -136,25 +149,27 @@ quality evidence is an envelope and vocabulary, not one cross-test scoring
 formula. A generic experiment engine would hide meaningful differences among
 color, timing, audio, and acuity tasks.
 
-Follow `adding-an-experiment.md` for the complete extension contract.
+Follow [adding an experiment](adding-an-experiment.md) for the complete
+extension contract.
 Tests compare the service-contract IDs with the presentation registry, so a
 partially registered experiment fails early.
 
 ## Quality gates
 
-`npm run check` is the behavioral release gate. It covers formatting, strict
-typed JavaScript, locale-catalog integrity, unit coverage, production build,
-static output, browser journeys, responsive layouts, and accessibility.
-`npm run check:release` adds generated HTML, internal-link, and production-site
-audits. Chromium and
-the mobile Chromium profile run the complete journey suite. A full Screen
-Colour Lab result journey and active-run invalidation also run in Firefox and
-WebKit as the selected compatibility paths.
+`npm run check:core` verifies source, typed JavaScript, locale catalogs,
+documentation, UI contracts, shared-module coverage, the production build, and
+static output. `npm run check` adds the complete configured browser matrix.
+`npm run check:release` also validates generated HTML, internal links, and site
+behavior. The [contributor guide](../CONTRIBUTING.md) lists setup and focused
+commands.
 
-The Sequence phase keeps each movable tile at least 24 by 24 CSS pixels. This
-minimum fits seven movable tiles and two anchors into the current 320 CSS pixel
-layout constraint. When less inline space remains, the tile row scrolls and the
-adjacent controls reflow instead of shrinking the tiles.
+The `chromium` and `mobile` projects run the complete behavioral suite against
+the Vite dev server. Accelerated fixtures require development mode and
+localhost; production schedules have separate unit-test invariants. The
+`chromium-smoke`, `firefox`, and `webkit` projects run selected journeys against
+generated `dist/` with production response headers. Those artifact checks cover
+hydration, a full Screen Colour Lab run, and display invalidation. This is
+selected compatibility coverage, not every experiment journey in every engine.
 
 The type gate automatically includes every module under `src/lib/`,
 `src/exams/results/`, `src/exams/views/`, `src/i18n/`, and `src/locales/`, plus
@@ -168,8 +183,8 @@ validation.
 
 CI runs the named representative browser suite for same-repository pull
 requests, covering the five instruments, routing, journal, and artifact
-handover. A push to `main` runs the complete Chromium/mobile/Firefox/WebKit
-matrix before a releasable artifact is created. Visual comparison, Lighthouse
+handover. A push to `main` runs the complete configured browser
+matrix before the release job creates its artifact. Visual comparison, Lighthouse
 budgets, and the non-browser release checks remain hard gates in both cases.
 The release job creates `dist/`, stamps the commit in `build-meta.json`,
 writes and verifies a SHA-256 manifest, and audits the built site.
@@ -240,8 +255,11 @@ Keep those route ownership boundaries when expanding either experiment.
 Same-repository pull requests run representative browser checks plus the
 complete non-browser, visual, Lighthouse and artifact verification gate, with
 read-only repository access. The complete browser matrix gates production
-`main` only. All jobs run on netcup ARC `arc-vps-sense6` (managed via
-`vps-infra`); fork pull requests cannot reach it.
+`main` only. The current workflows use the `arc-vps-sense6` self-hosted
+runner. Their same-repository condition is defense in depth, not an enforceable isolation
+boundary for untrusted workflow edits. Before making the repository public,
+verify runner-access isolation and a safe external-contribution workflow as
+recorded in [public-repository readiness](public-repository-readiness.md).
 Pull-request preview publication remains disabled until an operator provides
 an isolated, protected preview environment and a default-branch-owned
 publication workflow that never runs pull-request-controlled code.
