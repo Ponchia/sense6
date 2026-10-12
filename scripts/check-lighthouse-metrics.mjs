@@ -1,9 +1,22 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { SEARCH_REPRESENTATIVE_ROUTES, SEARCH_ROUTES } from '../audits/routes.js';
 
-const output = resolve(process.env.UNLIGHTHOUSE_OUTPUT_PATH ?? '.unlighthouse', 'reports');
+const output = resolve(process.env.LIGHTHOUSE_OUTPUT_PATH ?? '.lighthouse', 'reports');
 const reports = (await walk(output)).filter((file) => file.endsWith('/lighthouse.json'));
-if (reports.length === 0) throw new Error(`No Lighthouse reports found under ${output}`);
+const routes = process.env.FULL_SITE_AUDIT === '1' ? SEARCH_ROUTES : SEARCH_REPRESENTATIVE_ROUTES;
+const expectedOrigin = new URL(process.env.LIGHTHOUSE_SITE ?? 'http://127.0.0.1:4174').origin;
+const observedRoutes = new Set();
+if (reports.length !== routes.length) {
+  throw new Error(`Expected ${routes.length} Lighthouse reports, found ${reports.length} under ${output}`);
+}
+
+const categoryFloors = {
+  performance: 90,
+  accessibility: 100,
+  'best-practices': 100,
+  seo: 100,
+};
 
 const budgets = {
   'cumulative-layout-shift': { label: 'CLS', maximum: 0.1 },
@@ -15,7 +28,29 @@ const failures = [];
 
 for (const file of reports) {
   const report = JSON.parse(await readFile(file, 'utf8'));
-  const path = new URL(report.finalDisplayedUrl).pathname;
+  const finalURL = new URL(report.finalDisplayedUrl);
+  const path = finalURL.pathname;
+  if (finalURL.origin !== expectedOrigin) {
+    failures.push(`${path}: report URL is outside the audited Sense6 preview origin`);
+  }
+  if (!routes.includes(path)) {
+    failures.push(`${path}: report URL is not an expected indexable route`);
+  }
+  if (observedRoutes.has(path)) {
+    failures.push(`${path}: repeated audit report for one route`);
+  }
+  observedRoutes.add(path);
+  if (report.runtimeError) {
+    failures.push(`${path}: Lighthouse runtime error: ${JSON.stringify(report.runtimeError)}`);
+  }
+  for (const [category, floor] of Object.entries(categoryFloors)) {
+    const score = report.categories?.[category]?.score;
+    if (!Number.isFinite(score) || score * 100 + 0.0001 < floor) {
+      failures.push(
+        `${path}: ${category} ${Number.isFinite(score) ? Math.round(score * 100) : 'missing'} below ${floor}`,
+      );
+    }
+  }
   for (const [audit, budget] of Object.entries(budgets)) {
     const value = report.audits[audit]?.numericValue;
     if (!Number.isFinite(value)) {
@@ -29,6 +64,15 @@ for (const file of reports) {
       );
     }
   }
+}
+
+for (const route of routes) {
+  if (!observedRoutes.has(route)) failures.push(`${route}: required audit report is missing`);
+}
+
+const seen = reports.map((file) => file.split('/').at(-2));
+if (new Set(seen).size !== routes.length) {
+  failures.push('Lighthouse report slugs are missing or repeated');
 }
 
 if (failures.length > 0) {

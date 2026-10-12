@@ -2,6 +2,11 @@ name: Site audit
 
 on:
   workflow_dispatch:
+    inputs:
+      lighthouse_only:
+        description: Run only the full 157-route Lighthouse budget audit
+        type: boolean
+        default: false
   schedule:
     - cron: '23 3 * * 1'
 
@@ -21,6 +26,8 @@ concurrency:
 # second workflow for the same runner scale set.
 jobs:
   route-integrity:
+    # A manual Lighthouse-only verification keeps the normal weekly sweep intact.
+    if: github.event.inputs.lighthouse_only != 'true'
     runs-on: arc-vps-sense6
     timeout-minutes: 20
     env:
@@ -65,8 +72,8 @@ jobs:
       image: mcr.microsoft.com/playwright:v1.64.0-noble@sha256:06a9939e57531807f8d5fd76ce44b53165ffb7d7501d87ab10e285c20b1e971f
     env:
       FULL_SITE_AUDIT: '1'
-      UNLIGHTHOUSE_OUTPUT_PATH: .unlighthouse
-      UNLIGHTHOUSE_SITE: http://127.0.0.1:4174
+      LIGHTHOUSE_OUTPUT_PATH: .lighthouse
+      LIGHTHOUSE_SITE: http://127.0.0.1:4174
     steps:
       - name: Check out the repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
@@ -86,13 +93,15 @@ jobs:
         continue-on-error: true
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: unlighthouse-full-site-report
-          path: .unlighthouse
+          name: lighthouse-full-site-report
+          path: .lighthouse
           if-no-files-found: ignore
           include-hidden-files: true
           retention-days: 3
 
   external-links:
+    # A manual Lighthouse-only verification keeps the normal weekly sweep intact.
+    if: github.event.inputs.lighthouse_only != 'true'
     runs-on: arc-vps-sense6
     timeout-minutes: 15
     env:
@@ -122,6 +131,8 @@ jobs:
           lycheeVersion: v0.24.2
 
   passive-security:
+    # A manual Lighthouse-only verification keeps the normal weekly sweep intact.
+    if: github.event.inputs.lighthouse_only != 'true'
     runs-on: arc-vps-sense6
     timeout-minutes: 15
     steps:

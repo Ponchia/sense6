@@ -73,6 +73,12 @@ const EVENT_CONTEXTS = Object.freeze({
     'github.repository': REPOSITORY,
     'github.ref': 'refs/heads/main',
   },
+  'manual Lighthouse-only dispatch': {
+    'github.event_name': 'workflow_dispatch',
+    'github.repository': REPOSITORY,
+    'github.ref': 'refs/heads/main',
+    'github.event.inputs.lighthouse_only': 'true',
+  },
 });
 
 /**
@@ -104,6 +110,16 @@ const SELF_HOSTED_REACH = Object.freeze({
     'site-audit.yml:lighthouse-full-site',
     'site-audit.yml:passive-security',
     'site-audit.yml:route-integrity',
+    'verify.yml:browser',
+    'verify.yml:lighthouse',
+    'verify.yml:release',
+    'verify.yml:visual',
+  ],
+  // The static model enumerates every workflow with the same event name.
+  // An actual workflow_dispatch chooses one workflow file, so verify.yml's
+  // manual jobs appear here but are not part of Site audit's invocation.
+  'manual Lighthouse-only dispatch': [
+    'site-audit.yml:lighthouse-full-site',
     'verify.yml:browser',
     'verify.yml:lighthouse',
     'verify.yml:release',
@@ -275,11 +291,33 @@ test('the Lighthouse budget can stop a deploy', () => {
   // publish and the two jobs merely raced.
   assert.match(verify, /^ {2}lighthouse:$/m);
   assert.match(verify, /npm run audit:lighthouse/);
+  assert.equal(
+    packageJson.scripts['audit:lighthouse'],
+    'node scripts/run-lighthouse-audit.mjs && node scripts/check-lighthouse-metrics.mjs',
+    'the actual release command must invoke the maintained audit and fail-closed budget checker',
+  );
   assert.match(verify, /needs: \[browser, lighthouse, visual\]/);
   assert.doesNotMatch(
     siteAudit,
     /^ {2}lighthouse:$/m,
     'the gating Lighthouse job belongs in verify.yml, not in an unrelated workflow',
+  );
+});
+
+test('manual Lighthouse-only dispatch preserves the full sweep without starting unrelated site jobs', () => {
+  const audit = workflow('site-audit.yml');
+  assert.match(audit, /^ {2}workflow_dispatch:\n {4}inputs:\n {6}lighthouse_only:/m);
+  assert.match(audit, /type: boolean\n {8}default: false/);
+  for (const job of ['route-integrity', 'external-links', 'passive-security']) {
+    const segment = audit.split(`  ${job}:`)[1]?.split(/^ {2}[a-z-]+:$/m)[0];
+    assert.ok(segment, `missing protected job ${job}`);
+    assert.match(segment, /if: github\.event\.inputs\.lighthouse_only != 'true'/);
+  }
+  assert.deepEqual(
+    reachableSelfHostedJobs('manual Lighthouse-only dispatch').filter((id) =>
+      id.startsWith('site-audit.yml:'),
+    ),
+    ['site-audit.yml:lighthouse-full-site'],
   );
 });
 
@@ -293,10 +331,21 @@ test('scheduled Lighthouse covers the whole indexable site with a scalable timeo
   // headroom for the serial, throttled mobile crawl instead of dropping pages.
   assert.ok(timeout >= Math.ceil(SEARCH_ROUTES.length * 0.4));
   assert.match(lighthouse, /FULL_SITE_AUDIT: '1'/);
-  const configuration = readFileSync(new URL('../unlighthouse.config.mjs', import.meta.url), 'utf8');
-  assert.match(configuration, /FULL_SITE_AUDIT === '1' \? SEARCH_ROUTES : SEARCH_REPRESENTATIVE_ROUTES/);
-  assert.match(configuration, /maxRoutes: false/);
-  assert.match(configuration, /crawler: false/);
+  const runner = readFileSync(new URL('../scripts/run-lighthouse-audit.mjs', import.meta.url), 'utf8');
+  const budgets = readFileSync(new URL('../scripts/check-lighthouse-metrics.mjs', import.meta.url), 'utf8');
+  assert.match(runner, /FULL_SITE_AUDIT === '1' \? SEARCH_ROUTES : SEARCH_REPRESENTATIVE_ROUTES/);
+  assert.match(runner, /onlyCategories: \[\.\.\.CATEGORY_IDS\]/);
+  assert.match(runner, /local Sense6 preview root/);
+  assert.match(runner, /ROUTES_PER_CHROME_SESSION = 16/);
+  assert.match(runner, /index % ROUTES_PER_CHROME_SESSION === 0/);
+  assert.match(runner, /if \(chrome\) await chrome\.kill\(\)/);
+  assert.match(runner, /cpuSlowdownMultiplier: 1/);
+  assert.match(runner, /requestLatencyMs: 600/);
+  assert.match(runner, /deviceScaleFactor: 1/);
+  assert.match(budgets, /reports.length !== routes.length/);
+  for (const category of ['performance', 'accessibility', 'best-practices', 'seo']) {
+    assert.ok(budgets.includes(category), `missing ${category} budget`);
+  }
 });
 
 test('the visual comparison gates pull requests and direct pushes', () => {

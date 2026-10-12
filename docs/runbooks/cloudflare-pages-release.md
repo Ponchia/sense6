@@ -148,6 +148,47 @@ non-major group so routine unrelated upgrades remain testable. A standalone
 Playwright PR may initially fail the explicit image-alignment assertion until
 its matching image update is prepared; that failure is intentional.
 
+## Maintain the Lighthouse release gate
+
+`npm run audit:lighthouse` runs the official Lighthouse package against the
+locally built Sense6 preview on `127.0.0.1`, not arbitrary public sites. It
+runs every route in `SEARCH_REPRESENTATIVE_ROUTES` for each pull request and
+all routes in `SEARCH_ROUTES` for the scheduled full-site sweep. No crawler,
+unindexed utility page, or `llms.txt`-driven URL is silently added to its scope.
+
+The pinned Playwright Chromium image supplies the browser executable. Its
+mobile screen emulation, user agent, network throttling and **1× CPU slowdown**
+match the previously deployed Unlighthouse 0.19.1 profile; using unmodified
+Lighthouse mobile defaults raises the CPU slowdown to 4× and makes scores
+incomparable. A deliberate profile change needs its own comparative evidence.
+
+Before replacing the existing Lighthouse provider, run the entire route set on
+the **pinned CI runner** from the candidate branch using the Site audit workflow
+with the `lighthouse_only` manual input enabled. That input starts only the
+complete Lighthouse sweep, not its separate external-link, route-integrity or
+passive-security jobs. Regular weekly scheduled runs and manual runs without
+the input retain all four audit jobs. The current PR and production release
+gates remain unchanged and mandatory.
+
+The scheduled full sweep starts a fresh Chrome process every **16 routes** to
+bound browser-session resource accumulation. It still measures each of the
+157 canonical pages exactly once and applies the same unmodified budgets.
+The runner does **not** retry a slow page or ignore an anomalous score. If a
+full-site budget fails, preserve its Lighthouse report and compare isolated
+reproductions against nearby locale pages before changing experiment code,
+throttling settings, or thresholds.
+
+`scripts/check-lighthouse-metrics.mjs` requires one same-origin report for
+every requested route. All reports must meet the existing category floors
+(performance 90, accessibility 100, best-practices 100, SEO 100) and numeric
+budgets (CLS at most 0.1, LCP at most 2500 ms, TBT at most 200 ms). Missing,
+repeated, cross-origin, or incomplete reports fail the gate. The visual,
+browser, Lighthouse and release jobs remain mandatory for publishing.
+
+The current direct runner replaces an older Unlighthouse dependency chain
+containing unresolved *development-only* advisories. It doesn't change the
+browser experiments, the users' local results, or anonymous product metrics.
+
 ## Verify
 
 - `https://sense6.net/build-meta.json` reports the merged 40-character commit.
