@@ -1,0 +1,22 @@
+/* The existing 320px result layout stays unchanged: only shorten the landing
+   introduction on very short narrow phones so preparation is reachable. */
+@media (max-width: 360px) and (max-height: 640px) {
+  .tetracromia-hero {
+    padding-block: 0.6rem 1.25rem;
+  }
+
+  .tetracromia-hero h1 {
+    font-size: clamp(2.1rem, 10vw, 2.6rem);
+    line-height: 0.95;
+    margin-block: 0.35rem 0.7rem;
+  }
+
+  .tetracromia-hero__lede {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .tetracromia-hero__actions {
+    margin-block-start: 0.75rem;
+  }
+}
