@@ -31,7 +31,7 @@ const METRICS = Object.freeze(['lines', 'branches', 'functions']);
 const MODULE_FLOORS = Object.freeze({
   'acuity.js': { lines: 97, branches: 92, functions: 96 },
   'color.js': { lines: 100, branches: 100, functions: 100 },
-  'daltonism.js': { lines: 96, branches: 81, functions: 84 },
+  'daltonism.js': { lines: 96, branches: 92, functions: 84 },
   'display-geometry.js': { lines: 100, branches: 100, functions: 100 },
   'hearing-audio.js': { lines: 100, branches: 96, functions: 100 },
   'hearing.js': { lines: 100, branches: 94, functions: 100 },
