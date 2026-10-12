@@ -11,6 +11,16 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- Sense6 Learn: five source-traceable perception guides, an interactive browser
+  timing illustration, and full Learn editions in all 12 published languages
+  (72 Learn routes). Each guide links to its matching experiment; research
+  context is also reachable from experiment results and the private journal.
+- Reciprocal localized search metadata and correctly localized share previews
+  for Learn, bringing the generated canonical site to 157 URLs.
+- A documented consented visitor-comprehension review, human translation QA
+  procedure and Google/Bing indexing-evidence plan. These are plans for
+  independent verification, not claims that participation or indexing occurred.
+
 - Anonymous per-experiment landing-view totals, backed by a forward D1
   migration, so aggregate view-to-start conversion no longer requires visitor
   or session identifiers.
@@ -22,6 +32,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   and true transitive startup-bundle ratchets.
 
 ### Changed
+
+- Earlier mobile preparation actions and faster gallery browsing, clearer
+  first-run instructions and results across five labs, and more useful empty
+  and saved-journal navigation.
+- Better visual-regression approval scoping, one-week diagnostic retention,
+  route-complete scheduled Lighthouse coverage and Bronto UI 0.16.1 adoption.
 
 - The scheduled link audit retries transient publisher failures with bounded
   per-host concurrency. The passive security audit uses a reviewed ZAP
@@ -38,6 +54,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   research history, decisions, runbooks, and bounded decomposition work.
 
 ### Fixed
+
+- Correct anonymous Daltonia route-event identity and translated live-region
+  announcements in colour-vision tasks, without changing experimental methods.
 
 - Tetracromia keeps its active-session controls visible after phase changes,
   the gallery exposes a direct above-fold path to all tests, and Udito's

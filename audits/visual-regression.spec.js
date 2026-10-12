@@ -31,6 +31,10 @@ for (const snapshot of approvedSnapshots) {
 
 for (const route of REPRESENTATIVE_ROUTES) {
   test(`${route} matches the visual baseline`, async ({ page }) => {
+    // Cold-font, full-page captures occasionally take longer than the generic
+    // five-second expectation on shared ARM/ARC runners. Keep failOnFlakyTests
+    // and the exact pixel-diff thresholds; only allow stabilization to finish.
+    test.setTimeout(60_000);
     if (firstAppearance(route)) {
       // A route added in this revision has no comparable base capture. The base
       // build answers its path with the 404 page, so the capture step would
@@ -202,6 +206,7 @@ function screenshotOptions() {
     caret: 'hide',
     fullPage: true,
     maxDiffPixelRatio: 0.002,
+    timeout: 20_000,
   };
 }
 
