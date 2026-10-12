@@ -182,12 +182,15 @@ jobs:
         run: npm run test:visual:container
       - name: Upload the visual comparison report
         if: failure() || steps.visual-baselines.outputs.approved != ''
-        continue-on-error: true
+        # Missing artifacts on an ordinary failed run are best-effort diagnostics.
+        # Approved visual changes REQUIRE reviewable base/candidate/diff images;
+        # quota exhaustion or an absent HTML report must fail the visual gate.
+        continue-on-error: ${{ steps.visual-baselines.outputs.approved == '' }}
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: visual-regression-playwright-report
           path: playwright-report/site-audit
-          if-no-files-found: ignore
+          if-no-files-found: error
           # Keep a week of reviewable base/candidate/diff evidence; the
           # comparison itself and release gate remain mandatory.
           retention-days: 7
