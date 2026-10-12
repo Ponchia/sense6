@@ -28,6 +28,7 @@
     "test:visual:container": "playwright test --config playwright.site.config.js audits/visual-regression.spec.js --workers=1",
     "audit:lighthouse": "node scripts/run-lighthouse-audit.mjs && node scripts/check-lighthouse-metrics.mjs",
     "audit:site": "npm run build && npm run test:html && npm run test:links && npm run test:site-audit",
+    "indexnow:changed": "node scripts/submit-indexnow.mjs",
     "locales:generate": "node scripts/generate-locale-copy.mjs",
     "locales:check": "node scripts/generate-locale-copy.mjs --check && node scripts/check-locales.mjs",
     "docs:check": "node scripts/check-docs-lifecycle.mjs",

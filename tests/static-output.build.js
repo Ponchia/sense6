@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import test from 'node:test';
+import { publicIndexNowKey } from '../scripts/submit-indexnow.mjs';
 import {
   activeRouteModuleFiles,
   measureActiveRouteGraph,
@@ -62,6 +63,13 @@ const expectedSitemapPaths = [
   // its localized experiment and About pages. Sitemaps have no priority order.
   ...LEARN_PUBLISHED_LOCALES.flatMap((locale) => LEARN_ROUTES.map((route) => routePath(locale, route))),
 ];
+
+test('IndexNow root ownership proof is copied into the production artifact unchanged', async () => {
+  const { file, key } = await publicIndexNowKey();
+  const published = await readFile(new URL(file, DIST), 'utf8');
+  assert.equal(published.trim(), key, 'production build must serve the verified ownership key');
+  assert.ok(!published.includes('<html'), 'ownership proof must be served as plain UTF-8 text');
+});
 
 test('every localized static gallery features the same short Riflessi entry without inventing a new route', async () => {
   for (const { code } of LOCALES) {
