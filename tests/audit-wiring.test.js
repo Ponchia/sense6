@@ -364,6 +364,15 @@ test('the pinned CI browser image matches the locked Playwright version', () => 
   assert.ok(images.length >= 5, 'every browser CI job must use a digest-pinned Playwright image');
   assert.equal(images.length, (allWorkflows.match(/image: mcr\.microsoft\.com\/playwright:/g) ?? []).length);
   assert.equal(new Set(images.map((match) => match[1])).size, 1, 'use one image on all browser jobs');
+  const fastGuards =
+    allWorkflows.match(
+      /run: node --test --test-name-pattern='the pinned CI browser image matches the locked Playwright version' tests\/audit-wiring\.test\.js/g,
+    ) ?? [];
+  assert.equal(
+    fastGuards.length,
+    images.length - 1,
+    'all image jobs except the check:core release must fail fast on drift',
+  );
   for (const image of images) {
     assert.equal(image[2], installed, 'update the CI image digest in the same PR as Playwright');
   }
