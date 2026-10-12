@@ -84,8 +84,8 @@ const EVENT_CONTEXTS = Object.freeze({
 /**
  * Which self-hosted jobs each event is allowed to start, as `workflow:job`.
  *
- * The fork entry is the security property: no job may reach the cluster runner
- * with head-revision code. The other entries are the other half — a guard that
+ * The fork entry is a regression property of these checked-in workflows:
+ * no job may reach the cluster runner with head-revision code. The other entries are the other half — a guard that
  * also switched off the scheduled sweep or the push comparison would be a
  * regression, not a fix — so this table has to be updated deliberately whenever
  * a self-hosted job is added, removed, or re-gated.
@@ -153,19 +153,18 @@ test('every self-hosted job is discovered by this model', () => {
   );
 });
 
-test('no job reaches the self-hosted runner from a fork pull request', () => {
-  // `runs-on: arc-vps-sense6` is a runner inside the operator's netcup cluster,
-  // and every job that uses it runs `npm ci` and `npm run build` on candidate
-  // code — so an npm lifecycle script from the head revision executes there. The
-  // repository is private today, but branch protection is impossible without
-  // GitHub Pro and "make it public" is the obvious remedy, which would turn that
-  // into remote code execution in the cluster.
+test('the checked-in workflows exclude fork pull requests from self-hosted jobs', () => {
+  // npm lifecycle scripts and build commands execute candidate code on the
+  // maintainer's runner. Keep the same-repository-only dispatch regression
+  // check until a separately reviewed public contributor CI path exists.
   //
   // This walks the real job graph, including `uses: ./.github/workflows/...`
   // calls, and resolves each job-level `if:` against a fork pull request
   // context. It is deliberately not a text match for one guard in one file: a
   // new job with no guard, or a guard that admits a fork, fails here without
   // anyone remembering to extend a list.
+  // This model cannot prove runner isolation: a fork can modify the workflow
+  // itself. Public release also needs an externally enforced runner policy.
   const exposed = reachableSelfHostedJobs('fork pull request');
   assert.deepEqual(
     exposed,
@@ -433,56 +432,50 @@ test('the pinned CI browser image matches the locked Playwright version', () => 
   }
 });
 
-test('weekly scientific-reference anti-bot exclusions are exactly scoped, not blanket HTTP 403', () => {
-  const scheduled = workflow('site-audit.yml');
-  const external = scheduled.split('  external-links:')[1]?.split('  passive-security:')[0];
+test('weekly link exceptions cover the actual ignore file and remain exact live citations', () => {
+  const external = workflow('site-audit.yml').split('  external-links:')[1]?.split('  passive-security:')[0];
   assert.ok(external, 'the weekly external-link gate must remain present');
   assert.match(external, /fail: true/);
-  assert.doesNotMatch(external, /--accept(?:-timeouts)?\b|--offline\b/);
+  assert.doesNotMatch(external, /--accept(?:-timeouts)?\b|--offline\b|--config\b|workingDirectory:/);
 
   const flags = external.split('          args: >-')[1]?.split('          fail:')[0];
   assert.ok(flags, 'inspect the exact Lychee command, not arbitrary workflow comments');
-  const excludes = [...flags.matchAll(/--exclude '([^']+)'/g)].map((match) => match[1]);
-  assert.deepEqual(excludes.slice(1), [
-    String.raw`^https://www\.iso\.org/standard/69042\.html$`,
-    String.raw`^https://doi\.org/10\.1167/10\.8\.12$`,
-  ]);
-  assert.equal(excludes.length, 3, 'only the site itself and two reviewed publishers may be excluded');
-  assert.match(excludes[0], /^\^https:\/\/sense6/);
+  const inline = [...flags.matchAll(/--exclude '([^']+)'/g)].map((match) => match[1]);
+  assert.deepEqual(inline, [String.raw`^https://sense6\.net(?:/|$)`]);
+  const ownSite = new RegExp(inline[0]);
+  for (const url of ['https://sense6.net', 'https://sense6.net/en/']) assert.ok(ownSite.test(url));
+  for (const url of ['https://sense6Xnet/en/', 'https://sense6.net.evil.example/']) {
+    assert.ok(!ownSite.test(url), `the internal-route exception must not match ${url}`);
+  }
 
-  for (const [expression, accepted, nearMisses] of [
-    [
-      excludes[1],
-      'https://www.iso.org/standard/69042.html',
-      [
-        'https://www.iso.org/standard/69042.html?review=1',
-        'https://www.iso.org/standard/69043.html',
-        'https://wwwXiso.org/standard/69042.html',
-      ],
-    ],
-    [
-      excludes[2],
-      'https://doi.org/10.1167/10.8.12',
-      [
-        'https://doi.org/10.1167/10.8.13',
-        'https://doi.org/10.1167/10.8.12-extra',
-        'https://doiXorg/10.1167/10.8.12',
-      ],
-    ],
-  ]) {
-    const regex = new RegExp(expression);
-    assert.ok(regex.test(accepted), `the reviewed source ${accepted} must be exempt`);
-    for (const url of nearMisses) {
-      assert.ok(!regex.test(url), `a similar unreviewed link must stay checked: ${url}`);
+  // lychee-action loads this file even without an explicit CLI flag. Ignoring
+  // it in this policy test previously hid five additional publisher exceptions.
+  const patterns = readFileSync(new URL('../.lycheeignore', import.meta.url), 'utf8')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith('#'));
+  const reviewed = [
+    'https://doi.org/10.1121/1.1912375',
+    'https://doi.org/10.1177/23312165221118792',
+    'https://doi.org/10.7717/peerj.9414',
+    'https://www.merckmanuals.com/home/eye-disorders/symptoms-of-eye-disorders/eye-pain',
+    'https://www.iso.org/standard/69042.html',
+    'https://doi.org/10.1167/10.8.12',
+  ];
+  const exactPattern = (url) => `^${url.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`;
+  assert.deepEqual(patterns, reviewed.map(exactPattern), 'no hidden host-wide or obsolete exception');
+
+  const citations = ['../src/learn-content.json', '../src/exams/sources.js']
+    .map((file) => readFileSync(new URL(file, import.meta.url), 'utf8'))
+    .join('\n');
+  for (const [index, url] of reviewed.entries()) {
+    assert.ok(citations.includes(url), `remove stale exceptions when a source is retired: ${url}`);
+    const pattern = new RegExp(patterns[index]);
+    assert.ok(pattern.test(url));
+    for (const nearMiss of [`${url}?review=1`, `${url}-extra`, url.replace('.', 'X')]) {
+      assert.ok(!pattern.test(nearMiss), `a similar unreviewed URL must remain checked: ${nearMiss}`);
     }
   }
-  const source = readFileSync(new URL('../src/learn-content.json', import.meta.url), 'utf8');
-  const experiments = readFileSync(new URL('../src/exams/sources.js', import.meta.url), 'utf8');
-  assert.ok(source.includes('https://doi.org/10.1167/10.8.12'), 'do not remove the Jordan DOI');
-  assert.ok(
-    experiments.includes('https://www.iso.org/standard/69042.html'),
-    'do not remove the ISO standard',
-  );
 });
 
 test('PR smoke spans every instrument while production runs the full browser matrix', () => {

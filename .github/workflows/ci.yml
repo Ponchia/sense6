@@ -11,12 +11,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # `runs-on: arc-vps-sense6` is a self-hosted runner inside the operator's
-  # netcup cluster. This repository is private today, so only trusted pull
-  # requests reach it — but branch protection is impossible without GitHub Pro,
-  # and "make the repository public" is the obvious remedy. Making it public
-  # without this guard would hand every fork pull request code execution in the
-  # cluster. The guard is defensive and must survive any visibility change.
+  # The current private-repository workflow accepts same-repository PRs only.
+  # Keep this regression guard, but do not treat mutable workflow code as the
+  # public security boundary: a fork can propose changes to this file. Before
+  # making the repository public, enforce runner access outside PR-controlled
+  # code and provide an isolated/hosted path for untrusted contributions.
+  # See docs/public-repository-readiness.md.
   verify:
     if: github.event.pull_request.head.repo.full_name == github.repository
     uses: ./.github/workflows/verify.yml

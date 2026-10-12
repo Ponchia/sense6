@@ -8,7 +8,10 @@ const EXPORT_FORMAT = 'sense6-journal-export';
 const SCHEMA_VERSION = 2;
 const STORAGE_KEY = 'sense6:journal';
 const MAX_ENTRIES = 100;
-const MAX_IMPORT_BYTES = 1_000_000;
+const MAX_STORAGE_BYTES = 1_000_000;
+// Exports carry a format suffix and timestamp beyond the stored envelope.
+// Keep old journals at the storage limit portable without enlarging that limit.
+const MAX_IMPORT_BYTES = MAX_STORAGE_BYTES + 128;
 const MAX_NOTES = 12;
 
 const QUALITY = new Set(['usable', 'caution', 'limited']);
@@ -222,16 +225,30 @@ export function clearJournal(storage) {
 
 /** @param {JournalStorage} [storage] */
 export function exportJournal(storage) {
-  return JSON.stringify(
-    {
-      format: EXPORT_FORMAT,
-      schemaVersion: SCHEMA_VERSION,
-      exportedAt: new Date().toISOString(),
-      entries: loadJournal(storage),
-    },
-    null,
-    2,
-  );
+  const exported = journalExportDocument(loadJournal(storage));
+  const formatted = JSON.stringify(exported, null, 2);
+  // Indentation must not turn a readable journal into a file we cannot import.
+  return byteLength(formatted) <= MAX_IMPORT_BYTES ? formatted : JSON.stringify(exported);
+}
+
+/** @param {JournalEntry[]} entries */
+function journalExportDocument(entries) {
+  return {
+    format: EXPORT_FORMAT,
+    schemaVersion: SCHEMA_VERSION,
+    exportedAt: new Date().toISOString(),
+    entries,
+  };
+}
+
+/** @param {JournalEntry[]} entries */
+function serializeJournal(entries) {
+  return JSON.stringify({ format: FORMAT, schemaVersion: SCHEMA_VERSION, entries: sortEntries(entries) });
+}
+
+/** @param {JournalEntry[]} entries */
+function fitsJournalByteBudget(entries) {
+  return byteLength(serializeJournal(entries)) <= MAX_STORAGE_BYTES;
 }
 
 /**
@@ -300,6 +317,7 @@ function planJournalImport(raw, storage) {
     additions.push(entry);
   }
   const entries = sortEntries([...current, ...additions]).slice(0, MAX_ENTRIES);
+  if (!fitsJournalByteBudget(entries)) return { ok: false, reason: 'storage' };
   const retained = new Set(entries.map((entry) => entry.id));
   const retainedAdditions = additions.filter((entry) => retained.has(entry.id)).length;
   const discarded = additions.length - retainedAdditions;
@@ -416,21 +434,22 @@ export function captureDisplayPassport() {
   };
 }
 
-export const JOURNAL_LIMITS = Object.freeze({ maxEntries: MAX_ENTRIES, maxImportBytes: MAX_IMPORT_BYTES });
+export const JOURNAL_LIMITS = Object.freeze({
+  maxEntries: MAX_ENTRIES,
+  maxStorageBytes: MAX_STORAGE_BYTES,
+  maxImportBytes: MAX_IMPORT_BYTES,
+});
 
 /** @param {JournalEntry[]} entries @param {JournalStorage} storage */
 function writeJournal(entries, storage) {
   try {
     const canonical = entries.map(canonicalJournalEntry);
     if (canonical.some((entry) => entry === null)) return false;
-    storage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        format: FORMAT,
-        schemaVersion: SCHEMA_VERSION,
-        entries: sortEntries(/** @type {JournalEntry[]} */ (canonical)),
-      }),
-    );
+    const validated = /** @type {JournalEntry[]} */ (canonical);
+    // Never replace a readable journal with data our own reader must refuse.
+    // Entry-count and per-field limits alone do not bound the UTF-8 byte size.
+    if (!fitsJournalByteBudget(validated)) return false;
+    storage.setItem(STORAGE_KEY, serializeJournal(validated));
     return true;
   } catch {
     return false;
@@ -455,7 +474,7 @@ function readJournal(storage) {
     return { status: 'inaccessible', entries: [], raw: null, writable: false };
   }
   if (!raw) return { status: 'empty', entries: [], raw: null, writable: true };
-  if (byteLength(raw) > MAX_IMPORT_BYTES) {
+  if (byteLength(raw) > MAX_STORAGE_BYTES) {
     return { status: 'oversized', entries: [], raw, writable: false };
   }
   let parsed;

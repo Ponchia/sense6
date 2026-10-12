@@ -10,6 +10,9 @@ boundary explicit in code, result copy, metadata, and documentation.
 - `docs/README.md`: current guides, decisions, runbooks, and research lifecycle.
 - `docs/architecture.md`: runtime boundaries and source-of-truth map.
 - `docs/adding-an-experiment.md`: extension contract.
+- `CONTRIBUTING.md`: portable setup, checks, and contribution workflow.
+- `SECURITY.md`: private reporting and sensitive-data handling.
+- `docs/public-repository-readiness.md`: publication prerequisites and file-retention decisions.
 
 ## Rules
 
@@ -30,6 +33,11 @@ npm run check:core
 npm run docs:check
 ```
 
-Run the browser matrix only when the change needs it. Run
-`repo-instruction-audit --repo .` after changing agent instructions or
-documentation routing.
+Run the browser matrix when the change affects browser behavior.
+In the Bronto workspace, also run `repo-instruction-audit --repo .` after
+changing agent instructions or documentation routing. This optional workspace
+helper is not required for a standalone clone.
+
+Repository visibility, Git history rewrites, and deployment credentials are
+maintainer decisions. Never commit local `.env` or `.dev.vars` files, private
+journal exports, participant notes, or scanner reports containing secrets.

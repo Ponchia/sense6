@@ -862,3 +862,108 @@ function memoryStorage(initial = {}) {
     removeItem: (key) => values.delete(key),
   };
 }
+
+test('individually valid imports cannot combine into an unreadable oversized journal', () => {
+  const entries = Array.from({ length: 35 }, (_, index) => bulkyEntry(`large-${index}`));
+  const existing = entries.slice(0, 25);
+  const stored = JSON.stringify({ format: 'sense6-journal', schemaVersion: 2, entries: existing });
+  const source = exportWith(entries.slice(25));
+  const storage = memoryStorage({ 'sense6:journal': stored });
+  assert.equal(readJournalState(storage).status, 'ready');
+  assert.ok(Buffer.byteLength(source) < JOURNAL_LIMITS.maxImportBytes);
+
+  const preview = previewJournalImport(source, storage);
+  assert.deepEqual(preview, { ok: false, reason: 'storage' });
+  assert.deepEqual(importJournal(source, storage), { ok: false, reason: 'storage' });
+  assert.equal(storage.getItem('sense6:journal'), stored, 'refusal must preserve all existing entries');
+  assert.equal(loadJournal(storage).length, existing.length);
+});
+
+test('an append that exceeds the readable byte budget preserves the existing journal', () => {
+  const entries = [];
+  let stored = '';
+  let next = null;
+  for (let index = 0; index < JOURNAL_LIMITS.maxEntries; index += 1) {
+    const candidate = bulkyEntry(`large-${index}`);
+    const raw = JSON.stringify({
+      format: 'sense6-journal',
+      schemaVersion: 2,
+      entries: [...entries, candidate],
+    });
+    if (Buffer.byteLength(raw) > JOURNAL_LIMITS.maxImportBytes) {
+      next = candidate;
+      break;
+    }
+    entries.push(candidate);
+    stored = raw;
+  }
+  assert.ok(next, 'the fixture must exceed the byte budget before reaching the count limit');
+  const storage = memoryStorage({ 'sense6:journal': stored });
+  assert.equal(readJournalState(storage).status, 'ready');
+
+  assert.equal(appendJournalEntry(next, storage), false);
+  assert.equal(storage.getItem('sense6:journal'), stored);
+  assert.equal(loadJournal(storage).length, entries.length);
+});
+
+function bulkyEntry(id) {
+  const fields = (count) =>
+    Object.fromEntries(Array.from({ length: count }, (_, index) => [`field${index}`, '界'.repeat(160)]));
+  return entry({
+    id,
+    setup: fields(24),
+    qualityEvidence: fields(32),
+    notes: Array.from({ length: 12 }, () => '界'.repeat(100)),
+  });
+}
+
+test('a journal filled to its byte budget still exports a file the importer accepts', () => {
+  const storage = memoryStorage();
+  let retained = 0;
+  for (let index = 0; index < JOURNAL_LIMITS.maxEntries; index += 1) {
+    if (!appendJournalEntry(bulkyEntry(`large-${index}`), storage)) break;
+    retained += 1;
+  }
+  assert.ok(retained > 0 && retained < JOURNAL_LIMITS.maxEntries);
+  const exported = exportJournal(storage);
+  assert.ok(Buffer.byteLength(exported) <= JOURNAL_LIMITS.maxImportBytes);
+  assert.equal(exported.includes('\n'), false, 'large exports omit indentation instead of losing entries');
+
+  const target = memoryStorage();
+  const preview = previewJournalImport(exported, target);
+  assert.equal(preview.ok, true);
+  assert.equal(preview.additions, retained);
+  assert.deepEqual(importJournal(exported, target, preview), preview);
+  assert.deepEqual(loadJournal(target), loadJournal(storage));
+});
+
+test('existing schema-two journals at the storage limit round-trip with bounded export metadata', () => {
+  const entries = Array.from({ length: 35 }, (_, index) => bulkyEntry(`large-${index}`));
+  const storedDocument = { format: 'sense6-journal', schemaVersion: 2, entries };
+  let excess = Buffer.byteLength(JSON.stringify(storedDocument)) - (JOURNAL_LIMITS.maxStorageBytes - 10);
+  for (const candidate of entries) {
+    for (const values of [candidate.setup, candidate.qualityEvidence]) {
+      for (const key of Object.keys(values)) {
+        if (excess <= 0) break;
+        const removed = Math.min(values[key].length, Math.ceil(excess / 3));
+        values[key] = values[key].slice(removed);
+        excess -= removed * 3;
+      }
+    }
+  }
+  const stored = JSON.stringify(storedDocument);
+  assert.ok(Buffer.byteLength(stored) <= JOURNAL_LIMITS.maxStorageBytes);
+  assert.ok(JOURNAL_LIMITS.maxStorageBytes - Buffer.byteLength(stored) < 47);
+  const storage = memoryStorage({ 'sense6:journal': stored });
+  assert.equal(readJournalState(storage).status, 'ready');
+  const exported = exportJournal(storage);
+  assert.ok(Buffer.byteLength(exported) > JOURNAL_LIMITS.maxStorageBytes);
+  assert.ok(Buffer.byteLength(exported) <= JOURNAL_LIMITS.maxImportBytes);
+
+  const target = memoryStorage();
+  const preview = previewJournalImport(exported, target);
+  assert.equal(preview.ok, true);
+  assert.deepEqual(importJournal(exported, target, preview), preview);
+  assert.deepEqual(loadJournal(target), loadJournal(storage));
+  assert.ok(Buffer.byteLength(target.getItem('sense6:journal')) <= JOURNAL_LIMITS.maxStorageBytes);
+});

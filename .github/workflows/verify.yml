@@ -34,14 +34,13 @@ jobs:
       - name: Verify locked Playwright version matches the pinned browser image
         run: node --test --test-name-pattern='the pinned CI browser image matches the locked Playwright version' tests/audit-wiring.test.js
 
-      # The browser matrix runs against `dist` served by
-      # scripts/serve-deployed-smoke.mjs, so every project loads the
-      # pre-rendered static pages and the production bundle under an enforced
-      # Content-Security-Policy. See the webServer comment in
-      # playwright.config.js for why the Vite dev server was not a valid target.
-      # PRs exercise representative routes, instruments, persistence and engine
-      # handover. The publication workflow retains the entire browser matrix.
-      # Untrusted fork PRs are excluded by ci.yml before reaching this runner.
+      # Chromium/mobile use loopback-only accelerated dev fixtures. The
+      # chromium-smoke, Firefox and WebKit projects load the generated dist
+      # pages with the production Content-Security-Policy enforced. The local
+      # deployed-browser journey below also checks the production artifact.
+      # PRs run representative cases; production retains the full matrix.
+      # ci.yml excludes forks in this revision, but runner access must also be
+      # enforced outside PR-controlled workflow code before public release.
       - name: Verify representative browser journeys for pull requests
         if: ${{ !inputs.publish_production }}
         env:

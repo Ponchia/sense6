@@ -1026,3 +1026,20 @@ function headerBlock(headers, route) {
   }
   return entries;
 }
+
+test('production output carries the complete runtime and emitted-font license notices', async () => {
+  const notice = await readFile(new URL('third-party-notices.txt', DIST), 'utf8');
+  for (const source of [
+    '../LICENSE',
+    '../node_modules/@ponchia/ui/LICENSE',
+    '../node_modules/@ponchia/ui/fonts/OFL.txt',
+  ]) {
+    const original = await readFile(new URL(source, import.meta.url), 'utf8');
+    assert.ok(notice.includes(original), `the built site must preserve the complete notice from ${source}`);
+  }
+  const fonts = (await readdir(new URL('assets/', DIST))).filter((name) =>
+    /\.(?:woff2?|ttf|otf|eot)$/i.test(name),
+  );
+  assert.ok(fonts.length > 0, 'this release includes font software');
+  for (const font of fonts) assert.ok(notice.includes(`assets/${font}`), `${font} needs attribution`);
+});
