@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { loadMessages } from '../src/locales.js';
 import { expectInVisualViewport, expectJournalEntry, expectNoHorizontalOverflow } from './helpers/browser.js';
 
 async function startLab(page, locale = 'en') {
@@ -9,6 +10,18 @@ async function startLab(page, locale = 'en') {
   await page.locator('[data-action="start"]').click();
   await expect(page.locator('[data-choice="0"]')).toBeEnabled();
 }
+
+test('Tetracromia announces the translated task and choice confirmation @pr-smoke', async ({ page }) => {
+  for (const locale of ['it', 'ar', 'zh-hans']) {
+    const messages = await loadMessages(locale);
+    await startLab(page, locale);
+    const liveRegion = page.locator('#announcer');
+    await expect(liveRegion).toHaveText(messages.get('Which tile is different?'));
+    await page.locator('[data-choice="0"]').click();
+    await expect(liveRegion).toHaveText(messages.get('Response recorded.'));
+    await expect(page.locator('.lab-progress')).toHaveAttribute('aria-valuenow', /\d+/);
+  }
+});
 
 async function answerTrials(page, selector, count) {
   const choice = page.locator(selector).first();

@@ -170,7 +170,9 @@ function startLab() {
   document.body.classList.add('lab-mode');
   state.trialStartedAt = performance.now();
   renderLab({ semanticTransition: true });
-  announce('Instrument one. Tile observation. Find the different tile.');
+  // The focused trial heading already names the instrument. Announce only the
+  // existing, reviewed localized question instead of an English-only compound.
+  announce('Which tile is different?');
 }
 
 function renderLab({ semanticTransition = false, restoreChoice = null } = {}) {
@@ -529,7 +531,9 @@ function answerChoice(choice, { restoreFocus = false } = {}) {
       `${t('Instrument')} ${state.session.phase.number}. ${t(state.session.phase.name)}. ${t(phasePrompt(state.session.phase.id))}`,
     );
   } else {
-    announce('Response recorded. Next trial.');
+    // The following trial is rendered immediately; this short confirmation is
+    // already translated in every supported experiment locale.
+    announce('Response recorded.');
   }
 
   state.selectedSequenceIndex = null;
@@ -676,9 +680,9 @@ function renderResults() {
 
   window.scrollTo({ top: 0, behavior: 'instant' });
   document.querySelector('.results-view').focus({ preventScroll: true });
-  announce(
-    'Session complete. Three separate short-run observations are ready. No overall score was calculated.',
-  );
+  // The focused results view contains the complete scientific boundary; keep
+  // the live-region success notice brief and language-matched.
+  announce('Session complete');
 }
 
 function observationMetric(number, title, value, detail, note) {
