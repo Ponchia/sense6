@@ -32,7 +32,8 @@ not a publication prerequisite. Current priorities are in the
 | `public/4572265e611a4df9903d7bb3fe2c1572.txt` | Keep: the intentionally public IndexNow verification key. It is not a deployment credential. |
 | `docs/adr/` | Keep: accepted architectural decisions and their reasons. |
 | `docs/research/` | Keep: explicitly archived research and review evidence. It is not current setup instruction. |
-| `.editorconfig`, `.github/actionlint.yaml`, `.lycheeignore`, `.zap-rules.tsv` | Keep: editor or audit configuration consumed by the corresponding tools. Audit the automatic config files as well as workflow flags. |
+| `.editorconfig`, `.lycheeignore`, `.zap-rules.tsv` | Keep: editor or audit configuration consumed by the corresponding tools. Audit the automatic config files as well as workflow flags. |
+| `.github/actionlint.yaml` | Removed with the hosted-runner cutover: it only declared the retired custom runner label and a null configuration value. Standard Ubuntu labels need no custom declaration. |
 | `.codespellrc` | Removed: it only exempted a word no longer in the maintained source, and no current check invokes Codespell. |
 | Retired DOI in `.lycheeignore` | Removed: no current source cites it. The remaining exact publisher exceptions live in one registry and are covered by policy tests. |
 | `dist/`, reports, coverage, local credentials, personal exports | Keep out of Git. Build and validation outputs are reproducible; personal material is not project source. |
@@ -118,29 +119,181 @@ reported an account payment or spending-limit issue. That annotation does not
 establish which billing condition caused it. No billing setting was changed.
 The hosted jobs must pass before the infrastructure cutover can proceed.
 
-The current workflows use a self-hosted `arc-vps-sense6` runner. `ci.yml`
-currently accepts only same-repository pull requests, and policy tests verify
-that checked-in graph. A fork can propose a modified workflow, so neither the
-condition nor those tests establish an infrastructure security boundary.
-GitHub explicitly warns against exposing self-hosted runners to public
-pull-request code; approval settings alone are not isolation.
+The hosted draft depends on the [runtime followthrough](https://github.com/Ponchia/sense6/pull/157),
+which must merge first.
 
-Before publication, provide a GitHub-hosted or otherwise isolated path for
-untrusted contributions and remove their ability to target the internal
-runner. The simplest deployment model is to move public-repository jobs to
-GitHub-hosted runners and revoke this repository's internal-runner access. A
-retained private release service needs a separately reviewed trust boundary.
-Verify enforcement with a fork that changes the workflow and an npm lifecycle
-script, not only a normal fork that leaves the guard intact. Do not run that
-probe against an accessible privileged runner.
+The workflow source selects standard GitHub-hosted `ubuntu-24.04` VMs for all
+verification, release, and scheduled-audit jobs. Fork and same-repository pull
+requests enter the same unprivileged verifier. The pinned Playwright container,
+browser matrix, Lighthouse budgets, visual comparison and evidence rules,
+release dependencies, and artifact checksum checks remain mandatory.
 
-Keep deployment credentials restricted to trusted release work, review
-workflow approval and token settings, and verify exact required status checks.
-Record the resulting external policy and review evidence before changing
-visibility. This cleanup does not change runner infrastructure or authorize
-publication.
+This is only the repository half of the transition. A fork can change a
+workflow, add a job, or run an npm lifecycle script. A fixed runner label and
+source-policy tests do not revoke its ability to request an internal runner.
+Before public launch, remove Sense6's repository-scoped ARC registration from
+`Ponchia/vps-infra` and verify that deletion in Flux and GitHub. The current
+internal runner uses privileged Docker-in-Docker on a shared VPS; disabling its
+service-account token does not isolate that host. The repository belongs to a
+personal account, so organization runner-group restrictions are not an
+available boundary in the present account structure.
 
-References: [GitHub secure-use guidance](https://docs.github.com/en/actions/reference/security/secure-use#hardening-for-self-hosted-runners)
+#### Coordinated cutover
+
+Keep the hosted-workflow and infrastructure-removal pull requests as drafts
+until their prerequisites are satisfied. Neither draft changes visibility,
+GitHub settings, production, or the currently deployed runner.
+
+1. Keep the repository private. Review both exact candidate commits and verify
+   the account's Actions allowance without enabling spending. Standard hosted
+   runner minutes are free for public repositories; private rehearsals still
+   use the owner's allowance. Billing API access was unavailable during this
+   review, so no remaining private-minute balance is asserted. An exhausted or
+   unverified allowance is a reason to leave the cutover staged, not to skip a
+   required hosted check. Artifact storage is a separate limit: required visual
+   evidence must still upload successfully.
+2. Run the complete pull-request graph on the hosted candidate. Require
+   `verify / browser`, `verify / lighthouse`, `verify / visual`, and
+   `verify / release` for the exact head. Both visual revisions must be captured
+   in the same pinned container on the hosted VM. Preserve thresholds and
+   report runner-compatibility failures; do not lower budgets to finish migration.
+3. Merge the hosted workflow only after its required checks pass, while the
+   repository remains private. Verify the `main` production graph and deployed
+   commit. Stop submitting work to the old ARC label and drain all queued and
+   running Sense6 ARC jobs before retiring it.
+4. Merge the scoped `vps-infra` retirement. Flux `gha-runner` owns
+   `cluster/gha-runner/helmrelease-sense6.yaml`, its values and Kustomization
+   entries; Flux `shared-apps` owns the `arc-runner-sense6` service account.
+   Remove only those resources. Retain the shared ARC controller, credentials,
+   namespaces and every other repository's runner.
+5. Verify the retirement at the reconciled infrastructure commit: the
+   `arc-runner-sense6` HelmRelease, `arc-vps-sense6` AutoscalingRunnerSet,
+   associated listener/ephemeral runners and runner pods, and service account
+   must be absent. GitHub must show no Sense6 self-hosted runner registration.
+   An empty ephemeral-runner list by itself is insufficient: a scale set can
+   idle at zero and accept the next job. Check that peer runners and both Flux
+   Kustomizations remain healthy.
+6. During a separately authorized public launch, hold Actions disabled while
+   configuring settings that require a public repository on the current plan:
+   protect `main` with the exact required checks, require approval for all
+   external fork contributors, and enable private vulnerability reporting.
+   Keep the default workflow token read-only and approval of pull requests by
+   workflows disabled. Verify every setting before re-enabling Actions. Fork
+   approvals limit execution and resource use; the absent internal runner is
+   the infrastructure boundary.
+7. Verify public contributions with an innocuous fork that changes its workflow
+   and runs a harmless npm lifecycle marker on `ubuntu-24.04`. Inspect the actual
+   runner and confirm no deployment secrets or production steps are granted.
+   The source tests also reject self-hosted and dynamic runner selections using
+   in-memory fixtures. Never submit a malicious-workflow probe to an accessible
+   internal ARC runner; use the external registration checks to prove removal.
+
+If private hosted checks cannot run, leave both drafts unmerged and resolve the
+allowance or explicitly re-plan the launch with the maintainer. Changing
+visibility to evade a preparation gate is not part of this cutover.
+
+#### Reviewed launch settings
+
+These commands are a reviewable launch recipe, not a preparation step. The
+maintainer must authorize the public launch separately, verify ARC retirement,
+and drain active jobs first. Before any write, save the existing readbacks in
+private operator evidence. The private repository returned HTTP 403 for branch
+protection on the current plan; its `preview` and `production` environments
+have no protection rules. Do not claim these settings are already enforced.
+
+Hold Actions while performing the separately authorized visibility change and
+applying its public-only controls:
+
+```sh
+gh api repos/Ponchia/sense6/actions/permissions
+gh api --method PUT repos/Ponchia/sense6/actions/permissions -F enabled=false
+```
+
+After the maintainer changes visibility, protect `main` with the exact four
+GitHub Actions check contexts. App ID `15368` was verified from the successful
+review candidate; recheck the publisher on the hosted candidate before applying.
+Zero required approving reviews preserves the single-maintainer workflow; do
+not demand another approver unless one has actually joined the project.
+
+```sh
+gh api --method PUT repos/Ponchia/sense6/branches/main/protection --input - <<'JSON'
+{
+  "required_status_checks": {
+    "strict": true,
+    "contexts": [],
+    "checks": [
+      {"context": "verify / browser", "app_id": 15368},
+      {"context": "verify / lighthouse", "app_id": 15368},
+      {"context": "verify / visual", "app_id": 15368},
+      {"context": "verify / release", "app_id": 15368}
+    ]
+  },
+  "enforce_admins": true,
+  "required_pull_request_reviews": {
+    "required_approving_review_count": 0,
+    "require_code_owner_reviews": false,
+    "require_last_push_approval": false
+  },
+  "restrictions": null,
+  "allow_force_pushes": false,
+  "allow_deletions": false
+}
+JSON
+
+gh api --method PUT repos/Ponchia/sense6/actions/permissions/workflow \
+  -f default_workflow_permissions=read \
+  -F can_approve_pull_request_reviews=false
+gh api --method PUT repos/Ponchia/sense6/actions/permissions/fork-pr-contributor-approval \
+  -f approval_policy=all_external_contributors
+gh api --method PUT repos/Ponchia/sense6/private-vulnerability-reporting
+```
+
+Read back every setting. Confirm the exact four check names and publisher,
+strict checks and admin enforcement, zero required approving reviews, disabled
+force pushes/deletions, read-only default token, workflow approval disabled,
+`all_external_contributors`, and private reporting `enabled: true`:
+
+```sh
+gh api repos/Ponchia/sense6/branches/main/protection --jq '{checks: .required_status_checks.checks, strict: .required_status_checks.strict, enforce_admins: .enforce_admins.enabled, reviews: .required_pull_request_reviews.required_approving_review_count, force_pushes: .allow_force_pushes.enabled, deletions: .allow_deletions.enabled}'
+gh api repos/Ponchia/sense6/actions/permissions/workflow
+gh api repos/Ponchia/sense6/actions/permissions/fork-pr-contributor-approval
+gh api repos/Ponchia/sense6/private-vulnerability-reporting
+```
+
+Confirm **Report a vulnerability** is visible and the maintainer receives
+security notifications before accepting a real report. Do not submit exploit
+content as a setup test. Resolve any missing readback while Actions stays
+held. Only then restore Actions and confirm its enabled state:
+
+```sh
+gh api --method PUT repos/Ponchia/sense6/actions/permissions -F enabled=true
+gh api repos/Ponchia/sense6/actions/permissions
+```
+
+The existing main-only deployment caller retains its scoped publication steps;
+this recipe does not introduce an environment approval requirement that the
+current private account cannot enforce. If environment controls are added at
+launch, first verify their availability and how they affect the single
+maintainer's release path.
+
+API contracts: [branch protection](https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection),
+[Actions permissions](https://docs.github.com/en/rest/actions/permissions),
+and [private reporting](https://docs.github.com/en/rest/repos/repos#enable-private-vulnerability-reporting-for-a-repository).
+
+#### Rollback
+
+Before public launch, a failed hosted candidate leaves the existing private
+release path available. If the workflow migration has merged but retirement
+has not, revert that migration while still private. If ARC has already been
+retired, first restore its exact reviewed infrastructure source and verify the
+service account, HelmRelease and listener, then restore the private workflow.
+After the repository is public, recover on hosted runners or keep Actions
+disabled; do not reattach the shared internal runner as a quick rollback.
+
+References: [standard hosted runner selection](https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job),
+[Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions),
+[GitHub secure-use guidance](https://docs.github.com/en/actions/reference/security/secure-use#hardening-for-self-hosted-runners),
+[runner groups](https://docs.github.com/en/actions/concepts/runners/runner-groups),
 and [repository Actions settings](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#controlling-changes-from-forks-to-workflows-in-public-repositories).
 
 ### 2. Verify a private vulnerability-reporting route

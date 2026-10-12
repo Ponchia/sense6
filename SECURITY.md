@@ -49,5 +49,6 @@ no guaranteed response-time or bounty commitment.
 
 Before making this repository public, complete the runner-access and reporting
 prerequisites in [public-repository readiness](docs/public-repository-readiness.md).
-The current workflow's fork condition is a regression guard, not proof of
-isolation from untrusted pull-request code.
+The workflow's hosted-runner policy is a source regression check. The separate
+removal of this repository's internal ARC registration must be verified before
+public launch.

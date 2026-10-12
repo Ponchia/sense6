@@ -28,7 +28,7 @@ jobs:
   route-integrity:
     # A manual Lighthouse-only verification keeps the normal weekly sweep intact.
     if: github.event.inputs.lighthouse_only != 'true'
-    runs-on: arc-vps-sense6
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
       PUPPETEER_SKIP_DOWNLOAD: 'true'
@@ -63,7 +63,7 @@ jobs:
   # the release job needs it and a budget failure can actually stop a deploy.
   # What remains here is the scheduled full-site sweep over every route.
   lighthouse-full-site:
-    runs-on: arc-vps-sense6
+    runs-on: ubuntu-24.04
     # The full indexable set grew from 85 to 157 routes as Learn was published
     # across 12 languages. The old 45-minute ceiling was too close to the
     # projected serial mobile Lighthouse runtime; keep every route in scope.
@@ -102,7 +102,7 @@ jobs:
   external-links:
     # A manual Lighthouse-only verification keeps the normal weekly sweep intact.
     if: github.event.inputs.lighthouse_only != 'true'
-    runs-on: arc-vps-sense6
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       PUPPETEER_SKIP_DOWNLOAD: 'true'
@@ -137,7 +137,7 @@ jobs:
   passive-security:
     # A manual Lighthouse-only verification keeps the normal weekly sweep intact.
     if: github.event.inputs.lighthouse_only != 'true'
-    runs-on: arc-vps-sense6
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Check out the repository
