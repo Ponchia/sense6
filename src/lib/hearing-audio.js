@@ -65,16 +65,18 @@ export class HearingAudio {
       this.master.gain.value = this.config.masterGain;
       this.master.connect(this.context.destination);
     }
-    if (this.context.state !== 'running') await this.context.resume();
-    if (this.context.state !== 'running') throw new Error('Audio context is not running');
-    return this.context;
+    const context = this.context;
+    if (context.state !== 'running') await context.resume();
+    if (context !== this.context || context.state !== 'running') {
+      throw new Error('Audio context is not running');
+    }
+    return context;
   }
 
   async playReference() {
-    await this.init();
-    this.stop();
-    const context = this.requireContext();
-    const token = this.playToken;
+    const playback = await this.preparePlayback();
+    if (!playback || playback.token !== this.playToken) return false;
+    const { context, token } = playback;
     const startAt = context.currentTime + 0.05;
     const durationSeconds = this.config.referenceMs / 1000;
     this.scheduleTone({
@@ -128,10 +130,9 @@ export class HearingAudio {
 
   /** @param {(ToneInterval | null)[]} intervals @param {(index: number) => void} [onInterval] */
   async playIntervals(intervals, onInterval) {
-    await this.init();
-    this.stop();
-    const context = this.requireContext();
-    const token = this.playToken;
+    const playback = await this.preparePlayback();
+    if (!playback || playback.token !== this.playToken) return false;
+    const { context, token } = playback;
     const toneSeconds = this.config.toneMs / 1000;
     const gapSeconds = this.config.gapMs / 1000;
     const rampSeconds = Math.min(this.config.rampMs / 1000, toneSeconds / 3);
@@ -197,19 +198,36 @@ export class HearingAudio {
 
   async close() {
     this.stop();
-    if (this.context) {
-      this.context.removeEventListener?.('statechange', this.handleContextStateChange);
-      this.context.removeEventListener?.('sinkchange', this.handleSinkChange);
-      if (this.context.state !== 'closed') {
+    const context = this.context;
+    // Release this context before awaiting browser teardown. A new init must
+    // never reuse it or lose its replacement when the old close settles.
+    this.context = null;
+    this.master = null;
+    if (context) {
+      context.removeEventListener?.('statechange', this.handleContextStateChange);
+      context.removeEventListener?.('sinkchange', this.handleSinkChange);
+      if (context.state !== 'closed') {
         try {
-          await this.context.close();
+          await context.close();
         } catch {
           // A context that is already closing cannot be closed a second time.
         }
       }
     }
-    this.context = null;
-    this.master = null;
+  }
+
+  async preparePlayback() {
+    // Own the request before resume yields: stopping or starting another sound
+    // while the browser unlocks audio must invalidate this pending request too.
+    this.stop();
+    const token = this.playToken;
+    try {
+      const context = await this.init();
+      return token === this.playToken ? { context, token } : null;
+    } catch (error) {
+      if (token !== this.playToken) return null;
+      throw error;
+    }
   }
 
   /** @param {...TrackedAudioNode} nodes */
