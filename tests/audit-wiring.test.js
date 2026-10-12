@@ -338,8 +338,35 @@ test('successful unchanged visual checks do not consume artifact storage', () =>
   const verify = workflow('verify.yml');
 
   assert.match(verify, /if: failure\(\) \|\| steps\.visual-baselines\.outputs\.approved != ''/);
+  // Keep a fully pinned, consistent v7 action without coupling a workflow
+  // safety check to a particular Dependabot patch release.
   assert.doesNotMatch(allWorkflows, /actions\/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02/);
-  assert.match(allWorkflows, /actions\/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7\.0\.1/);
+  const uploads = [
+    ...allWorkflows.matchAll(/uses: actions\/upload-artifact@([a-f0-9]{40}) # v(\d+\.\d+\.\d+)/g),
+  ];
+  assert.ok(uploads.length >= 5, 'every artifact upload must use a reviewed full-SHA pin');
+  assert.equal(uploads.length, (allWorkflows.match(/uses: actions\/upload-artifact@/g) ?? []).length);
+  assert.equal(new Set(uploads.map((match) => `${match[1]} # v${match[2]}`)).size, 1);
+  assert.match(uploads[0][2], /^7\./, 'changing the artifact action major requires review');
+});
+
+test('the pinned CI browser image matches the locked Playwright version', () => {
+  const lock = JSON.parse(readFileSync(new URL('../package-lock.json', import.meta.url), 'utf8'));
+  const installed = lock.packages['node_modules/@playwright/test']?.version;
+  assert.match(installed ?? '', /^\d+\.\d+\.\d+$/);
+  assert.equal(lock.packages['node_modules/playwright-core']?.version, installed);
+
+  const images = [
+    ...allWorkflows.matchAll(
+      /image: (mcr\.microsoft\.com\/playwright:v(\d+\.\d+\.\d+)-noble@sha256:[a-f0-9]{64})/g,
+    ),
+  ];
+  assert.ok(images.length >= 5, 'every browser CI job must use a digest-pinned Playwright image');
+  assert.equal(images.length, (allWorkflows.match(/image: mcr\.microsoft\.com\/playwright:/g) ?? []).length);
+  assert.equal(new Set(images.map((match) => match[1])).size, 1, 'use one image on all browser jobs');
+  for (const image of images) {
+    assert.equal(image[2], installed, 'update the CI image digest in the same PR as Playwright');
+  }
 });
 
 test('PR smoke spans every instrument while production runs the full browser matrix', () => {
