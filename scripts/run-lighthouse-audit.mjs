@@ -10,6 +10,30 @@ import { SEARCH_REPRESENTATIVE_ROUTES, SEARCH_ROUTES } from '../audits/routes.js
 // Both CI modes use an explicit source-owned route allowlist: no crawler,
 // sitemap discovery, hidden sampling or arbitrary third-party destinations.
 const CATEGORY_IDS = Object.freeze(['performance', 'accessibility', 'best-practices', 'seo']);
+// Match @unlighthouse/core 0.19.1's explicit mobile configuration, not
+// Lighthouse's heavier default 4× CPU throttling. Changing this profile is a
+// measurement/protocol change and needs an independent before/after review.
+const MOBILE_PROFILE = Object.freeze({
+  formFactor: 'mobile',
+  screenEmulation: {
+    mobile: true,
+    width: 412,
+    height: 823,
+    deviceScaleFactor: 1,
+    disabled: false,
+  },
+  emulatedUserAgent:
+    'Mozilla/5.0 (Linux; Android 11; moto g power (2022)) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Mobile Safari/537.36',
+  throttlingMethod: 'simulate',
+  throttling: {
+    rttMs: 150,
+    throughputKbps: 1638.4,
+    requestLatencyMs: 600,
+    downloadThroughputKbps: 1638.4,
+    uploadThroughputKbps: 750,
+    cpuSlowdownMultiplier: 1,
+  },
+});
 const site = new URL(process.env.LIGHTHOUSE_SITE ?? 'http://127.0.0.1:4174');
 if (
   site.protocol !== 'http:' ||
@@ -42,8 +66,7 @@ try {
       output: 'json',
       logLevel: 'error',
       onlyCategories: [...CATEGORY_IDS],
-      formFactor: 'mobile',
-      throttlingMethod: 'simulate',
+      ...MOBILE_PROFILE,
     });
     const report = result?.lhr;
     if (!report || report.runtimeError) {

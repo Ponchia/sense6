@@ -298,6 +298,9 @@ test('scheduled Lighthouse covers the whole indexable site with a scalable timeo
   assert.match(runner, /FULL_SITE_AUDIT === '1' \? SEARCH_ROUTES : SEARCH_REPRESENTATIVE_ROUTES/);
   assert.match(runner, /onlyCategories: \[\.\.\.CATEGORY_IDS\]/);
   assert.match(runner, /local Sense6 preview root/);
+  assert.match(runner, /cpuSlowdownMultiplier: 1/);
+  assert.match(runner, /requestLatencyMs: 600/);
+  assert.match(runner, /deviceScaleFactor: 1/);
   assert.match(budgets, /reports.length !== routes.length/);
   for (const category of ['performance', 'accessibility', 'best-practices', 'seo']) {
     assert.ok(budgets.includes(category), `missing ${category} budget`);
