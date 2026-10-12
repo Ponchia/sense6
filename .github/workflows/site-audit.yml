@@ -32,6 +32,8 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - name: Install dependencies
         run: npm ci
+      - name: Verify locked Playwright version matches the pinned browser image
+        run: node --test --test-name-pattern='the pinned CI browser image matches the locked Playwright version' tests/audit-wiring.test.js
       - name: Build the static site
         run: npm run build
       - name: Validate all generated HTML
@@ -70,6 +72,8 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - name: Install dependencies
         run: npm ci
+      - name: Verify locked Playwright version matches the pinned browser image
+        run: node --test --test-name-pattern='the pinned CI browser image matches the locked Playwright version' tests/audit-wiring.test.js
       - name: Build and serve the static site
         run: |
           npm run build
