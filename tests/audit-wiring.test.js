@@ -73,6 +73,12 @@ const EVENT_CONTEXTS = Object.freeze({
     'github.repository': REPOSITORY,
     'github.ref': 'refs/heads/main',
   },
+  'manual Lighthouse-only dispatch': {
+    'github.event_name': 'workflow_dispatch',
+    'github.repository': REPOSITORY,
+    'github.ref': 'refs/heads/main',
+    'github.event.inputs.lighthouse_only': 'true',
+  },
 });
 
 /**
@@ -104,6 +110,16 @@ const SELF_HOSTED_REACH = Object.freeze({
     'site-audit.yml:lighthouse-full-site',
     'site-audit.yml:passive-security',
     'site-audit.yml:route-integrity',
+    'verify.yml:browser',
+    'verify.yml:lighthouse',
+    'verify.yml:release',
+    'verify.yml:visual',
+  ],
+  // The static model enumerates every workflow with the same event name.
+  // An actual workflow_dispatch chooses one workflow file, so verify.yml's
+  // manual jobs appear here but are not part of Site audit's invocation.
+  'manual Lighthouse-only dispatch': [
+    'site-audit.yml:lighthouse-full-site',
     'verify.yml:browser',
     'verify.yml:lighthouse',
     'verify.yml:release',
@@ -285,6 +301,23 @@ test('the Lighthouse budget can stop a deploy', () => {
     siteAudit,
     /^ {2}lighthouse:$/m,
     'the gating Lighthouse job belongs in verify.yml, not in an unrelated workflow',
+  );
+});
+
+test('manual Lighthouse-only dispatch preserves the full sweep without starting unrelated site jobs', () => {
+  const audit = workflow('site-audit.yml');
+  assert.match(audit, /^ {2}workflow_dispatch:\n {4}inputs:\n {6}lighthouse_only:/m);
+  assert.match(audit, /type: boolean\n {8}default: false/);
+  for (const job of ['route-integrity', 'external-links', 'passive-security']) {
+    const segment = audit.split(`  ${job}:`)[1]?.split(/^ {2}[a-z-]+:$/m)[0];
+    assert.ok(segment, `missing protected job ${job}`);
+    assert.match(segment, /if: github\.event\.inputs\.lighthouse_only != 'true'/);
+  }
+  assert.deepEqual(
+    reachableSelfHostedJobs('manual Lighthouse-only dispatch').filter((id) =>
+      id.startsWith('site-audit.yml:'),
+    ),
+    ['site-audit.yml:lighthouse-full-site'],
   );
 });
 

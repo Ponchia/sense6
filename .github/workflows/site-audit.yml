@@ -2,6 +2,11 @@ name: Site audit
 
 on:
   workflow_dispatch:
+    inputs:
+      lighthouse_only:
+        description: Run only the full 157-route Lighthouse budget audit
+        type: boolean
+        default: false
   schedule:
     - cron: '23 3 * * 1'
 
@@ -21,6 +26,8 @@ concurrency:
 # second workflow for the same runner scale set.
 jobs:
   route-integrity:
+    # A manual Lighthouse-only verification keeps the normal weekly sweep intact.
+    if: github.event.inputs.lighthouse_only != 'true'
     runs-on: arc-vps-sense6
     timeout-minutes: 20
     env:
@@ -93,6 +100,8 @@ jobs:
           retention-days: 3
 
   external-links:
+    # A manual Lighthouse-only verification keeps the normal weekly sweep intact.
+    if: github.event.inputs.lighthouse_only != 'true'
     runs-on: arc-vps-sense6
     timeout-minutes: 15
     env:
@@ -122,6 +131,8 @@ jobs:
           lycheeVersion: v0.24.2
 
   passive-security:
+    # A manual Lighthouse-only verification keeps the normal weekly sweep intact.
+    if: github.event.inputs.lighthouse_only != 'true'
     runs-on: arc-vps-sense6
     timeout-minutes: 15
     steps:

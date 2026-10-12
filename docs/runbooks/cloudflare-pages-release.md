@@ -162,6 +162,14 @@ match the previously deployed Unlighthouse 0.19.1 profile; using unmodified
 Lighthouse mobile defaults raises the CPU slowdown to 4× and makes scores
 incomparable. A deliberate profile change needs its own comparative evidence.
 
+Before replacing the existing Lighthouse provider, run the entire route set on
+the **pinned CI runner** from the candidate branch using the Site audit workflow
+with the `lighthouse_only` manual input enabled. That input starts only the
+complete Lighthouse sweep, not its separate external-link, route-integrity or
+passive-security jobs. Regular weekly scheduled runs and manual runs without
+the input retain all four audit jobs. The current PR and production release
+gates remain unchanged and mandatory.
+
 The scheduled full sweep starts a fresh Chrome process every **16 routes** to
 bound browser-session resource accumulation. It still measures each of the
 157 canonical pages exactly once and applies the same unmodified budgets.
