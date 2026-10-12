@@ -289,7 +289,10 @@ function submitPracticeAnswer(answer) {
       : `This clear practice gap is on the ${DIRECTION_LABELS[trial.orientation]}. Follow the open side of the coloured C.`,
   };
   renderPractice();
-  announce(state.practiceFeedback.message);
+  // Read the localized visible feedback rather than reconstructing an English
+  // direction sentence for the persistent, out-of-tree aria-live region.
+  const visibleFeedback = state.app.querySelector('.cb-practice-feedback p')?.textContent?.trim();
+  announce(visibleFeedback || t('Response recorded.'));
 }
 
 function advancePractice() {
@@ -300,7 +303,8 @@ function advancePractice() {
     return;
   }
   renderPractice();
-  announce(`Practice ${state.practiceIndex + 1} of ${PRACTICE_TARGETS.length}. Find the clear gap.`);
+  // Practice position is already present in the visible, focusable topbar.
+  announce('Where is the clear gap?');
 }
 
 function beginAdaptiveRun() {
@@ -431,7 +435,9 @@ function submitOrientation(orientation) {
     return;
   }
   renderTrial();
-  announce(`Response ${state.run.responses.length + 1}. Choose a direction or no gap visible.`);
+  // The new plate is ready: use reviewed localized task wording, rather
+  // than interpolating an English-only screen-reader prompt.
+  announce(`${t('Response recorded.')} ${t('Where is the gap?')}`);
 }
 
 function renderResults() {
@@ -515,7 +521,9 @@ function renderResults() {
     );
 
   document.querySelector('#main').focus({ preventScroll: true });
-  announce(`Experiment complete. ${result.title}. ${result.detail}`);
+  // Match the result heading that the localized root has just rendered. This
+  // avoids reintroducing raw English domain-model strings into the live region.
+  announce(state.app.querySelector('.results-head h1')?.textContent?.trim() || t('Session complete'));
 }
 
 function resultVerdict(result) {

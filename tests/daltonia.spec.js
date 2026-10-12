@@ -2,6 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { createAdaptiveRun, currentAdaptiveTrial, recordAdaptiveAnswer } from '../src/lib/daltonism.js';
 import { seededRandom } from '../src/lib/random.js';
+import { loadMessages } from '../src/locales.js';
 import {
   captureMetrics,
   expectInVisualViewport,
@@ -40,6 +41,29 @@ async function startPractice(page, locale = 'en') {
   await page.locator('#cb-start').click();
   await expect(page.locator('[data-target]')).toBeVisible();
 }
+
+test('Daltonia live-region feedback matches translated practice and trial content @pr-smoke', async ({
+  page,
+}) => {
+  for (const locale of ['it', 'ar']) {
+    const messages = await loadMessages(locale);
+    await startPractice(page, locale);
+    const liveRegion = page.locator('#announcer');
+    await page.locator('[data-orientation="right"]').click();
+    const visiblePractice = page.locator('.cb-practice-feedback p');
+    await expect(visiblePractice).toBeVisible();
+    await expect(liveRegion).toHaveText(await visiblePractice.textContent());
+    await page.locator('[data-action="cb-practice-next"]').click();
+    await expect(liveRegion).toHaveText(messages.get('Where is the clear gap?'));
+    await page.locator('[data-orientation="up"]').click();
+    await page.locator('[data-action="cb-practice-next"]').click();
+    await expect(page.locator('[data-measurement-active]')).toBeVisible();
+    await page.locator('[data-orientation="unseen"]').click();
+    await expect(liveRegion).toHaveText(
+      messages.get('Response recorded.') + ' ' + messages.get('Where is the gap?'),
+    );
+  }
+});
 
 async function startMeasuredRun(page, locale = 'en') {
   await startPractice(page, locale);
