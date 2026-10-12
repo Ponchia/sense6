@@ -28,7 +28,15 @@ import { relatedGuideResultLink } from './related-guide.js';
 import { isUditoLatestResult } from './results/udito.js';
 import { applyScopeSelection, scopeOptionMarkup } from './views/scope-picker.js';
 import { UDITO_INSTRUMENTS, uditoIntroMarkup } from './views/udito-intro.js';
+import {
+  uditoCompletionReasonLabel,
+  uditoJournalStatusMarkup,
+  uditoResultActions,
+  uditoResultSummary,
+  uditoResultsMarkup,
+} from './views/udito-results.js';
 
+const RESULT_TRANSLATIONS = { t, m, formatNumber };
 const STORAGE_KEY = 'sense6:udito:last';
 const RESULT_STORE = createResultStore({ key: STORAGE_KEY, validate: isUditoLatestResult });
 const MOUNT_OWNER = Symbol('udito');
@@ -643,35 +651,22 @@ function renderResults() {
     state.locale,
     'Understand what a browser hearing test can tell you',
   );
-  state.app.innerHTML = `
-    <section class="au-results ui-container ui-container--wide">
-      <button class="back-link" type="button" data-action="au-home"><span aria-hidden="true">←</span> ${m('nav.allTests')}</button>
-      <header class="au-results__hero"><div><p class="ui-eyebrow">${t('Udito / this setup / this run')}</p><h1>${includesPitch ? t('Three listening measures.') : t('Two focused listening measures.')}<br><em>${t('No hearing label.')}</em></h1><p>${usable ? t('The setup checks and adaptive tracks produced coherent run-level observations.') : t('At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.')}</p></div><div class="au-results__stamp ${usable ? '' : 'is-limited'}"><span>${t('Upper run boundary')}</span><strong>${formatHertz(range)}</strong><span>${t(setupQuality)}</span></div></header>
-      <div data-au-persistence></div>
-      <div class="au-result-grid">
-        ${resultCard('01', 'Headphone confidence', headphones.headphoneLike ? 'Headphone-like' : 'Uncertain', `${headphones.correct} / ${headphones.trials}`, 'A phase-based presentation check, not hardware detection.')}
-        ${resultCard('02', 'Upper run boundary', formatHertz(range), rangeDetail(range), range.atCeiling && range.settled ? 'Reached the technical frequency ceiling; your personal boundary may be higher.' : 'Relative to this device, self-reported unchanged volume, room, and audio sample rate.')}
-        ${includesPitch ? resultCard('03a', 'Pitch step near 500 Hz', formatPitch(pitch, 500), pitchDetail(pitch, 500), 'Adaptive ending estimate for this run; reversal range is not estimate uncertainty.') : ''}
-        ${includesPitch ? resultCard('03b', 'Pitch step near 2 kHz', formatPitch(pitch, 2000), pitchDetail(pitch, 2000), 'Reported separately; no composite hearing score is calculated.') : ''}
-      </div>
-      <div class="au-context-grid">
-        <article class="ui-card"><p class="ui-eyebrow">${t('Run context')}</p><h2>${t('What travelled with the sound.')}</h2><dl><div><dt>${t('Listening setup')}</dt><dd>${deviceLabel(state.session.device)}</dd></div><div><dt>Connection</dt><dd>${connectionLabel(state.session.connection)}</dd></div><div><dt>${t('Audio context')}</dt><dd>${formatNumber(state.session.sampleRate)} Hz</dd></div><div><dt>Audibility anchors</dt><dd>200 Hz, 500 Hz, and 2 kHz confirmed</dd></div><div><dt>Volume</dt><dd>${state.session.volumeConsistent ? 'Self-reported unchanged' : 'Changed or unsure'}</dd></div><div><dt>${t('Portata controls')}</dt><dd>${formatControlAccuracy(range)}</dd></div><div><dt>${t('Interruptions')}</dt><dd>${state.session.interruptions}</dd></div></dl></article>
-        <article class="ui-card"><p class="ui-eyebrow">${t('Interpretation boundary')}</p><h2>${t('Device-relative, never dB HL.')}</h2><p>${t('A browser knows digital amplitude, not sound pressure at your eardrum. Headphone response, fit, output, age, room noise, device processing, and the volume setting all shape these numbers.')}</p><p>${t('Do not infer hearing age, “normal” hearing, safety for work, or a medical diagnosis. If hearing concerns affect daily life, use calibrated clinical audiometry.')}</p>${uditoGuideLink ? `<p class="au-results__learn">${uditoGuideLink}</p>` : ''}</article>
-      </div>
-      <aside class="au-results__safety"><strong>${t('Keep the same volume only for comparison.')}</strong><p>${t('Compare your own runs only with the same device, headphones, fit, room, and volume. Stop testing if any sound is uncomfortable.')}</p></aside>
-      <div class="ui-cluster au-results__actions"></div>
-    </section>`;
+  state.app.innerHTML = uditoResultsMarkup(
+    result,
+    resultViewContext(state.session),
+    RESULT_TRANSLATIONS,
+    uditoGuideLink,
+  );
   saveLast({ setupQuality, sampleRate: state.session.sampleRate, recordedAt: Date.now() });
   const journalOutcome = saveJournalResult(result);
   const journalSaved = journalOutcome === 'saved';
-  const journalNote = journalStatusNote(journalOutcome);
   const persistence = state.app.querySelector('[data-au-persistence]');
   if (persistence) {
-    persistence.outerHTML = `<div class="ui-alert ${journalSaved ? 'ui-alert--success' : 'ui-alert--danger'}" data-au-journal-status role="${journalSaved ? 'status' : 'alert'}"><strong class="ui-alert__title">${t(journalSaved ? 'Saved to the private journal on this device.' : 'Journal entry not saved.')}</strong><p class="ui-alert__body">${journalNote}</p></div>`;
+    persistence.outerHTML = uditoJournalStatusMarkup(journalOutcome, t);
   }
   const actions = state.app.querySelector('.au-results__actions');
   if (actions) {
-    actions.innerHTML = `<button class="ui-button" type="button" data-action="au-restart">${t('Repeat this scope independently')}</button><button class="ui-button ui-button--ghost" type="button" data-action="au-copy">${resultActionLabel(t)}</button>${journalSaved ? `<button class="ui-button ui-button--ghost" type="button" data-action="au-journal">${t('Open private journal')}</button>` : ''}`;
+    actions.innerHTML = uditoResultActions({ journalSaved, copyLabel: resultActionLabel(t) }, t);
   }
   focusStage(
     'h1',
@@ -682,88 +677,10 @@ function renderResults() {
   );
 }
 
-/** @param {import('../lib/journal.js').JournalSaveOutcome} outcome */
-function journalStatusNote(outcome) {
-  if (outcome === 'saved')
-    return t('The structured run context is available for later same-setup comparison.');
-  if (outcome === 'invalid')
-    return t(
-      'This run did not match the journal record format, so it was not saved. Copy the summary to keep it.',
-    );
-  return t(
-    'The result remains available here and can still be copied, but it was not added to the private journal.',
-  );
-}
-
-function resultCard(index, label, value, detail, copy) {
-  const headingId = `au-metric-${index}`;
-  return `<article class="au-metric" aria-labelledby="${headingId}"><div><span>${index}</span><h2 id="${headingId}">${t(label)}</h2></div><strong>${t(value)}</strong><small>${detail}</small><p>${t(copy)}</p></article>`;
-}
-
-function formatHertz(result) {
-  if (result.thresholdHz === null) return t('Not settled');
-  return `${result.atCeiling ? '≥ ' : ''}${formatNumber(result.thresholdHz)} Hz`;
-}
-
-function rangeDetail(result) {
-  const completion = completionReasonLabel(result.completionReason);
-  const spread = result.reversalRangeHz
-    ? ` · reversal range ${formatNumber(result.reversalRangeHz)} Hz (not uncertainty)`
-    : '';
-  return `${completion} · ${result.reversals} reversals / ${result.trials} trials${spread}`;
-}
-
-function formatPitch(results, anchorHz) {
-  const result = results.find((item) => item.anchorHz === anchorHz);
-  return !result || result.thresholdPercent === null ? t('Not settled') : `${result.thresholdPercent}%`;
-}
-
-function pitchDetail(results, anchorHz) {
-  const result = results.find((item) => item.anchorHz === anchorHz);
-  if (!result) return 'Track unavailable';
-  const spread = result.reversalRangePercent
-    ? ` · reversal range ${result.reversalRangePercent}% (not uncertainty)`
-    : '';
-  return `${completionReasonLabel(result.completionReason)} · ${result.reversals} reversals / ${result.trials} trials${spread}`;
-}
-
-function completionReasonLabel(reason) {
-  return t(
-    {
-      converged: 'Converged to the configured reversal target',
-      'technical-ceiling': 'Bounded at the technical frequency ceiling',
-      'max-trials': 'Maximum trials reached before convergence',
-      incomplete: 'Incomplete',
-    }[reason] ?? 'Incomplete',
-  );
-}
-
-function deviceLabel(device) {
-  return t(
-    {
-      headphones: 'Over-ear / on-ear',
-      earbuds: 'Earbuds / in-ear',
-      assistive: 'Usual assistive setup',
-      other: 'Other / unsure',
-    }[device] ?? 'Other / unsure',
-  );
-}
-
-function connectionLabel(connection) {
-  return (
-    {
-      wired: 'Wired',
-      wireless: 'Wireless / Bluetooth',
-      integrated: 'Built-in / assistive route',
-      other: 'Other / unsure',
-    }[connection] ?? 'Other / unsure'
-  );
-}
-
-function formatControlAccuracy(range) {
-  const accuracy =
-    range.controlAccuracyPercent === null ? t('Not sampled') : `${range.controlAccuracyPercent}%`;
-  return `${accuracy} (${range.controlTrials}/${range.expectedControls} controls)`;
+/** @param {import('./views/udito-results.js').UditoResultContext} session */
+function resultViewContext(session) {
+  const { scope, device, connection, sampleRate, volumeConsistent, interruptions } = session;
+  return { scope, device, connection, sampleRate, volumeConsistent, interruptions };
 }
 
 function resultCautionReasons({ headphones, range, pitch }) {
@@ -776,11 +693,12 @@ function resultCautionReasons({ headphones, range, pitch }) {
   else if (range.controlAccuracyPercent === null) reasons.push('Portata controls were not sampled');
   else if (range.controlAccuracyPercent < 100)
     reasons.push(`Portata control accuracy was ${range.controlAccuracyPercent}%`);
-  if (!range.settled) reasons.push(`Portata: ${completionReasonLabel(range.completionReason).toLowerCase()}`);
+  if (!range.settled)
+    reasons.push(`Portata: ${uditoCompletionReasonLabel(range.completionReason, t).toLowerCase()}`);
   for (const item of state.session.scope === 'standard' ? pitch : []) {
     if (!item.settled)
       reasons.push(
-        `Intonazione near ${formatNumber(item.anchorHz)} Hz: ${completionReasonLabel(item.completionReason).toLowerCase()}`,
+        `Intonazione near ${formatNumber(item.anchorHz)} Hz: ${uditoCompletionReasonLabel(item.completionReason, t).toLowerCase()}`,
       );
   }
   if (state.session.interruptions)
@@ -872,47 +790,7 @@ async function copyResults() {
   const mountState = state;
   const session = mountState?.session;
   if (!mountState || !session?.result) return;
-  const { headphones, range, pitch, usable, setupQuality, cautionReasons } = session.result;
-  const text = [
-    t('Udito — device-relative listening observations'),
-    t('Run quality: {quality}', { quality: t(setupQuality) }),
-    t('Setup: {device}; {connection}; {sampleRate} Hz audio context', {
-      device: t(deviceLabel(session.device)),
-      connection: t(connectionLabel(session.connection)),
-      sampleRate: formatNumber(session.sampleRate),
-    }),
-    `Volume: ${session.volumeConsistent ? 'self-reported unchanged' : 'changed or unsure'} during the run; the browser could not verify it.`,
-    t('Headphone confidence: {correct}/{trials} ({confidence})', {
-      correct: headphones.correct,
-      trials: headphones.trials,
-      confidence: t(headphones.headphoneLike ? 'headphone-like' : 'uncertain'),
-    }),
-    t('Upper run boundary: {boundary}; {completion}; {reversals} reversals / {trials} trials', {
-      boundary: formatHertz(range),
-      completion: t(completionReasonLabel(range.completionReason)),
-      reversals: range.reversals,
-      trials: range.trials,
-    }),
-    t('Portata control accuracy: {accuracy}', { accuracy: formatControlAccuracy(range) }),
-    ...(session.scope === 'standard' ? pitch : []).map((item) =>
-      t('Pitch step near {anchor} Hz: {step}; {completion}; {reversals} reversals / {trials} trials', {
-        anchor: formatNumber(item.anchorHz),
-        step: formatPitch(pitch, item.anchorHz),
-        completion: t(completionReasonLabel(item.completionReason)),
-        reversals: item.reversals,
-        trials: item.trials,
-      }),
-    ),
-    t('Playback interruptions: {count}', { count: session.interruptions }),
-    ...(usable
-      ? []
-      : [
-          t('Interpret with caution: {evidence}', {
-            evidence: cautionReasons.join('; '),
-          }),
-        ]),
-    t('This is not dB HL, a hearing-age score, screening, or diagnosis.'),
-  ].join('\n');
+  const text = uditoResultSummary(session.result, resultViewContext(session), RESULT_TRANSLATIONS);
   try {
     const outcome = await shareOrCopyResult({
       title: t('Device-relative hearing lab — Udito | Sense6'),
