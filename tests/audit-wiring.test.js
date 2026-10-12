@@ -326,6 +326,12 @@ test('visual-approved diffs preserve evidence with bounded artifact retention', 
   const visual = readFileSync(new URL('../audits/visual-regression.spec.js', import.meta.url), 'utf8');
   assert.match(verify, /if: failure\(\) \|\| steps\.visual-baselines\.outputs\.approved != ''/);
   assert.match(verify, /name: visual-regression-playwright-report[\s\S]*?retention-days: 7/);
+  const upload = verify
+    .split('      - name: Upload the visual comparison report')[1]
+    ?.split('\n  release:')[0];
+  assert.ok(upload, 'visual evidence upload must remain in the gated visual job');
+  assert.match(upload, /continue-on-error: \$\{\{ steps\.visual-baselines\.outputs\.approved == '' \}\}/);
+  assert.match(upload, /if-no-files-found: error/);
   for (const label of ['base revision', 'candidate', 'diff']) {
     assert.ok(visual.includes(`(${label})`), `missing ${label} review image`);
   }
