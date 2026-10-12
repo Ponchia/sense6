@@ -275,6 +275,11 @@ test('the Lighthouse budget can stop a deploy', () => {
   // publish and the two jobs merely raced.
   assert.match(verify, /^ {2}lighthouse:$/m);
   assert.match(verify, /npm run audit:lighthouse/);
+  assert.equal(
+    packageJson.scripts['audit:lighthouse'],
+    'node scripts/run-lighthouse-audit.mjs && node scripts/check-lighthouse-metrics.mjs',
+    'the actual release command must invoke the maintained audit and fail-closed budget checker',
+  );
   assert.match(verify, /needs: \[browser, lighthouse, visual\]/);
   assert.doesNotMatch(
     siteAudit,
