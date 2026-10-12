@@ -1007,7 +1007,7 @@ const rows = [
   ['Device-relative hearing lab — Udito | Sense6', '장치 관련 청력 연구소 — Udito | Sense6'],
   [
     'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
-    'Sense6는 짧고 신중한 브라우저 지각 테스트와 화면 기준의 정직한 결과를 제공합니다. 계정이 필요 없으며 답변이나 결과가 업로드되지 않습니다.',
+    'Sense6에서 색 차이, 색각 관련 과제, 반응 시간, 들리는 소리의 범위, 화면의 세부 식별을 짧은 브라우저 실험으로 살펴보세요. 결과는 화면·오디오 기기·환경에 따라 달라지는 관찰값이며 의료 검사나 진단이 아닙니다. 계정이 필요 없고 개별 답변과 결과는 서버에 업로드되지 않고 브라우저에 남습니다.',
   ],
   [
     'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',

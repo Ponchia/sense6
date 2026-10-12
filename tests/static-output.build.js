@@ -83,6 +83,33 @@ test('every localized static gallery features the same short Riflessi entry with
   }
 });
 
+test('flagged East Asian gallery descriptions remain substantial and consistent in search and sharing metadata', async () => {
+  const source =
+    'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.';
+  for (const locale of ['ja', 'ko', 'zh-hans']) {
+    const html = await readFile(new URL(`${locale}/index.html`, DIST), 'utf8');
+    const messages = await loadMessages(locale);
+    const description = decodeEntities(html.match(/<meta name="description" content="([^"]+)">/)?.[1] ?? '');
+    assert.equal(description, messages.get(source), `${locale} static metadata lost its locale source`);
+    assert.ok(
+      [...description].length >= 145 && [...description].length <= 190,
+      `${locale} home summary needs useful substance, not repeated keywords or a truncated paragraph`,
+    );
+    assert.ok(description.includes('Sense6'), `${locale} home summary must identify the project`);
+    for (const tag of ['<meta property="og:description"', '<meta name="twitter:description"']) {
+      assert.ok(
+        html.includes(`${tag} content="${escapeHtml(description)}">`),
+        `${locale} share metadata diverges from the localized search description`,
+      );
+    }
+    assert.ok(
+      html.includes(`<link rel="canonical" href="https://sense6.net/${locale}/">`),
+      `${locale} home canonical must remain self-referencing`,
+    );
+    assert.doesNotMatch(html, /<meta name="robots" content="noindex">/);
+  }
+});
+
 test('the footer and gallery expose only actually published Learn locales', async () => {
   const root = await readFile(new URL('index.html', DIST), 'utf8');
   assert.match(root, /data-sense6-route="learn" data-sense6-english-only href="\/en\/learn\/"/);

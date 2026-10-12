@@ -1,12 +1,12 @@
 {
   "/": {
     "key": "site",
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "hash": "071763b01021f08938be3273cc0c3cdd"
   },
   "/ar/": {
     "key": "site",
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "hash": "54a0885144225130a10cf53de6c19a17"
   },
   "/ar/about/": {
@@ -71,7 +71,7 @@
   },
   "/de/": {
     "key": "site",
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "hash": "3775d26ed6b20566e6a1090838f6dc9d"
   },
   "/de/about/": {
@@ -136,7 +136,7 @@
   },
   "/en/": {
     "key": "site",
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "hash": "c6953309ae1f810d725323bd53ede5f6"
   },
   "/en/about/": {
@@ -201,7 +201,7 @@
   },
   "/es/": {
     "key": "site",
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "hash": "68f6198f8e63936becaffc45bb8ccb56"
   },
   "/es/about/": {
@@ -266,7 +266,7 @@
   },
   "/fr/": {
     "key": "site",
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "hash": "c822a974819e3daeb2ea34816a0f7d65"
   },
   "/fr/about/": {
@@ -331,7 +331,7 @@
   },
   "/hi/": {
     "key": "site",
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "hash": "ec11881fcceef6e2287c1af914d73755"
   },
   "/hi/about/": {
@@ -396,7 +396,7 @@
   },
   "/it/": {
     "key": "site",
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "hash": "7eb19f6ef0c6d813072f1ca5d4525535"
   },
   "/it/about/": {
@@ -461,8 +461,8 @@
   },
   "/ja/": {
     "key": "site",
-    "date": "2026-10-11",
-    "hash": "94433a69652944b366a3a5cb2fbe18e9"
+    "date": "2026-10-12",
+    "hash": "b2e25af385f011af62ccd5a2934ac233"
   },
   "/ja/about/": {
     "key": "about",
@@ -526,8 +526,8 @@
   },
   "/ko/": {
     "key": "site",
-    "date": "2026-10-11",
-    "hash": "5a9d9b2c923a4f06ebda5682cd5670c3"
+    "date": "2026-10-12",
+    "hash": "efb7f71b634dc8397dc96fe4d7f19a49"
   },
   "/ko/about/": {
     "key": "about",
@@ -591,7 +591,7 @@
   },
   "/pt-br/": {
     "key": "site",
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "hash": "06e1d96626c34d731c7dfb3e37eafb80"
   },
   "/pt-br/about/": {
@@ -656,7 +656,7 @@
   },
   "/pt/": {
     "key": "site",
-    "date": "2026-10-11",
+    "date": "2026-10-12",
     "hash": "00fbf8c42fb9ed9c33aaa5d2508fa34a"
   },
   "/pt/about/": {
@@ -721,8 +721,8 @@
   },
   "/zh-hans/": {
     "key": "site",
-    "date": "2026-10-11",
-    "hash": "ee85cc1ff958f25d03368ba00b8c8259"
+    "date": "2026-10-12",
+    "hash": "901250c5603a62912d76f3ec359046b1"
   },
   "/zh-hans/about/": {
     "key": "about",
