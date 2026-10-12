@@ -433,6 +433,58 @@ test('the pinned CI browser image matches the locked Playwright version', () => 
   }
 });
 
+test('weekly scientific-reference anti-bot exclusions are exactly scoped, not blanket HTTP 403', () => {
+  const scheduled = workflow('site-audit.yml');
+  const external = scheduled.split('  external-links:')[1]?.split('  passive-security:')[0];
+  assert.ok(external, 'the weekly external-link gate must remain present');
+  assert.match(external, /fail: true/);
+  assert.doesNotMatch(external, /--accept(?:-timeouts)?\b|--offline\b/);
+
+  const flags = external.split('          args: >-')[1]?.split('          fail:')[0];
+  assert.ok(flags, 'inspect the exact Lychee command, not arbitrary workflow comments');
+  const excludes = [...flags.matchAll(/--exclude '([^']+)'/g)].map((match) => match[1]);
+  assert.deepEqual(excludes.slice(1), [
+    String.raw`^https://www\.iso\.org/standard/69042\.html$`,
+    String.raw`^https://doi\.org/10\.1167/10\.8\.12$`,
+  ]);
+  assert.equal(excludes.length, 3, 'only the site itself and two reviewed publishers may be excluded');
+  assert.match(excludes[0], /^\^https:\/\/sense6/);
+
+  for (const [expression, accepted, nearMisses] of [
+    [
+      excludes[1],
+      'https://www.iso.org/standard/69042.html',
+      [
+        'https://www.iso.org/standard/69042.html?review=1',
+        'https://www.iso.org/standard/69043.html',
+        'https://wwwXiso.org/standard/69042.html',
+      ],
+    ],
+    [
+      excludes[2],
+      'https://doi.org/10.1167/10.8.12',
+      [
+        'https://doi.org/10.1167/10.8.13',
+        'https://doi.org/10.1167/10.8.12-extra',
+        'https://doiXorg/10.1167/10.8.12',
+      ],
+    ],
+  ]) {
+    const regex = new RegExp(expression);
+    assert.ok(regex.test(accepted), `the reviewed source ${accepted} must be exempt`);
+    for (const url of nearMisses) {
+      assert.ok(!regex.test(url), `a similar unreviewed link must stay checked: ${url}`);
+    }
+  }
+  const source = readFileSync(new URL('../src/learn-content.json', import.meta.url), 'utf8');
+  const experiments = readFileSync(new URL('../src/exams/sources.js', import.meta.url), 'utf8');
+  assert.ok(source.includes('https://doi.org/10.1167/10.8.12'), 'do not remove the Jordan DOI');
+  assert.ok(
+    experiments.includes('https://www.iso.org/standard/69042.html'),
+    'do not remove the ISO standard',
+  );
+});
+
 test('PR smoke spans every instrument while production runs the full browser matrix', () => {
   const verify = workflow('verify.yml');
   assert.match(verify, /name: Verify representative browser journeys for pull requests/);

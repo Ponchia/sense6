@@ -117,6 +117,24 @@ publication is currently disabled.
    branch code against a production credential.
 
 
+## Maintain scientific-reference link integrity
+
+The weekly Lychee external-link check retains strict HTTP failures for all
+references except **two exact publisher endpoints** that return HTTP 403 to
+automated link-checking clients: the ISO 8596:2017 catalogue URL
+`https://www.iso.org/standard/69042.html` and the Jordan et al. (2010)
+Journal of Vision DOI `https://doi.org/10.1167/10.8.12`. Both citations stay
+in the published source. The DOI is also traceable through PubMed record
+PMID 20884587.
+
+The two URL regexes are fully anchored; no blanket HTTP 403 exception is
+allowed. The workflow-policy test ensures that similar or modified URLs remain
+checked and that new citations are **not** automatically exempt. These exact
+URLs are not automatically verified by the scheduled job, so review them
+periodically in an authoritative bibliography or through human-accessible
+publisher pages. A missing or changed publication requires a real citation
+correction rather than a wider exclusion.
+
 ## Keep Playwright dependencies and CI images in lockstep
 
 The browser, visual, Lighthouse and release jobs run inside digest-pinned
