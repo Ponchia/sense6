@@ -1,6 +1,7 @@
 import { toast } from '@ponchia/ui/behaviors';
 import '../styles/riflessi-landing.css';
 import '../styles/riflessi.css';
+import '../styles/riflessi-compact-landing.css';
 import { m, t } from '../i18n.js';
 import { captureDisplayPassport, saveJournalRun } from '../lib/journal.js';
 import { createExamLifecycle, isCurrentMount } from '../lib/lifecycle.js';

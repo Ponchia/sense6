@@ -1,5 +1,6 @@
 import { toast } from '@ponchia/ui/behaviors';
 import '../styles/udito.css';
+import '../styles/udito-compact-landing.css';
 import { formatNumber, m, t } from '../i18n.js';
 import {
   createHeadphoneTrials,

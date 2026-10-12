@@ -30,8 +30,9 @@ en-color-blindness-guide-mobile-chromium-linux.png  # mobile editorial hierarchy
 
 en-journal-desktop-chromium-linux.png  # first-time journal starter moves beside introduction, ahead of export details
 en-journal-mobile-chromium-linux.png   # starter becomes immediately available before long privacy/export disclosure
-en-udito-mobile-chromium-linux.png  # compact listening-lab mobile hero brings safe preparation into first viewport
-en-tetracromia-mobile-chromium-linux.png  # compact mobile screen-colour hero keeps safe setup action visible on 360px phones
-en-acutezza-mobile-chromium-linux.png  # compact Acutezza first-screen CTA on phones, preserving safe calibration and consent
+en-riflessi-mobile-chromium-linux.png  # 320x568 short-height reaction-lab intro now exposes the safe preparation button before scrolling while keeping measured trials unchanged
+en-udito-mobile-chromium-linux.png  # 320x568 short-height layout now fits safe sound-lab preparation above the fold without touching listening setup or consent
+en-tetracromia-mobile-chromium-linux.png  # 320x568 short-height Screen Colour intro now shows its safe setup action without changing any measured colour tasks
+en-acutezza-mobile-chromium-linux.png  # 320x568 short-height vision-lab intro now exposes preparation without changing optotypes, calibration or consent
 ar-about-mobile-chromium-linux.png  # Arabic Learn is now published; the localized footer Learn link becomes visible on About at 320px, adding one 38px footer row without changing the About content or test protocols
 hi-about-mobile-chromium-linux.png  # Hindi Learn publication exposes the previously hidden footer guide link on a 320px About viewport, retaining access to the full experiment gallery
