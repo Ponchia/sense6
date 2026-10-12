@@ -643,14 +643,48 @@ test('rapid real touch activation records one response per rendered trial', asyn
   test.skip(testInfo.project.name !== 'mobile', 'Touchscreen-only response guard');
   await page.setViewportSize({ width: 390, height: 844 });
   await startLab(page);
-
+  const cdp = await page.context().newCDPSession(page);
+  await page.evaluate(() => {
+    // Count trusted touch-down events separately from their resulting clicks.
+    document.addEventListener('pointerdown', (event) => {
+      if (event.pointerType !== 'touch') return;
+      const root = document.documentElement;
+      const moments = JSON.parse(root.dataset.touchAudit ?? '[]');
+      moments.push({ at: event.timeStamp, trusted: event.isTrusted });
+      root.dataset.touchAudit = JSON.stringify(moments);
+    });
+  });
   const tapTwice = async (locator) => {
     await expect(locator).toBeEnabled();
     const bounds = await locator.boundingBox();
     const point = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
-    await page.touchscreen.tap(point.x, point.y);
-    await page.touchscreen.tap(point.x, point.y);
+    await page.evaluate(() => {
+      document.documentElement.dataset.touchAudit = '[]';
+    });
+    // Queue two genuine trusted Chromium touch sequences as one ordered CDP
+    // burst. Two separately awaited page.touchscreen.tap calls can be delayed
+    // by a busy remote CI runner beyond the 600ms duplicate-input guard,
+    // accidentally testing two intentional responses rather than a rapid tap.
+    // The actual pointer events still exercise the production response gate.
+    await Promise.all([
+      cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] }),
+      cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }),
+      cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] }),
+      cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] }),
+    ]);
     await page.waitForTimeout(240);
+    const moments = await page.evaluate(() =>
+      JSON.parse(document.documentElement.dataset.touchAudit ?? '[]'),
+    );
+    expect(moments, 'two physical touch-down events must be delivered').toHaveLength(2);
+    expect(
+      moments.every(({ trusted }) => trusted),
+      'both touches must be browser trusted',
+    ).toBe(true);
+    expect(
+      moments[1].at - moments[0].at,
+      'double tap must fall within the 600ms duplicate guard',
+    ).toBeLessThan(600);
   };
 
   await tapTwice(page.locator('[data-choice="0"]'));
