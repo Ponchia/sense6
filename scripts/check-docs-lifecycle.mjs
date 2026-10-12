@@ -10,6 +10,7 @@ const STRICT = new Set([
   'docs/adding-an-experiment.md',
   'docs/architecture.md',
   'docs/roadmap.md',
+  'docs/product-readiness.md',
   'docs/runbooks/cloudflare-pages-release.md',
   'docs/adr/0001-name-and-host-sense6-on-cloudflare-pages.md',
   'docs/adr/0002-store-only-anonymous-daily-product-metrics.md',
