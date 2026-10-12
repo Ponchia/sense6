@@ -5,12 +5,18 @@ import { fileURLToPath } from 'node:url';
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const STRICT = new Set([
   'README.md',
+  'AGENTS.md',
+  'CONTRIBUTING.md',
+  'SECURITY.md',
+  'THIRD_PARTY_NOTICES.md',
+  'src/learn-locales/README.md',
   'CHANGELOG.md',
   'docs/README.md',
   'docs/adding-an-experiment.md',
   'docs/architecture.md',
   'docs/roadmap.md',
   'docs/product-readiness.md',
+  'docs/public-repository-readiness.md',
   'docs/runbooks/cloudflare-pages-release.md',
   'docs/adr/0001-name-and-host-sense6-on-cloudflare-pages.md',
   'docs/adr/0002-store-only-anonymous-daily-product-metrics.md',
@@ -21,7 +27,10 @@ const STRICT = new Set([
 const BROAD = new Set(['docs/research/acutezza.md', 'docs/research/five-test-evidence-and-product-audit.md']);
 const BROAD_BASELINE = 2;
 
-const discovered = ['README.md', 'CHANGELOG.md', ...(await markdownFiles(join(ROOT, 'docs')))];
+const rootMarkdown = (await readdir(ROOT, { withFileTypes: true }))
+  .filter((entry) => entry.isFile() && entry.name.endsWith('.md'))
+  .map((entry) => entry.name);
+const discovered = [...rootMarkdown, ...(await markdownFiles(join(ROOT, 'docs')))];
 const unclassified = discovered.filter((path) => !STRICT.has(path) && !BROAD.has(path));
 if (unclassified.length) {
   throw new Error(`Unclassified documentation: ${unclassified.join(', ')}`);

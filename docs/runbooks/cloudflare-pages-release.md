@@ -23,7 +23,8 @@ publication is currently disabled.
 
 - The pull request is current with `main` and `npm run check:release` passes.
 - CI's release job produces `dist/`, `dist.sha256`, and
-  `dist/build-meta.json` from one build after the browser matrix passes. It
+  `dist/build-meta.json` from one build after the required browser, visual, and Lighthouse checks
+  pass. It
   stamps the checksum immediately after that build and re-checks it immediately
   before the upload, so every audit in between runs on the bytes that ship.
 - The existing production Cloudflare credentials are available to the `main`
@@ -35,18 +36,21 @@ publication is currently disabled.
 - A production preflight has recorded live state, drift, blast radius,
   rollback, and operator approval before applying a migration or merging to
   `main`.
-- Every workflow job that runs on `arc-vps-sense6`, the self-hosted runner in the
-  operator's cluster, carries a head-repository guard, so a fork pull request
-  cannot install and build its own code there. Confirm this before making the
-  repository public — the remedy for the missing branch protection — and whenever
-  a job is added. `tests/audit-wiring.test.js` resolves each job's condition
-  against a fork pull request and fails if any of them would start.
+- The checked-in workflows restrict pull-request verification to the same
+  repository. Keep that condition and its regression tests, but do not treat
+  it as sufficient self-hosted runner isolation: a pull request can alter
+  workflow content. Before making the repository public, verify externally
+  enforced runner access, untrusted-contribution execution policy, workflow
+  approval settings, and release protection. Follow
+  [public-repository readiness](../public-repository-readiness.md). Repository
+  tests cannot attest those external controls.
 
 ## Steps
 
-1. Inspect every numbered file under `migrations/` and confirm that the pull
-   request's migration test runs the complete ordered set while preserving
-   existing rows.
+1. When migrations or the metric contract change, inspect every numbered file
+   under `migrations/` and confirm that the pull request's migration test runs
+   the complete ordered set while preserving existing rows. For other changes,
+   continue at step 5.
 2. List remote D1 migrations without changing the database:
 
    ```sh
@@ -64,10 +68,11 @@ publication is currently disabled.
    intended production database. Confirm the zone rate-limit rule still matches
    only `POST /api/metric` with the documented 10 requests per 10 seconds and a
    10-second block.
-5. Push the pull-request branch. Wait for the reusable browser, visual,
-   Lighthouse, and release jobs. The release job builds once, stamps
-   `dist.sha256` over that build, runs the core, HTML, link, browser-journey,
-   and production-site audits against it, and re-checks the checksum as its
+5. Push the trusted pull-request branch. Wait for the representative browser,
+   visual, Lighthouse, and release jobs. The release job runs the core checks
+   and builds once, then stamps `dist.sha256` over that build. It runs HTML,
+   link, browser-journey, and production-site audits against the artifact and
+   re-checks the checksum as its
    last act before publication — without deployment credentials on a pull
    request.
 
@@ -119,21 +124,17 @@ publication is currently disabled.
 
 ## Maintain scientific-reference link integrity
 
-The weekly Lychee external-link check retains strict HTTP failures for all
-references except **two exact publisher endpoints** that return HTTP 403 to
-automated link-checking clients: the ISO 8596:2017 catalogue URL
-`https://www.iso.org/standard/69042.html` and the Jordan et al. (2010)
-Journal of Vision DOI `https://doi.org/10.1167/10.8.12`. Both citations stay
-in the published source. The DOI is also traceable through PubMed record
-PMID 20884587.
+The weekly Lychee external-link check treats HTTP failures as errors. The
+maintained exception registry is [`.lycheeignore`](../../.lycheeignore); its
+narrow URL patterns cover known publisher restrictions on automated clients.
+An exclusion keeps the citation in the site but means the scheduled job does
+not verify that endpoint.
 
-The two URL regexes are fully anchored; no blanket HTTP 403 exception is
-allowed. The workflow-policy test ensures that similar or modified URLs remain
-checked and that new citations are **not** automatically exempt. These exact
-URLs are not automatically verified by the scheduled job, so review them
-periodically in an authoritative bibliography or through human-accessible
-publisher pages. A missing or changed publication requires a real citation
-correction rather than a wider exclusion.
+Keep exceptions tied to exact current references, with a reason. Do not add
+blanket HTTP 403 exceptions or silently exempt new citations. Review excluded
+references periodically through an authoritative bibliography or a publisher
+page. A missing or changed publication requires a citation correction, not a
+wider exclusion. The workflow-policy tests protect the exception contract.
 
 ## Keep Playwright dependencies and CI images in lockstep
 
@@ -189,8 +190,8 @@ the input retain all four audit jobs. The current PR and production release
 gates remain unchanged and mandatory.
 
 The scheduled full sweep starts a fresh Chrome process every **16 routes** to
-bound browser-session resource accumulation. It still measures each of the
-157 canonical pages exactly once and applies the same unmodified budgets.
+bound browser-session resource accumulation. It still measures every route in
+`SEARCH_ROUTES` exactly once and applies the same unmodified budgets.
 The runner does **not** retry a slow page or ignore an anomalous score. If a
 full-site budget fails, preserve its Lighthouse report and compare isolated
 reproductions against nearby locale pages before changing experiment code,
@@ -202,10 +203,6 @@ every requested route. All reports must meet the existing category floors
 budgets (CLS at most 0.1, LCP at most 2500 ms, TBT at most 200 ms). Missing,
 repeated, cross-origin, or incomplete reports fail the gate. The visual,
 browser, Lighthouse and release jobs remain mandatory for publishing.
-
-The current direct runner replaces an older Unlighthouse dependency chain
-containing unresolved *development-only* advisories. It doesn't change the
-browser experiments, the users' local results, or anonymous product metrics.
 
 ## Optional IndexNow change notifications (Bing and other participating engines)
 

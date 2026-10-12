@@ -11,6 +11,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- Contributor, security, and public-repository preparation guides, with generated
+  distribution notices for the runtime UI code and Doto fonts.
 - Sense6 Learn: five source-traceable perception guides, an interactive browser
   timing illustration, and full Learn editions in all 12 published languages
   (72 Learn routes). Each guide links to its matching experiment; research
@@ -33,6 +35,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 
+- A shorter repository entry point, explicit generated-file ownership, and a
+  Node.js 22.19 minimum matching the locked tools; Node.js 24 is recorded for CI parity.
 - Earlier mobile preparation actions and faster gallery browsing, clearer
   first-run instructions and results across five labs, and more useful empty
   and saved-journal navigation.
@@ -55,6 +59,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Fixed
 
+- Audio cancellation across delayed context initialization and teardown, and
+  clipboard feedback that could appear after leaving Screen Colour Lab.
+- Journal byte-budget handling so combined imports preserve existing data and
+  exports remain compatible with the importer.
+- External-link audit policy now covers its automatically loaded exception
+  registry and correctly matches the canonical site hostname.
 - Correct anonymous Daltonia route-event identity and translated live-region
   announcements in colour-vision tasks, without changing experimental methods.
 

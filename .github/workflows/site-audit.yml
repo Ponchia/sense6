@@ -121,14 +121,11 @@ jobs:
       - name: Check external links
         uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
-          # A journal publisher and the ISO catalogue block automated probes
-          # with HTTP 403. These TWO canonical scientific references are still
-          # published; only these exact targets are omitted from HTTP checking.
-          # All other references retain the default strict status checks.
+          # .lycheeignore is the sole publisher-exception registry. Lychee
+          # loads it automatically; tests audit every entry and ensure that
+          # each URL is still cited. Internal routes have a separate strict gate.
           args: >-
-            --root-dir dist --exclude '^https://sense6\\.net'
-            --exclude '^https://www\.iso\.org/standard/69042\.html$'
-            --exclude '^https://doi\.org/10\.1167/10\.8\.12$'
+            --root-dir dist --exclude '^https://sense6\.net(?:/|$)'
             --max-concurrency 4 --host-concurrency 2 --timeout 30
             --max-retries 5 --retry-wait-time 3
             --no-progress 'dist/**/*.html'

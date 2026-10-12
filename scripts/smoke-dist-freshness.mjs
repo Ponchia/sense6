@@ -17,8 +17,17 @@ import { fileURLToPath } from 'node:url';
 const repository = resolve(fileURLToPath(new URL('../', import.meta.url)));
 const dist = resolve(repository, 'dist');
 
-/** Directories and files whose contents are compiled into `dist`. */
-const INPUTS = ['src', 'public', 'index.html', 'vite.config.js', 'scripts/generate-static-pages.mjs'];
+/** Source, tooling and license inputs that require a fresh artifact after edits. */
+const INPUTS = [
+  'src',
+  'public',
+  'scripts',
+  'index.html',
+  'vite.config.js',
+  'package.json',
+  'package-lock.json',
+  'LICENSE',
+];
 
 /**
  * Build *output* that happens to live under an input directory.
