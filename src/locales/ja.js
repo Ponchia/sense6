@@ -1013,7 +1013,7 @@ const rows = [
   ['Device-relative hearing lab — Udito | Sense6', 'デバイス相対の聴取ラボ — Udito | Sense6'],
   [
     'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
-    'Sense6 は、短く丁寧なブラウザ知覚テストで、画面相対の結果を率直に示します。アカウントは不要で、回答や結果はアップロードされません。',
+    'Sense6 では、色の違いを見分ける課題、色覚に関する実験、反応時間、聞こえる音の範囲、画面上の細部の識別を、短いブラウザテストで試せます。結果は画面や音声機器、利用環境に左右される観察値であり、医療検査や診断ではありません。アカウントは不要で、個々の回答や結果はサーバーへ送信されず、このブラウザ内で保存できます.',
   ],
   [
     'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',
