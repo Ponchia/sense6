@@ -728,8 +728,9 @@ function saveJournalResult(result) {
 }
 
 async function copyResults() {
-  if (!state.session) return;
-  const result = state.session.results();
+  const mountState = state;
+  if (!mountState?.session) return;
+  const result = mountState.session.results();
   const summary = `Screen Colour Lab (Tetracromia) — tile ${result.tile.correct}/${result.tile.presentations} at an ending adaptive level near ${result.tile.adaptiveLevelDegrees}°; field ${result.field.correct}/${result.field.presentations} near ${result.field.adaptiveLevelDegrees}°; ordering ${result.ordering.orderedPairsPercent}% of pairs. Short-run, display-relative observations—not thresholds, a clinical test, or a diagnosis.`;
 
   try {
@@ -737,11 +738,12 @@ async function copyResults() {
       title: t('Tetracromia — colour discrimination | Sense6'),
       summary,
       route: 'tetracromia',
-      locale: state.locale,
+      locale: mountState.locale,
     });
+    if (!isCurrentMount(state, mountState)) return;
     if (outcome === 'copied') toast(t('Result summary copied'), { tone: 'success' });
   } catch {
-    toast(t('Could not access the clipboard'), { tone: 'danger' });
+    if (isCurrentMount(state, mountState)) toast(t('Could not access the clipboard'), { tone: 'danger' });
   }
 }
 

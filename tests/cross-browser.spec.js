@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 
+import { captureMetrics } from './helpers/browser.js';
+
 /**
  * The cross-browser matrix.
  *
@@ -77,6 +79,7 @@ test('the Tetracromia setup reaches an enabled measured choice', async ({ page }
 
 test('a complete Screen Colour Lab journey reaches separate observations @pr-smoke', async ({ page }) => {
   test.setTimeout(60_000);
+  const metrics = await captureMetrics(page);
   await gotoHydrated(page, '/en/tetracromia/');
   await enterColorLabSetup(page);
   await page.locator('#screen-ready').check();
@@ -89,6 +92,8 @@ test('a complete Screen Colour Lab journey reaches separate observations @pr-smo
     page.getByRole('heading', { name: /Three observations from one short screen-colour run/i }),
   ).toBeVisible();
   await expect(page.locator('.result-metric')).toHaveCount(3);
+  // Production bundles served on loopback must suppress every journey metric.
+  expect(metrics).toEqual([]);
 });
 
 test('completed results survive a throwing localStorage getter', async ({ page }, testInfo) => {

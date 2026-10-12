@@ -50,7 +50,7 @@ The journal now:
 - records a setup passport with the device, input mode, correction state, and
   other experiment-specific conditions needed to judge comparability;
 - labels two runs as comparable, comparable with caution, or not comparable;
-- shows change together with uncertainty and measurement bounds;
+- shows per-measurement change and identifies bounded results;
 - keeps each instrument separate instead of producing a suite-wide score; and
 - exports and imports a documented local file without contacting a server.
 
@@ -185,6 +185,14 @@ changes, in this order:
 Keep every extraction behavior-preserving, covered by the existing production
 dose invariants and accelerated browser journeys, and small enough to review
 independently.
+
+## Public repository preparation
+
+Keep [public-repository readiness](public-repository-readiness.md) separate from
+the product-evidence work above. Publication needs a reviewed tracked tree and
+history, reproducible contributor setup, a private security-reporting channel,
+and an enforced boundary between fork code and self-hosted runners. A clean
+local test run alone does not establish that boundary.
 
 ## Maintenance gates
 

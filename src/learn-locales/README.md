@@ -1,5 +1,7 @@
 # Learn locale publication
 
+Lifecycle: current
+
 Only locales in [published.json](published.json) have public Learn pages. The
 current manifest contains English, Italian, Spanish, German, French, European
 Portuguese, Brazilian Portuguese, Arabic, Japanese, Korean, Hindi and Simplified

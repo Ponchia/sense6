@@ -38,12 +38,24 @@ export function isProductionMetricOrigin(location = globalThis.location) {
 }
 
 /** @param {{ origin?: string } | undefined} location */
+export function isLoopbackMetricOrigin(location) {
+  if (!location?.origin) return false;
+  try {
+    const url = new URL(location.origin);
+    return (
+      url.origin === location.origin &&
+      url.protocol === 'http:' &&
+      (url.hostname === 'localhost' || url.hostname === '127.0.0.1')
+    );
+  } catch {
+    return false;
+  }
+}
+
+/** @param {{ origin?: string } | undefined} location */
 function isMetricTransportEnabled(location) {
   if (isProductionMetricOrigin(location)) return true;
-  return (
-    import.meta.env?.DEV === true &&
-    (location?.origin === 'http://127.0.0.1:4173' || location?.origin === 'http://localhost:4173')
-  );
+  return import.meta.env?.DEV === true && isLoopbackMetricOrigin(location);
 }
 
 /**

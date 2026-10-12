@@ -1,5 +1,13 @@
-^https://doi\.org/10\.1111/j\.1475-1313\.2008\.00628\.x$
+# Exact publisher exceptions used by the weekly external-link audit.
+# Links remain published; these HTTP checks need periodic manual review.
+# See docs/runbooks/cloudflare-pages-release.md. Keep one anchored URL per line.
+
+# Levitt (1971), Zhao et al. (2022), PeerJ colour-test comparison, Merck eye pain.
 ^https://doi\.org/10\.1121/1\.1912375$
 ^https://doi\.org/10\.1177/23312165221118792$
 ^https://doi\.org/10\.7717/peerj\.9414$
 ^https://www\.merckmanuals\.com/home/eye-disorders/symptoms-of-eye-disorders/eye-pain$
+
+# ISO 8596 catalogue and Jordan et al. (2010); automated probes return HTTP 403.
+^https://www\.iso\.org/standard/69042\.html$
+^https://doi\.org/10\.1167/10\.8\.12$
