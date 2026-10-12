@@ -59,6 +59,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Fixed
 
+- Development telemetry checks now honor configurable HTTP loopback ports;
+  production transport remains restricted to the canonical site origin.
 - Audio cancellation across delayed context initialization and teardown, and
   clipboard feedback that could appear after leaving Screen Colour Lab.
 - Journal byte-budget handling so combined imports preserve existing data and
