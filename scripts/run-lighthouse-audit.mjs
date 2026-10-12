@@ -10,6 +10,11 @@ import { SEARCH_REPRESENTATIVE_ROUTES, SEARCH_ROUTES } from '../audits/routes.js
 // Both CI modes use an explicit source-owned route allowlist: no crawler,
 // sitemap discovery, hidden sampling or arbitrary third-party destinations.
 const CATEGORY_IDS = Object.freeze(['performance', 'accessibility', 'best-practices', 'seo']);
+// Lighthouse opens a new target for each page, but a long-running Chromium
+// process can accumulate memory/layout work during the 157-route site sweep.
+// Rotate the browser after a bounded group without retrying or disregarding
+// any score. The exact same mobile profile and budgets apply to every route.
+const ROUTES_PER_CHROME_SESSION = 16;
 // Match @unlighthouse/core 0.19.1's explicit mobile configuration, not
 // Lighthouse's heavier default 4× CPU throttling. Changing this profile is a
 // measurement/protocol change and needs an independent before/after review.
@@ -53,13 +58,22 @@ if (process.env.CI && process.env.LIGHTHOUSE_CHROME_PATH) {
 
 await rm(output, { recursive: true, force: true });
 await mkdir(reports, { recursive: true });
-const chrome = await launch({
-  chromePath: executable,
-  chromeFlags: ['--headless', '--no-sandbox', '--disable-dev-shm-usage'],
-});
+let chrome;
 let succeeded = 0;
 try {
   for (const [index, route] of routes.entries()) {
+    // Always validate the next route with a live, freshly bounded browser
+    // session; a prior failed report never gets a silent retry or exemption.
+    if (index % ROUTES_PER_CHROME_SESSION === 0) {
+      if (chrome) await chrome.kill();
+      chrome = await launch({
+        chromePath: executable,
+        chromeFlags: ['--headless', '--no-sandbox', '--disable-dev-shm-usage'],
+      });
+      console.log(
+        `Chrome session ${Math.floor(index / ROUTES_PER_CHROME_SESSION) + 1}: routes ${index + 1}-${Math.min(index + ROUTES_PER_CHROME_SESSION, routes.length)} of ${routes.length}`,
+      );
+    }
     const url = new URL(route, site).href;
     const result = await lighthouse(url, {
       port: chrome.port,
@@ -85,7 +99,7 @@ try {
     console.log(`[${index + 1}/${routes.length}] ${route} ${scores.join(' ')}`);
   }
 } finally {
-  await chrome.kill();
+  if (chrome) await chrome.kill();
 }
 if (succeeded !== routes.length) throw new Error(`Audited only ${succeeded}/${routes.length} routes`);
 console.log(`Saved ${succeeded} audited Lighthouse reports under ${reports}`);

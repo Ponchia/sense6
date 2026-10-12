@@ -162,6 +162,14 @@ match the previously deployed Unlighthouse 0.19.1 profile; using unmodified
 Lighthouse mobile defaults raises the CPU slowdown to 4× and makes scores
 incomparable. A deliberate profile change needs its own comparative evidence.
 
+The scheduled full sweep starts a fresh Chrome process every **16 routes** to
+bound browser-session resource accumulation. It still measures each of the
+157 canonical pages exactly once and applies the same unmodified budgets.
+The runner does **not** retry a slow page or ignore an anomalous score. If a
+full-site budget fails, preserve its Lighthouse report and compare isolated
+reproductions against nearby locale pages before changing experiment code,
+throttling settings, or thresholds.
+
 `scripts/check-lighthouse-metrics.mjs` requires one same-origin report for
 every requested route. All reports must meet the existing category floors
 (performance 90, accessibility 100, best-practices 100, SEO 100) and numeric

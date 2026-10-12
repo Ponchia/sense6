@@ -303,6 +303,9 @@ test('scheduled Lighthouse covers the whole indexable site with a scalable timeo
   assert.match(runner, /FULL_SITE_AUDIT === '1' \? SEARCH_ROUTES : SEARCH_REPRESENTATIVE_ROUTES/);
   assert.match(runner, /onlyCategories: \[\.\.\.CATEGORY_IDS\]/);
   assert.match(runner, /local Sense6 preview root/);
+  assert.match(runner, /ROUTES_PER_CHROME_SESSION = 16/);
+  assert.match(runner, /index % ROUTES_PER_CHROME_SESSION === 0/);
+  assert.match(runner, /if \(chrome\) await chrome\.kill\(\)/);
   assert.match(runner, /cpuSlowdownMultiplier: 1/);
   assert.match(runner, /requestLatencyMs: 600/);
   assert.match(runner, /deviceScaleFactor: 1/);
