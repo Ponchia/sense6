@@ -293,10 +293,15 @@ test('scheduled Lighthouse covers the whole indexable site with a scalable timeo
   // headroom for the serial, throttled mobile crawl instead of dropping pages.
   assert.ok(timeout >= Math.ceil(SEARCH_ROUTES.length * 0.4));
   assert.match(lighthouse, /FULL_SITE_AUDIT: '1'/);
-  const configuration = readFileSync(new URL('../unlighthouse.config.mjs', import.meta.url), 'utf8');
-  assert.match(configuration, /FULL_SITE_AUDIT === '1' \? SEARCH_ROUTES : SEARCH_REPRESENTATIVE_ROUTES/);
-  assert.match(configuration, /maxRoutes: false/);
-  assert.match(configuration, /crawler: false/);
+  const runner = readFileSync(new URL('../scripts/run-lighthouse-audit.mjs', import.meta.url), 'utf8');
+  const budgets = readFileSync(new URL('../scripts/check-lighthouse-metrics.mjs', import.meta.url), 'utf8');
+  assert.match(runner, /FULL_SITE_AUDIT === '1' \? SEARCH_ROUTES : SEARCH_REPRESENTATIVE_ROUTES/);
+  assert.match(runner, /onlyCategories: \[\.\.\.CATEGORY_IDS\]/);
+  assert.match(runner, /local Sense6 preview root/);
+  assert.match(budgets, /reports.length !== routes.length/);
+  for (const category of ['performance', 'accessibility', 'best-practices', 'seo']) {
+    assert.ok(budgets.includes(category), `missing ${category} budget`);
+  }
 });
 
 test('the visual comparison gates pull requests and direct pushes', () => {

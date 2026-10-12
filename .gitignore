@@ -8,3 +8,5 @@ coverage/
 validation/acutezza/*.local.json
 .DS_Store
 *.log
+
+.lighthouse/
