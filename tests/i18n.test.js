@@ -254,7 +254,12 @@ test('the About page has complete, dedicated copy for every locale', () => {
     assert.equal(page.profileLabel, 'Zeno');
     assert.deepEqual(Object.keys(page.experiments).sort(), examIds);
     assert.match(page.summary, /Sense6/);
-    assert.doesNotMatch(aboutMarkup(code), /\{(?:profile|privacy)\}/);
+    assert.match(page.supportLabel, /Ko-fi/);
+    const html = aboutMarkup(code);
+    assert.match(html, /href="https:\/\/brontolotto\.observer\/"/);
+    assert.match(html, /href="https:\/\/github\.com\/Ponchia"/);
+    assert.match(html, /href="https:\/\/ko-fi\.com\/ponchia"/);
+    assert.doesNotMatch(html, /\{(?:profile|privacy|github|support)\}/);
     if (code !== 'en') assert.notEqual(page.title, english.title);
   }
 });

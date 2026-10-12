@@ -1,5 +1,5 @@
 import { EXAMS } from './exams/registry.js';
-import { CREATOR_PROFILE_URL } from './site-identity.js';
+import { CREATOR_PROFILE_URL, CREATOR_SUPPORT_URL, CREATOR_WEBSITE_URL } from './site-identity.js';
 
 const CONTACT_EMAIL = 'privacy@sense6.net';
 
@@ -74,8 +74,10 @@ const ABOUT_COPY = Object.freeze({
     maintainerTitle: 'Who maintains Sense6',
     maintainer: [
       'Sense6 is created and maintained by {profile}. It is an independent personal project operated in Switzerland, not a clinic, university study, or commercial testing service.',
+      'Other software projects can be found on {github}. If Sense6 is useful to you, you can {support}.',
     ],
     profileLabel: 'Zeno',
+    supportLabel: 'support its development on Ko-fi',
     privacyTitle: 'The privacy boundary',
     privacy: [
       'Test answers, measurements, and journal entries are processed locally. Sense6 stores only anonymous daily activity totals without identifiers, referrers, user agents, exact timestamps, answers, or results. Read the {privacy} for the complete boundary.',
@@ -160,8 +162,10 @@ const ABOUT_COPY = Object.freeze({
     maintainerTitle: 'Chi mantiene Sense6',
     maintainer: [
       'Sense6 è creato e mantenuto da {profile}. È un progetto personale indipendente gestito in Svizzera, non una clinica, uno studio universitario o un servizio commerciale di test.',
+      'Altri progetti software dell’autore sono su {github}. Se Sense6 ti è utile, puoi {support}.',
     ],
     profileLabel: 'Zeno',
+    supportLabel: 'sostenere il suo sviluppo su Ko-fi',
     privacyTitle: 'Il confine della privacy',
     privacy: [
       'Risposte, misurazioni e voci del diario vengono elaborate localmente. Sense6 conserva soltanto totali giornalieri anonimi, senza identificatori, referrer, user agent, orari esatti, risposte o risultati. Leggi l’{privacy} per il quadro completo.',
@@ -249,8 +253,10 @@ const ABOUT_COPY = Object.freeze({
     maintainerTitle: 'Wer Sense6 pflegt',
     maintainer: [
       'Sense6 wird von {profile} entwickelt und gepflegt. Es ist ein unabhängiges persönliches Projekt aus der Schweiz, keine Klinik, Universitätsstudie oder kommerzielle Testleistung.',
+      'Weitere Softwareprojekte des Entwicklers finden Sie auf {github}. Wenn Sense6 für Sie nützlich ist, können Sie {support}.',
     ],
     profileLabel: 'Zeno',
+    supportLabel: 'die Entwicklung über Ko-fi unterstützen',
     privacyTitle: 'Die Datenschutzgrenze',
     privacy: [
       'Antworten, Messwerte und Journaleinträge werden lokal verarbeitet. Sense6 speichert nur anonyme Tagessummen ohne Kennungen, Referrer, User-Agents, genaue Zeitstempel, Antworten oder Ergebnisse. Die vollständige Grenze steht im {privacy}.',
@@ -341,8 +347,10 @@ const ABOUT_COPY = Object.freeze({
     maintainerTitle: 'Qui maintient Sense6',
     maintainer: [
       'Sense6 est créé et maintenu par {profile}. Il s’agit d’un projet personnel indépendant exploité en Suisse, et non d’une clinique, d’une étude universitaire ou d’un service commercial de test.',
+      'D’autres projets logiciels de l’auteur sont sur {github}. Si Sense6 vous est utile, vous pouvez {support}.',
     ],
     profileLabel: 'Zeno',
+    supportLabel: 'soutenir son développement sur Ko-fi',
     privacyTitle: 'La frontière de confidentialité',
     privacy: [
       'Les réponses, mesures et entrées du journal sont traitées localement. Sense6 ne conserve que des totaux quotidiens anonymes, sans identifiants, référents, agents utilisateur, heures exactes, réponses ou résultats. Consultez la {privacy} pour tous les détails.',
@@ -427,8 +435,10 @@ const ABOUT_COPY = Object.freeze({
     maintainerTitle: 'Quién mantiene Sense6',
     maintainer: [
       'Sense6 está creado y mantenido por {profile}. Es un proyecto personal independiente gestionado en Suiza, no una clínica, un estudio universitario ni un servicio comercial de pruebas.',
+      'Otros proyectos de software del autor están en {github}. Si Sense6 te resulta útil, puedes {support}.',
     ],
     profileLabel: 'Zeno',
+    supportLabel: 'apoyar su desarrollo en Ko-fi',
     privacyTitle: 'El límite de privacidad',
     privacy: [
       'Las respuestas, mediciones y entradas del diario se procesan localmente. Sense6 solo conserva totales diarios anónimos, sin identificadores, referencias, agentes de usuario, horas exactas, respuestas ni resultados. Consulta el {privacy} para conocer el límite completo.',
@@ -510,8 +520,10 @@ const ABOUT_COPY = Object.freeze({
     maintainerTitle: 'Quem mantém a Sense6',
     maintainer: [
       'A Sense6 é criada e mantida por {profile}. É um projeto pessoal independente operado na Suíça, não uma clínica, estudo universitário ou serviço comercial de testes.',
+      'Encontra outros projetos de software do autor no {github}. Se a Sense6 lhe for útil, pode {support}.',
     ],
     profileLabel: 'Zeno',
+    supportLabel: 'apoiar o seu desenvolvimento no Ko-fi',
     privacyTitle: 'O limite de privacidade',
     privacy: [
       'As respostas, medições e entradas do diário são processadas localmente. A Sense6 guarda apenas totais diários anónimos, sem identificadores, referências, agentes de utilizador, horas exatas, respostas ou resultados. Leia o {privacy} para conhecer o limite completo.',
@@ -593,8 +605,10 @@ const ABOUT_COPY = Object.freeze({
     maintainerTitle: 'Quem mantém a Sense6',
     maintainer: [
       'A Sense6 é criada e mantida por {profile}. É um projeto pessoal independente operado na Suíça, não uma clínica, estudo universitário ou serviço comercial de testes.',
+      'Outros projetos de software do autor estão no {github}. Se a Sense6 for útil para você, pode {support}.',
     ],
     profileLabel: 'Zeno',
+    supportLabel: 'apoiar seu desenvolvimento no Ko-fi',
     privacyTitle: 'O limite de privacidade',
     privacy: [
       'Respostas, medições e entradas do diário são processadas localmente. A Sense6 armazena apenas totais diários anônimos, sem identificadores, referências, agentes de usuário, horários exatos, respostas ou resultados. Leia o {privacy} para conhecer o limite completo.',
@@ -672,8 +686,10 @@ const ABOUT_COPY = Object.freeze({
     maintainerTitle: 'من يدير Sense6',
     maintainer: [
       'ينشئ {profile} Sense6 ويديرها. وهي مشروع شخصي مستقل يُشغّل من سويسرا، وليست عيادة أو دراسة جامعية أو خدمة اختبارات تجارية.',
+      'توجد مشاريع برمجية أخرى للمطوّر على {github}. إذا وجدت Sense6 مفيدة، فيمكنك {support}.',
     ],
     profileLabel: 'Zeno',
+    supportLabel: 'دعم تطويرها عبر Ko-fi',
     privacyTitle: 'حدود الخصوصية',
     privacy: [
       'تُعالج الإجابات والقياسات وسجلات اليوميات محليًا. لا تخزن Sense6 سوى إجماليات يومية مجهولة، من دون معرّفات أو مُحيلات أو وكلاء مستخدم أو أوقات دقيقة أو إجابات أو نتائج. اقرأ {privacy} لمعرفة الحدود كاملة.',
@@ -751,8 +767,10 @@ const ABOUT_COPY = Object.freeze({
     maintainerTitle: 'Sense6の運営者',
     maintainer: [
       'Sense6は{profile}が制作・運営しています。スイスで運営する独立した個人プロジェクトであり、診療所、大学研究、商用検査サービスではありません。',
+      '作者によるほかのソフトウェアプロジェクトは{github}で公開しています。Sense6が役に立った場合は、{support}こともできます。',
     ],
     profileLabel: 'Zeno',
+    supportLabel: 'Ko-fiで開発を支援する',
     privacyTitle: 'プライバシーの範囲',
     privacy: [
       '回答、測定値、ジャーナル項目は端末内で処理されます。Sense6が保存するのは匿名の日別合計だけで、識別子、参照元、ユーザーエージェント、正確な時刻、回答、結果は保存しません。詳しくは{privacy}をご覧ください。',
@@ -830,8 +848,10 @@ const ABOUT_COPY = Object.freeze({
     maintainerTitle: 'Sense6 운영자',
     maintainer: [
       'Sense6는 {profile}가 만들고 운영합니다. 스위스에서 운영하는 독립적인 개인 프로젝트이며 병원, 대학 연구 또는 상업 검사 서비스가 아닙니다.',
+      '개발자의 다른 소프트웨어 프로젝트는 {github}에서 볼 수 있습니다. Sense6가 유용했다면 {support}.',
     ],
     profileLabel: 'Zeno',
+    supportLabel: 'Ko-fi에서 개발을 후원할 수 있습니다',
     privacyTitle: '개인정보 보호 범위',
     privacy: [
       '답변, 측정값, 저널 항목은 기기에서 처리됩니다. Sense6는 식별자, 참조 페이지, 사용자 에이전트, 정확한 시각, 답변, 결과 없이 익명의 일일 합계만 저장합니다. 전체 범위는 {privacy}에서 확인하세요.',
@@ -907,8 +927,10 @@ const ABOUT_COPY = Object.freeze({
     maintainerTitle: 'Sense6 का रखरखाव कौन करता है',
     maintainer: [
       'Sense6 को {profile} बनाते और संभालते हैं। यह स्विट्ज़रलैंड में संचालित एक स्वतंत्र निजी परियोजना है, कोई क्लिनिक, विश्वविद्यालय अध्ययन या व्यावसायिक परीक्षण सेवा नहीं।',
+      'निर्माता की अन्य सॉफ़्टवेयर परियोजनाएँ {github} पर हैं। यदि Sense6 आपके लिए उपयोगी है, तो आप {support}।',
     ],
     profileLabel: 'Zeno',
+    supportLabel: 'Ko-fi पर इसके विकास में सहयोग कर सकते हैं',
     privacyTitle: 'गोपनीयता की सीमा',
     privacy: [
       'उत्तर, माप और जर्नल प्रविष्टियाँ स्थानीय रूप से संसाधित होती हैं। Sense6 केवल अनाम दैनिक कुल रखता है—कोई पहचानकर्ता, रेफ़रर, यूज़र एजेंट, सटीक समय, उत्तर या परिणाम नहीं। पूरी सीमा के लिए {privacy} पढ़ें।',
@@ -981,8 +1003,10 @@ const ABOUT_COPY = Object.freeze({
     maintainerTitle: '谁在维护 Sense6',
     maintainer: [
       'Sense6 由 {profile} 创建和维护。这是在瑞士运营的独立个人项目，不是诊所、大学研究或商业检测服务。',
+      '维护者的其他软件项目可以在 {github} 上查看。如果 Sense6 对你有帮助，可以通过 {support}。',
     ],
     profileLabel: 'Zeno',
+    supportLabel: 'Ko-fi 支持其开发',
     privacyTitle: '隐私边界',
     privacy: [
       '回答、测量值和日志条目都在本地处理。Sense6 只保存匿名的每日总数，不保存标识符、来源页面、用户代理、精确时间、回答或结果。完整说明请阅读{privacy}。',
@@ -1077,7 +1101,9 @@ function experimentMarkup(exam, page, hrefFor, translate) {
 
 function aboutHtml(text, page, hrefFor) {
   const links = {
-    profile: `<a href="${escapeAttribute(CREATOR_PROFILE_URL)}" rel="me noreferrer">${escapeHtml(page.profileLabel)}</a>`,
+    profile: `<a href="${escapeAttribute(CREATOR_WEBSITE_URL)}" rel="me noreferrer">${escapeHtml(page.profileLabel)}</a>`,
+    github: `<a href="${escapeAttribute(CREATOR_PROFILE_URL)}" rel="me noreferrer">GitHub</a>`,
+    support: `<a href="${escapeAttribute(CREATOR_SUPPORT_URL)}" rel="me noreferrer">${escapeHtml(page.supportLabel)}</a>`,
     contact: `<!--email_off--><a href="mailto:${escapeAttribute(CONTACT_EMAIL)}">${escapeHtml(CONTACT_EMAIL)}</a><!--/email_off-->`,
     privacy: `<a data-sense6-route="privacy" href="${escapeAttribute(hrefFor('privacy'))}">${escapeHtml(page.privacyLabel)}</a>`,
   };

@@ -566,10 +566,12 @@ test('the shared gallery and About renderers are exactly what shipped in every l
       }
     }
     assert.equal(
-      (aboutHtml.match(/href="https:\/\/github\.com\/Ponchia" rel="me noreferrer"/g) ?? []).length,
+      (aboutHtml.match(/href="https:\/\/brontolotto\.observer\/" rel="me noreferrer"/g) ?? []).length,
       2,
-      `${locale} About page must link both authorship references to the public creator profile`,
+      `${locale} About page must link both authorship references to the canonical creator homepage`,
     );
+    assert.equal((aboutHtml.match(/href="https:\/\/github\.com\/Ponchia"/g) ?? []).length, 1);
+    assert.equal((aboutHtml.match(/href="https:\/\/ko-fi\.com\/ponchia"/g) ?? []).length, 1);
     assert.equal(
       (aboutHtml.match(/href="mailto:privacy@sense6\.net"/g) ?? []).length,
       1,
@@ -710,7 +712,7 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   assert.match(about, /No certification or formal validation is planned\./);
   assert.match(
     about,
-    /created and maintained by <a href="https:\/\/github\.com\/Ponchia" rel="me noreferrer">Zeno<\/a>\./,
+    /created and maintained by <a href="https:\/\/brontolotto\.observer\/" rel="me noreferrer">Zeno<\/a>\./,
   );
   assert.match(
     about,
@@ -721,8 +723,11 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
     aboutJson['@graph'].map((entry) => entry['@type']),
     ['AboutPage', 'WebSite', 'Person'],
   );
-  assert.equal(aboutJson['@graph'][2].url, 'https://github.com/Ponchia');
-  assert.deepEqual(aboutJson['@graph'][2].sameAs, ['https://github.com/Ponchia']);
+  assert.equal(aboutJson['@graph'][2].url, 'https://brontolotto.observer/');
+  assert.deepEqual(aboutJson['@graph'][2].sameAs, [
+    'https://github.com/Ponchia',
+    'https://ko-fi.com/ponchia',
+  ]);
   assert.equal(aboutJson['@graph'][0].dateModified, CONTENT_DATES.about);
 });
 
