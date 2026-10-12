@@ -1,6 +1,7 @@
 import { toast } from '@ponchia/ui/behaviors';
 import '../styles/tetracromia-landing.css';
 import '../styles/tetracromia.css';
+import '../styles/tetracromia-compact-landing.css';
 import { formatNumber, m, t } from '../i18n.js';
 import { toRgbCss } from '../lib/color.js';
 import { captureDisplayPassport, saveJournalRun } from '../lib/journal.js';

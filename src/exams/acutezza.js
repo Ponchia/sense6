@@ -1,6 +1,7 @@
 import { toast } from '@ponchia/ui/behaviors';
 import '../styles/acutezza.css';
 import '../styles/acutezza-result-summary.css';
+import '../styles/acutezza-compact-landing.css';
 import { formatNumber, m, t } from '../i18n.js';
 import {
   ACUITY_DIRECTIONS,

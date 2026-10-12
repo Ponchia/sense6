@@ -1,0 +1,25 @@
+/* Compact the first screen, never the stimulus/response runner or controls. */
+@media (max-width: 360px) and (max-height: 640px) {
+  .rx-intro__hero {
+    padding-block-start: 0.75rem;
+  }
+
+  .rx-hero {
+    padding-block: 0.25rem 1rem;
+  }
+
+  .rx-hero h1 {
+    font-size: clamp(2.2rem, 11vw, 2.6rem);
+    line-height: 0.98;
+    margin-block: 0.35rem 0.7rem;
+  }
+
+  .rx-lede {
+    font-size: 1rem;
+    line-height: 1.42;
+  }
+
+  .rx-hero__actions {
+    margin-block-start: 0.75rem;
+  }
+}
