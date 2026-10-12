@@ -448,16 +448,18 @@ test('Japanese, Korean, Hindi and Chinese Learn editions remain usable on small 
   }
 });
 
-test('Japanese, Korean, Hindi and Chinese Learn guides remain readable on mobile @pr-smoke', async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 320, height: 568 });
-  for (const [locale, languageTag] of [
-    ['ja', 'ja'],
-    ['ko', 'ko'],
-    ['hi', 'hi'],
-    ['zh-hans', 'zh-Hans'],
-  ]) {
+// Keep one real localized mobile journey and complete accessibility scan per
+// writing system. The former combined 4-locale scenario could time out midway
+// through axe, obscuring the locale responsible for a failure.
+for (const [locale, languageTag] of [
+  ['ja', 'ja'],
+  ['ko', 'ko'],
+  ['hi', 'hi'],
+  ['zh-hans', 'zh-Hans'],
+]) {
+  test(`${locale} Learn guide remains readable on mobile @pr-smoke`, async ({ page }) => {
+    test.setTimeout(45_000);
+    await page.setViewportSize({ width: 320, height: 568 });
     await page.goto(`/${locale}/`);
     await expect(page.locator('html')).toHaveAttribute('lang', languageTag);
     const heroLearn = page.locator('.gallery-hero__learn');
@@ -500,8 +502,8 @@ test('Japanese, Korean, Hindi and Chinese Learn guides remain readable on mobile
     expect(accessibility.violations, `${locale} accessibility`).toEqual([]);
     await page.locator('.learn-answer [data-learn-early-experiment]').click();
     await expect(page).toHaveURL(new RegExp(`/${locale}/color-blindness/$`));
-  }
-});
+  });
+}
 
 test('switching among all twelve published languages keeps the current research guide @pr-smoke', async ({
   page,

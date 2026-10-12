@@ -660,31 +660,35 @@ test('language and theme controls do not overlap at narrow header widths', async
   }
 });
 
-test('every live exam has a localized entry point in every language', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name === 'mobile', 'Localization routing is viewport-independent');
-  test.setTimeout(90_000);
-  const headingSources = {
-    tetracromia: ['Notice colour in', 'three different ways'],
-    'color-blindness': ['Find the gap', 'in the dots'],
-    riflessi: ['Notice the signal.', 'Measure the response.'],
-    udito: ['Listen for the boundary.', 'Keep the limits audible.'],
-    acutezza: ['Calibrate the screen.', 'Resolve the opening.'],
-  };
-  const setupActions = {
-    tetracromia: '[data-action="setup"]',
-    'color-blindness': '[data-action="cb-setup"]',
-    riflessi: '[data-action="rx-setup"]',
-    udito: '[data-action="au-setup"]',
-    acutezza: '[data-action="ac-prepare"]',
-  };
-  const setupAttributeSources = {
-    tetracromia: ['Eleven brightness steps from black to white', 'Continuous grayscale gradient'],
-  };
-  for (const { code, languageTag } of LOCALES) {
+// Each locale covers all five fully localized landings and their setup screens.
+// A single 60-route scenario could time out on a busy runner before the final
+// zh-Hans route hydrated, obscuring the actual language and route involved.
+const headingSources = {
+  tetracromia: ['Notice colour in', 'three different ways'],
+  'color-blindness': ['Find the gap', 'in the dots'],
+  riflessi: ['Notice the signal.', 'Measure the response.'],
+  udito: ['Listen for the boundary.', 'Keep the limits audible.'],
+  acutezza: ['Calibrate the screen.', 'Resolve the opening.'],
+};
+const setupActions = {
+  tetracromia: '[data-action="setup"]',
+  'color-blindness': '[data-action="cb-setup"]',
+  riflessi: '[data-action="rx-setup"]',
+  udito: '[data-action="au-setup"]',
+  acutezza: '[data-action="ac-prepare"]',
+};
+const setupAttributeSources = {
+  tetracromia: ['Eleven brightness steps from black to white', 'Continuous grayscale gradient'],
+};
+for (const { code, languageTag } of LOCALES) {
+  test(`every live exam has a localized entry point in ${code}`, async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name === 'mobile', 'Localization routing is viewport-independent');
+    test.setTimeout(45_000);
     const messages = await loadMessages(code);
     for (const { route } of EXAMS) {
       await page.goto(`/${code}/${route}/`);
       await expect(page.locator('html')).toHaveAttribute('lang', languageTag);
+      await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', route);
       const expected = headingSources[route].map((source) => escapeRegex(messages.get(source))).join('\\s*');
       const prefix = route === 'tetracromia' ? 'Tetracromia\\s+—\\s+' : '';
       const suffix = ['tetracromia', 'color-blindness'].includes(route) ? '\\.' : '';
@@ -741,9 +745,13 @@ test('every live exam has a localized entry point in every language', async ({ p
         }
       }
     }
-  }
+  });
+}
 
+test('locale selector navigates to the selected translated instrument', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name === 'mobile', 'Localization routing is viewport-independent');
   await page.goto('/en/udito/');
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'udito');
   await page.locator('[data-locale-select]').selectOption('es');
   await expect(page).toHaveURL(/\/es\/udito\/$/);
   await expect(page.locator('main h1')).toContainText('Escucha el límite', { ignoreCase: true });
