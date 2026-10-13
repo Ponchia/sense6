@@ -153,7 +153,8 @@ measurement and persistence code. Follow the
 
 ## Maintainer and license
 
-Maintained by [Zeno Trevisan](https://brontolotto.observer/).
+Maintained by [Zeno Trevisan](https://brontolotto.observer/). Optional support is available on
+[Ko-fi](https://ko-fi.com/ponchia); the experiments remain free to use.
 
 The source code is licensed under the [MIT license](LICENSE). Distributed UI
 code and fonts retain their own [third-party notices](THIRD_PARTY_NOTICES.md).

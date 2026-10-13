@@ -28,7 +28,7 @@ jobs:
   route-integrity:
     # A manual Lighthouse-only verification keeps the normal weekly sweep intact.
     if: github.event.inputs.lighthouse_only != 'true'
-    runs-on: arc-vps-sense6
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     env:
       PUPPETEER_SKIP_DOWNLOAD: 'true'
@@ -37,6 +37,8 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
       - name: Install dependencies
         run: npm ci
       - name: Verify locked Playwright version matches the pinned browser image
@@ -63,7 +65,7 @@ jobs:
   # the release job needs it and a budget failure can actually stop a deploy.
   # What remains here is the scheduled full-site sweep over every route.
   lighthouse-full-site:
-    runs-on: arc-vps-sense6
+    runs-on: ubuntu-24.04
     # The full indexable set grew from 85 to 157 routes as Learn was published
     # across 12 languages. The old 45-minute ceiling was too close to the
     # projected serial mobile Lighthouse runtime; keep every route in scope.
@@ -77,6 +79,8 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
       - name: Install dependencies
         run: npm ci
       - name: Verify locked Playwright version matches the pinned browser image
@@ -102,13 +106,15 @@ jobs:
   external-links:
     # A manual Lighthouse-only verification keeps the normal weekly sweep intact.
     if: github.event.inputs.lighthouse_only != 'true'
-    runs-on: arc-vps-sense6
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     env:
       PUPPETEER_SKIP_DOWNLOAD: 'true'
     steps:
       - name: Check out the repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
       - name: Set up Node.js
         uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
@@ -137,11 +143,13 @@ jobs:
   passive-security:
     # A manual Lighthouse-only verification keeps the normal weekly sweep intact.
     if: github.event.inputs.lighthouse_only != 'true'
-    runs-on: arc-vps-sense6
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Check out the repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
       - name: Prepare the reviewed passive-scan rules
         run: |
           install -d -m 0777 "$RUNNER_TEMP/zap"
