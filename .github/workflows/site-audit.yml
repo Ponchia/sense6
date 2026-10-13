@@ -23,7 +23,7 @@ concurrency:
 # This workflow owns the expensive whole-site and external-production sweeps.
 # Pull requests and pushes use verify.yml instead, so their visual, browser,
 # Lighthouse, and release gates form one dependency graph rather than racing a
-# second workflow for the same runner scale set.
+# second independent verification graph.
 jobs:
   route-integrity:
     # A manual Lighthouse-only verification keeps the normal weekly sweep intact.

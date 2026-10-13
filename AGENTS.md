@@ -12,7 +12,7 @@ boundary explicit in code, result copy, metadata, and documentation.
 - `docs/adding-an-experiment.md`: extension contract.
 - `CONTRIBUTING.md`: portable setup, checks, and contribution workflow.
 - `SECURITY.md`: private reporting and sensitive-data handling.
-- `docs/public-repository-readiness.md`: publication prerequisites and file-retention decisions.
+- `docs/public-repository-readiness.md`: public-maintenance controls and file-retention decisions.
 
 ## Rules
 
