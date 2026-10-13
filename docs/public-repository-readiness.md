@@ -5,7 +5,8 @@ Lifecycle: current
 This guide separates repository preparation from the decision to make Sense6
 public. It complements [product readiness](product-readiness.md): source
 publication does not establish usability, translation quality, or scientific
-validity. The maintainer chooses when to change visibility.
+validity. The maintainer authorized public launch on 13 October 2026. The launch receipt
+records the applied controls and actual hosted qualification separately.
 
 ## Review baseline
 
@@ -117,7 +118,8 @@ They preserve the required browser, visual, Lighthouse, and release gates.
 The first hosted attempt was rejected before job steps ran because GitHub
 reported an account payment or spending-limit issue. That annotation does not
 establish which billing condition caused it. No billing setting was changed.
-The hosted jobs must pass before the infrastructure cutover can proceed.
+The maintainer subsequently authorized the Actions-held public bootstrap below.
+It does not mark those failed hosted attempts as passes or enable paid usage.
 
 The hosted draft depends on the [runtime followthrough](https://github.com/Ponchia/sense6/pull/157),
 which must merge first.
@@ -140,57 +142,44 @@ available boundary in the present account structure.
 
 #### Coordinated cutover
 
-Keep the hosted-workflow and infrastructure-removal pull requests as drafts
-until their prerequisites are satisfied. Neither draft changes visibility,
-GitHub settings, production, or the currently deployed runner.
+The normal path qualifies hosted jobs while private. The account blocked that
+path before runner allocation. On 13 October 2026 the maintainer explicitly
+authorized public release and standard hosted runners. This controlled bootstrap
+preserves the required checks without exposing the internal runner:
 
-1. Keep the repository private. Review both exact candidate commits and verify
-   the account's Actions allowance without enabling spending. Standard hosted
-   runner minutes are free for public repositories; private rehearsals still
-   use the owner's allowance. Billing API access was unavailable during this
-   review, so no remaining private-minute balance is asserted. An exhausted or
-   unverified allowance is a reason to leave the cutover staged, not to skip a
-   required hosted check. Artifact storage is a separate limit: required visual
-   evidence must still upload successfully.
-2. Run the complete pull-request graph on the hosted candidate. Require
-   `verify / browser`, `verify / lighthouse`, `verify / visual`, and
-   `verify / release` for the exact head. Both visual revisions must be captured
-   in the same pinned container on the hosted VM. Preserve thresholds and
-   report runner-compatibility failures; do not lower budgets to finish migration.
-3. Merge the hosted workflow only after its required checks pass, while the
-   repository remains private. Verify the `main` production graph and deployed
-   commit. Stop submitting work to the old ARC label and drain all queued and
-   running Sense6 ARC jobs before retiring it.
-4. Merge the scoped `vps-infra` retirement. Flux `gha-runner` owns
-   `cluster/gha-runner/helmrelease-sense6.yaml`, its values and Kustomization
-   entries; Flux `shared-apps` owns the `arc-runner-sense6` service account.
-   Remove only those resources. Retain the shared ARC controller, credentials,
-   namespaces and every other repository's runner.
-5. Verify the retirement at the reconciled infrastructure commit: the
-   `arc-runner-sense6` HelmRelease, `arc-vps-sense6` AutoscalingRunnerSet,
-   associated listener/ephemeral runners and runner pods, and service account
-   must be absent. GitHub must show no Sense6 self-hosted runner registration.
-   An empty ephemeral-runner list by itself is insufficient: a scale set can
-   idle at zero and accept the next job. Check that peer runners and both Flux
-   Kustomizations remain healthy.
-6. During a separately authorized public launch, hold Actions disabled while
-   configuring settings that require a public repository on the current plan:
-   protect `main` with the exact required checks, require approval for all
-   external fork contributors, and enable private vulnerability reporting.
-   Keep the default workflow token read-only and approval of pull requests by
-   workflows disabled. Verify every setting before re-enabling Actions. Fork
-   approvals limit execution and resource use; the absent internal runner is
-   the infrastructure boundary.
-7. Verify public contributions with an innocuous fork that changes its workflow
-   and runs a harmless npm lifecycle marker on `ubuntu-24.04`. Inspect the actual
-   runner and confirm no deployment secrets or production steps are granted.
-   The source tests also reject self-hosted and dynamic runner selections using
-   in-memory fixtures. Never submit a malicious-workflow probe to an accessible
-   internal ARC runner; use the external registration checks to prove removal.
+1. Review the exact source and run the portable local checks. Runtime content
+   remains the already verified production source; test the additional workflow
+   policies, contribution forms, and documentation. Keep historical author
+   metadata unchanged; the unpublished rewrite preview is not applied.
+2. Hold repository Actions disabled and drain queued/running work. Keep the
+   existing verified website serving its last release. Disable the deployment
+   and scheduled-audit workflows individually until the hosted change is merged.
+3. After its normal infrastructure gate passes, merge the scoped runner
+   retirement. Verify Flux, the removed HelmRelease, scale set, listener, runner
+   pods, service account, and GitHub registration. Verify peer-runner health.
+4. Make the reviewed repository public while Actions remains held. Configure
+   and read back branch protection, read-only workflow tokens, approval for all
+   external contributors, and private vulnerability reporting. Configure the
+   production environment to accept only the `main` branch, not tags.
+5. Re-enable Actions with deployment and scheduled workflows still disabled.
+   Run the exact hosted pull-request candidate. Require all four successful
+   checks, including required visual evidence. Do not merge the hosted change
+   with failed, skipped, or missing checks. Old self-hosted labels have no
+   registration and cannot reach the shared VPS.
+6. Merge the qualified hosted candidate normally, with an exact head guard.
+   Re-enable the deployment and scheduled workflows and dispatch production
+   from `main`. Verify its full graph, unchanged artifact checksum, live build
+   metadata, public contract, and deployed JavaScript journey.
+7. Qualify an external-contribution path only on hosted runners with no
+   publication credentials. In-memory hostile-runner fixtures and live removal
+   checks establish different properties; do not call them an actual fork test.
 
-If private hosted checks cannot run, leave both drafts unmerged and resolve the
-allowance or explicitly re-plan the launch with the maintainer. Changing
-visibility to evade a preparation gate is not part of this cutover.
+Publication reveals retained Git metadata, issues, pull requests, and Actions
+history. The sensitive-data review is bounded as described above. Preserve
+private audit material outside Git, remove the reviewed operational comment,
+and record any unavailable historical surface rather than declaring a full audit.
+Public source availability does not establish human language or physical-device
+validation. Do not change billing or substitute paid larger runners.
 
 #### Reviewed launch settings
 
@@ -209,7 +198,7 @@ gh api repos/Ponchia/sense6/actions/permissions
 gh api --method PUT repos/Ponchia/sense6/actions/permissions -F enabled=false
 ```
 
-After the maintainer changes visibility, protect `main` with the exact four
+After the authorized visibility change, protect `main` with the exact four
 GitHub Actions check contexts. App ID `15368` was verified from the successful
 review candidate; recheck the publisher on the hosted candidate before applying.
 Zero required approving reviews preserves the single-maintainer workflow; do
@@ -270,11 +259,10 @@ gh api --method PUT repos/Ponchia/sense6/actions/permissions -F enabled=true
 gh api repos/Ponchia/sense6/actions/permissions
 ```
 
-The existing main-only deployment caller retains its scoped publication steps;
-this recipe does not introduce an environment approval requirement that the
-current private account cannot enforce. If environment controls are added at
-launch, first verify their availability and how they affect the single
-maintainer's release path.
+The release job selects `production` only for publication and `verification`
+otherwise. Restrict the production environment to the branch `main` and verify
+that tags are not allowed. No extra human approval is required for this single
+maintainer workflow; all four automated release gates remain mandatory.
 
 API contracts: [branch protection](https://docs.github.com/en/rest/branches/branch-protection#update-branch-protection),
 [Actions permissions](https://docs.github.com/en/rest/actions/permissions),

@@ -172,6 +172,26 @@ test('runner policy rejects self-hosted, dynamic and external workflow targets',
   );
 });
 
+test('checkout credentials are not persisted into contributor build commands', () => {
+  const checkouts = allWorkflows.split(/uses: actions\/checkout@/).slice(1);
+  assert.ok(checkouts.length > 0);
+  for (const checkout of checkouts) {
+    const step = checkout.split(/^ {6}- /m)[0];
+    assert.match(step, /persist-credentials: false/);
+  }
+});
+
+test('production publishing uses the protected environment, not the PR verifier', () => {
+  const release = parseWorkflow('verify.yml').jobs.find((job) => job.id === 'release');
+  assert.ok(release);
+  assert.ok(
+    release.lines
+      .join('\n')
+      .includes('environment: $' + "{{ inputs.publish_production && 'production' || 'verification' }}"),
+  );
+  assert.doesNotMatch(workflow('ci.yml'), /secrets:\s*inherit|publish_production: true/);
+});
+
 test('fork, branch, release and scheduled events retain their complete hosted gates', () => {
   for (const [event, expected] of Object.entries(EXPECTED_JOB_REACH)) {
     assert.deepEqual(

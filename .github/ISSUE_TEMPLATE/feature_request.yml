@@ -1,0 +1,23 @@
+name: Focused improvement
+description: Suggest a concrete improvement to the experiments, accessibility, or documentation.
+title: "[Idea] "
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem should change?
+      description: Describe the user need before proposing an implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Keep results exploratory and device-relative. Sense6 does not provide medical assessments.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Examples or supporting sources
+      description: Optional. Use public links and synthetic examples, not personal measurements.
