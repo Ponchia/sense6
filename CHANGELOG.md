@@ -37,6 +37,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 
+- Public repository maintenance now documents the completed hosted launch,
+  sponsorship and branch-cleanup controls; package metadata includes the
+  maintained project, issue, and optional funding destinations.
 - Standard GitHub-hosted Ubuntu runners for verification, releases, and scheduled
   audits, with the same fork verification gates and no persisted checkout token.
 - Production releases select a main-only protected environment; pull-request

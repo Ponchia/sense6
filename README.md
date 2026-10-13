@@ -141,8 +141,8 @@ Start with the [architecture](docs/architecture.md) for a code change or
 The [roadmap](docs/roadmap.md) records current priorities and bounded technical
 debt; the [changelog](CHANGELOG.md) records behavior changes. Production
 operations belong in the [Cloudflare Pages runbook](docs/runbooks/cloudflare-pages-release.md).
-The [public-repository readiness review](docs/public-repository-readiness.md)
-tracks the remaining conditions for changing repository visibility.
+The [public repository maintenance guide](docs/public-repository-readiness.md)
+records the launch review, sponsorship setup, branch hygiene, and security controls.
 
 ## Contributing
 
