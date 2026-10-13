@@ -35,6 +35,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 
+- Udito and Riflessi result markup and copied summaries now have focused,
+  strictly checked view modules with lower controller growth ceilings.
 - A shorter repository entry point, explicit generated-file ownership, and a
   Node.js 22.19 minimum matching the locked tools; Node.js 24 is recorded for CI parity.
 - Earlier mobile preparation actions and faster gallery browsing, clearer
@@ -59,6 +61,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Fixed
 
+- Completed-run clipboard and share operations no longer post feedback after
+  restarting or leaving any of the five experiments. Udito also invalidates
+  delayed reference playback when the selected output setup changes.
+- Latest-result validation rejects malformed hearing, reflex, colour-axis,
+  and acuity records while retaining supported historical shapes and storage
+  envelopes. Unsupported older Daltonia measurement schemas stay untouched.
 - Development telemetry checks now honor configurable HTTP loopback ports;
   production transport remains restricted to the canonical site origin.
 - Audio cancellation across delayed context initialization and teardown, and

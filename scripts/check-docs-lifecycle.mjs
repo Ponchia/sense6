@@ -7,6 +7,7 @@ const STRICT = new Set([
   'README.md',
   'AGENTS.md',
   'CONTRIBUTING.md',
+  '.github/PULL_REQUEST_TEMPLATE.md',
   'SECURITY.md',
   'THIRD_PARTY_NOTICES.md',
   'src/learn-locales/README.md',
