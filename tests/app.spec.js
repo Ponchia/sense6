@@ -575,7 +575,16 @@ test('the About page explains authorship, methodology, and permanent limits in e
   await expect(page.getByRole('link', { name: 'Zeno', exact: true })).toHaveCount(2);
   await expect(page.getByRole('link', { name: 'Zeno', exact: true }).first()).toHaveAttribute(
     'href',
+    'https://brontolotto.observer/',
+  );
+  const maintainer = page.getByRole('heading', { name: 'Who maintains Sense6' }).locator('..');
+  await expect(maintainer.getByRole('link', { name: 'GitHub' })).toHaveAttribute(
+    'href',
     'https://github.com/Ponchia',
+  );
+  await expect(maintainer.getByRole('link', { name: 'support its development on Ko-fi' })).toHaveAttribute(
+    'href',
+    'https://ko-fi.com/ponchia',
   );
   await expect(page.getByRole('link', { name: 'privacy@sense6.net', exact: true })).toHaveCount(1);
   await expect(page.getByRole('link', { name: 'privacy notice', exact: true })).toBeVisible();
@@ -590,6 +599,9 @@ test('the About page explains authorship, methodology, and permanent limits in e
     await expect(page.locator('html')).toHaveAttribute('lang', languageTag);
     await expect(page.locator('html')).toHaveAttribute('dir', direction);
     await expect(page.getByRole('heading', { level: 1, name: aboutCopy(code).title })).toBeVisible();
+    await expect(page.locator('a[href="https://brontolotto.observer/"]')).toHaveCount(2);
+    await expect(page.locator('a[href="https://github.com/Ponchia"]')).toHaveCount(1);
+    await expect(page.locator('a[href="https://ko-fi.com/ponchia"]')).toHaveCount(1);
     await expect
       .poll(() =>
         page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),

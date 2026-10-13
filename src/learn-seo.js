@@ -3,7 +3,7 @@ import { learnCatalog } from './learn-catalog.js';
 import { learnPublicationDate } from './learn-publication.js';
 import { localeMetadata } from './locale-metadata.js';
 import { LEARN_ROUTES, SITE_ORIGIN } from './routes.js';
-import { CREATOR_PROFILE_URL } from './site-identity.js';
+import { CREATOR_PROFILE_URL, CREATOR_SUPPORT_URL, CREATOR_WEBSITE_URL } from './site-identity.js';
 
 const ORIGIN = SITE_ORIGIN;
 
@@ -69,7 +69,7 @@ function learnCreatorData() {
     '@type': 'Person',
     '@id': ORIGIN + '/#creator',
     name: 'Zeno',
-    url: CREATOR_PROFILE_URL,
-    sameAs: [CREATOR_PROFILE_URL],
+    url: CREATOR_WEBSITE_URL,
+    sameAs: [CREATOR_PROFILE_URL, CREATOR_SUPPORT_URL],
   };
 }

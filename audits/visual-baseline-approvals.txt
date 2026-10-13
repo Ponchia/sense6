@@ -34,5 +34,11 @@ en-riflessi-mobile-chromium-linux.png  # 320x568 short-height reaction-lab intro
 en-udito-mobile-chromium-linux.png  # 320x568 short-height layout now fits safe sound-lab preparation above the fold without touching listening setup or consent
 en-tetracromia-mobile-chromium-linux.png  # 320x568 short-height Screen Colour intro now shows its safe setup action without changing any measured colour tasks
 en-acutezza-mobile-chromium-linux.png  # 320x568 short-height vision-lab intro now exposes preparation without changing optotypes, calibration or consent
-ar-about-mobile-chromium-linux.png  # Arabic Learn is now published; the localized footer Learn link becomes visible on About at 320px, adding one 38px footer row without changing the About content or test protocols
-hi-about-mobile-chromium-linux.png  # Hindi Learn publication exposes the previously hidden footer guide link on a 320px About viewport, retaining access to the full experiment gallery
+ar-about-mobile-chromium-linux.png  # Arabic About adds the localized author and support paragraph, which increases the full-page height at 320px while keeping layout and experiment safety unchanged
+hi-about-mobile-chromium-linux.png  # Hindi About adds one localized maintainer and support paragraph at 320px, retaining readable wrapping and the existing navigation
+en-about-desktop-chromium-linux.png  # About maintainer attribution now links to the personal homepage, with a contextual GitHub profile link and optional Ko-fi support; scientific and privacy claims are unchanged
+en-about-mobile-chromium-linux.png  # The same additional About maintainer paragraph wraps naturally on narrow screens without adding a donation widget or changing experiments
+ar-about-desktop-chromium-linux.png  # Arabic About now includes localized maintainer links to the personal site, GitHub, and optional Ko-fi, without altering experimental content
+hi-about-desktop-chromium-linux.png  # Hindi About now provides the three contextually linked maintainer destinations; no experiments, measurement logic, or privacy statements change
+ja-about-desktop-chromium-linux.png  # Japanese About adds localized context for author homepage, public GitHub profile, and optional Ko-fi support beneath the existing maintainer section
+ja-about-mobile-chromium-linux.png  # Japanese About wraps its new maintainer and support paragraph on narrow devices without changing visual experiments or the footer
