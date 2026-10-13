@@ -179,15 +179,18 @@ Use synthetic fixtures in public reports and tests. Do not attach private
 journal exports, participant data, credentials, or account screenshots.
 Security-sensitive reports should use the process in [SECURITY.md](SECURITY.md).
 
-Same-repository pull requests run representative browser journeys and the
-non-browser, visual, Lighthouse, and artifact checks. The checked-in workflow
-routes verification only for same-repository pull requests. Contributors can
-run the local commands above; maintainers must review external changes and
-arrange trusted verification before integration. A condition in a
-pull-request-controlled workflow is not sufficient isolation for a self-hosted
-runner. The [public-repository readiness review](docs/public-repository-readiness.md)
-records the external runner-access prerequisites. Skipped fork CI is not a
-passing release gate.
+Pull requests, including forks, run representative browser journeys and the
+non-browser, visual, Lighthouse, and artifact checks on GitHub-hosted Ubuntu
+24.04 VMs. External-contributor jobs may await maintainer approval under the
+repository's configured approval policy. Contributors can also run the local
+commands above.
+
+Before public contributions are enabled, maintainers must retire the former
+ARC registration and verify that this repository cannot access internal
+runners. The [public-repository readiness review](docs/public-repository-readiness.md)
+records the external retirement and launch prerequisites. The checked-in
+hosted-runner policy does not prove that retirement is complete. Billing-blocked
+or skipped CI is not a passing release gate.
 
 Publishing the site is a maintainer operation. A push to `main` runs the
 complete configured browser matrix and the production release checks before
