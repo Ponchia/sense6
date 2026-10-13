@@ -20,7 +20,7 @@ privacy boundary, generated-file ownership, or operating instruction.
 Link the owning documentation and explain compatibility or migration effects.
 Delete this section if the change does not affect these contracts. -->
 
-See [Contributing](../CONTRIBUTING.md) for the required checks.
+See [Contributing](https://github.com/Ponchia/sense6/blob/main/CONTRIBUTING.md) for the required checks.
 Keep credentials, private journal exports, participant information, and account
-screenshots out of this pull request. Use [Security](../SECURITY.md) to arrange
+screenshots out of this pull request. Use [Security](https://github.com/Ponchia/sense6/blob/main/SECURITY.md) to arrange
 a private vulnerability report.
