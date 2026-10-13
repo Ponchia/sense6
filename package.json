@@ -5,6 +5,18 @@
   "type": "module",
   "description": "A privacy-first collection of experimental browser perception tests.",
   "license": "MIT",
+  "homepage": "https://sense6.net/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ponchia/sense6.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Ponchia/sense6/issues"
+  },
+  "funding": {
+    "type": "ko-fi",
+    "url": "https://ko-fi.com/ponchia"
+  },
   "engines": {
     "node": ">=22.19.0"
   },

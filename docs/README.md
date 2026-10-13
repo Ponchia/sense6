@@ -13,8 +13,8 @@ decisions or research for operating instructions.
 - [Security](../SECURITY.md) explains how to report security-sensitive issues.
 - [Third-party notices](../THIRD_PARTY_NOTICES.md) records the runtime and font
   licenses included in each build.
-- [Public-repository readiness](public-repository-readiness.md) tracks the
-  review and external prerequisites for changing repository visibility.
+- [Public repository maintenance](public-repository-readiness.md) records the
+  completed launch, sponsorship, branch cleanup, and external security controls.
 - [Architecture](architecture.md) describes runtime boundaries, data flow,
   quality gates, pressure points, and delivery environments.
 - [Adding an experiment](adding-an-experiment.md) is the extension checklist for
