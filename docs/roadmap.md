@@ -1,7 +1,7 @@
 # Sense6 roadmap
 <!-- vale Vale.Spelling = NO -->
 
-Status: current, 2026-10-12
+Status: current, 2026-10-13
 
 Lifecycle: current
 
@@ -91,8 +91,9 @@ The completed foundation includes:
 - source complexity and large-file ceilings that require extraction instead of
   allowing the existing controllers and styles to grow.
 
-The journal is now a separate versioned store. Existing concise latest-or-best
-keys remain compatible and are not rewritten as journal history.
+The journal is a separate versioned store. Supported latest-result records
+retain their existing storage keys and envelopes; they are not rewritten as
+journal history.
 
 ## 2. Experiment integrity: completed
 
@@ -171,12 +172,14 @@ The large controllers and route style sheets remain bounded debt, not a reason
 for a suite-wide framework rewrite. Work through them when the owning feature
 changes, in this order:
 
-1. Extract Udito's latest-result schema, audio-operation state, and result view;
-   then move one guarded phase at a time into the strict typed-JavaScript set.
-2. Extract Riflessi's latest-result schema and result view, followed by its
-   instrument-specific event coordination.
-3. Separate Acutezza calibration, eye-run, and result rendering after its
-   current persistence and migration contracts have settled.
+1. Continue Udito's guarded phase and audio-operation coordination one phase
+   at a time. Its latest-result schema and result view are now strict modules;
+   preserve the tested cancellation boundaries when moving internal state.
+2. Separate Riflessi's instrument-specific event coordination behind small
+   typed interfaces. Its latest-result schema and result view are extracted,
+   including compatibility fixtures from historical result producers.
+3. Separate Acutezza calibration and eye-run coordination. Its existing result
+   view and validated persistence/migration boundary provide the pattern.
 4. Continue splitting Tetracromia and Daltonia phase handlers and pure views
    without changing their frozen measurement schedules.
 5. Split each route style sheet by stable visual ownership when it approaches

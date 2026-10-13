@@ -43,32 +43,54 @@ Third-party attribution is described in [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_
 
 ## History and sensitive-data review
 
-The review inspected the fetched repository's reachable refs: 405 commits and
-2,084 unique blobs. Gitleaks found no matches in its Git-history scan. A second
-fully redacted scan covered all 1,957 UTF-8 text blobs, commit messages, and
-267 textual members of an old packaged UI dependency. The 127 binary blobs
-were not subjected to textual secret scanning. Historical screenshots account
-for most of the older binary material; the largest tracked historical file was
-under 618 KB.
+The first review inspected 405 commits and 2,084 unique blobs reachable in
+its checkout. The follow-through on 12 October 2026 expanded that scope to a
+fresh mirror, including GitHub pull-request refs, with `main` at `070a574`:
+446 commits, 2,047 UTF-8 text blobs, and 127 binary blobs. Gitleaks found no
+matches in either the Git-history scan or the fully redacted text scan, which
+also covered commit messages and 267 textual archive members.
 
-These are bounded scan results, not a guarantee that the repository contains
-no private information. They do not cover unfetched or deleted remote refs,
-GitHub issues and attachments, CI artifacts, external backups, or every kind
-of embedded binary metadata. Review those surfaces separately before changing
-visibility. Participant notes, journal exports, access tokens, and proprietary
-material require particular attention even when a detector produces no match.
+The binary inventory comprised 126 PNG files and one historical UI package
+archive. PNG chunk and checksum inspection found no text or EXIF metadata
+chunks. Contact-sheet review showed product pages and sharing assets. The
+archive's six non-text members were Doto font files. This bounded image review
+was not a complete pixel-by-pixel or optical-character-recognition audit.
 
-The author metadata is a concrete publication decision: 284 of the 405
-reachable commits use a non-noreply professional email identity. The remaining
-commits use GitHub noreply or bot identities. The maintainer must decide whether
-to disclose that existing author metadata before publication. A display-only
-author mapping would not remove the underlying email from Git objects.
+The follow-through separately inspected 155 GitHub issue/pull-request bodies
+and 107 issue comments. No review bodies or review comments were present.
+The redacted detector found no matches. One historical maintainer comment
+contains local backup paths and account-maintenance context that should be
+reviewed for removal before public exposure. Its content is not project
+source, and removing it from a checked-out tree would not change the comment.
 
-The scans do not justify a credential-related history rewrite. Preserve the
-existing history unless the maintainer chooses a specific privacy repair after
-reviewing its effect on commit identities and collaborator clones. If a real
-credential is later found, revoke it first and then plan the repair. A
-current-tree deletion alone never purges history.
+These results are bounded evidence, not a guarantee that every surface is free
+of private information. They do not cover deleted or unavailable refs, all CI
+artifacts, external backups, unavailable attachments, or every form of data
+embedded in binary content. The final publication candidate needs a fresh
+review of the refs and metadata that will actually become public. Keep raw
+metadata, scanner reports, private exports, and author mappings outside Git.
+
+### Author identity
+
+Future repository commits now use the maintainer's established GitHub noreply
+identity through repository-local Git configuration. The global Git identity
+and existing published history were not changed.
+
+An isolated, unpublished email-rewrite preview was prepared from the expanded
+446-commit mirror. It removes 596 occurrences of the professional email from
+author and committer fields while preserving every source tree. All 446 commit
+IDs change, and 147 existing signed commits are affected. The original mirror
+and the comparison map are retained privately; the rewritten preview has no
+remote configured.
+
+That preview makes the privacy decision concrete, but it has not been pushed.
+Preserve existing history unless the maintainer chooses this specific repair
+and its consequences. A display-only author mapping cannot remove the email
+from Git objects. Rewriting branch heads also does not by itself purge GitHub
+pull-request refs, cached views, or existing clones. If a real credential is
+later found, revoke it before planning history repair.
+
+Reference: [GitHub guidance on removing sensitive data](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository).
 
 To repeat the code scan, use Gitleaks with full redaction and scan every
 reachable ref in a freshly fetched clone:
@@ -86,6 +108,15 @@ does not reproduce the additional text-blob/archive-member inspection above.
 ## Prerequisites for changing visibility
 
 ### 1. Enforce the runner boundary outside pull-request code
+
+The implementation is staged in two unmerged draft pull requests:
+[Sense6 hosted verification](https://github.com/Ponchia/sense6/pull/156) and
+[retirement of its internal runner registration](https://github.com/Ponchia/vps-infra/pull/194).
+They preserve the required browser, visual, Lighthouse, and release gates.
+The first hosted attempt was rejected before job steps ran because GitHub
+reported an account payment or spending-limit issue. That annotation does not
+establish which billing condition caused it. No billing setting was changed.
+The hosted jobs must pass before the infrastructure cutover can proceed.
 
 The current workflows use a self-hosted `arc-vps-sense6` runner. `ci.yml`
 currently accepts only same-repository pull requests, and policy tests verify
@@ -116,9 +147,13 @@ and [repository Actions settings](https://docs.github.com/en/repositories/managi
 
 Enable and exercise GitHub private vulnerability reporting when available,
 or publish a verified private contact route. The API did not expose a reporting
-setting during this private-repository review; it returned HTTP 404. That is
-not evidence that a public reporting channel is configured. [SECURITY.md](../SECURITY.md)
-provides a contact fallback without inviting disclosures into public issues.
+setting during this private-repository review; it returned HTTP 404. GitHub's
+private-reporting feature is for public repositories, so this is not evidence
+that a reporting route is configured. The contact links in
+[SECURITY.md](../SECURITY.md) can be used to request a private channel; they have
+not been verified as a working vulnerability intake. Enable reporting and
+verify its readback and visible entry point at the visibility cutover, or
+exercise a private contact route beforehand.
 
 ### 3. Recheck the exact source and release candidate
 

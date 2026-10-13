@@ -594,3 +594,104 @@ test('Daltonia results reflow at 320px with 200% text sizing', async ({ page }, 
     await expectInVisualViewport(action, '200% text result action', { hitTest: true });
   }
 });
+
+for (const transport of ['share', 'copy']) {
+  for (const destination of ['repeat', 'dispose']) {
+    test(`a pending Daltonia ${transport} cannot publish feedback after ${destination} @pr-smoke`, async ({
+      page,
+    }) => {
+      await page.addInitScript((selectedTransport) => {
+        const pending = () =>
+          new Promise((resolve, reject) => {
+            window.__daltoniaResultPending = true;
+            window.__settleDaltoniaResult = () => {
+              if (selectedTransport === 'share') reject(new Error('settled after leaving results'));
+              else resolve();
+            };
+          });
+        Object.defineProperty(navigator, 'share', {
+          configurable: true,
+          value: selectedTransport === 'share' ? pending : undefined,
+        });
+        Object.defineProperty(navigator, 'clipboard', {
+          configurable: true,
+          value: { writeText: pending },
+        });
+      }, transport);
+      await startMeasuredRun(page);
+      await finishWithNoGap(page);
+      await expect(page.locator('.results-view')).toBeVisible();
+      await page.locator('[data-action="cb-copy"]').click();
+      await expect.poll(() => page.evaluate(() => window.__daltoniaResultPending)).toBe(true);
+
+      if (destination === 'repeat') {
+        await page.locator('[data-action="cb-setup"]').click();
+        await expect(page.locator('#cb-ready')).not.toBeChecked();
+        await expect(page.locator('#cb-start')).toBeDisabled();
+      } else {
+        await page.locator('#app [data-action="gallery"]').click();
+        await expect(page).toHaveURL(/\/en\/$/);
+      }
+      await expect(page.locator('.results-view')).toHaveCount(0);
+      await page.evaluate(async () => {
+        window.__settleDaltoniaResult();
+        await new Promise(requestAnimationFrame);
+      });
+      await expect(page.locator('.ui-toast-stack')).toHaveCount(0);
+    });
+  }
+}
+
+test('Daltonia rejects malformed latest-result storage instead of claiming a previous run', async ({
+  page,
+}) => {
+  const latest = {
+    schemaVersion: 3,
+    levels: [
+      { type: 'protan', level: 0.32, spread: 0.055 },
+      { type: 'deutan', level: 0.32, spread: 0.055 },
+      { type: 'tritan', level: 0.32, spread: 0.055 },
+    ],
+    controlOk: false,
+    savedAt: '2025-06-15T15:06:40.000Z',
+  };
+  const malformed = [
+    { ...latest, levels: [] },
+    { ...latest, levels: [null, ...latest.levels.slice(1)] },
+    { ...latest, levels: [{ ...latest.levels[0], level: 'NaN' }, ...latest.levels.slice(1)] },
+    { ...latest, levels: [latest.levels[0], latest.levels[0], latest.levels[2]] },
+    { ...latest, controlOk: 'passed' },
+    { ...latest, savedAt: 'not-a-date' },
+  ];
+  await page.goto('/en/color-blindness/');
+  for (const candidate of malformed) {
+    const raw = JSON.stringify(candidate);
+    await page.evaluate((value) => localStorage.setItem('sense6:daltonia:last', value), raw);
+    await page.reload();
+    await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'color-blindness');
+    await expect(page.locator('.previous-score')).toHaveCount(0);
+    await expect(page.locator('#app')).not.toContainText('NaN');
+    expect(await page.evaluate(() => localStorage.getItem('sense6:daltonia:last'))).toBe(raw);
+  }
+});
+
+test('Daltonia preserves a saved result when loading it through the historical key', async ({ page }) => {
+  await startMeasuredRun(page);
+  await finishWithNoGap(page);
+  await expect(page.locator('.results-view')).toBeVisible();
+  const result = await page.evaluate(() => JSON.parse(localStorage.getItem('sense6:daltonia:last')));
+  expect(result.schemaVersion).toBe(1);
+  expect(result.payload.schemaVersion).toBe(3);
+  expect(result.payload.levels).toHaveLength(3);
+  await page.evaluate((payload) => {
+    localStorage.removeItem('sense6:daltonia:last');
+    localStorage.setItem('daltonia-last', JSON.stringify(payload));
+  }, result.payload);
+  await page.reload();
+  await expect(page.locator('.previous-score')).toHaveText(/exploratory adaptive levels recorded/);
+  const migrated = await page.evaluate(() => JSON.parse(localStorage.getItem('sense6:daltonia:last')));
+  expect(migrated.payload).toEqual(result.payload);
+  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('daltonia-last')))).toEqual(
+    result.payload,
+  );
+});

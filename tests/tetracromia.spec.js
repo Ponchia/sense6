@@ -885,42 +885,47 @@ test('mobile layout stays inside the viewport through setup and the first trial'
     .toBe(true);
 });
 
-test('settled Tetracromia copies cannot publish feedback after their mount is disposed @pr-smoke', async ({
-  page,
-}) => {
-  await page.addInitScript(() => {
-    window.__tetracromiaCopies = [];
-    Object.defineProperty(navigator, 'share', { configurable: true, value: undefined });
-    Object.defineProperty(navigator, 'clipboard', {
-      configurable: true,
-      value: {
-        writeText: () =>
-          new Promise((resolve, reject) => {
-            window.__tetracromiaCopies.push({ resolve, reject });
-          }),
-      },
+for (const boundary of ['their mount is disposed', 'same-mount restart']) {
+  test(`settled Tetracromia copies cannot publish feedback after ${boundary} @pr-smoke`, async ({ page }) => {
+    await page.addInitScript(() => {
+      window.__tetracromiaCopies = [];
+      Object.defineProperty(navigator, 'share', { configurable: true, value: undefined });
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value: {
+          writeText: () =>
+            new Promise((resolve, reject) => {
+              window.__tetracromiaCopies.push({ resolve, reject });
+            }),
+        },
+      });
     });
-  });
-  await reachSequence(page);
-  const submit = page.getByRole('button', { name: /Lock this order/i });
-  for (let trial = 0; trial < 3; trial += 1) await submit.click();
-  await expect(page.locator('.results-view')).toBeVisible();
-  const copy = page.locator('[data-action="copy-results"]');
-  await copy.click();
-  await copy.click();
-  await expect.poll(() => page.evaluate(() => window.__tetracromiaCopies.length)).toBe(2);
+    await reachSequence(page);
+    const submit = page.getByRole('button', { name: /Lock this order/i });
+    for (let trial = 0; trial < 3; trial += 1) await submit.click();
+    await expect(page.locator('.results-view')).toBeVisible();
+    const copy = page.locator('[data-action="copy-results"]');
+    await copy.click();
+    await copy.click();
+    await expect.poll(() => page.evaluate(() => window.__tetracromiaCopies.length)).toBe(2);
 
-  await page.evaluate(async () => {
-    const { navigate } = await import('/src/router.js');
-    navigate('about', 'en');
+    if (boundary === 'same-mount restart') {
+      await page.locator('.results-actions [data-action="setup"]').click();
+      await expect(page.locator('.setup-view')).toBeVisible();
+    } else {
+      await page.evaluate(async () => {
+        const { navigate } = await import('/src/router.js');
+        navigate('about', 'en');
+      });
+      await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'about');
+    }
+    await page.evaluate(async () => {
+      window.__tetracromiaCopies[0].resolve();
+      window.__tetracromiaCopies[1].reject(new Error('settled after disposal'));
+      await new Promise(requestAnimationFrame);
+    });
+    // Toast stacks are created synchronously before their first item is queued
+    // for a frame, so an empty pending stack also exposes stale feedback.
+    await expect(page.locator('.ui-toast-stack')).toHaveCount(0);
   });
-  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'about');
-  await page.evaluate(async () => {
-    window.__tetracromiaCopies[0].resolve();
-    window.__tetracromiaCopies[1].reject(new Error('settled after disposal'));
-    await new Promise(requestAnimationFrame);
-  });
-  // Toast stacks are created synchronously before their first item is queued
-  // for a frame, so an empty pending stack also exposes stale feedback.
-  await expect(page.locator('.ui-toast-stack')).toHaveCount(0);
-});
+}

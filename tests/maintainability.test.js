@@ -9,10 +9,12 @@ const LINE_CEILINGS = Object.freeze({
   'scripts/static-structured-data.mjs': 160,
   'src/exams/acutezza.js': 1_200,
   'src/exams/color-blindness.js': 960,
-  'src/exams/riflessi.js': 1_180,
+  'src/exams/riflessi.js': 1_030,
   'src/exams/tetracromia.js': 1_050,
-  'src/exams/udito.js': 1_180,
+  'src/exams/udito.js': 1_060,
   'src/exams/views/acutezza-results.js': 180,
+  'src/exams/views/riflessi-results.js': 200,
+  'src/exams/views/udito-results.js': 210,
   'src/exams/views/udito-intro.js': 150,
   'src/styles/acutezza.css': 1_300,
   'src/styles/color-blindness.css': 900,
@@ -33,7 +35,7 @@ const LINE_CEILINGS = Object.freeze({
  * access to; the honest fix is a CI step that diffs LINE_CEILINGS against the
  * base ref and fails when a ceiling rises. Until then, the slack bound below at
  * least stops a ceiling drifting far above reality and banking headroom for
- * later — the current worst case is 61 lines of headroom.
+ * later.
  */
 const MAX_CEILING_SLACK = 80;
 

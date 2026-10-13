@@ -977,3 +977,40 @@ async function expectResponsiveAcutezzaStage(page, viewport, label, { actions = 
   if (actions) await expectAcutezzaActionsToBeReachable(page, label);
   if (viewport.width === 320) await expectAcutezzaAtTwoHundredPercent(page, label);
 }
+
+test('pending Acutezza copies cannot publish feedback after same-mount restart @pr-smoke', async ({
+  page,
+}) => {
+  await installQuickAcutezza(page);
+  await page.addInitScript(() => {
+    window.__acutezzaCopies = [];
+    Object.defineProperty(navigator, 'share', { configurable: true, value: undefined });
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: {
+        writeText: () =>
+          new Promise((resolve, reject) => {
+            window.__acutezzaCopies.push({ resolve, reject });
+          }),
+      },
+    });
+  });
+  await page.goto('/en/acutezza/');
+  await completeAcutezzaCalibration(page, { scope: 'focused' });
+  await page.getByRole('button', { name: /Prepare Right eye/i }).click();
+  await completeAcutezzaEye(page, { includeContrast: false });
+  await page.locator('[data-action="ac-finish-one-eye"]').click();
+  await expect(page.locator('.ac-results')).toBeVisible();
+  const copy = page.locator('[data-action="ac-copy"]');
+  await copy.click();
+  await copy.click();
+  await expect.poll(() => page.evaluate(() => window.__acutezzaCopies.length)).toBe(2);
+  await page.locator('[data-action="ac-restart"]').click();
+  await expect(page.locator('.ac-setup')).toBeVisible();
+  await page.evaluate(async () => {
+    window.__acutezzaCopies[0].resolve();
+    window.__acutezzaCopies[1].reject(new Error('settled after restart'));
+    await new Promise(requestAnimationFrame);
+  });
+  await expect(page.locator('.ui-toast-stack')).toHaveCount(0);
+});

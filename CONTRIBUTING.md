@@ -167,6 +167,9 @@ reviewer and review method.
 
 ## Prepare a pull request
 
+The [pull-request template](.github/PULL_REQUEST_TEMPLATE.md) prompts for the
+problem, behavior change, verification, and affected contracts.
+
 Explain the problem, resulting behavior, relevant test evidence, and any
 remaining limits. Include reproduction steps for bugs and the affected route
 and viewport for visual changes. Update the changelog for user-visible behavior

@@ -557,22 +557,29 @@ test('Udito accepts its existing latest-result shape and rejects malformed recor
   await page.reload();
   await expect(page.locator('.previous-score')).toContainText('Setup checks coherent');
 
-  await page.evaluate(() => {
-    localStorage.setItem(
-      'sense6:udito:last',
-      JSON.stringify({
-        format: 'sense6-result',
-        schemaVersion: 1,
-        payload: {
-          setupQuality: '<img src=x onerror=alert(1)>',
-          sampleRate: '48000',
-          recordedAt: null,
-        },
-      }),
-    );
+  const normalized = await page.evaluate(() => JSON.parse(localStorage.getItem('sense6:udito:last')));
+  expect(normalized.schemaVersion).toBe(1);
+  expect(normalized.payload).toEqual({
+    setupQuality: 'Setup checks coherent',
+    sampleRate: 48_000,
+    recordedAt: 1_721_000_000_000,
   });
-  await page.reload();
-  await expect(page.locator('.previous-score')).toHaveCount(0);
+
+  for (const payload of [
+    { setupQuality: '<img src=x onerror=alert(1)>', sampleRate: '48000', recordedAt: null },
+    { ...normalized.payload, extra: true },
+    { ...normalized.payload, recordedAt: 1.5 },
+  ]) {
+    await page.evaluate((payload) => {
+      localStorage.setItem(
+        'sense6:udito:last',
+        JSON.stringify({ format: 'sense6-result', schemaVersion: 1, payload }),
+      );
+    }, payload);
+    await page.reload();
+    await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'udito');
+    await expect(page.locator('.previous-score')).toHaveCount(0);
+  }
 });
 
 test('visibility changes replay only uncommitted trials and advance after committed feedback', async ({
