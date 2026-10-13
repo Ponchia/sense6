@@ -12,8 +12,8 @@ concurrency:
 
 jobs:
   # Fork and same-repository pull requests share the hosted verification graph.
-  # Before public launch, retire this repository's internal ARC registration;
-  # a contributor can change workflow source, so runner isolation is external.
-  # See docs/public-repository-readiness.md for the coordinated cutover.
+  # Internal ARC registration was retired before public launch. A contributor
+  # can change workflow source, so runner isolation remains an external control.
+  # See docs/public-repository-readiness.md for ongoing maintenance checks.
   verify:
     uses: ./.github/workflows/verify.yml

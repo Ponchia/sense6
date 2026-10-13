@@ -189,13 +189,13 @@ Keep every extraction behavior-preserving, covered by the existing production
 dose invariants and accelerated browser journeys, and small enough to review
 independently.
 
-## Public repository preparation
+## Public repository maintenance
 
-Keep [public-repository readiness](public-repository-readiness.md) separate from
-the product-evidence work above. Publication needs a reviewed tracked tree and
-history, reproducible contributor setup, a private security-reporting channel,
-and an enforced boundary between fork code and self-hosted runners. A clean
-local test run alone does not establish that boundary.
+The public launch and hosted-runner migration are complete. Preserve the
+[repository maintenance controls](public-repository-readiness.md), including
+protected releases, private security reporting, deliberate sponsorship links,
+and cleanup of reviewed feature branches. Keep this work separate from product
+evidence: neither publication nor a clean test run completes human review.
 
 ## Maintenance gates
 
