@@ -5,8 +5,25 @@ Lifecycle: current
 This guide separates repository preparation from the decision to make Sense6
 public. It complements [product readiness](product-readiness.md): source
 publication does not establish usability, translation quality, or scientific
-validity. The maintainer authorized public launch on 13 October 2026. The launch receipt
-records the applied controls and actual hosted qualification separately.
+validity. The maintainer authorized public launch on 13 October 2026. Source visibility
+is now public. The launch receipt records actual hosted qualification separately
+from source availability and the applied controls.
+
+## Public launch controls
+
+At the 13 October 2026 cutover, internal Sense6 runner registration was removed
+through infrastructure PR #194 and both owning Flux Kustomizations reconciled.
+The 18 peer runner specifications were unchanged. Actions was held during the
+visibility change and protection setup. Main requires all four GitHub Actions
+checks, including for administrators; force pushes and deletions are disabled.
+External contributors require workflow approval, and the default token is read-only.
+Private vulnerability reporting and secret-scanning push protection are enabled.
+The production environment allows only the branch `main`, not tags.
+
+Deployment and scheduled audits remain paused until the hosted migration passes
+its exact-head CI and merges normally. The published website keeps its previous
+verified release during this bootstrap. The launch work record is the source of
+truth for completion; public source alone is not a passed deployment.
 
 ## Review baseline
 
@@ -61,8 +78,9 @@ was not a complete pixel-by-pixel or optical-character-recognition audit.
 The follow-through separately inspected 155 GitHub issue/pull-request bodies
 and 107 issue comments. No review bodies or review comments were present.
 The redacted detector found no matches. One historical maintainer comment
-contains local backup paths and account-maintenance context that should be
-reviewed for removal before public exposure. Its content is not project
+contained local backup paths and account-maintenance context. It was removed
+during launch preparation; a readback returned HTTP 404. The previous private
+audit capture is retained. Its content is not project
 source, and removing it from a checked-out tree would not change the comment.
 
 These results are bounded evidence, not a guarantee that every surface is free
@@ -209,7 +227,6 @@ gh api --method PUT repos/Ponchia/sense6/branches/main/protection --input - <<'J
 {
   "required_status_checks": {
     "strict": true,
-    "contexts": [],
     "checks": [
       {"context": "verify / browser", "app_id": 15368},
       {"context": "verify / lighthouse", "app_id": 15368},
