@@ -185,12 +185,12 @@ non-browser, visual, Lighthouse, and artifact checks on GitHub-hosted Ubuntu
 repository's configured approval policy. Contributors can also run the local
 commands above.
 
-Before public contributions are enabled, maintainers must retire the former
-ARC registration and verify that this repository cannot access internal
-runners. The [public-repository readiness review](docs/public-repository-readiness.md)
-records the external retirement and launch prerequisites. The checked-in
-hosted-runner policy does not prove that retirement is complete. Billing-blocked
-or skipped CI is not a passing release gate.
+The former internal runner registration was retired at public launch. Preserve
+that external boundary: a contributor can change workflow source, so the
+checked-in hosted-runner policy alone is not isolation. The
+[public repository maintenance guide](docs/public-repository-readiness.md)
+records the verified launch and ongoing control checks. Billing-blocked or
+skipped CI is not a passing release gate.
 
 Publishing the site is a maintainer operation. A push to `main` runs the
 complete configured browser matrix and the production release checks before
