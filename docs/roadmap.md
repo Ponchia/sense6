@@ -91,8 +91,9 @@ The completed foundation includes:
 - source complexity and large-file ceilings that require extraction instead of
   allowing the existing controllers and styles to grow.
 
-The journal is now a separate versioned store. Existing concise latest-or-best
-keys remain compatible and are not rewritten as journal history.
+The journal is a separate versioned store. Supported latest-result records
+retain their existing storage keys and envelopes; they are not rewritten as
+journal history.
 
 ## 2. Experiment integrity: completed
 
