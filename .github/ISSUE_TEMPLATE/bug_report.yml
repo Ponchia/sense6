@@ -1,0 +1,34 @@
+name: Bug report
+description: Report a reproducible problem using synthetic data.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: "Do not include private journal exports, participant information, credentials, or browser profiles. Use the private security channel for vulnerabilities."
+  - type: input
+    id: route
+    attributes:
+      label: Page or experiment
+      description: Include the route and site version or commit when known.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Describe the smallest repeatable example, using invented data.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and observed behavior
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser, operating system, and viewport
+      description: Include keyboard, touch, zoom, or assistive-technology details when relevant.
+    validations:
+      required: true

@@ -195,8 +195,8 @@ indexed lookups.
 Values crossing browser and storage boundaries still require runtime
 validation.
 
-CI runs the named representative browser suite for same-repository pull
-requests, covering the five instruments, routing, journal, and artifact
+CI runs the named representative browser suite for pull requests, including
+forks, covering the five instruments, routing, journal, and artifact
 handover. A push to `main` runs the complete configured browser
 matrix before the release job creates its artifact. Visual comparison, Lighthouse
 budgets, and the non-browser release checks remain hard gates in both cases.
@@ -271,14 +271,15 @@ Keep those route ownership boundaries when expanding either experiment.
 
 ## Delivery environments
 
-Same-repository pull requests run representative browser checks plus the
+Pull requests, including forks, run representative browser checks plus the
 complete non-browser, visual, Lighthouse and artifact verification gate, with
 read-only repository access. The complete browser matrix gates production
-`main` only. The current workflows use the `arc-vps-sense6` self-hosted
-runner. Their same-repository condition is defense in depth, not an enforceable isolation
-boundary for untrusted workflow edits. Before making the repository public,
-verify runner-access isolation and a safe external-contribution workflow as
-recorded in [public-repository readiness](public-repository-readiness.md).
+`main` only. Verification and audit jobs target fresh GitHub-hosted Ubuntu
+24.04 VMs. Before making the repository public, retire the former ARC
+registration and verify that this repository cannot access internal runners,
+as recorded in [public-repository readiness](public-repository-readiness.md).
+The checked-in hosted-runner policy alone does not prove external retirement;
+contributor approval controls when a job runs, not its access to infrastructure.
 Pull-request preview publication remains disabled until an operator provides
 an isolated, protected preview environment and a default-branch-owned
 publication workflow that never runs pull-request-controlled code.

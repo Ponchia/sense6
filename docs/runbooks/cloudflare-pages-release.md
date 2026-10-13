@@ -36,14 +36,13 @@ publication is currently disabled.
 - A production preflight has recorded live state, drift, blast radius,
   rollback, and operator approval before applying a migration or merging to
   `main`.
-- The checked-in workflows restrict pull-request verification to the same
-  repository. Keep that condition and its regression tests, but do not treat
-  it as sufficient self-hosted runner isolation: a pull request can alter
-  workflow content. Before making the repository public, verify externally
-  enforced runner access, untrusted-contribution execution policy, workflow
-  approval settings, and release protection. Follow
+- Pull requests, including forks, run verification on GitHub-hosted Ubuntu
+  24.04 VMs. Keep the regression tests for hosted selection and fork
+  verification. Before making the repository public, retire the former ARC
+  registration and verify its absence outside pull-request-controlled code.
+  Also verify workflow approval settings and release protection. Follow
   [public-repository readiness](../public-repository-readiness.md). Repository
-  tests cannot attest those external controls.
+  tests cannot attest those external controls or completed runner retirement.
 
 ## Steps
 

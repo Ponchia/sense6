@@ -5,12 +5,12 @@
 Please keep exploit details, credentials, and private journal exports out of
 public issues and pull requests.
 
-If the repository's [Security tab](https://github.com/Ponchia/sense6/security)
-offers **Report a vulnerability**, use that private channel. If the option is
-unavailable, contact Zeno Trevisan through the contact links on
-[brontolotto.observer](https://brontolotto.observer/) to arrange a private report.
-An initial contact only needs to identify Sense6 and request a private channel.
-Do not assume a public issue is private because the source repository used to be.
+Use **[Report a vulnerability](https://github.com/Ponchia/sense6/security/advisories/new)**
+to send a private report. GitHub private vulnerability reporting is enabled.
+If that channel is unavailable, contact Zeno Trevisan through the contact links
+on [brontolotto.observer](https://brontolotto.observer/) to arrange a private route.
+An initial contact only needs to identify Sense6 and request that route.
+Do not put vulnerability details in a public issue.
 
 Include the affected commit or deployed URL, browser and operating system,
 reproduction steps using synthetic data, expected and observed behavior, and
@@ -47,7 +47,8 @@ no guaranteed response-time or bounty commitment.
   history repair. Removing a file from the current tree does not remove its
   earlier versions from Git history.
 
-Before making this repository public, complete the runner-access and reporting
-prerequisites in [public-repository readiness](docs/public-repository-readiness.md).
-The current workflow's fork condition is a regression guard, not proof of
-isolation from untrusted pull-request code.
+The repository is public and its internal ARC runner registration was removed
+at launch. See [public-repository readiness](docs/public-repository-readiness.md)
+for the controls and bounded audit scope. The hosted-runner source checks do not
+replace the external registration boundary. Never reattach the shared internal
+runner as a public-repository recovery path.
