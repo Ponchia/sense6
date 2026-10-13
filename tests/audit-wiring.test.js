@@ -37,7 +37,7 @@ const allWorkflows = workflowNames.map((file) => workflow(file)).join('\n');
 // now import the configs and assert the resolved objects.
 // -----------------------------------------------------------------------------
 
-const SELF_HOSTED_RUNNER = 'arc-vps-sense6';
+const HOSTED_RUNNER = 'ubuntu-24.04';
 const REPOSITORY = 'Ponchia/sense6';
 
 /**
@@ -82,16 +82,18 @@ const EVENT_CONTEXTS = Object.freeze({
 });
 
 /**
- * Which self-hosted jobs each event is allowed to start, as `workflow:job`.
- *
- * The fork entry is a regression property of these checked-in workflows:
- * no job may reach the cluster runner with head-revision code. The other entries are the other half — a guard that
- * also switched off the scheduled sweep or the push comparison would be a
- * regression, not a fix — so this table has to be updated deliberately whenever
- * a self-hosted job is added, removed, or re-gated.
+ * Hosted jobs each event must start, as `workflow:job`. Fork contributors get
+ * the same verification as repository branches; scheduled and release gates
+ * stay reachable. This models checked-in source, not the external removal of
+ * this repository's internal ARC registration.
  */
-const SELF_HOSTED_REACH = Object.freeze({
-  'fork pull request': [],
+const EXPECTED_JOB_REACH = Object.freeze({
+  'fork pull request': [
+    'verify.yml:browser',
+    'verify.yml:lighthouse',
+    'verify.yml:release',
+    'verify.yml:visual',
+  ],
   'same-repository pull request': [
     'verify.yml:browser',
     'verify.yml:lighthouse',
@@ -134,58 +136,68 @@ test('pull request CI is an unprivileged verification-only caller', () => {
   assert.doesNotMatch(ci, /deployments:\s*write/);
   assert.doesNotMatch(ci, /deploy_target|deploy_branch/);
   assert.doesNotMatch(ci, /secrets:\s*inherit/);
+  assert.doesNotMatch(ci, /publish_production: true/);
   assert.doesNotMatch(allWorkflows, /pull_request_target/);
 });
 
-test('every self-hosted job is discovered by this model', () => {
-  // The reachability assertions below are only as good as the parser: a job the
-  // parser fails to see is a job whose guard is never checked. Count the runner
-  // declarations in the workflow source and require the model to account for all
-  // of them, so a reformat that defeats the parser fails loudly instead of
-  // quietly reducing the security assertion to an empty set.
-  const declared = allWorkflows.match(/^\s*runs-on: arc-vps-sense6$/gm) ?? [];
-  const modelled = selfHostedJobs();
-  assert.ok(declared.length > 0, 'the guard exists because of this runner');
+test('every checked-in job uses a standard hosted runner or a local reusable workflow', () => {
+  const jobs = workflowJobs();
+  const declared = allWorkflows.match(/^ {4}runs-on:/gm) ?? [];
+  const modelled = jobs.filter((job) => job.runsOn !== null);
+  assert.ok(declared.length > 0, 'the runner policy must inspect real jobs');
   assert.equal(
     modelled.length,
     declared.length,
-    `the workflow parser found ${modelled.length} of ${declared.length} arc-vps-sense6 jobs`,
+    'every runner declaration must be discovered by the workflow parser',
+  );
+  for (const job of jobs) assertHostedJob(job);
+});
+
+test('runner policy rejects self-hosted, dynamic and external workflow targets', () => {
+  // Pure data fixtures: these probes never submit a workflow or contact a
+  // runner. They protect the source policy; infrastructure removal needs its
+  // separate live verification before public launch.
+  const fixture = { id: 'probe', workflow: 'fixture.yml', uses: null };
+  for (const runsOn of ['self-hosted', '[ubuntu-24.04, self-hosted]', '$' + '{{ vars.RUNNER }}']) {
+    assert.throws(() => assertHostedJob({ ...fixture, runsOn }), /must use/);
+  }
+  assert.throws(
+    () =>
+      assertHostedJob({
+        ...fixture,
+        runsOn: null,
+        uses: 'outside/project/.github/workflows/test.yml@main',
+      }),
+    /must use/,
   );
 });
 
-test('the checked-in workflows exclude fork pull requests from self-hosted jobs', () => {
-  // npm lifecycle scripts and build commands execute candidate code on the
-  // maintainer's runner. Keep the same-repository-only dispatch regression
-  // check until a separately reviewed public contributor CI path exists.
-  //
-  // This walks the real job graph, including `uses: ./.github/workflows/...`
-  // calls, and resolves each job-level `if:` against a fork pull request
-  // context. It is deliberately not a text match for one guard in one file: a
-  // new job with no guard, or a guard that admits a fork, fails here without
-  // anyone remembering to extend a list.
-  // This model cannot prove runner isolation: a fork can modify the workflow
-  // itself. Public release also needs an externally enforced runner policy.
-  const exposed = reachableSelfHostedJobs('fork pull request');
-  assert.deepEqual(
-    exposed,
-    [],
-    `a fork pull request would build head-revision code on ${SELF_HOSTED_RUNNER} in: ${exposed.join(', ')}`,
-  );
-
-  // The guard's literal text is pinned too, because the walk above proves only
-  // that the current expressions exclude a fork — not that anybody still intends
-  // them to.
-  assert.match(workflow('ci.yml'), /head\.repo\.full_name == github\.repository/);
+test('checkout credentials are not persisted into contributor build commands', () => {
+  const checkouts = allWorkflows.split(/uses: actions\/checkout@/).slice(1);
+  assert.ok(checkouts.length > 0);
+  for (const checkout of checkouts) {
+    const step = checkout.split(/^ {6}- /m)[0];
+    assert.match(step, /persist-credentials: false/);
+  }
 });
 
-test('the fork guard does not disable the trusted runs', () => {
-  // A guard that also stopped the scheduled sweep, the push comparison, or the
-  // same-repository pull request gate would be a regression dressed as a fix.
-  for (const [event, expected] of Object.entries(SELF_HOSTED_REACH)) {
+test('production publishing uses the protected environment, not the PR verifier', () => {
+  const release = parseWorkflow('verify.yml').jobs.find((job) => job.id === 'release');
+  assert.ok(release);
+  assert.ok(
+    release.lines
+      .join('\n')
+      .includes('environment: $' + "{{ inputs.publish_production && 'production' || 'verification' }}"),
+  );
+  assert.doesNotMatch(workflow('ci.yml'), /secrets:\s*inherit|publish_production: true/);
+});
+
+test('fork, branch, release and scheduled events retain their complete hosted gates', () => {
+  for (const [event, expected] of Object.entries(EXPECTED_JOB_REACH)) {
     assert.deepEqual(
-      reachableSelfHostedJobs(event),
+      reachableHostedJobs(event),
       expected,
-      `${event} no longer starts the expected set of ${SELF_HOSTED_RUNNER} jobs`,
+      `${event} no longer starts the expected set of ${HOSTED_RUNNER} jobs`,
     );
   }
 });
@@ -313,9 +325,7 @@ test('manual Lighthouse-only dispatch preserves the full sweep without starting 
     assert.match(segment, /if: github\.event\.inputs\.lighthouse_only != 'true'/);
   }
   assert.deepEqual(
-    reachableSelfHostedJobs('manual Lighthouse-only dispatch').filter((id) =>
-      id.startsWith('site-audit.yml:'),
-    ),
+    reachableHostedJobs('manual Lighthouse-only dispatch').filter((id) => id.startsWith('site-audit.yml:')),
     ['site-audit.yml:lighthouse-full-site'],
   );
 });
@@ -352,9 +362,9 @@ test('the visual comparison gates pull requests and direct pushes', () => {
   // result could arrive after production had already published. It now belongs
   // to the reusable verifier and is a hard release dependency.
   const verify = workflow('verify.yml');
-  for (const event of ['push to main', 'same-repository pull request']) {
+  for (const event of ['push to main', 'same-repository pull request', 'fork pull request']) {
     assert.ok(
-      reachableSelfHostedJobs(event).includes('verify.yml:visual'),
+      reachableHostedJobs(event).includes('verify.yml:visual'),
       `the visual comparison must run for a ${event}`,
     );
   }
@@ -759,18 +769,30 @@ function jobCondition(lines) {
   return folded.replace(/\s+/g, ' ').trim();
 }
 
-function selfHostedJobs() {
-  return workflowNames
-    .flatMap((name) => parseWorkflow(name).jobs.map((job) => ({ ...job, workflow: name })))
-    .filter((job) => job.runsOn === SELF_HOSTED_RUNNER);
+function workflowJobs() {
+  return workflowNames.flatMap((name) => parseWorkflow(name).jobs.map((job) => ({ ...job, workflow: name })));
+}
+
+function assertHostedJob(job) {
+  const label = `${job.workflow}:${job.id}`;
+  if (job.uses) {
+    assert.match(
+      job.uses,
+      /^\.\/\.github\/workflows\/[\w.-]+\.ya?ml$/,
+      `${label} must use a checked-in reusable workflow`,
+    );
+    assert.equal(job.runsOn, null, `${label} cannot both call a workflow and select a runner`);
+    return;
+  }
+  assert.equal(job.runsOn, HOSTED_RUNNER, `${label} must use the fixed standard hosted runner`);
 }
 
 /**
- * Which `workflow:job` identifiers on the self-hosted runner a named event can
+ * Which `workflow:job` identifiers on the standard hosted runner a named event can
  * start, following `uses: ./.github/workflows/...` into reusable workflows.
  * @param {string} event a key of EVENT_CONTEXTS
  */
-function reachableSelfHostedJobs(event) {
+function reachableHostedJobs(event) {
   const context = EVENT_CONTEXTS[event];
   if (!context) throw new Error(`unknown event ${event}`);
   const trigger = context['github.event_name'];
@@ -784,7 +806,7 @@ function reachableSelfHostedJobs(event) {
     for (const job of parsed.jobs) {
       if (job.if && !truthy(evaluateExpression(job.if, context))) continue;
       if (job.uses) visit(job.uses.replace(/^\.\/\.github\/workflows\//, ''), true, depth + 1);
-      else if (job.runsOn === SELF_HOSTED_RUNNER) reached.add(`${name}:${job.id}`);
+      else if (job.runsOn === HOSTED_RUNNER) reached.add(`${name}:${job.id}`);
     }
   };
 

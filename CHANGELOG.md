@@ -11,6 +11,8 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- Public bug and improvement forms, maintainer review routing, and optional
+  Ko-fi sponsorship in GitHub.
 - Contributor, security, and public-repository preparation guides, with generated
   distribution notices for the runtime UI code and Doto fonts.
 - Sense6 Learn: five source-traceable perception guides, an interactive browser
@@ -35,6 +37,10 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Changed
 
+- Standard GitHub-hosted Ubuntu runners for verification, releases, and scheduled
+  audits, with the same fork verification gates and no persisted checkout token.
+- Production releases select a main-only protected environment; pull-request
+  verification remains unprivileged and cannot publish.
 - Udito and Riflessi result markup and copied summaries now have focused,
   strictly checked view modules with lower controller growth ceilings.
 - A shorter repository entry point, explicit generated-file ownership, and a
