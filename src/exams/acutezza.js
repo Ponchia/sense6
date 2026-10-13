@@ -124,6 +124,7 @@ function renderIntro() {
 function renderPreparation() {
   state.lifecycle.setActive(false);
   clearRuntime();
+  state.session = null;
   document.body.classList.add('lab-mode');
   document.title = t('Prepare your vision setup — Acutezza | Sense6');
   renderScreen(`
@@ -760,19 +761,22 @@ function renderResults() {
 }
 
 async function copyResults() {
-  if (!state.session?.result) return;
   const mountState = state;
-  const resultState = state.session.result;
+  const session = mountState?.session;
+  const resultState = session?.result;
+  if (!resultState) return;
+  const ownsResult = () =>
+    isCurrentMount(state, mountState) && mountState.session === session && session.result === resultState;
   try {
     const outcome = await shareOrCopyResult({
       title: t('Calibrated sharpness experiment — Acutezza | Sense6'),
-      summary: acutezzaResultSummary(state.session, resultState),
+      summary: acutezzaResultSummary(session, resultState),
       route: 'acutezza',
-      locale: state.locale,
+      locale: mountState.locale,
     });
-    if (isCurrentMount(state, mountState) && outcome === 'copied') toast(t('Result summary copied.'));
+    if (ownsResult() && outcome === 'copied') toast(t('Result summary copied.'));
   } catch {
-    if (isCurrentMount(state, mountState)) toast(t('Copy was unavailable in this browser.'));
+    if (ownsResult()) toast(t('Copy was unavailable in this browser.'));
   }
 }
 

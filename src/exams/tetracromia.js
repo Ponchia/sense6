@@ -729,8 +729,10 @@ function saveJournalResult(result) {
 
 async function copyResults() {
   const mountState = state;
-  if (!mountState?.session) return;
-  const result = mountState.session.results();
+  const session = mountState?.session;
+  if (!session) return;
+  const ownsResult = () => isCurrentMount(state, mountState) && mountState.session === session;
+  const result = session.results();
   const summary = `Screen Colour Lab (Tetracromia) — tile ${result.tile.correct}/${result.tile.presentations} at an ending adaptive level near ${result.tile.adaptiveLevelDegrees}°; field ${result.field.correct}/${result.field.presentations} near ${result.field.adaptiveLevelDegrees}°; ordering ${result.ordering.orderedPairsPercent}% of pairs. Short-run, display-relative observations—not thresholds, a clinical test, or a diagnosis.`;
 
   try {
@@ -740,10 +742,10 @@ async function copyResults() {
       route: 'tetracromia',
       locale: mountState.locale,
     });
-    if (!isCurrentMount(state, mountState)) return;
+    if (!ownsResult()) return;
     if (outcome === 'copied') toast(t('Result summary copied'), { tone: 'success' });
   } catch {
-    if (isCurrentMount(state, mountState)) toast(t('Could not access the clipboard'), { tone: 'danger' });
+    if (ownsResult()) toast(t('Could not access the clipboard'), { tone: 'danger' });
   }
 }
 
