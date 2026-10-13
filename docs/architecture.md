@@ -80,6 +80,12 @@ Render tokens prevent a slower dynamic import from overwriting a newer route.
 Gallery, Tetracromia, the other experiments, About, privacy, and journal styles
 load on their own route where practical.
 
+Asynchronous audio and sharing operations also capture the owning mount and
+run or operation. Navigation, changed audio setup, and restarting a completed
+run retire that ownership before a pending browser promise can publish feedback.
+Checking only that the route is still mounted is insufficient: a new run may
+reuse the same mount.
+
 ## Route identity and loading
 
 `src/routes.js` creates one route metadata record for the static generator and
@@ -105,6 +111,14 @@ The current design has three deliberately separate stores:
 - concise versioned latest-result records in browser storage;
 - the versioned, validated multi-run journal in browser storage; and
 - anonymous daily aggregate counts in D1.
+
+Latest-result readers validate the owning experiment's payload before showing
+previous-run context. Udito, Riflessi, Acutezza, and Daltonia keep their guards
+under `src/exams/results/`. Tetracromia writes to the validated shared journal
+without a separate latest-result record.
+Legacy acceptance follows actual historical producers. A migration must not
+invent a missing denominator, measured eye, or protocol identity, and a newer
+schema must not silently reinterpret an incompatible older measurement.
 
 Don't merge these models. The metrics endpoint must never accept result,
 setup, locale, timing, or visitor data. Journal exports become portable files
@@ -225,9 +239,14 @@ event orchestration. The type gate checks their public `mount(context)`
 contract, the cognitive-complexity gate rejects functions above 28, and the
 maintainability test prevents known large controllers and style sheets from
 growing beyond their decomposition ceilings. Acutezza's intro and result view,
-Udito's intro, the strict result-schema boundary, and Tetracromia's extracted
-views and event handlers establish the incremental pattern: don't add a
-suite-wide base controller.
+Udito's intro and result view, Riflessi's result view, the strict result-schema
+boundary, and Tetracromia's extracted views and event handlers establish the
+incremental pattern: don't add a suite-wide base controller.
+
+The Udito and Riflessi result views receive read-only result data, a small
+projection of presentation context, and explicit localization callbacks.
+They own markup and copied-summary formatting; controllers retain measurement
+decisions, persistence outcomes, DOM assignment, focus, and lifecycle ownership.
 When you change one phase, extract its pure markup, result schema, or state
 transition behind a small typed interface and keep measurement behavior
 covered. The ordered controller backlog lives in `roadmap.md`.

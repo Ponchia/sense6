@@ -228,14 +228,12 @@ jobs:
           npm run test:html
           npm run test:links
 
-      # tests/deployed/deployed.spec.js holds the only browser-enforced CSP and
-      # hydration assertions in the repository, and it used to run exclusively
-      # after a production publish — never on a pull request, and never before
-      # traffic already had the build. With PLAYWRIGHT_DEPLOYED_URL unset,
+      # This deployed-browser journey supplements the production-artifact
+      # projects in the browser matrix. With PLAYWRIGHT_DEPLOYED_URL unset,
       # playwright.deployed.config.js starts scripts/serve-deployed-smoke.mjs
-      # over the artifact built above, replaying dist/_headers so the policy is
-      # genuinely enforced. This runs for every caller, and a failure stops the
-      # job before anything is published.
+      # over the checksummed artifact, replaying dist/_headers so CSP is enforced.
+      # It runs for every caller before publication and later repeats against
+      # production after the edge serves the expected revision.
       - name: Verify the JavaScript journey against the local artifact
         env:
           HOME: /root

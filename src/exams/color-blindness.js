@@ -21,16 +21,17 @@ import {
 } from '../lib/lifecycle.js';
 import { seededRandom } from '../lib/random.js';
 import { resultActionLabel, shareOrCopyResult } from '../lib/result-sharing.js';
-import { createResultStore, isRecord } from '../lib/storage.js';
+import { createResultStore } from '../lib/storage.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from '../metrics.js';
 import { protocolPassport } from './protocols.js';
 import { relatedGuideResultLink } from './related-guide.js';
+import { isDaltoniaLatestResult } from './results/daltonia.js';
 import { colorBlindnessIntroMarkup } from './views/color-blindness-intro.js';
 
 const RESULT_STORE = createResultStore({
   key: 'sense6:daltonia:last',
   legacyKeys: ['daltonia-last'],
-  validate: (value) => isRecord(value) && value.schemaVersion === 3 && Array.isArray(value.levels),
+  validate: isDaltoniaLatestResult,
 });
 const MOUNT_OWNER = Symbol('daltonia');
 const EDITABLE_CONTROL_SELECTOR = 'input, select, textarea, [contenteditable]:not([contenteditable="false"])';
@@ -98,6 +99,7 @@ export function mount(context) {
     mountState.dprGuardCleanup();
     mountState.active = false;
     mountState.phase = 'intro';
+    mountState.run = null;
     if (state === mountState) state = null;
   });
   return lifecycle.dispose;
@@ -131,6 +133,7 @@ function renderIntro() {
   state.active = false;
   state.lifecycle.setActive(false);
   state.phase = 'intro';
+  state.run = null;
   document.body.classList.remove('lab-mode');
   document.title = t('Experimental colour-vision check — Daltonia | Sense6');
 
@@ -149,6 +152,7 @@ function renderSetup() {
   state.active = false;
   state.lifecycle.setActive(false);
   state.phase = 'setup';
+  state.run = null;
   document.body.classList.add('lab-mode');
   document.title = t('Prepare your display — Daltonia | Sense6');
   window.scrollTo({ top: 0, behavior: 'instant' });
@@ -665,7 +669,12 @@ function announce(message) {
 }
 
 async function copyResults() {
-  const result = summarizeAdaptiveRun(state.run);
+  const mountState = state;
+  const run = mountState?.run;
+  if (!run || mountState.phase !== 'results' || !isCurrentMount(state, mountState)) return;
+  const ownsResult = () =>
+    isCurrentMount(state, mountState) && mountState.phase === 'results' && mountState.run === run;
+  const result = summarizeAdaptiveRun(run);
   const levels = result.axes
     .map((axis) => {
       const prefix = axis.limit === 'floor' ? '≤' : axis.limit === 'ceiling' ? '≥' : '';
@@ -681,11 +690,11 @@ async function copyResults() {
       title: t('Experimental colour-vision check — Daltonia | Sense6'),
       summary,
       route: 'color-blindness',
-      locale: state.locale,
+      locale: mountState.locale,
     });
-    if (outcome === 'copied') toast(t('Run summary copied'), { tone: 'success' });
+    if (outcome === 'copied' && ownsResult()) toast(t('Run summary copied'), { tone: 'success' });
   } catch {
-    toast(t('Could not access the clipboard'), { tone: 'danger' });
+    if (ownsResult()) toast(t('Could not access the clipboard'), { tone: 'danger' });
   }
 }
 
