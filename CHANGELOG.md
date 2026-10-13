@@ -70,6 +70,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Fixed
 
+- Toasts preserve full text contrast while entering and leaving, retaining
+  movement feedback, reduced-motion handling, and live-region dismissal.
+  The complete Acutezza result/copy journey now also runs in PR smoke.
 - Card backgrounds now switch with theme text instead of briefly interpolating
   through low-contrast colours. Deterministic theme-transition checks cover the
   five experiment landing pages in desktop and mobile Chromium.

@@ -96,6 +96,26 @@ body {
   transition-property: border-color, transform;
 }
 
+/* Keep transient feedback readable at every frame. Movement still signals
+ * entrance/exit; opacity must not fade text through insufficient contrast. */
+.ui-toast {
+  animation-name: s6-toast-in;
+  transition-property: transform;
+}
+
+.ui-toast.is-leaving {
+  opacity: 1;
+}
+
+@keyframes s6-toast-in {
+  from {
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
 ::view-transition {
   pointer-events: none;
 }
