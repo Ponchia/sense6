@@ -39,8 +39,8 @@ jobs:
       # pages with the production Content-Security-Policy enforced. The local
       # deployed-browser journey below also checks the production artifact.
       # PRs run representative cases; production retains the full matrix.
-      # ci.yml excludes forks in this revision, but runner access must also be
-      # enforced outside PR-controlled workflow code before public release.
+      # Forks use the same hosted verifier. Before public release, retire
+      # internal runner access outside PR-controlled workflow code.
       - name: Verify representative browser journeys for pull requests
         if: ${{ !inputs.publish_production }}
         env:
