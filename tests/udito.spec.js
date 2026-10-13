@@ -7,6 +7,7 @@ import {
   expectJournalEntry,
   installQuickUdito,
 } from './helpers/browser.js';
+import { findOverfragmentedWords } from './helpers/geometry.js';
 
 test('Udito keeps its safe preparation action in the first mobile screen @pr-smoke', async ({
   page,
@@ -700,24 +701,22 @@ test('short landscape runner reserves non-overlapping status, controls, and feed
   expect(stopBox?.height ?? 0).toBeGreaterThanOrEqual(44);
 });
 
-test('Udito keeps every mobile scope and stage readable across the required viewport matrix', async ({
-  page,
-}, testInfo) => {
-  test.skip(testInfo.project.name !== 'chromium', 'Explicit responsive geometry matrix');
-  test.setTimeout(120_000);
-  await installQuickUdito(page);
-
-  const cases = [
-    { width: 320, height: 568, scope: 'standard', textScale: 2 },
-    { width: 320, height: 568, scope: 'focused' },
-    { width: 360, height: 800, scope: 'standard' },
-    { width: 390, height: 844, scope: 'focused' },
-    { width: 412, height: 915, scope: 'standard' },
-    { width: 844, height: 390, scope: 'standard' },
-  ];
-
-  for (const responsiveCase of cases) {
-    const label = `${responsiveCase.width}x${responsiveCase.height} ${responsiveCase.scope}${responsiveCase.textScale ? ' at 200% text' : ''}`;
+// Each layout has its own deadline, page, and failure trace. The high-zoom
+// case also runs in PR smoke so geometry failures cannot hide until deployment.
+for (const responsiveCase of [
+  { width: 320, height: 568, scope: 'standard', textScale: 2 },
+  { width: 320, height: 568, scope: 'focused' },
+  { width: 360, height: 800, scope: 'standard' },
+  { width: 390, height: 844, scope: 'focused' },
+  { width: 412, height: 915, scope: 'standard' },
+  { width: 844, height: 390, scope: 'standard' },
+]) {
+  const label = `${responsiveCase.width}x${responsiveCase.height} ${responsiveCase.scope}${responsiveCase.textScale ? ' at 200% text' : ''}`;
+  const smokeTag = responsiveCase.textScale ? ' @pr-smoke' : '';
+  test(`Udito ${label} keeps every stage readable${smokeTag}`, async ({ page }, testInfo) => {
+    test.skip(testInfo.project.name !== 'chromium', 'Explicit responsive geometry matrix');
+    test.setTimeout(45_000);
+    await installQuickUdito(page);
     await page.setViewportSize({ width: responsiveCase.width, height: responsiveCase.height });
     await page.goto('/en/udito/');
     if (responsiveCase.textScale) {
@@ -789,8 +788,8 @@ test('Udito keeps every mobile scope and stage readable across the required view
       await page.locator('.au-metric').nth(1).locator(':scope > strong').innerText(),
     );
     await expect(page.getByText(/Device-relative, never dB HL/i)).toBeVisible();
-  }
-});
+  });
+}
 
 test('caution copies retain controls, interruptions, context, and visible journal failure', async ({
   page,
@@ -919,24 +918,7 @@ async function expectUditoGeometry(page, label, { runner = false } = {}) {
   });
   expect(overflow, `${label} should not overflow horizontally`).toEqual([]);
 
-  const splitWords = await page.evaluate(() => {
-    const root = document.querySelector('#app');
-    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
-    const offenders = [];
-    while (walker.nextNode()) {
-      const node = walker.currentNode;
-      const parent = node.parentElement;
-      if (!parent || parent.closest('.sr-only') || getComputedStyle(parent).display === 'none') continue;
-      for (const match of node.data.matchAll(/[\p{L}\p{N}][\p{L}\p{N}-]{5,}/gu)) {
-        const range = document.createRange();
-        range.setStart(node, match.index);
-        range.setEnd(node, match.index + match[0].length);
-        const fragments = [...range.getClientRects()].filter((rect) => rect.width > 0 && rect.height > 0);
-        if (fragments.length > 3) offenders.push(`${match[0]} (${fragments.length} lines)`);
-      }
-    }
-    return offenders;
-  });
+  const splitWords = await page.locator('#app').evaluate(findOverfragmentedWords);
   expect(splitWords, `${label} should not render words as vertical letter columns`).toEqual([]);
 
   if (!runner) return;

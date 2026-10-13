@@ -89,6 +89,13 @@ body {
   view-transition-name: sense6-page;
 }
 
+/* Theme text tokens switch immediately. Interpolating only a card's background
+ * can briefly erase contrast, so switch the surface in the same paint while
+ * retaining border and movement feedback. */
+.ui-card {
+  transition-property: border-color, transform;
+}
+
 ::view-transition {
   pointer-events: none;
 }
