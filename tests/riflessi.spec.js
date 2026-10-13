@@ -151,7 +151,7 @@ test('a settled Riflessi share cannot publish feedback after its mount is dispos
   await expect(page).toHaveURL(/\/en\/$/);
   await page.evaluate(() => window.__rejectRiflessiShare());
   await page.waitForTimeout(50);
-  await expect(page.locator('.ui-toast')).toHaveCount(0);
+  await expect(page.locator('.ui-toast-stack')).toHaveCount(0);
 });
 
 for (const transport of ['share', 'copy']) {
@@ -197,9 +197,9 @@ for (const transport of ['share', 'copy']) {
 
     await page.evaluate(async () => {
       window.__settleRiflessiResult();
-      await new Promise((resolve) => setTimeout(resolve, 0));
+      await new Promise(requestAnimationFrame);
     });
-    await expect(page.locator('.ui-toast')).toHaveCount(0);
+    await expect(page.locator('.ui-toast-stack')).toHaveCount(0);
     await expect(page.locator('[data-action="rx-start"]')).toBeDisabled();
     await expect(page.locator('[data-rx-scope-picker] [data-scope="signal"]')).toHaveAttribute(
       'aria-pressed',

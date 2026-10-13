@@ -1,6 +1,7 @@
 import { relatedGuideResultLink } from '../related-guide.js';
 
-/** @typedef {ReturnType<typeof import('../../lib/reflexes.js').summarizeRiflessi>} RiflessiResult */
+/** @typedef {ReturnType<typeof import('../../lib/reflexes.js').summarizeRiflessi>} RiflessiSummary */
+/** @typedef {Readonly<{ signal: Readonly<RiflessiSummary['signal']>, choice: Readonly<RiflessiSummary['choice']>, stability: Readonly<RiflessiSummary['stability']>, events: Readonly<RiflessiSummary['events']>, qualityReasons: Readonly<RiflessiSummary['qualityReasons']>, usable: RiflessiSummary['usable'] }>} RiflessiResult */
 /** @typedef {typeof import('../../i18n.js').t} Translate */
 /** @typedef {typeof import('../../i18n.js').m} Message */
 /** @typedef {Readonly<{ scope: 'signal' | 'signal-choice' | 'complete', inputMode: 'keyboard' | 'pointer', physicalSetup: 'seated-stable' | 'handheld-or-standing', frameMedianMs: number | null, interruptions: number, anticipationMs: number, locale: string }>} RiflessiViewContext */
