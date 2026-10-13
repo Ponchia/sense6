@@ -70,6 +70,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Fixed
 
+- Card backgrounds now switch with theme text instead of briefly interpolating
+  through low-contrast colours. Deterministic theme-transition checks cover the
+  five experiment landing pages in desktop and mobile Chromium.
+- Udito geometry checks inspect a finite text-node snapshot and count distinct
+  visual lines instead of inline rectangles. All six responsive layouts have
+  independent verification, including the high-zoom case in PR smoke.
 - Completed-run clipboard and share operations no longer post feedback after
   restarting or leaving any of the five experiments. Udito also invalidates
   delayed reference playback when the selected output setup changes.
