@@ -98,7 +98,8 @@ jobs:
           node <<'NODE'
           const fs = require('node:fs');
           const data = JSON.parse(fs.readFileSync(`${process.env.RUNNER_TEMP}/sense6-layout-negative.json`, 'utf8'));
-          const failed = data.reports.flatMap(r => r.findings.filter(f => f.status === 'fail'));
+          const failed = data.failures || [];
+          if (data.mode !== 'check' || data.format !== 'compact') throw new Error('Expected complete compact contract evidence');
           if (process.env.NEGATIVE_OUTCOME !== 'failure' || data.summary.failed !== 1 ||
               failed[0]?.id !== 'gallery-en-hero-aligns-tests' ||
               failed[0].deviation < 9 || failed[0].deviation > 15) {
