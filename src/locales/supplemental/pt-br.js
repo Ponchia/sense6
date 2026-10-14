@@ -1,10 +1,10 @@
 export const privacy = Object.freeze({
   title: 'Privacidade no Sense6',
   eyebrow: 'Privacidade / linguagem clara',
-  updated: 'Última atualização: 22 de julho de 2026',
+  updated: 'Última atualização: 14 de outubro de 2026',
   back: 'Todos os testes',
   intro:
-    'Seus testes permanecem no seu dispositivo. O Sense6 mantém apenas totais diários anônimos de atividade e não usa cookies, rastreadores publicitários nem perfis de usuário.',
+    'Seus testes permanecem no seu dispositivo. O Sense6 guarda em seu próprio banco apenas totais diários anônimos de atividade. A Cloudflare fornece separadamente estatísticas agregadas de visitas e desempenho sem cookies analíticos nem perfis de usuário.',
   summaryTitle: 'Resumo',
   summary:
     'Não podemos ver suas respostas nem seus resultados e não tentamos reconhecer você entre uma visita e outra.',
@@ -30,11 +30,17 @@ export const privacy = Object.freeze({
       ],
     },
     {
+      title: 'Estatísticas do site com respeito à privacidade',
+      paragraphs: [
+        'Somente em sense6.net, o Cloudflare Web Analytics mede visualizações de página, visitas estimadas, sites de referência e desempenho das páginas. Segundo a Cloudflare, esse serviço não usa cookies, identificadores analíticos no armazenamento local nem impressão digital dos visitantes. Esses relatórios são separados dos contadores diários de testes do D1. Respostas, pontuações, medições, diário e eventos específicos dos experimentos não são enviados ao Web Analytics.',
+      ],
+    },
+    {
       title: 'Hospedagem e segurança',
       paragraphs: [
         'O Sense6 usa o Cloudflare Pages para entregar o site, o Cloudflare D1 na União Europeia para os totais anônimos e os controles de segurança da Cloudflare para limitar abusos. Como qualquer provedor de hospedagem, a Cloudflare precisa processar informações técnicas das solicitações, como endereços IP e cabeçalhos, para entregar e proteger o serviço.',
         'O Sense6 não usa essas informações técnicas para criar perfis, exibir anúncios ou medir visitantes únicos. A Cloudflare pode processá-las fora da Suíça ou do Espaço Econômico Europeu sob suas garantias contratuais. Consulte a {cloudflarePrivacy} e o {cloudflareDpa}.',
-        'O Sense6 não cria cookies e não inclui pixels publicitários, ferramentas de análise comportamental nem scripts de fingerprinting.',
+        'O Sense6 não utiliza pixels publicitários, gravação de sessões nem scripts que identificam visitantes por impressão digital. O Cloudflare Web Analytics é explicado acima; o site continua funcionando se o beacon for bloqueado.',
       ],
     },
     {
@@ -47,7 +53,7 @@ export const privacy = Object.freeze({
     {
       title: 'Alterações',
       paragraphs: [
-        'Se, no futuro, o Sense6 adicionar contas, envios, resultados salvos na nuvem, análises de terceiros ou outro processamento, este aviso e o projeto de privacidade serão revisados antes do lançamento desses recursos.',
+        'Se o Sense6 adicionar contas, uploads, resultados na nuvem, outro provedor de estatísticas ou outros tipos de processamento, este aviso e o projeto de privacidade serão revisados antes dessas mudanças.',
       ],
     },
   ],

@@ -541,6 +541,11 @@ test('a stale catalog failure cannot roll back a later successful selection', as
   expect(pageErrors).toEqual([]);
 });
 
+test('preview origins never load Cloudflare Web Analytics', async ({ page }) => {
+  await page.goto('/en/');
+  await expect(page.locator('script[src*="cloudflareinsights.com"]')).toHaveCount(0);
+});
+
 test('the privacy notice describes the deployed data boundary in every locale', async ({ page }) => {
   await page.goto('/en/');
   await page.getByRole('link', { name: 'Privacy', exact: true }).click();

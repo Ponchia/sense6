@@ -24,6 +24,7 @@ const STRICT = new Set([
   'docs/adr/0003-generate-localized-static-entry-pages.md',
   'docs/adr/0004-store-a-local-structured-measurement-journal.md',
   'docs/adr/0005-continue-with-incremental-typed-javascript.md',
+  'docs/adr/0006-add-cookieless-web-analytics-without-test-telemetry.md',
 ]);
 const BROAD = new Set(['docs/research/acutezza.md', 'docs/research/five-test-evidence-and-product-audit.md']);
 const BROAD_BASELINE = 2;
