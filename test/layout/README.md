@@ -1,0 +1,9 @@
+# Sense6 — Bronto Layout beta field trial
+
+These **first-party, manually reviewed semantic contracts** are limited to the public generated gallery and Learn pages; they do not inspect a person's answers, measurements, journal or private application state. The trial checks English and Arabic gallery landmarks, logical inline-start alignment (RTL is not an ordinary LTR left-edge check), and the English Learn document at mobile/tablet/desktop widths. `--interior-probes` improves sampling without claiming unseen widths pass.
+
+The supplemental `.github/workflows/layout-field-trial.yml` checks the actual current source build on loopback with a pinned, sandboxed public Bronto Layout beta Action. It triggers only when layout-related source or these trial files change, and can be dispatched manually. It deliberately does **not** modify production release gating, transmit test responses, upload screenshots or publish audit artifacts. The static HTML, route CSS and runtime must all load from the generated site; a raw DOM fragment without styles is not meaningful evidence.
+
+The controlled negative page is generated from the built English gallery with one 12px desktop-only hero translation. Exactly one approved alignment rule must reject that change; a matched selector or a zero-contract audit alone cannot establish design intent. No source file or user session is mutated, and synthetic outcomes are not independent real-world accuracy labels.
+
+Agent workflow: review the contract before a style change, then run normal Sense6 checks and the relevant layout trial. Surface only rule IDs, CSS pixels, widths, locale, missing selector/coverage and actual observations. Do not infer a medical meaning from an experiment's layout, approve automatic suggestions, bypass Chrome sandboxing, or post any sensitive browser evidence. Record false positives, missed defects, and runtime privately before this trial becomes a required CI gate.
