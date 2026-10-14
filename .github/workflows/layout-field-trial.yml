@@ -77,7 +77,7 @@ jobs:
           if (!original.includes('</head>') || !original.includes('gallery-hero')) {
             throw new Error('Source-built English gallery is unavailable for the negative control');
           }
-          const injected = original.replace('</head>', '<style>@media(min-width:768px){.gallery-hero{transform:translateX(12px)!important}}</style></head>');
+          const injected = original.replace('</head>', '<style>@media(min-width:768px){.gallery-hero__starter{transform:translateX(12px)!important}}</style></head>');
           writeFileSync('dist/en/layout-trial-regression.html', injected);
           NODE
       - name: Semantic negative control must fail the hero-to-tests relationship
@@ -90,6 +90,13 @@ jobs:
           widths: 1280
           fail-on-skip: 'true'
           report: ${{ runner.temp }}/sense6-layout-negative.json
+      - name: Zero-contract audit should not invent an overflow from this semantic change
+        uses: Ponchia/bronto-layout@76d252304ab6fd8f1698fd0136b32091cb19f284
+        with:
+          mode: audit
+          url: http://127.0.0.1:4185/en/layout-trial-regression.html
+          widths: 1280
+          report: ${{ runner.temp }}/sense6-layout-audit-negative.json
       - name: Assert the temporary 12px layout mutation really failed
         shell: bash
         env:
@@ -99,9 +106,11 @@ jobs:
           const fs = require('node:fs');
           const data = JSON.parse(fs.readFileSync(`${process.env.RUNNER_TEMP}/sense6-layout-negative.json`, 'utf8'));
           const failed = data.failures || [];
+          const audit = JSON.parse(fs.readFileSync(`${process.env.RUNNER_TEMP}/sense6-layout-audit-negative.json`, 'utf8'));
           if (data.mode !== 'check' || data.format !== 'compact') throw new Error('Expected complete compact contract evidence');
           if (process.env.NEGATIVE_OUTCOME !== 'failure' || data.summary.failed !== 1 ||
-              failed[0]?.id !== 'gallery-en-hero-aligns-tests' ||
+              audit.mode !== 'audit' || audit.summary.measuredIssues !== 0 ||
+              failed[0]?.id !== 'gallery-en-starter-aligns-copy' ||
               failed[0].deviation < 9 || failed[0].deviation > 15) {
             console.error('Expected a single measured semantic alignment regression');
             process.exit(1);
