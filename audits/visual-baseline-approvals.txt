@@ -42,3 +42,5 @@ ar-about-desktop-chromium-linux.png  # Arabic About now includes localized maint
 hi-about-desktop-chromium-linux.png  # Hindi About now provides the three contextually linked maintainer destinations; no experiments, measurement logic, or privacy statements change
 ja-about-desktop-chromium-linux.png  # Japanese About adds localized context for author homepage, public GitHub profile, and optional Ko-fi support beneath the existing maintainer section
 ja-about-mobile-chromium-linux.png  # Japanese About wraps its new maintainer and support paragraph on narrow devices without changing visual experiments or the footer
+
+en-privacy-desktop-chromium-linux.png  # explicitly disclosed Cloudflare RUM introduces a separate website-analytics privacy section in all languages; the longer English privacy page is intentional and leaves test UX unchanged
