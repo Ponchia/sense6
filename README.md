@@ -115,6 +115,13 @@ increment an anonymous daily counter. The database contains only `day`,
 link events into sessions. The app does not send results, answers, locale,
 identifiers, fingerprints, or exact event timestamps with those counters.
 
+On the exact production hostname `sense6.net`, Cloudflare Web Analytics also
+provides aggregate page views, estimated visits and performance measurements.
+Its cookie-free beacon is separate from the anonymous D1 experiment counters;
+no answers, results or custom test events are sent to it. Preview deployments
+and localhost do not load the beacon. See
+[ADR 0006](docs/adr/0006-add-cookieless-web-analytics-without-test-telemetry.md).
+
 Cloudflare processes ordinary requests to deliver and protect the site; that
 hosting boundary is separate from the data Sense6 stores. Read the
 [privacy page](https://sense6.net/en/privacy/) and

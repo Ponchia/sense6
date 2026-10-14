@@ -32,6 +32,7 @@ instrument.
 | Person using Sense6 | Opens a localized route, completes an experiment, and optionally exports a journal | Answers, measurements, and journal entries stay in that browser |
 | Cloudflare Pages | Serves immutable static assets and generated HTML | Processes ordinary delivery traffic outside the Sense6 app |
 | Metrics Function and D1 | Accepts one allowlisted event and experiment name | Stores only coordinated-universal-time day, experiment, event, and count |
+| Cloudflare Web Analytics | Production-host-only anonymous page and performance beacon | Separate provider-reported website aggregates; never receives test answers or lifecycle events |
 | Maintainer | Changes source, reviews research, and deploys a verified build | Has no product endpoint for reading a person's results |
 
 <!-- markdownlint-enable MD013 -->
@@ -56,6 +57,7 @@ instrument.
 | Static generator | `scripts/generate-static-pages.mjs`, `scripts/static-structured-data.mjs` | Produce localized discovery HTML, structured metadata, sitemap, crawler files, and the 404 page |
 | Local journal | `src/lib/journal.js`, `src/journal.js` | Validate, store, compare, import, export, and render structured runs |
 | Anonymous metrics | `src/metrics.js`, `functions/api/metric.js` | Allowlist client events and increment daily aggregate counts |
+| Website analytics | `src/web-analytics.js`, `public/_headers` | Restrict the Cloudflare RUM script to the canonical production hostname and explicit CSP origins |
 
 <!-- markdownlint-enable MD013 -->
 

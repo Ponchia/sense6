@@ -11,6 +11,7 @@ import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from './metrics.js';
 import { currentLocation, currentRoute, navigate, startRouter } from './router.js';
 import { applyRouteMetadata, createRouteMetadata, LEARN_ROUTES } from './routes.js';
 import { renderGallery } from './site.js';
+import { startWebAnalytics } from './web-analytics.js';
 
 const appElement = document.querySelector('#app');
 const app = localizedRoot(appElement);
@@ -41,6 +42,7 @@ if (
 
 initThemeToggle();
 detectDisplay();
+startWebAnalytics();
 trackMetric(METRIC_EVENTS.siteLoaded, METRIC_TESTS.site);
 
 let cleanup = null;

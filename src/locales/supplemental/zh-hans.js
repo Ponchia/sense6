@@ -1,9 +1,10 @@
 export const privacy = Object.freeze({
   title: 'Sense6 隐私说明',
   eyebrow: '隐私 / 通俗说明',
-  updated: '最后更新：2026年7月22日',
+  updated: '最后更新：2026年10月14日',
   back: '所有测试',
-  intro: '测试只在你的设备上进行。Sense6 仅保留匿名的每日活动总数，不使用 Cookie、广告跟踪器或用户画像。',
+  intro:
+    '测试回答和结果始终保留在你的设备上。Sense6 自己的数据库只保存匿名的每日活动总数。Cloudflare 另行提供汇总的网站访问量和性能统计，不使用分析用 Cookie 或用户画像。',
   summaryTitle: '简要说明',
   summary: '我们看不到你的回答或结果，也不会尝试在多次访问之间识别你。',
   sections: [
@@ -26,11 +27,17 @@ export const privacy = Object.freeze({
       ],
     },
     {
+      title: '保护隐私的网站统计',
+      paragraphs: [
+        'Cloudflare Web Analytics 仅在 sense6.net 上统计页面浏览量、估算访问次数、引荐来源和页面性能。根据 Cloudflare 的说明，该服务不使用 Cookie、本地存储中的分析标识符或访客设备指纹。这些网站报告与存储在 D1 中的每日测试计数相互独立。测试回答、分数、测量值、私人日志以及实验专有事件不会发送给 Web Analytics。',
+      ],
+    },
+    {
       title: '托管与安全',
       paragraphs: [
         'Sense6 使用 Cloudflare Pages 提供网站内容，使用位于欧盟的 Cloudflare D1 保存匿名总数，并使用 Cloudflare 安全控制来限制滥用。与任何托管服务商一样，为了交付和保护服务，Cloudflare 必须处理 IP 地址、请求标头等技术请求信息。',
         'Sense6 不使用这些技术信息建立用户画像、投放广告或统计独立访客。Cloudflare 可能依据合同保障措施，在瑞士或欧洲经济区以外处理这些信息。请参阅 {cloudflarePrivacy} 和 {cloudflareDpa}。',
-        'Sense6 不设置 Cookie，也不包含广告像素、行为分析或设备指纹识别脚本。',
+        'Sense6 不使用广告像素、会话录制或识别访客设备指纹的脚本。Cloudflare Web Analytics 已在上文单独说明；即使其信标被屏蔽，网站仍可使用。',
       ],
     },
     {
@@ -43,7 +50,7 @@ export const privacy = Object.freeze({
     {
       title: '变更',
       paragraphs: [
-        '如果 Sense6 以后增加账户、上传、云端保存结果、第三方分析或其他处理方式，我们会在相关功能发布前重新审查本说明和隐私设计。',
+        '如果 Sense6 日后加入账户、上传、云端保存的结果、其他分析服务商或新的数据处理方式，我们会在上线前审查本说明和隐私设计。',
       ],
     },
   ],
