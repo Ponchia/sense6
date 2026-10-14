@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "widths": [320, 375, 768, 1280],
+  "scenario": { "locale": "ar" },
+  "selectors": {
+    "hero": ".gallery-hero",
+    "tests": "#tests.tests-section",
+    "grid": ".exam-grid",
+    "cards": ".exam-grid > .exam-card"
+  },
+  "rules": [
+    { "id": "gallery-ar-document-horizontal-fit", "type": "document-overflow", "tolerance": 2 },
+    { "id": "gallery-ar-hero-present", "type": "selector-count", "element": "hero", "exactly": 1 },
+    { "id": "gallery-ar-grid-present", "type": "selector-count", "element": "grid", "exactly": 1 },
+    { "id": "gallery-ar-card-collection-present", "type": "selector-count", "element": "cards", "min": 3 },
+    { "id": "gallery-ar-hero-horizontal-fit", "type": "contained", "element": "hero", "in": "viewport", "axis": "x", "tolerance": 2 },
+    { "id": "gallery-ar-grid-horizontal-fit", "type": "contained", "element": "grid", "in": "viewport", "axis": "x", "tolerance": 2 },
+    { "id": "gallery-ar-hero-aligns-tests", "type": "align-edge", "a": "hero", "b": "tests", "edgeA": "inline-start", "tolerance": 2 }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "widths": [320, 375, 768, 1280],
+  "selectors": {
+    "learn": ".learn-view",
+    "hero": ".learn-hero",
+    "topics": ".learn-topic-grid"
+  },
+  "rules": [
+    { "id": "learn-en-document-horizontal-fit", "type": "document-overflow", "tolerance": 2 },
+    { "id": "learn-en-root-present", "type": "selector-count", "element": "learn", "exactly": 1 },
+    { "id": "learn-en-topics-present", "type": "selector-count", "element": "topics", "exactly": 1 },
+    { "id": "learn-en-root-horizontal-fit", "type": "contained", "element": "learn", "in": "viewport", "axis": "x", "tolerance": 2 },
+    { "id": "learn-en-hero-horizontal-fit", "type": "contained", "element": "hero", "in": "viewport", "axis": "x", "tolerance": 2 },
+    { "id": "learn-en-topics-horizontal-fit", "type": "contained", "element": "topics", "in": "viewport", "axis": "x", "tolerance": 2 }
+  ]
+}

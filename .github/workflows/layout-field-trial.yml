@@ -1,0 +1,119 @@
+name: Bronto Layout first-party field trial
+
+# Supplemental source-built evidence; does not change the existing browser,
+# visual, Lighthouse or production-release gates during this beta trial.
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/layout-field-trial.yml'
+      - 'test/layout/**'
+      - 'src/styles/**'
+      - 'src/gallery-markup.js'
+      - 'src/learn.js'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: layout-trial-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  layout:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - name: Build the exact candidate with its generated localized static routes
+        run: |
+          npm ci --ignore-scripts
+          npm run build
+      - name: Serve generated site on loopback, with all route assets intact
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm run preview -- --host 127.0.0.1 --port 4185 --strictPort > "$RUNNER_TEMP/sense6-layout-preview.log" 2>&1 &
+          echo "$!" > "$RUNNER_TEMP/sense6-layout-preview.pid"
+          curl --silent --show-error --fail --retry 20 --retry-connrefused --retry-delay 1 http://127.0.0.1:4185/en/ > /dev/null
+      - name: English gallery — approved responsive relationships
+        uses: Ponchia/bronto-layout@76d252304ab6fd8f1698fd0136b32091cb19f284
+        with:
+          spec: test/layout/gallery-en.json
+          url: http://127.0.0.1:4185/en/
+          widths: 320,375,768,1280
+          interior-probes: '1'
+          fail-on-skip: 'true'
+          report: ${{ runner.temp }}/sense6-layout-gallery-en.json
+      - name: Arabic gallery — logical inline-start alignment
+        uses: Ponchia/bronto-layout@76d252304ab6fd8f1698fd0136b32091cb19f284
+        with:
+          spec: test/layout/gallery-ar.json
+          url: http://127.0.0.1:4185/ar/
+          widths: 320,375,768,1280
+          interior-probes: '1'
+          fail-on-skip: 'true'
+          report: ${{ runner.temp }}/sense6-layout-gallery-ar.json
+      - name: English Learn — a separate long-form document
+        uses: Ponchia/bronto-layout@76d252304ab6fd8f1698fd0136b32091cb19f284
+        with:
+          spec: test/layout/learn-en.json
+          url: http://127.0.0.1:4185/en/learn/
+          widths: 320,375,768,1280
+          interior-probes: '1'
+          fail-on-skip: 'true'
+          report: ${{ runner.temp }}/sense6-layout-learn.json
+      - name: Prepare a temporary desktop-only semantic regression
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs';
+          const file = 'dist/en/index.html';
+          const original = readFileSync(file, 'utf8');
+          if (!original.includes('</head>') || !original.includes('gallery-hero')) {
+            throw new Error('Source-built English gallery is unavailable for the negative control');
+          }
+          const injected = original.replace('</head>', '<style>@media(min-width:768px){.gallery-hero__starter{transform:translateX(12px)!important}}</style></head>');
+          writeFileSync('dist/en/layout-trial-regression.html', injected);
+          NODE
+      - name: Semantic negative control must fail the hero-to-tests relationship
+        id: shifted
+        continue-on-error: true
+        uses: Ponchia/bronto-layout@76d252304ab6fd8f1698fd0136b32091cb19f284
+        with:
+          spec: test/layout/gallery-en.json
+          url: http://127.0.0.1:4185/en/layout-trial-regression.html
+          widths: 1280
+          fail-on-skip: 'true'
+          report: ${{ runner.temp }}/sense6-layout-negative.json
+      - name: Zero-contract audit should not invent an overflow from this semantic change
+        uses: Ponchia/bronto-layout@76d252304ab6fd8f1698fd0136b32091cb19f284
+        with:
+          mode: audit
+          url: http://127.0.0.1:4185/en/layout-trial-regression.html
+          widths: 1280
+          report: ${{ runner.temp }}/sense6-layout-audit-negative.json
+      - name: Assert the temporary 12px layout mutation really failed
+        shell: bash
+        env:
+          NEGATIVE_OUTCOME: ${{ steps.shifted.outcome }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+          const data = JSON.parse(fs.readFileSync(`${process.env.RUNNER_TEMP}/sense6-layout-negative.json`, 'utf8'));
+          const failed = data.failures || [];
+          const audit = JSON.parse(fs.readFileSync(`${process.env.RUNNER_TEMP}/sense6-layout-audit-negative.json`, 'utf8'));
+          if (data.mode !== 'check' || data.format !== 'compact') throw new Error('Expected complete compact contract evidence');
+          if (process.env.NEGATIVE_OUTCOME !== 'failure' || data.summary.failed !== 1 ||
+              audit.mode !== 'audit' || audit.summary.measuredIssues !== 0 ||
+              failed[0]?.id !== 'gallery-en-starter-aligns-copy' ||
+              failed[0].deviation < 9 || failed[0].deviation > 15) {
+            console.error('Expected a single measured semantic alignment regression');
+            process.exit(1);
+          }
+          console.log('Synthetic 12px alignment change was detected; no source content or user results were changed.');
+          NODE
