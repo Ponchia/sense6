@@ -44,3 +44,4 @@ ja-about-desktop-chromium-linux.png  # Japanese About adds localized context for
 ja-about-mobile-chromium-linux.png  # Japanese About wraps its new maintainer and support paragraph on narrow devices without changing visual experiments or the footer
 
 en-privacy-desktop-chromium-linux.png  # explicitly disclosed Cloudflare RUM introduces a separate website-analytics privacy section in all languages; the longer English privacy page is intentional and leaves test UX unchanged
+en-privacy-mobile-chromium-linux.png  # expanded multilingual Cloudflare RUM disclosure intentionally increases the full mobile privacy page height; no measurement flows or visual experiment surfaces change
