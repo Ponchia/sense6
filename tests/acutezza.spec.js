@@ -234,7 +234,7 @@ async function expectDisplayedAcuityToMatchJournal(page) {
   }
 }
 
-test('Acutezza calibrates the display and reports separate non-clinical observations', async ({
+test('Acutezza calibrates the display and reports separate non-clinical observations @pr-smoke', async ({
   context,
   page,
 }) => {
