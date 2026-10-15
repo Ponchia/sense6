@@ -296,9 +296,8 @@
   min-inline-size: 0;
   overflow: hidden;
   padding: 0;
-  transition:
-    background-color var(--s6-motion-utility) var(--ease-standard),
-    transform var(--s6-motion-utility) var(--ease-standard);
+  /* Never interpolate card surfaces while light/dark text tokens switch. */
+  transition: transform var(--s6-motion-utility) var(--ease-standard);
 }
 
 .exam-card__link {

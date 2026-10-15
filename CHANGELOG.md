@@ -70,9 +70,15 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Fixed
 
+- Toasts preserve full text contrast while entering and leaving, retaining
+  movement feedback, reduced-motion handling, and live-region dismissal.
+  The complete Acutezza result/copy journey now also runs in PR smoke.
 - Card backgrounds now switch with theme text instead of briefly interpolating
   through low-contrast colours. Deterministic theme-transition checks cover the
   five experiment landing pages in desktop and mobile Chromium.
+- Gallery cards and Bronto UI action buttons also switch contrast-critical
+  colours immediately during theme changes; motion-only transitions remain.
+  Regression coverage checks both gallery and experiment entry actions.
 - Udito geometry checks inspect a finite text-node snapshot and count distinct
   visual lines instead of inline rectangles. All six responsive layouts have
   independent verification, including the high-zoom case in PR smoke.
