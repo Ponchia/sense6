@@ -170,7 +170,12 @@ test('privacy and journal routes have dedicated copy in every supported language
     assert.ok(journal.title);
     assert.ok(journal.reasonSetup);
     assert.ok(privacy.sections[1].paragraphs[1].length > 180, `${code} export disclosure is incomplete`);
-    assert.match(privacy.updated, /22/);
+    assert.match(privacy.updated, /14/);
+    const webAnalytics = privacy.sections.find(({ paragraphs }) =>
+      paragraphs.some((paragraph) => paragraph.includes('Cloudflare Web Analytics')),
+    );
+    assert.ok(webAnalytics, `${code} privacy notice must disclose Cloudflare Web Analytics`);
+    assert.ok(webAnalytics.paragraphs[0].length > 150, `${code} website analytics notice is incomplete`);
     assert.deepEqual(
       Object.keys(journal).sort(),
       englishJournalKeys,

@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "widths": [
+    320,
+    375,
+    768,
+    1280
+  ],
+  "selectors": {
+    "hero": ".gallery-hero",
+    "tests": "#tests.tests-section",
+    "grid": ".exam-grid",
+    "cards": ".exam-grid > .exam-card",
+    "research": ".gallery-learn",
+    "heroCopy": ".gallery-hero__copy",
+    "starter": ".gallery-hero__starter"
+  },
+  "rules": [
+    {
+      "id": "gallery-en-document-horizontal-fit",
+      "type": "document-overflow",
+      "tolerance": 2
+    },
+    {
+      "id": "gallery-en-hero-present",
+      "type": "selector-count",
+      "element": "hero",
+      "exactly": 1
+    },
+    {
+      "id": "gallery-en-grid-present",
+      "type": "selector-count",
+      "element": "grid",
+      "exactly": 1
+    },
+    {
+      "id": "gallery-en-card-collection-present",
+      "type": "selector-count",
+      "element": "cards",
+      "min": 3
+    },
+    {
+      "id": "gallery-en-hero-horizontal-fit",
+      "type": "contained",
+      "element": "hero",
+      "in": "viewport",
+      "axis": "x",
+      "tolerance": 2
+    },
+    {
+      "id": "gallery-en-grid-horizontal-fit",
+      "type": "contained",
+      "element": "grid",
+      "in": "viewport",
+      "axis": "x",
+      "tolerance": 2
+    },
+    {
+      "id": "gallery-en-research-horizontal-fit",
+      "type": "contained",
+      "element": "research",
+      "in": "viewport",
+      "axis": "x",
+      "tolerance": 2
+    },
+    {
+      "id": "gallery-en-hero-aligns-tests",
+      "type": "align-edge",
+      "a": "hero",
+      "b": "tests",
+      "edgeA": "inline-start",
+      "tolerance": 2
+    },
+    {
+      "id": "gallery-en-starter-aligns-copy",
+      "type": "align-edge",
+      "a": "heroCopy",
+      "b": "starter",
+      "edgeA": "inline-start",
+      "tolerance": 2
+    }
+  ]
+}

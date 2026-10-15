@@ -89,12 +89,14 @@ const EVENT_CONTEXTS = Object.freeze({
  */
 const EXPECTED_JOB_REACH = Object.freeze({
   'fork pull request': [
+    'layout-field-trial.yml:layout',
     'verify.yml:browser',
     'verify.yml:lighthouse',
     'verify.yml:release',
     'verify.yml:visual',
   ],
   'same-repository pull request': [
+    'layout-field-trial.yml:layout',
     'verify.yml:browser',
     'verify.yml:lighthouse',
     'verify.yml:release',
@@ -108,6 +110,7 @@ const EXPECTED_JOB_REACH = Object.freeze({
     'site-audit.yml:route-integrity',
   ],
   'manual dispatch': [
+    'layout-field-trial.yml:layout',
     'site-audit.yml:external-links',
     'site-audit.yml:lighthouse-full-site',
     'site-audit.yml:passive-security',
@@ -121,6 +124,7 @@ const EXPECTED_JOB_REACH = Object.freeze({
   // An actual workflow_dispatch chooses one workflow file, so verify.yml's
   // manual jobs appear here but are not part of Site audit's invocation.
   'manual Lighthouse-only dispatch': [
+    'layout-field-trial.yml:layout',
     'site-audit.yml:lighthouse-full-site',
     'verify.yml:browser',
     'verify.yml:lighthouse',
@@ -200,6 +204,16 @@ test('fork, branch, release and scheduled events retain their complete hosted ga
       `${event} no longer starts the expected set of ${HOSTED_RUNNER} jobs`,
     );
   }
+});
+
+test('first-party layout trial is an additional unprivileged browser gate with a deliberate negative control', () => {
+  const trial = workflow('layout-field-trial.yml');
+  assert.match(trial, /uses: Ponchia\/bronto-layout@76d252304ab6fd8f1698fd0136b32091cb19f284/);
+  assert.match(trial, /mode: audit/);
+  assert.match(trial, /id: shifted/);
+  assert.match(trial, /\.gallery-hero__starter\{transform:translateX\(12px\)!important\}/);
+  assert.match(trial, /permissions:\n  contents: read/);
+  assert.doesNotMatch(trial, /publish_production: true|secrets: inherit|pull_request_target|--no-sandbox/);
 });
 
 test('the reusable verifier cannot publish pull request previews', () => {

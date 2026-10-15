@@ -24,6 +24,26 @@ boundary explicit in code, result copy, metadata, and documentation.
   tests synchronized through their existing generators and gates.
 - Run `git status --short --branch` before editing and before handoff.
 
+## Responsive layout and coding agents
+
+When changing the generated gallery, Arabic RTL presentation or Learn pages,
+read the owned [Bronto Layout contracts](test/layout/README.md) and the
+supplemental [field-trial workflow](.github/workflows/layout-field-trial.yml).
+The workflow builds this exact source, serves public static routes on loopback,
+and checks reviewed selector, inline-start and containment relationships at
+sampled widths. It adds a reversible 12px negative control to verify that a
+semantic defect is detected even when the generic overflow audit sees none.
+This is **supplemental** and does not replace existing browser, visual,
+Lighthouse, HTML, accessibility or release gates.
+
+An agent investigating a layout failure should report the contract ID, actual
+viewport and locale (`en` versus `ar`), measured CSS-pixel deviation and any
+skipped state. Confirm the intended design before editing CSS. Never approve
+inferred suggestions automatically, change tolerances just to obtain green CI,
+turn uncertain geometry into a medical interpretation, or upload screenshots,
+answers or personal measurements. Checks at sampled widths do not prove
+correctness between them or inside inaccessible frames.
+
 ## Checks
 
 Use focused tests while iterating. Before handoff, run:
