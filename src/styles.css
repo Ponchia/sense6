@@ -96,6 +96,13 @@ body {
   transition-property: border-color, transform;
 }
 
+/* Theme text and button background tokens change together. Bronto UI's
+ * background/text colour interpolation can otherwise produce an inaccessible
+ * intermediate contrast ratio during a real theme toggle. */
+.ui-button {
+  transition-property: transform;
+}
+
 /* Keep transient feedback readable at every frame. Movement still signals
  * entrance/exit; opacity must not fade text through insufficient contrast. */
 .ui-toast {

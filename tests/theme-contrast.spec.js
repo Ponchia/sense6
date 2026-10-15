@@ -40,3 +40,32 @@ for (const route of ['acutezza', 'udito', 'riflessi', 'color-blindness', 'tetrac
     }
   });
 }
+
+// Cover the gallery-specific card declaration and the Bronto UI action class,
+// not only the shared `.ui-card` transition overridden above. A transition
+// here can silently lower contrast in the middle of light/dark theme changes.
+test('theme changes keep gallery cards and action colors coupled @pr-smoke', async ({ page }) => {
+  for (const route of ['/en/', '/en/acutezza/']) {
+    await page.goto(route);
+    await page.evaluate(async () => document.fonts.ready);
+    for (const theme of ['dark', 'light']) {
+      await page.locator('[data-bronto-theme-toggle]').click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+      const unsafeTransitions = await page
+        .locator('#app .ui-button, #app .exam-card')
+        .evaluateAll((elements) =>
+          elements.flatMap((element) => {
+            const properties = getComputedStyle(element)
+              .transitionProperty.split(',')
+              .map((property) => property.trim());
+            const unsafe = properties.filter((property) =>
+              ['all', 'color', 'background', 'background-color'].includes(property),
+            );
+            return unsafe.map((property) => `${element.className}: ${property}`);
+          }),
+        );
+      expect(unsafeTransitions, 'theme-sensitive surfaces must switch atomically').toEqual([]);
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    }
+  }
+});
