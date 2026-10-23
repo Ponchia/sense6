@@ -32,6 +32,20 @@ The [About page](https://sense6.net/en/about/) explains authorship, methods,
 privacy, and interpretation limits. The Learn guides distinguish research that
 informs a task from evidence that would validate its exact implementation.
 
+### Research guides
+
+Read the explanation alongside each experiment:
+
+- [Can an online test detect tetrachromacy?](https://sense6.net/en/tetrachromacy-guide/)
+- [How accurate is a reaction-time test in a browser?](https://sense6.net/en/reaction-time-guide/)
+- [What can an online colour-blindness test tell you?](https://sense6.net/en/color-blindness-guide/)
+- [Can a browser test your hearing range?](https://sense6.net/en/hearing-range-guide/)
+- [Can an online visual-acuity test replace an eye exam?](https://sense6.net/en/visual-acuity-guide/)
+
+Each guide links to its research sources and explains the limits of the
+corresponding browser task. Published translations are available through the
+language selector on the site.
+
 ## What is included
 
 - Five interactive experiments with explicit setup, interruption handling,
