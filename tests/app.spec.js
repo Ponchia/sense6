@@ -356,9 +356,8 @@ test('persistent shell copy keeps stable sources across de to it', async ({ page
   await expect(page.locator('[data-locale-select]')).toHaveValue('it');
   await expect(page.locator('.ui-skiplink')).toHaveText(italian.get('Skip to content'));
   await expect(page.locator('.theme-button__label')).toHaveText(italian.get('Theme'));
-  await expect(page.locator('[data-bronto-theme-toggle]')).toHaveAttribute(
-    'aria-label',
-    italian.get('Toggle light and dark theme'),
+  await expect(page.locator('[data-bronto-theme-toggle]')).toHaveAccessibleName(
+    `${italian.get('Theme')} ${italian.get('Toggle light and dark theme')}`,
   );
   await expect(page.locator('.ui-sitefooter__links [data-sense6-route="about"]')).toHaveText(
     italian.get('About'),
