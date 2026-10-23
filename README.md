@@ -46,6 +46,10 @@ Each guide links to its research sources and explains the limits of the
 corresponding browser task. Published translations are available through the
 language selector on the site.
 
+For code-level checks, see [Reproducing Sense6 methods](docs/methodology.md):
+protocol versions, seeded models, result calculations, and the limits of
+reproducing a physical measurement from software.
+
 ## What is included
 
 - Five interactive experiments with explicit setup, interruption handling,
