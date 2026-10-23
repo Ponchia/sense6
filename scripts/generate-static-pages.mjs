@@ -290,6 +290,7 @@ function localizeShell(html, locale) {
     ['Checking display…', tr('Checking display…')],
     ['Language', tr('Language')],
     ['Theme', tr('Theme')],
+    ['Toggle light and dark theme', tr('Toggle light and dark theme')],
     ['Measure carefully. Keep it private.', tr('Measure carefully. Keep it private.')],
     ['About', tr('About')],
     ['Journal', tr('Journal')],
@@ -303,7 +304,7 @@ function localizeShell(html, locale) {
       `shell message: ${source}`,
     );
   }
-  for (const source of ['Sense6 — all tests', 'Language', 'Toggle light and dark theme']) {
+  for (const source of ['Sense6 — all tests', 'Language']) {
     localized = replaceChecked(
       localized,
       ` aria-label="${source}"`,
