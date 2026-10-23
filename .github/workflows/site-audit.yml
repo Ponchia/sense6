@@ -17,8 +17,8 @@ concurrency:
   group: site-audit-${{ github.ref }}
   cancel-in-progress: true
 
-# Browser-container jobs use the Node 24 runtime bundled with the pinned
-# Playwright image, avoiding a redundant download on every ephemeral runner.
+# Browser-container jobs resolve the latest Node 24 patch independently of the
+# Node version bundled in the digest-pinned Playwright image.
 #
 # This workflow owns the expensive whole-site and external-production sweeps.
 # Pull requests and pushes use verify.yml instead, so their visual, browser,
@@ -33,12 +33,18 @@ jobs:
     env:
       PUPPETEER_SKIP_DOWNLOAD: 'true'
     container:
-      image: mcr.microsoft.com/playwright:v1.64.0-noble@sha256:06a9939e57531807f8d5fd76ce44b53165ffb7d7501d87ab10e285c20b1e971f
+      image: mcr.microsoft.com/playwright:v1.64.1-noble@sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea
     steps:
       - name: Check out the repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
+      - name: Set up the latest Node.js 24 patch
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          check-latest: true
+          package-manager-cache: false
       - name: Install dependencies
         run: npm ci
       - name: Verify locked Playwright version matches the pinned browser image
@@ -71,7 +77,7 @@ jobs:
     # projected serial mobile Lighthouse runtime; keep every route in scope.
     timeout-minutes: 65
     container:
-      image: mcr.microsoft.com/playwright:v1.64.0-noble@sha256:06a9939e57531807f8d5fd76ce44b53165ffb7d7501d87ab10e285c20b1e971f
+      image: mcr.microsoft.com/playwright:v1.64.1-noble@sha256:47b510dd9230bf0b9bfc9b20102241e577ea7a99334ab4c3ca19f19770e9b8ea
     env:
       FULL_SITE_AUDIT: '1'
       LIGHTHOUSE_OUTPUT_PATH: .lighthouse
@@ -81,6 +87,12 @@ jobs:
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
           persist-credentials: false
+      - name: Set up the latest Node.js 24 patch
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24'
+          check-latest: true
+          package-manager-cache: false
       - name: Install dependencies
         run: npm ci
       - name: Verify locked Playwright version matches the pinned browser image
@@ -116,9 +128,10 @@ jobs:
         with:
           persist-credentials: false
       - name: Set up Node.js
-        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
+          check-latest: true
           package-manager-cache: false
       - name: Install dependencies
         run: npm ci

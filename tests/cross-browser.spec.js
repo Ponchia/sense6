@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+import { loadMessages } from '../src/locales.js';
 import { captureMetrics } from './helpers/browser.js';
 
 /**
@@ -53,6 +54,33 @@ test('every browser loads the pre-rendered page and hands it over to the bundle 
 
   expect(await page.evaluate(() => window.__sense6CspViolations)).toEqual([]);
 });
+
+for (const locale of ['fr', 'ja']) {
+  test(`${locale} theme control keeps its visible label in the accessible name @pr-smoke`, async ({
+    page,
+  }) => {
+    await gotoHydrated(page, `/${locale}/`);
+    const messages = await loadMessages(locale);
+    const accessibleName = `${messages.get('Theme')} ${messages.get('Toggle light and dark theme')}`;
+    const toggle = page.locator('[data-bronto-theme-toggle]');
+
+    // The narrow header hides its text visually. Explicit label references keep
+    // the same localized name available in both header presentations.
+    for (const width of [1280, 320]) {
+      await page.setViewportSize({ width, height: 800 });
+      await expect(toggle).toHaveAccessibleName(accessibleName);
+      const wasDark = (await page.locator('html').getAttribute('data-theme')) === 'dark';
+      await toggle.click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', wasDark ? 'light' : 'dark');
+      await expect(toggle).toHaveAttribute('aria-pressed', String(!wasDark));
+      await expect(toggle).toHaveAccessibleName(accessibleName);
+    }
+
+    await page.locator('[data-locale-select]').selectOption('en');
+    await expect(page).toHaveURL(/\/en\/$/);
+    await expect(toggle).toHaveAccessibleName('Theme Toggle light and dark theme');
+  });
+}
 
 test('the gallery opens a localized experiment with route CSS', async ({ page }, testInfo) => {
   chromiumOnly(testInfo, 'asserts a computed CSS value, which differs by engine');
