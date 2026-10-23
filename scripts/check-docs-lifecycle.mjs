@@ -15,6 +15,7 @@ const STRICT = new Set([
   'docs/README.md',
   'docs/adding-an-experiment.md',
   'docs/architecture.md',
+  'docs/methodology.md',
   'docs/roadmap.md',
   'docs/product-readiness.md',
   'docs/public-repository-readiness.md',

@@ -17,6 +17,8 @@ decisions or research for operating instructions.
   completed launch, sponsorship, branch cleanup, and external security controls.
 - [Architecture](architecture.md) describes runtime boundaries, data flow,
   quality gates, pressure points, and delivery environments.
+- [Reproducing Sense6 methods](methodology.md) connects the colour and response
+  guides to versioned protocols, synthetic checks and device uncertainty.
 - [Adding an experiment](adding-an-experiment.md) is the extension checklist for
   contracts, methods, localization, journal data, static output, and tests.
 - [Roadmap](roadmap.md) records current product boundaries and the ordered,
