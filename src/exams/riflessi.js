@@ -331,11 +331,12 @@ function renderRunner() {
         ${
           choice
             ? `<div class="rx-choice-zones">
-                <button type="button" data-rx-response="left" aria-label="Respond left"><span aria-hidden="true">←</span><small>${state.session.inputMode === 'keyboard' ? 'left key' : 'tap left'}</small></button>
-                <button type="button" data-rx-response="right" aria-label="Respond right"><span aria-hidden="true">→</span><small>${state.session.inputMode === 'keyboard' ? 'right key' : 'tap right'}</small></button>
+                <button type="button" data-rx-response="left" aria-labelledby="rx-response-left-label rx-response-left-purpose"><span aria-hidden="true">←</span><small id="rx-response-left-label">${state.session.inputMode === 'keyboard' ? 'left key' : 'tap left'}</small><span id="rx-response-left-purpose" hidden>Respond left</span></button>
+                <button type="button" data-rx-response="right" aria-labelledby="rx-response-right-label rx-response-right-purpose"><span aria-hidden="true">→</span><small id="rx-response-right-label">${state.session.inputMode === 'keyboard' ? 'right key' : 'tap right'}</small><span id="rx-response-right-purpose" hidden>Respond right</span></button>
               </div>`
-            : `<button class="rx-response-pad" type="button" data-rx-response="signal" aria-label="Respond to signal">
-                <span>${state.session.inputMode === 'keyboard' ? 'press space' : 'tap chamber'}</span>
+            : `<button class="rx-response-pad" type="button" data-rx-response="signal" aria-labelledby="rx-response-signal-label rx-response-signal-purpose">
+                <span id="rx-response-signal-label">${state.session.inputMode === 'keyboard' ? 'press space' : 'tap chamber'}</span>
+                <span id="rx-response-signal-purpose" hidden>Respond to signal</span>
               </button>`
         }
       </div>

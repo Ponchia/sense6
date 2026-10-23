@@ -546,7 +546,7 @@ test('production-length denominators remain readable on a 320px result screen', 
   await expectScreenToReflow(page, '320x568 production-denominator results');
 });
 
-test('German Riflessi stages localize generated runner labels', async ({ page }, testInfo) => {
+test('German Riflessi stages localize generated runner labels @pr-smoke', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'chromium', 'Single-browser locale journey');
   await installQuickRiflessi(page);
   await page.setViewportSize({ width: 320, height: 568 });
@@ -566,6 +566,9 @@ test('German Riflessi stages localize generated runner labels', async ({ page },
   await page.locator('[data-action="rx-begin-stage"]').click();
   await expect(page.getByRole('heading', { name: 'Reaktionstest für Segnale' })).toBeAttached();
   await expect(page.locator('[data-rx-block]')).toHaveText('Übung');
+  await expect(page.locator('[data-rx-response="signal"]')).toHaveAccessibleName(
+    'Leertaste drücken Auf Signal reagieren',
+  );
   await respondWithKey(page, 'Space');
   await page.locator('[data-action="rx-begin-scored"]').click();
   await respondWithKey(page, 'Space');
@@ -715,7 +718,41 @@ test('Riflessi ignores secondary and non-primary pointer responses', async ({ pa
   await expect(page.getByRole('heading', { name: /Now the measured block/i })).toBeVisible();
 });
 
-test('runner progress, headings, focus, and paused state are accessible', async ({ page }) => {
+for (const mode of ['keyboard', 'pointer']) {
+  test(`Riflessi ${mode} response names include their visible instructions @pr-smoke`, async ({ page }) => {
+    await installQuickRiflessi(page);
+    await page.goto('/en/riflessi/');
+    await prepareRiflessi(page, mode, 'signal-choice');
+    await page.getByRole('button', { name: /Start practice/i }).click();
+
+    const signal = page.locator('[data-rx-response="signal"]');
+    await expect(signal).toHaveAccessibleName(
+      mode === 'keyboard' ? 'press space Respond to signal' : 'tap chamber Respond to signal',
+    );
+    const respondToSignal = async () => {
+      if (mode === 'keyboard') return respondWithKey(page, 'Space');
+      await expect(page.locator('[data-rx-chamber]')).toHaveAttribute('data-rx-state', 'live');
+      await signal.click();
+    };
+    await respondToSignal();
+    await page.getByRole('button', { name: /Begin measured block/i }).click();
+    const total = Number(
+      await page.locator('[data-rx-count]').evaluate((element) => element.textContent.split('/')[1]),
+    );
+    for (let trial = 0; trial < total; trial += 1) await respondToSignal();
+
+    await page.getByRole('button', { name: /Continue to Scelta/i }).click();
+    await page.getByRole('button', { name: /Start practice/i }).click();
+    await expect(page.locator('[data-rx-response="left"]')).toHaveAccessibleName(
+      mode === 'keyboard' ? 'left key Respond left' : 'tap left Respond left',
+    );
+    await expect(page.locator('[data-rx-response="right"]')).toHaveAccessibleName(
+      mode === 'keyboard' ? 'right key Respond right' : 'tap right Respond right',
+    );
+  });
+}
+
+test('runner progress, headings, focus, and paused state are accessible @pr-smoke', async ({ page }) => {
   await page.addInitScript(() => {
     window.__SENSE6_TEST_CONFIG__ = {
       riflessi: {

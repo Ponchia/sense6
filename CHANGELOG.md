@@ -70,6 +70,9 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Fixed
 
+- Acutezza keypad and Riflessi response controls include visible shortcuts
+  and instructions in accessible names while retaining localized purpose labels.
+  PR smoke checks now cover the affected runner accessibility states.
 - Toasts preserve full text contrast while entering and leaving, retaining
   movement feedback, reduced-motion handling, and live-region dismissal.
   The complete Acutezza result/copy journey now also runs in PR smoke.

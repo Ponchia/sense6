@@ -719,7 +719,7 @@ test('Acutezza carries the 20% fallback and unusable controls through results an
   expect(copied).toContain('Interpret with caution');
 });
 
-test('Acutezza keeps calibration and runner geometry ordered at required short viewports', async ({
+test('Acutezza keeps calibration and runner geometry ordered at required short viewports @pr-smoke', async ({
   page,
 }, testInfo) => {
   test.setTimeout(90_000);
@@ -788,6 +788,7 @@ test('Acutezza keeps calibration and runner geometry ordered at required short v
       geometry.stimulusScrollHeight <= geometry.stimulusClientHeight + 1,
       `${viewport.width}x${viewport.height} stimulus ${geometry.stimulusScrollHeight}/${geometry.stimulusClientHeight}`,
     ).toBe(true);
+    await expect(page.locator('[data-ac-direction="up"]')).toHaveAccessibleName('8 Gap at top');
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 
     if (viewport.width === 320) {
@@ -833,7 +834,7 @@ test('Acutezza keeps calibration and runner geometry ordered at required short v
   }
 });
 
-test('the mobile Acutezza setup and target controls remain inside the viewport', async ({
+test('the mobile Acutezza setup and target controls remain inside the viewport @pr-smoke', async ({
   page,
 }, testInfo) => {
   test.skip(testInfo.project.name !== 'mobile', 'Mobile-only geometry check');
