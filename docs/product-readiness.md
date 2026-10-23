@@ -110,7 +110,7 @@ in the review issue/PR. AI validation and structural equality are not
 substitutes for this sign-off. Keep factual corrections and any corresponding
 translation updates aligned with the source hash and publication checks.
 
-## Search visibility: verified technical output vs unknown indexing
+## Search and AI visibility: operating checks
 
 The build emits and tests the sitemap, canonical URLs, reciprocal `hreflang`,
 indexable static HTML, robots directives and share metadata. These checks
@@ -127,6 +127,38 @@ Track impressions, clicks, top queries and landing pages weekly. The first
 few days after publishing are insufficient to conclude that a translation is
 underperforming. Do not use the Google Indexing API for ordinary article pages
 or claim an `llms.txt` file guarantees LLM discovery.
+
+For an excluded page, inspect its exact canonical URL in the correct property.
+Check the rendered HTML, HTTP status, robots directives, canonical and internal
+links before changing content. If the page is eligible, request indexing once
+and retain the submission outcome separately from its eventual indexing state.
+Sitemap submission is a discovery hint, not an indexing guarantee. Do not remove
+intentional `noindex` directives on private-journal and utility pages to improve
+a coverage percentage.
+
+Compare a recommendation with the **current live page** before applying a fix.
+A short-description warning can refer to a previous crawl. Use a meaningful
+localized summary rather than padding Japanese, Korean or Chinese to an English
+character-count target. After a real correction, request a fresh crawl; the old
+warning may remain until the search engine processes it.
+
+When available, record Google Search Console's generative-AI report separately
+from Bing Webmaster Tools' AI Performance report. Preserve each report's date
+range, property, source coverage and metric definition. AI impressions,
+citations, citation share, conventional search clicks and referral visits are
+different measures. A Bing citation is not evidence of a ChatGPT or Claude
+recommendation, and a crawl is not evidence of any recommendation. Keep private
+account exports and operational evidence outside the public repository.
+
+Preserve the distinction in `src/crawler-policy.js` between training crawlers
+and search/user retrieval. Neither ownership verification nor indexing requests
+require additional visitor tracking, a paid analytics service or permission for
+training crawlers. Direct links in the project README help readers find the
+guides; they are not independent endorsements or a substitute for earned links.
+
+References: [Google URL recrawl requests](https://developers.google.com/search/docs/crawling-indexing/ask-google-to-recrawl),
+[Google snippet guidance](https://developers.google.com/search/docs/appearance/snippet),
+and [Bing site verification](https://www.bing.com/webmasters/help/add-and-verify-site-12184f8b).
 
 Use aggregate product events (`site_loaded`, per-lab `test_viewed`,
 `test_started`, `test_completed`) only as directional activity counts. A
