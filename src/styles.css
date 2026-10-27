@@ -1119,18 +1119,18 @@ html[dir="rtl"] :is(.back-link, .exam-card__cta) > span[aria-hidden="true"] {
 /* Keep experimental left/right placement and numbered response order physical.
    Reading direction must not invert a stimulus, a response side, or keyboard mapping. */
 html[dir="rtl"]
-:is(
-  .threshold-grid,
-  .field-grid,
-  .sequence-track,
-  .sequence-controls .ui-cluster,
-  .cb-directions,
-  .ac-sweep,
-  .ac-direction-pad,
-  .rx-choice-zones,
-  .au-intervals,
-  .au-responses
-) {
+  :is(
+    .threshold-grid,
+    .field-grid,
+    .sequence-track,
+    .sequence-controls .ui-cluster,
+    .cb-directions,
+    .ac-sweep,
+    .ac-direction-pad,
+    .rx-choice-zones,
+    .au-intervals,
+    .au-responses
+  ) {
   direction: ltr;
 }
 
