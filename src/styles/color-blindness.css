@@ -270,10 +270,7 @@
 .cb-directions {
   display: grid;
   gap: 0.45rem;
-  grid-template-areas:
-    ". up ."
-    "left center right"
-    ". down .";
+  /* Explicit placements preserve the physical 3-by-3 response layout. */
   grid-template-columns: repeat(3, 1fr);
   margin-block: 0.6rem;
 }
@@ -314,19 +311,23 @@
 }
 
 .cb-direction--up {
-  grid-area: up;
+  grid-column: 2;
+  grid-row: 1;
 }
 
 .cb-direction--right {
-  grid-area: right;
+  grid-column: 3;
+  grid-row: 2;
 }
 
 .cb-direction--down {
-  grid-area: down;
+  grid-column: 2;
+  grid-row: 3;
 }
 
 .cb-direction--left {
-  grid-area: left;
+  grid-column: 1;
+  grid-row: 2;
 }
 
 .cb-directions__center {
@@ -337,7 +338,8 @@
   display: flex;
   font-family: var(--display);
   font-size: 1.5rem;
-  grid-area: center;
+  grid-column: 2;
+  grid-row: 2;
   justify-content: center;
 }
 
