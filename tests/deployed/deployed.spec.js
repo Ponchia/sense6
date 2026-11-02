@@ -24,6 +24,11 @@ test('the deployed bundle hydrates, starts setup, and serves a real 404 without 
     }
     await route.continue();
   });
+  // A production smoke test must not load the live RUM beacon or submit it.
+  await page.route('**://static.cloudflareinsights.com/**', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/javascript', body: '' }),
+  );
+  await page.route('**/cdn-cgi/rum*', (route) => route.fulfill({ status: 204, body: '' }));
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text());
   });
@@ -87,6 +92,7 @@ test('inspection mode keeps the live experiment usable without metrics or RUM', 
   await page.locator('#screen-ready').check();
   await page.locator('[data-action="start"]').click();
   await expect(page.locator('[data-choice="0"]')).toBeEnabled();
+  await page.waitForLoadState('networkidle');
   await expect(page.locator('script[data-cf-beacon]')).toHaveCount(0);
   expect(measurementRequests).toEqual([]);
 });

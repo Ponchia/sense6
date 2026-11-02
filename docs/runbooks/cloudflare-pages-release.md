@@ -290,10 +290,18 @@ router removes the query. No cookie, local storage flag, visitor identifier or
 new event is created. A new document without the flag restores normal behavior;
 include the flag again on full-page loads.
 
-The existing deployed browser gate still intercepts every product metric POST.
-The inspection-mode gate additionally blocks beacon and metric endpoints as a
-safety net, then asserts that neither was requested. A failing check therefore
+Both deployed browser journeys intercept product metric POSTs and block the
+Cloudflare beacon and RUM endpoint before navigation. The inspection-mode gate
+additionally asserts that neither was requested. A failing check therefore
 does not add production metrics.
+
+The production-origin fixture in `tests/measurement-origin.spec.js` serves the
+candidate build entirely from local bytes under an intercepted `sense6.net`
+origin. Every request is fulfilled or blocked; none reaches production. Its
+no-flag positive control must attempt counters and the beacon, while the flag
+suppresses them through router query removal and another experiment mount. This
+avoids treating localhost, where analytics is already off, as proof of
+production-origin exclusion.
 
 This mode avoids deliberately identified inspection traffic. It does not
 classify bots, subtract past counts, prove that other traffic is human, or
