@@ -46,3 +46,9 @@ test('a production page loads exactly one Cloudflare RUM beacon and no custom te
   assert.equal(options.spa, true);
   assert.deepEqual(Object.keys(options).sort(), ['spa', 'token']);
 });
+
+test('inspection mode does not create or load a Cloudflare beacon', () => {
+  const document = fakeDocument();
+  assert.equal(startWebAnalytics({ hostname: WEB_ANALYTICS_SITE, search: '?metrics=off', document }), false);
+  assert.equal(document.scripts.length, 0);
+});

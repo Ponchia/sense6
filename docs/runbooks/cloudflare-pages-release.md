@@ -277,3 +277,27 @@ remote migration state, artifact commit, checksum, or rollback target is
 uncertain. Preserve the failed workflow and deployment links. Don't merge a
 runtime metric change while production D1 is behind, and don't bypass the
 verified-artifact workflow with an ad hoc Pages upload.
+
+
+## Inspect without adding measurements
+
+Open a fresh document with `?metrics=off`, for example
+`https://sense6.net/en/tetracromia/?metrics=off`, when manually checking the
+production experience. This explicit inspection mode prevents the page from
+loading the Cloudflare Web Analytics beacon or sending anonymous product
+counters. It remains disabled through same-document navigation even when the
+router removes the query. No cookie, local storage flag, visitor identifier or
+new event is created. A new document without the flag restores normal behavior;
+include the flag again on full-page loads.
+
+The existing deployed browser gate still intercepts every product metric POST.
+The inspection-mode gate additionally blocks beacon and metric endpoints as a
+safety net, then asserts that neither was requested. A failing check therefore
+does not add production metrics.
+
+This mode avoids deliberately identified inspection traffic. It does not
+classify bots, subtract past counts, prove that other traffic is human, or
+explain a historical spike. Record release dates privately when comparing
+periods across instrumentation changes. A low count of completed experiments
+alone is not evidence of a broken flow; use the consented study in
+[product readiness](../product-readiness.md) to investigate actual friction.

@@ -1,4 +1,5 @@
 import { METRIC_TEST_IDS } from './exams/contracts.js';
+import { measurementsAllowed } from './measurement-policy.js';
 
 export const METRIC_EVENTS = Object.freeze({
   siteLoaded: 'site_loaded',
@@ -62,10 +63,15 @@ function isMetricTransportEnabled(location) {
  * @param {string} event
  * @param {string} test
  * @param {typeof fetch} [fetchImpl]
- * @param {{ origin?: string }} [location]
+ * @param {{ origin?: string, search?: string }} [location]
  */
 export async function sendMetric(event, test, fetchImpl = globalThis.fetch, location = globalThis.location) {
-  if (!isMetricTransportEnabled(location) || !isAllowedMetric(event, test) || typeof fetchImpl !== 'function')
+  if (
+    !measurementsAllowed(location) ||
+    !isMetricTransportEnabled(location) ||
+    !isAllowedMetric(event, test) ||
+    typeof fetchImpl !== 'function'
+  )
     return false;
 
   try {

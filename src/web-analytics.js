@@ -1,3 +1,5 @@
+import { measurementsAllowed } from './measurement-policy.js';
+
 /**
  * Cloudflare's cookie-free page and performance measurements complement our
  * independent aggregate D1 product counters. Never send answers or test events.
@@ -9,10 +11,11 @@ export const WEB_ANALYTICS_ORIGIN = 'https://static.cloudflareinsights.com/beaco
 export const WEB_ANALYTICS_SITE = 'sense6.net';
 const SITE_TOKEN = 'f57709663e3a4d92ba4a492c242cf90b';
 
-/** @param {{ hostname?: string, document?: Document }} context */
-export function startWebAnalytics({ hostname, document: doc } = {}) {
+/** @param {{ hostname?: string, search?: string, document?: Document }} context */
+export function startWebAnalytics({ hostname, search, document: doc } = {}) {
   const resolvedHostname = hostname ?? (typeof window === 'undefined' ? '' : window.location.hostname);
   const resolvedDocument = doc ?? (typeof document === 'undefined' ? undefined : document);
+  if (!measurementsAllowed({ search: search ?? globalThis.location?.search })) return false;
   if (resolvedHostname !== WEB_ANALYTICS_SITE || !resolvedDocument) return false;
   if (resolvedDocument.querySelector('script[data-cf-beacon]')) return false;
 
