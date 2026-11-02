@@ -961,14 +961,17 @@ function renderedText(html) {
   return decodeEntities(
     stripTags(
       html
-        .replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi, ' ')
-        .replace(/<style\b[^>]*>[\s\S]*?<\/style\s*>/gi, ' '),
+        .replace(/<script\b[^>]*>[\s\S]*?<\/script\b[^>]*>/gi, ' ')
+        .replace(/<style\b[^>]*>[\s\S]*?<\/style\b[^>]*>/gi, ' '),
     ),
   );
 }
 
 test('spaced script and style end tags do not leak copy into rendered text', () => {
-  assert.equal(renderedText('<div>Visible</div><script>undefined</script ><style>NaN</style >'), 'Visible');
+  assert.equal(
+    renderedText('<div>Visible</div><script>undefined</script \t bar><style>NaN</style >'),
+    'Visible',
+  );
 });
 
 async function sumSizes(files) {
