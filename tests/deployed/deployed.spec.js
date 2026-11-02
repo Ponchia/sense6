@@ -24,6 +24,11 @@ test('the deployed bundle hydrates, starts setup, and serves a real 404 without 
     }
     await route.continue();
   });
+  // A production smoke test must not load the live RUM beacon or submit it.
+  await page.route('**://static.cloudflareinsights.com/**', (route) =>
+    route.fulfill({ status: 200, contentType: 'application/javascript', body: '' }),
+  );
+  await page.route('**/cdn-cgi/rum*', (route) => route.fulfill({ status: 204, body: '' }));
   page.on('console', (message) => {
     if (message.type() === 'error') consoleErrors.push(message.text());
   });
@@ -62,4 +67,32 @@ test('the deployed bundle hydrates, starts setup, and serves a real 404 without 
   expect(missing?.status()).toBe(404);
   await expect(page.getByRole('heading', { name: 'Page not found.' })).toBeVisible();
   await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+});
+
+test('inspection mode keeps the live experiment usable without metrics or RUM', async ({ page }) => {
+  const measurementRequests = [];
+  await page.route('**/api/metric', async (route) => {
+    measurementRequests.push(route.request().url());
+    await route.fulfill({ status: 204, body: '' });
+  });
+  await page.route('**://static.cloudflareinsights.com/**', async (route) => {
+    measurementRequests.push(route.request().url());
+    await route.fulfill({ status: 200, contentType: 'application/javascript', body: '' });
+  });
+  await page.route('**/cdn-cgi/rum*', async (route) => {
+    measurementRequests.push(route.request().url());
+    await route.fulfill({ status: 204, body: '' });
+  });
+  await page.goto('/en/tetracromia/?metrics=off');
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'tetracromia');
+  // The initial flag must remain effective even if same-document navigation
+  // replaces the URL before the next metric-bearing action.
+  await page.evaluate(() => history.replaceState(null, '', '/en/tetracromia/'));
+  await page.locator('[data-action="setup"]').first().click();
+  await page.locator('#screen-ready').check();
+  await page.locator('[data-action="start"]').click();
+  await expect(page.locator('[data-choice="0"]')).toBeEnabled();
+  await page.waitForLoadState('networkidle');
+  await expect(page.locator('script[data-cf-beacon]')).toHaveCount(0);
+  expect(measurementRequests).toEqual([]);
 });

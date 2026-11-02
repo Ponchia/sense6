@@ -150,3 +150,28 @@ test('every experiment route maps to an allowed anonymous metric identity', () =
   assert.equal(daltonia?.metricTest, METRIC_TESTS.daltonia);
   assert.equal(METRIC_TESTS['color-blindness'], undefined);
 });
+
+test('explicit inspection URLs never send product metrics, even on production', async () => {
+  let requests = 0;
+  const fetchImpl = async () => {
+    requests += 1;
+    return { ok: true };
+  };
+  for (const search of ['?metrics=off', '?a=1&metrics=off', '?metrics=on&metrics=off']) {
+    assert.equal(
+      await sendMetric(METRIC_EVENTS.siteLoaded, METRIC_TESTS.site, fetchImpl, {
+        ...PRODUCTION_LOCATION,
+        search,
+      }),
+      false,
+    );
+    assert.equal(
+      await sendMetric(METRIC_EVENTS.testCompleted, METRIC_TESTS.tetracromia, fetchImpl, {
+        ...PRODUCTION_LOCATION,
+        search,
+      }),
+      false,
+    );
+  }
+  assert.equal(requests, 0);
+});
