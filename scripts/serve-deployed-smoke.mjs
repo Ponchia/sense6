@@ -65,8 +65,13 @@ const server = createServer(async (request, response) => {
     });
     stream.pipe(response);
   } catch (error) {
-    response.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
-    response.end(error instanceof Error ? error.message : String(error));
+    // A loopback fixture must not expose filesystem paths or raw exceptions.
+    console.error(
+      'Local deployed-smoke request failed:',
+      error instanceof Error ? error.name : 'Unexpected error',
+    );
+    if (!response.headersSent) response.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+    response.end('Internal fixture error');
   }
 });
 

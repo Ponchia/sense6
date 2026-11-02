@@ -1,6 +1,7 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
 import { dirname, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { decodeAttribute } from './decode-html-attribute.mjs';
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
 const DIST = resolve(ROOT, 'dist');
@@ -89,13 +90,4 @@ async function exists(file) {
 async function cachedRead(file) {
   if (!htmlCache.has(file)) htmlCache.set(file, await readFile(file, 'utf8'));
   return htmlCache.get(file);
-}
-
-function decodeAttribute(value) {
-  return value
-    .replaceAll('&amp;', '&')
-    .replaceAll('&quot;', '"')
-    .replaceAll('&#39;', "'")
-    .replaceAll('&lt;', '<')
-    .replaceAll('&gt;', '>');
 }
