@@ -943,13 +943,7 @@ test('no generated page renders undefined, NaN, or a stringified object as text'
   const offenders = [];
   for (const page of pages) {
     const html = await readFile(page, 'utf8');
-    const text = decodeEntities(
-      stripTags(
-        html
-          .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, ' ')
-          .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, ' '),
-      ),
-    );
+    const text = renderedText(html);
     for (const pattern of forbidden) {
       const found = text.match(pattern);
       if (!found) continue;
@@ -960,6 +954,24 @@ test('no generated page renders undefined, NaN, or a stringified object as text'
     }
   }
   assert.deepEqual(offenders, [], `unrendered values reached the crawlable HTML:\n${offenders.join('\n')}`);
+});
+
+function renderedText(html) {
+  // Only a static text audit, never a sanitizer for untrusted HTML.
+  return decodeEntities(
+    stripTags(
+      html
+        .replace(/<script\b[^>]*>[\s\S]*?<\/script\b[^>]*>/gi, ' ')
+        .replace(/<style\b[^>]*>[\s\S]*?<\/style\b[^>]*>/gi, ' '),
+    ),
+  );
+}
+
+test('spaced script and style end tags do not leak copy into rendered text', () => {
+  assert.equal(
+    renderedText('<div>Visible</div><script>undefined</script \t bar><style>NaN</style >'),
+    'Visible',
+  );
 });
 
 async function sumSizes(files) {
