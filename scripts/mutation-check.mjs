@@ -17,7 +17,11 @@
  *   node scripts/mutation-check.mjs                        # every src/lib module
  *   node scripts/mutation-check.mjs src/lib/hearing.js     # one module
  *   node scripts/mutation-check.mjs --list src/lib/hearing.js
- *   node scripts/mutation-check.mjs --test 'node --test tests/hearing.test.js' src/lib/hearing.js
+ *   node scripts/mutation-check.mjs --test tests/hearing.test.js src/lib/hearing.js
+ *
+ * `--test <file>` (repeatable) narrows the suite to those test files. The suite
+ * always runs as `node --test <files>` without a shell, so no argument is
+ * interpreted as shell syntax.
  *
  * How it works, and the caveat that follows from it: the harness rewrites the
  * real file in place, runs the suite, and restores the original from memory in a
@@ -99,18 +103,35 @@ async function isDirty(file) {
   return stdout.trim().length > 0;
 }
 
-const DEFAULT_TEST_COMMAND = 'node --test tests/*.test.js';
-
 /** @param {string[]} args */
 function parseArgs(args) {
-  const testIndex = args.indexOf('--test');
+  const testFiles = [];
+  const consumed = new Set();
+  args.forEach((arg, index) => {
+    if (arg !== '--test') return;
+    const value = args[index + 1];
+    if (!value || value.startsWith('-') || !value.endsWith('.js')) {
+      throw new Error('--test takes one test file path ending in .js, for example tests/hearing.test.js');
+    }
+    testFiles.push(value);
+    consumed.add(index + 1);
+  });
   return {
     listOnly: args.includes('--list'),
-    testCommand: testIndex === -1 ? DEFAULT_TEST_COMMAND : (args[testIndex + 1] ?? DEFAULT_TEST_COMMAND),
+    testFiles,
     targets: args.filter(
-      (arg, index) => !arg.startsWith('--') && index !== testIndex + 1 && arg.endsWith('.js'),
+      (arg, index) => !arg.startsWith('--') && !consumed.has(index) && arg.endsWith('.js'),
     ),
   };
+}
+
+/** Every unit test file, the same set `node --test tests/*.test.js` selects. */
+async function defaultTestFiles() {
+  const names = await readdir(new URL('../tests/', import.meta.url));
+  return names
+    .filter((name) => name.endsWith('.test.js'))
+    .map((name) => `tests/${name}`)
+    .sort();
 }
 
 /** @param {string[]} targets */
@@ -123,10 +144,14 @@ async function resolveFiles(targets) {
     .sort();
 }
 
-/** Run one mutant and classify it. */
-async function classify(testCommand) {
+/**
+ * Run one mutant and classify it.
+ *
+ * @param {string[]} testFiles
+ */
+async function classify(testFiles) {
   try {
-    await run('sh', ['-c', testCommand], { cwd: ROOT, timeout: TEST_TIMEOUT_MS });
+    await run(process.execPath, ['--test', ...testFiles], { cwd: ROOT, timeout: TEST_TIMEOUT_MS });
     return 'SURVIVED';
   } catch (error) {
     return error.killed ? 'TIMEOUT' : 'KILLED';
@@ -138,7 +163,7 @@ async function classify(testCommand) {
  *
  * @returns {Promise<{ total: number, killed: number, timedOut: number, survivors: string[] }>}
  */
-async function sweepFile(file, mutants, testCommand) {
+async function sweepFile(file, mutants, testFiles) {
   const tally = { total: 0, killed: 0, timedOut: 0, survivors: /** @type {string[]} */ ([]) };
   const target = new URL(file, `file://${ROOT}`);
   const original = await readFile(target, 'utf8');
@@ -151,7 +176,7 @@ async function sweepFile(file, mutants, testCommand) {
     for (const mutant of mutants) {
       await writeFile(target, mutant.mutated);
       tally.total += 1;
-      const status = await classify(testCommand);
+      const status = await classify(testFiles);
       if (status === 'KILLED') tally.killed += 1;
       else if (status === 'TIMEOUT') tally.timedOut += 1;
       else
@@ -189,7 +214,8 @@ function report(tally) {
 }
 
 async function main() {
-  const { listOnly, testCommand, targets } = parseArgs(argv.slice(2));
+  const { listOnly, testFiles: chosenTests, targets } = parseArgs(argv.slice(2));
+  const testFiles = chosenTests.length ? chosenTests : await defaultTestFiles();
   const files = await resolveFiles(targets);
   const tally = { total: 0, killed: 0, timedOut: 0, survivors: /** @type {string[]} */ ([]) };
 
@@ -206,7 +232,7 @@ async function main() {
       );
       continue;
     }
-    const result = await sweepFile(file, mutants, testCommand);
+    const result = await sweepFile(file, mutants, testFiles);
     tally.total += result.total;
     tally.killed += result.killed;
     tally.timedOut += result.timedOut;

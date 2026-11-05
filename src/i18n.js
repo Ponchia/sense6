@@ -193,7 +193,8 @@ function translateTextNode(node) {
   if (translated === trimmed) return;
   const leading = current.match(/^\s*/)?.[0] ?? '';
   const trailing = current.match(/\s*$/)?.[0] ?? '';
-  node.data = `${leading}${translated}${trailing}`;
+  // textContent on a Text node replaces its data in place without HTML parsing.
+  node.textContent = `${leading}${translated}${trailing}`;
 }
 
 /** @param {Element} element */

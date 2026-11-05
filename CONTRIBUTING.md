@@ -130,7 +130,7 @@ module:
 
 ```sh
 node scripts/mutation-check.mjs --list src/lib/hearing.js
-node scripts/mutation-check.mjs --test 'node --test tests/hearing.test.js' src/lib/hearing.js
+node scripts/mutation-check.mjs --test tests/hearing.test.js src/lib/hearing.js
 ```
 
 It edits its target in place, restores it after each sweep, and refuses dirty

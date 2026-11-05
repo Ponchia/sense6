@@ -1,4 +1,4 @@
-import { readFile, stat } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { extname, resolve, sep } from 'node:path';
 import { expect, test } from '@playwright/test';
 
@@ -50,11 +50,19 @@ for (const excluded of [false, true]) {
       try {
         let file = resolve(root, `.${decodeURIComponent(url.pathname)}`);
         if (file !== root && !file.startsWith(`${root}${sep}`)) throw new Error('Outside fixture');
-        if ((await stat(file)).isDirectory()) file = resolve(file, 'index.html');
+        // Read first and fall back on EISDIR, so no check-then-use window exists.
+        let body;
+        try {
+          body = await readFile(file);
+        } catch (error) {
+          if (error?.code !== 'EISDIR') throw error;
+          file = resolve(file, 'index.html');
+          body = await readFile(file);
+        }
         await route.fulfill({
           status: 200,
           contentType: mime[extname(file)] ?? 'application/octet-stream',
-          body: await readFile(file),
+          body,
         });
       } catch {
         await route.fulfill({ status: 404, contentType: 'text/plain', body: 'Fixture not found' });
