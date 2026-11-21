@@ -50,6 +50,60 @@
     "At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.",
     "Mindestens eine Prüfung der Einrichtung, der Unterbrechungen, der Lautstärke oder eines adaptiven Durchlaufs war eingeschränkt. Die Beobachtungen bleiben sichtbar; für Vergleiche ist ein erneuter Versuch unter stabileren Bedingungen sinnvoll."
   ],
+  ["Sense6 — reaction time & perception experiments", "Sense6 — Reaktionszeit und Wahrnehmungsexperimente"],
+  [
+    "Explore free browser experiments in reaction time, colour, hearing and visual detail. Private, device-relative results with no account or result uploads.",
+    "Kostenlose Browserexperimente zu Reaktionszeit, Farben, Hören und visuellen Details. Private, gerätebezogene Ergebnisse ohne Konto oder Ergebnis-Upload."
+  ],
+  ["Browser perception lab", "Wahrnehmungslabor im Browser"],
+  ["Explore how you", "Entdecken Sie, wie Sie"],
+  ["see, hear and react.", "sehen, hören und reagieren."],
+  [
+    "Try five free experiments in colour, hearing, visual detail and reaction time. Your device and setup shape every result.",
+    "Probieren Sie fünf kostenlose Experimente zu Farben, Hören, visuellen Details und Reaktionszeit. Gerät und Einrichtung beeinflussen jedes Ergebnis."
+  ],
+  [
+    "Colour discrimination experiment — Tetracromia | Sense6",
+    "Experiment zur Farbunterscheidung — Tetracromia | Sense6"
+  ],
+  ["Colour vision experiment — Daltonia | Sense6", "Experiment zum Farbsehen — Daltonia | Sense6"],
+  [
+    "Reaction time test — simple & choice tasks | Sense6",
+    "Reaktionszeittest — einfache Reaktion und Wahlaufgaben | Sense6"
+  ],
+  [
+    "Hearing range & pitch experiment — Udito | Sense6",
+    "Experiment zu Hörbereich und Tonhöhe — Udito | Sense6"
+  ],
+  [
+    "Visual sharpness & contrast experiment — Acutezza | Sense6",
+    "Experiment zu visueller Schärfe und Kontrast — Acutezza | Sense6"
+  ],
+  ["Spot the gap", "Die Lücke finden"],
+  ["Colour differences", "Farbunterschiede"],
+  ["Changing difficulty", "Wechselnde Schwierigkeit"],
+  ["Comfortable-volume setup", "Angenehme Lautstärke einstellen"],
+  ["Hearing range", "Hörbereich"],
+  [
+    "Match colour tiles, spot differences in noisy dots and arrange hues. Explore three observations on your screen, with no overall score.",
+    "Vergleichen Sie Farbfelder, erkennen Sie Unterschiede in Punktfeldern und ordnen Sie Farbtöne. Erkunden Sie drei Beobachtungen auf Ihrem Bildschirm, ohne Gesamtwert."
+  ],
+  [
+    "Find the gap as colour differences get smaller. Explore three colour directions on your screen, without a colour-vision diagnosis.",
+    "Finden Sie die Lücke, während die Farbunterschiede kleiner werden. Erkunden Sie drei Farbrichtungen auf Ihrem Bildschirm, ohne Diagnose des Farbsehens."
+  ],
+  [
+    "React to a signal, make a choice and follow your responses over time. See separate results for each task on this setup.",
+    "Reagieren Sie auf ein Signal, treffen Sie eine Wahl und verfolgen Sie Ihre Reaktionen im Verlauf. Jede Aufgabe liefert ein eigenes Ergebnis für diese Einrichtung."
+  ],
+  [
+    "Explore which tones you hear and how small a pitch change you notice. Keep a comfortable volume and read each result separately.",
+    "Erkunden Sie, welche Töne Sie hören und wie kleine Tonhöhenänderungen Sie bemerken. Bleiben Sie bei angenehmer Lautstärke und betrachten Sie jedes Ergebnis einzeln."
+  ],
+  [
+    "Set the screen scale, find a small gap and try lower contrast. Explore visual detail for each eye on this setup.",
+    "Stellen Sie den Bildschirmmaßstab ein, finden Sie eine kleine Lücke und probieren Sie geringeren Kontrast. Erkunden Sie visuelle Details für jedes Auge mit dieser Einrichtung."
+  ],
   ["How much do you want to run?", "Wie umfangreich soll der Durchlauf sein?"],
   ["about 2 minutes", "etwa 2 Minuten"],
   ["about 4 minutes", "etwa 4 Minuten"],

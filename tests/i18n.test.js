@@ -16,7 +16,7 @@ import { STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
  * lowering the number here, and leaving one untranslated fails.
  */
 const UNTRANSLATED_CEILINGS = Object.freeze({
-  fr: 15,
+  fr: 14,
   it: 7,
   de: 6,
   es: 4,

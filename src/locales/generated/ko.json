@@ -47,6 +47,48 @@
     "At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.",
     "설정, 중단, 음량 또는 적응형 트랙 점검 중 하나 이상에 제한이 있었습니다. 관찰 결과는 계속 표시되지만, 비교하려면 더 안정적인 조건에서 다시 실행하세요."
   ],
+  ["Sense6 — reaction time & perception experiments", "Sense6 — 반응 시간과 지각 실험"],
+  [
+    "Explore free browser experiments in reaction time, colour, hearing and visual detail. Private, device-relative results with no account or result uploads.",
+    "Sense6는 색 구별, 반응 시간, 청취 범위, 음높이와 시각적 세부를 무료로 탐색하는 브라우저 실험실입니다. 짧은 과제를 해 보고 연구 해설로 기기와 설정의 영향을 이해하세요. 계정이 필요 없으며 답변과 결과는 기기에만 남습니다. 같은 설정의 기록을 비교할 수 있지만 진단이나 능력 순위는 제공하지 않습니다."
+  ],
+  ["Browser perception lab", "브라우저 지각 실험실"],
+  ["Explore how you", "보고, 듣고, 반응하는"],
+  ["see, hear and react.", "방식을 탐색하세요."],
+  [
+    "Try five free experiments in colour, hearing, visual detail and reaction time. Your device and setup shape every result.",
+    "색, 청각, 시각적 세부, 반응 시간을 다루는 다섯 가지 무료 실험을 해 보세요. 기기와 설정은 모든 결과에 영향을 줍니다."
+  ],
+  ["Colour discrimination experiment — Tetracromia | Sense6", "색 구별 실험 — Tetracromia | Sense6"],
+  ["Colour vision experiment — Daltonia | Sense6", "색각 실험 — Daltonia | Sense6"],
+  ["Reaction time test — simple & choice tasks | Sense6", "반응 시간 테스트 — 단순 반응과 선택 과제 | Sense6"],
+  ["Hearing range & pitch experiment — Udito | Sense6", "청취 범위와 음높이 실험 — Udito | Sense6"],
+  ["Visual sharpness & contrast experiment — Acutezza | Sense6", "시각적 선명도와 대비 실험 — Acutezza | Sense6"],
+  ["Spot the gap", "틈 찾기"],
+  ["Colour differences", "색 차이"],
+  ["Changing difficulty", "변하는 난이도"],
+  ["Comfortable-volume setup", "편안한 음량 설정"],
+  ["Hearing range", "청취 범위"],
+  [
+    "Match colour tiles, spot differences in noisy dots and arrange hues. Explore three observations on your screen, with no overall score.",
+    "색 타일을 맞추고, 점 무늬에서 차이를 찾고, 색조를 배열하세요. 화면에서 세 가지 관찰을 탐색하며 종합 점수는 제공하지 않습니다."
+  ],
+  [
+    "Find the gap as colour differences get smaller. Explore three colour directions on your screen, without a colour-vision diagnosis.",
+    "색 차이가 작아지는 동안 틈을 찾으세요. 화면에서 세 가지 색 방향을 탐색하며 색각을 진단하지 않습니다."
+  ],
+  [
+    "React to a signal, make a choice and follow your responses over time. See separate results for each task on this setup.",
+    "신호에 반응하고, 선택하고, 시간에 따른 반응을 살펴보세요. 이 설정에서 각 과제의 결과를 따로 확인할 수 있습니다."
+  ],
+  [
+    "Explore which tones you hear and how small a pitch change you notice. Keep a comfortable volume and read each result separately.",
+    "어떤 음이 들리는지, 얼마나 작은 음높이 변화를 알아차리는지 탐색하세요. 편안한 음량을 유지하고 각 결과를 따로 읽으세요."
+  ],
+  [
+    "Set the screen scale, find a small gap and try lower contrast. Explore visual detail for each eye on this setup.",
+    "화면 크기 기준을 맞추고, 작은 틈을 찾고, 낮은 대비를 시도하세요. 이 설정에서 각 눈의 시각적 세부를 탐색합니다."
+  ],
   ["How much do you want to run?", "검사를 어느 정도 깊이 진행할까요?"],
   ["about 2 minutes", "약 2분"],
   ["about 4 minutes", "약 4분"],

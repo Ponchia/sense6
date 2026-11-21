@@ -11,7 +11,7 @@ import { expectInVisualViewport, expectNoHorizontalOverflow } from './helpers/br
 
 test('the gallery lists exams, is accessible, and routes into one @pr-smoke', async ({ page }) => {
   await page.goto('/en/');
-  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Explore how you see, hear and react/i })).toBeVisible();
   await expect(page.locator('.brand')).toHaveText('Sense6');
   await expect(page.locator('.brand')).not.toContainText('Perception lab');
   await expect(page.locator('.sense-mark')).toHaveText('Sense6');
@@ -223,9 +223,9 @@ test('SPA navigation commits complete canonical and social metadata for each act
 }) => {
   await page.goto('/en/');
   await expectRouteMetadata(page, {
-    title: 'Sense6 — measure what your senses notice',
+    title: 'Sense6 — reaction time & perception experiments',
     description:
-      'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
+      'Explore free browser experiments in reaction time, colour, hearing and visual detail. Private, device-relative results with no account or result uploads.',
     path: '/en/',
     image: '/social/sense6.png',
     imageAlt:
@@ -384,7 +384,7 @@ test('an initial catalog failure hydrates the source-language app with a retry p
   await page.goto('/de/');
   await expect(page).toHaveURL(/\/en\/$/);
   await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'gallery');
-  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Explore how you see, hear and react/i })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.locator('html')).toHaveAttribute('dir', 'ltr');
   await expect(page.locator('[data-locale-select]')).toHaveValue('en');

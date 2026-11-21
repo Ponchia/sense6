@@ -18,13 +18,6 @@ const rows = [
   ['How Sense6 works', 'Come funziona Sense6'],
   ['Try a short reaction test', 'Prova un breve test di reazione'],
   ['Source', 'Codice sorgente'],
-  ['Sense6 — measure what your senses notice', 'Sense6 — misura ciò che i tuoi sensi percepiscono'],
-  ['Measure what your', 'Misura ciò che i tuoi'],
-  ['senses notice.', 'sensi percepiscono.'],
-  [
-    'Short, careful tests that turn what you notice into honest, device-relative results.',
-    'Test brevi e accurati che trasformano ciò che percepisci in risultati onesti e relativi al dispositivo.',
-  ],
   ['No account, no answers or results uploaded.', 'Nessun account, nessuna risposta o risultato caricato.'],
   [
     'Experimental perception tests for curiosity and fun—not medical tests or diagnoses.',
@@ -55,28 +48,14 @@ const rows = [
   ['What this test includes', 'Contenuto del test'],
   ['Colour discrimination', 'Discriminazione cromatica'],
   ['Adaptive browser colour-vision experiment', 'Esperimento adattivo di visione cromatica nel browser'],
-  [
-    'Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.',
-    'Trova un’apertura nascosta tra punti con rumore di luminanza mentre tre direzioni cromatiche relative allo schermo si adattano in modo indipendente.',
-  ],
   ['Colour-vision experiment', 'Esperimento di visione cromatica'],
-  ['3 display directions', '3 direzioni dello schermo'],
-  ['Run-relative result', 'Risultato relativo alla sessione'],
   ['Response timing', 'Tempi di risposta'],
-  ['Device-relative timing', 'Tempi relativi al dispositivo'],
   ['No composite score', 'Nessun punteggio composito'],
   ['Headphone confidence, audibility & pitch', 'Affidabilità delle cuffie, udibilità e intonazione'],
-  [
-    'Three listening instruments map this setup without pretending an uncalibrated browser is an audiometer.',
-    'Tre strumenti di ascolto descrivono questa configurazione senza fingere che un browser non calibrato sia un audiometro.',
-  ],
   ['Listening experiment', 'Esperimento di ascolto'],
-  ['Volume safety contract', 'Accordo sul volume sicuro'],
   ['No hearing label', 'Nessuna etichetta uditiva'],
-  ['3 instruments', '3 strumenti'],
   ['Calibrated sharpness experiment', 'Esperimento di nitidezza calibrata'],
   ['Physical screen calibration', 'Calibrazione fisica dello schermo'],
-  ['No clinical label', 'Nessuna etichetta clinica'],
   ['Calibrate the screen.', 'Calibra lo schermo.'],
   ['Resolve the opening.', 'Risolvi l’apertura.'],
   ['Prepare the vision lab', 'Prepara il laboratorio visivo'],
@@ -194,10 +173,6 @@ const rows = [
   [
     'This is not vision screening, diagnosis, or a prescription.',
     'Non è uno screening visivo, una diagnosi o una prescrizione.',
-  ],
-  [
-    'Calibrated sharpness experiment — Acutezza | Sense6',
-    'Esperimento di nitidezza calibrata — Acutezza | Sense6',
   ],
   ['Calibrate screen size — Acutezza | Sense6', 'Calibra le dimensioni dello schermo — Acutezza | Sense6'],
   ['Estimate viewing distance — Acutezza | Sense6', 'Stima la distanza di visione — Acutezza | Sense6'],
@@ -1035,27 +1010,6 @@ const rows = [
   [
     'This is not dB HL, a hearing-age score, screening, or diagnosis.',
     'Non è dB HL, un punteggio di età uditiva, uno screening o una diagnosi.',
-  ],
-  [
-    'Private browser tests for colour, response timing, hearing, and calibrated visual detail. Answers and results stay in your browser.',
-    'Test privati nel browser per colore, tempi di risposta, udito e dettaglio visivo calibrato. Risposte e risultati restano nel browser.',
-  ],
-  ['Tetracromia — colour discrimination | Sense6', 'Tetracromia — discriminazione cromatica | Sense6'],
-  [
-    'Experimental colour-vision check — Daltonia | Sense6',
-    'Test sperimentale della visione cromatica — Daltonia | Sense6',
-  ],
-  [
-    'Response speed and consistency — Riflessi | Sense6',
-    'Velocità e costanza della risposta — Riflessi | Sense6',
-  ],
-  [
-    'Device-relative hearing lab — Udito | Sense6',
-    'Laboratorio uditivo relativo al dispositivo — Udito | Sense6',
-  ],
-  [
-    'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
-    'Sense6 offre brevi e accurati test di percezione nel browser con risultati onesti e relativi allo schermo. Nessun account e nessuna risposta o risultato caricato.',
   ],
   [
     'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',

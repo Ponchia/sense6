@@ -18,13 +18,6 @@ const rows = [
   ['How Sense6 works', 'كيف تعمل Sense6'],
   ['Try a short reaction test', 'جرّب اختبارًا قصيرًا لسرعة الاستجابة'],
   ['Source', 'المصدر'],
-  ['Sense6 — measure what your senses notice', 'Sense6 — قِس ما تدركه حواسّك'],
-  ['Measure what your', 'قِس ما تدركه'],
-  ['senses notice.', 'حواسّك.'],
-  [
-    'Short, careful tests that turn what you notice into honest, device-relative results.',
-    'اختبارات قصيرة ودقيقة تحول ما تلاحظه إلى نتائج صادقة متعلقة بالجهاز.',
-  ],
   ['No account, no answers or results uploaded.', 'لا حساب، ولا تُرفع أي إجابات أو نتائج.'],
   [
     'Experimental perception tests for curiosity and fun—not medical tests or diagnoses.',
@@ -55,31 +48,17 @@ const rows = [
   ['What this test includes', 'ماذا يتضمن هذا الاختبار'],
   ['Colour discrimination', 'التمييز اللوني'],
   ['Adaptive browser colour-vision experiment', 'تجربة رؤية الألوان في المتصفح التكيفي'],
-  [
-    'Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.',
-    'اعثر على فجوة مخفية بين نقاط متفاوتة النصوع، بينما تتكيّف ثلاثة اتجاهات لونية مرتبطة بالشاشة كلٌّ على حدة.',
-  ],
   ['Colour-vision experiment', 'تجربة رؤية الألوان'],
-  ['3 display directions', '3 اتجاهات مرتبطة بالشاشة'],
-  ['Run-relative result', 'نتيجة خاصة بهذه الجولة'],
   ['Response timing', 'توقيت الاستجابة'],
-  ['Device-relative timing', 'توقيت مرتبط بالجهاز'],
   ['No composite score', 'لا درجة إجمالية مركّبة'],
   [
     'Headphone confidence, audibility & pitch',
     'موثوقية إعداد السماعات، والقدرة على السمع، وتمييز طبقة الصوت',
   ],
-  [
-    'Three listening instruments map this setup without pretending an uncalibrated browser is an audiometer.',
-    'ترسم ثلاث أدوات استماع صورةً لهذا الإعداد من دون الادعاء بأن متصفحًا غير مُعاير هو جهاز قياس سمع.',
-  ],
   ['Listening experiment', 'تجربة الاستماع'],
-  ['Volume safety contract', 'تعليمات سلامة مستوى الصوت'],
   ['No hearing label', 'لا تصنيف للسمع'],
-  ['3 instruments', '3 أدوات'],
   ['Calibrated sharpness experiment', 'تجربة حدة مُعايرة'],
   ['Physical screen calibration', 'معايرة الأبعاد الفعلية للشاشة'],
-  ['No clinical label', 'لا تصنيف سريري'],
   ['Calibrate the screen.', 'عاير الشاشة.'],
   ['Resolve the opening.', 'حدّد اتجاه الفتحة.'],
   ['Prepare the vision lab', 'تحضير معمل الرؤية'],
@@ -192,7 +171,6 @@ const rows = [
     'This is not vision screening, diagnosis, or a prescription.',
     'هذا ليس فحصًا تحرّيًا للبصر، ولا تشخيصًا، ولا وصفة طبية.',
   ],
-  ['Calibrated sharpness experiment — Acutezza | Sense6', 'تجربة الحدة المعايرة — Acutezza | Sense6'],
   ['Calibrate screen size — Acutezza | Sense6', 'معايرة حجم الشاشة — Acutezza | Sense6'],
   ['Estimate viewing distance — Acutezza | Sense6', 'تقدير مسافة المشاهدة — Acutezza | Sense6'],
   [
@@ -993,18 +971,6 @@ const rows = [
   [
     'This is not dB HL, a hearing-age score, screening, or diagnosis.',
     'هذا ليس قياسًا بوحدة dB HL، ولا تقديرًا لعمر السمع، ولا فحصًا تحرّيًا، ولا تشخيصًا.',
-  ],
-  [
-    'Private browser tests for colour, response timing, hearing, and calibrated visual detail. Answers and results stay in your browser.',
-    'اختبارات خاصة داخل المتصفح لتمييز الألوان، وتوقيت الاستجابة، والسمع، والتفاصيل البصرية المُعايرة. تبقى إجاباتك ونتائجك في متصفحك.',
-  ],
-  ['Tetracromia — colour discrimination | Sense6', 'Tetracromia — تمييز الألوان | Sense6'],
-  ['Experimental colour-vision check — Daltonia | Sense6', 'فحص رؤية الألوان التجريبي — Daltonia | Sense6'],
-  ['Response speed and consistency — Riflessi | Sense6', 'سرعة الاستجابة والاتساق — Riflessi | Sense6'],
-  ['Device-relative hearing lab — Udito | Sense6', 'معمل السمع المرتبط بالجهاز — Udito | Sense6'],
-  [
-    'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
-    'يقدّم Sense6 اختبارات إدراك قصيرة ودقيقة داخل المتصفح، بنتائج صريحة مرتبطة بالشاشة. لا حاجة إلى حساب، ولا تُرفع أي إجابات أو نتائج.',
   ],
   [
     'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',

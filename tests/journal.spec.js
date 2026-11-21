@@ -330,11 +330,11 @@ test('a deferred journal file read cannot write or render after route disposal',
   await expect.poll(() => page.evaluate(() => window.__deferredJournalTextStarted)).toBe(true);
 
   await page.locator('.journal-view .back-link').click();
-  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Explore how you see, hear and react/i })).toBeVisible();
   await page.evaluate(() => window.__resolveDeferredJournalText());
 
   expect(await page.evaluate(() => localStorage.getItem('sense6:journal'))).toBe(before);
-  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Explore how you see, hear and react/i })).toBeVisible();
   await expect(page.locator('[data-journal-entry="deferred-import"]')).toHaveCount(0);
 });
 

@@ -47,6 +47,48 @@
     "At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.",
     "設定、中断、音量、適応トラックのいずれかの確認に制約がありました。観察結果は表示されますが、比較する前に、より安定した条件で再実施してください。"
   ],
+  ["Sense6 — reaction time & perception experiments", "Sense6 — 反応時間と知覚の実験"],
+  [
+    "Explore free browser experiments in reaction time, colour, hearing and visual detail. Private, device-relative results with no account or result uploads.",
+    "Sense6 は、色の見分け方、反応時間、聞こえる音域、音の高さ、視覚の細部を無料で探るブラウザ実験室です。短い課題を体験し、研究に基づく解説で結果と機器の影響を確認できます。アカウントは不要で、回答と結果は端末内に保存されます。同じ設定での記録を振り返るための実験であり、診断や能力の順位付けは行いません。"
+  ],
+  ["Browser perception lab", "ブラウザで知覚を探る実験室"],
+  ["Explore how you", "見る・聞く・反応する。"],
+  ["see, hear and react.", "その仕組みを探ろう。"],
+  [
+    "Try five free experiments in colour, hearing, visual detail and reaction time. Your device and setup shape every result.",
+    "色、聞こえ方、視覚の細部、反応時間を探る5つの無料実験。機器と設定がすべての結果に影響します。"
+  ],
+  ["Colour discrimination experiment — Tetracromia | Sense6", "色の見分け方を探る実験 — Tetracromia | Sense6"],
+  ["Colour vision experiment — Daltonia | Sense6", "色の見え方を探る実験 — Daltonia | Sense6"],
+  ["Reaction time test — simple & choice tasks | Sense6", "反応時間テスト — 単純反応と選択課題 | Sense6"],
+  ["Hearing range & pitch experiment — Udito | Sense6", "聞こえる範囲と音の高さの実験 — Udito | Sense6"],
+  ["Visual sharpness & contrast experiment — Acutezza | Sense6", "視覚の鮮明さとコントラストの実験 — Acutezza | Sense6"],
+  ["Spot the gap", "切れ目を見つける"],
+  ["Colour differences", "色の違い"],
+  ["Changing difficulty", "変化する難易度"],
+  ["Comfortable-volume setup", "快適な音量の設定"],
+  ["Hearing range", "聞こえる範囲"],
+  [
+    "Match colour tiles, spot differences in noisy dots and arrange hues. Explore three observations on your screen, with no overall score.",
+    "色のタイルを合わせ、点の集まりの違いを見つけ、色相を並べます。画面上の3つの観察を探る実験で、総合点はありません。"
+  ],
+  [
+    "Find the gap as colour differences get smaller. Explore three colour directions on your screen, without a colour-vision diagnosis.",
+    "色の違いが小さくなる中で切れ目を見つけます。画面上の3つの色方向を探りますが、色覚の診断は行いません。"
+  ],
+  [
+    "React to a signal, make a choice and follow your responses over time. See separate results for each task on this setup.",
+    "合図に反応し、左右を選び、時間とともに変わる反応を観察します。この設定での各課題の結果を個別に確認できます。"
+  ],
+  [
+    "Explore which tones you hear and how small a pitch change you notice. Keep a comfortable volume and read each result separately.",
+    "どの音が聞こえるか、どれほど小さな音の高さの変化に気づくかを探ります。快適な音量を保ち、各結果を個別に読みます。"
+  ],
+  [
+    "Set the screen scale, find a small gap and try lower contrast. Explore visual detail for each eye on this setup.",
+    "画面の縮尺を合わせ、小さな切れ目を見つけ、低いコントラストを試します。この設定で片目ずつ視覚の細部を探ります。"
+  ],
   ["How much do you want to run?", "どの程度詳しく実施しますか？"],
   ["about 2 minutes", "約2分"],
   ["about 4 minutes", "約4分"],

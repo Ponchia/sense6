@@ -12,6 +12,11 @@ export const MESSAGE_SOURCES = Object.freeze({
   'action.seeMethod': 'See the method',
   'section.methodLimits': 'Method and limits',
   'section.researchTrail': 'Research trail',
+  'gallery.eyebrow': 'Browser perception lab',
+  'gallery.headingLead': 'Explore how you',
+  'gallery.headingFocus': 'see, hear and react.',
+  'gallery.introduction':
+    'Try five free experiments in colour, hearing, visual detail and reaction time. Your device and setup shape every result.',
   'gallery.testIncludes': 'What this test includes',
   'boundary.recreational':
     'Experimental perception tests for curiosity and fun—not medical tests or diagnoses.',

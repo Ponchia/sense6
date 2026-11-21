@@ -949,7 +949,7 @@ test('browser Back cancellation preserves the exact active Riflessi trial', asyn
   page.once('dialog', (dialog) => dialog.accept());
   await page.evaluate(() => history.back());
   await expect(page).toHaveURL(/\/en\/$/);
-  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Explore how you see, hear and react/i })).toBeVisible();
   await expect(page.locator('[data-locale-select]')).toBeEnabled();
   await expect(page.locator('[data-bronto-theme-toggle]')).toBeEnabled();
 });

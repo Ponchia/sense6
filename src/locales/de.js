@@ -18,13 +18,6 @@ const rows = [
   ['How Sense6 works', 'So funktioniert Sense6'],
   ['Try a short reaction test', 'Probiere einen kurzen Reaktionstest'],
   ['Source', 'Quellcode'],
-  ['Sense6 — measure what your senses notice', 'Sense6 — messen, was Ihre Sinne wahrnehmen'],
-  ['Measure what your', 'Messen, was Ihre'],
-  ['senses notice.', 'Sinne wahrnehmen.'],
-  [
-    'Short, careful tests that turn what you notice into honest, device-relative results.',
-    'Kurze, sorgfältige Tests machen Ihre Wahrnehmung als ehrliche, gerätebezogene Ergebnisse sichtbar.',
-  ],
   [
     'No account, no answers or results uploaded.',
     'Kein Konto, keine hochgeladenen Antworten oder Ergebnisse.',
@@ -58,28 +51,14 @@ const rows = [
   ['What this test includes', 'Inhalt dieses Tests'],
   ['Colour discrimination', 'Farbdiskrimination'],
   ['Adaptive browser colour-vision experiment', 'Adaptives Browserexperiment zum Farbsehen'],
-  [
-    'Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.',
-    'Finden Sie eine Lücke in Punkten mit Luminanzrauschen, während sich drei bildschirmbezogene Farbrichtungen unabhängig anpassen.',
-  ],
   ['Colour-vision experiment', 'Farbsehexperiment'],
-  ['3 display directions', '3 Bildschirmrichtungen'],
-  ['Run-relative result', 'Laufbezogenes Ergebnis'],
   ['Response timing', 'Reaktionszeit'],
-  ['Device-relative timing', 'Gerätebezogene Zeitmessung'],
   ['No composite score', 'Kein Gesamtwert'],
   ['Headphone confidence, audibility & pitch', 'Kopfhörer-Konfidenz, Hörbarkeit und Tonhöhe'],
-  [
-    'Three listening instruments map this setup without pretending an uncalibrated browser is an audiometer.',
-    'Drei Hörinstrumente erfassen diese Einrichtung, ohne einen unkalibrierten Browser als Audiometer auszugeben.',
-  ],
   ['Listening experiment', 'Hörexperiment'],
-  ['Volume safety contract', 'Sicherheitsvereinbarung zur Lautstärke'],
   ['No hearing label', 'Keine Hörbewertung'],
-  ['3 instruments', '3 Instrumente'],
   ['Calibrated sharpness experiment', 'Kalibriertes Schärfeexperiment'],
   ['Physical screen calibration', 'Physische Bildschirmkalibrierung'],
-  ['No clinical label', 'Keine klinische Bewertung'],
   ['Calibrate the screen.', 'Kalibrieren Sie den Bildschirm.'],
   ['Resolve the opening.', 'Erkennen Sie die Öffnung.'],
   ['Prepare the vision lab', 'Sehlabor vorbereiten'],
@@ -194,10 +173,6 @@ const rows = [
   [
     'This is not vision screening, diagnosis, or a prescription.',
     'Dies ist weder Sehscreening noch Diagnose oder Verordnung.',
-  ],
-  [
-    'Calibrated sharpness experiment — Acutezza | Sense6',
-    'Kalibriertes Schärfeexperiment — Acutezza | Sense6',
   ],
   ['Calibrate screen size — Acutezza | Sense6', 'Bildschirmgröße kalibrieren — Acutezza | Sense6'],
   ['Estimate viewing distance — Acutezza | Sense6', 'Betrachtungsabstand schätzen — Acutezza | Sense6'],
@@ -1029,21 +1004,6 @@ const rows = [
   [
     'This is not dB HL, a hearing-age score, screening, or diagnosis.',
     'Dies ist weder dB HL noch ein Höralterswert, Screening oder eine Diagnose.',
-  ],
-  [
-    'Private browser tests for colour, response timing, hearing, and calibrated visual detail. Answers and results stay in your browser.',
-    'Private Browsertests für Farbe, Reaktionszeit, Hören und kalibrierte visuelle Details. Antworten und Ergebnisse bleiben in Ihrem Browser.',
-  ],
-  ['Tetracromia — colour discrimination | Sense6', 'Tetracromia — Farbdiskrimination | Sense6'],
-  ['Experimental colour-vision check — Daltonia | Sense6', 'Experimenteller Farbsehtest — Daltonia | Sense6'],
-  [
-    'Response speed and consistency — Riflessi | Sense6',
-    'Reaktionsgeschwindigkeit und Konstanz — Riflessi | Sense6',
-  ],
-  ['Device-relative hearing lab — Udito | Sense6', 'Gerätebezogenes Hörlabor — Udito | Sense6'],
-  [
-    'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
-    'Sense6 bietet kurze, sorgfältige Wahrnehmungstests im Browser mit ehrlichen, bildschirmbezogenen Ergebnissen. Kein Konto und keine hochgeladenen Antworten oder Ergebnisse.',
   ],
   [
     'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',

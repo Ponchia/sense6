@@ -1,3 +1,5 @@
+import { discoveryRows } from './discovery-copy.js';
+
 /**
  * Localized presentation-registry copy.
  *
@@ -454,5 +456,8 @@ const TRANSLATIONS = Object.freeze({
 export function registryRows(locale) {
   const translations = TRANSLATIONS[locale];
   if (translations.length !== SOURCES.length) throw new Error(`Incomplete registry copy for ${locale}`);
-  return SOURCES.map((source, index) => [source, translations[index] ?? source]);
+  const rows = SOURCES.map(
+    (source, index) => /** @type {[string, string]} */ ([source, translations[index] ?? source]),
+  );
+  return [...rows, ...discoveryRows(locale)];
 }
