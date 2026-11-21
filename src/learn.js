@@ -27,7 +27,12 @@ export function learnMetadata(route, locale = 'en') {
     socialImage: route === 'learn' ? '/social/sense6.png' : `/social/${page.experiment.route}.png`,
     socialImageAlt:
       route === 'learn' ? page.description : `${ui['Sense6 experiment artwork:']} ${page.experiment.title}`,
-    dateModified: route === 'learn' ? (reviewedDate ?? CONTENT_DATES.learn) : page.dateModified,
+    dateModified:
+      route === 'learn'
+        ? locale === 'en'
+          ? CONTENT_DATES.learnIndexEn
+          : (reviewedDate ?? CONTENT_DATES.learn)
+        : page.dateModified,
     references: route === 'learn' ? [] : page.sources,
   };
 }
@@ -62,13 +67,23 @@ export function learnMarkup(route, locale = 'en', catalog = learnCatalog(locale)
 
 function overviewMarkup(content, ui, locale) {
   const page = content.overview;
+  const classroomResource =
+    locale === 'en'
+      ? [
+          '<section class="learn-next" aria-labelledby="learn-classroom-title">',
+          '<div><p class="ui-eyebrow">Free teaching resource</p><h2 id="learn-classroom-title">Why can browser reaction times differ?</h2>',
+          "<p>A 25-minute classroom activity with a printable worksheet. Explore a short test, medians and device delays without collecting students' results.</p></div>",
+          '<a class="ui-button" href="/education/browser-reaction-time/">Open the classroom activity →</a>',
+          '</section>',
+        ].join('')
+      : '';
   return `
     <div class="learn-view ui-container ui-container--wide" data-sense6-view="learn" data-sense6-route="learn" data-learn-locale="${locale}">
       <nav class="learn-breadcrumb" aria-label="${esc(ui['Breadcrumb'])}"><a data-sense6-route="" href="/${locale}/">${esc(ui['All experiments'])}</a><span aria-hidden="true">/</span><span aria-current="page">${esc(ui['Learn'])}</span></nav>
       <header class="learn-hero">
         <h1>${esc(page.title)}</h1>
         <p class="learn-hero__lede">${esc(page.intro)}</p>
-        <p class="learn-hero__date">${esc(ui['By'])} <a href="${CREATOR_PROFILE_URL}" rel="me noreferrer">Zeno</a> · ${esc(ui['Reviewed'])} ${esc(page.updated)}</p>
+        <p class="learn-hero__date">${esc(ui['By'])} <a href="${CREATOR_PROFILE_URL}" rel="me noreferrer">Zeno</a> · ${esc(ui['Reviewed'])} ${esc(locale === 'en' ? '21 November 2026' : page.updated)}</p>
       </header>
       <section aria-labelledby="learn-topics" class="learn-topics">
         <div class="learn-section-heading"><h2 id="learn-topics">${esc(ui['Research guides'])}</h2></div>
@@ -84,7 +99,7 @@ function overviewMarkup(content, ui, locale) {
             .join('')}
         </div>
       </section>
-      <aside class="learn-boundary" aria-label="${esc(ui['Interpretation limits'])}"><p>${esc(page.boundary)}</p></aside>
+      ${classroomResource}<aside class="learn-boundary" aria-label="${esc(ui['Interpretation limits'])}"><p>${esc(page.boundary)}</p></aside>
       <section class="learn-next" aria-label="${esc(ui['Explore experiments'])}">
         <div><h2>${esc(ui['Try an experiment'])}</h2><p>${esc(ui['Each lab explains its setup and records results in your browser. Choose a short scope to see how the task works; return to a guide when you want to understand its result.'])}</p></div>
         <a class="ui-button" data-sense6-route="" href="/${locale}/">${esc(ui['Explore all five experiments \u2192'])}</a>

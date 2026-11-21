@@ -212,7 +212,7 @@ test('first-party layout trial is an additional unprivileged browser gate with a
   assert.match(trial, /mode: audit/);
   assert.match(trial, /id: shifted/);
   assert.match(trial, /\.gallery-hero__starter\{transform:translateX\(12px\)!important\}/);
-  assert.match(trial, /permissions:\n  contents: read/);
+  assert.match(trial, /permissions:\n {2}contents: read/);
   assert.doesNotMatch(trial, /publish_production: true|secrets: inherit|pull_request_target|--no-sandbox/);
 });
 
@@ -654,8 +654,8 @@ test('Lighthouse audits the indexable route set instead of penalizing deliberate
   const guides = LEARN_PUBLISHED_LOCALES.length * LEARN_ROUTES.length;
   // Indexable guides exist only for fully published locales. The three utility
   // routes include the deliberately nonindexed journal and privacy pages.
-  assert.equal(SITE_ROUTES.length, 1 + LOCALES.length * (EXAMS.length + 4) + guides);
-  assert.equal(SEARCH_ROUTES.length, 1 + LOCALES.length * (EXAMS.length + 2) + guides);
+  assert.equal(SITE_ROUTES.length, 2 + LOCALES.length * (EXAMS.length + 4) + guides);
+  assert.equal(SEARCH_ROUTES.length, 2 + LOCALES.length * (EXAMS.length + 2) + guides);
   assert.ok(SEARCH_ROUTES.every((route) => !/\/(?:journal|privacy)\/$/.test(route)));
   assert.ok(SEARCH_REPRESENTATIVE_ROUTES.every((route) => SEARCH_ROUTES.includes(route)));
   assert.ok(!SEARCH_REPRESENTATIVE_ROUTES.includes('/en/journal/'));

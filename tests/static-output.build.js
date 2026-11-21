@@ -12,6 +12,7 @@ import {
 import { aboutMarkup } from '../src/about.js';
 import { CONTENT_DATES, examContentDate } from '../src/content-dates.js';
 import { CRAWLER_POLICY } from '../src/crawler-policy.js';
+import { EDUCATION_RESOURCE_PATH } from '../src/education-resource.js';
 import { examDescriptionSource } from '../src/exams/metadata.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { galleryMarkup } from '../src/gallery-markup.js';
@@ -62,6 +63,7 @@ const expectedSitemapPaths = [
   // Static generator deliberately appends original English Learn pages after
   // its localized experiment and About pages. Sitemaps have no priority order.
   ...LEARN_PUBLISHED_LOCALES.flatMap((locale) => LEARN_ROUTES.map((route) => routePath(locale, route))),
+  EDUCATION_RESOURCE_PATH,
 ];
 
 test('IndexNow root ownership proof is copied into the production artifact unchanged', async () => {
@@ -610,6 +612,7 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   );
   const expectedDates = new Map([
     ['/', CONTENT_DATES.site],
+    [EDUCATION_RESOURCE_PATH, CONTENT_DATES.education],
     ...LEARN_PUBLISHED_LOCALES.flatMap((locale) =>
       LEARN_ROUTES.map((route) => [routePath(locale, route), learnMetadata(route, locale).dateModified]),
     ),
@@ -625,7 +628,7 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   const lastModified = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((match) => match[1]);
   assert.equal(
     lastModified.length,
-    1 + LEARN_PUBLISHED_LOCALES.length * LEARN_ROUTES.length + LOCALES.length * (EXAMS.length + 2),
+    2 + LEARN_PUBLISHED_LOCALES.length * LEARN_ROUTES.length + LOCALES.length * (EXAMS.length + 2),
   );
   for (const date of lastModified) {
     assert.match(date, /^\d{4}-\d{2}-\d{2}$/);
@@ -633,6 +636,7 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   }
 
   const llmsIndex = await readFile(new URL('llms.txt', DIST), 'utf8');
+  assert.match(llmsIndex, /Browser reaction-time classroom activity/);
   for (const locale of LEARN_PUBLISHED_LOCALES) {
     for (const route of LEARN_ROUTES) {
       assert.ok(
@@ -692,6 +696,31 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   assert.ok(!sitemapPaths.includes('/en/journal/'));
   assert.match(journal, /Your private measurement journal/);
   assert.match(journal, /Entries, setup passports, comparisons, imports, and exports stay on this device/);
+
+  const lesson = await readFile(new URL('education/browser-reaction-time/index.html', DIST), 'utf8');
+  assert.match(lesson, /<html lang="en" dir="ltr">/);
+  assert.ok(lesson.includes('rel="canonical" href="https://sense6.net/education/browser-reaction-time/"'));
+  assert.match(lesson, /<h1>Can a browser measure/);
+  assert.match(lesson, /These five fictional reaction-time readings/);
+  assert.match(lesson, /This is a recreational, unvalidated browser task/);
+  assert.match(lesson, /"@type": "LearningResource"/);
+  assert.doesNotMatch(lesson, /onclick=|onload=|<iframe|leaderboard/i);
+  const lessonCss = await readFile(new URL('education/browser-reaction-time/lesson.css', DIST), 'utf8');
+  assert.match(lessonCss, /@media print/);
+  const lessonJs = await readFile(new URL('education/browser-reaction-time/lesson.js', DIST), 'utf8');
+  assert.ok(lessonJs.includes("addEventListener('click'"));
+  const appAnalytics = await readFile(new URL('../src/web-analytics.js', import.meta.url), 'utf8');
+  const appBeaconToken = appAnalytics.match(/const SITE_TOKEN = '([^']+)'/)?.[1];
+  assert.ok(appBeaconToken, 'the app must still define the production Web Analytics token');
+  assert.ok(lessonJs.includes(appBeaconToken), 'classroom page must use the existing analytics site token');
+  assert.ok(lessonJs.includes("hostname === 'sense6.net'"));
+  assert.ok(lessonJs.includes("getAll('metrics').includes('off')"));
+  assert.match(lessonJs, /spa: false/);
+
+  const englishLearn = await readFile(new URL('en/learn/index.html', DIST), 'utf8');
+  assert.ok(englishLearn.includes('href="/education/browser-reaction-time/"'));
+  const italianLearn = await readFile(new URL('it/learn/index.html', DIST), 'utf8');
+  assert.ok(!italianLearn.includes('href="/education/browser-reaction-time/"'));
 
   const gallery = await readFile(new URL('en/index.html', DIST), 'utf8');
   assert.match(

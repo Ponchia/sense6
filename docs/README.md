@@ -23,6 +23,8 @@ decisions or research for operating instructions.
   contracts, methods, localization, journal data, static output, and tests.
 - [Roadmap](roadmap.md) records current product boundaries and the ordered,
   bounded decomposition backlog.
+- [Classroom activity](../public/education/browser-reaction-time/index.html) is the free printable reaction-time lesson, at https://sense6.net/education/browser-reaction-time/.
+- [First-visitor field kit](education/first-visitor-field-kit.md) describes consent-first product feedback without collecting results.
 - [Product readiness](product-readiness.md) provides the consented usability
   study script, translation review checklist, search-indexing baseline and
   decision criteria for further feature work.

@@ -11,6 +11,8 @@ export const CONTENT_DATES = Object.freeze({
   site: '2026-10-12',
   about: '2026-10-12',
   learn: '2026-10-11',
+  learnIndexEn: '2026-11-21',
+  education: '2026-11-21',
   exams: Object.freeze({
     tetracromia: '2026-10-11',
     'color-blindness': '2026-10-11',

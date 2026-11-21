@@ -46,6 +46,8 @@ Each guide links to its research sources and explains the limits of the
 corresponding browser task. Published translations are available through the
 language selector on the site.
 
+Educators can use the [free 25-minute reaction-time classroom activity](https://sense6.net/education/browser-reaction-time/), including a printable worksheet that explores measurement uncertainty without ranking people.
+
 For code-level checks, see [Reproducing Sense6 methods](docs/methodology.md):
 protocol versions, seeded models, result calculations, and the limits of
 reproducing a physical measurement from software.

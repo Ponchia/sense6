@@ -134,6 +134,11 @@
     "date": "2026-10-11",
     "hash": "e0c61edb684e92187810df980befea29"
   },
+  "/education/browser-reaction-time/": {
+    "key": "education",
+    "date": "2026-11-21",
+    "hash": "492509a2ae551c7397039c5ef4a14dee"
+  },
   "/en/": {
     "key": "site",
     "date": "2026-10-12",
@@ -165,9 +170,9 @@
     "hash": "f722ce51345e1a87fcd68d6211eb1f55"
   },
   "/en/learn/": {
-    "key": "learn",
-    "date": "2026-10-11",
-    "hash": "97c90d100a8b4fd67164c5777731cf56"
+    "key": "learnIndexEn",
+    "date": "2026-11-21",
+    "hash": "892c67819e6625a6597d3310c30f19c0"
   },
   "/en/reaction-time-guide/": {
     "key": "learn",
