@@ -122,6 +122,7 @@ export function galleryMarkup({ exams, locale, localeHref, m, t, learnInfo = nul
         </a>
       </div>
       <a class="ui-link gallery-learn__all" data-sense6-route="learn" href="/en/learn/">Browse the Learn section →</a>
+      <p><a class="ui-link" data-sense6-route="browser-timing-explorer" href="/en/browser-timing-explorer/">Compare two fictional timing setups in the Browser Timing Explorer →</a></p>
     </section>`
         : learnInfo
           ? localizedLearnGallery(locale, learnInfo)

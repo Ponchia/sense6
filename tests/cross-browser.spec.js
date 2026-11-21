@@ -55,6 +55,54 @@ test('every browser loads the pre-rendered page and hands it over to the bundle 
   expect(await page.evaluate(() => window.__sense6CspViolations)).toEqual([]);
 });
 
+test('every browser hydrates and changes a shared timing example without inventing device measurements @pr-smoke', async ({
+  page,
+}) => {
+  const route = '/en/browser-timing-explorer/';
+  const pageErrors = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  const response = await page.goto(`${route}?metrics=off`);
+  expect(response?.status()).toBe(200);
+  // Check the response bytes as well as the hydrated DOM: a client-only fallback
+  // can otherwise look correct while search engines receive no teaching content.
+  const html = await response.text();
+  expect(html).toContain('data-sense6-view="timing-explorer"');
+  expect(html).toMatch(/data-timing-total="a">248/);
+  expect(html).toMatch(/data-timing-control="b-input"[^>]*disabled/);
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'browser-timing-explorer', {
+    timeout: 20_000,
+  });
+  await expect(page.getByRole('heading', { name: 'Browser timing explorer', exact: true })).toBeVisible();
+
+  const input = page.locator('[data-timing-control="b-input"]');
+  await expect(input).toBeEnabled();
+  await input.press('ArrowRight');
+  await expect(input).toHaveValue('5');
+  await expect(input).toHaveAttribute('aria-valuetext', '5 milliseconds');
+  await expect(page.locator('[data-timing-total="b"]')).toHaveText('233 ms');
+  await expect(page.locator('[data-timing-comparison]')).toContainText('Scenario B is 15 ms shorter');
+
+  await page.locator('[data-timing-control="a-hz"]').selectOption('120');
+  await expect(page.locator('[data-timing-refresh="a"]')).toContainText('8.33 ms');
+  await expect(page.locator('[data-timing-total="a"]')).toHaveText('248 ms');
+  await expect(page.locator('[data-timing-total="b"]')).toHaveText('233 ms');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://sense6.net${route}`);
+  await expect(page.locator('link[hreflang]')).toHaveCount(0);
+
+  await page.goto(`${route}?response=300&ad=20&ai=10&ahz=144&bd=5&bi=20&bhz=60&metrics=off`);
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'browser-timing-explorer', {
+    timeout: 20_000,
+  });
+  await expect(page.locator('[data-timing-control="response"]')).toHaveValue('300');
+  await expect(page.locator('[data-timing-total="a"]')).toHaveText('330 ms');
+  await expect(page.locator('[data-timing-total="b"]')).toHaveText('325 ms');
+  await expect(page.locator('[data-timing-refresh="a"]')).toContainText('6.94 ms');
+  await expect(page.locator('[data-timing-status]')).toContainText('Shared hypothetical example loaded');
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', `https://sense6.net${route}`);
+  await expect(page.locator('link[hreflang]')).toHaveCount(0);
+  expect(pageErrors).toEqual([]);
+});
+
 for (const locale of ['fr', 'ja']) {
   test(`${locale} theme control keeps its visible label in the accessible name @pr-smoke`, async ({
     page,

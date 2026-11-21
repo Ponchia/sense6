@@ -55,6 +55,7 @@ instrument.
 | Shared landing views | `src/exams/landing.js` | Render repeated instrument, method, and research structures |
 | Localization | `src/i18n.js`, `src/i18n/message-ids.js`, `src/i18n/catalog-audit.js`, `src/locales/` | Generate coordinated locale rows, load one catalog, translate stable shared IDs and source-keyed prose, apply locale metadata, and report catalog drift |
 | Static generator | `scripts/generate-static-pages.mjs`, `scripts/static-structured-data.mjs` | Produce localized discovery HTML, structured metadata, sitemap, crawler files, and the 404 page |
+| Educational resource | `src/timing-explorer.js`, `src/timing-explorer-model.js`, `src/timing-explorer-seo.js` | Render a hypothetical comparison and printable activity, validate shared example settings, and describe its published English page |
 | Local journal | `src/lib/journal.js`, `src/journal.js` | Validate, store, compare, import, export, and render structured runs |
 | Anonymous metrics | `src/metrics.js`, `functions/api/metric.js` | Allowlist client events and increment daily aggregate counts |
 | Website analytics | `src/web-analytics.js`, `public/_headers` | Restrict the Cloudflare RUM script to the canonical production hostname and explicit CSP origins |
@@ -98,6 +99,20 @@ landing pages, so they carry `noindex` and are absent from the sitemap; navigati
 back to a gallery, experiment, or About page removes that robots directive. The
 generated 404 removes canonical and social identity because it does not
 represent a real route.
+
+The Browser Timing Explorer is a separate educational resource, not an
+experiment protocol. `ENGLISH_ONLY_ROUTES` limits it to its complete English
+edition; it has no invented language alternates. Switching languages returns
+to that locale's gallery. Its parameters describe fictional examples only,
+remain separate from result storage, and are shared only through an explicit
+copy-link action. It loads its own module and styles and adopts generated HTML.
+
+The English Learn index and reaction-time guide link to the resource. Their
+published modification dates include this resource addition; the existing
+scientific-review dates and translation-review records remain unchanged.
+`scripts/canonical-redirects.mjs` adds bounded, exact doubled-slash aliases for
+currently indexable canonical pages. It retains the manual locale redirects
+and does not turn arbitrary missing paths into gallery responses.
 
 The static generator reads the Vite manifest and preloads the active route's
 transitive JavaScript modules. It does not add an active-route preload to the

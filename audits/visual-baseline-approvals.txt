@@ -22,9 +22,9 @@
 #   en-tetracromia-desktop-chromium-linux.png  # new hero layout, PR #58
 #
 
-en-mobile-chromium-linux.png  # compact visual previews make all five experiments easier to browse on a phone
-en-learn-desktop-chromium-linux.png  # index-only spacing and introduction scale bring the first complete research-guide title into the initial laptop viewport without changing article methods
-en-learn-mobile-chromium-linux.png  # tighter index-only hero and first guide placement at 320/390px, preserving mobile reading width and the five source-backed choices
+en-mobile-chromium-linux.png  # new exploration copy and activity-focused experiment descriptions wrap on narrow screens; short reaction entry remains available
+en-learn-desktop-chromium-linux.png  # adds the original timing explorer and printable activity after the research-guide grid, preserving first-guide visibility and existing review dates
+en-learn-mobile-chromium-linux.png  # new timing resource after the guide choices extends the page naturally without changing translated articles or their review claims
 en-color-blindness-guide-desktop-chromium-linux.png  # editorial rewrite: remove redundant callouts and triads; reduce source-link noise and simplify reading layout
 en-color-blindness-guide-mobile-chromium-linux.png  # mobile editorial hierarchy and source-navigation changes with unchanged experimental boundaries
 
@@ -45,3 +45,6 @@ ja-about-mobile-chromium-linux.png  # Japanese About wraps its new maintainer an
 
 en-privacy-desktop-chromium-linux.png  # explicitly disclosed Cloudflare RUM introduces a separate website-analytics privacy section in all languages; the longer English privacy page is intentional and leaves test UX unchanged
 en-privacy-mobile-chromium-linux.png  # expanded multilingual Cloudflare RUM disclosure intentionally increases the full mobile privacy page height; no measurement flows or visual experiment surfaces change
+root-desktop-chromium-linux.png  # language gateway heading now names seeing, hearing and reacting to match the localized galleries
+root-mobile-chromium-linux.png  # revised language gateway heading wraps at 320px while preserving every language choice
+en-desktop-chromium-linux.png  # clearer exploration heading and activity descriptions, plus contextual Browser Timing Explorer link below the existing guides

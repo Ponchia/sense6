@@ -46,6 +46,18 @@ Each guide links to its research sources and explains the limits of the
 corresponding browser task. Published translations are available through the
 language selector on the site.
 
+### Browser Timing Explorer
+
+The [Browser Timing Explorer](https://sense6.net/en/browser-timing-explorer/)
+compares two hypothetical timing setups with the same assumed human response.
+Change display and input contributions, inspect refresh-interval arithmetic,
+and share a link containing only those example settings. Its printable
+20-minute activity works with the simulation alone; trying a real reaction task
+is optional. It does not measure latency or correct anyone's result.
+
+This resource is currently in English. The five experiments and existing
+research guides retain all 12 published languages.
+
 For code-level checks, see [Reproducing Sense6 methods](docs/methodology.md):
 protocol versions, seeded models, result calculations, and the limits of
 reproducing a physical measurement from software.

@@ -8,15 +8,16 @@
  * build when a hash moves while its entry here stands still.
  */
 export const CONTENT_DATES = Object.freeze({
-  site: '2026-10-12',
+  site: '2026-11-21',
   about: '2026-10-12',
   learn: '2026-10-11',
+  timingExplorer: '2026-11-21',
   exams: Object.freeze({
-    tetracromia: '2026-10-11',
-    'color-blindness': '2026-10-11',
-    riflessi: '2026-10-11',
-    udito: '2026-10-11',
-    acutezza: '2026-10-11',
+    tetracromia: '2026-11-21',
+    'color-blindness': '2026-11-21',
+    riflessi: '2026-11-21',
+    udito: '2026-11-21',
+    acutezza: '2026-11-21',
   }),
 });
 

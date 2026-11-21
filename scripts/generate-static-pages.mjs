@@ -19,10 +19,13 @@ import { LOCALES, loadMessages } from '../src/locales.js';
 import { preparePrivacyCopy, privacyCopy, privacyMarkup } from '../src/privacy.js';
 import { ROOT_GATEWAY, rootGatewayMarkup } from '../src/root-gateway.js';
 import { createRouteMetadata, LEARN_ROUTES, SITE_ORIGIN, UTILITY_ROUTES } from '../src/routes.js';
+import { HOME_METADATA } from '../src/site-copy.js';
 import { ENGLISH_EXPLAINER_COPY, STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
+import { renderCanonicalRedirects } from './canonical-redirects.mjs';
 import { recordContentFingerprint, verifyContentFingerprints } from './content-fingerprints.mjs';
 import { learnDiscoveryLinks, writeLearnPages } from './learn-pages.mjs';
 import { aboutData, examData, webpageData, websiteData } from './static-structured-data.mjs';
+import { writeTimingExplorerPage } from './timing-explorer-page.mjs';
 import { activeRouteModuleFiles } from './vite-manifest.mjs';
 
 const ROOT = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -71,10 +74,8 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
     direction,
     route: '',
     path: galleryPath,
-    title: translate('Sense6 — measure what your senses notice'),
-    description: translate(
-      'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
-    ),
+    title: translate(HOME_METADATA.title),
+    description: translate(HOME_METADATA.description),
     socialImage: '/social/sense6.png',
     socialImageAlt: translate(
       'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',
@@ -179,6 +180,7 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
 }
 
 await writeLearnPages({ writePage, canonicalPaths, routeStyles });
+await writeTimingExplorerPage({ writePage, canonicalPaths, routeStyles });
 
 await write404();
 await writeDiscoveryFiles();
@@ -258,7 +260,7 @@ function displayFontPreload(locale, route) {
 }
 
 function indexRouteStyles(assets) {
-  const routeNames = ['gallery', 'learn', ...EXAMS.map(({ id }) => id), ...UTILITY_ROUTES];
+  const routeNames = ['gallery', 'learn', 'timing-explorer', ...EXAMS.map(({ id }) => id), ...UTILITY_ROUTES];
   return new Map(
     routeNames.map((name) => {
       const pattern = new RegExp(`^${escapeRegExp(name)}-.+\\.css$`);
@@ -471,6 +473,10 @@ async function write404() {
 }
 
 async function writeDiscoveryFiles() {
+  await writeFile(
+    join(DIST, '_redirects'),
+    renderCanonicalRedirects(canonicalPaths, await readFile(join(ROOT, 'public/_redirects'), 'utf8')),
+  );
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${canonicalPaths
     .map(
       ({ path, lastModified }) =>
@@ -479,7 +485,7 @@ async function writeDiscoveryFiles() {
     .join('\n')}\n</urlset>\n`;
   await writeFile(join(DIST, 'sitemap.xml'), sitemap);
   await writeFile(join(DIST, 'robots.txt'), renderRobots(ORIGIN));
-  const llms = `# Sense6\n\nSense6 is a privacy-first collection of experimental, device-relative browser perception tests made for curiosity and fun. It is not validated, certified, diagnostic, or intended to become a medical product. Answers and results stay in the browser; the service stores only anonymous daily activity totals.\n\n## Main pages\n\n- [English test gallery](${ORIGIN}/en/)\n${learnDiscoveryLinks(ORIGIN)}\n- [About Sense6 and its methodology](${ORIGIN}/en/about/)\n- [Private measurement journal](${ORIGIN}/en/journal/)\n- [Privacy notice](${ORIGIN}/en/privacy/)\n\n## Crawler policy\n\n${CRAWLER_POLICY.intent} The policy was reviewed on ${CRAWLER_POLICY.reviewedAt} and must be reviewed again by ${CRAWLER_POLICY.reviewBy}. robots.txt is advisory; llms.txt is a discovery aid, not an access-control mechanism.\n\n## Experiments\n\n${EXAMS.map(
+  const llms = `# Sense6\n\nSense6 is a privacy-first collection of experimental, device-relative browser perception tests made for curiosity and fun. It is not validated, certified, diagnostic, or intended to become a medical product. Answers and results stay in the browser; the service stores only anonymous daily activity totals.\n\n## Main pages\n\n- [English test gallery](${ORIGIN}/en/)\n- [Browser Timing Explorer and printable activity](${ORIGIN}/en/browser-timing-explorer/): Hypothetical setup comparisons, not measured latency or corrected results.\n${learnDiscoveryLinks(ORIGIN)}\n- [About Sense6 and its methodology](${ORIGIN}/en/about/)\n- [Private measurement journal](${ORIGIN}/en/journal/)\n- [Privacy notice](${ORIGIN}/en/privacy/)\n\n## Crawler policy\n\n${CRAWLER_POLICY.intent} The policy was reviewed on ${CRAWLER_POLICY.reviewedAt} and must be reviewed again by ${CRAWLER_POLICY.reviewBy}. robots.txt is advisory; llms.txt is a discovery aid, not an access-control mechanism.\n\n## Experiments\n\n${EXAMS.map(
     (definition) =>
       `- [${definition.discoveryName ?? definition.name}](${ORIGIN}/en/${definition.route}/): ${definition.blurb} ${definition.limit}`,
   ).join(
