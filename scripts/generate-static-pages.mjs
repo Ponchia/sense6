@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { aboutCopy, aboutMarkup } from '../src/about.js';
 import { CONTENT_DATES, examContentDate } from '../src/content-dates.js';
 import { CRAWLER_POLICY, renderRobots } from '../src/crawler-policy.js';
+import { EDUCATION_RESOURCE } from '../src/education-resource.js';
 import { examDescriptionSource } from '../src/exams/metadata.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { relatedGuideMarkup } from '../src/exams/related-guide.js';
@@ -23,6 +24,7 @@ import { HOME_METADATA } from '../src/site-copy.js';
 import { ENGLISH_EXPLAINER_COPY, STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
 import { renderCanonicalRedirects } from './canonical-redirects.mjs';
 import { recordContentFingerprint, verifyContentFingerprints } from './content-fingerprints.mjs';
+import { recordEducationResourceFingerprint } from './education-page.mjs';
 import { learnDiscoveryLinks, writeLearnPages } from './learn-pages.mjs';
 import { aboutData, examData, webpageData, websiteData } from './static-structured-data.mjs';
 import { writeTimingExplorerPage } from './timing-explorer-page.mjs';
@@ -181,6 +183,9 @@ for (const { code: locale, languageTag, direction } of LOCALES) {
 
 await writeLearnPages({ writePage, canonicalPaths, routeStyles });
 await writeTimingExplorerPage({ writePage, canonicalPaths, routeStyles });
+canonicalPaths.push(EDUCATION_RESOURCE);
+
+await recordEducationResourceFingerprint(DIST);
 
 await write404();
 await writeDiscoveryFiles();
@@ -485,7 +490,8 @@ async function writeDiscoveryFiles() {
     .join('\n')}\n</urlset>\n`;
   await writeFile(join(DIST, 'sitemap.xml'), sitemap);
   await writeFile(join(DIST, 'robots.txt'), renderRobots(ORIGIN));
-  const llms = `# Sense6\n\nSense6 is a privacy-first collection of experimental, device-relative browser perception tests made for curiosity and fun. It is not validated, certified, diagnostic, or intended to become a medical product. Answers and results stay in the browser; the service stores only anonymous daily activity totals.\n\n## Main pages\n\n- [English test gallery](${ORIGIN}/en/)\n- [Browser Timing Explorer and printable activity](${ORIGIN}/en/browser-timing-explorer/): Hypothetical setup comparisons, not measured latency or corrected results.\n${learnDiscoveryLinks(ORIGIN)}\n- [About Sense6 and its methodology](${ORIGIN}/en/about/)\n- [Private measurement journal](${ORIGIN}/en/journal/)\n- [Privacy notice](${ORIGIN}/en/privacy/)\n\n## Crawler policy\n\n${CRAWLER_POLICY.intent} The policy was reviewed on ${CRAWLER_POLICY.reviewedAt} and must be reviewed again by ${CRAWLER_POLICY.reviewBy}. robots.txt is advisory; llms.txt is a discovery aid, not an access-control mechanism.\n\n## Experiments\n\n${EXAMS.map(
+  const llms = `# Sense6\n\nSense6 is a privacy-first collection of experimental, device-relative browser perception tests made for curiosity and fun. It is not validated, certified, diagnostic, or intended to become a medical product. Answers and results stay in the browser; the service stores only anonymous daily activity totals.\n\n## Main pages\n\n- [English test gallery](${ORIGIN}/en/)\n- [Browser Timing Explorer and printable activity](${ORIGIN}/en/browser-timing-explorer/): Hypothetical setup comparisons, not measured latency or corrected results.\n${learnDiscoveryLinks(ORIGIN)}\n- [Browser reaction-time classroom activity](https://sense6.net/education/browser-reaction-time/)
+- [About Sense6 and its methodology](${ORIGIN}/en/about/)\n- [Private measurement journal](${ORIGIN}/en/journal/)\n- [Privacy notice](${ORIGIN}/en/privacy/)\n\n## Crawler policy\n\n${CRAWLER_POLICY.intent} The policy was reviewed on ${CRAWLER_POLICY.reviewedAt} and must be reviewed again by ${CRAWLER_POLICY.reviewBy}. robots.txt is advisory; llms.txt is a discovery aid, not an access-control mechanism.\n\n## Experiments\n\n${EXAMS.map(
     (definition) =>
       `- [${definition.discoveryName ?? definition.name}](${ORIGIN}/en/${definition.route}/): ${definition.blurb} ${definition.limit}`,
   ).join(

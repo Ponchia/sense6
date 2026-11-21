@@ -18,6 +18,7 @@ const STRICT = new Set([
   'docs/methodology.md',
   'docs/roadmap.md',
   'docs/product-readiness.md',
+  'docs/education/first-visitor-field-kit.md',
   'docs/public-repository-readiness.md',
   'docs/runbooks/cloudflare-pages-release.md',
   'docs/adr/0001-name-and-host-sense6-on-cloudflare-pages.md',

@@ -52,7 +52,7 @@ function verifyFixture(change = () => {}) {
 test('Lighthouse category and Core Web Vitals boundaries pass at their exact limits', () => {
   const result = verifyFixture();
   assert.equal(result.status, 0, result.stderr);
-  assert.match(result.stdout, /passed for 17 routes/);
+  assert.ok(result.stdout.includes('passed for ' + SEARCH_REPRESENTATIVE_ROUTES.length + ' routes'));
 });
 
 test('Lighthouse policy fails closed on an insufficient category score', () => {

@@ -20,6 +20,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CONTENT_DATES } from '../src/content-dates.js';
+import { EDUCATION_RESOURCE_PATH } from '../src/education-resource.js';
 import { EXAM_IDS } from '../src/exams/contracts.js';
 import { LEARN_ROUTES } from '../src/routes.js';
 
@@ -76,6 +77,8 @@ function staleContentMessage(stale, today) {
 
 /** @param {string} path @returns {string | null} */
 function contentDateKey(path) {
+  if (path === EDUCATION_RESOURCE_PATH) return 'education';
+  if (path === '/en/learn/') return 'learnIndexEn';
   const route = path.split('/').filter(Boolean)[1];
   if (!route) return 'site';
   if (route === 'about') return 'about';

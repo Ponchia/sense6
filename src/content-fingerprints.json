@@ -134,6 +134,11 @@
     "date": "2026-10-11",
     "hash": "e0c61edb684e92187810df980befea29"
   },
+  "/education/browser-reaction-time/": {
+    "key": "education",
+    "date": "2026-11-21",
+    "hash": "1bf9092659a31dd1add5d4a4f9584087"
+  },
   "/en/": {
     "key": "site",
     "date": "2026-11-21",
@@ -152,7 +157,7 @@
   "/en/browser-timing-explorer/": {
     "key": "timingExplorer",
     "date": "2026-11-21",
-    "hash": "41268857fb964d7ad37afc691f721945"
+    "hash": "c3ca241f386da87366910d613ea45a08"
   },
   "/en/color-blindness-guide/": {
     "key": "learn",
@@ -170,9 +175,9 @@
     "hash": "f722ce51345e1a87fcd68d6211eb1f55"
   },
   "/en/learn/": {
-    "key": "learn",
+    "key": "learnIndexEn",
     "date": "2026-11-21",
-    "hash": "ab0843c33efa20af29fca09a846f7b7e"
+    "hash": "57a0a6a6bbd800d911d10c892e38ddb3"
   },
   "/en/reaction-time-guide/": {
     "key": "learn",

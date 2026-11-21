@@ -657,11 +657,11 @@ test('Lighthouse audits the indexable route set instead of penalizing deliberate
   // routes include the deliberately nonindexed journal and privacy pages.
   assert.equal(
     SITE_ROUTES.length,
-    1 + ENGLISH_ONLY_ROUTES.length + LOCALES.length * (EXAMS.length + 4) + guides,
+    2 + ENGLISH_ONLY_ROUTES.length + LOCALES.length * (EXAMS.length + 4) + guides,
   );
   assert.equal(
     SEARCH_ROUTES.length,
-    1 + ENGLISH_ONLY_ROUTES.length + LOCALES.length * (EXAMS.length + 2) + guides,
+    2 + ENGLISH_ONLY_ROUTES.length + LOCALES.length * (EXAMS.length + 2) + guides,
   );
   assert.ok(SEARCH_ROUTES.every((route) => !/\/(?:journal|privacy)\/$/.test(route)));
   assert.ok(SEARCH_REPRESENTATIVE_ROUTES.every((route) => SEARCH_ROUTES.includes(route)));

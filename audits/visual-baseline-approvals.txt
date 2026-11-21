@@ -22,9 +22,9 @@
 #   en-tetracromia-desktop-chromium-linux.png  # new hero layout, PR #58
 #
 
-en-mobile-chromium-linux.png  # new exploration copy and activity-focused experiment descriptions wrap on narrow screens; short reaction entry remains available
-en-learn-desktop-chromium-linux.png  # adds the original timing explorer and printable activity after the research-guide grid, preserving first-guide visibility and existing review dates
-en-learn-mobile-chromium-linux.png  # new timing resource after the guide choices extends the page naturally without changing translated articles or their review claims
+en-mobile-chromium-linux.png  # updated gallery experiment discovery copy and mobile reading hierarchy; the short reaction entry remains available
+en-learn-desktop-chromium-linux.png  # combines the new 25-minute classroom worksheet and separate Browser Timing Explorer on English Learn, with honest dates and unchanged existing studies
+en-learn-mobile-chromium-linux.png  # both new educational links extend the Learn mobile page naturally, preserving source-backed guides, navigation and reading order
 en-color-blindness-guide-desktop-chromium-linux.png  # editorial rewrite: remove redundant callouts and triads; reduce source-link noise and simplify reading layout
 en-color-blindness-guide-mobile-chromium-linux.png  # mobile editorial hierarchy and source-navigation changes with unchanged experimental boundaries
 

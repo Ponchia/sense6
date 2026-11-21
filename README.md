@@ -58,6 +58,8 @@ is optional. It does not measure latency or correct anyone's result.
 This resource is currently in English. The five experiments and existing
 research guides retain all 12 published languages.
 
+Educators can use the [free 25-minute reaction-time classroom activity](https://sense6.net/education/browser-reaction-time/), including a printable worksheet that explores measurement uncertainty without ranking people.
+
 For code-level checks, see [Reproducing Sense6 methods](docs/methodology.md):
 protocol versions, seeded models, result calculations, and the limits of
 reproducing a physical measurement from software.
