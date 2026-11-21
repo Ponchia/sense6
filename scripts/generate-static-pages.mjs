@@ -22,10 +22,10 @@ import { ROOT_GATEWAY, rootGatewayMarkup } from '../src/root-gateway.js';
 import { createRouteMetadata, LEARN_ROUTES, SITE_ORIGIN, UTILITY_ROUTES } from '../src/routes.js';
 import { HOME_METADATA } from '../src/site-copy.js';
 import { ENGLISH_EXPLAINER_COPY, STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
-import { renderCanonicalRedirects } from './canonical-redirects.mjs';
 import { recordContentFingerprint, verifyContentFingerprints } from './content-fingerprints.mjs';
 import { recordEducationResourceFingerprint } from './education-page.mjs';
 import { learnDiscoveryLinks, writeLearnPages } from './learn-pages.mjs';
+import { assertSafeCloudflareRedirects } from './redirect-safety.mjs';
 import { aboutData, examData, webpageData, websiteData } from './static-structured-data.mjs';
 import { writeTimingExplorerPage } from './timing-explorer-page.mjs';
 import { activeRouteModuleFiles } from './vite-manifest.mjs';
@@ -478,10 +478,9 @@ async function write404() {
 }
 
 async function writeDiscoveryFiles() {
-  await writeFile(
-    join(DIST, '_redirects'),
-    renderCanonicalRedirects(canonicalPaths, await readFile(join(ROOT, 'public/_redirects'), 'utf8')),
-  );
+  const redirects = await readFile(join(ROOT, 'public/_redirects'), 'utf8');
+  assertSafeCloudflareRedirects(redirects);
+  await writeFile(join(DIST, '_redirects'), redirects);
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${canonicalPaths
     .map(
       ({ path, lastModified }) =>

@@ -110,9 +110,11 @@ copy-link action. It loads its own module and styles and adopts generated HTML.
 The English Learn index and reaction-time guide link to the resource. Their
 published modification dates include this resource addition; the existing
 scientific-review dates and translation-review records remain unchanged.
-`scripts/canonical-redirects.mjs` adds bounded, exact doubled-slash aliases for
-currently indexable canonical pages. It retains the manual locale redirects
-and does not turn arbitrary missing paths into gallery responses.
+`scripts/redirect-safety.mjs` validates the authored Pages redirects against
+Cloudflare's adjacent-slash normalization before building. Only distinct
+locale-alias redirects are published: generated doubled-slash rules were removed
+after they caused canonical paths to self-redirect at the edge. The canonical
+metadata still names original pages, and unknown paths remain 404.
 
 The static generator reads the Vite manifest and preloads the active route's
 transitive JavaScript modules. It does not add an active-route preload to the

@@ -125,8 +125,9 @@ async function findPropagationGap(production, pages, unreferenced, attempt) {
     for (const { path, assets } of pages) {
       const response = await fetch(new URL(`${path}?propagation=${attempt}`, production), {
         cache: 'no-store',
+        redirect: 'manual',
       });
-      if (!response.ok) return `${path} returned ${response.status}`;
+      if (response.status !== 200) return `${path} returned ${response.status}`;
       const html = await response.text();
       const missing = assets.filter((asset) => !html.includes(asset));
       if (missing.length > 0) return `${path} does not reference ${missing.join(', ')}`;
@@ -199,8 +200,8 @@ async function fetchReady(url) {
   let lastError;
   for (let attempt = 1; attempt <= 8; attempt += 1) {
     try {
-      const response = await fetch(url, { redirect: 'follow' });
-      if (response.ok) return response;
+      const response = await fetch(url, { redirect: 'manual' });
+      if (response.status === 200) return response;
       lastError = new Error(`${url} returned ${response.status}`);
     } catch (error) {
       lastError = error;
