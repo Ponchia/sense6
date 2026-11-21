@@ -13,8 +13,9 @@ Sense6. It does not promise release dates.
 The weekend of 9–11 October added five sourced Sense6 Learn guides, complete
 editions in all 12 site languages (72 Learn URLs), contextual experiment and
 journal links, earlier mobile first actions, stronger result interpretation,
-and release-audit improvements. The site now emits 158 canonical URLs, including
-the English Browser Timing Explorer and its printable activity. This
+and release-audit improvements. The site now emits 159 canonical URLs, including
+the English Browser Timing Explorer and a separate classroom lesson with a
+printable worksheet. The two teaching resources link to each other. This
 provides a discovery and usability *foundation*, not evidence that the pages
 are indexed or that first-time visitors complete and understand the tasks.
 
