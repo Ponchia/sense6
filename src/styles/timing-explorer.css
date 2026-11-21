@@ -64,6 +64,34 @@
   max-inline-size: 68ch;
 }
 
+.timing-explorer__answer {
+  border-inline-start: 3px solid var(--accent-text);
+  color: var(--text-soft);
+  font-size: 1.02rem;
+  line-height: 1.55;
+  margin-block: 1.1rem 0.8rem;
+  max-inline-size: 73ch;
+  padding-inline-start: 0.95rem;
+}
+.timing-explorer__answer strong {
+  color: var(--text);
+}
+.timing-explorer__first-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.35rem;
+  margin-block-start: 0.9rem;
+}
+.timing-explorer__first-actions .ui-button {
+  min-block-size: 2.75rem;
+}
+.timing-explorer__first-note {
+  color: var(--text-dim);
+  font-size: 0.86rem;
+  margin-block: 0.65rem 0.1rem;
+  max-inline-size: 72ch;
+}
 .timing-explorer__byline {
   color: var(--text-dim);
   font-family: var(--mono);

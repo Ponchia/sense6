@@ -83,18 +83,45 @@ test('the timing resource is useful without scripts and publishes only its compl
   assert.match(html, /248 ms/);
   assert.match(html, /232 ms/);
   assert.match(html, /20-minute activity/);
+  assert.match(html, /<strong>Short answer:<\/strong>/);
   assert.match(html, /href="\/education\/browser-reaction-time\/"/);
+  assert.match(html, /href="\/en\/riflessi\/\?scope=signal"/);
+  assert.ok(html.indexOf('class="timing-explorer__first-actions"') < html.indexOf('id="timing-comparison"'));
+  assert.ok(
+    html.includes(
+      '<meta property="og:image" content="https://sense6.net/social/browser-timing-explorer.png">',
+    ),
+  );
+  assert.ok(
+    html.includes(
+      '<meta name="twitter:image" content="https://sense6.net/social/browser-timing-explorer.png">',
+    ),
+  );
   assert.match(html, /data-timing-control="response"[^>]+disabled/);
   assert.doesNotMatch(html, /rel="alternate" hreflang=/);
   const data = JSON.parse(html.match(/<script type="application\/ld\+json">(.+)<\/script>/)?.[1] ?? '{}');
   assert.equal(data['@graph'][0].dateModified, CONTENT_DATES.timingExplorer);
   assert.equal(data['@graph'][0].inLanguage, 'en');
+  assert.equal(data['@graph'][0].image, 'https://sense6.net/social/browser-timing-explorer.png');
   for (const locale of LOCALES.filter(({ code }) => code !== 'en')) {
     await assert.rejects(stat(new URL(`${locale.code}/browser-timing-explorer/index.html`, DIST)));
   }
   for (const path of ['en/index.html', 'en/learn/index.html', 'en/reaction-time-guide/index.html']) {
     const source = await readFile(new URL(path, DIST), 'utf8');
     assert.ok(source.includes('href="/en/browser-timing-explorer/"'), `${path} must expose the resource`);
+  }
+});
+
+test('original teaching resources publish distinct 1200x630 previews', async () => {
+  const cards = ['browser-timing-explorer', 'browser-reaction-time-classroom'];
+  for (const card of cards) {
+    const png = await readFile(new URL('social/' + card + '.png', DIST));
+    const svg = await readFile(new URL('social/' + card + '.svg', DIST), 'utf8');
+    assert.ok(png.length > 10_000, card + ' preview should not be a placeholder');
+    assert.equal(png.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
+    assert.equal(png.readUInt32BE(16), 1200, card + ' width');
+    assert.equal(png.readUInt32BE(20), 630, card + ' height');
+    assert.match(svg, /width="1200" height="630"/);
   }
 });
 
@@ -746,7 +773,18 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   assert.match(lesson, /These five fictional reaction-time readings/);
   assert.match(lesson, /This is a recreational, unvalidated browser task/);
   assert.match(lesson, /"@type": "LearningResource"/);
+  assert.match(lesson, /"educationalLevel": "secondary school"/);
   assert.match(lesson, /href="\/en\/browser-timing-explorer\/"/);
+  assert.match(lesson, /You may print and share this worksheet unchanged with students/);
+  assert.match(lesson, /class="worksheet-credit">Sense6 · Zeno Trevisan/);
+  assert.match(
+    lesson,
+    /<meta property="og:image" content="https:\/\/sense6\.net\/social\/browser-reaction-time-classroom\.png">/,
+  );
+  assert.match(
+    lesson,
+    /<meta name="twitter:image" content="https:\/\/sense6\.net\/social\/browser-reaction-time-classroom\.png">/,
+  );
   assert.doesNotMatch(lesson, /onclick=|onload=|<iframe|leaderboard/i);
   const lessonCss = await readFile(new URL('education/browser-reaction-time/lesson.css', DIST), 'utf8');
   assert.match(lessonCss, /@media print/);
@@ -766,6 +804,12 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   assert.ok(!italianLearn.includes('href="/education/browser-reaction-time/"'));
 
   const gallery = await readFile(new URL('en/index.html', DIST), 'utf8');
+  assert.ok(gallery.includes('aria-label="Interactive and classroom learning resources"'));
+  assert.ok(gallery.includes('href="/education/browser-reaction-time/"'));
+  assert.ok(gallery.includes('href="/en/browser-timing-explorer/"'));
+  assert.ok(!italianLearn.includes('aria-label="Interactive and classroom learning resources"'));
+  const italianGallery = await readFile(new URL('it/index.html', DIST), 'utf8');
+  assert.ok(!italianGallery.includes('href="/education/browser-reaction-time/"'));
   assert.match(
     gallery,
     /Experimental perception tests for curiosity and fun—not medical tests or diagnoses\./,

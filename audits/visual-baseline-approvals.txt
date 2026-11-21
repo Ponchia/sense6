@@ -22,7 +22,7 @@
 #   en-tetracromia-desktop-chromium-linux.png  # new hero layout, PR #58
 #
 
-en-mobile-chromium-linux.png  # updated gallery experiment discovery copy and mobile reading hierarchy; the short reaction entry remains available
+en-mobile-chromium-linux.png  # 21 Nov educational growth: English gallery now offers two clear resource pathways below the existing guide cards, stacked at mobile widths; no experiment or translation behavior changes
 en-learn-desktop-chromium-linux.png  # combines the new 25-minute classroom worksheet and separate Browser Timing Explorer on English Learn, with honest dates and unchanged existing studies
 en-learn-mobile-chromium-linux.png  # both new educational links extend the Learn mobile page naturally, preserving source-backed guides, navigation and reading order
 en-color-blindness-guide-desktop-chromium-linux.png  # editorial rewrite: remove redundant callouts and triads; reduce source-link noise and simplify reading layout
@@ -47,4 +47,7 @@ en-privacy-desktop-chromium-linux.png  # explicitly disclosed Cloudflare RUM int
 en-privacy-mobile-chromium-linux.png  # expanded multilingual Cloudflare RUM disclosure intentionally increases the full mobile privacy page height; no measurement flows or visual experiment surfaces change
 root-desktop-chromium-linux.png  # language gateway heading now names seeing, hearing and reacting to match the localized galleries
 root-mobile-chromium-linux.png  # revised language gateway heading wraps at 320px while preserving every language choice
-en-desktop-chromium-linux.png  # clearer exploration heading and activity descriptions, plus contextual Browser Timing Explorer link below the existing guides
+en-desktop-chromium-linux.png  # 21 Nov educational growth: replace the small timing-only footer link with distinct, readable interactive and printable-classroom resource cards; existing experiment discovery remains unchanged
+
+en-browser-timing-explorer-desktop-chromium-linux.png  # 21 Nov first-visitor improvement: both fictional-comparison and optional real-task routes move beside the introductory question; concise model answer follows, without changing measurement logic
+en-browser-timing-explorer-mobile-chromium-linux.png  # 21 Nov 320px first-screen improvement: the main comparison link and optional real-task path appear before long explanatory text, with no overflow or hidden safeguards

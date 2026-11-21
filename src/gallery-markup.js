@@ -122,7 +122,18 @@ export function galleryMarkup({ exams, locale, localeHref, m, t, learnInfo = nul
         </a>
       </div>
       <a class="ui-link gallery-learn__all" data-sense6-route="learn" href="/en/learn/">Browse the Learn section →</a>
-      <p><a class="ui-link" data-sense6-route="browser-timing-explorer" href="/en/browser-timing-explorer/">Compare two fictional timing setups in the Browser Timing Explorer →</a></p>
+      <nav class="gallery-learn__resources" aria-label="Interactive and classroom learning resources">
+        <a data-sense6-route="browser-timing-explorer" href="/en/browser-timing-explorer/">
+          <span class="ui-eyebrow">Interactive tool · 20 minutes</span>
+          <strong>Why can a browser reaction time change?</strong>
+          <span>Explore two fictional devices and compare timing assumptions.</span>
+        </a>
+        <a href="/education/browser-reaction-time/">
+          <span class="ui-eyebrow">Free classroom lesson · 25 minutes</span>
+          <strong>Teach reaction time with a printable worksheet.</strong>
+          <span>Explore medians and fair comparisons without collecting student results.</span>
+        </a>
+      </nav>
     </section>`
         : learnInfo
           ? localizedLearnGallery(locale, learnInfo)

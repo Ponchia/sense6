@@ -11,6 +11,14 @@ import {
   timingConfigurationLink,
 } from '../src/timing-explorer-model.js';
 
+test('the resource leads with a concise honest answer and accessible next steps', () => {
+  const html = timingExplorerMarkup();
+  assert.match(html, /<strong>Short answer:<\/strong>/);
+  assert.match(html, /the comparison below is a separate fictional teaching model/);
+  assert.ok(html.indexOf('Try the real short reaction task') < html.indexOf('id="timing-comparison"'));
+  assert.ok(html.includes('href="/education/browser-reaction-time/"'));
+});
+
 test('comparison isolates assumed setup contributions while the person stays constant', () => {
   const initial = defaultTimingConfiguration();
   assert.deepEqual(compareTimingScenarios(initial), {

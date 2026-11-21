@@ -25,6 +25,7 @@ decisions or research for operating instructions.
   bounded decomposition backlog.
 - [Classroom activity](../public/education/browser-reaction-time/index.html) is the free printable reaction-time lesson, at https://sense6.net/education/browser-reaction-time/.
 - [First-visitor field kit](education/first-visitor-field-kit.md) describes consent-first product feedback without collecting results.
+- [Education distribution and discovery](education/distribution-and-measurement.md) records listing metadata, reuse permission, indexing evidence and honest growth decisions.
 - [Product readiness](product-readiness.md) provides the consented usability
   study script, translation review checklist, search-indexing baseline and
   decision criteria for further feature work.

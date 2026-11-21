@@ -13,8 +13,8 @@ export const TIMING_EXPLORER_METADATA = Object.freeze({
   title: 'Browser timing explorer — reaction time & device delay | Sense6',
   description:
     'Compare hypothetical reaction times across two setups. Explore display and input delays, calculate refresh intervals, and print a 20-minute learning activity.',
-  socialImage: '/social/riflessi.png',
-  socialImageAlt: 'Sense6 reaction timing experiment artwork',
+  socialImage: '/social/browser-timing-explorer.png',
+  socialImageAlt: 'Browser Timing Explorer teaching preview: two fictional setups and one response',
   datePublished: '2026-11-21',
   dateModified: '2026-11-21',
 });
@@ -28,8 +28,14 @@ export function timingExplorerMarkup() {
       <p class="ui-eyebrow">Interactive explanation · hypothetical values</p>
       <h1>Browser timing explorer</h1>
       <p class="timing-explorer__lede">Can the same person get two different reaction times? Compare two fictional setups and see how the delays around a response can change the number.</p>
+      <div class="timing-explorer__first-actions">
+        <a class="ui-button" href="#timing-comparison">Change the fictional setups ↓</a>
+        <a class="ui-link" href="/en/riflessi/?scope=signal">Try the real short reaction task →</a>
+      </div>
+      <p class="timing-explorer__first-note">The real task opens its preparation screen; the comparison below is a separate fictional teaching model.</p>
+      <p class="timing-explorer__answer"><strong>Short answer:</strong> yes. Device display and input delays can contribute to an observed browser interval. A different number alone cannot tell us whether the person reacted differently. This explorer uses invented values, not measurements.</p>
       <p class="timing-explorer__byline">By <a href="${CREATOR_PROFILE_URL}" rel="me noreferrer">Zeno</a> · Published <time datetime="2026-11-21">21 November 2026</time> · Available in English</p>
-      <nav class="timing-explorer__jumps" aria-label="On this page"><a href="#timing-comparison">Compare scenarios</a><a href="#timing-activity">20-minute activity</a><a href="#timing-explanation">How the model works</a></nav>
+      <nav class="timing-explorer__jumps" aria-label="On this page"><a href="#timing-activity">20-minute activity</a><a href="#timing-explanation">How the model works</a><a href="/education/browser-reaction-time/">Printable 25-minute classroom worksheet</a></nav>
     </header>
     <section class="timing-explorer__comparison" id="timing-comparison" aria-labelledby="timing-comparison-title">
       <div class="timing-explorer__heading"><div><p class="ui-eyebrow">One person, two assumed setups</p><h2 id="timing-comparison-title">Change the setup. Keep the response.</h2></div><p>Every value below is an assumption you choose. This page does not measure your device, time your reactions, or correct a real result.</p></div>
