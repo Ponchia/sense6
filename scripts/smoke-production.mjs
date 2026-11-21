@@ -1,4 +1,6 @@
 import { readdir, readFile, stat } from 'node:fs/promises';
+import { EDUCATION_RESOURCE_PATH } from '../src/education-resource.js';
+import { fetchCanonicalPage } from './production-canary.mjs';
 
 const candidate = process.argv[2] ?? 'https://sense6.net';
 const expectedCommit = process.argv[3];
@@ -20,11 +22,21 @@ if (production.protocol !== 'https:' || production.hostname !== 'sense6.net') {
  * unambiguous.
  */
 if (expectedCommit) await expectCommit(production, expectedCommit);
+// Fail before the propagation retry window if the edge redirects canonical pages.
+for (const path of [
+  '/en/',
+  '/en/learn/',
+  '/en/riflessi/',
+  '/en/browser-timing-explorer/',
+  EDUCATION_RESOURCE_PATH,
+]) {
+  await fetchCanonicalPage(new URL(path, production));
+}
 await expectAssetPropagation(production);
 
 for (const path of ['/en/', '/en/about/', '/en/udito/']) {
   const route = new URL(path, production);
-  const response = await fetchReady(route);
+  const response = await fetchCanonicalPage(route);
   const html = await response.text();
   if (!response.headers.get('content-type')?.includes('text/html') || !html.includes('Sense6')) {
     throw new Error(`Production did not serve substantive Sense6 HTML at ${route}`);
@@ -125,8 +137,9 @@ async function findPropagationGap(production, pages, unreferenced, attempt) {
     for (const { path, assets } of pages) {
       const response = await fetch(new URL(`${path}?propagation=${attempt}`, production), {
         cache: 'no-store',
+        redirect: 'error',
       });
-      if (!response.ok) return `${path} returned ${response.status}`;
+      if (response.status !== 200) return `${path} returned ${response.status}`;
       const html = await response.text();
       const missing = assets.filter((asset) => !html.includes(asset));
       if (missing.length > 0) return `${path} does not reference ${missing.join(', ')}`;
@@ -193,21 +206,6 @@ async function prerenderedRoutes(dist) {
   }
   if (routes.length < 2) throw new Error(`The local build has no pre-rendered pages under ${dist.pathname}`);
   return routes;
-}
-
-async function fetchReady(url) {
-  let lastError;
-  for (let attempt = 1; attempt <= 8; attempt += 1) {
-    try {
-      const response = await fetch(url, { redirect: 'follow' });
-      if (response.ok) return response;
-      lastError = new Error(`${url} returned ${response.status}`);
-    } catch (error) {
-      lastError = error;
-    }
-    await new Promise((resolve) => setTimeout(resolve, attempt * 1_000));
-  }
-  throw lastError;
 }
 
 function assertSecurityHeaders(response, route) {

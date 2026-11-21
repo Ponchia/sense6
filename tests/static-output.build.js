@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readdir, readFile, stat } from 'node:fs/promises';
 import test from 'node:test';
+import { assertNoNormalizedSelfRedirects } from '../scripts/canonical-redirects.mjs';
 import { publicIndexNowKey } from '../scripts/submit-indexnow.mjs';
 import {
   activeRouteModuleFiles,
@@ -632,9 +633,8 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   const redirects = await readFile(new URL('_redirects', DIST), 'utf8');
   assert.match(redirects, /^\/pt-BR\/\* \/pt-br\/:splat 301$/m);
   assert.match(redirects, /^\/zh-CN\/\* \/zh-hans\/:splat 301$/m);
-  assert.match(redirects, /^\/en\/\/ \/en\/ 301$/m);
-  assert.match(redirects, /^\/en\/reaction-time-guide\/\/ \/en\/reaction-time-guide\/ 301$/m);
-  assert.match(redirects, /^\/en\/browser-timing-explorer\/\/ \/en\/browser-timing-explorer\/ 301$/m);
+  assert.equal(redirects, await readFile(new URL('../public/_redirects', import.meta.url), 'utf8'));
+  assertNoNormalizedSelfRedirects(redirects);
 
   const sitemap = await readFile(new URL('sitemap.xml', DIST), 'utf8');
   const sitemapPaths = [...sitemap.matchAll(/<loc>https:\/\/sense6\.net([^<]*)<\/loc>/g)].map(
