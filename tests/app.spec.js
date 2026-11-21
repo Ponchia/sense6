@@ -312,10 +312,13 @@ async function expectRouteMetadata(
   }
 }
 
-test('language routes translate, persist, and remain accessible', async ({ page }) => {
+// A localized title regression in PR #186 reached the full production matrix because
+// this journey was omitted from PR smoke. Run it in review on Chromium + mobile.
+test('language routes translate, persist, and remain accessible @pr-smoke', async ({ page }) => {
   await page.goto('/it/');
   await expect(page.locator('html')).toHaveAttribute('lang', 'it');
-  await expect(page).toHaveTitle('Sense6 — misura ciò che i tuoi sensi percepiscono');
+  await expect(page).toHaveTitle('Sense6 — tempo di reazione ed esperimenti percettivi');
+  await expect(page.locator('.gallery-hero h1')).toHaveText('Esplora come vedi, senti e reagisci.');
   await expect(page.locator('[data-locale-select] option')).toHaveText(LOCALES.map(({ label }) => label));
   await expect(page.getByRole('heading', { name: 'Inizia da ciò che vuoi scoprire.' })).toBeVisible();
   await expect(page.locator('.exam-card__link[href="/it/udito/"]')).toBeVisible();
@@ -326,6 +329,10 @@ test('language routes translate, persist, and remain accessible', async ({ page 
     await expect(page).toHaveURL(new RegExp(`/${code}/$`));
     await expect(page.locator('html')).toHaveAttribute('lang', languageTag);
     await expect(page.locator('html')).toHaveAttribute('dir', direction);
+    await expect(page).toHaveTitle(messages.get('Sense6 — reaction time & perception experiments'));
+    await expect(page.locator('.gallery-hero h1')).toHaveText(
+      `${messages.get('Explore how you')} ${messages.get('see, hear and react.')}`,
+    );
     const heading = messages.get('Start with what you want to learn.');
     await expect(page.getByRole('heading', { name: heading })).toBeVisible();
     await expect(page.locator('.gallery-hero__boundary')).toHaveText(
@@ -341,7 +348,7 @@ test('language routes translate, persist, and remain accessible', async ({ page 
   await expect(page.locator('[data-locale-select]')).toHaveValue('de');
   await page.locator('.exam-card__link[href="/de/udito/"]').click();
   await expect(page.getByRole('heading', { name: /Hören Sie auf die Grenze/i })).toBeVisible();
-  await expect(page).toHaveTitle(/Gerätebezogenes Hörlabor/);
+  await expect(page).toHaveTitle('Experiment zu Hörbereich und Tonhöhe — Udito | Sense6');
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
