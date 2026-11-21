@@ -38,6 +38,27 @@ test('timing examples support keyboard changes, private links and a printable ac
   await expect(page.locator('.timing-explorer__print-source')).toBeVisible();
 });
 
+test('compact phone users can reach the comparison or real task without scrolling @pr-smoke', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto(`${path}?metrics=off`);
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'browser-timing-explorer');
+  const firstActions = page.locator('.timing-explorer__first-actions');
+  await expect(firstActions.getByRole('link', { name: /change the fictional setups/i })).toHaveAttribute(
+    'href',
+    '#timing-comparison',
+  );
+  await expect(firstActions.getByRole('link', { name: /real short reaction task/i })).toHaveAttribute(
+    'href',
+    '/en/riflessi/?scope=signal',
+  );
+  const bounds = await firstActions.boundingBox();
+  expect(bounds, 'the first useful choices must be rendered').not.toBeNull();
+  expect(bounds.y + bounds.height, 'both first actions should fit within 320 x 568').toBeLessThanOrEqual(568);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(320);
+});
+
 test('shared examples restore safely and navigation does not invent translations or retain tool schema @pr-smoke', async ({
   page,
 }) => {

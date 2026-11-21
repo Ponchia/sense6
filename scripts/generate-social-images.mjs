@@ -55,9 +55,30 @@ const CARDS = [
     copy: 'ANGULAR DETAIL · NOMINAL CONTRAST',
     glyph: 'A',
   },
+  {
+    id: 'browser-timing-explorer',
+    accent: '#4cc9f0',
+    eyebrow: 'INTERACTIVE TEACHING TOOL',
+    title: 'Browser timing',
+    copy: 'TWO FICTIONAL SETUPS · ONE RESPONSE',
+    glyph: 'A/B',
+  },
+  {
+    id: 'browser-reaction-time-classroom',
+    accent: '#f4b942',
+    eyebrow: 'PRINTABLE TEACHING RESOURCE',
+    title: 'Classroom lab',
+    copy: 'MEDIANS · DEVICE DELAYS · FAIR COMPARISONS',
+    glyph: '25',
+  },
 ];
 
-const expectedCardIds = ['sense6', ...EXAMS.map(({ id }) => id)].sort();
+const expectedCardIds = [
+  'sense6',
+  ...EXAMS.map(({ id }) => id),
+  'browser-timing-explorer',
+  'browser-reaction-time-classroom',
+].sort();
 const cardIds = CARDS.map(({ id }) => id).sort();
 if (JSON.stringify(cardIds) !== JSON.stringify(expectedCardIds)) {
   throw new Error(

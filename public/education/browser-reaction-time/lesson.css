@@ -69,6 +69,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--red); outline-o
 .worksheet-header .eyebrow { margin: 0; }
 .worksheet-body { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 2rem; }
 .worksheet-task { break-inside: avoid; padding-top: 1rem; }
+.worksheet-credit { border-top: 1px solid var(--line); color: var(--muted); font-size: .72rem; margin: 1rem 0 0; padding-top: .45rem; }
 .worksheet-task h3 { font-size: 1.06rem; letter-spacing: -.025em; line-height: 1.3; margin: .35rem 0; }
 .worksheet-task p { font-size: .91rem; margin: .4rem 0; }
 .example-values { display: flex; flex-wrap: wrap; gap: .4rem; margin: .8rem 0; }
@@ -125,6 +126,7 @@ a:focus-visible, button:focus-visible { outline: 3px solid var(--red); outline-o
   .worksheet-header .eyebrow { font-size: 7.5pt; }
   .worksheet-body { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5mm 8mm; }
   .worksheet-task { padding-top: 2mm; }
+  .worksheet-credit { font-size: 7pt; margin-top: 2mm; padding-top: 1mm; }
   .worksheet-task h3 { font-size: 10pt; }
   .worksheet-task p { font-size: 8.5pt; margin: 2mm 0; }
   .worksheet-task .prompt { margin-top: 3mm; font-size: 8.5pt; }
