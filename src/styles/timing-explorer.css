@@ -24,6 +24,7 @@
 
 .timing-explorer a:not(.ui-button) {
   color: var(--text);
+  text-decoration-line: underline;
   text-underline-offset: 0.2em;
 }
 

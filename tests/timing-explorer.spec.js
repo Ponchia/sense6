@@ -47,12 +47,14 @@ test('shared examples restore safely and navigation does not invent translations
   await expect(page.locator('link[hreflang]')).toHaveCount(0);
   await page.locator('.timing-explorer__breadcrumb [data-sense6-route="learn"]').click();
   await expect(page).toHaveURL(/\/en\/learn\/$/);
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'learn');
   const schema = await page.locator('script[type="application/ld+json"]').allTextContents();
   expect(schema.join('')).not.toContain('Browser timing explorer');
   await page.locator('[data-sense6-route="browser-timing-explorer"]').click();
   await expect(page.locator('[data-timing-total="b"]')).toHaveText('232 ms');
   await page.locator('[data-locale-select]').selectOption('it');
   await expect(page).toHaveURL(/\/it\/$/);
+  await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'gallery');
   await expect(page.locator('html')).toHaveAttribute('lang', 'it');
 
   await page.goto(`${path}?response=220&ad=bad`);
