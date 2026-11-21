@@ -35,7 +35,7 @@ export function timingExplorerMarkup() {
       <div class="timing-explorer__heading"><div><p class="ui-eyebrow">One person, two assumed setups</p><h2 id="timing-comparison-title">Change the setup. Keep the response.</h2></div><p>Every value below is an assumption you choose. This page does not measure your device, time your reactions, or correct a real result.</p></div>
       <div class="timing-explorer__response">
         <div><label for="timing-response">Assumed person’s response, used in both scenarios</label><p id="timing-response-hint">The starting 220 ms is an invented example, not an average or a target.</p></div>
-        <div><output for="timing-response" data-timing-value="response">220 ms</output><input id="timing-response" aria-describedby="timing-response-hint" data-timing-control="response" type="range" min="100" max="500" step="1" value="220" disabled></div>
+        <div><output aria-live="off" for="timing-response" data-timing-value="response">220 ms</output><input id="timing-response" aria-describedby="timing-response-hint" data-timing-control="response" type="range" min="100" max="500" step="1" value="220" aria-valuetext="220 milliseconds" disabled></div>
       </div>
       <div class="timing-explorer__scenarios">${scenarioMarkup('a', configuration.a, 248)}${scenarioMarkup('b', configuration.b, 232)}</div>
       <div class="timing-explorer__difference"><p class="ui-eyebrow">What changed?</p><output data-timing-comparison aria-live="polite" aria-atomic="true">Scenario B is 16 ms shorter. The assumed person’s response is the same.</output><p>The difference comes entirely from the display and input values you chose.</p></div>
@@ -62,16 +62,16 @@ export function timingExplorerMarkup() {
 
 function scenarioMarkup(id, scenario, total) {
   const label = id.toUpperCase();
-  return `<section class="timing-explorer__scenario" aria-labelledby="timing-${id}-title"><h3 id="timing-${id}-title">Scenario ${label}</h3><p class="timing-explorer__total-label">Illustrative interval</p><output class="timing-explorer__total" data-timing-total="${id}">${total} <span>ms</span></output>
+  return `<section class="timing-explorer__scenario" aria-labelledby="timing-${id}-title"><h3 id="timing-${id}-title">Scenario ${label}</h3><p class="timing-explorer__total-label">Illustrative interval</p><output aria-live="off" class="timing-explorer__total" data-timing-total="${id}">${total} <span>ms</span></output>
     <div class="timing-explorer__bar" aria-hidden="true"><span data-timing-bar="${id}-display" class="timing-explorer__bar-display" style="inline-size:${(scenario.display / 700) * 100}%"></span><span data-timing-bar="${id}-response" class="timing-explorer__bar-response" style="inline-size:${(220 / 700) * 100}%"></span><span data-timing-bar="${id}-input" class="timing-explorer__bar-input" style="inline-size:${(scenario.input / 700) * 100}%"></span></div>
     <p class="timing-explorer__equation" data-timing-equation="${id}">${scenario.display} display + 220 response + ${scenario.input} input = ${total} ms</p>
     ${delayControl(id, 'display', scenario.display, 'Assumed display contribution', 'Request to show the stimulus → stimulus visible.')}
     ${delayControl(id, 'input', scenario.input, 'Assumed input contribution', 'Action → arrival at the browser event handler.')}
-    <div class="timing-explorer__refresh"><label for="timing-${id}-hz">Assumed refresh rate</label><select id="timing-${id}-hz" class="ui-input" data-timing-control="${id}-hz" aria-describedby="timing-${id}-refresh-note" disabled>${REFRESH_RATES.map((hz) => `<option value="${hz}"${hz === scenario.hz ? ' selected' : ''}>${hz} Hz</option>`).join('')}</select><output for="timing-${id}-hz" data-timing-refresh="${id}">1000 ÷ ${scenario.hz} = ${(1000 / scenario.hz).toFixed(2)} ms between refreshes</output><p id="timing-${id}-refresh-note">Shown separately. A refresh interval is not a measured display delay and is not added to the total.</p></div></section>`;
+    <div class="timing-explorer__refresh"><label for="timing-${id}-hz">Assumed refresh rate</label><select id="timing-${id}-hz" class="ui-input" data-timing-control="${id}-hz" aria-describedby="timing-${id}-refresh-note" disabled>${REFRESH_RATES.map((hz) => `<option value="${hz}"${hz === scenario.hz ? ' selected' : ''}>${hz} Hz</option>`).join('')}</select><output aria-live="off" for="timing-${id}-hz" data-timing-refresh="${id}">1000 ÷ ${scenario.hz} = ${(1000 / scenario.hz).toFixed(2)} ms between refreshes</output><p id="timing-${id}-refresh-note">Shown separately. A refresh interval is not a measured display delay and is not added to the total.</p></div></section>`;
 }
 
 function delayControl(id, property, value, label, hint) {
-  return `<div class="timing-explorer__control"><div><label for="timing-${id}-${property}">${label}</label><output for="timing-${id}-${property}" data-timing-value="${id}-${property}">${value} ms</output></div><input id="timing-${id}-${property}" aria-describedby="timing-${id}-${property}-hint" data-timing-control="${id}-${property}" type="range" min="0" max="100" step="1" value="${value}" disabled><p id="timing-${id}-${property}-hint">${hint}</p></div>`;
+  return `<div class="timing-explorer__control"><div><label for="timing-${id}-${property}">${label}</label><output aria-live="off" for="timing-${id}-${property}" data-timing-value="${id}-${property}">${value} ms</output></div><input id="timing-${id}-${property}" aria-describedby="timing-${id}-${property}-hint" data-timing-control="${id}-${property}" type="range" min="0" max="100" step="1" value="${value}" aria-valuetext="${value} milliseconds" disabled><p id="timing-${id}-${property}-hint">${hint}</p></div>`;
 }
 
 function activityMarkup() {
@@ -106,7 +106,7 @@ export function mountTimingExplorer({ app, search = window.location.search }) {
   const shareField = root.querySelector('[data-timing-share-field]');
   const shareInput = root.querySelector('[data-timing-share-link]');
   const say = (message) => {
-    if (!signal.aborted && status) status.textContent = message;
+    if (!signal.aborted && status && status.textContent !== message) status.textContent = message;
   };
   const update = () => {
     revision += 1;
@@ -206,9 +206,16 @@ function readTimingControls(root) {
 
 function updateTimingOutputs(root, configuration) {
   const result = compareTimingScenarios(configuration);
+  // Native sliders announce their own values. Auxiliary outputs stay quiet;
+  // only the comparison summary announces a changed explanation.
+  for (const input of root.querySelectorAll('input[type="range"][data-timing-control]')) {
+    if (!(input instanceof HTMLInputElement)) continue;
+    const valueText = `${input.value} milliseconds`;
+    if (input.getAttribute('aria-valuetext') !== valueText) input.setAttribute('aria-valuetext', valueText);
+  }
   const text = (selector, value) => {
     const node = root.querySelector(selector);
-    if (node) node.textContent = value;
+    if (node && node.textContent !== value) node.textContent = value;
   };
   text('[data-timing-value="response"]', `${configuration.response} ms`);
   for (const id of ['a', 'b']) {

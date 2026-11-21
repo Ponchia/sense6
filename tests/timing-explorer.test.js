@@ -132,3 +132,20 @@ test('static page provides the worked example, honest boundary and an ungated ac
   assert.equal((html.match(/data-timing-control="[^"]+"[^>]*disabled/g) ?? []).length, 7);
   assert.doesNotMatch(html, /onclick=|javascript:|undefined|NaN/);
 });
+
+test('only the comparison output announces updates and sliders expose milliseconds', () => {
+  const html = timingExplorerMarkup();
+  const outputs = [...html.matchAll(/<output\b[^>]*>/g)].map(([tag]) => tag);
+  const comparison = outputs.filter((tag) => tag.includes('data-timing-comparison'));
+  const auxiliary = outputs.filter((tag) => !tag.includes('data-timing-comparison'));
+  assert.equal(comparison.length, 1);
+  assert.match(comparison[0], /aria-live="polite"/);
+  assert.equal(auxiliary.length, 9);
+  for (const tag of auxiliary) assert.match(tag, /aria-live="off"/);
+  const ranges = [...html.matchAll(/<input\b[^>]*type="range"[^>]*>/g)].map(([tag]) => tag);
+  assert.equal(ranges.length, 5);
+  for (const tag of ranges) {
+    const value = tag.match(/\bvalue="(\d+)"/)[1];
+    assert.ok(tag.includes(`aria-valuetext="${value} milliseconds"`));
+  }
+});
