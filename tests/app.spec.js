@@ -315,7 +315,8 @@ async function expectRouteMetadata(
 test('language routes translate, persist, and remain accessible', async ({ page }) => {
   await page.goto('/it/');
   await expect(page.locator('html')).toHaveAttribute('lang', 'it');
-  await expect(page).toHaveTitle('Sense6 — misura ciò che i tuoi sensi percepiscono');
+  const italian = await loadMessages('it');
+  await expect(page).toHaveTitle(italian.get('Sense6 — reaction time & perception experiments'));
   await expect(page.locator('[data-locale-select] option')).toHaveText(LOCALES.map(({ label }) => label));
   await expect(page.getByRole('heading', { name: 'Inizia da ciò che vuoi scoprire.' })).toBeVisible();
   await expect(page.locator('.exam-card__link[href="/it/udito/"]')).toBeVisible();
@@ -341,7 +342,8 @@ test('language routes translate, persist, and remain accessible', async ({ page 
   await expect(page.locator('[data-locale-select]')).toHaveValue('de');
   await page.locator('.exam-card__link[href="/de/udito/"]').click();
   await expect(page.getByRole('heading', { name: /Hören Sie auf die Grenze/i })).toBeVisible();
-  await expect(page).toHaveTitle(/Gerätebezogenes Hörlabor/);
+  const german = await loadMessages('de');
+  await expect(page).toHaveTitle(german.get('Hearing range & pitch experiment — Udito | Sense6'));
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 
