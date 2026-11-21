@@ -60,6 +60,21 @@ test.describe('every canonical route', () => {
   }
 });
 
+test('the English Learn index leads into the standalone classroom lesson', async ({ page }) => {
+  await page.goto('/en/learn/', { waitUntil: 'domcontentloaded' });
+  await settlePage(page);
+  const action = page.getByRole('link', { name: 'Open the classroom activity' });
+  await expect(action).toBeVisible();
+  await action.click();
+  await expect(page).toHaveURL(/\/education\/browser-reaction-time\/$/);
+  await expect(page.locator('main h1')).toHaveText('Can a browser measure your reaction time?');
+  await expect(page.getByRole('link', { name: /Open the short experiment/ })).toBeVisible();
+
+  await page.goto('/it/learn/', { waitUntil: 'domcontentloaded' });
+  await settlePage(page);
+  await expect(page.locator('a[href="/education/browser-reaction-time/"]')).toHaveCount(0);
+});
+
 async function settlePage(page) {
   await page.locator('main h1').waitFor({ state: 'visible' });
   if (new URL(page.url()).pathname === EDUCATION_RESOURCE_PATH) return;
