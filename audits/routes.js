@@ -1,3 +1,4 @@
+import { EDUCATION_RESOURCE_PATH } from '../src/education-resource.js';
 import { EXAMS } from '../src/exams/registry.js';
 import { LEARN_PUBLISHED_LOCALES } from '../src/learn-publication.js';
 import { LOCALES } from '../src/locales.js';
@@ -5,6 +6,7 @@ import { LEARN_ROUTES, routePath, UTILITY_ROUTES } from '../src/routes.js';
 
 export const SITE_ROUTES = Object.freeze([
   '/',
+  EDUCATION_RESOURCE_PATH,
   ...LEARN_PUBLISHED_LOCALES.flatMap((locale) => LEARN_ROUTES.map((route) => routePath(locale, route))),
   ...LOCALES.flatMap(({ code }) => [
     routePath(code),
@@ -15,6 +17,7 @@ export const SITE_ROUTES = Object.freeze([
 
 export const SEARCH_ROUTES = Object.freeze([
   '/',
+  EDUCATION_RESOURCE_PATH,
   ...LEARN_PUBLISHED_LOCALES.flatMap((locale) => LEARN_ROUTES.map((route) => routePath(locale, route))),
   ...LOCALES.flatMap(({ code }) => [
     routePath(code),
@@ -37,6 +40,7 @@ export const REPRESENTATIVE_ROUTES = Object.freeze([
 
 export const SEARCH_REPRESENTATIVE_ROUTES = Object.freeze([
   '/',
+  EDUCATION_RESOURCE_PATH,
   '/en/',
   '/en/learn/',
   '/en/tetrachromacy-guide/',

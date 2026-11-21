@@ -1,0 +1,137 @@
+:root {
+  color-scheme: light;
+  --ink: #20201f;
+  --muted: #565553;
+  --red: #b90d32;
+  --line: #d5d3cf;
+  --paper: #fcfbf8;
+  --soft: #f3f0eb;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --body: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); line-height: 1.6; }
+a { color: var(--red); text-underline-offset: .18em; }
+a:hover { text-decoration-thickness: .14em; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--red); outline-offset: 4px; }
+.skip-link { position: absolute; left: 1rem; top: -6rem; padding: .75rem 1rem; z-index: 20; background: white; }
+.skip-link:focus { top: 1rem; }
+.site-header, .footer { max-width: 1440px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.2rem clamp(1.25rem,5vw,5rem); }
+.site-header { border-bottom: 1px solid var(--line); }
+.wordmark { font: 800 1.55rem/1 var(--mono); text-decoration: none; letter-spacing: -.13em; color: var(--ink); }
+.wordmark span { color: var(--red); }
+.site-header nav { display: flex; flex-wrap: wrap; gap: clamp(.75rem,2.3vw,2rem); font-size: .85rem; }
+.site-header nav a { color: var(--ink); }
+.page-shell { max-width: 1320px; margin: auto; padding: 0 clamp(1.25rem,5vw,5rem) 4.5rem; }
+.breadcrumb { padding-top: 1.3rem; display: flex; align-items: center; flex-wrap: wrap; gap: .55rem; font: .8rem var(--mono); }
+.breadcrumb a { color: var(--muted); }
+.eyebrow { font: 700 .76rem/1.5 var(--mono); letter-spacing: .08em; color: var(--red); text-transform: uppercase; }
+.hero { display: grid; grid-template-columns: minmax(0,1.4fr) minmax(280px,.9fr); align-items: center; gap: clamp(2rem,5vw,5rem); padding: clamp(3rem,6vw,6rem) 0; }
+.hero h1 { font-size: clamp(2.5rem,5.4vw,5rem); line-height: 1.07; letter-spacing: -.065em; margin: 1.25rem 0; max-width: 18ch; }
+.hero h1 em { color: var(--red); font-style: normal; }
+.lede { font-size: clamp(1.14rem,2.3vw,1.48rem); line-height: 1.5; max-width: 40rem; }
+.byline { color: var(--muted); font-size: .83rem; }
+.byline a { color: inherit; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: .85rem; margin-top: 2.2rem; }
+.button { display: inline-flex; justify-content: center; align-items: center; gap: .5rem; padding: .8rem 1.12rem; text-decoration: none; font: 700 .9rem/1.4 var(--body); border: 1.5px solid var(--ink); border-radius: .25rem; cursor: pointer; }
+.button-primary { color: white; background: var(--red); border-color: var(--red); }
+.button-primary:hover { background: #960b2a; }
+.button-secondary { color: var(--ink); background: transparent; }
+.button-secondary:hover { background: #e9e5dd; }
+.fine-print { color: var(--muted); max-width: 57ch; font-size: .78rem; margin-top: 1.45rem; }
+.visual { background: #242222; color: #f6f0e9; border-radius: .45rem; padding: clamp(1.5rem,3vw,3rem); min-width: 0; box-shadow: .7rem .7rem 0 #e9e5df; }
+.visual-heading { font: 700 .72rem/1.5 var(--mono); letter-spacing: .08em; color: #e9b2be; }
+.visual-value { font: 700 clamp(4.5rem,10vw,8rem)/1 var(--mono); margin: 1.65rem 0 .8rem; letter-spacing: -.08em; }
+.visual-value span { font: 500 clamp(1.1rem,2.2vw,1.7rem)/1 var(--mono); color: #d9d4cf; letter-spacing: 0; margin-left: .4rem; }
+.visual-rule { height: 5px; background: linear-gradient(90deg, #ff7790 0 42%, #d3c8bc 42% 68%, #89a8b1 68%); }
+.visual-layers { padding: 1.55rem 0 1rem; display: grid; gap: .8rem; font: .9rem var(--mono); }
+.visual-layers div { display: flex; align-items: center; gap: .7rem; }
+.dot { display: inline-block; flex-shrink: 0; width: .8rem; height: .8rem; border-radius: 50%; }
+.dot-one { background: #ff7790; } .dot-two { background: #d3c8bc; } .dot-three { background: #89a8b1; }
+.visual-note { margin: 1.1rem 0 0; color: #c9c1b9; font-size: .77rem; }
+.intro-panel { display: grid; grid-template-columns: .7fr 1fr; gap: clamp(1.5rem,4vw,4rem); background: var(--soft); border-left: 4px solid var(--red); padding: clamp(1.5rem,4vw,3.5rem); align-items: start; }
+.intro-panel h2 { font-size: clamp(1.55rem,3vw,2.5rem); line-height: 1.2; letter-spacing: -.045em; margin: .65rem 0; }
+.intro-panel > p { font-size: 1.13rem; margin: .6rem 0; }
+.section-title { display: flex; align-items: end; justify-content: space-between; gap: 2rem; margin-bottom: 2rem; }
+.section-title h2, .worksheet-header h2, .resource-links h2 { font-size: clamp(1.75rem,3.2vw,2.8rem); line-height: 1.2; letter-spacing: -.055em; margin: .3rem 0; }
+.section-title > p { max-width: 40ch; color: var(--muted); font-size: .92rem; }
+.lesson-plan { padding: clamp(3.5rem,6vw,6rem) 0; }
+.steps { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.steps li { display: grid; grid-template-columns: 10rem 1fr; border-bottom: 1px solid var(--line); gap: clamp(1.5rem,3vw,3rem); padding: 1.7rem 0; }
+.step-time { display: flex; gap: 1.3rem; align-items: baseline; font: .83rem var(--mono); color: var(--muted); }
+.step-num { font-size: 1.8rem; font-weight: 700; color: var(--red); }
+.step-content h3 { font-size: 1.35rem; margin: .15rem 0; letter-spacing: -.035em; }
+.step-content p { margin: .5rem 0; max-width: 73ch; }
+.worksheet { background: white; border: 2px solid var(--ink); padding: clamp(1.25rem,3.5vw,3rem); box-shadow: .75rem .75rem 0 var(--soft); scroll-margin-top: 2rem; }
+.worksheet-header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding-bottom: 1rem; border-bottom: 2px solid var(--ink); }
+.worksheet-header p { margin: .35rem 0; }
+.worksheet-header .eyebrow { margin: 0; }
+.worksheet-body { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 2rem; }
+.worksheet-task { break-inside: avoid; padding-top: 1rem; }
+.worksheet-task h3 { font-size: 1.06rem; letter-spacing: -.025em; line-height: 1.3; margin: .35rem 0; }
+.worksheet-task p { font-size: .91rem; margin: .4rem 0; }
+.example-values { display: flex; flex-wrap: wrap; gap: .4rem; margin: .8rem 0; }
+.example-values span { font: 700 .9rem var(--mono); background: var(--soft); padding: .5rem .7rem; }
+.worksheet-task .prompt { font-size: .87rem; margin-top: .85rem; }
+.writing-line { height: 1.35rem; border-bottom: 1px solid #888; margin-bottom: .4rem; }
+.blank-short { display: inline-block; width: 4.8rem; border-bottom: 1px solid #888; }
+.blank-wide { display: inline-block; min-width: 7rem; border-bottom: 1px solid #888; }
+.reflection { grid-column: 1 / -1; border-top: 1px solid var(--line); padding-bottom: .6rem; }
+.teacher-notes { padding: clamp(3rem,6vw,6rem) 0; }
+.note-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem 3rem; }
+.note-grid > div { border-top: 1px solid var(--line); padding-top: .9rem; }
+.note-grid h3 { margin: 0; font-size: 1.18rem; }
+.note-grid p { margin-top: .5rem; color: #444; }
+.resource-links { padding: 2rem; background: var(--soft); display: grid; grid-template-columns: 1fr 1fr; align-items: start; gap: 2rem; }
+.resource-links h2 { max-width: 18ch; }
+.resource-actions { display: grid; gap: .8rem; }
+.resource-actions a { border-bottom: 1px solid #aaa; padding: .65rem 0; font-weight: 700; text-decoration: none; }
+.resource-actions a:hover { text-decoration: underline; }
+.closing-note { color: var(--muted); margin: 3rem 0 0; font-size: .88rem; }
+.footer { color: var(--muted); border-top: 1px solid var(--line); font-size: .8rem; font-family: var(--mono); }
+.footer a { color: inherit; }
+@media (max-width: 850px) {
+  .hero, .intro-panel, .resource-links { grid-template-columns: 1fr; }
+  .hero { padding: 2.5rem 0 3.5rem; }
+  .hero h1 { max-width: 24ch; }
+  .visual { max-width: 570px; }
+  .section-title { display: block; }
+  .worksheet-body { grid-template-columns: 1fr; }
+  .reflection { grid-column: auto; }
+}
+@media (max-width: 520px) {
+  .site-header { align-items: start; }
+  .site-header nav { justify-content: end; font-size: .75rem; gap: .65rem; }
+  .steps li { grid-template-columns: 1fr; gap: 0; }
+  .step-time { gap: .8rem; }
+  .hero-actions .button { width: 100%; }
+  .visual-value { font-size: 5rem; }
+  .worksheet-header { display: block; }
+  .print-button { margin: .5rem 0 0; }
+  .note-grid { grid-template-columns: 1fr; }
+  .footer { display: block; }
+}
+@media print {
+  @page { size: A4 portrait; margin: 12mm; }
+  :root { --ink: #111; }
+  html, body { margin: 0; padding: 0; color: #111; background: white; }
+  body > :not(main), .breadcrumb, .hero, .intro-panel, .lesson-plan, .teacher-notes, .resource-links, .closing-note { display: none !important; }
+  .page-shell { margin: 0; padding: 0; max-width: none; }
+  .worksheet { display: block; border: 1.5px solid #111; box-shadow: none; padding: 7mm; break-inside: avoid; }
+  .worksheet-header { padding-bottom: 3mm; }
+  .worksheet-header h2 { font-size: 19pt; }
+  .worksheet-header p { font-size: 8.4pt; }
+  .worksheet-header .eyebrow { font-size: 7.5pt; }
+  .worksheet-body { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5mm 8mm; }
+  .worksheet-task { padding-top: 2mm; }
+  .worksheet-task h3 { font-size: 10pt; }
+  .worksheet-task p { font-size: 8.5pt; margin: 2mm 0; }
+  .worksheet-task .prompt { margin-top: 3mm; font-size: 8.5pt; }
+  .example-values span { background: white; border: 1px solid #aaa; font-size: 9pt; padding: 2mm; }
+  .writing-line { height: 7mm; }
+  .reflection { grid-column: 1 / -1; }
+  .print-button { display: none !important; }
+  a { color: #111; }
+}
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }

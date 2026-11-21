@@ -1,5 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { EDUCATION_RESOURCE_PATH } from '../src/education-resource.js';
 import { SITE_ROUTES } from './routes.js';
 
 test.describe('every canonical route', () => {
@@ -61,6 +62,7 @@ test.describe('every canonical route', () => {
 
 async function settlePage(page) {
   await page.locator('main h1').waitFor({ state: 'visible' });
+  if (new URL(page.url()).pathname === EDUCATION_RESOURCE_PATH) return;
   await page.locator('#app[data-sense6-hydrated]').waitFor();
   if (new URL(page.url()).pathname !== '/') {
     await page.waitForFunction(() => !document.querySelector('#app > .static-entry'));
