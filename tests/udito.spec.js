@@ -494,7 +494,7 @@ test('navigation during every Udito playback stage leaves no stale continuation'
     }
 
     await page.locator('.brand').click();
-    await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Explore how you see, hear and react/i })).toBeVisible();
   }
 
   expect(pageErrors).toEqual([]);

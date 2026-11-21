@@ -19,6 +19,11 @@ export function learnMetadata(route, locale = 'en') {
   const { ui, reviewedDate } = learnCatalog(locale);
   const page = learnPage(route, locale);
   if (!page || !LEARN_ROUTES.includes(route)) return null;
+  const editorialDate = route === 'learn' ? (reviewedDate ?? CONTENT_DATES.learn) : page.dateModified;
+  // A new related teaching resource changes these English pages, but does not
+  // claim a fresh scientific or translation review of the existing articles.
+  const resourceDate =
+    locale === 'en' && ['learn', 'reaction-time-guide'].includes(route) ? CONTENT_DATES.timingExplorer : '';
   return {
     title: page.metaTitle,
     description: page.description,
@@ -27,12 +32,13 @@ export function learnMetadata(route, locale = 'en') {
     socialImage: route === 'learn' ? '/social/sense6.png' : `/social/${page.experiment.route}.png`,
     socialImageAlt:
       route === 'learn' ? page.description : `${ui['Sense6 experiment artwork:']} ${page.experiment.title}`,
-    dateModified:
-      route === 'learn'
-        ? locale === 'en'
-          ? CONTENT_DATES.learnIndexEn
-          : (reviewedDate ?? CONTENT_DATES.learn)
-        : page.dateModified,
+    dateModified: [
+      editorialDate,
+      resourceDate,
+      locale === 'en' && route === 'learn' ? CONTENT_DATES.learnIndexEn : '',
+    ]
+      .sort()
+      .at(-1),
     references: route === 'learn' ? [] : page.sources,
   };
 }
@@ -98,7 +104,12 @@ function overviewMarkup(content, ui, locale) {
             )
             .join('')}
         </div>
-      </section>
+      </section>${
+        locale === 'en'
+          ? `
+      ${timingExplorerResourceMarkup()}`
+          : ''
+      }
       ${classroomResource}<aside class="learn-boundary" aria-label="${esc(ui['Interpretation limits'])}"><p>${esc(page.boundary)}</p></aside>
       <section class="learn-next" aria-label="${esc(ui['Explore experiments'])}">
         <div><h2>${esc(ui['Try an experiment'])}</h2><p>${esc(ui['Each lab explains its setup and records results in your browser. Choose a short scope to see how the task works; return to a guide when you want to understand its result.'])}</p></div>
@@ -144,7 +155,12 @@ function articleMarkup(route, article, content, ui, locale) {
           <li><a href="#research-sources">${esc(ui['Sources and their roles'])}</a></li>
         </ol>
       </nav>
-      ${route === 'reaction-time-guide' ? timingIllustrationMarkup(ui) : ''}
+      ${route === 'reaction-time-guide' ? timingIllustrationMarkup(ui) : ''}${
+        locale === 'en' && route === 'reaction-time-guide'
+          ? `
+      ${timingExplorerResourceMarkup()}`
+          : ''
+      }
       <div class="learn-article__columns">
         <div class="learn-article__body">
           ${article.sections
@@ -186,6 +202,18 @@ function articleMarkup(route, article, content, ui, locale) {
       </nav>
     </article>
   `;
+}
+
+function timingExplorerResourceMarkup() {
+  return `<section class="learn-next" aria-labelledby="timing-resource-title">
+    <div>
+      <p class="ui-eyebrow">Interactive explanation · printable activity</p>
+      <h2 id="timing-resource-title">Same person. Different device. Different number?</h2>
+      <p>Compare two fictional timing setups, change one variable, and see why a faster browser result does not by itself prove a faster person. Includes a 20-minute activity you can print.</p>
+      <p>Activity published <time datetime="${CONTENT_DATES.timingExplorer}">${CONTENT_DATES.timingExplorer}</time>.</p>
+    </div>
+    <a class="ui-button" data-sense6-route="browser-timing-explorer" href="/en/browser-timing-explorer/">Open the timing explorer →</a>
+  </section>`;
 }
 
 /** Connect a section to its cited background, specification or Sense6 method

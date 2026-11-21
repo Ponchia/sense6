@@ -47,6 +47,60 @@
     "At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.",
     "सेटअप, व्यवधान, वॉल्यूम या अनुकूली ट्रैक की कम-से-कम एक जाँच सीमित रही। अवलोकन दिखाई देते रहेंगे, लेकिन तुलना से पहले अधिक स्थिर परिस्थितियों में दोबारा परीक्षण करें।"
   ],
+  ["Sense6 — reaction time & perception experiments", "Sense6 — प्रतिक्रिया समय और संवेदी अनुभवों के प्रयोग"],
+  [
+    "Explore free browser experiments in reaction time, colour, hearing and visual detail. Private, device-relative results with no account or result uploads.",
+    "ब्राउज़र में प्रतिक्रिया समय, रंग, सुनने और दृश्य विवरण के मुफ़्त प्रयोग करें। नतीजे निजी और उपकरण पर निर्भर हैं; खाता या नतीजे अपलोड करना ज़रूरी नहीं।"
+  ],
+  ["Browser perception lab", "ब्राउज़र में संवेदी अनुभवों की प्रयोगशाला"],
+  ["Explore how you", "जानें कि आप कैसे"],
+  ["see, hear and react.", "देखते, सुनते और प्रतिक्रिया देते हैं।"],
+  [
+    "Try five free experiments in colour, hearing, visual detail and reaction time. Your device and setup shape every result.",
+    "रंग, सुनने, दृश्य विवरण और प्रतिक्रिया समय के पाँच मुफ़्त प्रयोग करें। उपकरण और सेटअप हर नतीजे को प्रभावित करते हैं।"
+  ],
+  [
+    "Colour discrimination experiment — Tetracromia | Sense6",
+    "रंगों में अंतर पहचानने का प्रयोग — Tetracromia | Sense6"
+  ],
+  ["Colour vision experiment — Daltonia | Sense6", "रंग देखने का प्रयोग — Daltonia | Sense6"],
+  [
+    "Reaction time test — simple & choice tasks | Sense6",
+    "प्रतिक्रिया समय परीक्षण — सरल प्रतिक्रिया और चुनाव | Sense6"
+  ],
+  [
+    "Hearing range & pitch experiment — Udito | Sense6",
+    "श्रवण सीमा और सुर की ऊँचाई का प्रयोग — Udito | Sense6"
+  ],
+  [
+    "Visual sharpness & contrast experiment — Acutezza | Sense6",
+    "दृश्य स्पष्टता और कंट्रास्ट का प्रयोग — Acutezza | Sense6"
+  ],
+  ["Spot the gap", "खुला हिस्सा खोजें"],
+  ["Colour differences", "रंगों के अंतर"],
+  ["Changing difficulty", "बदलती कठिनाई"],
+  ["Comfortable-volume setup", "आरामदायक आवाज़ का सेटअप"],
+  ["Hearing range", "श्रवण सीमा"],
+  [
+    "Match colour tiles, spot differences in noisy dots and arrange hues. Explore three observations on your screen, with no overall score.",
+    "रंगीन टाइलें मिलाएँ, बिंदुओं के समूह में अंतर पहचानें और रंगतों को क्रम में लगाएँ। अपनी स्क्रीन पर तीन अलग अवलोकन करें; कोई कुल स्कोर नहीं मिलता।"
+  ],
+  [
+    "Find the gap as colour differences get smaller. Explore three colour directions on your screen, without a colour-vision diagnosis.",
+    "रंगों के अंतर छोटे होने पर खुला हिस्सा खोजें। अपनी स्क्रीन पर तीन रंग दिशाएँ जाँचें; इससे रंग दृष्टि का निदान नहीं होता।"
+  ],
+  [
+    "React to a signal, make a choice and follow your responses over time. See separate results for each task on this setup.",
+    "संकेत पर प्रतिक्रिया दें, चुनाव करें और समय के साथ अपनी प्रतिक्रियाएँ देखें। इस सेटअप में हर कार्य के अलग नतीजे पढ़ें।"
+  ],
+  [
+    "Explore which tones you hear and how small a pitch change you notice. Keep a comfortable volume and read each result separately.",
+    "जानें कि कौन-सी ध्वनियाँ सुनते हैं और सुर की ऊँचाई में कितना छोटा बदलाव पहचानते हैं। आवाज़ आरामदायक रखें और हर नतीजा अलग पढ़ें।"
+  ],
+  [
+    "Set the screen scale, find a small gap and try lower contrast. Explore visual detail for each eye on this setup.",
+    "स्क्रीन का पैमाना सेट करें, छोटा खुला हिस्सा खोजें और कम कंट्रास्ट आज़माएँ। इस सेटअप में हर आँख के लिए दृश्य विवरण का अन्वेषण करें।"
+  ],
   ["How much do you want to run?", "आप परीक्षण कितनी गहराई तक करना चाहते हैं?"],
   ["about 2 minutes", "लगभग 2 मिनट"],
   ["about 4 minutes", "लगभग 4 मिनट"],

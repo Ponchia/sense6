@@ -32,10 +32,10 @@ export function galleryMarkup({ exams, locale, localeHref, m, t, learnInfo = nul
   return `
     <section class="gallery-hero ui-container ui-container--wide" data-sense6-view="gallery" data-sense6-locale="${locale}">
       <div class="gallery-hero__copy">
-        <p class="ui-eyebrow">Sense6</p>
-        <h1 class="ui-display">${t('Measure what your')} <em>${t('senses notice.')}</em></h1>
+        <p class="ui-eyebrow">Sense6 · ${m('gallery.eyebrow')}</p>
+        <h1 class="ui-display">${m('gallery.headingLead')} <em>${m('gallery.headingFocus')}</em></h1>
         <p class="gallery-hero__lede">
-          ${t('Short, careful tests that turn what you notice into honest, device-relative results.')}
+          ${m('gallery.introduction')}
           ${t('No account, no answers or results uploaded.')}
         </p>
         <p class="gallery-hero__boundary">
@@ -122,6 +122,7 @@ export function galleryMarkup({ exams, locale, localeHref, m, t, learnInfo = nul
         </a>
       </div>
       <a class="ui-link gallery-learn__all" data-sense6-route="learn" href="/en/learn/">Browse the Learn section →</a>
+      <p><a class="ui-link" data-sense6-route="browser-timing-explorer" href="/en/browser-timing-explorer/">Compare two fictional timing setups in the Browser Timing Explorer →</a></p>
     </section>`
         : learnInfo
           ? localizedLearnGallery(locale, learnInfo)

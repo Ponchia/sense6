@@ -28,8 +28,16 @@ import {
 } from '../src/learn-publication.js';
 import { openGraphLocale } from '../src/locale-metadata.js';
 import { LOCALES, loadMessages } from '../src/locales.js';
-import { LEARN_ROUTES, NON_INDEXABLE_ROUTES, routePath, UTILITY_ROUTES } from '../src/routes.js';
+import {
+  ENGLISH_ONLY_ROUTES,
+  LEARN_ROUTES,
+  NON_INDEXABLE_ROUTES,
+  routePath,
+  UTILITY_ROUTES,
+} from '../src/routes.js';
+import { HOME_METADATA } from '../src/site-copy.js';
 import { ENGLISH_EXPLAINER_COPY, STATIC_SEARCH_INTENT_COPY } from '../src/static-discovery.js';
+import { timingExplorerMarkup } from '../src/timing-explorer.js';
 
 const DIST = new URL('../dist/', import.meta.url);
 /**
@@ -46,6 +54,7 @@ const DISCOVERY_NAMES = Object.freeze({
 });
 const expectedPaths = [
   '/',
+  ...ENGLISH_ONLY_ROUTES.map((route) => routePath('en', route)),
   ...LEARN_PUBLISHED_LOCALES.flatMap((locale) => LEARN_ROUTES.map((route) => routePath(locale, route))),
   ...LOCALES.flatMap(({ code }) => [
     routePath(code),
@@ -63,8 +72,30 @@ const expectedSitemapPaths = [
   // Static generator deliberately appends original English Learn pages after
   // its localized experiment and About pages. Sitemaps have no priority order.
   ...LEARN_PUBLISHED_LOCALES.flatMap((locale) => LEARN_ROUTES.map((route) => routePath(locale, route))),
+  ...ENGLISH_ONLY_ROUTES.map((route) => routePath('en', route)),
   EDUCATION_RESOURCE_PATH,
 ];
+
+test('the timing resource is useful without scripts and publishes only its complete English edition', async () => {
+  const html = await readFile(new URL('en/browser-timing-explorer/index.html', DIST), 'utf8');
+  assert.ok(html.includes(timingExplorerMarkup()), 'the static resource must match its adopted runtime view');
+  assert.match(html, /248 ms/);
+  assert.match(html, /232 ms/);
+  assert.match(html, /20-minute activity/);
+  assert.match(html, /href="\/education\/browser-reaction-time\/"/);
+  assert.match(html, /data-timing-control="response"[^>]+disabled/);
+  assert.doesNotMatch(html, /rel="alternate" hreflang=/);
+  const data = JSON.parse(html.match(/<script type="application\/ld\+json">(.+)<\/script>/)?.[1] ?? '{}');
+  assert.equal(data['@graph'][0].dateModified, CONTENT_DATES.timingExplorer);
+  assert.equal(data['@graph'][0].inLanguage, 'en');
+  for (const locale of LOCALES.filter(({ code }) => code !== 'en')) {
+    await assert.rejects(stat(new URL(`${locale.code}/browser-timing-explorer/index.html`, DIST)));
+  }
+  for (const path of ['en/index.html', 'en/learn/index.html', 'en/reaction-time-guide/index.html']) {
+    const source = await readFile(new URL(path, DIST), 'utf8');
+    assert.ok(source.includes('href="/en/browser-timing-explorer/"'), `${path} must expose the resource`);
+  }
+});
 
 test('IndexNow root ownership proof is copied into the production artifact unchanged', async () => {
   const { file, key } = await publicIndexNowKey();
@@ -94,8 +125,7 @@ test('every localized static gallery features the same short Riflessi entry with
 });
 
 test('flagged East Asian gallery descriptions remain substantial and consistent in search and sharing metadata', async () => {
-  const source =
-    'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.';
+  const source = HOME_METADATA.description;
   for (const locale of ['ja', 'ko', 'zh-hans']) {
     const html = await readFile(new URL(`${locale}/index.html`, DIST), 'utf8');
     const messages = await loadMessages(locale);
@@ -287,7 +317,11 @@ test('every canonical route has substantive, localized raw HTML', async () => {
     );
     assert.equal(
       (html.match(/rel="alternate" hreflang=/g) ?? []).length,
-      publishedGuide ? learnAlternates(route).length : LOCALES.length + 1,
+      ENGLISH_ONLY_ROUTES.includes(route)
+        ? 0
+        : publishedGuide
+          ? learnAlternates(route).length
+          : LOCALES.length + 1,
       path,
     );
     assert.match(html, /<script type="application\/ld\+json">.+<\/script>/, path);
@@ -297,7 +331,8 @@ test('every canonical route has substantive, localized raw HTML', async () => {
       assert.doesNotMatch(html, /<meta name="robots" content="noindex">/, path);
     }
     assertCriticalDisplayFontPreloads(html, path, locale, route);
-    const stylesheet = publishedGuide ? 'learn' : route || 'gallery';
+    const stylesheet =
+      route === 'browser-timing-explorer' ? 'timing-explorer' : publishedGuide ? 'learn' : route || 'gallery';
     assert.match(
       html,
       new RegExp(`<link rel="stylesheet" crossorigin href="/assets/${escapeRegex(stylesheet)}-[^"]+\\.css">`),
@@ -597,6 +632,9 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   const redirects = await readFile(new URL('_redirects', DIST), 'utf8');
   assert.match(redirects, /^\/pt-BR\/\* \/pt-br\/:splat 301$/m);
   assert.match(redirects, /^\/zh-CN\/\* \/zh-hans\/:splat 301$/m);
+  assert.match(redirects, /^\/en\/\/ \/en\/ 301$/m);
+  assert.match(redirects, /^\/en\/reaction-time-guide\/\/ \/en\/reaction-time-guide\/ 301$/m);
+  assert.match(redirects, /^\/en\/browser-timing-explorer\/\/ \/en\/browser-timing-explorer\/ 301$/m);
 
   const sitemap = await readFile(new URL('sitemap.xml', DIST), 'utf8');
   const sitemapPaths = [...sitemap.matchAll(/<loc>https:\/\/sense6\.net([^<]*)<\/loc>/g)].map(
@@ -612,6 +650,7 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   );
   const expectedDates = new Map([
     ['/', CONTENT_DATES.site],
+    ['/en/browser-timing-explorer/', CONTENT_DATES.timingExplorer],
     [EDUCATION_RESOURCE_PATH, CONTENT_DATES.education],
     ...LEARN_PUBLISHED_LOCALES.flatMap((locale) =>
       LEARN_ROUTES.map((route) => [routePath(locale, route), learnMetadata(route, locale).dateModified]),
@@ -628,7 +667,10 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   const lastModified = [...sitemap.matchAll(/<lastmod>([^<]+)<\/lastmod>/g)].map((match) => match[1]);
   assert.equal(
     lastModified.length,
-    2 + LEARN_PUBLISHED_LOCALES.length * LEARN_ROUTES.length + LOCALES.length * (EXAMS.length + 2),
+    2 +
+      ENGLISH_ONLY_ROUTES.length +
+      LEARN_PUBLISHED_LOCALES.length * LEARN_ROUTES.length +
+      LOCALES.length * (EXAMS.length + 2),
   );
   for (const date of lastModified) {
     assert.match(date, /^\d{4}-\d{2}-\d{2}$/);
@@ -704,6 +746,7 @@ test('sitemap, robots, llms index, and 404 match the registry', async () => {
   assert.match(lesson, /These five fictional reaction-time readings/);
   assert.match(lesson, /This is a recreational, unvalidated browser task/);
   assert.match(lesson, /"@type": "LearningResource"/);
+  assert.match(lesson, /href="\/en\/browser-timing-explorer\/"/);
   assert.doesNotMatch(lesson, /onclick=|onload=|<iframe|leaderboard/i);
   const lessonCss = await readFile(new URL('education/browser-reaction-time/lesson.css', DIST), 'utf8');
   assert.match(lessonCss, /@media print/);

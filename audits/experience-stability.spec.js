@@ -4,9 +4,10 @@ const ADOPTED_ROUTES = [
   ['/en/', 'gallery'],
   ['/en/about/', 'about'],
   ['/en/privacy/', 'privacy'],
+  ['/en/browser-timing-explorer/', 'timing-explorer', 'browser-timing-explorer'],
 ];
 
-for (const [route, view] of ADOPTED_ROUTES) {
+for (const [route, view, hydrated = view] of ADOPTED_ROUTES) {
   test(`${route} adopts its static view without replacing it`, async ({ page }) => {
     const runtimeErrors = [];
     page.on('pageerror', (error) => runtimeErrors.push(error.message));
@@ -18,7 +19,7 @@ for (const [route, view] of ADOPTED_ROUTES) {
     );
     await observeInitialView(page);
     await page.goto(route, { waitUntil: 'networkidle' });
-    await page.locator(`#app[data-sense6-hydrated="${view}"]`).waitFor();
+    await page.locator(`#app[data-sense6-hydrated="${hydrated}"]`).waitFor();
     await page.locator(`[data-sense6-view="${view}"] h1`).waitFor();
     await page.evaluate(async () => document.fonts?.ready);
 

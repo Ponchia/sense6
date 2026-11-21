@@ -35,7 +35,10 @@ test('removed, noindex, and non-site routes do not become IndexNow submissions',
     changedPublicPaths({ '/en/': { hash: HASH_A } }, { '/en/journal/': { hash: HASH_B } }),
     [],
   );
-  assert.equal(SEARCH_ROUTES.length, 158);
+  assert.equal(SEARCH_ROUTES.length, 159);
+  assert.deepEqual(changedPublicPaths({}, { '/en/browser-timing-explorer/': { hash: HASH_B } }), [
+    '/en/browser-timing-explorer/',
+  ]);
   assert.ok(!SEARCH_ROUTES.some((route) => /\/(?:journal|privacy)\/$/.test(route)));
 });
 

@@ -11,7 +11,16 @@ export const LEARN_ROUTES = Object.freeze([
 ]);
 export const UTILITY_ROUTES = Object.freeze(['about', 'journal', 'privacy']);
 export const NON_INDEXABLE_ROUTES = Object.freeze(['journal', 'privacy']);
-export const STATIC_ADOPTED_ROUTES = Object.freeze(['', 'about', 'privacy', ...LEARN_ROUTES]);
+// Standalone resources publish only where complete content exists. They do not
+// inherit the experiment UI's twelve-language availability.
+export const ENGLISH_ONLY_ROUTES = Object.freeze(['browser-timing-explorer']);
+export const STATIC_ADOPTED_ROUTES = Object.freeze([
+  '',
+  'about',
+  'privacy',
+  ...LEARN_ROUTES,
+  ...ENGLISH_ONLY_ROUTES,
+]);
 export const SITE_ORIGIN = 'https://sense6.net';
 
 /** @typedef {{ locale: string, route: string, path: string, title: string, description: string, canonical: string, socialImage: string, socialImageAlt: string, indexable: boolean, structuredData?: object }} RouteMetadata */
@@ -80,19 +89,21 @@ export function applyRouteMetadata(metadata, root = document) {
     LEARN_ROUTES.includes(metadata.route) && metadata.route !== 'learn' ? 'article' : 'website',
   );
   for (const link of root.querySelectorAll('link[rel="alternate"][hreflang]')) link.remove();
-  const alternates = LEARN_ROUTES.includes(metadata.route)
-    ? learnAlternates(metadata.route)
-    : [
-        ...LOCALES.map(({ code, languageTag }) => ({
-          languageTag,
-          href: `${SITE_ORIGIN}${routePath(code, metadata.route)}`,
-        })),
-        {
-          languageTag: 'x-default',
-          href:
-            metadata.path === '/' ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}${routePath('en', metadata.route)}`,
-        },
-      ];
+  const alternates = ENGLISH_ONLY_ROUTES.includes(metadata.route)
+    ? []
+    : LEARN_ROUTES.includes(metadata.route)
+      ? learnAlternates(metadata.route)
+      : [
+          ...LOCALES.map(({ code, languageTag }) => ({
+            languageTag,
+            href: `${SITE_ORIGIN}${routePath(code, metadata.route)}`,
+          })),
+          {
+            languageTag: 'x-default',
+            href:
+              metadata.path === '/' ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}${routePath('en', metadata.route)}`,
+          },
+        ];
   for (const alternate of alternates) {
     const link = root.createElement('link');
     link.rel = 'alternate';
@@ -100,17 +111,12 @@ export function applyRouteMetadata(metadata, root = document) {
     link.href = alternate.href;
     root.head.append(link);
   }
-  // Remove stale Learn Article/CollectionPage claims when leaving a guide.
+  // Keep matching static schema during hydration. On navigation, retire the
+  // previous page's complete graph, including its breadcrumb, while retaining
+  // standalone site-wide identity. A supplied destination graph replaces both.
   for (const script of root.querySelectorAll('script[type="application/ld+json"]')) {
     const data = JSON.parse(script.textContent ?? '{}');
-    if (
-      metadata.structuredData ||
-      data['@graph']?.some(
-        /** @param {{'@type'?: string}} entry */ (entry) =>
-          ['Article', 'CollectionPage'].includes(entry['@type'] ?? ''),
-      )
-    )
-      script.remove();
+    if (metadata.structuredData || describesAnotherRoute(data, metadata.canonical)) script.remove();
   }
   if (metadata.structuredData) {
     const script = root.createElement('script');
@@ -118,6 +124,26 @@ export function applyRouteMetadata(metadata, root = document) {
     script.textContent = JSON.stringify(metadata.structuredData);
     root.head.append(script);
   }
+}
+
+const ROUTE_SCHEMA_TYPES = new Set(['WebApplication', 'AboutPage', 'Article', 'CollectionPage', 'WebPage']);
+
+/**
+ * Current static and resource builders put the page identity in `url`.
+ * Person and WebSite URLs describe shared entities, not the active route.
+ * @param {{ '@graph'?: Array<{ '@type'?: string | string[], url?: string }>, '@type'?: string | string[], url?: string }} data
+ * @param {string} canonical
+ */
+function describesAnotherRoute(data, canonical) {
+  const entries = data['@graph'] ?? [data];
+  return entries.some((entry) => {
+    const types = Array.isArray(entry['@type']) ? entry['@type'] : [entry['@type']];
+    return (
+      types.some((type) => ROUTE_SCHEMA_TYPES.has(type ?? '')) &&
+      typeof entry.url === 'string' &&
+      entry.url !== canonical
+    );
+  });
 }
 
 /** @param {Document} root @param {boolean} indexable */

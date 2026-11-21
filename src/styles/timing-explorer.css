@@ -1,0 +1,530 @@
+/* An English teaching tool; styles are owned by this lazy route. */
+.timing-explorer {
+  max-inline-size: 82rem;
+  padding-block: clamp(1rem, 2vw, 1.75rem) clamp(3rem, 6vw, 5rem);
+}
+
+.timing-explorer__breadcrumb,
+.timing-explorer__jumps,
+.timing-explorer__actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+}
+
+.timing-explorer__breadcrumb {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  gap: 0.5rem;
+  line-height: 1.5;
+  margin-block-end: 1rem;
+  overflow-wrap: anywhere;
+}
+
+.timing-explorer a:not(.ui-button) {
+  color: var(--text);
+  text-decoration-line: underline;
+  text-underline-offset: 0.2em;
+}
+
+.timing-explorer a:not(.ui-button):hover {
+  color: var(--accent-text);
+}
+
+.timing-explorer a:focus-visible,
+.timing-explorer input:focus-visible,
+.timing-explorer select:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+.timing-explorer__hero {
+  border-block-end: 1px solid var(--line);
+  padding-block-end: 0.75rem;
+}
+
+.timing-explorer h1 {
+  font-family: var(--display);
+  font-size: clamp(2.6rem, 5.8vw, 5.5rem);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  line-height: 1.02;
+  margin-block: 0.65rem 0.85rem;
+  max-inline-size: 26ch;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.timing-explorer__lede {
+  color: var(--text-soft);
+  font-size: clamp(1.1rem, 1.9vw, 1.4rem);
+  line-height: 1.55;
+  margin-block: 0.75rem 0;
+  max-inline-size: 68ch;
+}
+
+.timing-explorer__byline {
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  margin-block: 0.75rem;
+}
+
+.timing-explorer__jumps a {
+  align-items: center;
+  display: inline-flex;
+  font-size: 0.95rem;
+  min-block-size: 2.75rem;
+  padding-block: 0.35rem;
+}
+
+.timing-explorer__comparison,
+.timing-explorer__activity,
+.timing-explorer__explanation {
+  margin-block-start: clamp(2.5rem, 5vw, 4rem);
+  scroll-margin-block-start: 2rem;
+}
+
+/* The first control should follow the explanation without a second hero gap. */
+.timing-explorer__comparison {
+  margin-block-start: 1.25rem;
+}
+
+.timing-explorer__heading {
+  align-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 3rem;
+  justify-content: space-between;
+  margin-block-end: 1.5rem;
+}
+
+.timing-explorer h2 {
+  font-size: clamp(1.8rem, 3.2vw, 2.65rem);
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  margin-block: 0.5rem 1rem;
+  max-inline-size: 26ch;
+  text-wrap: balance;
+}
+
+.timing-explorer__heading > p {
+  color: var(--text-soft);
+  flex-basis: 34rem;
+  line-height: 1.65;
+  margin: 0;
+}
+
+:where(.timing-explorer__comparison) .timing-explorer__heading {
+  gap: 0.5rem 1.5rem;
+  margin-block-end: 1rem;
+}
+
+.timing-explorer__comparison h2 {
+  margin-block: 0.35rem 0.5rem;
+}
+
+.timing-explorer__response {
+  align-items: center;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  display: grid;
+  gap: 1rem 2.5rem;
+  grid-template-columns: minmax(0, 1fr) minmax(12rem, 0.55fr);
+  padding: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+.timing-explorer label {
+  display: block;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.timing-explorer__response p,
+.timing-explorer__control p,
+.timing-explorer__refresh p {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin-block: 0.4rem 0;
+}
+
+.timing-explorer input[type="range"] {
+  accent-color: var(--accent);
+  display: block;
+  inline-size: 100%;
+  margin-block: 0.5rem 0;
+  min-block-size: 2.75rem;
+}
+
+.timing-explorer output {
+  font-variant-numeric: tabular-nums;
+}
+
+.timing-explorer__response output,
+.timing-explorer__control output {
+  font-family: var(--mono);
+  font-weight: 650;
+}
+
+.timing-explorer__scenarios {
+  display: grid;
+  gap: 1px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  background: var(--line-strong);
+  border: 1px solid var(--line-strong);
+  margin-block-start: 1.25rem;
+}
+
+.timing-explorer__scenario {
+  background: var(--panel);
+  min-inline-size: 0;
+  padding: clamp(1rem, 3vw, 2.25rem);
+}
+
+.timing-explorer__scenario h3 {
+  font-size: 1.4rem;
+  letter-spacing: -0.025em;
+  margin-block: 0 1.5rem;
+}
+
+.timing-explorer__total-label {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin-block: 0;
+}
+
+.timing-explorer__total {
+  display: block;
+  font-family: var(--display);
+  font-size: clamp(2.8rem, 5vw, 4.5rem);
+  font-weight: 800;
+  letter-spacing: -0.055em;
+  line-height: 1.2;
+  margin-block: 0.35rem 0.8rem;
+}
+
+.timing-explorer__bar {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  display: flex;
+  block-size: 1rem;
+  overflow: hidden;
+}
+
+.timing-explorer__bar-response {
+  background: var(--text-soft);
+}
+
+.timing-explorer__bar-display {
+  background: var(--accent);
+}
+
+.timing-explorer__bar-input {
+  background: var(--text);
+}
+
+.timing-explorer__equation {
+  color: var(--text-soft);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.7;
+  margin-block: 0.75rem 1.8rem;
+  overflow-wrap: anywhere;
+}
+
+.timing-explorer__control + .timing-explorer__control {
+  margin-block-start: 1.3rem;
+}
+
+.timing-explorer__control > div {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1rem;
+  justify-content: space-between;
+}
+
+.timing-explorer__refresh {
+  border-block-start: 1px solid var(--line);
+  margin-block-start: 1.75rem;
+  padding-block-start: 1.2rem;
+}
+
+.timing-explorer__refresh select {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  display: block;
+  font: inherit;
+  inline-size: 100%;
+  margin-block: 0.55rem 0.75rem;
+  min-block-size: 2.75rem;
+  padding: 0.5rem 0.7rem;
+}
+
+.timing-explorer__refresh output {
+  display: block;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.timing-explorer__difference {
+  border-inline-start: 3px solid var(--accent);
+  margin-block: 1.75rem;
+  padding-inline-start: 1.25rem;
+}
+
+.timing-explorer__difference output {
+  display: block;
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  font-weight: 650;
+  line-height: 1.5;
+  max-inline-size: 60ch;
+}
+
+.timing-explorer__difference p:last-child {
+  color: var(--text-soft);
+  line-height: 1.6;
+  margin-block: 0.7rem 0;
+}
+
+.timing-explorer__actions .ui-button {
+  max-inline-size: 100%;
+  text-align: center;
+  white-space: normal;
+}
+
+.timing-explorer__share-note,
+.timing-explorer__status {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  max-inline-size: 75ch;
+}
+
+.timing-explorer__status {
+  min-block-size: 1.6em;
+}
+
+.timing-explorer__share-field:not([hidden]) {
+  display: grid;
+  gap: 0.5rem;
+  max-inline-size: 60rem;
+}
+
+.timing-explorer__share-field input {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--line-strong);
+  font: inherit;
+  inline-size: 100%;
+  min-block-size: 2.75rem;
+  padding: 0.65rem;
+}
+
+.timing-explorer__activity {
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  padding: clamp(1.1rem, 3.2vw, 2.75rem);
+}
+
+.timing-explorer__activity > p,
+.timing-explorer__steps,
+.timing-explorer__reading p,
+.timing-explorer__explanation > p {
+  color: var(--text-soft);
+  line-height: 1.7;
+  max-inline-size: 74ch;
+}
+
+.timing-explorer__steps {
+  padding-inline-start: 1.4rem;
+}
+
+.timing-explorer__steps li {
+  padding-inline-start: 0.2rem;
+  margin-block: 0.9rem;
+}
+
+.timing-explorer__worksheet {
+  margin-block: 1.8rem;
+}
+
+.timing-explorer__worksheet table {
+  border-collapse: collapse;
+  inline-size: 100%;
+  table-layout: fixed;
+  text-align: start;
+}
+
+.timing-explorer__worksheet caption {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin-block-end: 0.7rem;
+  text-align: start;
+}
+
+.timing-explorer__worksheet th,
+.timing-explorer__worksheet td {
+  border: 1px solid var(--line-strong);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  padding: 0.65rem;
+  text-align: start;
+}
+
+.timing-explorer__worksheet td {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.timing-explorer__prompt {
+  overflow-wrap: anywhere;
+}
+
+.timing-explorer__activity .timing-explorer__activity-note,
+.timing-explorer__print-source {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.timing-explorer__print-source {
+  display: none;
+}
+
+.timing-explorer__reading {
+  display: grid;
+  gap: 1.5rem 2.5rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.timing-explorer__reading section {
+  min-inline-size: 0;
+}
+
+.timing-explorer__reading h3 {
+  font-size: 1.25rem;
+  letter-spacing: -0.025em;
+  line-height: 1.4;
+}
+
+.timing-explorer__boundary {
+  border-block-start: 1px solid var(--line);
+  margin-block: 2rem;
+  padding-block-start: 1.5rem;
+}
+
+@media (min-width: 900px) {
+  :where(.timing-explorer__comparison) .timing-explorer__heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 800px) {
+  .timing-explorer__reading {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .timing-explorer__jumps {
+    align-items: stretch;
+    display: grid;
+    gap: 0.25rem 0.75rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .timing-explorer__response {
+    gap: 0.5rem;
+  }
+
+  .timing-explorer__response,
+  .timing-explorer__scenarios {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .timing-explorer__worksheet th,
+  .timing-explorer__worksheet td {
+    font-size: 0.75rem;
+    padding: 0.45rem 0.3rem;
+  }
+}
+
+@media print {
+  body:has(.timing-explorer) {
+    background: white;
+    color: black;
+  }
+
+  body:has(.timing-explorer) .site-chrome,
+  body:has(.timing-explorer) .ui-sitefooter,
+  body:has(.timing-explorer) .ui-skiplink,
+  .timing-explorer > :not(.timing-explorer__activity),
+  .timing-explorer__activity button {
+    display: none;
+  }
+
+  .timing-explorer,
+  .timing-explorer__activity {
+    background: white;
+    border: 0;
+    color: black;
+    margin: 0;
+    max-inline-size: none;
+    padding: 0;
+  }
+
+  .timing-explorer__activity h2 {
+    font-size: 20pt;
+    max-inline-size: none;
+  }
+
+  .timing-explorer__activity p,
+  .timing-explorer__activity li,
+  .timing-explorer__activity a,
+  .timing-explorer__activity caption,
+  .timing-explorer__activity th,
+  .timing-explorer__activity td {
+    color: black;
+    font-size: 10pt;
+    line-height: 1.4;
+    max-inline-size: none;
+  }
+
+  .timing-explorer__activity .ui-eyebrow,
+  .timing-explorer__activity .timing-explorer__activity-note,
+  .timing-explorer__activity .timing-explorer__print-source {
+    color: black;
+    font-size: 8.5pt;
+  }
+
+  .timing-explorer__heading,
+  .timing-explorer__worksheet {
+    margin-block: 0 0.8rem;
+  }
+
+  .timing-explorer__worksheet th,
+  .timing-explorer__worksheet td {
+    border-color: black;
+  }
+
+  .timing-explorer__worksheet,
+  .timing-explorer__steps li,
+  .timing-explorer__prompt {
+    break-inside: avoid;
+  }
+
+  .timing-explorer__print-source {
+    display: block;
+    overflow-wrap: anywhere;
+  }
+}

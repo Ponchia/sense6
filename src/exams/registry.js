@@ -20,13 +20,13 @@ export const EXAMS = Object.freeze([
     discoveryName: 'Tetracromia — Screen Colour Lab',
     tagline: 'Three short colour observations',
     blurb:
-      'Tetracromia is a recreational screen-colour lab with three separate, short-run observations and no overall score.',
+      'Match colour tiles, spot differences in noisy dots and arrange hues. Explore three observations on your screen, with no overall score.',
     accent: 'var(--accent)',
     durationMinutes: 4,
     glyph: 'ΔE',
     category: 'Colour discrimination',
-    facts: ['Fixed 29-block dose', '3 separate observations', 'No composite score'],
-    pageTitle: 'Tetracromia — colour discrimination | Sense6',
+    facts: ['Tile choices', 'Dot fields', 'Hue ordering'],
+    pageTitle: 'Colour discrimination experiment — Tetracromia | Sense6',
     limit: 'This is not a medical test and cannot confirm tetrachromacy.',
     discovery: {
       paragraphs: [
@@ -43,13 +43,13 @@ export const EXAMS = Object.freeze([
     discoveryName: 'Daltonia — Colour Discrimination Lab',
     tagline: 'Adaptive browser colour-vision experiment',
     blurb:
-      'Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.',
+      'Find the gap as colour differences get smaller. Explore three colour directions on your screen, without a colour-vision diagnosis.',
     accent: '#3bd6a2',
     durationMinutes: 3,
     glyph: 'C',
     category: 'Colour-vision experiment',
-    facts: ['Adaptive levels', '3 display directions', 'Run-relative result'],
-    pageTitle: 'Experimental colour-vision check — Daltonia | Sense6',
+    facts: ['Spot the gap', 'Colour differences', 'Changing difficulty'],
+    pageTitle: 'Colour vision experiment — Daltonia | Sense6',
     limit:
       'Experimental and unvalidated. This is not a colour blindness test: it is not a screening result or diagnosis.',
     discovery: {
@@ -68,13 +68,13 @@ export const EXAMS = Object.freeze([
     discoveryName: 'Riflessi — Reaction Time Lab',
     tagline: 'Response speed, choice task & consistency',
     blurb:
-      'Three instruments keep simple response, a choice task, and within-run stability as separate observations.',
+      'React to a signal, make a choice and follow your responses over time. See separate results for each task on this setup.',
     accent: '#f4b942',
     durationMinutes: 7,
     glyph: 'R',
     category: 'Response timing',
-    facts: ['3 instruments', 'Device-relative timing', 'No composite score'],
-    pageTitle: 'Response speed and consistency — Riflessi | Sense6',
+    facts: ['Simple visual response', 'Two-choice response', 'Sustained response'],
+    pageTitle: 'Reaction time test — simple & choice tasks | Sense6',
     limit: 'Compare only on the same device and input. Not a clinical or population score.',
     discovery: {
       paragraphs: [
@@ -92,13 +92,13 @@ export const EXAMS = Object.freeze([
     discoveryName: 'Udito — Hearing Range & Pitch Lab',
     tagline: 'Headphone confidence, audibility & pitch',
     blurb:
-      'Three listening instruments map this setup without pretending an uncalibrated browser is an audiometer.',
+      'Explore which tones you hear and how small a pitch change you notice. Keep a comfortable volume and read each result separately.',
     accent: '#4cc9f0',
     durationMinutes: 6,
     glyph: 'U',
     category: 'Listening experiment',
-    facts: ['3 instruments', 'Volume safety contract', 'No hearing label'],
-    pageTitle: 'Device-relative hearing lab — Udito | Sense6',
+    facts: ['Comfortable-volume setup', 'Hearing range', 'Pitch discrimination'],
+    pageTitle: 'Hearing range & pitch experiment — Udito | Sense6',
     limit: 'This is not a clinical hearing test: no dB HL, hearing age, diagnosis, or population score.',
     discovery: {
       paragraphs: [
@@ -116,13 +116,13 @@ export const EXAMS = Object.freeze([
     discoveryName: 'Acutezza — Visual Sharpness Lab',
     tagline: 'Calibrated sharpness & nominal contrast',
     blurb:
-      'Two per-eye conditions describe angular detail and nominal low-contrast cost without making a clinical claim.',
+      'Set the screen scale, find a small gap and try lower contrast. Explore visual detail for each eye on this setup.',
     accent: '#8357ff',
     durationMinutes: 8,
     glyph: 'A',
     category: 'Calibrated sharpness experiment',
-    facts: ['Physical screen calibration', '2 per-eye conditions', 'No clinical label'],
-    pageTitle: 'Calibrated sharpness experiment — Acutezza | Sense6',
+    facts: ['Physical screen calibration', 'High contrast', 'Low contrast'],
+    pageTitle: 'Visual sharpness & contrast experiment — Acutezza | Sense6',
     limit:
       'This is not a visual acuity test: no 20/20 label, diagnosis, astigmatism detection, or prescription.',
     discovery: {

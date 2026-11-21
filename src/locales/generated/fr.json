@@ -53,6 +53,63 @@
     "At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.",
     "Au moins un contrôle de configuration, des interruptions, du volume ou du parcours adaptatif a présenté des limites. Les observations restent visibles, mais une nouvelle tentative dans des conditions plus stables est préférable avant toute comparaison."
   ],
+  [
+    "Sense6 — reaction time & perception experiments",
+    "Sense6 — temps de réaction et expériences de perception"
+  ],
+  [
+    "Explore free browser experiments in reaction time, colour, hearing and visual detail. Private, device-relative results with no account or result uploads.",
+    "Explorez gratuitement le temps de réaction, les couleurs, l’audition et les détails visuels dans le navigateur. Résultats privés, propres à l’appareil, sans compte ni envoi."
+  ],
+  ["Browser perception lab", "Laboratoire de perception dans le navigateur"],
+  ["Explore how you", "Explorez comment vous"],
+  ["see, hear and react.", "voyez, entendez et réagissez."],
+  [
+    "Try five free experiments in colour, hearing, visual detail and reaction time. Your device and setup shape every result.",
+    "Essayez cinq expériences gratuites sur les couleurs, l’audition, les détails visuels et le temps de réaction. L’appareil et la configuration influencent chaque résultat."
+  ],
+  [
+    "Colour discrimination experiment — Tetracromia | Sense6",
+    "Expérience de discrimination des couleurs — Tetracromia | Sense6"
+  ],
+  ["Colour vision experiment — Daltonia | Sense6", "Expérience de vision des couleurs — Daltonia | Sense6"],
+  [
+    "Reaction time test — simple & choice tasks | Sense6",
+    "Test du temps de réaction — réponse simple et choix | Sense6"
+  ],
+  [
+    "Hearing range & pitch experiment — Udito | Sense6",
+    "Expérience de plage audible et de hauteur tonale — Udito | Sense6"
+  ],
+  [
+    "Visual sharpness & contrast experiment — Acutezza | Sense6",
+    "Expérience de netteté visuelle et de contraste — Acutezza | Sense6"
+  ],
+  ["Spot the gap", "Repérer l’ouverture"],
+  ["Colour differences", "Différences de couleur"],
+  ["Changing difficulty", "Difficulté variable"],
+  ["Comfortable-volume setup", "Régler un volume confortable"],
+  ["Hearing range", "Plage audible"],
+  [
+    "Match colour tiles, spot differences in noisy dots and arrange hues. Explore three observations on your screen, with no overall score.",
+    "Associez des cases colorées, repérez des différences dans des champs de points et ordonnez les teintes. Explorez trois observations sur votre écran, sans score global."
+  ],
+  [
+    "Find the gap as colour differences get smaller. Explore three colour directions on your screen, without a colour-vision diagnosis.",
+    "Repérez l’ouverture à mesure que les différences de couleur diminuent. Explorez trois directions chromatiques sur votre écran, sans diagnostic de la vision des couleurs."
+  ],
+  [
+    "React to a signal, make a choice and follow your responses over time. See separate results for each task on this setup.",
+    "Réagissez à un signal, faites un choix et observez vos réponses au fil du temps. Chaque tâche fournit un résultat distinct pour cette configuration."
+  ],
+  [
+    "Explore which tones you hear and how small a pitch change you notice. Keep a comfortable volume and read each result separately.",
+    "Explorez les sons que vous entendez et les petites variations de hauteur que vous remarquez. Gardez un volume confortable et lisez chaque résultat séparément."
+  ],
+  [
+    "Set the screen scale, find a small gap and try lower contrast. Explore visual detail for each eye on this setup.",
+    "Réglez l’échelle de l’écran, repérez une petite ouverture et essayez un contraste réduit. Explorez les détails visuels pour chaque œil dans cette configuration."
+  ],
   ["How much do you want to run?", "Quelle doit être la profondeur de la session ?"],
   ["about 2 minutes", "environ 2 minutes"],
   ["about 4 minutes", "environ 4 minutes"],

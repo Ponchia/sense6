@@ -32,7 +32,7 @@ test('a dynamic route import failure renders a recoverable route boundary', asyn
   test.skip(testInfo.project.name !== 'chromium', 'Single-browser route failure injection');
   const pageErrors = capturePageErrors(page);
   await page.goto('/en/');
-  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Explore how you see, hear and react/i })).toBeVisible();
   await page.route('**/src/journal.js*', (route) => route.abort('failed'));
 
   await page.getByRole('link', { name: 'Journal', exact: true }).click();
@@ -46,7 +46,7 @@ test('a locale load failure preserves the committed route', async ({ page }, tes
   test.skip(testInfo.project.name !== 'chromium', 'Single-browser route failure injection');
   const pageErrors = capturePageErrors(page);
   await page.goto('/en/');
-  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Explore how you see, hear and react/i })).toBeVisible();
   await page.evaluate(() => {
     window.__sense6RouteRoot = document.querySelector('#app')?.firstElementChild;
   });
@@ -59,7 +59,7 @@ test('a locale load failure preserves the committed route', async ({ page }, tes
   });
 
   await expect.poll(() => routeRootWasPreserved(page)).toBe(true);
-  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Explore how you see, hear and react/i })).toBeVisible();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(page.locator('[data-locale-select]')).toHaveValue('en');
   await expect(page.getByRole('heading', { name: 'Page unavailable.' })).toHaveCount(0);
@@ -95,7 +95,7 @@ test('a translation failure during commit does not strand the router', async ({ 
   test.skip(testInfo.project.name !== 'chromium', 'Single-browser route failure injection');
   const pageErrors = capturePageErrors(page);
   await page.goto('/en/');
-  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Explore how you see, hear and react/i })).toBeVisible();
   await page.evaluate(() => {
     const createTreeWalker = document.createTreeWalker.bind(document);
     document.createTreeWalker = (...args) => {
@@ -134,7 +134,7 @@ test('a throwing controller mount disposes its partial lifecycle', async ({ page
     }),
   );
   await page.goto('/en/');
-  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Explore how you see, hear and react/i })).toBeVisible();
 
   await page.locator('.exam-card__link[data-sense6-route="udito"]').click();
 
@@ -161,7 +161,7 @@ async function expectRouteFailure(page) {
 
 async function recoverToGallery(page) {
   await page.locator('#app').getByRole('link', { name: 'All tests', exact: true }).click();
-  await expect(page.getByRole('heading', { name: /Measure what your senses notice/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /Explore how you see, hear and react/i })).toBeVisible();
   await expect(page.locator('#app')).toHaveAttribute('data-sense6-hydrated', 'gallery');
 }
 

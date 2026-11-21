@@ -11,6 +11,12 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 
 ### Added
 
+- Browser Timing Explorer: two hypothetical timing scenarios, independent
+  refresh-interval arithmetic, shareable example settings and a printable
+  20-minute activity. The English resource has substantive static HTML and
+  contextual links from the gallery and research guides, adding one canonical
+  page to the existing site.
+
 - Public bug and improvement forms, maintainer review routing, and optional
   Ko-fi sponsorship in GitHub.
 - Contributor, security, and public-repository preparation guides, with generated
@@ -36,6 +42,13 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
   and true transitive startup-bundle ratchets.
 
 ### Changed
+
+- Clearer homepage language and experiment search titles across all 12 UI
+  languages. Gallery cards describe the activities visitors can try; experiment
+  methods, setup, consent and interpretation boundaries remain unchanged.
+- Exact canonical redirects for doubled slashes on known indexable pages,
+  retaining query parameters and existing locale aliases. Unknown paths remain
+  missing pages.
 
 - Public repository maintenance now documents the completed hosted launch,
   sponsorship and branch-cleanup controls; package metadata includes the

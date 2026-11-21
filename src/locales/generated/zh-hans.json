@@ -47,6 +47,48 @@
     "At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.",
     "设置、中断、音量或自适应轨迹的检查中至少有一项受到限制。观察结果仍会显示，但比较前应在更稳定的条件下重新测试。"
   ],
+  ["Sense6 — reaction time & perception experiments", "Sense6 — 反应时间与感知实验"],
+  [
+    "Explore free browser experiments in reaction time, colour, hearing and visual detail. Private, device-relative results with no account or result uploads.",
+    "Sense6 是免费的浏览器感知实验室，提供色彩辨别、反应时间、可听范围、音高与视觉细节实验。你可以尝试简短任务，并结合研究解说理解屏幕、输入设备、音量与设置如何影响结果。无需注册账户，回答和测量结果保存在你的设备上，可在本地日志中回顾相同设置下的记录。每项观察分别呈现，不给出诊断、能力排名或综合分数。"
+  ],
+  ["Browser perception lab", "浏览器感知实验室"],
+  ["Explore how you", "探索你的感知："],
+  ["see, hear and react.", "看、听与反应。"],
+  [
+    "Try five free experiments in colour, hearing, visual detail and reaction time. Your device and setup shape every result.",
+    "尝试五项免费的色彩、听觉、视觉细节与反应时间实验。设备和设置会影响每一项结果。"
+  ],
+  ["Colour discrimination experiment — Tetracromia | Sense6", "色彩辨别实验 — Tetracromia | Sense6"],
+  ["Colour vision experiment — Daltonia | Sense6", "色觉实验 — Daltonia | Sense6"],
+  ["Reaction time test — simple & choice tasks | Sense6", "反应时间测试 — 简单反应与选择任务 | Sense6"],
+  ["Hearing range & pitch experiment — Udito | Sense6", "可听范围与音高实验 — Udito | Sense6"],
+  ["Visual sharpness & contrast experiment — Acutezza | Sense6", "视觉清晰度与对比度实验 — Acutezza | Sense6"],
+  ["Spot the gap", "寻找缺口"],
+  ["Colour differences", "色彩差异"],
+  ["Changing difficulty", "变化的难度"],
+  ["Comfortable-volume setup", "舒适音量设置"],
+  ["Hearing range", "可听范围"],
+  [
+    "Match colour tiles, spot differences in noisy dots and arrange hues. Explore three observations on your screen, with no overall score.",
+    "匹配色块、辨别点阵中的差异并排列色相。在你的屏幕上探索三项独立观察，不提供总分。"
+  ],
+  [
+    "Find the gap as colour differences get smaller. Explore three colour directions on your screen, without a colour-vision diagnosis.",
+    "在色彩差异逐渐缩小时寻找缺口。探索屏幕上的三个色彩方向，不作色觉诊断。"
+  ],
+  [
+    "React to a signal, make a choice and follow your responses over time. See separate results for each task on this setup.",
+    "对信号作出反应、作出选择，并观察反应随时间的变化。分别查看当前设置下各项任务的结果。"
+  ],
+  [
+    "Explore which tones you hear and how small a pitch change you notice. Keep a comfortable volume and read each result separately.",
+    "探索你能听到哪些音调，以及能察觉多小的音高变化。保持舒适音量，分别阅读每项结果。"
+  ],
+  [
+    "Set the screen scale, find a small gap and try lower contrast. Explore visual detail for each eye on this setup.",
+    "设置屏幕比例、寻找小缺口并尝试较低对比度。在当前设置下分别探索每只眼睛对视觉细节的辨别。"
+  ],
   ["How much do you want to run?", "你希望测试进行到什么程度？"],
   ["about 2 minutes", "约2分钟"],
   ["about 4 minutes", "约4分钟"],

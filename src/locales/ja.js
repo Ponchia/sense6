@@ -18,13 +18,6 @@ const rows = [
   ['How Sense6 works', 'Sense6の仕組み'],
   ['Try a short reaction test', '短い反応速度テストを試す'],
   ['Source', 'ソース'],
-  ['Sense6 — measure what your senses notice', 'Sense6 — 感覚が捉えるものを測る'],
-  ['Measure what your', '感覚が捉える'],
-  ['senses notice.', 'ものを測る。'],
-  [
-    'Short, careful tests that turn what you notice into honest, device-relative results.',
-    '短く丁寧なテストで、あなたが感じ取ったものを、このデバイス上での率直な結果にします。',
-  ],
   ['No account, no answers or results uploaded.', 'アカウント不要。回答や結果は送信しません。'],
   [
     'Experimental perception tests for curiosity and fun—not medical tests or diagnoses.',
@@ -55,28 +48,14 @@ const rows = [
   ['What this test includes', 'このテストの内容'],
   ['Colour discrimination', '色弁別'],
   ['Adaptive browser colour-vision experiment', 'ブラウザで行う適応型色覚実験'],
-  [
-    'Find a gap hidden in luminance-noise dots while three display-relative colour directions adapt independently.',
-    'ディスプレイ相対の3つの色方向を個別に調整しながら、輝度ノイズの点に隠れた切れ目を探します。',
-  ],
   ['Colour-vision experiment', '色覚実験'],
-  ['3 display directions', 'ディスプレイ上の3方向'],
-  ['Run-relative result', 'この測定内の相対結果'],
   ['Response timing', '反応時間'],
-  ['Device-relative timing', 'デバイス相対の時間'],
   ['No composite score', '複合スコアなし'],
   ['Headphone confidence, audibility & pitch', 'ヘッドホン提示の確度、可聴性、音高'],
-  [
-    'Three listening instruments map this setup without pretending an uncalibrated browser is an audiometer.',
-    '未較正のブラウザを聴力計に見立てることなく、3つの聴取測定で現在の環境を捉えます。',
-  ],
   ['Listening experiment', '聴取実験'],
-  ['Volume safety contract', '安全な音量の確認事項'],
   ['No hearing label', '聴力の判定なし'],
-  ['3 instruments', '3つの測定項目'],
   ['Calibrated sharpness experiment', '較正した視認精度の実験'],
   ['Physical screen calibration', '画面の物理サイズを較正'],
-  ['No clinical label', '臨床的判定なし'],
   ['Calibrate the screen.', '画面を較正する。'],
   ['Resolve the opening.', '切れ目を見分ける。'],
   ['Prepare the vision lab', '視覚ラボの準備'],
@@ -189,7 +168,6 @@ const rows = [
     'This is not vision screening, diagnosis, or a prescription.',
     'これは視力スクリーニング、診断、処方ではありません。',
   ],
-  ['Calibrated sharpness experiment — Acutezza | Sense6', '較正した視認精度の実験 — Acutezza | Sense6'],
   ['Calibrate screen size — Acutezza | Sense6', '画面サイズを較正 — Acutezza | Sense6'],
   ['Estimate viewing distance — Acutezza | Sense6', '視距離を推定 — Acutezza | Sense6'],
   [
@@ -999,21 +977,6 @@ const rows = [
   [
     'This is not dB HL, a hearing-age score, screening, or diagnosis.',
     'dB HL、聴力年齢スコア、スクリーニング、診断ではありません。',
-  ],
-  [
-    'Private browser tests for colour, response timing, hearing, and calibrated visual detail. Answers and results stay in your browser.',
-    '色、反応時間、聴覚、較正した視認精度を測る、プライバシー重視のブラウザテストです。回答と結果はブラウザ内に留まります。',
-  ],
-  ['Tetracromia — colour discrimination | Sense6', 'Tetracromia — 色弁別 | Sense6'],
-  [
-    'Experimental colour-vision check — Daltonia | Sense6',
-    'ブラウザで行う実験的な色覚確認 — Daltonia | Sense6',
-  ],
-  ['Response speed and consistency — Riflessi | Sense6', '反応速度と一貫性 — Riflessi | Sense6'],
-  ['Device-relative hearing lab — Udito | Sense6', 'デバイス相対の聴取ラボ — Udito | Sense6'],
-  [
-    'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
-    'Sense6 では、色の違いを見分ける課題、色覚に関する実験、反応時間、聞こえる音の範囲、画面上の細部の識別を、短いブラウザテストで試せます。結果は画面や音声機器、利用環境に左右される観察値であり、医療検査や診断ではありません。アカウントは不要で、個々の回答や結果はサーバーへ送信されず、このブラウザ内で保存できます.',
   ],
   [
     'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',

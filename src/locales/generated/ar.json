@@ -47,6 +47,54 @@
     "At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.",
     "كانت هناك قيود في فحص واحد على الأقل من فحوص الإعداد أو الانقطاعات أو مستوى الصوت أو المسار التكيّفي. تظل الملاحظات ظاهرة، لكن يُفضّل تكرار التجربة في ظروف أكثر استقرارًا قبل مقارنتها."
   ],
+  ["Sense6 — reaction time & perception experiments", "Sense6 — زمن الاستجابة وتجارب الإدراك"],
+  [
+    "Explore free browser experiments in reaction time, colour, hearing and visual detail. Private, device-relative results with no account or result uploads.",
+    "استكشف تجارب مجانية في المتصفح للاستجابة والألوان والسمع والتفاصيل المرئية. نتائج خاصة مرتبطة بالجهاز، بلا حساب أو رفع للنتائج."
+  ],
+  ["Browser perception lab", "مختبر الإدراك في المتصفح"],
+  ["Explore how you", "اكتشف كيف"],
+  ["see, hear and react.", "ترى وتسمع وتستجيب."],
+  [
+    "Try five free experiments in colour, hearing, visual detail and reaction time. Your device and setup shape every result.",
+    "جرّب خمس تجارب مجانية في الألوان والسمع والتفاصيل المرئية وزمن الاستجابة. يؤثر الجهاز والإعداد في كل نتيجة."
+  ],
+  ["Colour discrimination experiment — Tetracromia | Sense6", "تجربة تمييز الألوان — Tetracromia | Sense6"],
+  ["Colour vision experiment — Daltonia | Sense6", "تجربة رؤية الألوان — Daltonia | Sense6"],
+  [
+    "Reaction time test — simple & choice tasks | Sense6",
+    "اختبار زمن الاستجابة — استجابة بسيطة واختيار | Sense6"
+  ],
+  ["Hearing range & pitch experiment — Udito | Sense6", "تجربة النطاق المسموع وطبقة الصوت — Udito | Sense6"],
+  [
+    "Visual sharpness & contrast experiment — Acutezza | Sense6",
+    "تجربة وضوح التفاصيل المرئية والتباين — Acutezza | Sense6"
+  ],
+  ["Spot the gap", "اعثر على الفتحة"],
+  ["Colour differences", "فروق الألوان"],
+  ["Changing difficulty", "صعوبة متغيّرة"],
+  ["Comfortable-volume setup", "ضبط مستوى صوت مريح"],
+  ["Hearing range", "النطاق المسموع"],
+  [
+    "Match colour tiles, spot differences in noisy dots and arrange hues. Explore three observations on your screen, with no overall score.",
+    "طابق المربعات الملونة، ولاحظ الفروق في حقول النقاط ورتّب درجات اللون. استكشف ثلاث ملاحظات على شاشتك، دون درجة إجمالية."
+  ],
+  [
+    "Find the gap as colour differences get smaller. Explore three colour directions on your screen, without a colour-vision diagnosis.",
+    "اعثر على الفتحة كلما صغرت فروق الألوان. استكشف ثلاثة اتجاهات لونية على شاشتك، دون تشخيص لرؤية الألوان."
+  ],
+  [
+    "React to a signal, make a choice and follow your responses over time. See separate results for each task on this setup.",
+    "استجب لإشارة، واتخذ خيارًا وتابع استجاباتك مع مرور الوقت. اقرأ نتائج منفصلة لكل مهمة بهذا الإعداد."
+  ],
+  [
+    "Explore which tones you hear and how small a pitch change you notice. Keep a comfortable volume and read each result separately.",
+    "استكشف النغمات التي تسمعها ومدى صغر التغيّر في طبقة الصوت الذي تلاحظه. حافظ على مستوى صوت مريح واقرأ كل نتيجة على حدة."
+  ],
+  [
+    "Set the screen scale, find a small gap and try lower contrast. Explore visual detail for each eye on this setup.",
+    "اضبط مقياس الشاشة، واعثر على فتحة صغيرة وجرّب تباينًا أقل. استكشف التفاصيل المرئية لكل عين بهذا الإعداد."
+  ],
   ["How much do you want to run?", "ما مدى عمق الاختبار الذي تريده؟"],
   ["about 2 minutes", "نحو دقيقتين"],
   ["about 4 minutes", "نحو 4 دقائق"],

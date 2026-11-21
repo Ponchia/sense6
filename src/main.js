@@ -9,8 +9,9 @@ import { disposeActiveMounts } from './lib/mount-registry.js';
 import { LOCALES } from './locales.js';
 import { METRIC_EVENTS, METRIC_TESTS, trackMetric } from './metrics.js';
 import { currentLocation, currentRoute, navigate, startRouter } from './router.js';
-import { applyRouteMetadata, createRouteMetadata, LEARN_ROUTES } from './routes.js';
+import { applyRouteMetadata, createRouteMetadata, ENGLISH_ONLY_ROUTES, LEARN_ROUTES } from './routes.js';
 import { renderGallery } from './site.js';
+import { HOME_METADATA } from './site-copy.js';
 import { startWebAnalytics } from './web-analytics.js';
 
 const appElement = document.querySelector('#app');
@@ -29,7 +30,10 @@ await initializeI18n({
     }
     // Keep the guide only when its complete locale has been published.
     const route = currentRoute();
-    navigate(LEARN_ROUTES.includes(route) && !isLearnPublished(nextLocale) ? '' : route, nextLocale);
+    const unavailable =
+      (LEARN_ROUTES.includes(route) && !isLearnPublished(nextLocale)) ||
+      (ENGLISH_ONLY_ROUTES.includes(route) && nextLocale !== 'en');
+    navigate(unavailable ? '' : route, nextLocale);
   },
 });
 
@@ -94,7 +98,11 @@ async function renderRoute({ route, locale }) {
 
     let mountRoute;
     let metadata;
-    if (['journal', 'about', 'privacy'].includes(route) || LEARN_ROUTES.includes(route)) {
+    if (
+      ['journal', 'about', 'privacy'].includes(route) ||
+      LEARN_ROUTES.includes(route) ||
+      ENGLISH_ONLY_ROUTES.includes(route)
+    ) {
       const page = await prepareInformationalRoute(route, locale);
       if (token !== renderToken || !page) return;
       mountRoute = page.mountRoute;
@@ -133,10 +141,8 @@ async function renderRoute({ route, locale }) {
       mountRoute = () => renderGallery({ ...context(), exams: EXAMS, learnInfo });
       metadata = createRouteMetadata({
         locale,
-        title: t('Sense6 — measure what your senses notice'),
-        description: t(
-          'Sense6 offers short, careful browser perception tests with honest, screen-relative results. No account and no answers or results uploaded.',
-        ),
+        title: t(HOME_METADATA.title),
+        description: t(HOME_METADATA.description),
         socialImageAlt: t(
           'Private browser tests for colour, response timing, and hearing. Answers and results stay in your browser.',
         ),
@@ -171,6 +177,28 @@ async function renderRoute({ route, locale }) {
  * lazily, and their markup can be adopted without a flash after hydration.
  */
 async function prepareInformationalRoute(route, locale) {
+  if (ENGLISH_ONLY_ROUTES.includes(route)) {
+    if (locale !== 'en') {
+      navigate('', locale, { replace: true });
+      return null;
+    }
+    const [{ mountTimingExplorer, TIMING_EXPLORER_METADATA }, { timingExplorerPageData }] = await Promise.all(
+      [
+        import('./timing-explorer.js'),
+        import('./timing-explorer-seo.js'),
+        import('./styles/timing-explorer.css'),
+      ],
+    );
+    return {
+      mountRoute: () => mountTimingExplorer({ app, search: window.location.search }),
+      metadata: createRouteMetadata({
+        locale,
+        route,
+        ...TIMING_EXPLORER_METADATA,
+        structuredData: timingExplorerPageData(),
+      }),
+    };
+  }
   if (route === 'journal') {
     const [{ renderJournal }, { journalCopy, prepareJournalCopy }] = await Promise.all([
       import('./journal.js'),

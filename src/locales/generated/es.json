@@ -56,6 +56,63 @@
     "At least one setup check, interruption check, volume check, or adaptive track was limited. The observations remain visible, but comparison should wait for a steadier repeat.",
     "Al menos una comprobación de la configuración, las interrupciones, el volumen o el recorrido adaptativo tuvo limitaciones. Las observaciones siguen visibles, pero conviene repetir la prueba en condiciones más estables antes de compararlas."
   ],
+  [
+    "Sense6 — reaction time & perception experiments",
+    "Sense6 — tiempo de reacción y experimentos de percepción"
+  ],
+  [
+    "Explore free browser experiments in reaction time, colour, hearing and visual detail. Private, device-relative results with no account or result uploads.",
+    "Explora gratis experimentos de reacción, color, audición y detalle visual en el navegador. Resultados privados, relativos al dispositivo, sin cuenta ni envío de resultados."
+  ],
+  ["Browser perception lab", "Laboratorio de percepción en el navegador"],
+  ["Explore how you", "Explora cómo"],
+  ["see, hear and react.", "ves, oyes y reaccionas."],
+  [
+    "Try five free experiments in colour, hearing, visual detail and reaction time. Your device and setup shape every result.",
+    "Prueba cinco experimentos gratuitos de color, audición, detalle visual y tiempo de reacción. El dispositivo y la configuración influyen en cada resultado."
+  ],
+  [
+    "Colour discrimination experiment — Tetracromia | Sense6",
+    "Experimento de discriminación del color — Tetracromia | Sense6"
+  ],
+  ["Colour vision experiment — Daltonia | Sense6", "Experimento de visión del color — Daltonia | Sense6"],
+  [
+    "Reaction time test — simple & choice tasks | Sense6",
+    "Test de tiempo de reacción — respuesta simple y elección | Sense6"
+  ],
+  [
+    "Hearing range & pitch experiment — Udito | Sense6",
+    "Experimento de rango auditivo y tono — Udito | Sense6"
+  ],
+  [
+    "Visual sharpness & contrast experiment — Acutezza | Sense6",
+    "Experimento de nitidez visual y contraste — Acutezza | Sense6"
+  ],
+  ["Spot the gap", "Encuentra la abertura"],
+  ["Colour differences", "Diferencias de color"],
+  ["Changing difficulty", "Dificultad variable"],
+  ["Comfortable-volume setup", "Ajuste de volumen cómodo"],
+  ["Hearing range", "Rango auditivo"],
+  [
+    "Match colour tiles, spot differences in noisy dots and arrange hues. Explore three observations on your screen, with no overall score.",
+    "Empareja fichas de colores, distingue diferencias en campos de puntos y ordena tonos. Explora tres observaciones en tu pantalla, sin una puntuación global."
+  ],
+  [
+    "Find the gap as colour differences get smaller. Explore three colour directions on your screen, without a colour-vision diagnosis.",
+    "Encuentra la abertura mientras las diferencias de color se reducen. Explora tres direcciones cromáticas en tu pantalla, sin un diagnóstico de visión del color."
+  ],
+  [
+    "React to a signal, make a choice and follow your responses over time. See separate results for each task on this setup.",
+    "Reacciona a una señal, toma una decisión y observa tus respuestas a lo largo del tiempo. Consulta resultados separados para cada tarea en esta configuración."
+  ],
+  [
+    "Explore which tones you hear and how small a pitch change you notice. Keep a comfortable volume and read each result separately.",
+    "Explora qué tonos oyes y qué pequeños cambios de tono distingues. Mantén un volumen cómodo y lee cada resultado por separado."
+  ],
+  [
+    "Set the screen scale, find a small gap and try lower contrast. Explore visual detail for each eye on this setup.",
+    "Ajusta la escala de la pantalla, encuentra una pequeña abertura y prueba un contraste menor. Explora el detalle visual de cada ojo con esta configuración."
+  ],
   ["How much do you want to run?", "¿Qué profundidad quieres para la prueba?"],
   ["about 2 minutes", "unos 2 minutos"],
   ["about 4 minutes", "unos 4 minutos"],

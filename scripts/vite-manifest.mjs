@@ -62,6 +62,7 @@ export async function activeRouteModuleFiles(locale, route, dist = new URL('../d
     roots.push('src/learn-seo.js');
     if (locale !== 'en') roots.push(`src/learn-locales/${locale}.json`);
   }
+  if (route === 'browser-timing-explorer') roots.push('src/timing-explorer-seo.js');
   if (SUPPLEMENTAL_LOCALES.has(locale) && ['journal', 'privacy'].includes(route)) {
     roots.push(`src/locales/supplemental/${locale}.js`);
   }
@@ -91,6 +92,7 @@ export async function measureActiveRouteGraph(locale, route, dist = new URL('../
 
 /** @param {string} route */
 function routeModuleEntry(route) {
+  if (route === 'browser-timing-explorer') return 'src/timing-explorer.js';
   if (route === 'about') return 'src/about.js';
   if (route === 'journal') return 'src/journal.js';
   if (route === 'privacy') return 'src/privacy.js';

@@ -44,7 +44,7 @@ export function learnPageData(route, locale = 'en') {
             inLanguage: localeMetadata(locale).languageTag,
             // Translation first-publication dates differ from their English source.
             datePublished: locale === 'en' ? page.publishedDate : learnPublicationDate(locale),
-            dateModified: page.dateModified,
+            dateModified: learnMetadata(route, locale).dateModified,
             author: learnCreatorData(),
             publisher: { '@type': 'Organization', name: 'Sense6', url: ORIGIN },
             mainEntityOfPage: { '@type': 'WebPage', '@id': `${url}#page`, url },

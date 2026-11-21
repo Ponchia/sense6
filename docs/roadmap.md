@@ -1,19 +1,20 @@
 # Sense6 roadmap
 <!-- vale Vale.Spelling = NO -->
 
-Status: current, 2026-10-13
+Status: current, 2026-11-21
 
 Lifecycle: current
 
 This document records the current product and engineering priorities for
 Sense6. It does not promise release dates.
 
-## Current focus — evidence before expanding (October 2026)
+## Current focus — useful organic discovery (November 2026)
 
 The weekend of 9–11 October added five sourced Sense6 Learn guides, complete
 editions in all 12 site languages (72 Learn URLs), contextual experiment and
 journal links, earlier mobile first actions, stronger result interpretation,
-and release-audit improvements. The site now emits 157 canonical URLs. This
+and release-audit improvements. The site now emits 158 canonical URLs, including
+the English Browser Timing Explorer and its printable activity. This
 provides a discovery and usability *foundation*, not evidence that the pages
 are indexed or that first-time visitors complete and understand the tasks.
 
@@ -22,17 +23,23 @@ The next development slice is deliberately bounded:
 1. **Release reliability:** keep accessibility announcements localized,
    browser-image pins compatible with the lockfile, and production browser,
    visual, Lighthouse and artifact-integrity gates passing.
-2. **Independent comprehension checks:** run the 5–8-person opt-in usability
-   review defined in [product readiness](product-readiness.md), and fix
-   observed P0/P1 findings rather than speculating about engagement.
+2. **Useful organic entry points:** maintain clear query-aligned titles and
+   short experiment entry paths. Improve the timing explorer and printable
+   activity from evidence as visitors arrive organically; do not duplicate the
+   resource into thin pages or require outreach before useful work can ship.
 3. **Language quality:** seek human editorial review of the already published
    AI-assisted Learn editions, beginning with the locales readers actually use.
 4. **Search evidence:** read Google Search Console and Bing Webmaster Tools
-   rather than inferring indexing from a 157-URL sitemap. Reassess after
-   enough time to observe the recently published translations.
+   rather than inferring indexing from the sitemap. Compare complete windows,
+   separate branded from nonbranded queries when available, and retain the
+   actual observation cutoff. Missing collector data is not zero traffic.
 5. **Experiment evidence:** preserve recreational, device-relative claims;
    use observer simulations and consented repeatability work before changing
    frozen methods or adding new constructs.
+6. **Independent comprehension checks:** use the opt-in review in
+   [product readiness](product-readiness.md) when participants are available.
+   Organic feedback and reproducible bug reports can guide improvements in the
+   meantime. Automated checks do not become observations of real people.
 
 Do not create accounts, upload raw results, or expand anonymous telemetry to
 build a product funnel. Current daily counters cannot identify distinct
