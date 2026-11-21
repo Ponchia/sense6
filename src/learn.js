@@ -89,7 +89,7 @@ function overviewMarkup(content, ui, locale) {
       <header class="learn-hero">
         <h1>${esc(page.title)}</h1>
         <p class="learn-hero__lede">${esc(page.intro)}</p>
-        <p class="learn-hero__date">${esc(ui['By'])} <a href="${CREATOR_PROFILE_URL}" rel="me noreferrer">Zeno</a> · ${esc(ui['Reviewed'])} ${esc(locale === 'en' ? '21 November 2026' : page.updated)}</p>
+        <p class="learn-hero__date">${esc(ui['By'])} <a href="${CREATOR_PROFILE_URL}" rel="me noreferrer">Zeno</a> · ${esc(ui['Reviewed'])} ${esc(page.updated)}</p>
       </header>
       <section aria-labelledby="learn-topics" class="learn-topics">
         <div class="learn-section-heading"><h2 id="learn-topics">${esc(ui['Research guides'])}</h2></div>
